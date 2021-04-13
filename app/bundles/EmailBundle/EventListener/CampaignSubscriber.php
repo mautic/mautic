@@ -132,7 +132,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'description'          => 'mautic.email.campaign.event.send_descr',
                 'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
                 'formType'             => EmailSendType::class,
-                'formTypeOptions'      => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
+                'formTypeOptions'      => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true, 'send_to_dnc' => true],
                 'formTheme'            => 'MauticEmailBundle:FormTheme\EmailSendList',
                 'channel'              => 'email',
                 'channelIdField'       => 'email',
@@ -268,8 +268,9 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         $event->setChannel('email', $emailId);
 
-        $type    = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
-        $options = [
+        $type      = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
+        $sendToDnc = (isset($config['send_to_dnc'])) ? $config['send_to_dnc'] : false;
+        $options   = [
             'source'         => ['campaign.event', $event->getEvent()->getId()],
             'email_attempts' => (isset($config['attempts'])) ? $config['attempts'] : 3,
             'email_priority' => (isset($config['priority'])) ? $config['priority'] : 2,
@@ -279,6 +280,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'customHeaders'  => [
                 'X-EMAIL-ID' => $emailId,
             ],
+            'ignoreDNC'      => !empty($sendToDnc),
         ];
 
         // Determine if this email is transactional/marketing

@@ -77,6 +77,26 @@ class EmailSendType extends AbstractType
             );
         }
 
+        if (!empty($options['send_to_dnc'])) {
+            $builder->add(
+                'send_to_dnc',
+                ButtonGroupType::class,
+                [
+                    'choices'           => [
+                        'mautic.email.send.sendtodnc.yes' => true,
+                        'mautic.email.send.sendtodnc.no'  => false,
+                    ],
+                    'label'      => 'mautic.email.send.sendtodnc',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'   => 'form-control email-type',
+                        'tooltip' => 'mautic.email.send.sendtodnc.tooltip',
+                    ],
+                    'data' => (!isset($options['data']['send_to_dnc'])) ? false : $options['data']['send_to_dnc'],
+                ]
+            );
+        }
+
         if (!empty($options['update_select'])) {
             $windowUrl = $this->router->generate(
                 'mautic_email_action',
@@ -190,10 +210,11 @@ class EmailSendType extends AbstractType
         $resolver->setDefaults(
             [
                 'with_email_types' => false,
+                'send_to_dnc'      => false,
             ]
         );
 
-        $resolver->setDefined(['update_select', 'with_email_types']);
+        $resolver->setDefined(['update_select', 'with_email_types', 'send_to_dnc']);
     }
 
     /**
