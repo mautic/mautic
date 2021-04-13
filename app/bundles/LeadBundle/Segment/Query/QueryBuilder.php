@@ -1194,6 +1194,10 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
                 $tableReference = $from['alias'];
             }
 
+            if (isset($from['hint'])) {
+                $tableSql .= ' '.$from['hint'];
+            }
+
             $knownAliases[$tableReference] = true;
 
             $fromClauses[$tableReference] = $tableSql.$this->getSQLForJoins($tableReference, $knownAliases);
