@@ -9,6 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUseValidator;
+
 return [
     'routes' => [
         'main' => [
@@ -804,6 +806,18 @@ return [
                 'arguments' => ['mautic.lead.repository.lead_list', 'mautic.helper.user'],
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'uniqueleadlist',
+            ],
+            'mautic.lead_list.constraint.in_use' => [
+                'class'     => SegmentInUseValidator::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead_list',
+                ],
+                'tag'       => 'validator.constraint_validator',
+                'alias'     => 'segment_in_use',
+            ],
+            'mautic.lead.validator.custom_field' => [
+                'class'     => \Mautic\LeadBundle\Validator\CustomFieldValidator::class,
+                'arguments' => ['mautic.lead.model.field', 'translator'],
             ],
             'mautic.lead.event.dispatcher' => [
                 'class'     => \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::class,

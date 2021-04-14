@@ -543,4 +543,166 @@ class LeadListRepository extends CommonRepository
     {
         return 'l';
     }
+
+    /**
+     * @throws DBALException,
+     */
+    public function isContactInAnySegment(int $contactId): bool
+    {
+        $tableName = MAUTIC_TABLE_PREFIX.'lead_lists_leads';
+
+        $sql = <<<SQL
+            SELECT leadlist_id 
+            FROM $tableName
+            WHERE lead_id = ?
+                AND manually_removed = 0
+            LIMIT 1
+SQL;
+
+        $segmentIds = $this->getEntityManager()->getConnection()
+            ->executeQuery(
+                $sql,
+                [$contactId],
+                [PDO::PARAM_INT]
+            )
+            ->fetch(FetchMode::COLUMN);
+
+        return !empty($segmentIds);
+    }
+
+    /**
+     * @throws DBALException,
+     */
+    public function isNotContactInAnySegment(int $contactId): bool
+    {
+        return !$this->isContactInAnySegment($contactId);
+    }
+
+    /**
+     * @throws DBALException,
+     */
+    public function isContactInSegments(int $contactId, array $expectedSegmentIds): bool
+    {
+        $segmentIds = $this->fetchContactToSegmentIdsRelationships($contactId, $expectedSegmentIds);
+
+        if (empty($segmentIds)) {
+            return false; // Contact is not associated wit any segment
+        }
+
+        foreach ($expectedSegmentIds as $expectedSegmentId) {
+            if (in_array($expectedSegmentId, $segmentIds)) {
+                continue;
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @throws DBALException,
+     */
+    public function isNotContactInSegments(int $contactId, array $expectedSegmentIds): bool
+    {
+        $segmentIds = $this->fetchContactToSegmentIdsRelationships($contactId, $expectedSegmentIds);
+
+        if (empty($segmentIds)) {
+            return true; // Contact is not associated wit any segment
+        }
+
+        foreach ($expectedSegmentIds as $expectedSegmentId) {
+            if (in_array($expectedSegmentId, $segmentIds)) { // No exact type comparison used!
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return string[] Segment IDs as string in array
+     *
+     * @throws DBALException
+     */
+    private function fetchContactToSegmentIdsRelationships(int $contactId, array $expectedSegmentIds): array
+    {
+        $tableName = MAUTIC_TABLE_PREFIX.'lead_lists_leads';
+
+        $sql = <<<SQL
+            SELECT leadlist_id 
+            FROM $tableName
+            WHERE lead_id = ?
+                AND leadlist_id IN (?)
+                AND manually_removed = 0
+SQL;
+
+        return $this->getEntityManager()->getConnection()
+            ->executeQuery(
+                $sql,
+                [$contactId, $expectedSegmentIds],
+                [
+                    PDO::PARAM_INT,
+                    Connection::PARAM_INT_ARRAY,
+                ]
+            )
+            ->fetchAll(FetchMode::COLUMN);
+    }
+
+    /**
+     * @throws DBALException
+     */
+    public function leadListExists(int $id): bool
+    {
+        $tableName = MAUTIC_TABLE_PREFIX.'lead_lists';
+        $result    = (int) $this->getEntityManager()->getConnection()
+            ->executeQuery("SELECT EXISTS(SELECT 1 FROM {$tableName} WHERE id = {$id})")
+            ->fetchColumn();
+
+        return 1 === $result;
+    }
+
+    public function getExistingLeadListIds(array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('l');
+        $qb->select('l.id')
+            ->where(
+                $qb->expr()->in('l.id', ':ids')
+            )
+            ->setParameter('ids', $ids, Connection::PARAM_INT_ARRAY);
+        $result = $qb->getQuery()->getArrayResult();
+
+        return array_column($result, 'id');
+    }
+
+    public function getSegmentsByFilter(string $filterKey, string $filterValue): array
+    {
+        $filteredSegment = [];
+        $like            = '%;s:5:"field";s:'.mb_strlen($filterKey).":\"$filterKey\";%";
+        $q               = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('l.id, l.name, l.filters')
+            ->from(MAUTIC_TABLE_PREFIX.LeadList::TABLE_NAME, 'l')
+            ->where(
+                $q->expr()->like('l.filters', $q->expr()->literal($like))
+            );
+        $leadList = $q->execute()->fetchAll();
+        foreach ($leadList as $segment) {
+            $filters = unserialize($segment['filters']);
+            foreach ($filters as $filter) {
+                if (isset($filter['properties']['filter']) &&
+                    $filter['field'] === $filterKey &&
+                    in_array($filterValue, $filter['properties']['filter'])
+                ) {
+                    $filteredSegment[$segment['id']] = $segment['name'];
+                    break;
+                }
+            }
+        }
+
+        return $filteredSegment;
+    }
 }
