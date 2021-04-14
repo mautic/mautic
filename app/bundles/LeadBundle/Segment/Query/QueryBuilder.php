@@ -151,7 +151,9 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
 
             $knownAliases[$tableReference] = true;
 
-            $fromClauses[$tableReference] = $tableSql.$this->parentMethod('getSQLForJoins', $tableReference, $knownAliases);
+            $fromClauses[$tableReference] = $tableSql.Closure::bind(function ($tableReference, &$knownAliases) {
+                return $this->{'getSQLForJoins'}($tableReference, $knownAliases);
+            }, $this, parent::class)($tableReference, $knownAliases);
         }
 
         $this->parentMethod('verifyAllAliasesAreKnown', $knownAliases);
