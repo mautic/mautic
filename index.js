@@ -53,7 +53,7 @@ export default (editor, opts = {}) => {
       // https://github.com/artf/grapesjs/blob/dev/src/asset_manager/view/AssetImageView.js
       onRemove(e) {
         e.stopImmediatePropagation();
-        const model = this.model;
+        const { model } = this;
 
         if (confirm(config.deleteAssetConfirmText)) {
           model.collection.remove(model);
@@ -64,13 +64,13 @@ export default (editor, opts = {}) => {
 
   if (config.replaceRteWithFroala && typeof $.FroalaEditor !== 'undefined') {
     // Hiding other toolbars already created
-    let rteToolbar = editor.RichTextEditor.getToolbarEl();
+    const rteToolbar = editor.RichTextEditor.getToolbarEl();
     [].forEach.call(rteToolbar.children, (child) => {
       child.style.display = 'none';
     });
 
     editor.setCustomRte({
-      enable: function (el, rte) {
+      enable(el, rte) {
         rte = $(el).froalaEditor({
           enter: $.FroalaEditor.ENTER_BR,
           pastePlain: true,
@@ -329,16 +329,16 @@ export default (editor, opts = {}) => {
           linkEditButtons: ['linkOpen', 'linkRemove'],
         });
 
-        $(el).on('froalaEditor.popups.show.link.edit', function (e, editor) {
+        $(el).on('froalaEditor.popups.show.link.edit', (e, editor) => {
           // Get the link DOM object of the current selection.
-          let currentLink = $(el).froalaEditor('link.get');
+          const currentLink = $(el).froalaEditor('link.get');
 
           // Get popup link.edit
-          let popupLink = $(el).froalaEditor('popups.get', 'link.edit');
+          const popupLink = $(el).froalaEditor('popups.get', 'link.edit');
 
           if (typeof currentLink !== 'undefined') {
-            let top = currentLink.getBoundingClientRect().top;
-            let height = $(currentLink).outerHeight();
+            const { top } = currentLink.getBoundingClientRect();
+            const height = $(currentLink).outerHeight();
 
             // Set position of link popup
             popupLink.css('top', parseInt(top) + parseInt(height) + 35);
@@ -347,7 +347,7 @@ export default (editor, opts = {}) => {
 
         return rte;
       },
-      disable: function (el, rte) {
+      disable(el, rte) {
         // Remove events and destroy rte
         $(el).off('froalaEditor.popups.show.link.edit');
         $(el).froalaEditor('destroy');
