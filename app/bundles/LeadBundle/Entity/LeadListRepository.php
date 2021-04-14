@@ -662,23 +662,6 @@ SQL;
         return 1 === $result;
     }
 
-    public function getExistingLeadListIds(array $ids): array
-    {
-        if (empty($ids)) {
-            return [];
-        }
-
-        $qb = $this->createQueryBuilder('l');
-        $qb->select('l.id')
-            ->where(
-                $qb->expr()->in('l.id', ':ids')
-            )
-            ->setParameter('ids', $ids, Connection::PARAM_INT_ARRAY);
-        $result = $qb->getQuery()->getArrayResult();
-
-        return array_column($result, 'id');
-    }
-
     public function getSegmentsByFilter(string $filterKey, string $filterValue): array
     {
         $filteredSegment = [];
