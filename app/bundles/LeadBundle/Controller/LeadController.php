@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\CoreBundle\Service\ExportLogger;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
@@ -294,6 +295,7 @@ class LeadController extends FormController
                 'lead:leads:editother',
                 'lead:leads:deleteown',
                 'lead:leads:deleteother',
+                'lead:exports:create',
             ],
             'RETURN_ARRAY'
         );
@@ -656,8 +658,8 @@ class LeadController extends FormController
                         $objectId,
                         $this->get('mautic.helper.user')->getUser()->getName()
                     ));
-                    $model->modifyCompanies($lead, $companies);
                     $model->saveEntity($lead, $form->get('buttons')->get('save')->isClicked());
+                    $model->modifyCompanies($lead, $companies);
 
                     // Upload avatar if applicable
                     $image = $form['preferred_profile_image']->getData();
@@ -1925,13 +1927,17 @@ class LeadController extends FormController
                 'lead:leads:editother',
                 'lead:leads:deleteown',
                 'lead:leads:deleteother',
+                'lead:exports:notanonymize',
+                'lead:exports:create',
             ],
             'RETURN_ARRAY'
         );
 
-        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother'] || !$permissions['lead:exports:create']) {
             return $this->accessDenied();
         }
+
+        $notAnonymize = $permissions['lead:exports:notanonymize'] ? true : false;
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model      = $this->getModel('lead');
@@ -1975,14 +1981,26 @@ class LeadController extends FormController
             'orderByDir'     => $orderByDir,
             'withTotalCount' => true,
         ];
-
-        $resultsCallback = function ($contact) {
-            return $contact->getProfileFields();
-        };
+        if (!$notAnonymize) {
+            $resultsCallback = function ($contact) {
+                return $contact->getAnonimizationProfileFields();
+            };
+        } else {
+            $resultsCallback = function ($contact) {
+                return $contact->getProfileFields();
+            };
+        }
 
         $iterator = new IteratorExportDataModel($model, $args, $resultsCallback);
 
-        return $this->exportResultsAs($iterator, $dataType, 'contacts');
+        $response              = $this->exportResultsAs($iterator, $dataType, 'contacts');
+        $args['total']         = $iterator->total;
+        $args['dataType']      = $dataType;
+        $args['anonimization'] = !$notAnonymize;
+        $logger                = new ExportLogger($this->coreParametersHelper);
+        $logger->loggerInfo($this->getUser(), ExportLogger::LEAD_EXPORT, $args);
+
+        return $response;
     }
 
     /**
@@ -1997,13 +2015,16 @@ class LeadController extends FormController
             [
                 'lead:leads:viewown',
                 'lead:leads:viewother',
+                'lead:exports:create',
             ],
             'RETURN_ARRAY'
         );
 
-        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother'] || !$permissions['lead:exports:create']) {
             return $this->accessDenied();
         }
+
+        $notAnonymize = $permissions['lead:exports:notanonymize'] ? true : false;
 
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead.lead');
@@ -2014,7 +2035,14 @@ class LeadController extends FormController
             return $this->notFound();
         }
 
-        $contactFields = $lead->getProfileFields();
+        $contactFields = $notAnonymize ? $lead->getProfileFields() : $lead->getAnonimizationProfileFields();
+        $args[]        = [
+            'lead'          => $contactId,
+            'anonimization' => $notAnonymize ? false : true,
+            'dataType'      => $dataType,
+        ];
+        $logger = new ExportLogger($this->coreParametersHelper);
+        $logger->loggerInfo($this->getUser(), ExportLogger::LEAD_EXPORT, $args);
         $export        = [];
         foreach ($contactFields as $alias => $contactField) {
             $export[] = [
