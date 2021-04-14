@@ -384,6 +384,7 @@ return [
                     'mautic.lead.model.company',
                     'mautic.campaign.model.campaign',
                     'mautic.helper.core_parameters',
+                    'mautic.lead.model.dnc',
                 ],
             ],
             'mautic.lead.campaignbundle.action_delete_contacts.subscriber' => [
