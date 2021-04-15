@@ -1156,7 +1156,7 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
                 $msg = $this->translator->trans('mautic.core.error.badrequest', [], 'flashes');
             }
 
-            return $this->returnError($msg, Response::HTTP_BAD_REQUEST, $formErrors);
+            return $this->returnError($msg, Response::HTTP_UNPROCESSABLE_ENTITY, $formErrors);
         }
 
         return $this->handleView($view);

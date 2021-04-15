@@ -40,7 +40,7 @@ class SegmentInUseValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, SegmentInUse::class);
         }
 
-        if ($leadList->getIsPublished()) {
+        if (!$leadList->getId() || $leadList->getIsPublished()) {
             return;
         }
 
@@ -48,7 +48,6 @@ class SegmentInUseValidator extends ConstraintValidator
 
         if (count($lists)) {
             $this->context->buildViolation($constraint->message)
-                ->setParameter('%segments%', implode(', ', $lists))
                 ->addViolation();
         }
     }
