@@ -65,7 +65,7 @@ Installing Mautic is a simple three-step process:
 If you get stuck, check our our [general troubleshooting](https://docs.mautic.org/en/troubleshooting) page. Still no joy? Join the [Mautic community](https://www.mautic.org/community) for support and answers.
 
 ### User Documentation
-Documentation on how to use Mautic is available at [docs.mautic.org](https://docs.mautic.org).
+Documentation on how to use Mautic is available at [docs.mautic.org][mautic-docs].
 
 ### Developer Docs
 Developer documentation, including API reference docs, is available at [developer.mautic.org] (https://developer.mautic.org/).
