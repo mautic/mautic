@@ -45,7 +45,7 @@ Installing and using Mautic
 `*`Security support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL, such as Symfony 2.8.
 
 ## Software Downloads
-The GitHub version is recommended for both development and testing. The production package (including all libraries) is available at [mautic.org/download](https://www.mautic.org/download).
+The GitHub version is recommended for both development and testing. The production package (including all libraries) is available at [mautic.org/download][download-mautic].
 
 ## Installation
 ### Disclaimer
