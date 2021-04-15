@@ -162,6 +162,8 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
+     * @deprecated this method is not used anywhere and will be removed in the future
+     *
      * @param $alias
      *
      * @return bool
@@ -211,6 +213,8 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
+     * @deprecated this method is not used anywhere and will be removed in the future
+     *
      * @param $alias
      * @param $expr
      *
