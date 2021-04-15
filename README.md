@@ -68,7 +68,7 @@ If you get stuck, check our our [general troubleshooting](https://docs.mautic.or
 Documentation on how to use Mautic is available at [docs.mautic.org][mautic-docs].
 
 ### Developer Docs
-Developer documentation, including API reference docs, is available at [developer.mautic.org] (https://developer.mautic.org/).
+Developer documentation, including API reference docs, is available at [developer.mautic.org][dev-docs].
 
 
 ## Contributors ✨
