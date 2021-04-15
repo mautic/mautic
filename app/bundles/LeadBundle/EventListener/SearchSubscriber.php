@@ -24,9 +24,9 @@ use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\Entity\SmsRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use Mautic\SmsBundle\Entity\SmsRepository;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
@@ -464,13 +464,13 @@ class SearchSubscriber implements EventSubscriberInterface
 
     public function buildSmsPendingQuery(LeadBuildSearchEvent $event)
     {
-        $q = $event->getQueryBuilder();
-        $smsId = (int)$event->getString();
+        $q     = $event->getQueryBuilder();
+        $smsId = (int) $event->getString();
         /** @var Sms $sms */
         $sms = $this->smsRepository->getEntity($smsId);
         if (null !== $sms) {
-            $variantIds = [];//$sms->getRelatedEntityIds();
-            $nq = $this->smsRepository->getSmsPendingQuery($smsId, $variantIds);
+            $variantIds = []; //$sms->getRelatedEntityIds();
+            $nq         = $this->smsRepository->getSmsPendingQuery($smsId, $variantIds);
             if (!$nq instanceof QueryBuilder) {
                 return;
             }
@@ -478,7 +478,7 @@ class SearchSubscriber implements EventSubscriberInterface
             $nq->select('l.id'); // select only id
             $nsql = $nq->getSQL();
             foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
-                $nsql = preg_replace('/:' . $pk . '/', is_bool($pv) ? (int)$pv : $pv, $nsql);
+                $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
             }
             $query = $q->expr()->in('l.id', sprintf('(%s)', $nsql));
             $event->setSubQuery($query);
@@ -489,9 +489,9 @@ class SearchSubscriber implements EventSubscriberInterface
         $tables = [
             [
                 'from_alias' => 'l',
-                'table' => 'message_queue',
-                'alias' => 'mq',
-                'condition' => 'l.id = mq.lead_id',
+                'table'      => 'message_queue',
+                'alias'      => 'mq',
+                'condition'  => 'l.id = mq.lead_id',
             ],
         ];
 
@@ -499,7 +499,7 @@ class SearchSubscriber implements EventSubscriberInterface
             'column' => 'mq.channel_id',
             'params' => [
                 'mq.channel' => 'sms',
-                'mq.status' => MessageQueue::STATUS_PENDING,
+                'mq.status'  => MessageQueue::STATUS_PENDING,
             ],
         ];
 

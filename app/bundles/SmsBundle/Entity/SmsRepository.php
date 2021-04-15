@@ -110,14 +110,13 @@ class SmsRepository extends CommonRepository
 
     /**
      * Get amounts of pending text messages.
-     *
      */
     public function getSmsPendingQuery($emailId, array $variantIds)
     {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $dncQb->select('null')
-            ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->where(
                 $dncQb->expr()->andX(
                     $dncQb->expr()->eq('dnc.lead_id', 'l.id'),
@@ -128,7 +127,7 @@ class SmsRepository extends CommonRepository
         // Do not include contacts where the message is pending in the message queue
         $mqQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $mqQb->select('null')
-            ->from(MAUTIC_TABLE_PREFIX . 'message_queue', 'mq')
+            ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')
             ->where(
                 $mqQb->expr()->andX(
                     $mqQb->expr()->eq('mq.lead_id', 'l.id'),
@@ -139,8 +138,8 @@ class SmsRepository extends CommonRepository
 
         $lists = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('el.leadlist_id')
-            ->from(MAUTIC_TABLE_PREFIX . 'sms_message_list_xref', 'el')
-            ->where('el.sms_id = ' . (int)$emailId)
+            ->from(MAUTIC_TABLE_PREFIX.'sms_message_list_xref', 'el')
+            ->where('el.sms_id = '.(int) $emailId)
             ->execute()
             ->fetchAll();
 
@@ -149,11 +148,10 @@ class SmsRepository extends CommonRepository
             $listIds[] = $list['leadlist_id'];
         }
 
-
         // Only include those in associated segments
         $segmentQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $segmentQb->select('null')
-            ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
                 $segmentQb->expr()->andX(
                     $segmentQb->expr()->eq('ll.lead_id', 'l.id'),
@@ -162,33 +160,28 @@ class SmsRepository extends CommonRepository
                 )
             );
 
-
         // Do not include leads that have already been sent the text message
         $statQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $statQb->select('null')
-            ->from(MAUTIC_TABLE_PREFIX . 'sms_message_stats', 'stat')
+            ->from(MAUTIC_TABLE_PREFIX.'sms_message_stats', 'stat')
             ->where(
                 $statQb->expr()->eq('stat.lead_id', 'l.id')
             );
 
-
-        $statQb->andWhere($statQb->expr()->eq('stat.sms_id', (int)$emailId));
-        $mqQb->andWhere($mqQb->expr()->eq('mq.channel_id', (int)$emailId));
-
+        $statQb->andWhere($statQb->expr()->eq('stat.sms_id', (int) $emailId));
+        $mqQb->andWhere($mqQb->expr()->eq('mq.channel_id', (int) $emailId));
 
         // Main query
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('l.*');
 
-
-        $q->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+        $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->andWhere(sprintf('EXISTS (%s)', $segmentQb->getSQL()))
             ->andWhere(sprintf('NOT EXISTS (%s)', $dncQb->getSQL()))
             ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
             ->andWhere(sprintf('NOT EXISTS (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
-
 
         // Has an email
         $q->andWhere(
@@ -197,7 +190,6 @@ class SmsRepository extends CommonRepository
                 $q->expr()->neq('l.mobile', $q->expr()->literal(''))
             )
         );
-
 
         return $q;
     }
