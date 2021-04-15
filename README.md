@@ -21,7 +21,7 @@ Open source means more than open code. Open source provides equality for all and
 
 Get Involved
 =============
-Before we tell you how to install and use Mautic, we like to shamelessly plug our awesome user and developer communities! Users, start [here](https://www.mautic.org/community/get-involved) for inspiration, or follow us on Twitter [@MauticCommunity](https://twitter.com/MauticCommunity) or Facebook [@MauticCommunity](https://www.facebook.com/MauticCommunity/). And once you’re familiar with using the software, maybe you will share your wisdom with others in our [Slack](https://www.mautic.org/community/get-involved/communication-channels) channel.
+Before we tell you how to install and use Mautic, we like to shamelessly plug our awesome user and developer communities! Users, start [here][get-involved] for inspiration, or follow us on Twitter [@MauticCommunity][twitter] or Facebook [@MauticCommunity][facebook]. Once you’re familiar with using the software, maybe you will share your wisdom with others in our [Slack][slack] channel.
 
 Calling all devs, testers and tech writers! Technical contributions are also welcome. First, read our [general guidelines](https://contribute.mautic.org/contributing-to-mautic) about contributing. If you want to contribute code, read our [CONTRIBUTING.md](https://github.com/mautic/mautic/blob/feature/.github/CONTRIBUTING.md) or [Contributing Code](https://contribute.mautic.org/contributing-to-mautic/developer) docs then check out the issues with the [L1 label](https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AL1) to get stuck in quickly and show us what you’re made of.
 
