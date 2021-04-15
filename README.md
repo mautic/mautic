@@ -25,7 +25,7 @@ Before we tell you how to install and use Mautic, we like to shamelessly plug ou
 
 Calling all devs, testers and tech writers! Technical contributions are also welcome. First, read our [general guidelines][contributing] about contributing. If you want to contribute code, read our [CONTRIBUTING.md][contributing-md] or [Contributing Code][contribute-developer] docs then check out the issues with the [T1 label][t1-isssues] to get stuck in quickly and show us what you’re made of.
 
-If you have questions, the Mautic community can help provide the answers.
+If you have questions, the Mautic Community can help provide the answers.
 
 Installing and Using Mautic
 ============================
