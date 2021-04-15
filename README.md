@@ -53,7 +53,7 @@ The GitHub version is recommended for both development and testing. The producti
 
 *Also note that source code outside of a [tagged release][tagged-release] should be considered ‘alpha’. It may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*
 
-### How to Install Mautic
+### How to install Mautic
 You must already have [Composer v1](http://getcomposer.org/) available on your computer because this is a development release and you'll need Composer to download the vendor packages. Note that Composer v2 is not yet supported.
 
 Installing Mautic is a simple three-step process:
