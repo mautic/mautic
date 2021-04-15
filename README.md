@@ -58,7 +58,7 @@ You must already have [Composer v1](http://getcomposer.org/) available on your c
 
 Installing Mautic is a simple three-step process:
 
-1. [Download the repository zip](https://github.com/mautic/mautic/archive/master.zip) then extract the zip to your web root.
+1. [Download the repository zip][download-zip] then extract the zip to your web root.
 2. Run the `composer install` command to install the required packages.
 3. Open your browser and complete the installation through the web installer.
 
