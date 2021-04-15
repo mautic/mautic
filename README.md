@@ -27,7 +27,7 @@ Calling all devs, testers and tech writers! Technical contributions are also wel
 
 If you have questions, the Mautic Community can help provide the answers.
 
-Installing and Using Mautic
+Installing and using Mautic
 ============================
 
 ## Supported Versions
