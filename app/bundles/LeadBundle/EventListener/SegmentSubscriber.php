@@ -78,10 +78,7 @@ class SegmentSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * Add a segment entry to the audit log.
-     */
-    public function onSegmentPreUnpublish(SegmentEvent $event)
+    public function onSegmentPreUnpublish(SegmentEvent $event): ?RecordCanNotUnpublishException
     {
         $leadList = $event->getList();
         $lists    = $this->segmentRepository->getSegmentsByFilter(LeadList::MEMBERSHIP_FILTER_FIELD, $leadList->getId());
@@ -89,6 +86,8 @@ class SegmentSubscriber implements EventSubscriberInterface
         if (count($lists)) {
             throw new RecordCanNotUnpublishException('mautic.lead_list.is_in_use');
         }
+
+        return null;
     }
 
     /**
