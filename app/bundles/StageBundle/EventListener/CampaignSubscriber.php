@@ -43,20 +43,10 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     public function __construct(LeadModel $leadModel, StageModel $stageModel, TranslatorInterface $translator)
     {
-        $this->leadModel                 = $leadModel;
-        $this->stageModel                = $stageModel;
-        $this->translator                = $translator;
+        $this->leadModel  = $leadModel;
+        $this->stageModel = $stageModel;
+        $this->translator = $translator;
     }
-
-    /**
-     * @var Stage
-     */
-    private $stage;
-
-    /**
-     * @var PendingEvent
-     */
-    private $pendingEvent;
 
     /**
      * @return array
