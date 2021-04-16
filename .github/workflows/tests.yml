@@ -4,8 +4,12 @@ on:
   push:
     branches:
       - staging
+      - features
       - '[0-9]+\.[0-9]+'
   pull_request:
+  schedule:
+    # Run every day at 10 AM UTC to discover potential issues with dependencies like PHP updates etc.
+    - cron: '0 10 * * *'
 
 jobs:
   phpunit:
@@ -13,7 +17,7 @@ jobs:
 
     strategy:
         matrix:
-          php-versions: ['7.2', '7.3', '7.4']
+          php-versions: ['7.3', '7.4']
           db-types: ['mysql', 'mariadb']
   
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -39,6 +43,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      # Codecov needs access to previous commits, so we add fetch-depth: 0
+      with:
+        fetch-depth: 0
     
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
@@ -72,6 +79,13 @@ jobs:
       env:
         mysql_port: ${{ job.services.mysql.ports[3306] }}
         mariadb_port: ${{ job.services.mariadb.ports[3306] }}
+
+    - name: Slack Notification if tests fail
+      uses: rtCamp/action-slack-notify@v2
+      if: ${{ failure() && github.event_name == 'schedule' }}
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'
 
   misc:
     runs-on: ubuntu-latest
@@ -112,3 +126,10 @@ jobs:
           echo "Invalid command"
           exit 1
         fi
+
+    - name: Slack Notification if tests fail
+      uses: rtCamp/action-slack-notify@v2
+      if: ${{ failure() && github.event_name == 'schedule' }}
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'
