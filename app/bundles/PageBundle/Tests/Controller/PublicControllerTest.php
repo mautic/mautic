@@ -11,6 +11,7 @@
 
 namespace Mautic\PageBundle\Tests\Controller;
 
+use Exception;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -39,6 +40,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
 
 class PublicControllerTest extends TestCase
@@ -303,36 +305,36 @@ class PublicControllerTest extends TestCase
         return $response->getContent();
     }
 
-    public function testThatInvalidClickTroughGetsProcessed()
+    public function testThatInvalidClickTroughGetsProcessed(): void
     {
         $redirectId  = 'someRedirectId';
         $clickTrough = 'someClickTroughValue';
         $redirectUrl = 'https://someurl.test/';
 
-        $this->redirectModel->expects($this->once())
+        $this->redirectModel->expects(self::once())
             ->method('getRedirectById')
             ->with($redirectId)
             ->willReturn($this->redirect);
 
-        $this->modelFactory->expects($this->exactly(3))
+        $this->modelFactory->expects(self::exactly(3))
             ->method('getModel')
             ->withConsecutive(['page.redirect'], ['lead'], ['page'])
             ->willReturnOnConsecutiveCalls($this->redirectModel, $this->leadModel, $this->pageModel);
 
-        $this->redirect->expects($this->once())
+        $this->redirect->expects(self::once())
             ->method('isPublished')
             ->with(false)
             ->willReturn(true);
 
-        $this->redirect->expects($this->once())
+        $this->redirect->expects(self::once())
             ->method('getUrl')
             ->willReturn($redirectUrl);
 
-        $this->ipLookupHelper->expects($this->once())
+        $this->ipLookupHelper->expects(self::once())
             ->method('getIpAddress')
             ->willReturn($this->ipAddress);
 
-        $this->ipAddress->expects($this->once())
+        $this->ipAddress->expects(self::once())
             ->method('isTrackable')
             ->willReturn(true);
 
@@ -344,11 +346,11 @@ class PublicControllerTest extends TestCase
             throw new InvalidDecodedStringException($clickTrough);
         };
 
-        $this->leadModel->expects($this->exactly(2))
+        $this->leadModel->expects(self::exactly(2))
             ->method('getContactFromRequest')
-            ->will($this->returnCallback($getContactFromRequestCallback));
+            ->willReturnCallback($getContactFromRequestCallback);
 
-        $this->container->expects($this->exactly(6))
+        $this->container->expects(self::exactly(7))
             ->method('get')
             ->withConsecutive(
                 ['monolog.logger.mautic'],
@@ -356,21 +358,107 @@ class PublicControllerTest extends TestCase
                 ['mautic.helper.ip_lookup'],
                 ['mautic.model.factory'],
                 ['mautic.model.factory'],
-                ['mautic.lead.helper.primary_company']
-                )
+                ['mautic.lead.helper.primary_company'],
+                ['router']
+            )
             ->willReturnOnConsecutiveCalls(
                 $this->logger,
                 $this->modelFactory,
                 $this->ipLookupHelper,
                 $this->modelFactory,
                 $this->modelFactory,
-                $this->primaryCompanyHelper
-        );
+                $this->primaryCompanyHelper,
+                $this->createMock(Router::class)
+            );
 
         $this->request->query->set('ct', $clickTrough);
 
         $response = $this->controller->redirectAction($redirectId);
-        $this->assertInstanceOf(RedirectResponse::class, $response);
+        self::assertInstanceOf(RedirectResponse::class, $response);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testAssetRedirectUrlWithClickThrough(): void
+    {
+        $redirectId   = 'dummy_redirect_id';
+        $clickThrough = 'dummy_click_through';
+        $redirectUrl  = 'https://some.test.url/asset/1:examplefilejpg';
+        $targetUrl    = $redirectUrl.'?ct='.$clickThrough;
+
+        $this->redirectModel->expects(self::once())
+            ->method('getRedirectById')
+            ->with($redirectId)
+            ->willReturn($this->redirect);
+
+        $this->modelFactory->expects(self::exactly(3))
+            ->method('getModel')
+            ->withConsecutive(['page.redirect'], ['lead'], ['page'])
+            ->willReturnOnConsecutiveCalls($this->redirectModel, $this->leadModel, $this->pageModel);
+
+        $this->redirect->expects(self::once())
+            ->method('isPublished')
+            ->with(false)
+            ->willReturn(true);
+
+        $this->redirect->expects(self::once())
+            ->method('getUrl')
+            ->willReturn($redirectUrl);
+
+        $this->ipLookupHelper->expects(self::once())
+            ->method('getIpAddress')
+            ->willReturn($this->ipAddress);
+
+        $this->ipAddress->expects(self::once())
+            ->method('isTrackable')
+            ->willReturn(true);
+
+        $getContactFromRequestCallback = function ($queryFields) use ($clickThrough) {
+            if (empty($queryFields)) {
+                return null;
+            }
+
+            throw new InvalidDecodedStringException($clickThrough);
+        };
+
+        $this->leadModel->expects(self::exactly(2))
+            ->method('getContactFromRequest')
+            ->willReturnCallback($getContactFromRequestCallback);
+
+        $routerMock = $this->createMock(Router::class);
+        $routerMock->expects(self::once())
+            ->method('generate')
+            ->with('mautic_asset_download')
+            ->willReturn('/asset');
+
+        $this->container->expects(self::exactly(7))
+            ->method('get')
+            ->withConsecutive(
+                ['monolog.logger.mautic'],
+                ['mautic.model.factory'],
+                ['mautic.helper.ip_lookup'],
+                ['mautic.model.factory'],
+                ['mautic.model.factory'],
+                ['mautic.lead.helper.primary_company'],
+                ['router']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->logger,
+                $this->modelFactory,
+                $this->ipLookupHelper,
+                $this->modelFactory,
+                $this->modelFactory,
+                $this->primaryCompanyHelper,
+                $routerMock
+            );
+
+        $this->request->query->set('ct', $clickThrough);
+
+        $response = $this->controller->redirectAction($redirectId);
+        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertSame($targetUrl, $response->getTargetUrl());
+        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
     }
 
     /**
