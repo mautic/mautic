@@ -163,22 +163,10 @@ trait MatchFilterForLeadTrait
                     $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/', $leadVal);
                     break;
                 case OperatorOptions::IN:
-                    $leadValMatched = false;
-
-                    if (in_array($leadVal, $filterVal)) {
-                        $leadValMatched = true;
-                    }
-
-                    $groups[$groupNum] = $leadValMatched;
+                    $groups[$groupNum] = in_array($leadVal, $filterVal);
                     break;
                 case OperatorOptions::NOT_IN:
-                    $leadValNotMatched = true;
-
-                    if (in_array($leadVal, $filterVal)) {
-                        $leadValNotMatched = false;
-                    }
-
-                    $groups[$groupNum] = $leadValNotMatched;
+                    $groups[$groupNum] = !in_array($leadVal, $filterVal);
                     break;
                 case 'regexp':
                     $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/i', $leadVal);
