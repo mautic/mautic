@@ -306,7 +306,7 @@ class AjaxController extends CommonController
                         $dataArray['statusHtml'] = $html;
                     }
                 } catch (RecordCanNotUnpublishException $e) {
-                    $this->addFlash('mautic.lead_list.is_in_use');
+                    $this->addFlash($e->getMessage());
                     $status = Response::HTTP_UNPROCESSABLE_ENTITY;
                 }
             } else {
