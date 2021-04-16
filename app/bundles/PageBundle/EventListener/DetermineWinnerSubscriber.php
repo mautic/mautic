@@ -111,7 +111,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 $min                   = min($rates);
                 $support['step_width'] = (ceil($min / 10) * 10);
 
-                $winners = ($min > 0) ? array_keys($rates, $min) : [];
+                $winners = ($min >= 0) ? array_keys($rates, $min) : [];
 
                 $event->setAbTestResults([
                     'winners'         => $winners,
