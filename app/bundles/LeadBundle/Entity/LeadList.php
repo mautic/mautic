@@ -25,7 +25,11 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class LeadList extends FormEntity
 {
-    const TABLE_NAME = 'lead_lists';
+    const TABLE_NAME              = 'lead_lists';
+    const MEMBERSHIP_FILTER_FIELD = 'leadlist';
+
+    use UuidTrait;
+
     /**
      * @var int|null
      */
