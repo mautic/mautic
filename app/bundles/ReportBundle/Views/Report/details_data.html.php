@@ -64,9 +64,12 @@ $graphContent = $view->render(
                             <?php foreach ($columnOrder as $key): ?>
                                 <?php
                                 if (isset($columns[$key])):
+                                    // order by alias if exists, if not then by column name
+                                    $orderBy = $columns[$key]['alias'] ??
+                                        (0 === strpos($key, 'channel.') ? str_replace('.', '_', $key) : $key);
                                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                                         'sessionVar' => 'report.'.$report->getId(),
-                                        'orderBy'    => 0 === strpos($key, 'channel.') ? str_replace('.', '_', $key) : $key,
+                                        'orderBy'    => $orderBy,
                                         'text'       => $columns[$key]['label'],
                                         'class'      => 'col-report-'.$columns[$key]['type'],
                                         'dataToggle' => in_array($columns[$key]['type'], ['date', 'datetime']) ? 'date' : '',
