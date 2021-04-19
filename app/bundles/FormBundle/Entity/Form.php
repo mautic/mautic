@@ -792,19 +792,16 @@ class Form extends FormEntity
     }
 
     /**
-     * Set noIndex.
-     *
      * @param bool $noIndex
      */
     public function setNoIndex($noIndex)
     {
-        $this->isChanged('noIndex', (bool) $noIndex);
-        $this->noIndex = (bool) $noIndex;
+        $sanitizedNoIndex = null === $noIndex ? null : (bool) $noIndex;
+        $this->isChanged('noIndex', $sanitizedNoIndex);
+        $this->noIndex = $sanitizedNoIndex;
     }
 
     /**
-     * Get noIndex.
-     *
      * @return bool
      */
     public function getNoIndex()
