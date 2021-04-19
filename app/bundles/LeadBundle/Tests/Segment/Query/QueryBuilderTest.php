@@ -172,6 +172,120 @@ class QueryBuilderTest extends TestCase
         $this->assertSQL('SELECT t.name FROM table1 l LEFT JOIN table2 j ON j.removed = 1');
     }
 
+    public function testSetParametersPairsNonArray(): void
+    {
+        $queryBuilder = $this->queryBuilder->setParametersPairs('one', 'first');
+        Assert::assertSame($queryBuilder, $this->queryBuilder);
+        $this->queryBuilder->setParametersPairs('two', 'second');
+        $this->queryBuilder->setParametersPairs(':three', 'third');
+
+        Assert::assertSame([
+            'one'   => 'first',
+            'two'   => 'second',
+            'three' => 'third',
+        ], $this->queryBuilder->getParameters());
+    }
+
+    public function testSetParametersPairsWithArray(): void
+    {
+        $queryBuilder     = $this->queryBuilder->setParametersPairs(['one', 'three', ':five'], ['first', 'third', 'fifth']);
+        Assert::assertSame($queryBuilder, $this->queryBuilder);
+        Assert::assertSame([
+            'one'   => 'first',
+            'three' => 'third',
+            'five'  => 'fifth',
+        ], $this->queryBuilder->getParameters());
+    }
+
+    public function testGetTableAlias(): void
+    {
+        $this->queryBuilder->select('1')
+            ->from('tableFrom', 'f')
+            ->leftJoin('f', 'leftJoinTable', 'l', 'f.id = l.fid')
+            ->rightJoin('l', 'rightJoinTable', 'r', 'l.id = r.lid')
+            ->innerJoin('f', 'innerJoinTable', 'i', 'f.id = i.fid')
+            ->where('t.enabled = 1')
+            ->groupBy('t.type')
+            ->having('t.salary > 5000')
+            ->orderBy('t.id', 'DESC')
+            ->setFirstResult(30)
+            ->setMaxResults(10);
+
+        Assert::assertFalse($this->queryBuilder->getTableAlias('nonExistent'));
+        Assert::assertFalse($this->queryBuilder->getTableAlias('nonExistent', 'inner'));
+        Assert::assertFalse($this->queryBuilder->getTableAlias('nonExistent', 'left'));
+        Assert::assertFalse($this->queryBuilder->getTableAlias('nonExistent', 'right'));
+
+        Assert::assertSame('f', $this->queryBuilder->getTableAlias('tableFrom'));
+        Assert::assertFalse($this->queryBuilder->getTableAlias('tableFrom', 'inner'));
+        Assert::assertFalse($this->queryBuilder->getTableAlias('tableFrom', 'left'));
+        Assert::assertFalse($this->queryBuilder->getTableAlias('tableFrom', 'right'));
+
+        Assert::assertSame('l', $this->queryBuilder->getTableAlias('leftJoinTable'));
+        Assert::assertFalse($this->queryBuilder->getTableAlias('leftJoinTable', 'inner'));
+        Assert::assertSame('l', $this->queryBuilder->getTableAlias('leftJoinTable', 'left'));
+        Assert::assertFalse($this->queryBuilder->getTableAlias('leftJoinTable', 'right'));
+
+        Assert::assertSame('r', $this->queryBuilder->getTableAlias('rightJoinTable'));
+        Assert::assertFalse($this->queryBuilder->getTableAlias('rightJoinTable', 'inner'));
+        Assert::assertFalse($this->queryBuilder->getTableAlias('rightJoinTable', 'left'));
+        Assert::assertSame('r', $this->queryBuilder->getTableAlias('rightJoinTable', 'right'));
+
+        Assert::assertSame('i', $this->queryBuilder->getTableAlias('innerJoinTable'));
+        Assert::assertSame('i', $this->queryBuilder->getTableAlias('innerJoinTable', 'inner'));
+        Assert::assertFalse($this->queryBuilder->getTableAlias('innerJoinTable', 'left'));
+        Assert::assertFalse($this->queryBuilder->getTableAlias('innerJoinTable', 'right'));
+    }
+
+    public function testGetTableJoins(): void
+    {
+        $this->queryBuilder->select('1')
+            ->from('tableFrom', 'f')
+            ->leftJoin('f', 'leftJoinTable', 'l', 'f.id = l.fid')
+            ->rightJoin('l', 'rightJoinTable', 'r', 'l.id = r.lid')
+            ->innerJoin('f', 'innerJoinTable', 'i', 'f.id = i.fid')
+            ->innerJoin('f', 'innerJoinTable', 'i2', 'f.id = i2.fid')
+            ->where('t.enabled = 1')
+            ->groupBy('t.type')
+            ->having('t.salary > 5000')
+            ->orderBy('t.id', 'DESC')
+            ->setFirstResult(30)
+            ->setMaxResults(10);
+
+        Assert::assertSame([], $this->queryBuilder->getTableJoins('nonExistent'));
+        Assert::assertSame([], $this->queryBuilder->getTableJoins('tableFrom'));
+        Assert::assertSame([
+            [
+                'joinType'      => 'left',
+                'joinTable'     => 'leftJoinTable',
+                'joinAlias'     => 'l',
+                'joinCondition' => 'f.id = l.fid',
+            ],
+        ], $this->queryBuilder->getTableJoins('leftJoinTable'));
+        Assert::assertSame([
+            [
+                'joinType'      => 'right',
+                'joinTable'     => 'rightJoinTable',
+                'joinAlias'     => 'r',
+                'joinCondition' => 'l.id = r.lid',
+            ],
+        ], $this->queryBuilder->getTableJoins('rightJoinTable'));
+        Assert::assertSame([
+            [
+                'joinType'      => 'inner',
+                'joinTable'     => 'innerJoinTable',
+                'joinAlias'     => 'i',
+                'joinCondition' => 'f.id = i.fid',
+            ],
+            [
+                'joinType'      => 'inner',
+                'joinTable'     => 'innerJoinTable',
+                'joinAlias'     => 'i2',
+                'joinCondition' => 'f.id = i2.fid',
+            ],
+        ], $this->queryBuilder->getTableJoins('innerJoinTable'));
+    }
+
     private function assertSQL(string $sql, int $repeat = 1): void
     {
         for ($i = 0; $i < $repeat; ++$i) {
