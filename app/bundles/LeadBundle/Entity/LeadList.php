@@ -14,26 +14,34 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class LeadList.
- */
 class LeadList extends FormEntity
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $name;
+
+    /**
+     * @var string|null
+     */
+    private $publicName;
+
+    /**
+     * @var Category
+     **/
+    private $category;
 
     /**
      * @var string
@@ -41,7 +49,7 @@ class LeadList extends FormEntity
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $alias;
 
@@ -65,9 +73,6 @@ class LeadList extends FormEntity
      */
     private $leads;
 
-    /**
-     * Construct.
-     */
     public function __construct()
     {
         $this->leads = new ArrayCollection();
@@ -83,6 +88,12 @@ class LeadList extends FormEntity
         $builder->addIdColumns();
 
         $builder->addField('alias', 'string');
+
+        $builder->createField('publicName', 'string')
+            ->columnName('public_name')
+            ->build();
+
+        $builder->addCategory();
 
         $builder->addField('filters', 'array');
 
@@ -115,8 +126,6 @@ class LeadList extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -125,6 +134,7 @@ class LeadList extends FormEntity
                 [
                     'id',
                     'name',
+                    'publicName',
                     'alias',
                     'description',
                 ]
@@ -140,9 +150,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get id.
-     *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -150,9 +158,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set name.
-     *
-     * @param int $name
+     * @param string|null $name
      *
      * @return LeadList
      */
@@ -165,9 +171,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get name.
-     *
-     * @return int
+     * @return string|null
      */
     public function getName()
     {
@@ -175,9 +179,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set description.
-     *
-     * @param string $description
+     * @param string|null $description
      *
      * @return LeadList
      */
@@ -190,9 +192,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get description.
-     *
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -200,8 +200,48 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set filters.
+     * Set category.
+     */
+    public function setCategory(Category $category = null): LeadList
+    {
+        $this->isChanged('category', $category);
+        $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * Get category.
+     */
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    /**
+     * Get publicName.
      *
+     * @return string|null
+     */
+    public function getPublicName()
+    {
+        return $this->publicName;
+    }
+
+    /**
+     * @param string|null $publicName
+     *
+     * @return LeadList
+     */
+    public function setPublicName($publicName)
+    {
+        $this->isChanged('publicName', $publicName);
+        $this->publicName = $publicName;
+
+        return $this;
+    }
+
+    /**
      * @return LeadList
      */
     public function setFilters(array $filters)
@@ -213,8 +253,6 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get filters.
-     *
      * @return array
      */
     public function getFilters()
@@ -227,8 +265,6 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set isGlobal.
-     *
      * @param bool $isGlobal
      *
      * @return LeadList
@@ -242,8 +278,6 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get isGlobal.
-     *
      * @return bool
      */
     public function getIsGlobal()
@@ -262,9 +296,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set alias.
-     *
-     * @param string $alias
+     * @param string|null $alias
      *
      * @return LeadList
      */
@@ -277,9 +309,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get alias.
-     *
-     * @return string
+     * @return string|null
      */
     public function getAlias()
     {
@@ -287,8 +317,6 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get leads.
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getLeads()
