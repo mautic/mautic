@@ -792,7 +792,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @param bool $noIndex
+     * @param bool|null $noIndex
      */
     public function setNoIndex($noIndex)
     {
@@ -802,7 +802,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function getNoIndex()
     {
