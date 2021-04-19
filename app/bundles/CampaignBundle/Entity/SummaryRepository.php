@@ -109,7 +109,7 @@ class SummaryRepository extends CommonRepository
             '           WHERE mcl.campaign_id = mclel.campaign_id AND mcl.manually_removed = 0 '.
             '           AND mclel.lead_id = mcl.lead_id AND mcl.rotation = mclel.rotation '.
             '           AND NOT EXISTS(SELECT NULL FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl2 '.
-            '               WHERE mclefl2.log_id = mclel.id AND mclefl2.date_added BETWEEN FROM_UNIXTIME('.$dateFromTs.') AND FROM_UNIXTIME('.$dateToTs.')) AND '.
+            '               WHERE mclefl2.log_id = mclel.id AND mclefl2.date_added BETWEEN FROM_UNIXTIME('.$dateFromTs.') AND FROM_UNIXTIME('.$dateToTs.'))'.
             '       ) AS log_counts_processed_i '.
             ' FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl ON mclefl.log_id = mclel.id '.
             ' WHERE (mclel.date_triggered BETWEEN FROM_UNIXTIME('.$dateFromTs.') AND FROM_UNIXTIME('.$dateToTs.')) ';
@@ -131,5 +131,6 @@ class SummaryRepository extends CommonRepository
             ' log_counts_processed = s.log_counts_processed_i;';
 
         $this->getEntityManager()->getConnection()->query($sql);
+        }
     }
 }
