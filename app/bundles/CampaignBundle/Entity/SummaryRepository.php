@@ -92,15 +92,23 @@ class SummaryRepository extends CommonRepository
         int $campaignId = null,
         int $eventId = null
     ): void {
-        $dateFromTs = $dateFrom->getTimestamp();
-        $dateToTs   = $dateTo->getTimestamp();
+        $dateFromTsActual = $dateFrom->getTimestamp();
+        $dateToTsActual   = $dateTo->getTimestamp();
+
+        $dateFromStartWithZeroMinutes = $dateFromTsActual - ($dateFromTsActual % 3600);
+        $numberOfHoursDiff = ceil((($dateFromStartWithZeroMinutes - $dateToTsActual) / 3600));
+
+        for($hour = 0; $hour < $numberOfHoursDiff; $hour++){
+            $dateFromTs = date('Y-m-d H:i:s', $dateFromStartWithZeroMinutes + ($hour * 3600));
+            $dateToTs   = date('Y-m-d H:i:s', $dateFromTs + 3599);
+            $dateTriggered = date('Y-m-d H:i:s', $dateFromTs);
 
         $sql = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
             ' (campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count, log_counts_processed) '.
             ' SELECT * FROM (SELECT '.
             '       mclel.campaign_id AS campaign_id, '.
             '       mclel.event_id AS event_id, '.
-            '       FROM_UNIXTIME(UNIX_TIMESTAMP(mclel.date_triggered) - (UNIX_TIMESTAMP(mclel.date_triggered) % 3600)) AS date_triggered_i, '.
+            '       "'. $dateTriggered .'" AS date_triggered_i, '.
             '       SUM(IF(mclel.is_scheduled = 1 AND mclel.trigger_date > NOW(), 1, 0)) AS scheduled_count_i, '.
             '       SUM(IF(mclel.is_scheduled = 1 AND mclel.trigger_date > NOW(), 0, mclel.non_action_path_taken)) AS non_action_path_taken_count_i, '.
             '       SUM(IF((mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken, 0, mclefl.log_id IS NOT NULL)) AS failed_count_i, '.
@@ -109,10 +117,10 @@ class SummaryRepository extends CommonRepository
             '           WHERE mcl.campaign_id = mclel.campaign_id AND mcl.manually_removed = 0 '.
             '           AND mclel.lead_id = mcl.lead_id AND mcl.rotation = mclel.rotation '.
             '           AND NOT EXISTS(SELECT NULL FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl2 '.
-            '               WHERE mclefl2.log_id = mclel.id AND mclefl2.date_added BETWEEN FROM_UNIXTIME('.$dateFromTs.') AND FROM_UNIXTIME('.$dateToTs.'))'.
+            '               WHERE mclefl2.log_id = mclel.id AND mclefl2.date_added BETWEEN "'.$dateFromTs.'" AND "'.$dateToTs.'")'.
             '       ) AS log_counts_processed_i '.
             ' FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl ON mclefl.log_id = mclel.id '.
-            ' WHERE (mclel.date_triggered BETWEEN FROM_UNIXTIME('.$dateFromTs.') AND FROM_UNIXTIME('.$dateToTs.')) ';
+            ' WHERE (mclel.date_triggered BETWEEN "'.$dateFromTs.'" AND "'.$dateToTs.'") ';
 
         if ($campaignId) {
             $sql .= ' AND mclel.campaign_id = '.$campaignId;
@@ -122,7 +130,7 @@ class SummaryRepository extends CommonRepository
             $sql .= ' AND mclel.event_id = '.$eventId;
         }
 
-        $sql .= ' GROUP BY mclel.campaign_id, mclel.event_id, date_triggered_i) AS `s` '.
+        $sql .= ' GROUP BY mclel.campaign_id, mclel.event_id) AS `s` '.
             ' ON DUPLICATE KEY UPDATE '.
             ' scheduled_count = s.scheduled_count_i, '.
             ' non_action_path_taken_count = s.non_action_path_taken_count_i, '.
