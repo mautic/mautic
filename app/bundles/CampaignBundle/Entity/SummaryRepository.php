@@ -96,19 +96,18 @@ class SummaryRepository extends CommonRepository
         $dateToTsActual   = $dateTo->getTimestamp();
 
         $dateFromStartWithZeroMinutes = $dateFromTsActual - ($dateFromTsActual % 3600);
-        $numberOfHoursDiff = ceil((($dateFromStartWithZeroMinutes - $dateToTsActual) / 3600));
+        $numberOfHoursDiff            = ceil((($dateFromStartWithZeroMinutes - $dateToTsActual) / 3600));
 
-        for($hour = 0; $hour < $numberOfHoursDiff; $hour++){
+        for ($hour = 0; $hour < $numberOfHoursDiff; ++$hour) {
             $dateFromTs = date('Y-m-d H:i:s', $dateFromStartWithZeroMinutes + ($hour * 3600));
             $dateToTs   = date('Y-m-d H:i:s', $dateFromTs + 3599);
-            $dateTriggered = date('Y-m-d H:i:s', $dateFromTs);
 
-        $sql = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
+            $sql = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
             ' (campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count, log_counts_processed) '.
             ' SELECT * FROM (SELECT '.
             '       mclel.campaign_id AS campaign_id, '.
             '       mclel.event_id AS event_id, '.
-            '       "'. $dateTriggered .'" AS date_triggered_i, '.
+            '       "'.$dateFromTs.'" AS date_triggered_i, '.
             '       SUM(IF(mclel.is_scheduled = 1 AND mclel.trigger_date > NOW(), 1, 0)) AS scheduled_count_i, '.
             '       SUM(IF(mclel.is_scheduled = 1 AND mclel.trigger_date > NOW(), 0, mclel.non_action_path_taken)) AS non_action_path_taken_count_i, '.
             '       SUM(IF((mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken, 0, mclefl.log_id IS NOT NULL)) AS failed_count_i, '.
@@ -122,15 +121,15 @@ class SummaryRepository extends CommonRepository
             ' FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl ON mclefl.log_id = mclel.id '.
             ' WHERE (mclel.date_triggered BETWEEN "'.$dateFromTs.'" AND "'.$dateToTs.'") ';
 
-        if ($campaignId) {
-            $sql .= ' AND mclel.campaign_id = '.$campaignId;
-        }
+            if ($campaignId) {
+                $sql .= ' AND mclel.campaign_id = '.$campaignId;
+            }
 
-        if ($eventId) {
-            $sql .= ' AND mclel.event_id = '.$eventId;
-        }
+            if ($eventId) {
+                $sql .= ' AND mclel.event_id = '.$eventId;
+            }
 
-        $sql .= ' GROUP BY mclel.campaign_id, mclel.event_id) AS `s` '.
+            $sql .= ' GROUP BY mclel.campaign_id, mclel.event_id) AS `s` '.
             ' ON DUPLICATE KEY UPDATE '.
             ' scheduled_count = s.scheduled_count_i, '.
             ' non_action_path_taken_count = s.non_action_path_taken_count_i, '.
@@ -138,7 +137,7 @@ class SummaryRepository extends CommonRepository
             ' triggered_count = s.triggered_count_i, '.
             ' log_counts_processed = s.log_counts_processed_i;';
 
-        $this->getEntityManager()->getConnection()->query($sql);
+            $this->getEntityManager()->getConnection()->query($sql);
         }
     }
 }
