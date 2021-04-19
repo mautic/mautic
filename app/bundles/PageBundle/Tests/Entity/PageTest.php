@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\FormBundle\Tests\EventListener;
+namespace Mautic\PageBundle\Tests\Entity;
 
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
