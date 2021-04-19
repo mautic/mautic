@@ -14,19 +14,15 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class SegmentSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadListRepository
-     */
-    public $segmentRepository;
-
     /**
      * @var IpLookupHelper
      */
@@ -37,14 +33,26 @@ class SegmentSubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var ListModel
+     */
+    private $listModel;
+
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
-        LeadListRepository $segmentRepository
+        ListModel $listModel,
+        TranslatorInterface $translator
     ) {
         $this->ipLookupHelper    = $ipLookupHelper;
         $this->auditLogModel     = $auditLogModel;
-        $this->segmentRepository = $segmentRepository;
+        $this->listModel         = $listModel;
+        $this->translator        = $translator;
     }
 
     /**
@@ -81,10 +89,10 @@ class SegmentSubscriber implements EventSubscriberInterface
     public function onSegmentPreUnpublish(SegmentEvent $event): ?RecordCanNotUnpublishException
     {
         $leadList = $event->getList();
-        $lists    = $this->segmentRepository->getSegmentsByFilter(LeadList::MEMBERSHIP_FILTER_FIELD, $leadList->getId());
-
+        $lists    = $this->listModel->getSegmentsWithDependenciesOnSegment($leadList->getId(), 'name');
         if (count($lists)) {
-            throw new RecordCanNotUnpublishException('mautic.lead_list.is_in_use');
+            $message = $this->translator->trans('mautic.lead_list.is_in_use', ['%segments%' => implode(',', $lists)], 'validators');
+            throw new RecordCanNotUnpublishException($message);
         }
 
         return null;

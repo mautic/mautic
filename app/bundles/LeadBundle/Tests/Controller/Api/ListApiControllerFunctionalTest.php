@@ -32,6 +32,47 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload = [
             'name'        => 'API segment',
             'description' => 'Segment created via API test',
+            'filters'     => [
+                // Legacy structure.
+                [
+                    'object'   => 'lead',
+                    'glue'     => 'and',
+                    'field'    => 'city',
+                    'type'     => 'text',
+                    'filter'   => 'Prague',
+                    'display'  => null,
+                    'operator' => '=',
+                ],
+                [
+                    'object'   => 'lead',
+                    'glue'     => 'and',
+                    'field'    => 'owner_id',
+                    'type'     => 'lookup_id',
+                    'operator' => '=',
+                    'display'  => 'John Doe',
+                    'filter'   => '4',
+                ],
+                // Current structure.
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'city',
+                    'type'       => 'text',
+                    'properties' => ['filter' => 'Prague'],
+                    'operator'   => '=',
+                ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'leadlist',
+                    'type'       => 'leadlist',
+                    'operator'   => 'in',
+                    'properties' => [
+                        'display' => 'John Doe',
+                        'filter'  => '4',
+                    ],
+                ],
+            ],
         ];
 
         // Create:

@@ -543,7 +543,8 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
-                    'mautic.lead.repository.lead_list',
+                    'mautic.lead.model.list',
+                    'translator',
                 ],
             ],
             'mautic.lead.serializer.subscriber' => [
@@ -811,7 +812,7 @@ return [
             'mautic.lead_list.constraint.in_use' => [
                 'class'     => SegmentInUseValidator::class,
                 'arguments' => [
-                    'mautic.lead.repository.lead_list',
+                    'mautic.lead.model.list',
                 ],
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'segment_in_use',

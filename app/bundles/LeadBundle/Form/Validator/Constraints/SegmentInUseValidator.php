@@ -12,7 +12,7 @@
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -21,13 +21,13 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class SegmentInUseValidator extends ConstraintValidator
 {
     /**
-     * @var LeadListRepository
+     * @var ListModel
      */
-    public $segmentRepository;
+    private $listModel;
 
-    public function __construct(LeadListRepository $segmentRepository)
+    public function __construct(ListModel $listModel)
     {
-        $this->segmentRepository = $segmentRepository;
+        $this->listModel = $listModel;
     }
 
     /**
@@ -43,11 +43,12 @@ class SegmentInUseValidator extends ConstraintValidator
             return;
         }
 
-        $lists = $this->segmentRepository->getSegmentsByFilter(LeadList::MEMBERSHIP_FILTER_FIELD, $leadList->getId());
+        $lists = $this->listModel->getSegmentsWithDependenciesOnSegment($leadList->getId(), 'name');
 
         if (count($lists)) {
             $this->context->buildViolation($constraint->message)
                 ->setCode(Response::HTTP_UNPROCESSABLE_ENTITY)
+                ->setParameter('%segments%', implode(',', $lists))
                 ->addViolation();
         }
     }
