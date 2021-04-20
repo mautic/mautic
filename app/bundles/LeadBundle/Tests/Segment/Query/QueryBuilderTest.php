@@ -286,6 +286,238 @@ class QueryBuilderTest extends TestCase
         ], $this->queryBuilder->getTableJoins('innerJoinTable'));
     }
 
+    public function testGuessPrimaryLeadContactIdColumnWithOrphanedLeads(): void
+    {
+        $this->queryBuilder->select('1')
+            ->from('lead_lists_leads', 'orp');
+
+        Assert::assertSame('orp.lead_id', $this->queryBuilder->guessPrimaryLeadContactIdColumn());
+    }
+
+    public function testGuessPrimaryLeadContactIdColumnWithoutJoins(): void
+    {
+        $this->queryBuilder->select('1')
+            ->from('leads', 'l');
+
+        Assert::assertSame('l.id', $this->queryBuilder->guessPrimaryLeadContactIdColumn());
+    }
+
+    public function testGuessPrimaryLeadContactIdColumnWithNonRightJoin(): void
+    {
+        $this->queryBuilder->select('1')
+            ->from('leads', 'l')
+            ->leftJoin('l', 'leftJoinTable', 'lj', 'l.id = lj.lid')
+            ->innerJoin('l', 'innerJoinTable', 'ij', 'l.id = ij.lid');
+
+        Assert::assertSame('l.id', $this->queryBuilder->guessPrimaryLeadContactIdColumn());
+    }
+
+    public function testGuessPrimaryLeadContactIdColumnWithNonMatchingRightJoin(): void
+    {
+        $this->queryBuilder->select('1')
+            ->from('leads', 'l')
+            ->rightJoin('l', 'rightJoinTable', 'r', 'l.name = r.name');
+
+        Assert::assertSame('l.id', $this->queryBuilder->guessPrimaryLeadContactIdColumn());
+    }
+
+    public function testGuessPrimaryLeadContactIdColumnWithMatchingRightJoin(): void
+    {
+        $this->queryBuilder->select('1')
+            ->from('leads', 'l')
+            ->rightJoin('l', 'rightJoinTable', 'r', 'l.id = r.lid');
+
+        Assert::assertSame('r.lid', $this->queryBuilder->guessPrimaryLeadContactIdColumn());
+    }
+
+    public function testIsJoinTable(): void
+    {
+        $this->queryBuilder->select('1')
+            ->from('leads', 'l')
+            ->leftJoin('l', 'leftJoinTable', 'lj', 'l.id = lj.lid')
+            ->rightJoin('l', 'rightJoinTable', 'rj', 'l.id = rj.lid')
+            ->innerJoin('l', 'innerJoinTable', 'ij', 'l.id = ij.lid');
+
+        Assert::assertFalse($this->queryBuilder->isJoinTable('nonExistent'));
+        Assert::assertFalse($this->queryBuilder->isJoinTable('leads'));
+        Assert::assertTrue($this->queryBuilder->isJoinTable('leftJoinTable'));
+        Assert::assertTrue($this->queryBuilder->isJoinTable('rightJoinTable'));
+        Assert::assertTrue($this->queryBuilder->isJoinTable('innerJoinTable'));
+    }
+
+    public function testGetDebugOutput(): void
+    {
+        $this->queryBuilder->select('t.name')
+            ->from('table1', 't')
+            ->leftJoin('t', 'table2', 'j', 't.id = j.fid')
+            ->where('t.enabled = :enabled')
+            ->andWhere('t.state IN (:states)')
+            ->groupBy('t.type')
+            ->having('t.salary > :salary AND t.flag = :flag')
+            ->orderBy('t.id', 'DESC')
+            ->setParameter('enabled', true)
+            ->setParameter(':salary', 5000)
+            ->setParameter('states', ['new', 'active'], Connection::PARAM_STR_ARRAY)
+            ->setParameter('flag', 'internal')
+            ->setFirstResult(30)
+            ->setMaxResults(10);
+
+        Assert::assertSame("SELECT t.name FROM table1 t LEFT JOIN table2 j ON t.id = j.fid WHERE (t.enabled = 1) AND (t.state IN ('new', 'active')) GROUP BY t.type HAVING t.salary > 5000 AND t.flag = 'internal' ORDER BY t.id DESC LIMIT 10 OFFSET 30", $this->queryBuilder->getDebugOutput());
+    }
+
+    public function testHasLogicStack(): void
+    {
+        $this->queryBuilder->select('t.name')
+            ->from('table1', 't')
+            ->where('t.enabled = 1');
+        Assert::assertFalse($this->queryBuilder->hasLogicStack());
+
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->eq('a.name', 'John'), 'OR');
+        Assert::assertTrue($this->queryBuilder->hasLogicStack());
+    }
+
+    public function testGetLogicStack(): void
+    {
+        $this->queryBuilder->select('t.name')
+            ->from('table1', 't')
+            ->where('t.enabled = 1');
+        Assert::assertSame([], $this->queryBuilder->getLogicStack());
+
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->eq('a.name', 'John'), 'OR');
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->lt('a.salary', 3000), 'AND');
+        Assert::assertSame([
+            'a.name = John',
+            'a.salary < 3000',
+        ], $this->queryBuilder->getLogicStack());
+    }
+
+    public function testPopLogicStack(): void
+    {
+        $this->queryBuilder->select('t.name')
+            ->from('table1', 't')
+            ->where('t.enabled = 1');
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->eq('a.name', 'John'), 'OR');
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->lt('a.salary', 3000), 'AND');
+        Assert::assertSame([
+            'a.name = John',
+            'a.salary < 3000',
+        ], $this->queryBuilder->popLogicStack());
+        Assert::assertSame([], $this->queryBuilder->getLogicStack());
+    }
+
+    public function testAddLogicOrWithEmptyWhere(): void
+    {
+        $this->queryBuilder->select('t.name')
+            ->from('table1', 't');
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->eq('a.name', 'John'), 'OR');
+        Assert::assertSame([], $this->queryBuilder->getLogicStack());
+        $this->assertSQL('SELECT t.name FROM table1 t WHERE a.name = John');
+        $this->queryBuilder->applyStackLogic();
+        $this->assertSQL('SELECT t.name FROM table1 t WHERE a.name = John');
+    }
+
+    public function testAddLogicOrWithExistingWhereWithEmptyStack(): void
+    {
+        $this->queryBuilder->select('t.name')
+            ->from('table1', 't')
+            ->where('t.enabled = 1');
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->eq('a.name', 'John'), 'OR');
+        Assert::assertSame(['a.name = John'], $this->queryBuilder->getLogicStack());
+        $this->assertSQL('SELECT t.name FROM table1 t WHERE t.enabled = 1');
+        $this->queryBuilder->applyStackLogic();
+        $this->assertSQL('SELECT t.name FROM table1 t WHERE (t.enabled = 1) OR (a.name = John)');
+    }
+
+    public function testAddLogicOrWithExistingWhereWithExistingStack(): void
+    {
+        $this->queryBuilder->select('t.name')
+            ->from('table1', 't')
+            ->where('t.enabled = 1');
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->eq('a.name', 'John'), 'OR');
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->eq('a.flag', 'active'), 'OR');
+        Assert::assertSame(['a.flag = active'], $this->queryBuilder->getLogicStack());
+        $this->assertSQL('SELECT t.name FROM table1 t WHERE (t.enabled = 1) OR (a.name = John)');
+        $this->queryBuilder->applyStackLogic();
+        $this->assertSQL('SELECT t.name FROM table1 t WHERE (t.enabled = 1) OR (a.name = John) OR (a.flag = active)');
+    }
+
+    public function testAddLogicAndWithEmptyWhere(): void
+    {
+        $this->queryBuilder->select('t.name')
+            ->from('table1', 't');
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->eq('a.name', 'John'), 'AND');
+        Assert::assertSame([], $this->queryBuilder->getLogicStack());
+        $this->assertSQL('SELECT t.name FROM table1 t WHERE a.name = John');
+        $this->queryBuilder->applyStackLogic();
+        $this->assertSQL('SELECT t.name FROM table1 t WHERE a.name = John');
+    }
+
+    public function testAddLogicAndWithExistingWhereWithEmptyStack(): void
+    {
+        $this->queryBuilder->select('t.name')
+            ->from('table1', 't')
+            ->where('t.enabled = 1');
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->eq('a.name', 'John'), 'AND');
+        Assert::assertSame([], $this->queryBuilder->getLogicStack());
+        $this->assertSQL('SELECT t.name FROM table1 t WHERE (t.enabled = 1) AND (a.name = John)');
+        $this->queryBuilder->applyStackLogic();
+        $this->assertSQL('SELECT t.name FROM table1 t WHERE (t.enabled = 1) AND (a.name = John)');
+    }
+
+    public function testAddLogicAndWithExistingWhereWithExistingStack(): void
+    {
+        $this->queryBuilder->select('t.name')
+            ->from('table1', 't')
+            ->where('t.enabled = 1');
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->eq('a.name', 'John'), 'OR');
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->eq('a.flag', 'active'), 'AND');
+        Assert::assertSame([
+            'a.name = John',
+            'a.flag = active',
+        ], $this->queryBuilder->getLogicStack());
+        $this->assertSQL('SELECT t.name FROM table1 t WHERE t.enabled = 1');
+        $this->queryBuilder->applyStackLogic();
+        $this->assertSQL('SELECT t.name FROM table1 t WHERE (t.enabled = 1) OR ((a.name = John) AND (a.flag = active))');
+    }
+
+    public function testApplyStackLogicWithEmptyStack(): void
+    {
+        $this->queryBuilder->select('t.name')
+            ->from('table1', 't')
+            ->where('t.enabled = 1');
+        $queryBuilder = $this->queryBuilder->applyStackLogic();
+        Assert::assertSame($queryBuilder, $this->queryBuilder);
+        $this->assertSQL('SELECT t.name FROM table1 t WHERE t.enabled = 1');
+    }
+
+    public function testApplyStackLogicWithExistingStack(): void
+    {
+        $this->queryBuilder->select('t.name')
+            ->from('table1', 't')
+            ->where('t.enabled = 1');
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->eq('a.name', 'John'), 'AND');
+        $this->queryBuilder->addLogic($this->queryBuilder->expr()->eq('a.flag', 'active'), 'AND');
+        $queryBuilder = $this->queryBuilder->applyStackLogic();
+        Assert::assertSame($queryBuilder, $this->queryBuilder);
+        $this->assertSQL('SELECT t.name FROM table1 t WHERE (t.enabled = 1) AND (a.name = John) AND (a.flag = active)');
+    }
+
+    public function testCreateQueryBuilderWithoutConnectionPassed(): void
+    {
+        $existingConnection = $this->queryBuilder->getConnection();
+        $queryBuilder       = $this->queryBuilder->createQueryBuilder();
+        Assert::assertSame($existingConnection, $queryBuilder->getConnection());
+    }
+
+    public function testCreateQueryBuilderWithConnectionPassed(): void
+    {
+        $existingConnection = $this->queryBuilder->getConnection();
+        $newConnection      = $this->createConnectionFake();
+        $queryBuilder       = $this->queryBuilder->createQueryBuilder($newConnection);
+        Assert::assertSame($newConnection, $queryBuilder->getConnection());
+        Assert::assertNotSame($existingConnection, $queryBuilder->getConnection());
+    }
+
     private function assertSQL(string $sql, int $repeat = 1): void
     {
         for ($i = 0; $i < $repeat; ++$i) {
