@@ -1245,7 +1245,6 @@ class ListModel extends FormModel
                     } else {
                         $dependents[] = $entity;
                     }
-
                     break;
                 }
             }
