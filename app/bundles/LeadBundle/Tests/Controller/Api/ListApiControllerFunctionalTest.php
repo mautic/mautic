@@ -13,9 +13,6 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Entity\LeadListRepository;
-use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -70,9 +67,11 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
                 [
                     'object'     => 'lead',
                     'glue'       => 'and',
-                    'field'      => 'leadlist',
-                    'type'       => 'leadlist',
-                    'operator'   => 'in',
+                    'field'      => 'owner_id',
+                    'type'       => 'lookup_id',
+                    'operator'   => '=',
+                    'display'    => 'outdated name',
+                    'filter'     => 'outdated_id',
                     'properties' => [
                         'display' => 'John Doe',
                         'filter'  => '4',
