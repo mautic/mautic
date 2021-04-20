@@ -198,7 +198,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
-    public function testUnpublishUsedSingleSegment()
+    public function testUnpublishUsedSingleSegment(): void
     {
         $filter = [[
             'glue'     => 'and',
@@ -231,7 +231,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($response['errors'][0]['message'], $expectedErrorMessage);
     }
 
-    public function testUnpublishUsedBatchSegment()
+    public function testUnpublishUsedBatchSegment(): void
     {
         $filter = [[
             'glue'     => 'and',

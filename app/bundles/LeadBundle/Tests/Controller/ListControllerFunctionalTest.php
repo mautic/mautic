@@ -205,7 +205,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         self::assertSame(Response::HTTP_NOT_FOUND, $response['statusCode']);
     }
 
-    public function testUnpublishUsedSegment()
+    public function testUnpublishUsedSegment(): void
     {
         $filter = [[
             'glue'     => 'and',
@@ -243,7 +243,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString($expectedErrorMessage, $crawler->html());
     }
 
-    public function testUnpublishUnUsedSegment()
+    public function testUnpublishUnUsedSegment(): void
     {
         $filter = [[
             'glue'     => 'and',

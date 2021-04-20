@@ -661,31 +661,4 @@ SQL;
 
         return 1 === $result;
     }
-
-    public function getSegmentsByFilter(string $filterKey, string $filterValue): array
-    {
-        $filteredSegment = [];
-        $like            = '%;s:5:"field";s:'.mb_strlen($filterKey).":\"$filterKey\";%";
-        $q               = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('l.id, l.name, l.filters')
-            ->from(MAUTIC_TABLE_PREFIX.LeadList::TABLE_NAME, 'l')
-            ->where(
-                $q->expr()->like('l.filters', $q->expr()->literal($like))
-            );
-        $leadList = $q->execute()->fetchAll();
-        foreach ($leadList as $segment) {
-            $filters = unserialize($segment['filters']);
-            foreach ($filters as $filter) {
-                if (isset($filter['properties']['filter']) &&
-                    $filter['field'] === $filterKey &&
-                    in_array($filterValue, $filter['properties']['filter'])
-                ) {
-                    $filteredSegment[$segment['id']] = $segment['name'];
-                    break;
-                }
-            }
-        }
-
-        return $filteredSegment;
-    }
 }
