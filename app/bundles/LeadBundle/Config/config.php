@@ -9,8 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUseValidator;
-
 return [
     'routes' => [
         'main' => [
@@ -810,7 +808,7 @@ return [
                 'alias'     => 'uniqueleadlist',
             ],
             'mautic.lead_list.constraint.in_use' => [
-                'class'     => SegmentInUseValidator::class,
+                'class'     => Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUseValidator::class,
                 'arguments' => [
                     'mautic.lead.model.list',
                 ],

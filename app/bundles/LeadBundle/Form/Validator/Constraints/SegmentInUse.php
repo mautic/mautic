@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 /*
  * @copyright   2021 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -17,12 +18,12 @@ class SegmentInUse extends Constraint
 {
     public $message = 'mautic.lead_list.is_in_use';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return 'segment_in_use';
     }
 
-    public function getTargets()
+    public function getTargets(): string
     {
         return self::CLASS_CONSTRAINT;
     }

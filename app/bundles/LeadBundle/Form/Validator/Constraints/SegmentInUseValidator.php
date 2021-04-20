@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 /*
  * @copyright   2021 Mautic Contributors. All rights reserved
  * @author      Mautic
