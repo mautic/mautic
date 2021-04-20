@@ -96,11 +96,11 @@ class SummaryRepository extends CommonRepository
         $dateToTsActual   = $dateTo->getTimestamp();
 
         $dateFromStartWithZeroMinutes = $dateFromTsActual - ($dateFromTsActual % 3600);
-        $numberOfHoursDiff            = ceil((($dateFromStartWithZeroMinutes - $dateToTsActual) / 3600));
+        $numberOfHoursDiff            = ceil((($dateToTsActual - $dateFromStartWithZeroMinutes) / 3600));
 
         for ($hour = 0; $hour < $numberOfHoursDiff; ++$hour) {
             $dateFromTs = date('Y-m-d H:i:s', $dateFromStartWithZeroMinutes + ($hour * 3600));
-            $dateToTs   = date('Y-m-d H:i:s', $dateFromTs + 3599);
+            $dateToTs   = date('Y-m-d H:i:s', strtotime($dateFromTs) + 3599);
 
             $sql = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
             ' (campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count, log_counts_processed) '.
