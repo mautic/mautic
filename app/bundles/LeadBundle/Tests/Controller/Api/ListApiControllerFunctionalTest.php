@@ -151,7 +151,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
-    public function testSegmentWithCategory()
+    public function testSegmentWithCategory(): void
     {
         $categoryPayload = [
             'title'  => 'API Cat',
@@ -184,7 +184,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode());
+        $this->assertTrue($clientResponse->isOk());
         $this->assertEquals($segmentPayload['category'], $response['list']['category']['id']);
 
         // Search segments by category:
@@ -192,7 +192,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode());
-        $this->assertNotEmpty($response['lists']);
+        $this->assertTrue($clientResponse->isOk());
+        $this->assertCount(1, $response['lists']);
     }
 }
