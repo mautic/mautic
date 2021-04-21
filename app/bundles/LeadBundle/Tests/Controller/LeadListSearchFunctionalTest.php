@@ -43,6 +43,9 @@ class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $listOne  = $this->createLeadList('first-list', $leadOne, $leadTwo, $leadThree);
         $listTwo  = $this->createLeadList('second-list', $leadOne, $leadFour, $leadFive, $leadSix);
 
+        $this->em->flush();
+        $this->em->clear();
+
         $this->client->enableProfiler();
         $prefix          = $this->container->getParameter('mautic.db_table_prefix');
         $previousQueries = [];
