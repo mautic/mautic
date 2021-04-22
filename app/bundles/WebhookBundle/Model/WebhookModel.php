@@ -441,6 +441,7 @@ class WebhookModel extends FormModel
             $log->setWebhook($webhook);
             $this->getLogRepository()->removeOldLogs($webhook->getId(), $this->logMax);
         }
+
         $log->setNote($note);
         $log->setRuntime($runtime);
         $log->setStatusCode($statusCode);
