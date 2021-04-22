@@ -340,7 +340,7 @@ class WebhookModel extends FormModel
 
             $responseStatusCode = $response->getStatusCode();
 
-            $this->addLog($webhook, $response->getStatusCode(), (microtime(true) - $start), $responseBody);
+            $this->addLog($webhook, $responseStatusCode, (microtime(true) - $start), $responseBody);
 
             // throw an error exception if we don't get a 200 back
             if ($responseStatusCode >= 300 || $responseStatusCode < 200) {
@@ -441,7 +441,6 @@ class WebhookModel extends FormModel
             $log->setWebhook($webhook);
             $this->getLogRepository()->removeOldLogs($webhook->getId(), $this->logMax);
         }
-
         $log->setNote($note);
         $log->setRuntime($runtime);
         $log->setStatusCode($statusCode);
