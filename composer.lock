@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b04abc6b54701c5e30a9d9cf40d24c0b",
+    "content-hash": "fae2476138b85de30627eead2fc894a4",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -5405,7 +5405,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "684d41f75faba0e92cdba02c996ebd8c47b56a88"
+                "reference": "35585658a3d1f51a5bc86db3066185e390e769bf"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5444,6 +5444,7 @@
                 "liip/functional-test-bundle": "^4.2",
                 "liip/test-fixtures-bundle": "^1.6",
                 "matomo/device-detector": "^4.0",
+                "mautic/plugin-grapesjs-builder": "1.0-RC4",
                 "mautic/transifex": "^4.0",
                 "misd/phone-number-bundle": "^1.1",
                 "mrclay/minify": "2.2.0",
@@ -5570,6 +5571,22 @@
             "description": "Mautic Open Source Distribution",
             "transport-options": {
                 "relative": true
+            }
+        },
+        {
+            "name": "mautic/plugin-grapesjs-builder",
+            "version": "1.0-RC4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/plugin-grapesjs-builder.git",
+                "reference": "1.0-RC4"
+            },
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "mautic-plugin",
+            "extra": {
+                "installer-name": "GrapesJsBuilderBundle"
             }
         },
         {

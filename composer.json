@@ -8,6 +8,17 @@
     "mautic/core-lib": "self.version"
   },
   "replace": {
+    "mautic/plugin-citrix": "self.version",
+    "mautic/plugin-clearbit": "self.version",
+    "mautic/plugin-cloudstorage": "self.version",
+    "mautic/plugin-crm": "self.version",
+    "mautic/plugin-emailmarketing": "self.version",
+    "mautic/plugin-focus": "self.version",
+    "mautic/plugin-fullcontact": "self.version",
+    "mautic/plugin-gmail": "self.version",
+    "mautic/plugin-outlook": "self.version",
+    "mautic/plugin-social": "self.version",
+    "mautic/plugin-zapier": "self.version",
     "mautic/theme-coffee": "self.version",
     "mautic/theme-mauve": "self.version",
     "mautic/theme-nature": "self.version",
