@@ -2,7 +2,6 @@
   "name": "mautic/grapes-js-builder-bundle",
   "description": "GrapesJS Builder with MJML support for Mautic",
   "type": "mautic-plugin",
-  "version": "1.0.1",
   "keywords": ["mautic","plugin","integration"],
   "require": {
     "mautic/composer-plugin": "^1.0",
