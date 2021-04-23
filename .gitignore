@@ -79,7 +79,20 @@
 !/media/images/.htaccess
 
 /plugins/*
+!/plugins/MauticCitrixBundle
+!/plugins/MauticClearbitBundle
+!/plugins/MauticCloudStorageBundle
+!/plugins/MauticCrmBundle
+!/plugins/MauticDynamicsBundle
+!/plugins/MauticEmailMarketingBundle
+!/plugins/MauticFocusBundle
+!/plugins/MauticFullContactBundle
+!/plugins/MauticGmailBundle
+!/plugins/MauticOutlookBundle
+!/plugins/MauticSocialBundle
+!/plugins/MauticZapierBundle
 !/plugins/index.html
+!/plugins/.gitkeep
 
 /themes/*
 !/themes/aurora
