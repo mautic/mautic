@@ -31,6 +31,9 @@ class CampaignHelper
      */
     private array $contactsValues = [];
 
+    /** @var \Joomla\Http\Response */
+    private $response;
+
     private EventDispatcherInterface $dispatcher;
 
     public function __construct(Client $client, CompanyModel $companyModel, EventDispatcherInterface $dispatcher)
