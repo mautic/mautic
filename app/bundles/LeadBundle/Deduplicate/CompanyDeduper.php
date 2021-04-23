@@ -21,11 +21,6 @@ class CompanyDeduper
     use DeduperTrait;
 
     /**
-     * @var array
-     */
-    private $availableFields;
-
-    /**
      * @var CompanyRepository
      */
     private $companyRepository;
@@ -41,9 +36,11 @@ class CompanyDeduper
     }
 
     /**
-     * @return Lead[]
+     * @return Company[]
+     *
+     * @throws UniqueFieldNotFoundException
      */
-    public function checkForDuplicateCompanies(array $queryFields)
+    public function checkForDuplicateCompanies(array $queryFields): array
     {
         $uniqueData = $this->getUniqueData($queryFields);
         if (empty($uniqueData)) {

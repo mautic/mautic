@@ -33,11 +33,6 @@ class ContactDeduper
     private $leadRepository;
 
     /**
-     * @var array
-     */
-    private $availableFields;
-
-    /**
      * @var bool
      */
     private $mergeNewerIntoOlder = false;

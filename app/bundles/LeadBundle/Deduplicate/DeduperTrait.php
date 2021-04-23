@@ -23,6 +23,11 @@ trait DeduperTrait
     private $fieldModel;
 
     /**
+     * @var array
+     */
+    private $availableFields;
+
+    /**
      * @return array
      */
     public function getUniqueData(array $queryFields)
