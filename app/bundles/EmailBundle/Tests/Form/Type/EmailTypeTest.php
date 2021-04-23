@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -17,6 +19,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\StageBundle\Model\StageModel;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -72,32 +75,24 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
         $this->formBuilder->method('create')->willReturnSelf();
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
-        $options = [
-            'data' => new Email(),
-        ];
+        $options = ['data' => new Email()];
+        $names   = [];
 
-        $this->formBuilder->expects($this->at(47))
-            ->method('add')
+        $this->formBuilder->method('add')
             ->with(
-                'buttons',
-                FormButtonsType::class,
-                [
-                    'pre_extra_buttons' => [
-                        [
-                            'name'  => 'builder',
-                            'label' => 'mautic.core.builder',
-                            'attr'  => [
-                                'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
-                                'icon'    => 'fa fa-cube',
-                                'onclick' => "Mautic.launchBuilder('emailform', 'email');",
-                            ],
-                        ],
-                    ],
-                ]
+                $this->callback(
+                    function ($name) use (&$names) {
+                        $names[] = $name;
+
+                        return true;
+                    }
+                )
             );
 
         $this->form->buildForm($this->formBuilder, $options);
+
+        Assert::assertContains('buttons', $names);
     }
 }
