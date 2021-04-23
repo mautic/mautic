@@ -24,9 +24,6 @@ $container->loadFromExtension('fos_oauth_server', [
             'refresh_token_lifetime' => '%env(int:MAUTIC_API_OAUTH2_REFRESH_TOKEN_LIFETIME)%',
         ],
     ],
-    'template' => [
-        'engine' => 'php',
-    ],
 ]);
 
 //oAuth 1.0a
