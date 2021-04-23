@@ -64,11 +64,14 @@ class SchedulerBuilder
         $defaultTimezone = $this->coreParametersHelper->get('default_timezone', 'UTC');
 
         $startDate = (new \DateTime('now', new \DateTimeZone($defaultTimezone)))->setTime(0, 0)->modify('+1 day');
+        $builder   = $this->schedulerTemplateFactory->getBuilder($scheduler);
         $rule      = new Rule();
-        $rule->setStartDate($startDate)
-            ->setCount($count);
 
-        $builder = $this->schedulerTemplateFactory->getBuilder($scheduler);
+        if (!$scheduler->isScheduledNow()) {
+            $startDate->setTime(0, 0)->modify('+1 day');
+        }
+
+        $rule->setStartDate($startDate)->setCount($count);
 
         try {
             $finalScheduler = $builder->build($rule, $scheduler);

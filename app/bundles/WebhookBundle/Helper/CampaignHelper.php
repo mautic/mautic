@@ -12,35 +12,32 @@
 namespace Mautic\WebhookBundle\Helper;
 
 use Doctrine\Common\Collections\Collection;
-use Joomla\Http\Http;
+use GuzzleHttp\Client;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\WebhookBundle\Event\WebhookRequestEvent;
+use Mautic\WebhookBundle\WebhookEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CampaignHelper
 {
-    /**
-     * @var Http
-     */
-    protected $connector;
-
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
+    protected Client $client;
+    protected CompanyModel $companyModel;
 
     /**
      * Cached contact values in format [contact_id => [key1 => val1, key2 => val1]].
-     *
-     * @var array
      */
-    private $contactsValues = [];
+    private array $contactsValues = [];
 
-    public function __construct(Http $connector, $companyModel)
+    private EventDispatcherInterface $dispatcher;
+
+    public function __construct(Client $client, CompanyModel $companyModel, EventDispatcherInterface $dispatcher)
     {
-        $this->connector    = $connector;
+        $this->client       = $client;
         $this->companyModel = $companyModel;
+        $this->dispatcher   = $dispatcher;
     }
 
     /**
@@ -51,7 +48,17 @@ class CampaignHelper
         $payload = $this->getPayload($config, $contact);
         $headers = $this->getHeaders($config, $contact);
         $url     = rawurldecode(TokenHelper::findLeadTokens($config['url'], $this->getContactValues($contact), true));
-        $this->makeRequest($url, $config['method'], $config['timeout'], $headers, $payload);
+
+        $webhookRequestEvent = new WebhookRequestEvent($contact, $url, $headers, $payload);
+        $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_ON_REQUEST, $webhookRequestEvent);
+
+        $this->makeRequest(
+            $webhookRequestEvent->getUrl(),
+            $config['method'],
+            $config['timeout'],
+            $webhookRequestEvent->getHeaders(),
+            $webhookRequestEvent->getPayload()
+        );
     }
 
     /**
@@ -93,7 +100,10 @@ class CampaignHelper
         switch ($method) {
             case 'get':
                 $payload  = $url.(parse_url($url, PHP_URL_QUERY) ? '&' : '?').http_build_query($payload);
-                $response = $this->connector->get($payload, $headers, $timeout);
+                $response = $this->client->get($payload, [
+                    \GuzzleHttp\RequestOptions::HEADERS => $headers,
+                    \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                ]);
                 break;
             case 'post':
             case 'put':
@@ -102,17 +112,24 @@ class CampaignHelper
                 if (array_key_exists('content-type', $headers) && 'application/json' == strtolower($headers['content-type'])) {
                     $payload                 = json_encode($payload);
                 }
-                $response = $this->connector->$method($url, $payload, $headers, $timeout);
+                $response = $this->client->request($method, $url, [
+                    \GuzzleHttp\RequestOptions::BODY    => $payload,
+                    \GuzzleHttp\RequestOptions::HEADERS => $headers,
+                    \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                ]);
                 break;
             case 'delete':
-                $response = $this->connector->delete($url, $headers, $timeout, $payload);
+                $response = $this->client->delete($url, [
+                    \GuzzleHttp\RequestOptions::HEADERS => $headers,
+                    \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                ]);
                 break;
             default:
                 throw new \InvalidArgumentException('HTTP method "'.$method.' is not supported."');
         }
 
-        if (!in_array($response->code, [200, 201])) {
-            throw new \OutOfRangeException('Campaign webhook response returned error code: '.$response->code);
+        if (!in_array($response->getStatusCode(), [200, 201])) {
+            throw new \OutOfRangeException('Campaign webhook response returned error code: '.$response->getStatusCode());
         }
     }
 
