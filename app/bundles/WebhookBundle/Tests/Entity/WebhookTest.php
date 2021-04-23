@@ -39,7 +39,7 @@ class WebhookTest extends \PHPUnit\Framework\TestCase
 
     public function testTriggersFromApiAreStoredAsEvents(): void
     {
-        $webhook = new Webhook();
+        $webhook  = new Webhook();
         $triggers = [
             'mautic.company_post_save',
             'mautic.company_post_delete',
