@@ -11,6 +11,7 @@
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
+use DateTime;
 use Doctrine\DBAL\Driver\PDOStatement;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -23,10 +24,10 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ReportSubscriberTest extends WebTestCase
+class ReportSubscriberTest extends TestCase
 {
     /**
      * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
@@ -53,7 +54,7 @@ class ReportSubscriberTest extends WebTestCase
      */
     private $fieldBuilderMock;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->fieldBuilderMock = $this->createMock(FieldsBuilder::class);
         parent::setUp();
@@ -65,7 +66,8 @@ class ReportSubscriberTest extends WebTestCase
         $this->subscriber        = new ReportSubscriber(
             $this->companyReportData,
             $this->hitRepository,
-            $this->translator
+            $this->translator,
+            $this->fieldBuilderMock
         );
     }
 
@@ -327,8 +329,8 @@ class ReportSubscriberTest extends WebTestCase
         $graphOptions = [
             'chartQuery' => $mockChartQuery,
             'translator' => $this->translator,
-            'dateFrom'   => new \DateTime(),
-            'dateTo'     => new \DateTime(),
+            'dateFrom'   => new DateTime(),
+            'dateTo'     => new DateTime(),
         ];
 
         $mockEvent->expects($this->once())
@@ -368,8 +370,8 @@ class ReportSubscriberTest extends WebTestCase
             ->willReturn(
                 [
                     [
-                        'from'  => new \DateTime(),
-                        'till'  => new \DateTime(),
+                        'from'  => new DateTime(),
+                        'till'  => new DateTime(),
                         'label' => 'My Chart',
                     ],
                 ]

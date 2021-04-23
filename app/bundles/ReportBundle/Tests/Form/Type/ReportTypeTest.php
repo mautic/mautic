@@ -81,27 +81,29 @@ final class ReportTypeTest extends \PHPUnit\Framework\TestCase
         $this->reportModel->method('getFilterList')
             ->willReturn($filterList);
 
-        $this->reportModel->method('getColumnList')
-            ->with('assets') // This is the confirmation that the source was selected properly.
+        $this->reportModel->expects($this->exactly(2))
+            ->method('getColumnList')
+            ->with($this->equalTo('assets')) // This is the confirmation that the source was selected properly.
             ->willReturn($columnList);
 
         $this->reportModel->method('getGraphList')
             ->willReturn($graphList);
 
-        $this->formBuilder->expects($this->at(14))
-            ->method('addEventListener')
-            ->with(
-                FormEvents::PRE_SET_DATA,
-                $this->callback(
-                    function (callable $listener) use ($report) {
-                        /** @var FormInterface $form */
-                        $form = $this->createMock(FormInterface::class);
-                        $formEvent = new FormEvent($form, $report);
-                        $listener($formEvent);
+        $this->formBuilder->method('addEventListener')
+            ->withConsecutive(
+                [
+                    FormEvents::PRE_SET_DATA,
+                    $this->callback(
+                        function (callable $listener) use ($report) {
+                            /** @var FormInterface $form */
+                            $form = $this->createMock(FormInterface::class);
+                            $formEvent = new FormEvent($form, $report);
+                            $listener($formEvent);
 
-                        return true;
-                    }
-                )
+                            return true;
+                        }
+                    ),
+                ]
             );
 
         $this->reportType->buildForm($this->formBuilder, $data);
