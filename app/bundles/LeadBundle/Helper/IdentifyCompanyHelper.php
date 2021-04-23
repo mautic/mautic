@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Model\CompanyModel;
 
 /**
@@ -72,7 +73,12 @@ class IdentifyCompanyHelper
             return [[], []];
         }
 
-        $companyEntities = $companyModel->checkForDuplicateCompanies($parameters);
+        try {
+            $companyEntities = $companyModel->checkForDuplicateCompanies($parameters);
+        } catch (UniqueFieldNotFoundException $uniqueFieldNotFoundException) {
+            return [[], []];
+        }
+
         $companyData     = $parameters;
         if (!empty($companyEntities)) {
             end($companyEntities);

@@ -26,6 +26,7 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
+use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Form\Type\CompanyType;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
@@ -789,12 +790,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function importCompany($fields, $data, $owner = null, $persist = true)
     {
-        $uniqueFields = $this->companyDeduper->getUniqueData($data);
-        if (empty($uniqueFields)) {
+        try {
+            $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));
+        } catch (UniqueFieldNotFoundException $uniqueFieldNotFoundException) {
             return null;
         }
-
-        $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($data);
 
         $company = !empty($duplicateCompanies) ? $duplicateCompanies[0] : new Company();
 
@@ -832,14 +832,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $company->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
         }
 
-        // Set profile data using the form so that values are validated
-        $fieldData = [];
-        foreach ($fields as $entityField => $importField) {
-            // Prevent overwriting existing data with empty data
-            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && '' != $data[$importField]) {
-                $fieldData[$entityField] = $data[$importField];
-            }
-        }
+        $fieldData = $this->getFieldData($fields, $data);
 
         $fieldErrors = [];
 
@@ -888,5 +881,23 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     public function checkForDuplicateCompanies(array $queryFields)
     {
         return $this->companyDeduper->checkForDuplicateCompanies($queryFields);
+    }
+
+    /**
+     * @param array $fields
+     * @param array $data
+     */
+    protected function getFieldData($fields, $data): array
+    {
+        // Set profile data using the form so that values are validated
+        $fieldData = [];
+        foreach ($fields as $entityField => $importField) {
+            // Prevent overwriting existing data with empty data
+            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && '' != $data[$importField]) {
+                $fieldData[$entityField] = $data[$importField];
+            }
+        }
+
+        return $fieldData;
     }
 }

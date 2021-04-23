@@ -1299,7 +1299,6 @@ class LeadModel extends FormModel
         [$companyFields, $companyData]     = $this->companyModel->extractCompanyDataFromImport($fields, $data);
 
         if (!empty($companyData)) {
-            $companyFields = array_flip($companyFields);
             $company       = $this->companyModel->importCompany($companyFields, $companyData, $owner);
         }
 

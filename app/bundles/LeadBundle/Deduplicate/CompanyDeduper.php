@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Deduplicate;
 
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Model\FieldModel;
 
 class CompanyDeduper
@@ -44,12 +45,11 @@ class CompanyDeduper
      */
     public function checkForDuplicateCompanies(array $queryFields)
     {
-        $duplicates = [];
         $uniqueData = $this->getUniqueData($queryFields);
-        if (!empty($uniqueData)) {
-            $duplicates = $this->companyRepository->getCompaniesByUniqueFields($uniqueData);
+        if (empty($uniqueData)) {
+            throw new UniqueFieldNotFoundException();
         }
 
-        return $duplicates;
+        return $this->companyRepository->getCompaniesByUniqueFields($uniqueData);
     }
 }
