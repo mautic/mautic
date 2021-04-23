@@ -1,7 +1,10 @@
 .*
+!.github
 !.gitignore
 !.htaccess
 !.gitkeep
+!.ddev
+.ddev/mautic-preference
 .php_cs.cache
 /.env
 /composer.phar
@@ -89,6 +92,7 @@
 !/plugins/MauticSocialBundle
 !/plugins/MauticZapierBundle
 !/plugins/index.html
+!/plugins/.gitkeep
 
 /themes/*
 !/themes/aurora

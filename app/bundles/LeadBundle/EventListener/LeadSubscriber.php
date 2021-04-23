@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
@@ -71,6 +72,13 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $router;
 
+    /**
+     * Whether or not we're running in a test environment.
+     *
+     * @var bool
+     */
+    private $isTest;
+
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
@@ -78,7 +86,8 @@ class LeadSubscriber implements EventSubscriberInterface
         DncReasonHelper $dncReasonHelper,
         EntityManager $entityManager,
         TranslatorInterface $translator,
-        RouterInterface $router
+        RouterInterface $router,
+        $isTest = false
     ) {
         $this->ipLookupHelper      = $ipLookupHelper;
         $this->auditLogModel       = $auditLogModel;
@@ -87,6 +96,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->entityManager       = $entityManager;
         $this->translator          = $translator;
         $this->router              = $router;
+        $this->isTest              = $isTest;
     }
 
     /**
@@ -319,9 +329,17 @@ class LeadSubscriber implements EventSubscriberInterface
             $eventTypes['lead.create']     = 'mautic.lead.event.create';
             $eventTypes['lead.identified'] = 'mautic.lead.event.identified';
             $eventTypes['lead.ipadded']    = 'mautic.lead.event.ipadded';
+            $eventTypes['lead.apiadded']   = 'mautic.lead.event.apiadded';
         }
 
         $filters = $event->getEventFilters();
+
+        // Temporary measure as the other event types don't have tests yet
+        if ($this->isTest) {
+            $eventTypes = [
+                'lead.apiadded' => 'mautic.lead.event.apiadded',
+            ];
+        }
 
         foreach ($eventTypes as $type => $label) {
             $name = $this->translator->trans($label);
@@ -354,6 +372,10 @@ class LeadSubscriber implements EventSubscriberInterface
 
                 case 'lead.imported':
                     $this->addTimelineImportedEntries($event, $type, $name);
+                    break;
+
+                case 'lead.apiadded':
+                    $this->addTimelineApiCreatedEntries($event, $type, $name);
                     break;
             }
         }
@@ -607,6 +629,7 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
+        /** @var LeadEventLogRepository */
         $eventLogRepo = $this->entityManager->getRepository(LeadEventLog::class);
         $imports      = $eventLogRepo->getEvents(
             $event->getLead(),
@@ -655,6 +678,59 @@ class LeadSubscriber implements EventSubscriberInterface
                             'contactId'       => $import['lead_id'],
                         ]
                     );
+            }
+        } else {
+            // Purposively not including this
+        }
+    }
+
+    /**
+     * @param $eventTypeKey
+     * @param $eventTypeName
+     */
+    private function addTimelineApiCreatedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    {
+        /** @var LeadEventLogRepository */
+        $eventLogRepo    = $this->entityManager->getRepository(LeadEventLog::class);
+        $apiSingleEvents = $eventLogRepo->getEvents(
+            $event->getLead(),
+            'lead',
+            'api-single',
+            null,
+            $event->getQueryOptions()
+        );
+        $apiBatchEvents = $eventLogRepo->getEvents(
+            $event->getLead(),
+            'lead',
+            'api-batch',
+            null,
+            $event->getQueryOptions()
+        );
+
+        // Add to counter
+        $event->addToCounter($eventTypeKey, $apiSingleEvents);
+        $event->addToCounter($eventTypeKey, $apiBatchEvents);
+
+        if (!$event->isEngagementCount()) {
+            $apiEvents = [
+                'total'   => intval($apiSingleEvents['total']) + intval($apiBatchEvents['total']),
+                'results' => array_merge($apiSingleEvents['results'], $apiBatchEvents['results']),
+            ];
+
+            // Add the logs to the event array
+            foreach ($apiEvents['results'] as $apiEvent) {
+                $event->addEvent(
+                    [
+                        'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$apiEvent['id'],
+                        'eventType'  => $eventTypeName,
+                        'eventLabel' => $eventTypeName,
+                        'timestamp'  => $apiEvent['date_added'],
+                        'icon'       => 'fa-cogs',
+                        'extra'      => $apiEvent,
+                        'contactId'  => $apiEvent['lead_id'],
+                    ]
+                );
             }
         } else {
             // Purposively not including this

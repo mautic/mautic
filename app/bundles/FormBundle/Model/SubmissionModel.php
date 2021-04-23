@@ -38,6 +38,7 @@ use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
+use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
@@ -370,8 +371,11 @@ class SubmissionModel extends CommonFormModel
         if ($lead && $form->usesProgressiveProfiling()) {
             $leadSubmissions = $this->formModel->getLeadSubmissions($form, $lead->getId());
 
+            $displayManager = new DisplayManager($form, $this->formModel->getCustomComponents()['viewOnlyFields']);
             foreach ($fields as $field) {
-                if (isset($validationErrors[$field->getAlias()]) && !$field->showForContact($leadSubmissions, $lead, $form)) {
+                if ($field->showForContact($leadSubmissions, $lead, $form, $displayManager)) {
+                    $displayManager->increaseDisplayedFields($field);
+                } elseif (isset($validationErrors[$field->getAlias()])) {
                     unset($validationErrors[$field->getAlias()]);
                 }
             }
@@ -761,7 +765,8 @@ class SubmissionModel extends CommonFormModel
     protected function executeFormActions(SubmissionEvent $event): void
     {
         $actions          = $event->getSubmission()->getForm()->getActions();
-        $availableActions = $this->formModel->getCustomComponents()['actions'];
+        $customComponents = $this->formModel->getCustomComponents();
+        $availableActions = $customComponents['actions'] ?? [];
 
         $actions->filter(function (Action $action) use ($availableActions) {
             return array_key_exists($action->getType(), $availableActions);

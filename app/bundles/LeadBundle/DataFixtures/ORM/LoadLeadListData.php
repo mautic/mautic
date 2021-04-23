@@ -13,7 +13,7 @@ namespace Mautic\LeadBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 
@@ -38,6 +38,7 @@ class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterfac
 
         $list = new LeadList();
         $list->setName('United States');
+        $list->setPublicName('United States');
         $list->setAlias('us');
         $list->setCreatedBy($adminUser);
         $list->setIsGlobal(true);

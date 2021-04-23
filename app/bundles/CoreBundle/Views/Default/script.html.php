@@ -20,9 +20,11 @@ $mauticContent = $view['slots']->get(
     var mauticBaseUrl     = '<?php echo $view['router']->path('mautic_base_index'); ?>';
     var mauticAjaxUrl     = '<?php echo $view['router']->path('mautic_core_ajax'); ?>';
     var mauticAjaxCsrf    = '<?php echo $view['security']->getCsrfToken('mautic_ajax_post'); ?>';
+    var mauticImagesPath  = '<?php echo $view['assets']->getImagesPath(); ?>';
     var mauticAssetPrefix = '<?php echo $view['assets']->getAssetPrefix(true); ?>';
     var mauticContent     = '<?php echo $mauticContent; ?>';
     var mauticEnv         = '<?php echo $app->getEnvironment(); ?>';
     var mauticLang        = <?php echo $view['translator']->getJsLang(); ?>;
+    var mauticEditorFonts = <?php echo json_encode($view['config']->get('editor_fonts')); ?>;
 </script>
 <?php $view['assets']->outputSystemScripts(true); ?>
