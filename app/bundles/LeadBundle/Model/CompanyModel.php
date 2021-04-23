@@ -66,6 +66,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     private $fields = [];
 
     /**
+     * @var bool
+     */
+    private $repoSetup = false;
+
+    /**
      * @var CompanyDeduper
      */
     private $companyDeduper;
@@ -119,7 +124,21 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:Company');
+        $repo =  $this->em->getRepository('MauticLeadBundle:Company');
+        if (!$this->repoSetup) {
+            $this->repoSetup = true;
+            $repo->setDispatcher($this->dispatcher);
+            //set the point trigger model in order to get the color code for the lead
+            $fields = $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
+
+            $searchFields = [];
+            foreach ($fields as $groupFields) {
+                $searchFields = array_merge($searchFields, array_keys($groupFields));
+            }
+            $repo->setAvailableSearchFields($searchFields);
+        }
+
+        return $repo;
     }
 
     /**

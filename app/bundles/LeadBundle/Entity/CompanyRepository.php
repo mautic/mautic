@@ -14,6 +14,9 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Event\CompanyBuildSearchEvent;
+use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class CompanyRepository.
@@ -21,6 +24,29 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class CompanyRepository extends CommonRepository implements CustomFieldRepositoryInterface
 {
     use CustomFieldRepositoryTrait;
+
+    /**
+     * @var array
+     */
+    private $availableSearchFields = [];
+
+    /**
+     * @var EventDispatcherInterface|null
+     */
+    private $dispatcher;
+
+    /**
+     * Used by search functions to search using aliases as commands.
+     */
+    public function setAvailableSearchFields(array $fields)
+    {
+        $this->availableSearchFields = $fields;
+    }
+
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
 
     /**
      * {@inheritdoc}
@@ -156,7 +182,35 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     protected function addSearchCommandWhereClause($q, $filter)
     {
-        return $this->addStandardSearchCommandWhereClause($q, $filter);
+        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        $unique                  = $this->generateRandomParameterName();
+        $returnParameter         = true;
+        $command                 = $filter->command;
+
+        if (in_array($command, $this->availableSearchFields)) {
+            $expr = $q->expr()->like($this->getTableAlias().".$command", ":$unique");
+        }
+
+        if ($this->dispatcher) {
+            $event = new CompanyBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $q);
+            $this->dispatcher->dispatch(LeadEvents::COMPANY_BUILD_SEARCH_COMMANDS, $event);
+            if ($event->isSearchDone()) {
+                $returnParameter = $event->getReturnParameters();
+                $filter->strict  = $event->getStrict();
+                $expr            = $event->getSubQuery();
+                $parameters      = array_merge($parameters, $event->getParameters());
+            }
+        }
+
+        if ($returnParameter) {
+            $string              = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $parameters[$unique] = $string;
+        }
+
+        return [
+            $expr,
+            $parameters,
+        ];
     }
 
     /**
@@ -164,7 +218,12 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     public function getSearchCommands()
     {
-        return $this->getStandardSearchCommands();
+        $commands = $this->getStandardSearchCommands();
+        if (!empty($this->availableSearchFields)) {
+            $commands = array_merge($commands, $this->availableSearchFields);
+        }
+
+        return $commands;
     }
 
     /**
