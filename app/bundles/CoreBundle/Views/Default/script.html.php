@@ -25,5 +25,6 @@ $mauticContent = $view['slots']->get(
     var mauticContent     = '<?php echo $mauticContent; ?>';
     var mauticEnv         = '<?php echo $app->getEnvironment(); ?>';
     var mauticLang        = <?php echo $view['translator']->getJsLang(); ?>;
+    var mauticEditorFonts = <?php echo json_encode($view['config']->get('editor_fonts')); ?>;
 </script>
 <?php $view['assets']->outputSystemScripts(true); ?>
