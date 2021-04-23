@@ -789,13 +789,15 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function importCompany($fields, $data, $owner = null, $persist = true)
     {
+        $uniqueFields = $this->companyDeduper->getUniqueData($data);
+        if (empty($uniqueFields)) {
+            return null;
+        }
+
         $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($data);
 
-        if (!empty($duplicateCompanies)) {
-            $company = $duplicateCompanies[0];
-        } else {
-            $company = new Company();
-        }
+        $company = !empty($duplicateCompanies) ? $duplicateCompanies[0] : new Company();
+
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
             $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);
             $company->setDateAdded($dateAdded->getUtcDateTime());
