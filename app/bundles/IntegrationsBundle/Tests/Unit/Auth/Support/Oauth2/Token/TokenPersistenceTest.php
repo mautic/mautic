@@ -21,11 +21,19 @@ use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistence;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotSetException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\PluginBundle\Entity\Integration;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TokenPersistenceTest extends TestCase
 {
+    /**
+     * @var MockObject|IntegrationsHelper
+     */
     private $integrationsHelper;
+
+    /**
+     * @var TokenPersistence
+     */
     private $tokenPersistence;
 
     public function setUp(): void
@@ -99,19 +107,18 @@ class TokenPersistenceTest extends TestCase
             'instance_url' => 'abc.123.com',
         ];
 
-        $token = new IntegrationToken($newApiKeys['access_token'], $newApiKeys['refresh_token'], $newApiKeys['expires_at'], $extraData);
-
+        $token       = new IntegrationToken($newApiKeys['access_token'], $newApiKeys['refresh_token'], $newApiKeys['expires_at'], $extraData);
         $integration = $this->createMock(Integration::class);
-        $integration->expects($this->at(0))
+        $newApiKeys  = array_merge($oldApiKeys, $extraData, $newApiKeys);
+
+        $integration->expects($this->exactly(2))
             ->method('getApiKeys')
-            ->willReturn($oldApiKeys);
-        $newApiKeys = array_merge($oldApiKeys, $extraData, $newApiKeys);
+            ->willReturnOnConsecutiveCalls($oldApiKeys, $newApiKeys);
+
         $integration->expects($this->once())
             ->method('setApiKeys')
             ->with($newApiKeys);
-        $integration->expects($this->at(2))
-            ->method('getApiKeys')
-            ->willReturn($newApiKeys);
+
         $this->tokenPersistence->setIntegration($integration);
 
         $this->integrationsHelper->expects($this->once())
@@ -149,12 +156,8 @@ class TokenPersistenceTest extends TestCase
         );
 
         $integration = $this->createMock(Integration::class);
-        $integration->expects($this->at(0))
-            ->method('getApiKeys')
-            ->willReturn($apiKeys);
-        $integration->expects($this->at(2))
-            ->method('getApiKeys')
-            ->willReturn($apiKeys);
+        $integration->method('getApiKeys')
+            ->willReturn($apiKeys, $apiKeys);
 
         $this->tokenPersistence->setIntegration($integration);
 
@@ -182,12 +185,8 @@ class TokenPersistenceTest extends TestCase
         ];
 
         $integration = $this->createMock(Integration::class);
-        $integration->expects($this->at(2))
-            ->method('getApiKeys')
-            ->willReturn($apiKeys);
-        $integration->expects($this->at(3))
-            ->method('getApiKeys')
-            ->willReturn(['access_token' => $accessToken]);
+        $integration->method('getApiKeys')
+            ->willReturnOnConsecutiveCalls(null, $apiKeys, ['access_token' => $accessToken]);
 
         $this->tokenPersistence->setIntegration($integration);
         $this->assertFalse($this->tokenPersistence->hasToken());
