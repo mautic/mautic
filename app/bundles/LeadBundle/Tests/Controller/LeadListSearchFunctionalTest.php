@@ -54,35 +54,35 @@ class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->assertSearchResult('segment%3AnonExistent', [], [$leadOne, $leadTwo, $leadThree, $leadFour, $leadFive, $leadSix]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = 'nonexistent'",
-            "SELECT COUNT(DISTINCT(l.id)) as count FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) INNER JOIN {$prefix}lead_lists_leads list_lead ON l.id = list_lead.lead_id WHERE ((list_lead.manually_removed = 0) AND (list_lead.leadlist_id IN (0))) AND (l.date_identified IS NOT NULL)",
+            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN (0)))) AND (l.date_identified IS NOT NULL)",
         ], $previousQueries);
 
         // first-list segment search
         $this->assertSearchResult('segment%3A'.$listOne->getAlias(), [$leadOne, $leadTwo, $leadThree], [$leadFour, $leadFive, $leadSix]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listOne->getAlias()}'",
-            "SELECT COUNT(DISTINCT(l.id)) as count FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) INNER JOIN {$prefix}lead_lists_leads list_lead ON l.id = list_lead.lead_id WHERE ((list_lead.manually_removed = 0) AND (list_lead.leadlist_id IN ('{$listOne->getId()}'))) AND (l.date_identified IS NOT NULL)",
-            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) INNER JOIN {$prefix}lead_lists_leads list_lead ON l.id = list_lead.lead_id WHERE ((list_lead.manually_removed = 0) AND (list_lead.leadlist_id IN ('{$listOne->getId()}'))) AND (l.date_identified IS NOT NULL) GROUP BY l.id ORDER BY l.last_active DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC LIMIT 30",
         ], $previousQueries);
-        $this->assertSearchResult('!segment%3A'.$listOne->getAlias(), [$leadOne, $leadFour, $leadFive, $leadSix], [$leadTwo, $leadThree]);
+        $this->assertSearchResult('!segment%3A'.$listOne->getAlias(), [$leadFour, $leadFive, $leadSix], [$leadOne, $leadTwo, $leadThree]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listOne->getAlias()}'",
-            "SELECT COUNT(DISTINCT(l.id)) as count FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) LEFT JOIN {$prefix}lead_lists_leads list_lead ON l.id = list_lead.lead_id WHERE ((list_lead.manually_removed <> 0) OR ((list_lead.leadlist_id NOT IN ('{$listOne->getId()}')) OR (list_lead.leadlist_id IS NULL))) AND (l.date_identified IS NOT NULL)",
-            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) LEFT JOIN {$prefix}lead_lists_leads list_lead ON l.id = list_lead.lead_id WHERE ((list_lead.manually_removed <> 0) OR ((list_lead.leadlist_id NOT IN ('{$listOne->getId()}')) OR (list_lead.leadlist_id IS NULL))) AND (l.date_identified IS NOT NULL) GROUP BY l.id ORDER BY l.last_active DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC LIMIT 30",
         ], $previousQueries);
 
         // second-list segment search
         $this->assertSearchResult('segment%3A'.$listTwo->getAlias(), [$leadOne, $leadFour, $leadFive, $leadSix], [$leadTwo, $leadThree]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listTwo->getAlias()}'",
-            "SELECT COUNT(DISTINCT(l.id)) as count FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) INNER JOIN {$prefix}lead_lists_leads list_lead ON l.id = list_lead.lead_id WHERE ((list_lead.manually_removed = 0) AND (list_lead.leadlist_id IN ('{$listTwo->getId()}'))) AND (l.date_identified IS NOT NULL)",
-            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) INNER JOIN {$prefix}lead_lists_leads list_lead ON l.id = list_lead.lead_id WHERE ((list_lead.manually_removed = 0) AND (list_lead.leadlist_id IN ('{$listTwo->getId()}'))) AND (l.date_identified IS NOT NULL) GROUP BY l.id ORDER BY l.last_active DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC LIMIT 30",
         ], $previousQueries);
-        $this->assertSearchResult('!segment%3A'.$listTwo->getAlias(), [$leadOne, $leadTwo, $leadThree], [$leadFour, $leadFive, $leadSix]);
+        $this->assertSearchResult('!segment%3A'.$listTwo->getAlias(), [$leadTwo, $leadThree], [$leadOne, $leadFour, $leadFive, $leadSix]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listTwo->getAlias()}'",
-            "SELECT COUNT(DISTINCT(l.id)) as count FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) LEFT JOIN {$prefix}lead_lists_leads list_lead ON l.id = list_lead.lead_id WHERE ((list_lead.manually_removed <> 0) OR ((list_lead.leadlist_id NOT IN ('{$listTwo->getId()}')) OR (list_lead.leadlist_id IS NULL))) AND (l.date_identified IS NOT NULL)",
-            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) LEFT JOIN {$prefix}lead_lists_leads list_lead ON l.id = list_lead.lead_id WHERE ((list_lead.manually_removed <> 0) OR ((list_lead.leadlist_id NOT IN ('{$listTwo->getId()}')) OR (list_lead.leadlist_id IS NULL))) AND (l.date_identified IS NOT NULL) GROUP BY l.id ORDER BY l.last_active DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN (`PRIMARY`) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC LIMIT 30",
         ], $previousQueries);
     }
 
