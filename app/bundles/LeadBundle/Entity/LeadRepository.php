@@ -704,10 +704,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $operators = $this->getFilterExpressionFunctions();
         $operators = array_merge($operators, [
-            'x' => [
-                'expr'        => 'andX',
-                'negate_expr' => 'orX',
-            ],
             'null' => [
                 'expr'        => 'isNull',
                 'negate_expr' => 'isNotNull',
@@ -720,7 +716,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $eqExpr   = $operators['='][$exprType];
         $nullExpr = $operators['null'][$exprType];
         $inExpr   = $operators['in'][$exprType];
-        $xExpr    = $operators['x'][$exprType];
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
@@ -761,29 +756,22 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.list', [], null, 'en_US'):
-                $this->applySearchQueryRelationship(
-                    $q,
-                    [
-                        [
-                            'from_alias' => 'l',
-                            'table'      => 'lead_lists_leads',
-                            'alias'      => 'list_lead',
-                            'condition'  => 'l.id = list_lead.lead_id',
-                        ],
-                    ],
-                    $innerJoinTables,
-                    $this->generateFilterExpression($q, 'list_lead.leadlist_id', $filter->not ? 'notIn' : 'in', $unique, (bool) $filter->not,
-                        // orX for filter->not either manual removed or is null
-                        $q->expr()->$xExpr(
-                            $q->expr()->$eqExpr('list_lead.manually_removed', 0)
+                $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                $sq->select('1')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lla')
+                    ->where(
+                        $q->expr()->andX(
+                            $q->expr()->eq('l.id', 'lla.lead_id'),
+                            $q->expr()->eq('lla.manually_removed', 0),
+                            $q->expr()->in('lla.leadlist_id', ":$unique")
                         )
-                    )
-                );
+                    );
                 $from = $q->getQueryPart('from')[0];
                 $q->resetQueryPart('from');
                 $q->add('from', ['hint' => 'USE INDEX FOR JOIN (`PRIMARY`)'] + $from, true);
 
                 $filter->strict  = true;
+                $q->andWhere($q->expr()->{$filter->not ? 'notExists' : 'exists'}($sq->getSQL()));
                 $q->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], Connection::PARAM_INT_ARRAY);
 
                 break;
