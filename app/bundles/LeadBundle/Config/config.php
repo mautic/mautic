@@ -824,11 +824,6 @@ return [
                     'mautic.lead.model.field',
                     'mautic.lead.repository.company',
                 ],
-                'methodCalls' => [
-                    'setUniqueIdentifiersOperator' => [
-                        '%mautic.company_unique_identifiers_operator%',
-                    ],
-                ],
             ],
             'mautic.lead.helper.primary_company' => [
                 'class'     => \Mautic\LeadBundle\Helper\PrimaryCompanyHelper::class,
@@ -886,6 +881,11 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\LeadBundle\Entity\CompanyLead::class,
+                ],
+                'methodCalls' => [
+                    'setUniqueIdentifiersOperator' => [
+                        '%mautic.company_unique_identifiers_operator%',
+                    ],
                 ],
             ],
             'mautic.lead.repository.stages_lead_log' => [
