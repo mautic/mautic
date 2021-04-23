@@ -5,7 +5,25 @@
   "description": "Mautic Open Source Distribution",
   "require": {
     "composer/installers": "^1.10",
-    "mautic/core-lib": "self.version"
+    "mautic/core-lib": "self.version",
+    "mautic/grapes-js-builder-bundle": "1.0-RC4"
+  },
+  "require-dev": {
+    "symfony/web-profiler-bundle": "~4.4.0",
+    "symfony/var-dumper": "~4.4.0",
+    "symfony/browser-kit": "~4.4.0",
+    "symfony/dom-crawler": "~4.4.0",
+    "mautic/transifex": "^4.0",
+    "http-interop/http-factory-guzzle": "^1.0",
+    "webfactory/exceptions-bundle": "~4.3",
+    "friendsofphp/php-cs-fixer": "~2.16.1",
+    "liip/test-fixtures-bundle": "^1.6",
+    "phpstan/phpstan": "^0.12.82",
+    "rector/rector-prefixed": "^0.9.31",
+    "symfony/phpunit-bridge": "~5.1.0",
+    "phpunit/phpunit": "^9.5",
+    "liip/functional-test-bundle": "^4.2",
+    "php-http/mock-client": "^1.4"
   },
   "replace": {
     "mautic/plugin-citrix": "self.version",
@@ -58,25 +76,6 @@
     {
       "type": "git",
       "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
-    },
-    {
-      "type": "package",
-      "package": {
-        "name": "mautic/plugin-grapesjs-builder",
-        "version": "1.0-RC4",
-        "type": "mautic-plugin",
-        "source": {
-          "url": "https://github.com/mautic/plugin-grapesjs-builder.git",
-          "type": "git",
-          "reference": "1.0-RC4"
-        },
-        "require": {
-          "composer/installers": "~1.0"
-        },
-        "extra": {
-          "installer-name": "GrapesJsBuilderBundle"
-        }
-      }
     },
     {
       "type": "package",
