@@ -2,6 +2,7 @@ import loadComponents from './components';
 import loadCommands from './commands';
 import loadButtons from './buttons';
 import loadBlocks from './blocks';
+import loadListeners from './listeners';
 
 export default (editor, opts = {}) => {
   const $ = mQuery;
@@ -360,4 +361,5 @@ export default (editor, opts = {}) => {
   loadCommands(editor, config);
   loadButtons(editor, config);
   loadBlocks(editor, config);
+  loadListeners(editor, config);
 };

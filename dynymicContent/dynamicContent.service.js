@@ -12,7 +12,7 @@ export default class DynamicContentService {
 
   /**
    * Convert dynamic content tokens to slot and load content
-   * Used in grapesjs-preset-mautic
+   * used in grapesjs-preset-mautic
    */
   grapesConvertDynamicContentTokenToSlot(editor) {
     const dc = editor.DomComponents;
