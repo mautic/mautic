@@ -131,7 +131,7 @@ class FileManager
     {
         $files      = [];
         $uploadDir  = $this->getUploadDir();
-       
+
         $fileSystem = new Filesystem();
 
         if (!$fileSystem->exists($uploadDir)) {
@@ -144,7 +144,7 @@ class FileManager
 
         $finder = new Finder();
         $finder->files()->in($uploadDir);
-        
+
         foreach ($finder as $file) {
             // exclude certain folders from grapesjs file manager
             if (in_array($file->getRelativePath(), $this->coreParametersHelper->get('image_path_exclude'))) {
