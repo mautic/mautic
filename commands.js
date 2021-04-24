@@ -1,7 +1,7 @@
 import DynamicContentService from './dynymicContent/dynamicContent.service';
-import DynamicContentCommands from './dynymicContent/dynamicContent.commands';
+import DynamicContentCommands from './dynymicContent/dynamicContent.command';
 
-export default (editor, opts = {}) => {
+export default (editor) => {
   const cmd = editor.Commands;
 
   // Launch Code Editor popup

@@ -1,7 +1,7 @@
 import DynamicContentService from './dynamicContent.service';
 import CodeEditor from '../codeEditor';
 
-class DynamicContent {
+export default class DynamicContentCommands {
   constructor(editor, opts = {}) {
     console.warn({ editor });
     this.editor = editor;
@@ -112,5 +112,3 @@ class DynamicContent {
     mQuery(popupContent).empty().append(focusForm.detach());
   }
 }
-
-export default DynamicContent;

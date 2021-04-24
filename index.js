@@ -56,6 +56,7 @@ export default (editor, opts = {}) => {
         e.stopImmediatePropagation();
         const { model } = this;
 
+        // eslint-disable-next-line no-alert, no-restricted-globals
         if (confirm(config.deleteAssetConfirmText)) {
           model.collection.remove(model);
         }
@@ -67,11 +68,13 @@ export default (editor, opts = {}) => {
     // Hiding other toolbars already created
     const rteToolbar = editor.RichTextEditor.getToolbarEl();
     [].forEach.call(rteToolbar.children, (child) => {
+      // eslint-disable-next-line no-param-reassign
       child.style.display = 'none';
     });
 
     editor.setCustomRte({
       enable(el, rte) {
+        // eslint-disable-next-line no-param-reassign
         rte = $(el).froalaEditor({
           enter: $.FroalaEditor.ENTER_BR,
           pastePlain: true,
@@ -330,7 +333,8 @@ export default (editor, opts = {}) => {
           linkEditButtons: ['linkOpen', 'linkRemove'],
         });
 
-        $(el).on('froalaEditor.popups.show.link.edit', (e, editor) => {
+        // @todo remove froalaEditor
+        $(el).on('froalaEditor.popups.show.link.edit', () => {
           // Get the link DOM object of the current selection.
           const currentLink = $(el).froalaEditor('link.get');
 
@@ -342,13 +346,13 @@ export default (editor, opts = {}) => {
             const height = $(currentLink).outerHeight();
 
             // Set position of link popup
-            popupLink.css('top', parseInt(top) + parseInt(height) + 35);
+            popupLink.css('top', parseInt(top, 10) + parseInt(height, 10) + 35);
           }
         });
 
         return rte;
       },
-      disable(el, rte) {
+      disable(el) {
         // Remove events and destroy rte
         $(el).off('froalaEditor.popups.show.link.edit');
         $(el).froalaEditor('destroy');
