@@ -141,7 +141,7 @@ class FileManager
 
         $finder = new Finder();
         $finder->files()->in($uploadDir);
-       
+
         foreach ($finder as $file) {
             if ($size = @getimagesize($this->getCompleteFilePath($file->getFilename()))) {
                 $files[] = [
