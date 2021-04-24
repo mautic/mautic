@@ -106,13 +106,19 @@ export default (editor, opts = {}) => {
 
     // Activate by default View Components button
     const viewComponents = pm.getButton('options', 'sw-visibility');
-    viewComponents && viewComponents.set('active', 1);
+    if (viewComponents) {
+      viewComponents.set('active', 1);
+    }
 
     // Load and show settings and style manager
     const openTmBtn = pm.getButton('views', 'open-tm');
-    openTmBtn && openTmBtn.set('active', 1);
     const openSm = pm.getButton('views', 'open-sm');
-    openSm && openSm.set('active', 1);
+    if (openTmBtn) {
+      openTmBtn.set('active', 1);
+    }
+    if (openSm) {
+      openSm.set('active', 1);
+    }
 
     pm.removeButton('views', 'open-tm');
 
@@ -142,6 +148,8 @@ export default (editor, opts = {}) => {
 
     // Open block manager
     const openBlocksBtn = editor.Panels.getButton('views', 'open-blocks');
-    openBlocksBtn && openBlocksBtn.set('active', 1);
+    if (openBlocksBtn) {
+      openBlocksBtn.set('active', 1);
+    }
   });
 };
