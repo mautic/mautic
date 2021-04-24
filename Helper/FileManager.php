@@ -103,7 +103,7 @@ class FileManager
     public function getFullUrl($fileName, $separator = '/')
     {
         // if a static_url (CDN) is configured use that, otherwiese use the site url
-        $url = $this->coreParametersHelper->getParameter('static_url') ?? $this->coreParametersHelper->getParameter('site_url');
+        $url = $this->coreParametersHelper->get('static_url') ?? $this->coreParametersHelper->get('site_url');
 
         return $url
             .$separator
@@ -144,8 +144,13 @@ class FileManager
 
         $finder = new Finder();
         $finder->files()->in($uploadDir);
-
+        
         foreach ($finder as $file) {
+            // exclude certain folders from grapesjs file manager
+            if (in_array($file->getRelativePath(), $this->coreParametersHelper->get('image_path_exclude'))) {
+                continue;
+            }
+
             if ($size = @getimagesize($this->getCompleteFilePath($file->getRelativePathname()))) {
                 $files[] = [
                     'src'    => $this->getFullUrl($file->getRelativePathname()),
