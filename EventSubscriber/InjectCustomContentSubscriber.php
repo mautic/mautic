@@ -94,10 +94,17 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
             }
 
             $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $parameters['email']]);
-            if ($grapesJsBuilder instanceof GrapesJsBuilder && 'POST' !== $this->requestStack->getCurrentRequest()->getMethod()) {
-                $passParams['customMjml'] = $grapesJsBuilder->getCustomMjml();
-            }
+            if ('POST' !== $this->requestStack->getCurrentRequest()->getMethod()) {
+                if (!$grapesJsBuilder instanceof GrapesJsBuilder && $parameters['email']->getClonedId()) {
+                    $grapesJsBuilder = $this->grapesJsBuilderModel->getGrapesJsFromEmailId(
+                        $parameters['email']->getClonedId()
+                    );
+                }
 
+                if ($grapesJsBuilder instanceof GrapesJsBuilder) {
+                    $passParams['customMjml'] = $grapesJsBuilder->getCustomMjml();
+                }
+            }
             $content = $this->templatingHelper->getTemplating()->render(
                 'GrapesJsBuilderBundle:Setting:fields.html.php',
                 $passParams
