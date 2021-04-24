@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2017 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -132,9 +134,7 @@ class LeadSubscriberTest extends CommonMocks
             $this->router
         );
 
-        $leadEvent = $this->getMockBuilder(LeadEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $leadEvent = $this->createMock(LeadEvent::class);
 
         $leadEvent->expects($this->exactly(2))
             ->method('getLead')
@@ -194,23 +194,16 @@ class LeadSubscriberTest extends CommonMocks
             'contactId'  => $leadEventLog['lead_id'],
         ];
 
-        $leadEvent = new LeadTimelineEvent(
-            $lead
-        );
+        $leadEvent = new LeadTimelineEvent($lead);
+        $repo      = $this->createMock(LeadEventLogRepository::class);
 
-        $repo = $this->getMockBuilder(LeadEventLogRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repo->expects($this->at(0))
+        $repo->expects($this->exactly(2))
             ->method('getEvents')
-            ->with($lead, 'lead', 'api-single', null, $leadEvent->getQueryOptions())
-            ->will($this->returnValue($logs));
-
-        $repo->expects($this->at(1))
-            ->method('getEvents')
-            ->with($lead, 'lead', 'api-batch', null, $leadEvent->getQueryOptions())
-            ->will($this->returnValue(['total' => 0, 'results' => []]));
+            ->withConsecutive(
+                [$lead, 'lead', 'api-single', null, $leadEvent->getQueryOptions()],
+                [$lead, 'lead', 'api-batch', null, $leadEvent->getQueryOptions()]
+            )
+            ->willReturnOnConsecutiveCalls($logs, ['total' => 0, 'results' => []]);
 
         $this->entityManager->method('getRepository')
             ->with(LeadEventLog::class)

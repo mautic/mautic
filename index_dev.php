@@ -10,7 +10,7 @@ define('MAUTIC_ROOT_DIR', __DIR__);
 // Fix for hosts that do not have date.timezone set, it will be reset based on users settings
 date_default_timezone_set('UTC');
 
-require_once __DIR__.'/vendor/autoload.php';
+require_once 'autoload.php';
 
 use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use Mautic\Middleware\MiddlewareBuilder;
