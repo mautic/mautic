@@ -93,4 +93,24 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+This project follows the [all-contributors][all-contributors] specification. Contributions of any kind welcome!
+
+[mautic-blog]: <https://www.mautic.org/blog>
+[get-involved]: <https://www.mautic.org/community/get-involved>
+[twitter]: <https://twitter.com/MauticCommunity>
+[facebook]: <https://www.facebook.com/MauticCommunity/>
+[slack]: <https://www.mautic.org/community/get-involved/communication-channels>
+[contributing]: <https://contribute.mautic.org/contributing-to-mautic>
+[contributing-md]: <https://github.com/mautic/mautic/blob/feature/.github/CONTRIBUTING.md>
+[contribute-developer]: <https://contribute.mautic.org/contributing-to-mautic/developer>
+[t1-issues]: <https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AT1>
+[download-mautic]: <https://www.mautic.org/download>
+[tagged-release]: <https://github.com/mautic/mautic/releases>
+[composer-v1]: <http://getcomposer.org/>
+[download-zip]: <https://github.com/mautic/mautic/archive/refs/heads/features.zip>
+[ddev-mautic]: <https://kb.mautic.org/knowledgebase/development/how-to-install-mautic-using-ddev>
+[troubleshooting]: <https://docs.mautic.org/en/troubleshooting>
+[community]: <https://www.mautic.org/community>
+[mautic-docs]: <https://docs.mautic.org>
+[dev-docs]: <https://developer.mautic.org>
+[all-contributors]: <https://github.com/all-contributors/all-contributors>
