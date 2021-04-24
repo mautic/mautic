@@ -5118,12 +5118,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/plugin-grapesjs-builder.git",
-                "reference": "7065d36d9285eca5d5efd4a6237f057f02e6a6e5"
+                "reference": "1219769f1e8052719618f3eee6d9bc0bfe2f0036"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mautic/plugin-grapesjs-builder/zipball/7065d36d9285eca5d5efd4a6237f057f02e6a6e5",
-                "reference": "7065d36d9285eca5d5efd4a6237f057f02e6a6e5",
+                "url": "https://api.github.com/repos/mautic/plugin-grapesjs-builder/zipball/1219769f1e8052719618f3eee6d9bc0bfe2f0036",
+                "reference": "1219769f1e8052719618f3eee6d9bc0bfe2f0036",
                 "shasum": ""
             },
             "require": {
@@ -5155,7 +5155,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2021-04-23T21:00:09+00:00"
+            "time": "2021-04-24T12:08:15+00:00"
         },
         {
             "name": "maxmind-db/reader",
