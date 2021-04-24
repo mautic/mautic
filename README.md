@@ -64,7 +64,7 @@ Installing Mautic is a simple three-step process:
 2. Run the `composer install` command to install the required packages.
 3. Open your browser and complete the installation through the web installer.
 
-If you get stuck, check our our [general troubleshooting](https://docs.mautic.org/en/troubleshooting) page. Still no joy? Join the [Mautic community](https://www.mautic.org/community) for support and answers.
+If you get stuck, check our our [general troubleshooting][troubleshooting] page. Still no joy? Join our lively [Mautic Community][community] for support and answers.
 
 ### User Documentation
 Documentation on how to use Mautic is available at [docs.mautic.org][mautic-docs].
