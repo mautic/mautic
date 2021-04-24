@@ -1,9 +1,38 @@
+import DynamicContentService from './dynamicContent.service';
+import CodeEditor from '../codeEditor';
+
 class DynamicContent {
   constructor(editor, opts = {}) {
+    console.warn({ editor });
     this.editor = editor;
     this.opts = opts;
 
     this.codePopup = this.buildCodePopup();
+  }
+
+  /**
+   * Launch Code Editor popup
+   */
+  static launchCodeEdit(editor, sender) {
+    const codeEditor = new CodeEditor(editor, this.opts);
+
+    if (sender) {
+      sender.set('active', 0);
+    }
+
+    // Transform DC to token
+    DynamicContentService.grapesConvertDynamicContentSlotsToTokens(editor);
+    codeEditor.showCodePopup();
+  }
+
+  static launchDynamicContent(editor, sender, options) {
+    const { target } = options;
+    const component = target || editor.getSelected();
+
+    this.showCodePopup(component);
+
+    // Transform DC to token
+    DynamicContentService.grapesConvertDynamicContentSlotsToTokens(editor);
   }
 
   // Build popup content, Dynamic Content area and buttons
