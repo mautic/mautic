@@ -4,7 +4,6 @@
   "type": "mautic-plugin",
   "keywords": ["mautic","plugin","integration"],
   "require": {
-    "mautic/composer-plugin": "^1.0",
     "php": "^7.2"
   },
   "require-dev": {
