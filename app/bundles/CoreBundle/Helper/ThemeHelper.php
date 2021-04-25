@@ -658,10 +658,10 @@ class ThemeHelper
             $builderName = $builder->getName();
         } catch (IntegrationNotFoundException $exception) {
             // Assume legacy builder
-            $builderName = 'legacy';
+            $builderName = 'grapesjsbuilder';
         }
 
-        $builderRequested = $config['builder'] ?? 'legacy';
+        $builderRequested = $config['builder'] ?? null;
 
         return $builderName === $builderRequested;
     }
