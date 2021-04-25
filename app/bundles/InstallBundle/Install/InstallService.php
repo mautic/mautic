@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Install;
@@ -206,7 +207,7 @@ class InstallService
                     'mautic.installer.error.writing.configuration',
                     [],
                     'flashes'
-                )
+                ),
             ];
         }
 
@@ -218,8 +219,6 @@ class InstallService
     }
 
     /**
-     * @param array $dbParams
-     *
      * @return array Validation errors
      */
     public function validateDatabaseParams(array $dbParams): array
