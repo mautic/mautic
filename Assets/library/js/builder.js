@@ -14,9 +14,7 @@ function launchBuilderGrapesjs(formName) {
   const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
   const fullHtml = parser.parseFromString(textareaHtml.val(), 'text/html');
 
-  const canvasContent = fullHtml.body.innerHTML
-    ? fullHtml.body.innerHTML
-    : mQuery('textarea.builder-mjml').val();
+  const canvasContent = mQuery('textarea.builder-mjml').val() ? mQuery('textarea.builder-mjml').val() : fullHtml.body.innerHTML;
 
   const assets = textareaAssets.val() ? JSON.parse(textareaAssets.val()) : [];
 
