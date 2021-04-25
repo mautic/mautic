@@ -312,7 +312,7 @@ class InstallCommand extends ContainerAwareCommand
             case InstallService::CHECK_STEP:
                 $output->writeln($step.' - Checking installation requirements...');
                 $messages = $this->stepAction($installer, ['site_url' => $siteUrl], $step);
-                if (is_array($messages) && !empty($messages)) {
+                if (!empty($messages)) {
                     if (isset($messages['requirements']) && !empty($messages['requirements'])) {
                         // Stop install if requirements not met
                         $output->writeln('Missing requirements:');
@@ -343,7 +343,7 @@ class InstallCommand extends ContainerAwareCommand
             case InstallService::DOCTRINE_STEP:
                 $output->writeln($step.' - Creating database...');
                 $messages = $this->stepAction($installer, $dbParams, $step);
-                if (is_array($messages) && !empty($messages)) {
+                if (!empty($messages)) {
                     $output->writeln('Errors in database configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -355,7 +355,7 @@ class InstallCommand extends ContainerAwareCommand
 
                 $output->writeln($step.' - Creating schema...');
                 $messages = $this->stepAction($installer, $dbParams, $step);
-                if (is_array($messages) && !empty($messages)) {
+                if (!empty($messages)) {
                     $output->writeln('Errors in schema configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -367,7 +367,7 @@ class InstallCommand extends ContainerAwareCommand
 
                 $output->writeln($step.' - Loading fixtures...');
                 $messages = $this->stepAction($installer, $dbParams, $step);
-                if (is_array($messages) && !empty($messages)) {
+                if (!empty($messages)) {
                     $output->writeln('Errors in fixtures configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -382,7 +382,7 @@ class InstallCommand extends ContainerAwareCommand
             case InstallService::USER_STEP:
                 $output->writeln($step.' - Creating admin user...');
                 $messages = $this->stepAction($installer, $adminParam, $step);
-                if (is_array($messages) && !empty($messages)) {
+                if (!empty($messages)) {
                     $output->writeln('Errors in admin user configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -397,7 +397,7 @@ class InstallCommand extends ContainerAwareCommand
             case InstallService::EMAIL_STEP:
                 $output->writeln($step.' - Email configuration...');
                 $messages = $this->stepAction($installer, $allParams, $step);
-                if (is_array($messages) && !empty($messages)) {
+                if (!empty($messages)) {
                     $output->writeln('Errors in email configuration:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -413,7 +413,7 @@ class InstallCommand extends ContainerAwareCommand
                 $output->writeln($step.' - Final steps...');
                 $messages = $this->stepAction($installer, $allParams, $step);
 
-                if (is_array($messages) && !empty($messages)) {
+                if (!empty($messages)) {
                     $output->writeln('Errors in final migration:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -440,19 +440,17 @@ class InstallCommand extends ContainerAwareCommand
      * @param array          $params    The install parameters
      * @param int            $index     The step number to process
      *
-     * @return int|array|bool
-     *
      * @throws \Exception
      */
-    protected function stepAction(InstallService $installer, $params, $index = 0)
+    protected function stepAction(InstallService $installer, array $params, int $index = 0): array
     {
         if (false !== strpos($index, '.')) {
-            list($index, $subIndex) = explode('.', $index);
+            [$index, $subIndex] = explode('.', $index);
         }
 
-        $step = $installer->getStep($index);
+        $step     = $installer->getStep($index);
+        $messages = [];
 
-        $messages = false;
         switch ($index) {
             case InstallService::CHECK_STEP:
                 // Check installation requirements
@@ -461,7 +459,6 @@ class InstallCommand extends ContainerAwareCommand
                     $step->site_url = $params['site_url'];
                 }
 
-                $messages                 = [];
                 $messages['requirements'] = $installer->checkRequirements($step);
                 $messages['optional']     = $installer->checkOptionalSettings($step);
                 break;
@@ -515,7 +512,7 @@ class InstallCommand extends ContainerAwareCommand
                 // Save final configuration
                 $siteUrl  = $params['site_url'];
                 $messages = $installer->createFinalConfigStep($siteUrl);
-                if (is_bool($messages) && true === $messages) {
+                if (empty($messages)) {
                     $installer->finalMigrationStep();
                 }
                 break;
