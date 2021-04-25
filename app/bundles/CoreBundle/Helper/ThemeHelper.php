@@ -661,7 +661,7 @@ class ThemeHelper
             $builderName = 'grapesjsbuilder';
         }
 
-        $builderRequested = $config['builder'] ?? null;
+        $builderRequested = $config['builder'] ?? 'grapesjsbuilder';
 
         return $builderName === $builderRequested;
     }
