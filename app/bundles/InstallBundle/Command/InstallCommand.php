@@ -14,6 +14,7 @@ namespace Mautic\InstallBundle\Command;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;
+use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -351,8 +352,8 @@ class InstallCommand extends ContainerAwareCommand
 
                     return -$step;
                 }
-                $step = InstallService::DOCTRINE_STEP + .1;
 
+                $step = InstallService::DOCTRINE_STEP + .1;
                 $output->writeln($step.' - Creating schema...');
                 $messages = $this->stepAction($installer, $dbParams, $step);
                 if (!empty($messages)) {
@@ -363,8 +364,8 @@ class InstallCommand extends ContainerAwareCommand
 
                     return -InstallService::DOCTRINE_STEP;
                 }
-                $step = InstallService::DOCTRINE_STEP + .2;
 
+                $step = InstallService::DOCTRINE_STEP + .2;
                 $output->writeln($step.' - Loading fixtures...');
                 $messages = $this->stepAction($installer, $dbParams, $step);
                 if (!empty($messages)) {
@@ -375,6 +376,7 @@ class InstallCommand extends ContainerAwareCommand
 
                     return -InstallService::DOCTRINE_STEP;
                 }
+
                 // Keep on with next step
                 $step = InstallService::USER_STEP;
 
@@ -412,9 +414,8 @@ class InstallCommand extends ContainerAwareCommand
             case InstallService::FINAL_STEP:
                 $output->writeln($step.' - Final steps...');
                 $messages = $this->stepAction($installer, $allParams, $step);
-
                 if (!empty($messages)) {
-                    $output->writeln('Errors in final migration:');
+                    $output->writeln('Errors in final step:');
                     $this->handleInstallerErrors($output, $messages);
 
                     $output->writeln('Install canceled');
@@ -438,22 +439,24 @@ class InstallCommand extends ContainerAwareCommand
      *
      * @param InstallService $installer The install process
      * @param array          $params    The install parameters
-     * @param int            $index     The step number to process
+     * @param float          $index     The step number to process
      *
      * @throws \Exception
      */
-    protected function stepAction(InstallService $installer, array $params, int $index = 0): array
+    protected function stepAction(InstallService $installer, array $params, float $index = 0): array
     {
-        if (false !== strpos($index, '.')) {
-            [$index, $subIndex] = explode('.', $index);
+        if ($index - floor($index) > 0) {
+            $subIndex = (int) (round($index - floor($index), 1) * 10);
+            $index    = floor($index);
         }
+        $index = (int) $index;
 
-        $step     = $installer->getStep($index);
         $messages = [];
 
         switch ($index) {
             case InstallService::CHECK_STEP:
                 // Check installation requirements
+                $step = $installer->getStep($index);
                 if ($step instanceof CheckStep) {
                     // Set all step fields based on parameters
                     $step->site_url = $params['site_url'];
@@ -464,6 +467,7 @@ class InstallCommand extends ContainerAwareCommand
                 break;
 
             case InstallService::DOCTRINE_STEP:
+                $step = $installer->getStep($index);
                 if ($step instanceof DoctrineStep) {
                     // Set all step fields based on parameters
                     foreach ($step as $key => $value) {
@@ -472,21 +476,24 @@ class InstallCommand extends ContainerAwareCommand
                         }
                     }
                 }
+
                 if (!isset($subIndex)) {
                     // Install database
                     $messages = $installer->createDatabaseStep($step, $params);
-                } else {
-                    switch ((int) $subIndex) {
-                        case 1:
-                            // Install schema
-                            $messages = $installer->createSchemaStep($params);
-                            break;
 
-                        case 2:
-                            // Install fixtures
-                            $messages = $installer->createFixturesStep($this->getContainer());
-                            break;
-                    }
+                    break;
+                }
+
+                switch ($subIndex) {
+                    case 1:
+                        // Install schema
+                        $messages = $installer->createSchemaStep($params);
+                        break;
+
+                    case 2:
+                        // Install fixtures
+                        $messages = $installer->createFixturesStep($this->getContainer());
+                        break;
                 }
                 break;
 
@@ -497,6 +504,7 @@ class InstallCommand extends ContainerAwareCommand
 
             case InstallService::EMAIL_STEP:
                 // Save email configuration
+                $step = $installer->getStep($index);
                 if ($step instanceof EmailStep) {
                     // Set all step fields based on parameters
                     foreach ($step as $key => $value) {

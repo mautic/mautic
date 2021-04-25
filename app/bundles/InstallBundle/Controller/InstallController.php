@@ -46,7 +46,7 @@ class InstallController extends CommonController
      *
      * @throws DBALException
      */
-    public function stepAction($index = 0)
+    public function stepAction(float $index = 0)
     {
         // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app
         // is installed and redirect
@@ -54,9 +54,11 @@ class InstallController extends CommonController
             return $this->redirect($this->generateUrl('mautic_dashboard_index'));
         }
 
-        if (false !== strpos($index, '.')) {
-            [$index, $subIndex] = explode('.', $index);
+        if ($index - floor($index) > 0) {
+            $subIndex = (int) (round($index - floor($index), 1) * 10);
+            $index    = floor($index);
         }
+        $index = (int) $index;
 
         $params = $this->configurator->getParameters();
 
@@ -151,7 +153,7 @@ class InstallController extends CommonController
                 case InstallService::DOCTRINE_STEP:
                     $dbParams = (array) $step;
 
-                    switch ((int) $subIndex) {
+                    switch ($subIndex) {
                         case 1:
                             $messages = $this->installer->createSchemaStep($dbParams);
                             if (!empty($messages)) {
@@ -211,7 +213,7 @@ class InstallController extends CommonController
             // Redirect back to last step if the user advanced ahead via the URL
             $last = (int) end($completedSteps) + 1;
             if ($index && $index > $last) {
-                return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => (int) $last]));
+                return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => $last]));
             }
         }
 
