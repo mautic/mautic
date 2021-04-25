@@ -60,6 +60,14 @@
 
     * `mautic.http.connector` has been removed in favor of `mautic.http.client`. See the example above on how to use it in your class constructors.
 
-*   Plugins
+*   PluginBundle
     * If you extend `AbstractIntegration` and use the method `makeRequest`, including `$options['return_raw']`, you will now get `\Psr\Http\Message\ResponseInterface` as the response type (was `\Joomla\CMS\Http\Response`)
     * If you're listening on the `Mautic\PluginBundle\PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE` event, `PluginIntegrationRequestEvent->getResponse()` now returns `\Psr\Http\Message\ResponseInterface` as the type (was not explicitly defined)
+
+*   WebhookBundle
+    * \Mautic\WebhookBundle\Entity\Webhook::getQueues() removed and there is no replacement
+    * \Mautic\WebhookBundle\Entity\Webhook::addQueues() removed and there is no replacement
+    * \Mautic\WebhookBundle\Entity\Webhook::addQueue() removed and there is no replacement
+    * \Mautic\WebhookBundle\Entity\Webhook::removeQueue() removed and there is no replacement
+
+    
