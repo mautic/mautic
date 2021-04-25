@@ -161,7 +161,7 @@ class InstallService
     /**
      * Translation messages array.
      */
-    private function translateMessage(array $messages): array
+    private function translateMessages(array $messages): array
     {
         if (empty($messages)) {
             return $messages;
@@ -181,7 +181,7 @@ class InstallService
     {
         $messages = $step->checkRequirements();
 
-        return $this->translateMessage($messages);
+        return $this->translateMessages($messages);
     }
 
     /**
@@ -191,7 +191,7 @@ class InstallService
     {
         $messages = $step->checkOptionalSettings();
 
-        return $this->translateMessage($messages);
+        return $this->translateMessages($messages);
     }
 
     public function saveConfiguration($params, StepInterface $step = null, $clearCache = false): array
@@ -398,8 +398,6 @@ class InstallService
             $user = new User();
         }
 
-        $translator = $this->translator;
-
         $required = [
             'firstname',
             'lastname',
@@ -411,7 +409,7 @@ class InstallService
         $messages = [];
         foreach ($required as $r) {
             if (!isset($data[$r])) {
-                $messages[$r] = $translator->trans(
+                $messages[$r] = $this->translator->trans(
                     'mautic.core.value.required',
                     [],
                     'validators'
@@ -424,7 +422,7 @@ class InstallService
         }
 
         $emailConstraint          = new Assert\Email();
-        $emailConstraint->message = $translator->trans('mautic.core.email.required',
+        $emailConstraint->message = $this->translator->trans('mautic.core.email.required',
             [],
             'validators'
         );
@@ -454,7 +452,7 @@ class InstallService
         try {
             $adminRole = $entityManager->getReference('MauticUserBundle:Role', 1);
         } catch (\Exception $exception) {
-            $messages['error'] = $translator->trans(
+            $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.getting.role',
                 ['%exception%' => $exception->getMessage()],
                 'flashes'
@@ -468,7 +466,7 @@ class InstallService
                 $entityManager->persist($user);
                 $entityManager->flush();
             } catch (\Exception $exception) {
-                $messages['error'] = $translator->trans(
+                $messages['error'] = $this->translator->trans(
                     'mautic.installer.error.creating.user',
                     ['%exception%' => $exception->getMessage()],
                     'flashes'
