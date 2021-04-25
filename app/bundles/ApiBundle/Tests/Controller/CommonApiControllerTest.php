@@ -12,11 +12,13 @@
 namespace Mautic\ApiBundle\Tests\Controller;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class CommonApiControllerTest extends CampaignTestAbstract
@@ -113,6 +115,12 @@ class CommonApiControllerTest extends CampaignTestAbstract
                 return $this->getBatchEntities($parameters, $errors, false, 'id', $model);
             }
         };
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container->method('get')
+            ->with('mautic.api.helper.entity_result')
+            ->willReturn(new EntityResultHelper());
+        $controller->setContainer($container);
 
         $errors     = [];
         $parameters = [
