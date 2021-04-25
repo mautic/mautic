@@ -308,9 +308,10 @@ class InstallService
     {
         $translator = $this->translator;
 
-        $messages = $this->validateDatabaseParams($dbParams);
+        $status   = $this->validateDatabaseParams($dbParams);
+        $messages = [];
 
-        if (is_bool($messages) && true === $messages) {
+        if (is_bool($status) && true === $status) {
             // Check if connection works and/or create database if applicable
             $schemaHelper = new SchemaHelper($dbParams);
 
@@ -318,9 +319,9 @@ class InstallService
                 $schemaHelper->testConnection();
 
                 if ($schemaHelper->createDatabase()) {
-                    $messages = $this->saveConfiguration($dbParams, $step, true);
-                    if (is_bool($messages)) {
-                        return $messages;
+                    $status = $this->saveConfiguration($dbParams, $step, true);
+                    if (is_bool($status) && true === $status) {
+                        return $status;
                     }
 
                     $messages['error'] = $translator->trans(
