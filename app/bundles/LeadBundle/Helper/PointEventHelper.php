@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+use Mautic\LeadBundle\Model\LeadModel;
+
 /**
  * Class PointEventHelper.
  */
@@ -18,17 +20,14 @@ class PointEventHelper
 {
     /**
      * @param $event
-     * @param $factory
      * @param $lead
      *
      * @return bool
      */
-    public static function changeLists($event, $factory, $lead)
+    public static function changeLists($event, LeadModel $leadModel, $lead)
     {
         $properties = $event['properties'];
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel  = $factory->getModel('lead');
         $addTo      = $properties['addToLists'];
         $removeFrom = $properties['removeFromLists'];
 

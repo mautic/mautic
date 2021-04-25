@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\PointEventHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -29,45 +28,17 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $result = $helper->sendEmail($event, $lead, $this->getMockMauticFactory());
+        $result = $helper->sendEmail($event, $lead, $this->getMockEmail(), $this->getMockLead());
         $this->assertEquals(true, $result);
 
-        $result = $helper->sendEmail($event, $lead, $this->getMockMauticFactory(false));
+        $result = $helper->sendEmail($event, $lead, $this->getMockEmail(false), $this->getMockLead());
         $this->assertEquals(false, $result);
 
-        $result = $helper->sendEmail($event, $lead, $this->getMockMauticFactory(true, false));
+        $result = $helper->sendEmail($event, $lead, $this->getMockEmail(true, false), $this->getMockLead());
         $this->assertEquals(false, $result);
 
-        $result = $helper->sendEmail($event, new Lead(), $this->getMockMauticFactory(true, false));
+        $result = $helper->sendEmail($event, new Lead(), $this->getMockEmail(true, false), $this->getMockLead());
         $this->assertEquals(false, $result);
-    }
-
-    /**
-     * @param bool $published
-     * @param bool $success
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getMockMauticFactory($published = true, $success = true)
-    {
-        $mock = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getModel'])
-            ->getMock()
-        ;
-
-        $mock->expects($this->any())
-            ->method('getModel')
-            ->willReturnCallback(function ($model) use ($published, $success) {
-                switch ($model) {
-                    case 'email':
-                        return $this->getMockEmail($published, $success);
-                    case 'lead':
-                        return $this->getMockLead();
-                }
-            });
-
-        return $mock;
     }
 
     /**

@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -50,20 +50,17 @@ class PointEventHelper
      *
      * @return bool
      */
-    public static function sendEmail($event, Lead $lead, MauticFactory $factory)
+    public static function sendEmail($event, Lead $lead, EmailModel $model)
     {
         $properties = $event['properties'];
         $emailId    = (int) $properties['email'];
 
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model = $factory->getModel('email');
         $email = $model->getEntity($emailId);
 
         //make sure the email still exists and is published
         if (null != $email && $email->isPublished()) {
             $leadFields = $lead->getFields();
             if (isset($leadFields['core']['email']['value']) && $leadFields['core']['email']['value']) {
-                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
                 $leadCredentials       = $lead->getProfileFields();
                 $leadCredentials['id'] = $lead->getId();
 
