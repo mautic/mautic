@@ -259,4 +259,20 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(true, $this->installer->validateDatabaseParams($dbParams));
     }
+
+    /**
+     * When an exception is raised while creating a database, there must be an array returned.
+     */
+    public function testcreateDatabaseStepWithErrors(): void
+    {
+        $dbParams = [
+            'driver' => 'pdo_mysql',
+            'host'   => 'localhost',
+            'port'   => '3306',
+            'name'   => 'mautic',
+            'user'   => 'mautic',
+        ];
+
+        $this->assertEquals(['error' => null], $this->installer->createDatabaseStep(1, $dbParams));
+    }
 }
