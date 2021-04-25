@@ -1,24 +1,19 @@
 <?php
-
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Install;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
@@ -32,9 +27,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-/**
- * Class InstallService.
- */
 class InstallService
 {
     const CHECK_STEP    = 0;
@@ -86,21 +78,20 @@ class InstallService
      *
      * @param int $index The step number to retrieve
      *
-     * @return bool|StepInterface the valid step given installation status
+     * @return StepInterface the valid step given installation status
      *
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException|AlreadyInstalledException
      */
-    public function getStep($index = 0)
+    public function getStep(int $index = 0): StepInterface
     {
         // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app
         // is installed and redirect
         if ($this->checkIfInstalled()) {
-            return true;
+            throw new AlreadyInstalledException();
         }
 
-        if (false !== ($pos = strpos($index, '.'))) {
-            $index = (int) substr($index, 0, $pos);
-        }
+        // Some pages have sub steps i.e. 1.2
+        $index = floor($index);
 
         $params = $this->configurator->getParameters();
 
@@ -116,30 +107,26 @@ class InstallService
 
     /**
      * Get local config file location.
-     *
-     * @return string
      */
-    private function localConfig()
+    private function localConfig(): string
     {
-        return $this->pathsHelper->getSystemPath('local_config', false);
+        return (string) $this->pathsHelper->getSystemPath('local_config', false);
     }
 
     /**
      * Get local config parameters.
-     *
-     * @return array
      */
-    public function localConfigParameters()
+    public function localConfigParameters(): array
     {
         $localConfigFile = $this->localConfig();
 
         if (file_exists($localConfigFile)) {
             /** @var array $parameters */
-            $parameters = false;
+            $parameters = [];
 
             // Load local config to override parameters
             include $localConfigFile;
-            $localParameters = (is_array($parameters)) ? $parameters : [];
+            $localParameters = $parameters;
         } else {
             $localParameters = [];
         }
@@ -149,10 +136,8 @@ class InstallService
 
     /**
      * Checks if the application has been installed and redirects if so.
-     *
-     * @return bool
      */
-    public function checkIfInstalled()
+    public function checkIfInstalled(): bool
     {
         // If the config file doesn't even exist, no point in checking further
         $localConfigFile = $this->localConfig();
@@ -175,19 +160,15 @@ class InstallService
 
     /**
      * Translation messages array.
-     *
-     * @param array $messages
-     *
-     * @return array
      */
-    private function translateMessage($messages)
+    private function translateMessage(array $messages): array
     {
-        $translator = $this->translator;
+        if (empty($messages)) {
+            return $messages;
+        }
 
-        if (is_array($messages) && !empty($messages)) {
-            foreach ($messages as $key => $value) {
-                $messages[$key] = $translator->trans($value);
-            }
+        foreach ($messages as $key => $value) {
+            $messages[$key] = $this->translator->trans($value);
         }
 
         return $messages;
@@ -195,12 +176,8 @@ class InstallService
 
     /**
      * Checks for step's requirements.
-     *
-     * @param StepInterface|null $step
-     *
-     * @return array
      */
-    public function checkRequirements($step)
+    public function checkRequirements(StepInterface $step): array
     {
         $messages = $step->checkRequirements();
 
@@ -209,46 +186,33 @@ class InstallService
 
     /**
      * Checks for step's optional settings.
-     *
-     * @param StepInterface|null $step
-     *
-     * @return array
      */
-    public function checkOptionalSettings($step)
+    public function checkOptionalSettings(StepInterface $step): array
     {
         $messages = $step->checkOptionalSettings();
 
         return $this->translateMessage($messages);
     }
 
-    /**
-     * @param array|StepInterface $params
-     * @param StepInterface|null  $step
-     * @param bool                $clearCache
-     *
-     * @return bool
-     */
-    public function saveConfiguration($params, $step = null, $clearCache = false)
+    public function saveConfiguration($params, StepInterface $step = null, $clearCache = false): array
     {
-        $translator = $this->translator;
-
-        if (null !== $step && $step instanceof StepInterface) {
+        if ($step instanceof StepInterface) {
             $params = $step->update($step);
         }
 
         $this->configurator->mergeParameters($params);
 
-        $messages = false;
-
+        $messages = [];
         try {
             $this->configurator->write();
-            $messages = true;
         } catch (\RuntimeException $exception) {
-            $messages          = [];
-            $messages['error'] = $translator->trans(
-                'mautic.installer.error.writing.configuration',
-                [],
-                'flashes');
+            $messages = [
+                'error' => $this->translator->trans(
+                    'mautic.installer.error.writing.configuration',
+                    [],
+                    'flashes'
+                )
+            ];
         }
 
         if ($clearCache) {
@@ -261,12 +225,10 @@ class InstallService
     /**
      * @param array $dbParams
      *
-     * @return array|bool
+     * @return array Validation errors
      */
-    public function validateDatabaseParams($dbParams)
+    public function validateDatabaseParams(array $dbParams): array
     {
-        $translator = $this->translator;
-
         $required = [
             'driver',
             'host',
@@ -277,7 +239,7 @@ class InstallService
         $messages = [];
         foreach ($required as $r) {
             if (!isset($dbParams[$r]) || empty($dbParams[$r])) {
-                $messages[$r] = $translator->trans(
+                $messages[$r] = $this->translator->trans(
                     'mautic.core.value.required',
                     [],
                     'validators'
@@ -286,60 +248,51 @@ class InstallService
         }
 
         if (!isset($dbParams['port']) || (int) $dbParams['port'] <= 0) {
-            $messages['port'] = $translator->trans(
+            $messages['port'] = $this->translator->trans(
                 'mautic.install.database.port.invalid',
                 [],
                 'validators'
             );
         }
 
-        return empty($messages) ? true : $messages;
+        return $messages;
     }
 
     /**
      * Create the database.
-     *
-     * @param StepInterface|null $step
-     * @param array              $dbParams
-     *
-     * @return array|bool
      */
-    public function createDatabaseStep($step, $dbParams)
+    public function createDatabaseStep(StepInterface $step, array $dbParams): array
     {
-        $translator = $this->translator;
+        $messages = $this->validateDatabaseParams($dbParams);
 
-        $status   = $this->validateDatabaseParams($dbParams);
-        $messages = [];
+        if (!empty($messages)) {
+            return $messages;
+        }
 
-        if (is_bool($status) && true === $status) {
-            // Check if connection works and/or create database if applicable
-            $schemaHelper = new SchemaHelper($dbParams);
+        // Check if connection works and/or create database if applicable
+        $schemaHelper = new SchemaHelper($dbParams);
 
-            try {
-                $schemaHelper->testConnection();
+        try {
+            $schemaHelper->testConnection();
 
-                if ($schemaHelper->createDatabase()) {
-                    $status = $this->saveConfiguration($dbParams, $step, true);
-                    if (is_bool($status) && true === $status) {
-                        return $status;
-                    }
-
-                    $messages['error'] = $translator->trans(
-                        'mautic.installer.error.writing.configuration',
-                        [],
-                        'flashes');
-                } else {
-                    $messages['error'] = $translator->trans(
-                        'mautic.installer.error.creating.database',
-                        ['%name%' => $dbParams['name']],
-                        'flashes');
+            if ($schemaHelper->createDatabase()) {
+                $messages = $this->saveConfiguration($dbParams, $step, true);
+                if (empty($messages)) {
+                    return $messages;
                 }
-            } catch (\Exception $exception) {
-                $messages['error'] = $translator->trans(
-                    'mautic.installer.error.connecting.database',
-                    ['%exception%' => $exception->getMessage()],
-                    'flashes');
             }
+
+            $messages['error'] = $this->translator->trans(
+                'mautic.installer.error.creating.database',
+                ['%name%' => $dbParams['name']],
+                'flashes'
+            );
+        } catch (\Exception $exception) {
+            $messages['error'] = $this->translator->trans(
+                'mautic.installer.error.connecting.database',
+                ['%exception%' => $exception->getMessage()],
+                'flashes'
+            );
         }
 
         return $messages;
@@ -347,30 +300,22 @@ class InstallService
 
     /**
      * Create the database schema.
-     *
-     * @param array $dbParams
-     *
-     * @return array|bool
      */
-    public function createSchemaStep($dbParams)
+    public function createSchemaStep(array $dbParams): array
     {
-        $translator    = $this->translator;
-        $entityManager = $this->entityManager;
         $schemaHelper  = new SchemaHelper($dbParams);
-        $schemaHelper->setEntityManager($entityManager);
+        $schemaHelper->setEntityManager($this->entityManager);
 
         $messages = [];
         try {
             if (!$schemaHelper->installSchema()) {
-                $messages['error'] = $translator->trans(
+                $messages['error'] = $this->translator->trans(
                     'mautic.installer.error.no.metadata',
                     [],
                     'flashes');
-            } else {
-                $messages = true;
             }
         } catch (\Exception $exception) {
-            $messages['error'] = $translator->trans(
+            $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.installing.data',
                 ['%exception%' => $exception->getMessage()],
                 'flashes');
@@ -381,22 +326,19 @@ class InstallService
 
     /**
      * Load the database fixtures in the database.
-     *
-     * @return array|bool
      */
-    public function createFixturesStep(ContainerInterface $container)
+    public function createFixturesStep(ContainerInterface $container): array
     {
-        $translator = $this->translator;
-
         $messages = [];
+
         try {
             $this->installDatabaseFixtures($container);
-            $messages = true;
         } catch (\Exception $exception) {
-            $messages['error'] = $translator->trans(
+            $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.adding.fixtures',
                 ['%exception%' => $exception->getMessage()],
-                'flashes');
+                'flashes'
+            );
         }
 
         return $messages;
@@ -405,13 +347,12 @@ class InstallService
     /**
      * Installs data fixtures for the application.
      *
-     * @return bool boolean true on success
+     * @throws \InvalidArgumentException
      */
-    public function installDatabaseFixtures(ContainerInterface $container)
+    public function installDatabaseFixtures(ContainerInterface $container): void
     {
-        $entityManager = $this->entityManager;
-        $paths         = [dirname(__DIR__).'/InstallFixtures/ORM'];
-        $loader        = new ContainerAwareLoader($container);
+        $paths  = [dirname(__DIR__).'/InstallFixtures/ORM'];
+        $loader = new ContainerAwareLoader($container);
 
         foreach ($paths as $path) {
             if (is_dir($path)) {
@@ -425,9 +366,9 @@ class InstallService
             throw new \InvalidArgumentException(sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths)));
         }
 
-        $purger = new ORMPurger($entityManager);
+        $purger = new ORMPurger($this->entityManager);
         $purger->setPurgeMode(ORMPurger::PURGE_MODE_DELETE);
-        $executor = new ORMExecutor($entityManager, $purger);
+        $executor = new ORMExecutor($this->entityManager, $purger);
         /*
          * FIXME entity manager does not load configuration if local.php just created by CLI install
          * [error] An error occurred while attempting to add default data
@@ -435,21 +376,12 @@ class InstallService
          * SQLSTATE[HY000] [1045] Access refused for user: ''@'@localhost' (mot de passe: NON)
          */
         $executor->execute($fixtures, true);
-
-        return true;
     }
 
     /**
      * Create the administrator user.
-     *
-     * @param array $data
-     *
-     * @return array|bool
-     *
-     * @throws ORMException
-     * @throws OptimisticLockException
      */
-    public function createAdminUserStep($data)
+    public function createAdminUserStep(array $data): array
     {
         $entityManager = $this->entityManager;
 
@@ -535,7 +467,6 @@ class InstallService
             try {
                 $entityManager->persist($user);
                 $entityManager->flush();
-                $messages = true;
             } catch (\Exception $exception) {
                 $messages['error'] = $translator->trans(
                     'mautic.installer.error.creating.user',
@@ -550,16 +481,9 @@ class InstallService
 
     /**
      * Setup the email configuration.
-     *
-     * @param StepInterface|null $step
-     * @param array              data
-     *
-     * @return array|bool
      */
-    public function setupEmailStep($step, $data)
+    public function setupEmailStep(StepInterface $step, array $data): array
     {
-        $translator = $this->translator;
-
         $required = [
             'mailer_from_name',
             'mailer_from_email',
@@ -568,7 +492,7 @@ class InstallService
         $messages = [];
         foreach ($required as $r) {
             if (!isset($data[$r]) || empty($data[$r])) {
-                $messages[$r] = $translator->trans(
+                $messages[$r] = $this->translator->trans(
                     'mautic.core.value.required',
                     [],
                     'validators'
@@ -581,7 +505,7 @@ class InstallService
         }
 
         $emailConstraint          = new Assert\Email();
-        $emailConstraint->message = $translator->trans('mautic.core.email.required',
+        $emailConstraint->message = $this->translator->trans('mautic.core.email.required',
             [],
             'validators'
         );
@@ -595,21 +519,17 @@ class InstallService
             foreach ($errors as $error) {
                 $messages[] = $error->getMessage();
             }
-        } else {
-            $messages = $this->saveConfiguration($data, $step, true);
+
+            return $messages;
         }
 
-        return $messages;
+        return $this->saveConfiguration($data, $step, true);
     }
 
     /**
      * Create the final configuration.
-     *
-     * @param string $siteUrl
-     *
-     * @return array|bool
      */
-    public function createFinalConfigStep($siteUrl)
+    public function createFinalConfigStep(string $siteUrl): array
     {
         // Merge final things into the config, wipe the container, and we're done!
         $finalConfigVars = [
@@ -622,12 +542,8 @@ class InstallService
 
     /**
      * Final migration step for install.
-     *
-     * @return bool
-     *
-     * @throws \Exception
      */
-    public function finalMigrationStep()
+    public function finalMigrationStep(): void
     {
         // Add database migrations up to this point since this is a fresh install (must be done at this point
         // after the cache has been rebuilt
@@ -637,7 +553,5 @@ class InstallService
         $application = new Application($this->kernel);
         $application->setAutoExit(false);
         $application->run($input, $output);
-
-        return true;
     }
 }
