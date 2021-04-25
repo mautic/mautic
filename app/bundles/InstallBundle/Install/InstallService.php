@@ -88,9 +88,6 @@ class InstallService
             throw new AlreadyInstalledException();
         }
 
-        // Some pages have sub steps i.e. 1.2
-        $index = floor($index);
-
         $params = $this->configurator->getParameters();
 
         // Check to ensure the installer is in the right place
