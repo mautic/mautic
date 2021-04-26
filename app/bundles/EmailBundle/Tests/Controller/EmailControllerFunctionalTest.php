@@ -131,7 +131,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
         $html    = $crawler->filterXPath("//select[@id='emailform_segmentTranslationParent']//optgroup")->html();
-        self::assertSame('<option value="'.$email->getId().'">'.$email->getName().'</option>', $html);
+        self::assertSame('<option value="'.$email->getId().'">'.$email->getName().'</option>', trim($html));
     }
 
     private function createSegment(string $suffix = 'A'): LeadList
