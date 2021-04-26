@@ -6,8 +6,6 @@ body, html {
 /* GrapesJS temporary fix #2490 */
 .gjs-clm-tag-status,
 .gjs-clm-tag-close {
-    width: 12px;
-    height: 12px;
 }
 .gjs-clm-tags-btn {
     width: 24px;
@@ -19,6 +17,7 @@ body, html {
     padding: 0 0 0;
     top: 40px;
     bottom: 0;
+    background: #f0f0f0;
 }
 
 .gjs-btn-code-edit {
@@ -75,12 +74,11 @@ body, html {
 /* GrapesJS Colors / Theme */
 .gjs-clm-tags .gjs-sm-title,
 .gjs-sm-sector .gjs-sm-title {
-    border-top: none; }
+}
 
 .gjs-clm-tags .gjs-clm-tag {
-    border: none;
+    border: 1px solid #707070;
     box-shadow: none;
-    padding: 5px 8px;
     text-shadow: none; }
 
 .gjs-field {
@@ -106,16 +104,6 @@ body, html {
     font-size: 12px; }
 
 /* GrapesJS Extra */
-.gjs-block {
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 3px;
-    margin: 10px 2.5% 5px;
-    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.15);
-    transition: box-shadow, color 0.2s ease 0s; }
-
-.gjs-block:hover {
-    box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.15); }
-
 #gjs-pn-views-container.gjs-pn-panel {
     padding: 39px 0 0; }
 
@@ -156,7 +144,7 @@ body, html {
 #gjs-sm-padding-bottom,
 #gjs-sm-padding-right,
 #gjs-sm-padding-left {
-    flex: 999 1 60px; }
+}
 
 #gjs-sm-border-width,
 #gjs-sm-border-style,
@@ -176,7 +164,9 @@ body, html {
     order: 4; }
 
 .gjs-field-radio {
-    width: 100%; }
+    width: 100%; 
+    background: #f0f0f0;
+}
 
 .gjs-field-radio #gjs-sm-input-holder {
     display: flex; }
