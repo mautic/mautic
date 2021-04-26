@@ -18,6 +18,7 @@ parameters:
 		- app/bundles/CoreBundle/Configurator/Configurator.php
 	ignoreErrors:
 		- '#Cannot unset offset#'
+		- '#Undefined variable: \$container#'
 		- '#Undefined variable: \$parameters#'
 		- '#Call to an undefined static method Mautic\\IntegrationsBundle\\Bundle\\AbstractPluginBundle::installAllTablesIfMissing\(\).#'
 		- '#Constant MAUTIC_TABLE_PREFIX not found.#'
