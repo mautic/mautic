@@ -768,7 +768,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     );
                 $from = $q->getQueryPart('from')[0];
                 $q->resetQueryPart('from');
-                $q->add('from', ['hint' => 'USE INDEX FOR JOIN (`PRIMARY`)'] + $from, true);
+                $q->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
 
                 $filter->strict  = true;
                 $q->andWhere($q->expr()->{$filter->not ? 'notExists' : 'exists'}($sq->getSQL()));
