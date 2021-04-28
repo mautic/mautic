@@ -371,7 +371,7 @@ class QueryBuilderTest extends TestCase
             ->setFirstResult(30)
             ->setMaxResults(10);
 
-        Assert::assertSame("SELECT t.name FROM table1 t LEFT JOIN table2 j ON t.id = j.fid WHERE (t.enabled = 1) AND (t.state IN ('Array')) GROUP BY t.type HAVING t.salary > 5000 AND t.flag = 'internal' ORDER BY t.id DESC LIMIT 10 OFFSET 30", $this->queryBuilder->getDebugOutput());
+        Assert::assertSame("SELECT t.name FROM table1 t LEFT JOIN table2 j ON t.id = j.fid WHERE (t.enabled = 1) AND (t.state IN ('new', 'active')) GROUP BY t.type HAVING t.salary > 5000 AND t.flag = 'internal' ORDER BY t.id DESC LIMIT 10 OFFSET 30", $this->queryBuilder->getDebugOutput());
     }
 
     public function testHasLogicStack(): void
