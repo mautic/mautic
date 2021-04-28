@@ -350,6 +350,11 @@ class PublicControllerTest extends TestCase
             ->method('getContactFromRequest')
             ->willReturnCallback($getContactFromRequestCallback);
 
+        $routerMock = $this->createMock(Router::class);
+        $routerMock->expects(self::once())
+            ->method('generate')
+            ->willReturn('/asset/');
+
         $this->container->expects(self::exactly(7))
             ->method('get')
             ->withConsecutive(
@@ -368,7 +373,7 @@ class PublicControllerTest extends TestCase
                 $this->modelFactory,
                 $this->modelFactory,
                 $this->primaryCompanyHelper,
-                $this->createMock(Router::class)
+                $routerMock
             );
 
         $this->request->query->set('ct', $clickTrough);
