@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class LeadTriggerLog
 {
+    public const TABLE_NAME = 'point_lead_event_log';
     /**
      * @var TriggerEvent
      **/
@@ -40,7 +41,7 @@ class LeadTriggerLog
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('point_lead_event_log')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(LeadTriggerLogRepository::class);
 
         $builder->createManyToOne('event', 'TriggerEvent')

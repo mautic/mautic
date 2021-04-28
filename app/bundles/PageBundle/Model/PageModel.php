@@ -681,7 +681,7 @@ class PageModel extends FormModel
 
         //glean info from the IP address
         $ipAddress = $hit->getIpAddress();
-        if ($details = $ipAddress->getIpDetails()) {
+        if ($ipAddress && $details = $ipAddress->getIpDetails()) {
             $hit->setCountry($details['country']);
             $hit->setRegion($details['region']);
             $hit->setCity($details['city']);

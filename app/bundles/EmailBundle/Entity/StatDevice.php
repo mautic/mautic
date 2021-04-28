@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
  */
 class StatDevice
 {
+    public const TABLE_NAME = 'email_stats_devices';
     /**
      * @var int
      */
@@ -51,7 +52,7 @@ class StatDevice
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('email_stats_devices')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatDeviceRepository')
             ->addIndex(['date_opened'], 'date_opened_search');
 

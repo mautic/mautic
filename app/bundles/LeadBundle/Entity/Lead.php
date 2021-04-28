@@ -283,12 +283,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
         $builder->createManyToMany('ipAddresses', 'Mautic\CoreBundle\Entity\IpAddress')
             ->setJoinTable('lead_ips_xref')
-            ->addInverseJoinColumn('ip_id', 'id', false)
+            ->addInverseJoinColumn('ip_id', 'id', true, false, 'CASCADE')
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
             ->setIndexBy('ipAddress')
-            ->cascadeDetach()
-            ->cascadeMerge()
-            ->cascadePersist()
             ->build();
 
         $builder->createOneToMany('pushIds', 'Mautic\NotificationBundle\Entity\PushID')

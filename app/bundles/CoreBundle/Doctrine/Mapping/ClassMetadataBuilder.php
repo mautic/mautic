@@ -337,10 +337,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     public function addIpAddress($nullable = false)
     {
         $this->createManyToOne('ipAddress', IpAddress::class)
-            ->cascadePersist()
-            ->cascadeMerge()
-            ->cascadeDetach()
-            ->addJoinColumn('ip_id', 'id', $nullable)
+            ->addJoinColumn('ip_id', 'id', $nullable, false, 'SET NULL')
             ->build();
 
         return $this;

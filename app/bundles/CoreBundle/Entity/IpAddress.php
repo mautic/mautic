@@ -20,6 +20,8 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
  */
 class IpAddress
 {
+    public const TABLE_NAME = 'ip_addresses';
+
     /**
      * Set by factory of configured IPs to not track.
      *
@@ -46,7 +48,7 @@ class IpAddress
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('ip_addresses')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\IpAddressRepository')
             ->addIndex(['ip_address'], 'ip_search');
 

@@ -633,6 +633,13 @@ return [
                     'mautic.maxmind.doNotSellList',
                 ],
             ],
+            'mautic.core.command.anonymize_ip' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\AnonymizeIpCommand::class,
+                'arguments' => [
+                    'mautic.core.repository.ip_address',
+                ],
+            ],
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [
@@ -1100,6 +1107,15 @@ return [
             ],
             'mautic.core.model.form' => [
                 'class' => 'Mautic\CoreBundle\Model\FormModel',
+            ],
+        ],
+        'repositories' => [
+            'mautic.core.repository.ip_address' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\CoreBundle\Entity\IpAddress::class,
+                ],
             ],
         ],
         'validator' => [

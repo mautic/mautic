@@ -24,6 +24,8 @@ class Stat
     /** @var int Limit number of stored 'openDetails' */
     const MAX_OPEN_DETAILS = 1000;
 
+    public const TABLE_NAME = 'email_stats';
+
     /**
      * @var int|null
      */
@@ -138,7 +140,7 @@ class Stat
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('email_stats')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatRepository')
             ->addIndex(['email_id', 'lead_id'], 'stat_email_search')
             ->addIndex(['lead_id', 'email_id'], 'stat_email_search2')

@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
  */
 class Stat
 {
+    public const TABLE_NAME = 'push_notification_stats';
     /**
      * @var int
      */
@@ -111,7 +112,7 @@ class Stat
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('push_notification_stats')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\NotificationBundle\Entity\StatRepository')
             ->addIndex(['notification_id', 'lead_id'], 'stat_notification_search')
             ->addIndex(['is_clicked'], 'stat_notification_clicked_search')

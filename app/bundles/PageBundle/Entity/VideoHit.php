@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class VideoHit
 {
+    public const TABLE_NAME = 'video_hits';
     /**
      * @var int
      */
@@ -136,7 +137,7 @@ class VideoHit
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('video_hits')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\PageBundle\Entity\VideoHitRepository')
             ->addIndex(['date_hit'], 'video_date_hit')
             ->addIndex(['channel', 'channel_id'], 'video_channel_search')
@@ -155,7 +156,7 @@ class VideoHit
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
 
         $builder->createField('country', 'string')
             ->nullable()

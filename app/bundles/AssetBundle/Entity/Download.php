@@ -20,6 +20,8 @@ use Mautic\EmailBundle\Entity\Email;
  */
 class Download
 {
+    public const TABLE_NAME = 'asset_downloads';
+
     /**
      * @var int
      */
@@ -79,7 +81,7 @@ class Download
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('asset_downloads')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\AssetBundle\Entity\DownloadRepository')
             ->addIndex(['tracking_id'], 'download_tracking_search')
             ->addIndex(['source', 'source_id'], 'download_source_search')
@@ -95,7 +97,7 @@ class Download
             ->addJoinColumn('asset_id', 'id', true, false, 'CASCADE')
             ->build();
 
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
 
         $builder->addLead(true, 'SET NULL');
 

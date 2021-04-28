@@ -19,6 +19,8 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
  */
 class LeadStageLog
 {
+    public const TABLE_NAME = 'stage_lead_action_log';
+
     /**
      * @var Stage
      **/
@@ -43,7 +45,7 @@ class LeadStageLog
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('stage_lead_action_log')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\StageBundle\Entity\LeadStageLogRepository');
 
         $builder->createManyToOne('stage', 'Stage')

@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class LeadPointLog
 {
+    public const TABLE_NAME = 'point_lead_action_log';
     /**
      * @var Point
      **/
@@ -40,7 +41,7 @@ class LeadPointLog
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('point_lead_action_log')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\PointBundle\Entity\LeadPointLogRepository');
 
         $builder->createManyToOne('point', 'Point')

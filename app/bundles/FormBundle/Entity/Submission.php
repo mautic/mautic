@@ -23,6 +23,8 @@ use Mautic\PageBundle\Entity\Page;
  */
 class Submission
 {
+    public const TABLE_NAME = 'form_submissions';
+
     /**
      * @var int
      */
@@ -72,7 +74,7 @@ class Submission
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('form_submissions')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\FormBundle\Entity\SubmissionRepository')
             ->addIndex(['tracking_id'], 'form_submission_tracking_search')
             ->addIndex(['date_submitted'], 'form_date_submitted');
@@ -84,7 +86,7 @@ class Submission
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
 
         $builder->addLead(true, 'SET NULL');
 

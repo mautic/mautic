@@ -16,6 +16,8 @@ namespace Mautic\CoreBundle\Entity;
  */
 class IpAddressRepository extends CommonRepository
 {
+    const DELETE_BATCH_SIZE = 10000;
+
     /**
      * Count how many unique IP addresses is there.
      *
@@ -102,5 +104,14 @@ SQL;
         $stmt   = $this->_em->getConnection()->executeQuery($sql, $params, $types);
 
         return $stmt->rowCount();
+    }
+
+    public function deleteAllIpAddress(): void
+    {
+        $table_name = $this->getTableName();
+        $sql        = "DELETE FROM {$table_name} LIMIT ".self::DELETE_BATCH_SIZE;
+        $conn       = $this->getEntityManager()->getConnection();
+        while ($conn->executeQuery($sql)->rowCount()) {
+        }
     }
 }
