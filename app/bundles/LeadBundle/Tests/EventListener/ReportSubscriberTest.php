@@ -213,10 +213,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->translatorMock
         );
 
-        $this->expressionBuilderMock->expects($this->any())
-            ->method('andX')
-            ->willReturn($this->expressionBuilderMock);
-
         $this->queryBuilderMock->expects($this->any())
                 ->method('expr')
                 ->willReturn($this->expressionBuilderMock);
