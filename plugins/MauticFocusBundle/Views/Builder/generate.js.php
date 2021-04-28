@@ -696,7 +696,7 @@ switch ($style) {
                     }
                     return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
                 },
-                setItem: function (sKey, sValue, vEnd, sPath, sDomain, bSecure) {
+                setItem: function (sKey, sValue, vEnd, sPath, sDomain) {
                     if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) {
                         return false;
                     }
@@ -717,7 +717,7 @@ switch ($style) {
                                 break;
                         }
                     }
-                    document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + (bSecure ? "; secure" : "");
+                    document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + "; secure";
                     return true;
                 },
                 removeItem: function (sKey, sPath, sDomain) {
