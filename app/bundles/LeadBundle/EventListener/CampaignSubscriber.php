@@ -494,7 +494,9 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $operators = $this->leadModel->getFilterExpressionFunctions();
                 $field     = $event->getConfig()['field'];
                 $value     = $event->getConfig()['value'];
-                $fields    = $lead->getFields(true);
+                $contactFields    = $lead->getFields(true);
+                $companyFields    = $this->leadFieldModel->getFieldListWithProperties('company');
+                $fields = array_merge($contactFields, $companyFields);
 
                 $result = $this->leadFieldModel->getRepository()->compareValue(
                     $lead->getId(),
