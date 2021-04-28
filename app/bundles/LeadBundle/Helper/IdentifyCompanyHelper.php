@@ -38,8 +38,7 @@ class IdentifyCompanyHelper
 
         $companies = $companyModel->checkForDuplicateCompanies($parameters);
         if (!empty($companies)) {
-            end($companies);
-            $companyEntity = key($companies);
+            $companyEntity = end($companies);
             $companyData   = $companyEntity->getProfileFields();
 
             if ($lead) {
