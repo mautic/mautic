@@ -491,12 +491,12 @@ class CampaignSubscriber implements EventSubscriberInterface
                         $lead->getId(), $event->getConfig()['field'], $triggerDate);
                 }
             } else {
-                $operators = $this->leadModel->getFilterExpressionFunctions();
-                $field     = $event->getConfig()['field'];
-                $value     = $event->getConfig()['value'];
+                $operators        = $this->leadModel->getFilterExpressionFunctions();
+                $field            = $event->getConfig()['field'];
+                $value            = $event->getConfig()['value'];
                 $contactFields    = $lead->getFields(true);
                 $companyFields    = $this->leadFieldModel->getFieldListWithProperties('company');
-                $fields = array_merge($contactFields, $companyFields);
+                $fields           = array_merge($contactFields, $companyFields);
 
                 $result = $this->leadFieldModel->getRepository()->compareValue(
                     $lead->getId(),
