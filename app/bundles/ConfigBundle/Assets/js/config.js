@@ -66,4 +66,16 @@ Mautic.observeConfigTabs = function() {
         }
     });
 }
+
+Mautic.showAnonymizeWarningMessage = function(anonymize_ip) {
+    if (parseInt(anonymize_ip, 10) === 1)
+    {
+        mQuery('.anonymize_ip_address').removeClass('hide');
+    }
+    else
+    {
+        mQuery('.anonymize_ip_address').addClass('hide');
+    }
+};
+
 mQuery(Mautic.observeConfigTabs);
