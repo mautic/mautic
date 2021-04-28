@@ -78,9 +78,9 @@ class EventLoggerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($logCollection->getValues(), $persistedLogs->getValues());
     }
 
-    public function testbuildLogEntry()
+    public function testBuildLogEntry()
     {
-        $this->ipLookupHelper->expects($this->exactly(3))->method('getIpAddress')->willReturn(new IpAddress());
+        $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress());
 
         $this->leadRepository->expects($this->exactly(3))
             ->method('getContactRotations')
