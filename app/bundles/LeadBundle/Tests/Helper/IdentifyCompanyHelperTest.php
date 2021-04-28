@@ -46,12 +46,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         ];
 
         $expected = [
-            'company'        => 'Mautic',
-            'companycity'    => '',
-            'companystate'   => '',
-            'companycountry' => '',
             'companyname'    => 'Mautic',
-            'companywebsite' => null,
         ];
 
         $model = $this->getMockBuilder(CompanyModel::class)
@@ -62,11 +57,15 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('checkForDuplicateCompanies')
             ->willReturn([]);
 
+        $model->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([['alias' => 'companyname']]);
+
         $helper     = new IdentifyCompanyHelper();
         $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
         $method     = $reflection->getMethod('findCompany');
         $method->setAccessible(true);
-        list($resultCompany, $entities) = $method->invokeArgs($helper, [$company, $model]);
+        [$resultCompany, $entities] = $method->invokeArgs($helper, [$company, $model]);
 
         $this->assertEquals($expected, $resultCompany);
     }
@@ -79,12 +78,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         ];
 
         $expected = [
-            'company'        => 'Mautic',
-            'companycity'    => '',
-            'companystate'   => '',
-            'companycountry' => '',
             'companyname'    => 'Mautic',
-            'companywebsite' => 'mautic.org',
             'companyemail'   => 'hello@mautic.org',
         ];
 
@@ -95,6 +89,10 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         $model->expects($this->once())
             ->method('checkForDuplicateCompanies')
             ->willReturn([]);
+
+        $model->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([['alias' => 'companyname']]);
 
         $helper     = new IdentifyCompanyHelper();
         $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
@@ -114,10 +112,6 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         ];
 
         $expected = [
-            'company'        => 'Mautic',
-            'companycity'    => '',
-            'companystate'   => '',
-            'companycountry' => '',
             'companyname'    => 'Mautic',
             'companywebsite' => 'https://mautic.org',
             'companyemail'   => 'hello@mautic.org',
@@ -130,6 +124,10 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         $model->expects($this->once())
             ->method('checkForDuplicateCompanies')
             ->willReturn([]);
+
+        $model->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([['alias' => 'companyname']]);
 
         $helper     = new IdentifyCompanyHelper();
         $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
