@@ -111,7 +111,7 @@ class SmsRepository extends CommonRepository
     /**
      * Get amounts of pending text messages.
      */
-    public function getSmsPendingQuery($emailId, array $variantIds)
+    public function getSmsPendingQuery($smsId)
     {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -135,17 +135,18 @@ class SmsRepository extends CommonRepository
                     $mqQb->expr()->eq('mq.channel', $mqQb->expr()->literal('sms'))
                 )
             );
-
         $lists = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('el.leadlist_id')
             ->from(MAUTIC_TABLE_PREFIX.'sms_message_list_xref', 'el')
-            ->where('el.sms_id = '.(int) $emailId)
-            ->execute()
-            ->fetchAll();
-
+            ->where('el.sms_id = '.(int) $smsId)->execute()
+            ;
         $listIds = [];
-        foreach ($lists as $list) {
-            $listIds[] = $list['leadlist_id'];
+        if ($lists) {
+            $lists->fetchAssociative();
+
+            foreach ($lists as $list) {
+                $listIds[] = $list['leadlist_id'];
+            }
         }
 
         // Only include those in associated segments
@@ -168,8 +169,8 @@ class SmsRepository extends CommonRepository
                 $statQb->expr()->eq('stat.lead_id', 'l.id')
             );
 
-        $statQb->andWhere($statQb->expr()->eq('stat.sms_id', (int) $emailId));
-        $mqQb->andWhere($mqQb->expr()->eq('mq.channel_id', (int) $emailId));
+        $statQb->andWhere($statQb->expr()->eq('stat.sms_id', (int) $smsId));
+        $mqQb->andWhere($mqQb->expr()->eq('mq.channel_id', (int) $smsId));
 
         // Main query
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();

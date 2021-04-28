@@ -469,8 +469,7 @@ class SearchSubscriber implements EventSubscriberInterface
         /** @var Sms $sms */
         $sms = $this->smsRepository->getEntity($smsId);
         if (null !== $sms) {
-            $variantIds = []; //$sms->getRelatedEntityIds();
-            $nq         = $this->smsRepository->getSmsPendingQuery($smsId, $variantIds);
+            $nq         = $this->smsRepository->getSmsPendingQuery($smsId);
             if (!$nq instanceof QueryBuilder) {
                 return;
             }

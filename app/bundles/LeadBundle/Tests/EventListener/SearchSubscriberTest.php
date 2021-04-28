@@ -140,6 +140,12 @@ class SearchSubscriberTest extends TestCase
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE ss.sms_id = ? GROUP BY l.id', $sql);
 
+        // test sms pending
+        $event = new LeadBuildSearchEvent('1', 'sms_pending', $alias, false, new QueryBuilder($connection));
+        $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+        $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
+        $this->assertEquals('SELECT  WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status = ?) GROUP BY l.id', $sql);
+
         // test web sent
         $event = new LeadBuildSearchEvent('1', 'web_sent', $alias, false, new QueryBuilder($connection));
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
