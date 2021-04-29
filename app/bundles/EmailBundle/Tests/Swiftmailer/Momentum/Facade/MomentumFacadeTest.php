@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Swiftmailer\Momentum\Facade;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\AdapterInterface;
@@ -11,36 +13,37 @@ use Mautic\EmailBundle\Swiftmailer\Momentum\Facade\MomentumFacade;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Service\SwiftMessageServiceInterface;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Validator\SwiftMessageValidator\SwiftMessageValidatorInterface;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use SparkPost\SparkPostPromise;
 use SparkPost\SparkPostResponse;
 
 /**
- * Class MomentumFacadeTest.
+ * @todo this test is slow as it calls methods with sleep(5). Find a better way to speed it up.
  */
 class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|AdapterInterface
      */
     private $adapterMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|SwiftMessageServiceInterface
      */
     private $swiftMessageServiceMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|SwiftMessageValidatorInterface
      */
     private $swiftMessageValidatorMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|MomentumCallbackInterface
      */
     private $momentumCallbackMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|Logger
      */
     private $loggerMock;
 
@@ -54,183 +57,199 @@ class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
         $this->loggerMock                = $this->createMock(Logger::class);
     }
 
-    public function testSendOk()
+    public function testSendOk(): void
     {
-        $swiftMessageMock = $this->createMock(\Swift_Mime_SimpleMessage::class);
-        $this->swiftMessageValidatorMock->expects($this->at(0))
-            ->method('validate')
-            ->with($swiftMessageMock);
-        $transmissionDTOMock = $this->createMock(TransmissionDTO::class);
-        $this->swiftMessageServiceMock->expects($this->at(0))
-            ->method('transformToTransmission')
-            ->with($swiftMessageMock)
-            ->willReturn($transmissionDTOMock);
-        $sparkPostPromiseMock = $this->createMock(SparkPostPromise::class);
-        $this->adapterMock->expects($this->at(0))
-            ->method('createTransmission')
-            ->with($transmissionDTOMock)
-            ->willReturn($sparkPostPromiseMock);
+        $swiftMessageMock      = $this->createMock(\Swift_Mime_SimpleMessage::class);
         $sparkPostResponseMock = $this->createMock(SparkPostResponse::class);
-        $sparkPostPromiseMock->expects($this->once())
-            ->method('wait')
-            ->willReturn($sparkPostResponseMock);
-        $sparkPostResponseMock->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn('200');
-        $totalRecipients = 0;
-        $bodyResults     = [
+        $transmissionDTOMock   = $this->createMock(TransmissionDTO::class);
+        $sparkPostPromiseMock  = $this->createMock(SparkPostPromise::class);
+        $totalRecipients       = 0;
+        $bodyResults           = [
             'results' => [
                 'total_accepted_recipients' => $totalRecipients,
             ],
         ];
+
+        $this->swiftMessageValidatorMock->expects($this->once())
+            ->method('validate')
+            ->with($swiftMessageMock);
+
+        $this->swiftMessageServiceMock->expects($this->once())
+            ->method('transformToTransmission')
+            ->with($swiftMessageMock)
+            ->willReturn($transmissionDTOMock);
+
+        $this->adapterMock->expects($this->once())
+            ->method('createTransmission')
+            ->with($transmissionDTOMock)
+            ->willReturn($sparkPostPromiseMock);
+
+        $sparkPostPromiseMock->expects($this->once())
+            ->method('wait')
+            ->willReturn($sparkPostResponseMock);
+
+        $sparkPostResponseMock->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn('200');
+
         $sparkPostResponseMock->expects($this->once())
             ->method('getBody')
             ->willReturn($bodyResults);
+
         $this->momentumCallbackMock->expects($this->once())
             ->method('processImmediateFeedback')
             ->with($swiftMessageMock, $bodyResults);
-        $facade = $this->getMomentumFacade();
-        $this->assertSame($totalRecipients, $facade->send($swiftMessageMock));
+
+        $this->assertSame($totalRecipients, $this->getMomentumFacade()->send($swiftMessageMock));
     }
 
     /**
      * Test for SwiftMessageValidationException exception.
      */
-    public function testSendValidatorError()
+    public function testSendValidatorError(): void
     {
         $swiftMessageMock                    = $this->createMock(\Swift_Mime_SimpleMessage::class);
         $exceptionMessage                    = 'Example exception message';
         $swiftMessageValidationExceptionMock = new SwiftMessageValidationException($exceptionMessage);
-        $this->swiftMessageValidatorMock->expects($this->at(0))
+
+        $this->swiftMessageValidatorMock->expects($this->once())
             ->method('validate')
             ->with($swiftMessageMock)
             ->willThrowException($swiftMessageValidationExceptionMock);
-        $this->loggerMock->expects($this->at(0))
+
+        $this->loggerMock->expects($this->once())
             ->method('addError')
             ->with('Momentum send exception', [
                 'message' => $exceptionMessage,
             ]);
+
         $facade = $this->getMomentumFacade();
+
         $this->expectException(MomentumSendException::class);
+
         $facade->send($swiftMessageMock);
     }
 
     /**
      * Test for correct handle of first 500 error followed by 200.
      */
-    public function testSend500FirstAttempt()
+    public function testSend500FirstAttempt(): void
     {
-        $swiftMessageMock    = $this->createMock(\Swift_Mime_SimpleMessage::class);
-        $transmissionDTOMock = $this->createMock(TransmissionDTO::class);
-        $this->swiftMessageServiceMock->expects($this->at(0))
-            ->method('transformToTransmission')
-            ->with($swiftMessageMock)
-            ->willReturn($transmissionDTOMock);
-        $sparkPostPromiseMock = $this->createMock(SparkPostPromise::class);
-        $this->adapterMock->expects($this->at(0))
-            ->method('createTransmission')
-            ->with($transmissionDTOMock)
-            ->willReturn($sparkPostPromiseMock);
+        $swiftMessageMock         = $this->createMock(\Swift_Mime_SimpleMessage::class);
+        $transmissionDTOMock      = $this->createMock(TransmissionDTO::class);
+        $sparkPostPromiseMock     = $this->createMock(SparkPostPromise::class);
         $sparkPostResponseMock500 = $this->createMock(SparkPostResponse::class);
-        $sparkPostPromiseMock->expects($this->at(0))
-            ->method('wait')
-            ->willReturn($sparkPostResponseMock500);
-        $sparkPostResponseMock500->expects($this->once())
-            ->method('getStatusCode')
-            ->willReturn('500');
-        $this->adapterMock->expects($this->at(1))
-            ->method('createTransmission')
-            ->with($transmissionDTOMock)
-            ->willReturn($sparkPostPromiseMock);
         $sparkPostResponseMock200 = $this->createMock(SparkPostResponse::class);
-        $sparkPostPromiseMock->expects($this->at(1))
-            ->method('wait')
-            ->willReturn($sparkPostResponseMock200);
-        $sparkPostResponseMock200->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn('200');
-        $totalRecipients = 0;
-        $bodyResults     = [
+        $totalRecipients          = 0;
+        $bodyResults              = [
             'results' => [
                 'total_accepted_recipients' => $totalRecipients,
             ],
         ];
+
+        $this->swiftMessageServiceMock->expects($this->once())
+            ->method('transformToTransmission')
+            ->with($swiftMessageMock)
+            ->willReturn($transmissionDTOMock);
+
+        $this->adapterMock->expects($this->exactly(2))
+            ->method('createTransmission')
+            ->with($transmissionDTOMock)
+            ->willReturn($sparkPostPromiseMock);
+
+        $sparkPostPromiseMock->expects($this->exactly(2))
+            ->method('wait')
+            ->willReturn($sparkPostResponseMock500, $sparkPostResponseMock200);
+
+        $sparkPostResponseMock500->expects($this->once())
+            ->method('getStatusCode')
+            ->willReturn('500');
+
+        $sparkPostResponseMock200->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn('200');
+
         $sparkPostResponseMock200->expects($this->once())
             ->method('getBody')
             ->willReturn($bodyResults);
-        $this->momentumCallbackMock->expects($this->at(0))
+
+        $this->momentumCallbackMock->expects($this->once())
             ->method('processImmediateFeedback')
             ->with($swiftMessageMock, $bodyResults);
-        $facade = $this->getMomentumFacade();
-        $this->assertSame($totalRecipients, $facade->send($swiftMessageMock));
+
+        $this->assertSame($totalRecipients, $this->getMomentumFacade()->send($swiftMessageMock));
     }
 
     /**
      * Test for correct handle of repeated 500s.
      */
-    public function testSend500Repeated()
+    public function testSend500Repeated(): void
     {
-        $swiftMessageMock    = $this->createMock(\Swift_Mime_SimpleMessage::class);
-        $transmissionDTOMock = $this->createMock(TransmissionDTO::class);
-        $this->swiftMessageServiceMock->expects($this->at(0))
+        $swiftMessageMock       = $this->createMock(\Swift_Mime_SimpleMessage::class);
+        $transmissionDTOMock    = $this->createMock(TransmissionDTO::class);
+        $sparkPostPromiseMock   = $this->createMock(SparkPostPromise::class);
+        $sparkPostResponseMock1 = $this->createMock(SparkPostResponse::class);
+        $sparkPostResponseMock2 = $this->createMock(SparkPostResponse::class);
+        $sparkPostResponseMock3 = $this->createMock(SparkPostResponse::class);
+        $responseBody           = 'Empty';
+
+        $this->swiftMessageServiceMock->expects($this->once())
             ->method('transformToTransmission')
             ->with($swiftMessageMock)
             ->willReturn($transmissionDTOMock);
-        $sparkPostPromiseMock = $this->createMock(SparkPostPromise::class);
+
         $this->adapterMock->expects($this->exactly(3))
             ->method('createTransmission')
             ->with($transmissionDTOMock)
             ->willReturn($sparkPostPromiseMock);
 
-        $sparkPostResponseMock1 = $this->createMock(SparkPostResponse::class);
         $sparkPostResponseMock1->expects($this->once())
             ->method('getStatusCode')
             ->willReturn('500');
-        $sparkPostPromiseMock->expects($this->at(0))
-            ->method('wait')
-            ->willReturn($sparkPostResponseMock1);
 
-        $sparkPostResponseMock2 = $this->createMock(SparkPostResponse::class);
+        $sparkPostPromiseMock->expects($this->exactly(3))
+            ->method('wait')
+            ->willReturnOnConsecutiveCalls(
+                $sparkPostResponseMock1,
+                $sparkPostResponseMock2,
+                $sparkPostResponseMock3
+            );
+
         $sparkPostResponseMock2->expects($this->once())
             ->method('getStatusCode')
             ->willReturn('500');
-        $sparkPostPromiseMock->expects($this->at(1))
-            ->method('wait')
-            ->willReturn($sparkPostResponseMock2);
 
-        $sparkPostResponseMock3 = $this->createMock(SparkPostResponse::class);
         $sparkPostResponseMock3->expects($this->exactly(3))
             ->method('getStatusCode')
             ->willReturn('500');
-        $responseBody = 'Empty';
+
         $sparkPostResponseMock3->expects($this->exactly(2))
             ->method('getBody')
             ->willReturn($responseBody);
-        $sparkPostPromiseMock->expects($this->at(2))
-            ->method('wait')
-            ->willReturn($sparkPostResponseMock3);
 
-        $this->loggerMock->expects($this->at(0))
+        $this->loggerMock->expects($this->exactly(2))
             ->method('addError')
-            ->with('Momentum send: 500', [
-                'response' => $responseBody,
-            ]);
-
-        $this->loggerMock->expects($this->at(1))
-            ->method('addError')
-            ->with('Momentum send exception', [
-                'message' => $responseBody,
-            ]);
+            ->withConsecutive(
+                [
+                    'Momentum send: 500', [
+                        'response' => $responseBody,
+                    ],
+                ],
+                [
+                    'Momentum send exception', [
+                        'message' => $responseBody,
+                    ],
+                ]
+            );
 
         $facade = $this->getMomentumFacade();
+
         $this->expectException(MomentumSendException::class);
+
         $facade->send($swiftMessageMock);
     }
 
-    /**
-     * @return MomentumFacade
-     */
-    private function getMomentumFacade()
+    private function getMomentumFacade(): MomentumFacade
     {
         return new MomentumFacade(
             $this->adapterMock,
