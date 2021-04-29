@@ -33,10 +33,10 @@ trait RequestTrait
     protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [], $fields = [])
     {
         // ungroup fields if need it
-        foreach ($fields as $key=>$field) {
+        foreach ($fields as $key => $field) {
             if (is_array($field)) {
-                foreach ($field as $k=>$f) {
-                    $fields[$k]=$f;
+                foreach ($field as $k => $f) {
+                    $fields[$k] = $f;
                 }
                 unset($fields[$key]);
                 continue;
@@ -175,11 +175,11 @@ trait RequestTrait
         }
 
         switch ($leadField['type']) {
-            // Adjust the boolean values from text to boolean. Do not convert null to false.
+                // Adjust the boolean values from text to boolean. Do not convert null to false.
             case 'boolean':
                 $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
                 break;
-            // Ensure date/time entries match what symfony expects
+                // Ensure date/time entries match what symfony expects
             case 'datetime':
             case 'date':
             case 'time':
