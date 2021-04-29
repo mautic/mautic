@@ -43,6 +43,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class EmailType extends AbstractType
 {
@@ -522,6 +523,30 @@ class EmailType extends AbstractType
                     ],
                 ],
             ]
+        );
+
+        $builder->add(
+            $builder->create(
+                'preheaderText',
+                TextType::class,
+                [
+                    'label'      => 'mautic.email.preheader_text',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'    => 'form-control',
+                        'tooltip'  => 'mautic.email.preheader_text.tooltip',
+                    ],
+                    'required'    => false,
+                    'constraints' => [
+                        new Assert\Length(
+                            [
+                                'max'        => 150,
+                                'maxMessage' => 'mautic.email.preheader_text.length',
+                            ]
+                        ),
+                    ],
+                ]
+            )->addModelTransformer($emojiTransformer)
         );
 
         if (!empty($options['update_select'])) {

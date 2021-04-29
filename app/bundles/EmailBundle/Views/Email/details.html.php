@@ -194,6 +194,15 @@ if (!$isEmbedded) {
                                 </tr>
                             <?php endif; ?>
 
+                            <?php if ($preheaderText = $email->getPreheaderText()): ?>
+                                <tr>
+                                    <td width="20%">
+                                        <span class="fw-b"><?php echo $view['translator']->trans('mautic.email.preheader_text'); ?></span>
+                                    </td>
+                                    <td><?php echo $preheaderText; ?></td>
+                                </tr>
+                            <?php endif; ?>
+
                             <?php if ($headers = $email->getHeaders()): ?>
                                 <tr>
                                     <td width="20%">
