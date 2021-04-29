@@ -94,13 +94,14 @@ class SummaryRepository extends CommonRepository
     ): void {
         $dateFromTsActual = $dateFrom->getTimestamp();
         $dateToTsActual   = $dateTo->getTimestamp();
+        $intervalInSeconds= 3600;
 
-        $dateFromStartWithZeroMinutes = $dateFromTsActual - ($dateFromTsActual % 3600);
-        $numberOfHoursDiff            = ceil((($dateToTsActual - $dateFromStartWithZeroMinutes) / 3600));
+        $dateFromStartWithZeroMinutes = $dateFromTsActual - ($dateFromTsActual % $intervalInSeconds);
+        $numberOfIntervals            = ceil((($dateToTsActual - $dateFromStartWithZeroMinutes) / $intervalInSeconds));
 
-        for ($hour = 0; $hour < $numberOfHoursDiff; ++$hour) {
-            $dateFromTs = date('Y-m-d H:i:s', $dateFromStartWithZeroMinutes + ($hour * 3600));
-            $dateToTs   = date('Y-m-d H:i:s', strtotime($dateFromTs) + 3599);
+        for ($interval = 0; $interval < $numberOfIntervals; ++$interval) {
+            $dateFromTs = date('Y-m-d H:i:s', $dateFromStartWithZeroMinutes + ($interval * $intervalInSeconds));
+            $dateToTs   = date('Y-m-d H:i:s', strtotime($dateFromTs) + ($intervalInSeconds - 1));
 
             $sql = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
             ' (campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count, log_counts_processed) '.
@@ -120,7 +121,6 @@ class SummaryRepository extends CommonRepository
             '       )) AS log_counts_processed_i '.
             ' FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl ON mclefl.log_id = mclel.id '.
             ' WHERE (mclel.date_triggered BETWEEN "'.$dateFromTs.'" AND "'.$dateToTs.'") ';
-
             if ($campaignId) {
                 $sql .= ' AND mclel.campaign_id = '.$campaignId;
             }
