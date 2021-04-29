@@ -113,7 +113,7 @@ class SummaryRepository extends CommonRepository
             '       SUM(IF(mclel.is_scheduled = 1 AND mclel.trigger_date > NOW(), 0, mclel.non_action_path_taken)) AS non_action_path_taken_count_i, '.
             '       SUM(IF((mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken, 0, mclefl.log_id IS NOT NULL)) AS failed_count_i, '.
             '       SUM(IF((mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken OR mclefl.log_id IS NOT NULL, 0, 1)) AS triggered_count_i, '.
-            '       COUNT((SELECT NULL FROM '.MAUTIC_TABLE_PREFIX.'campaign_leads mcl '.
+            '       COUNT((SELECT mcl.campaign_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_leads mcl '.
             '           WHERE mcl.campaign_id = mclel.campaign_id AND mcl.manually_removed = 0 '.
             '           AND mclel.lead_id = mcl.lead_id AND mcl.rotation = mclel.rotation '.
             '           AND NOT EXISTS(SELECT NULL FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl2 '.
