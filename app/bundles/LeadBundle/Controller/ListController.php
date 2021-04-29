@@ -341,11 +341,6 @@ class ListController extends FormController
                             'objectId'     => $segment->getId(),
                         ]);
 
-                        // Re-create the form once more with the fresh segment and action.
-                        // The alias was empty on redirect after cloning.
-                        $editAction = $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $segment->getId()]);
-                        $form       = $segmentModel->createForm($segment, $this->get('form.factory'), $editAction);
-
                         $postActionVars['viewParameters'] = [
                             'objectAction' => 'edit',
                             'objectId'     => $segment->getId(),

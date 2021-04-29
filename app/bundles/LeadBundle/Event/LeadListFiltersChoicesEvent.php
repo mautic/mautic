@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright  2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -16,9 +18,6 @@ use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadListFiltersChoicesEvent.
- */
 class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
 {
     /**
@@ -90,9 +89,17 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
         if (!isset($this->choices[$object])) {
             $this->choices[$object] = [];
         }
-
         if (!array_key_exists($choiceKey, $this->choices[$object])) {
             $this->choices[$object][$choiceKey] = $choiceConfig;
         }
+    }
+
+    public function setChoice(string $object, string $choiceKey, array $choiceConfig): void
+    {
+        if (!isset($this->choices[$object])) {
+            $this->choices[$object] = [];
+        }
+
+        $this->choices[$object][$choiceKey] = $choiceConfig;
     }
 }

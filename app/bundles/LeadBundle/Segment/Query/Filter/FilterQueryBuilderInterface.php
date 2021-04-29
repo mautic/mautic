@@ -13,9 +13,6 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-/**
- * Interface FilterQueryBuilderInterface.
- */
 interface FilterQueryBuilderInterface
 {
     /**
