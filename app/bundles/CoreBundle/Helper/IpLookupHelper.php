@@ -128,9 +128,9 @@ class IpLookupHelper
      */
     public function getIpAddress($ip = null)
     {
-        static $ipAddresses = [];
-        $request            = $this->requestStack->getCurrentRequest();
-
+        static $ipAddresses       = [];
+        $request                  = $this->requestStack->getCurrentRequest();
+        $isEnabledIpAnonymization = $this->coreParametersHelper->get('anonymize_ip', false);
         if (null === $ip) {
             $ip = $this->getIpAddressFromRequest();
         }
@@ -142,19 +142,21 @@ class IpLookupHelper
 
         $this->realIp = $ip;
 
-        if ($this->coreParametersHelper->get('anonymize_ip')) {
-            $ip = preg_replace(['/\.\d*$/', '/[\da-f]*:[\da-f]*$/'], ['.***', '****:****'], $ip);
-        }
-
         if (empty($ipAddresses[$ip])) {
-            $repo      = $this->em->getRepository('MauticCoreBundle:IpAddress');
-            $ipAddress = $repo->findOneByIpAddress($ip);
-            $saveIp    = (null === $ipAddress);
+            $ipAddress = null;
+            $saveIp    = false;
+            if (!$isEnabledIpAnonymization) {
+                $repo      = $this->em->getRepository('MauticCoreBundle:IpAddress');
+                $ipAddress = $repo->findOneByIpAddress($ip);
+                $saveIp    = (null === $ipAddress);
+            }
 
             if (null === $ipAddress) {
                 $ipAddress = new IpAddress();
                 $ipAddress->setIpAddress($ip);
             }
+
+            $ipAddress->setIsAnonymize($isEnabledIpAnonymization);
 
             // Ensure the do not track list is inserted
             if (!is_array($this->doNotTrackIps)) {
@@ -189,7 +191,7 @@ class IpLookupHelper
             }
 
             $details = $ipAddress->getIpDetails();
-            if ($ipAddress->isTrackable() && empty($details['city']) && !$this->coreParametersHelper->get('anonymize_ip')) {
+            if ($ipAddress->isTrackable() && !$isEnabledIpAnonymization && empty($details['city'])) {
                 // Get the IP lookup service
 
                 // Fetch the data

@@ -233,7 +233,7 @@ class Submission
      */
     public function setIpAddress(IpAddress $ipAddress = null)
     {
-        $this->ipAddress = $ipAddress;
+        $this->ipAddress = !$ipAddress->getIsAnonymize() ? $ipAddress : null;
 
         return $this;
     }

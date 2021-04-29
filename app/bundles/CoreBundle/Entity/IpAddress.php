@@ -21,6 +21,10 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class IpAddress
 {
     public const TABLE_NAME = 'ip_addresses';
+    /**
+     * @var bool
+     */
+    private $isAnonymizeOn = false;
 
     /**
      * Set by factory of configured IPs to not track.
@@ -173,6 +177,18 @@ class IpAddress
     public function getDoNotTrackList()
     {
         return $this->doNotTrack;
+    }
+
+    public function setIsAnonymize(bool $isAnonymize): IpAddress
+    {
+        $this->isAnonymizeOn = $isAnonymize;
+
+        return $this;
+    }
+
+    public function getIsAnonymize(): bool
+    {
+        return $this->isAnonymizeOn;
     }
 
     /**

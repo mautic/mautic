@@ -88,7 +88,7 @@ class LeadPointLog
      */
     public function setIpAddress($ipAddress)
     {
-        $this->ipAddress = $ipAddress;
+        $this->ipAddress = !$ipAddress->getIsAnonymize() ? $ipAddress : null;
     }
 
     /**

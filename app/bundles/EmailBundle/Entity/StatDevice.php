@@ -113,7 +113,7 @@ class StatDevice
      */
     public function setIpAddress(IpAddress $ip)
     {
-        $this->ipAddress = $ip;
+        $this->ipAddress = !$ip->getIsAnonymize() ? $ip : null;
     }
 
     /**
