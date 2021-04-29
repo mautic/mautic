@@ -17,7 +17,7 @@ use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\Form\Type\CampaignReplyType;
-use Mautic\SmsBundle\Helper\ReplyHelper;
+use Mautic\SmsBundle\Helper\CallbackHelper;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -90,7 +90,7 @@ class CampaignReplySubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!ReplyHelper::matches($pattern, $replyEvent->getMessage())) {
+        if (!CallbackHelper::matches($pattern, $replyEvent->getMessage())) {
             // It does not match so ignore
 
             return;

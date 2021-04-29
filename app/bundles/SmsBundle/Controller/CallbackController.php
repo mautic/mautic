@@ -13,13 +13,13 @@ namespace Mautic\SmsBundle\Controller;
 
 use Mautic\SmsBundle\Callback\HandlerContainer;
 use Mautic\SmsBundle\Exception\CallbackHandlerNotFound;
-use Mautic\SmsBundle\Helper\ReplyHelper;
+use Mautic\SmsBundle\Helper\CallbackHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class ReplyController extends AbstractController
+class CallbackController extends AbstractController
 {
     /**
      * @var HandlerContainer
@@ -27,17 +27,17 @@ class ReplyController extends AbstractController
     private $callbackHandler;
 
     /**
-     * @var ReplyHelper
+     * @var CallbackHelper
      */
-    private $replyHelper;
+    private $callbackHelper;
 
     /**
      * ReplyController constructor.
      */
-    public function __construct(HandlerContainer $callbackHandler, ReplyHelper $replyHelper)
+    public function __construct(HandlerContainer $callbackHandler, CallbackHelper $callbackHelper)
     {
         $this->callbackHandler = $callbackHandler;
-        $this->replyHelper     = $replyHelper;
+        $this->callbackHelper  = $callbackHelper;
     }
 
     /**
@@ -57,6 +57,6 @@ class ReplyController extends AbstractController
             throw new NotFoundHttpException();
         }
 
-        return $this->replyHelper->handleRequest($handler, $request);
+        return $this->callbackHelper->handleRequest($handler, $request);
     }
 }

@@ -33,7 +33,9 @@ class StopSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $lead = new Lead();
         $lead->setId(1);
-        $event = new ReplyEvent($lead, 'stop');
+        $event = new ReplyEvent();
+        $event->setMessage('stop');
+        $event->setContact($lead);
 
         $this->doNotContactModel->expects($this->once())
         ->method('addDncForContact')

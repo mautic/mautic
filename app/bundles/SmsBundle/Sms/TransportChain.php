@@ -33,6 +33,11 @@ class TransportChain
     private $integrationHelper;
 
     /**
+     * @var TransportSettings
+     */
+    private $settings;
+
+    /**
      * @param string $primaryTransport
      */
     public function __construct($primaryTransport, IntegrationHelper $integrationHelper)
@@ -61,7 +66,7 @@ class TransportChain
     /**
      * Return the transport defined in parameters.
      *
-     * @return TransportInterface
+     * @return TransportAbstract
      *
      * @throws PrimaryTransportNotEnabledException
      */
@@ -90,11 +95,25 @@ class TransportChain
      *
      * @return mixed
      *
-     * @throws \Exception
+     * @throws PrimaryTransportNotEnabledException
      */
     public function sendSms(Lead $lead, $content, Stat $stat = null)
     {
         return $this->getPrimaryTransport()->sendSms($lead, $content, $stat);
+    }
+
+    /**
+     * @return TransportSettings
+     *
+     * @throws PrimaryTransportNotEnabledException
+     */
+    public function getSettings()
+    {
+        if (!$this->settings) {
+            $this->settings = new TransportSettings($this->getPrimaryTransport());
+        }
+
+        return $this->settings;
     }
 
     /**

@@ -29,6 +29,16 @@ $isExisting = $sms->getId();
         <?php echo $view['form']->row($form['message']); ?>
     </div>
 </div>
+
+<div class="row">
+    <?php foreach ($form->children['properties'] as $name => $f): ?>
+        <?php if ($row = $view['form']->row($f)): ?>
+            <div class="col-xs-6">
+                <?php echo $row; ?>
+            </div>
+        <?php endif; ?>
+    <?php endforeach; ?>
+</div>
 <?php $view['slots']->stop(); ?>
 
 <?php $view['slots']->start('rightFormContent'); ?>

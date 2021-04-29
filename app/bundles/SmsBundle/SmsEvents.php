@@ -104,4 +104,31 @@ final class SmsEvents
      * @var string
      */
     const ON_CAMPAIGN_REPLY = 'mautic.sms.on_campaign_reply';
+
+    /**
+     * The mautic.sms.on_delivered event is dispatched when a SMS service receives a delivery status.
+     *
+     * The event listener receives a Mautic\SmsBundle\Event\DeliveredEvent
+     *
+     * @var string
+     */
+    const ON_DELIVERY = 'mautic.sms.on_delivered';
+
+    /**
+     * The mautic.sms.on_campaign_delivery event is dispatched when a SMS delivery campaign decision is processed.
+     *
+     * The event listener receives a Mautic\SmsBundle\Event\ReplyEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_DELIVERY = 'mautic.sms.on_campaign_delivery';
+
+    /**
+     * The mautic.sms_properties event is dispatched during the configuration in send text message dialog.
+     *
+     * The event listener receives a Mautic\SmsBundle\Event\SmsPropertiesEvent instance.
+     *
+     * @var string
+     */
+    const SMS_PROPERTIES = 'mautic.sms_properties';
 }
