@@ -52,6 +52,8 @@ return [
                 'class'     => \Mautic\ConfigBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
                     'mautic.config.config_change_logger',
+                    'mautic.core.repository.ip_address',
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],
