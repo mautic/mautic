@@ -8,6 +8,8 @@ use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\EventListener\ConfigSubscriber;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -26,7 +28,9 @@ class ConfigSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->logger     = $this->createMock(ConfigChangeLogger::class);
-        $this->subscriber = new ConfigSubscriber($this->logger);
+        $ipAddressRepo    = $this->createMock(IpAddressRepository::class);
+        $coreParamHelper  = $this->createMock(CoreParametersHelper::class);
+        $this->subscriber = new ConfigSubscriber($this->logger, $ipAddressRepo, $coreParamHelper);
     }
 
     public function testGetSubscribedEvents()
