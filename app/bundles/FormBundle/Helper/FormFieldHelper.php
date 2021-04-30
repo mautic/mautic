@@ -215,10 +215,10 @@ class FormFieldHelper extends AbstractFormFieldHelper
             case 'date':
             case 'datetime':
             if (preg_match('/<input(.*)?id="mauticform_input_'.$formName.'_'.$alias.'"(.*)?value="(.*)?"(.*)?\/?>/i', $formHtml, $match)) {
-                    $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.$this->sanitizeValue($value).'"'
+                $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.$this->sanitizeValue($value).'"'
                         .$match[4].'/>';
-                    $formHtml = str_replace($match[0], $replace, $formHtml);
-                }
+                $formHtml = str_replace($match[0], $replace, $formHtml);
+            }
                 break;
             case 'textarea':
                 if (preg_match('/<textarea(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
