@@ -18,7 +18,8 @@ $leadName = $lead->getPrimaryIdentifier();
     ?>
     <li class="list-group-item">
         <i class="fa fa-lg fa-fw <?php echo $switch.' '.$bgClass; ?>" id="leadCampaignToggle<?php echo $c['id']; ?>" onclick="Mautic.toggleLeadCampaign('leadCampaignToggle<?php echo $c['id']; ?>', <?php echo $leadId; ?>, <?php echo $c['id']; ?>);"></i>
-        <span><?php echo $c['name']; ?></span>
+        <a  data-dismiss="modal" class="pull-right" href="<?php echo $view['router']->url('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $c['id']]); ?>" data-toggle="ajax"><span class="label label-primary"><?php echo $view['translator']->trans('mautic.core.id'); ?>: <?php echo $c['id']; ?></span></a>
+        <span> <?php echo $c['name']; ?></span>
     </li>
     <?php endforeach; ?>
 </ul>

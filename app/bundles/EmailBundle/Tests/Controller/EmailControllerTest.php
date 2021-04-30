@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -19,6 +21,7 @@ use Mautic\EmailBundle\Controller\EmailController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
@@ -30,19 +33,74 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailControllerTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|TranslatorInterface
+     */
     private $translatorMock;
+
+    /**
+     * @var MockObject|Session
+     */
     private $sessionMock;
+
+    /**
+     * @var MockObject|ModelFactory
+     */
     private $modelFactoryMock;
+
+    /**
+     * @var MockObject|Container
+     */
     private $containerMock;
+
+    /**
+     * @var MockObject|Router
+     */
     private $routerMock;
+
+    /**
+     * @var MockObject|EmailModel
+     */
     private $modelMock;
+
+    /**
+     * @var MockObject|Email
+     */
     private $emailMock;
+
+    /**
+     * @var MockObject|FlashBag
+     */
     private $flashBagMock;
+
+    /**
+     * @var EmailController
+     */
     private $controller;
+
+    /**
+     * @var MockObject|CorePermissions
+     */
     private $corePermissionsMock;
+
+    /**
+     * @var MockObject|UserHelper
+     */
     private $helperUserMock;
+
+    /**
+     * @var MockObject|FormFactory
+     */
     private $formFactoryMock;
+
+    /**
+     * @var MockObject|Form
+     */
     private $formMock;
+
+    /**
+     * @var MockObject|DelegatingEngine
+     */
     private $templatingMock;
 
     protected function setUp(): void
@@ -70,32 +128,22 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->controller->setRequest(new Request());
     }
 
-    public function testSendActionWhenNoEntityFound()
+    public function testSendActionWhenNoEntityFound(): void
     {
-        $this->containerMock->expects($this->at(0))
+        $this->containerMock->expects($this->exactly(3))
             ->method('get')
-            ->with('mautic.model.factory')
-            ->willReturn($this->modelFactoryMock);
+            ->withConsecutive(['mautic.model.factory'], ['session'], ['router'])
+            ->willReturnOnConsecutiveCalls($this->modelFactoryMock, $this->sessionMock, $this->routerMock);
 
-        $this->modelFactoryMock->expects($this->at(0))
+        $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
             ->with('email')
             ->willReturn($this->modelMock);
 
-        $this->modelMock->expects($this->at(0))
+        $this->modelMock->expects($this->once())
             ->method('getEntity')
             ->with(5)
             ->willReturn(null);
-
-        $this->containerMock->expects($this->at(1))
-            ->method('get')
-            ->with('session')
-            ->willReturn($this->sessionMock);
-
-        $this->containerMock->expects($this->at(2))
-            ->method('get')
-            ->with('router')
-            ->willReturn($this->routerMock);
 
         $this->routerMock->expects($this->any())
             ->method('generate')
@@ -108,32 +156,22 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(302, $response->getStatusCode());
     }
 
-    public function testSendActionWhenEnityFoundButNotPublished()
+    public function testSendActionWhenEnityFoundButNotPublished(): void
     {
-        $this->containerMock->expects($this->at(0))
+        $this->containerMock->expects($this->exactly(3))
             ->method('get')
-            ->with('mautic.model.factory')
-            ->willReturn($this->modelFactoryMock);
+            ->withConsecutive(['mautic.model.factory'], ['session'], ['router'])
+            ->willReturnOnConsecutiveCalls($this->modelFactoryMock, $this->sessionMock, $this->routerMock);
 
-        $this->modelFactoryMock->expects($this->at(0))
+        $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
             ->with('email')
             ->willReturn($this->modelMock);
 
-        $this->modelMock->expects($this->at(0))
+        $this->modelMock->expects($this->once())
             ->method('getEntity')
             ->with(5)
             ->willReturn($this->emailMock);
-
-        $this->containerMock->expects($this->at(1))
-            ->method('get')
-            ->with('session')
-            ->willReturn($this->sessionMock);
-
-        $this->containerMock->expects($this->at(2))
-            ->method('get')
-            ->with('router')
-            ->willReturn($this->routerMock);
 
         $this->routerMock->expects($this->any())
             ->method('generate')
@@ -150,43 +188,52 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(302, $response->getStatusCode());
     }
 
-    public function testThatExampleEmailsHaveTestStringInTheirSubject()
+    public function testThatExampleEmailsHaveTestStringInTheirSubject(): void
     {
         $this->emailMock->expects($this->once())
             ->method('setSubject')
             ->with($this->stringStartsWith(EmailController::EXAMPLE_EMAIL_SUBJECT_PREFIX));
 
-        $this->containerMock->expects($this->at(0))
+        $this->containerMock->expects($this->exactly(7))
             ->method('get')
-            ->with('mautic.model.factory')
-            ->willReturn($this->modelFactoryMock);
+            ->withConsecutive(
+                ['mautic.model.factory'],
+                ['mautic.security'],
+                ['router'],
+                ['mautic.helper.user'],
+                ['form.factory'],
+                ['templating'],
+                ['templating']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->modelFactoryMock,
+                $this->corePermissionsMock,
+                $this->routerMock,
+                $this->helperUserMock,
+                $this->formFactoryMock,
+                $this->templatingMock,
+                $this->templatingMock
+            );
 
-        $this->modelFactoryMock->expects($this->at(0))
+        $this->templatingMock->method('supports')
+            ->willReturn(true);
+
+        $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
             ->with('email')
             ->willReturn($this->modelMock);
 
-        $this->modelMock->expects($this->at(0))
+        $this->modelMock->expects($this->once())
             ->method('getEntity')
             ->with(1)
             ->willReturn($this->emailMock);
 
-        $this->containerMock->expects($this->at(1))
-            ->method('get')
-            ->with('mautic.security')
-            ->willReturn($this->corePermissionsMock);
-
-        $this->corePermissionsMock->expects($this->at(0))
+        $this->corePermissionsMock->expects($this->once())
             ->method('hasEntityAccess')
             ->with('email:emails:viewown', 'email:emails:viewother', null)
             ->willReturn(true);
 
-        $this->containerMock->expects($this->at(2))
-            ->method('get')
-            ->with('router')
-            ->willReturn($this->routerMock);
-
-        $this->routerMock->expects($this->at(0))
+        $this->routerMock->expects($this->once())
             ->method('generate')
             ->with('mautic_email_action', [
                 'objectAction' => 'sendExample',
@@ -194,21 +241,11 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             ], 1)
             ->willReturn('someUrl');
 
-        $this->containerMock->expects($this->at(3))
-            ->method('get')
-            ->with('mautic.helper.user')
-            ->willReturn($this->helperUserMock);
-
-        $this->helperUserMock->expects($this->at(0))
+        $this->helperUserMock->expects($this->once())
             ->method('getUser')
             ->willReturn(new User(false));
 
-        $this->containerMock->expects($this->at(4))
-            ->method('get')
-            ->with('form.factory')
-            ->willReturn($this->formFactoryMock);
-
-        $this->formFactoryMock->expects($this->at(0))
+        $this->formFactoryMock->expects($this->once())
             ->method('create')
             ->with('Mautic\EmailBundle\Form\Type\ExampleSendType',
                 [
@@ -224,15 +261,10 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($this->formMock);
 
-        $this->containerMock->expects($this->at(5))
+        $this->containerMock->expects($this->once())
             ->method('has')
             ->with('templating')
             ->willReturn(true);
-
-        $this->containerMock->expects($this->at(6))
-            ->method('get')
-            ->with('templating')
-            ->willReturn($this->templatingMock);
 
         $this->templatingMock->expects($this->once())
             ->method('render')
