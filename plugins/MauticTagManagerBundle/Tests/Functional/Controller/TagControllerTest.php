@@ -1,14 +1,10 @@
 <?php
 
-namespace MauticPlugin\MauticTagManagerBundle\Tests\Controller;
+namespace MauticPlugin\MauticTagManagerBundle\Tests\Functional\Controller;
 
-use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
-use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
-use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use Symfony\Component\HttpFoundation\Response;
 
 class TagControllerTest extends MauticMysqlTestCase
