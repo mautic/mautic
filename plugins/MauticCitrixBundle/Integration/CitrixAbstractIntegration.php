@@ -128,6 +128,20 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     }
 
     /**
+     * @param bool $inAuthorization
+     *
+     * @return string|null
+     */
+    public function getBearerToken($inAuthorization = false)
+    {
+        if (!$inAuthorization && isset($this->keys[$this->getAuthTokenKey()])) {
+            return $this->keys[$this->getAuthTokenKey()];
+        }
+
+        return null;
+    }
+
+    /**
      * @return string
      */
     public function getOrganizerKey()
