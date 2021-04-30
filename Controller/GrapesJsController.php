@@ -86,6 +86,7 @@ class GrapesJsController extends CommonController
         $themeHelper  = $this->get('mautic.helper.theme');
 
         // Check for MJML template
+        // @deprecated - use mjml directly in email.html.twig
         if ($logicalName = $this->checkForMjmlTemplate($templateName.'.mjml.twig')) {
             $type        = 'mjml';
         } else {
@@ -122,6 +123,10 @@ class GrapesJsController extends CommonController
                 'basePath'  => $this->request->getBasePath(),
             ]
         );
+
+        if (false !== strpos($renderedTemplate, '<mjml>')) {
+            $type = 'mjml';
+        }
 
         $renderedTemplateHtml = ('html' === $type) ? $renderedTemplate : '';
         $renderedTemplateMjml = ('mjml' === $type) ? $renderedTemplate : '';
