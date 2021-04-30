@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\MauticTagManagerBundle\Tests\Controller;
+namespace MauticPlugin\MauticTagManagerBundle\Tests\Unit\Security\Permissions;
 
 use MauticPlugin\MauticTagManagerBundle\Security\Permissions\TagManagerPermissions;
 use PHPUnit\Framework\TestCase;
