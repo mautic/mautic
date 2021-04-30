@@ -1,3 +1,5 @@
+import DynamicContentBlocks from './dynymicContent/dynamicContent.blocks';
+
 export default (editor, opts = {}) => {
   const bm = editor.BlockManager;
   const cfg = editor.getConfig();
@@ -7,18 +9,8 @@ export default (editor, opts = {}) => {
   if ('grapesjsmjml' in cfg.pluginsOpts) {
     // Dynamic Content MJML block
   } else if ('grapesjsnewsletter' in cfg.pluginsOpts) {
-    bm.add('dynamic-content', {
-      label: opts.dynamicContentBlockLabel,
-      activate: true,
-      select: true,
-      attributes: { class: 'fa fa-tag' },
-      content: {
-        type: 'dynamic-content',
-        content: '{dynamiccontent="Dynamic Content"}',
-        style: { padding: '10px' },
-        activeOnRender: 1,
-      },
-    });
+    const dcb = new DynamicContentBlocks(editor, opts);
+    dcb.addDynamciContentBlock();
   }
 
   // Add icon to mj-hero
