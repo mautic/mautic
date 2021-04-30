@@ -108,4 +108,8 @@ return [
             ],
         ],
     ],
+    'parameters' => [
+        'image_path_exclude'     => ['flags', 'mejs'], // exclude certain folders from showing in the image browser
+        'static_url'             => '', // optional base url for images
+    ],
 ];

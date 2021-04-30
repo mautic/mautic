@@ -14,7 +14,7 @@ use Symfony\Component\Finder\Finder;
 
 class FileManager
 {
-    const GRAPESJS_IMAGES_DIRECTORY = 'grapesjs';
+    const GRAPESJS_IMAGES_DIRECTORY = '';
 
     /**
      * @var FileUploader
@@ -102,7 +102,10 @@ class FileManager
      */
     public function getFullUrl($fileName, $separator = '/')
     {
-        return $this->coreParametersHelper->getParameter('site_url')
+        // if a static_url (CDN) is configured use that, otherwiese use the site url
+        $url = $this->coreParametersHelper->get('static_url') ?? $this->coreParametersHelper->get('site_url');
+
+        return $url
             .$separator
             .$this->getGrapesJsImagesPath(false, $separator)
             .$fileName;
@@ -118,8 +121,7 @@ class FileManager
     {
         return $this->pathsHelper->getSystemPath('images', $fullPath)
             .$separator
-            .self::GRAPESJS_IMAGES_DIRECTORY
-            .$separator;
+            .self::GRAPESJS_IMAGES_DIRECTORY;
     }
 
     /**
@@ -129,6 +131,7 @@ class FileManager
     {
         $files      = [];
         $uploadDir  = $this->getUploadDir();
+
         $fileSystem = new Filesystem();
 
         if (!$fileSystem->exists($uploadDir)) {
@@ -143,15 +146,20 @@ class FileManager
         $finder->files()->in($uploadDir);
 
         foreach ($finder as $file) {
-            if ($size = @getimagesize($this->getCompleteFilePath($file->getFilename()))) {
+            // exclude certain folders from grapesjs file manager
+            if (in_array($file->getRelativePath(), $this->coreParametersHelper->get('image_path_exclude'))) {
+                continue;
+            }
+
+            if ($size = @getimagesize($this->getCompleteFilePath($file->getRelativePathname()))) {
                 $files[] = [
-                    'src'    => $this->getFullUrl($file->getFilename()),
+                    'src'    => $this->getFullUrl($file->getRelativePathname()),
                     'width'  => $size[0],
                     'type'   => 'image',
                     'height' => $size[1],
                 ];
             } else {
-                $files[] = $this->getFullUrl($file->getFilename());
+                $files[] = $this->getFullUrl($file->getRelativePathname());
             }
         }
 
