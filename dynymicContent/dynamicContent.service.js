@@ -1,13 +1,9 @@
 export default class DynamicContentService {
   // dynamic content tabs on the base html (hidden)
-  dynamicContentTabs;
+  dynamicContentTabs = [];
 
-  constructor(dynamicContentTabs) {
-    if (!dynamicContentTabs) {
-      throw Error('No dynamic content tabs found');
-    }
-
-    this.dynamicContentTabs = dynamicContentTabs;
+  constructor() {
+    this.getDynamicContentTabs();
   }
 
   /**
@@ -138,6 +134,22 @@ export default class DynamicContentService {
           dynamicContent.set('content', dynConToken);
         }
       });
+    }
+  }
+
+  getDynamicContentTabs() {
+    mQuery('#dynamicContentTabs a').each((index, value) => {
+      if (value.href.indexOf('javascript') >= 0) {
+        return;
+      }
+      this.dynamicContentTabs.push({
+        title: value.innerHTML.trim(),
+        href: value.href,
+      });
+    });
+
+    if (!this.dynamicContentTabs) {
+      throw Error('No dynamic content tabs found');
     }
   }
 }
