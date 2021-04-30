@@ -82,7 +82,7 @@ class InstallNewFilesStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
 
         $this->assertFileExists($resourcePath.'/update');
-        $this->assertFileNotExists($resourcePath.'/update-test.zip');
+        $this->assertFileDoesNotExist($resourcePath.'/update-test.zip');
 
         // Cleanup
         $filesystem = new Filesystem();
@@ -118,7 +118,7 @@ class InstallNewFilesStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
 
         $this->assertFileExists($resourcePath.'/update');
-        $this->assertFileNotExists($resourcePath.'/update-test.zip');
+        $this->assertFileDoesNotExist($resourcePath.'/update-test.zip');
 
         // Cleanup
         $filesystem = new Filesystem();

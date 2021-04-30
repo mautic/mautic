@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+ROOT=$(git rev-parse --show-toplevel)
+
+echo "php-cs-fixer pre commit hook start"
+
+PHP_CS_FIXER="bin/php-cs-fixer"
+HAS_PHP_CS_FIXER=false
+
+if [ -x $PHP_CS_FIXER ]; then
+    HAS_PHP_CS_FIXER=true
+fi
+
+if $HAS_PHP_CS_FIXER; then
+
+    # Fix changed (indexed) files
+    $PHP_CS_FIXER fix --config=$ROOT/.php_cs --verbose --using-cache=no $(git diff --cached --name-only)
+
+    # Add the changes from CS Fixer back to the git index:
+    git add $(git diff --cached --name-only)
+
+else
+    echo ""
+    echo "Please install php-cs-fixer, e.g.:"
+    echo ""
+    echo "  composer require --dev friendsofphp/php-cs-fixer"
+    echo ""
+fi
+
+echo "php-cs-fixer pre commit hook finish"
