@@ -2,14 +2,12 @@ import DynamicContentService from './dynamicContent.service';
 import CodeEditor from '../codeEditor';
 
 export default class DynamicContentCommands {
-  constructor(editor, opts = {}) {
-    console.warn({ editor });
-    this.editor = editor;
-    this.opts = opts;
-    this.dcService = new DynamicContentService();
-
-    this.codePopup = this.buildCodePopup();
-  }
+  // constructor(editor, opts = {}) {
+  //   console.warn({ editor });
+  //   this.editor = editor;
+  //   this.opts = opts;
+  //   this.dcService = new DynamicContentService();
+  // }
 
   /**
    * Launch Code Editor popup
@@ -28,28 +26,28 @@ export default class DynamicContentCommands {
     codeEditor.showCodePopup();
   }
 
-  launchDynamicContent(editor, sender, options) {
-    const { target } = options;
-    const component = target || editor.getSelected();
-
-    this.showCodePopup(component);
+  static launchDynamicContent(editor) {
+    // const { target } = options;
+    // const component = target || editor.getSelected();
+    DynamicContentCommands.showCodePopup(editor);
 
     // Transform DC to token
     DynamicContentService.grapesConvertDynamicContentSlotsToTokens(editor);
   }
 
   // Build popup content, Dynamic Content area and buttons
-  buildCodePopup() {
-    const cfg = this.editor.getConfig();
+  static buildCodePopup(editor) {
+    const cfg = editor.getConfig();
 
     const codePopup = document.createElement('div');
     const content = document.createElement('div');
     content.setAttribute('id', 'dynamic-content-popup');
     const btnEdit = document.createElement('button');
+    const btnLabel = Mautic.translate('grapesjsbuilder.dynamicContentBtnLabel');
 
-    btnEdit.innerHTML = this.opts.dynamicContentBtnLabel;
+    btnEdit.innerHTML = btnLabel;
     btnEdit.className = `${cfg.stylePrefix}btn-prim ${cfg.stylePrefix}btn-dynamic-content`;
-    btnEdit.onclick = this.updateCode.bind(this);
+    btnEdit.onclick = DynamicContentCommands.updateCode.bind(this);
 
     codePopup.appendChild(content);
     codePopup.appendChild(btnEdit);
@@ -58,18 +56,21 @@ export default class DynamicContentCommands {
   }
 
   // Load content and show popup
-  showCodePopup(component) {
+  static showCodePopup(editor) {
     // this.updatePopupContents(component);
-    console.warn({ component });
-    this.editor.Modal.setContent('');
-    this.editor.Modal.setContent(this.codePopup);
-    this.editor.Modal.setTitle(this.opts.dynamicContentModalTitle);
-    this.editor.Modal.open();
+    const codePopup = DynamicContentCommands.buildCodePopup(editor);
+    const title = Mautic.translate('grapesjsbuilder.dynamicContentBlockLabel');
+
+    editor.Modal.setContent('');
+    editor.Modal.setContent(codePopup);
+    editor.Modal.setTitle(title);
+    editor.Modal.open();
   }
 
   // Close popup
-  updateCode() {
-    this.editor.Modal.close();
+  static updateCode(editor) {
+    console.warn('updateCode button', editor);
+    editor.Modal.close();
   }
 
   /**
@@ -117,6 +118,4 @@ export default class DynamicContentCommands {
     // Insert inside popup
     mQuery(popupContent).empty().append(focusForm.detach());
   }
-
-
 }
