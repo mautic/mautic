@@ -20,8 +20,6 @@ export default (editor, opts = {}) => {
     replaceRteWithFroala: true,
     categorySectionLabel: 'Sections',
     categoryBlockLabel: 'Blocks',
-    dynamicContentBlockLabel: 'Dynamic Content',
-    dynamicContentBtnLabel: 'Save',
     dynamicContentModalTitle: 'Edit Dynamic Content',
     dynamicContentFroalaButtons: [
       'undo',

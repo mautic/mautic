@@ -13,7 +13,7 @@ export default class DynamicContentBlocks {
 
   addDynamciContentBlock() {
     this.blockManager.add('dynamic-content', {
-      label: this.opts.dynamicContentBlockLabel,
+      label: Mautic.translate('grapesjsbuilder.dynamicContentBlockLabel'),
       activate: true,
       select: true,
       attributes: { class: 'fa fa-tag' },
