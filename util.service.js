@@ -1,4 +1,10 @@
 export default class UtilService {
+  static modeEmailHtml = 'email-html';
+
+  static modeEmailMjml = 'email-mjml';
+
+  static modePageHtml = 'page-html';
+
   static getMode(editor) {
     const cfg = editor.getConfig();
 

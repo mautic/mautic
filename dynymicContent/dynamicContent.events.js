@@ -12,10 +12,9 @@ export default class DynamicContentEvents {
 
   onComponentAdd() {
     this.editor.on('component:add', (component) => {
-      const type = component.get('type');
-
       // Create dynamic-content on Mautic side
-      if (type === 'dynamic-content') {
+      console.warn(component.get('type'));
+      if (component.get('type') === 'dynamic-content') {
         this.dcService.manageDynamicContentTokenToSlot(component);
       }
     });
@@ -23,11 +22,9 @@ export default class DynamicContentEvents {
 
   onComponentRemove() {
     this.editor.on('component:remove', (component) => {
-      const type = component.get('type');
-
       // Delete dynamic-content on Mautic side
-      if (type === 'dynamic-content') {
-        this.deleteDynamicContentItem(component);
+      if (component.get('type') === 'dynamic-content') {
+        this.dcService.deleteDynamicContentItem(component);
       }
     });
   }

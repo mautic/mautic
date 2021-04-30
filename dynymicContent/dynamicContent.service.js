@@ -86,7 +86,8 @@ export default class DynamicContentService {
    *
    * @param component
    */
-  static deleteDynamicContentItem(component) {
+   // eslint-disable-next-line class-methods-use-this
+   deleteDynamicContentItem(component) {
     const attributes = component.getAttributes();
 
     // Only delete if we click on trash, not when GrapesJs is destroyed
