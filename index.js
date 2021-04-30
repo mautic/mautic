@@ -1,6 +1,7 @@
 import loadComponents from './components';
 import loadCommands from './commands';
 import loadButtons from './buttons';
+import loadEvents from './events';
 import loadBlocks from './blocks';
 import loadListeners from './listeners';
 
@@ -363,7 +364,8 @@ export default (editor, opts = {}) => {
   // Load other parts
   loadComponents(editor, config);
   loadCommands(editor, config);
+  loadEvents(editor, config);
   loadButtons(editor, config);
   loadBlocks(editor, config);
-  loadListeners(editor, config);
+  loadListeners(editor);
 };

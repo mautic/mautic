@@ -1,24 +1,27 @@
+import DynamicContentService from './dynamicContent.service';
+
 export default class DynamicContentEvents {
   editor;
 
+  dcService;
+
   constructor(editor) {
     this.editor = editor;
-    this.componentAdd();
-    this.componentRemove();
+    this.dcService = new DynamicContentService();
   }
 
-  componentAdd() {
+  onComponentAdd() {
     this.editor.on('component:add', (component) => {
       const type = component.get('type');
 
       // Create dynamic-content on Mautic side
       if (type === 'dynamic-content') {
-        this.manageDynamicContentTokenToSlot(component);
+        this.dcService.manageDynamicContentTokenToSlot(component);
       }
     });
   }
 
-  componentRemove() {
+  onComponentRemove() {
     this.editor.on('component:remove', (component) => {
       const type = component.get('type');
 
@@ -29,6 +32,7 @@ export default class DynamicContentEvents {
     });
   }
 
+  // @todo remove? not used
   modalClose() {
     const commands = this.editor.Commands;
 

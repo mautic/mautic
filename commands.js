@@ -1,5 +1,5 @@
 import DynamicContentService from './dynymicContent/dynamicContent.service';
-import DynamicContentCommands from './dynymicContent/dynamicContent.command';
+import DynamicContentCommands from './dynymicContent/dynamicContent.commands';
 
 export default (editor) => {
   const cmd = editor.Commands;

@@ -6,6 +6,7 @@ export default class DynamicContentCommands {
     console.warn({ editor });
     this.editor = editor;
     this.opts = opts;
+    this.dcService = new DynamicContentService();
 
     this.codePopup = this.buildCodePopup();
   }
@@ -15,17 +16,19 @@ export default class DynamicContentCommands {
    */
   static launchCodeEdit(editor, sender) {
     const codeEditor = new CodeEditor(editor, this.opts);
+    console.warn({ editor });
 
     if (sender) {
       sender.set('active', 0);
     }
 
     // Transform DC to token
-    DynamicContentService.grapesConvertDynamicContentSlotsToTokens(editor);
+    this.dcService.grapesConvertDynamicContentSlotsToTokens(editor);
+    console.warn({ codeEditor });
     codeEditor.showCodePopup();
   }
 
-  static launchDynamicContent(editor, sender, options) {
+  launchDynamicContent(editor, sender, options) {
     const { target } = options;
     const component = target || editor.getSelected();
 
@@ -56,8 +59,8 @@ export default class DynamicContentCommands {
 
   // Load content and show popup
   showCodePopup(component) {
-    this.updatePopupContents(component);
-
+    // this.updatePopupContents(component);
+    console.warn({ component });
     this.editor.Modal.setContent('');
     this.editor.Modal.setContent(this.codePopup);
     this.editor.Modal.setTitle(this.opts.dynamicContentModalTitle);
@@ -69,7 +72,10 @@ export default class DynamicContentCommands {
     this.editor.Modal.close();
   }
 
-  // Load Dynamic Content editor from Mautic and append to popup
+  /**
+   * Load Dynamic Content editor and append to the Modal
+   * @param {*} component
+   */
   updatePopupContents(component) {
     const self = this;
     const popupContent = this.codePopup.querySelector('#dynamic-content-popup');
@@ -111,4 +117,6 @@ export default class DynamicContentCommands {
     // Insert inside popup
     mQuery(popupContent).empty().append(focusForm.detach());
   }
+
+
 }
