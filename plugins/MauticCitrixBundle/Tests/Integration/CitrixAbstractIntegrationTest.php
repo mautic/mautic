@@ -26,8 +26,8 @@ class CitrixAbstractIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->citrixTestIntegration = new class() extends CitrixAbstractIntegration {
-            public $keys             = [];
+        $this->citrixTestIntegration       = new class() extends CitrixAbstractIntegration {
+            public array $keys             = [];
 
             /** @noinspection PhpMissingParentConstructorInspection */
             public function __construct()
