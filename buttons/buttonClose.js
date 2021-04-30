@@ -1,17 +1,26 @@
+import UtilService from '../util.service';
 import ButtonCloseCommands from './buttonClose.command';
 
 export default class ButtonClose {
+  editor;
+
+  static modeEmailHtml = 'email-html';
+
+  static modeEmailMjml = 'email-mjml';
+
+  static modePageHtml = 'page-html';
+
   /**
    * Add close button with save for Mautic
    */
-  constructor(editor, command) {
-    if (!command) {
-      throw new Error('no close button command');
-    }
+  constructor(editor) {
     if (!editor) {
       throw new Error('no editor');
     }
     this.editor = editor;
+
+    const command = this.getCommand();
+
     this.addButton(command);
     this.addCommand(command);
   }
@@ -29,21 +38,24 @@ export default class ButtonClose {
 
   addCommand(command) {
     const cmd = this.editor.Commands;
+    cmd.add(command, {
+      run: ButtonCloseCommands.closeEditorPageHtml,
+    });
+  }
 
-    if (command === 'mautic-editor-page-html-close') {
-      cmd.add(command, {
-        run: ButtonCloseCommands.closeEditorPageHtml,
-      });
-    } else if (command === 'mautic-editor-email-mjml-close') {
-      cmd.add(command, {
-        run: ButtonCloseCommands.closeEditorEmailMjml,
-      });
-    } else if (command === 'mautic-editor-email-html-close') {
-      cmd.add(command, {
-        run: ButtonCloseCommands.closeEditorEmailHtml,
-      });
-    } else {
-      throw new Error('no correct close command');
+  /**
+   * Get the close command based on the editor mode
+   */
+  getCommand() {
+    const mode = UtilService.getMode(this.editor);
+
+    if (mode === ButtonClose.modePageHtml) {
+      return 'mautic-editor-email-html-close';
+    } else if (mode === ButtonClose.modeEmailHtml) {
+      return 'mautic-editor-email-html-close';
+    } else if (mode === ButtonClose.modeEmailMjml) {
+      return 'mautic-editor-email-html-close';
     }
+    throw new Error(`no valid builder mode: ${mode}`);
   }
 }
