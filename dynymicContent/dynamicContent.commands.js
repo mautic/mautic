@@ -36,21 +36,19 @@ export default class DynamicContentCommands {
   }
 
   // Build popup content, Dynamic Content area and buttons
-  static buildCodePopup(editor) {
-    const cfg = editor.getConfig();
+  static buildCodePopup() {
 
     const codePopup = document.createElement('div');
     const content = document.createElement('div');
     content.setAttribute('id', 'dynamic-content-popup');
-    const btnEdit = document.createElement('button');
-    const btnLabel = Mautic.translate('grapesjsbuilder.dynamicContentBtnLabel');
-
-    btnEdit.innerHTML = btnLabel;
-    btnEdit.className = `${cfg.stylePrefix}btn-prim ${cfg.stylePrefix}btn-dynamic-content`;
-    btnEdit.onclick = DynamicContentCommands.updateCode.bind(this);
-
     codePopup.appendChild(content);
-    codePopup.appendChild(btnEdit);
+
+    // const btnEdit = document.createElement('button');
+    // const btnLabel = Mautic.translate('grapesjsbuilder.dynamicContentBtnLabel');
+    // btnEdit.innerHTML = btnLabel;
+    // btnEdit.className = `${cfg.stylePrefix}btn-prim ${cfg.stylePrefix}btn-dynamic-content`;
+    // btnEdit.onclick = DynamicContentCommands.updateCode.bind(this);
+    // codePopup.appendChild(btnEdit);
 
     return codePopup;
   }
@@ -70,7 +68,7 @@ export default class DynamicContentCommands {
   // Close popup
   static updateCode(editor) {
     console.warn('updateCode button', editor);
-    editor.Modal.close();
+    this.Modal.close();
   }
 
   /**
