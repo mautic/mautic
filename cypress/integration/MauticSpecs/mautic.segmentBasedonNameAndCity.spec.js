@@ -146,9 +146,9 @@ context("Verify segment membership based on Name ,City and Company", () => {
     contact.waitforPageLoad();
     cy.visit("/s/contacts?search=contact"); // Community Specific
     contact.waitTillSearchResultGetsDisplayed();
-    search.selectParentCheckBox.click({ force: true });
+    search.selectParentCheckBox.click();
     search.selectParentsOptionsDropdown.click();
-    search.selectBatchdeleteButton.click({force: true});
+    search.selectBatchdeleteButton.click();
     search.confirmDeleteButton.click();
   })
 
