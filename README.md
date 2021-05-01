@@ -3,13 +3,36 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-Mautic Introduction
-===========
+[![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
+
+About Mautic
+============
+Mautic is the world’s largest open source marketing automation project. With over 200,000 organisations using Mautic and over 1,000 community volunteers, we empower businesses by making it easy to manage their marketing across a range of channels. Stay up to date about initiatives, releases and strategy via our [blog][mautic-blog].
+
+Marketing automation has historically been difficult to implement within organisations. The Mautic Community is an example of open source at its best, offering great software and a vibrant and caring community in which to learn and share knowledge.
+
+Open source means more than open code. Open source provides equality for all and a chance for everyone to improve.
+
 ![Mautic](.github/readme_image.png "Mautic Open Source Marketing Automation")
+
+Get Involved
+=============
+Before we tell you how to install and use Mautic, we like to shamelessly plug our awesome user and developer communities! Users, start [here][get-involved] for inspiration, or follow us on Twitter [@MauticCommunity][twitter] or Facebook [@MauticCommunity][facebook]. Once you’re familiar with using the software, maybe you will share your wisdom with others in our [Slack][slack] channel.
+
+Calling all devs, testers and tech writers! Technical contributions are also welcome. First, read our [general guidelines][contributing] about contributing. If you want to contribute code, read our [CONTRIBUTING.md][contributing-md] or [Contributing Code][contribute-developer] docs then check out the issues with the [T1 label][t1-isssues] to get stuck in quickly and show us what you’re made of.
+
+If you have questions, the Mautic Community can help provide the answers.
+
+Installing and using Mautic
+============================
 
 ## Supported Versions
 
-| Branch | RC Release | Initial Release | Active Support Until | Security Support Until *
+| Branch | RC Release | Initial Release | Active Support Until | Security Support Until*
 |--|--|--|--|--|
 |2.15  | 27 Sep 2019 | 8 Oct 2019 | 8 Oct 2019 | 8 Oct 2019
 |2.16  | 30 Jan 2020 | 13 Feb 2020 | 15 June 2020 | 15 December 2020
@@ -19,65 +42,36 @@ Mautic Introduction
 |3.3   | 16 Feb 2021 | 22 Feb 2021 | 17 May 2021 | 24 May 2021
 |4.x   | 17 May 2021 | 24 May 2021 | 24 May 2022 | 20 Dec 2022
 
-* = Security Support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL like Symfony 2.8.
+`*`Security support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL, such as Symfony 2.8.
 
-## Getting Started
+## Software Downloads
+The GitHub version is recommended for both development and testing. The production package (including all libraries) is available at [mautic.org/download][download-mautic].
 
-The GitHub version is recommended for development or testing. Production package ready for install with all the libraries is at [https://www.mautic.org/download](https://www.mautic.org/download).
+## Installation
+### Disclaimer
+*Install from source only if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and keep it working. If the source/database schema gets out of sync with Mautic releases, the release updater may not work and will require manual updates. For production, we recommend the pre-packaged Mautic which is available at [mautic.org/download][download-mautic].*
 
-Documentation on how to use Mautic is available at [https://docs.mautic.org](https://docs.mautic.org).
+*Also note that source code outside of a [tagged release][tagged-release] should be considered ‘alpha’. It may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*
 
-This is a simple 3 step installation process. You'll want to make sure you already have [Composer v1](http://getcomposer.org) available on your computer as this is a development release and you'll need to use Composer to download the vendor packages. Note that v2 is not yet supported.
+### How to install Mautic
+You must already have [Composer v1][composer-v1] available on your computer because this is a development release and you'll need Composer to download the vendor packages. Note that Composer v2 is not yet supported.
 
-<table width="100%" border="0">
-	<tr>
-		<td>
-			<center><b>Step 1</b></center>
-		</td>
-		<td>
-			<center><b>Step 2</b></center>
-		</td>
-		<td>
-			<center><b>Step 3</b></center>
-		</td>
-	</tr>
-	<tr>
-		<td align="center" width="33.3%">
-			<a href="https://github.com/mautic/mautic/archive/master.zip">Download the repository zip</a><br />Extract this zip to your web root.
-		</td>
-		<td align="center" width="33.3%">
-			Run the following command to install required packages.<br /> <code>composer install</code>
-		</td>
-		<td align="center" width="33.3%">
-			Open your browser and complete the installation through the web installer.
-		</td>
-	</tr>
-</table>
+Also note that if you have DDEV installed, you can run 'ddev config' followed by 'ddev start'. This will kick off the Mautic first-run process which will automatically install dependencies and configure Mautic for use. ✨ 🚀 Read more [here][ddev-mautic]
 
-**Get stuck?** *No problem. Check out [general troubleshooting](https://docs.mautic.org/en/troubleshooting) and if it won't solve your issue join us at the <a href="https://www.mautic.org/community">Mautic community</a> for help and answers.*
+Installing Mautic is a simple three-step process:
 
-## Disclaimer
-Installing from source is only recommended if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and to keep it working. If the source and/or database schema gets out of sync with Mautic's releases, the release updater may not work and will require manual updates. For production the pre-packaged Mautic available at [mautic.org/download](https://www.mautic.org/download) is recommended.
+1. [Download the repository zip][download-zip] then extract the zip to your web root.
+2. Run the `composer install` command to install the required packages.
+3. Open your browser and complete the installation through the web installer.
 
-*Also note that the source outside <a href="https://github.com/mautic/mautic/releases">a tagged release</a> should be considered "alpha" and may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*
+If you get stuck, check our our [general troubleshooting][troubleshooting] page. Still no joy? Join our lively [Mautic Community][community] for support and answers.
 
-## Ready to Install from Source and/or Contribute?
-That's fantastic! 
+### User Documentation
+Documentation on how to use Mautic is available at [docs.mautic.org][mautic-docs].
 
-If you want to contribute to Mautic's **code**, please read our [CONTRIBUTING.md](https://github.com/mautic/mautic/blob/feature/.github/CONTRIBUTING.md) or [Contributing Code](https://contribute.mautic.org/contributing-to-mautic/developer) docs. Then, check out the issues with the [L1 label](https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AL1) to get started quickly :rocket:
+### Developer Docs
+Developer documentation, including API reference docs, is available at [developer.mautic.org][dev-docs].
 
-If you want to contribute in **other areas** of Mautic, please read our general [Contributing](https://contribute.mautic.org/contributing-to-mautic) guide.
-
-## FAQ and Contact Information
-Marketing automation has historically been a difficult tool to implement in a business. The Mautic community is a rich environment for you to learn from others and share your knowledge as well. Open source means more than open code. Open source is providing equality for all and a chance to improve. If you have questions then the Mautic community can help provide the answers.
-
-**Ready to get started with the community?** You can get <a href="https://www.mautic.org/community/get-involved">more involved</a> on the <a href="https://www.mautic.org">Mautic</a> website. Or follow Mautic on social media just to stay current with what's happening!
-
-### Contact Info
-
-* <a href="https://www.mautic.org">https://www.mautic.org</a>
-* <a href="https://twitter.com/MauticCommunity">@MauticCommunity</a> [Twitter]
-* <a href="https://www.facebook.com/MauticCommunity/">@MauticCommunity</a> [Facebook]
 
 ## Contributors ✨
 
@@ -99,4 +93,24 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+This project follows the [all-contributors][all-contributors] specification. Contributions of any kind welcome!
+
+[mautic-blog]: <https://www.mautic.org/blog>
+[get-involved]: <https://www.mautic.org/community/get-involved>
+[twitter]: <https://twitter.com/MauticCommunity>
+[facebook]: <https://www.facebook.com/MauticCommunity/>
+[slack]: <https://www.mautic.org/community/get-involved/communication-channels>
+[contributing]: <https://contribute.mautic.org/contributing-to-mautic>
+[contributing-md]: <https://github.com/mautic/mautic/blob/feature/.github/CONTRIBUTING.md>
+[contribute-developer]: <https://contribute.mautic.org/contributing-to-mautic/developer>
+[t1-issues]: <https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AT1>
+[download-mautic]: <https://www.mautic.org/download>
+[tagged-release]: <https://github.com/mautic/mautic/releases>
+[composer-v1]: <http://getcomposer.org/>
+[download-zip]: <https://github.com/mautic/mautic/archive/refs/heads/features.zip>
+[ddev-mautic]: <https://kb.mautic.org/knowledgebase/development/how-to-install-mautic-using-ddev>
+[troubleshooting]: <https://docs.mautic.org/en/troubleshooting>
+[community]: <https://www.mautic.org/community>
+[mautic-docs]: <https://docs.mautic.org>
+[dev-docs]: <https://developer.mautic.org>
+[all-contributors]: <https://github.com/all-contributors/all-contributors>
