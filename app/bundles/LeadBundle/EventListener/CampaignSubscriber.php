@@ -312,11 +312,49 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         $lead   = $event->getLead();
-        $values = $event->getConfig();
-        $fields = $lead->getFields(true);
 
-        $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $values), false);
-        $this->leadModel->saveEntity($lead);
+        $config   = $event->getConfig();
+        $fields   = $config['fields'];
+        $actions  = $config['actions'];
+
+        $fieldsToProcess  = array_intersect_key($fields, array_flip($config['fields_to_update']));
+        $actionsToProcess = array_intersect_key($actions, array_flip($config['fields_to_update']));
+
+        $fieldsToUpdate       = array_intersect_key($fieldsToProcess, array_flip(array_keys($actionsToProcess, 'update')));
+        $fieldsToEmpty        = array_intersect_key($fieldsToProcess, array_flip(array_keys($actionsToProcess, 'empty')));
+        $fieldsToAddValues    = array_intersect_key($fieldsToProcess, array_flip(array_keys($actionsToProcess, 'add')));
+        $fieldsToRemoveValues = array_intersect_key($fieldsToProcess, array_flip(array_keys($actionsToProcess, 'remove')));
+
+        if (!empty($fieldsToUpdate)) {
+            $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($lead->getFields(true), $fieldsToUpdate));
+        }
+
+        if (!empty($fieldsToEmpty)) {
+            $this->leadModel->setFieldValues($lead, $fieldsToEmpty, true);
+        }
+
+        if (!empty($fieldsToAddValues)) {
+            // update values with diff after remove
+            foreach ($fieldsToAddValues as $field => &$fieldToAddValue) {
+                $fieldValue      = $lead->getFieldValue($field);
+                $oldValue        = !empty($fieldValue) ? explode('|', $fieldValue) : [];
+                $fieldToAddValue = array_unique(array_merge($oldValue, $fieldToAddValue));
+            }
+            $this->leadModel->setFieldValues($lead, $fieldsToAddValues);
+        }
+
+        if (!empty($fieldsToRemoveValues)) {
+            // update values with diff after remove
+            foreach ($fieldsToRemoveValues as $field => &$fieldToRemoveValue) {
+                $oldValue           = explode('|', $lead->getFieldValue($field));
+                $fieldToRemoveValue = array_diff($oldValue, $fieldToRemoveValue);
+            }
+            $this->leadModel->setFieldValues($lead, $fieldsToRemoveValues);
+        }
+
+        if (!empty($lead->getChanges())) {
+            $this->leadModel->saveEntity($lead);
+        }
 
         return $event->setResult(true);
     }

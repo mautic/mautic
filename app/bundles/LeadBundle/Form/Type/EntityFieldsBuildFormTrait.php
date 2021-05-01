@@ -68,6 +68,9 @@ trait EntityFieldsBuildFormTrait
             if ($field['isUniqueIdentifer']) {
                 $attr['data-unique-identifier'] = $field['alias'];
             }
+            if (isset($options['disabled'][$alias])) {
+                $attr['disabled'] = true;
+            }
 
             if ($isObject) {
                 $value = (isset($fieldValues[$group][$alias]['value'])) ?
@@ -222,7 +225,7 @@ trait EntityFieldsBuildFormTrait
                     }
 
                     $typeProperties['data']        = MultiselectType::class === $type ? FormFieldHelper::parseList($value) : $value;
-                    $typeProperties['placeholder'] = $emptyValue;
+                    $typeProperties['placeholder'] = isset($options['placeholder'][$alias]) ? $options['placeholder'][$alias] : $emptyValue;
                     $builder->add(
                         $alias,
                         $type,
@@ -275,6 +278,9 @@ trait EntityFieldsBuildFormTrait
                             $constraints[] = new Length(['max' => 65535]);
                             break;
                     }
+
+                    $attr['class']            = 'form-control';
+                    $attr['data-placeholder'] = $field['label'];
 
                     $builder->add(
                         $alias,
