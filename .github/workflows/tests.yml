@@ -225,7 +225,6 @@ jobs:
       with:
         config: baseUrl=http://localhost
         env: CI=true
-        browser: chrome
         working-directory: /var/www/html
         record: true
         group: 'Mautic Cypress'
