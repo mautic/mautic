@@ -1,119 +1,49 @@
 import DynamicContentService from './dynamicContent.service';
 import CodeEditor from '../codeEditor';
+import DynamicContent from './dynamicContent';
 
 export default class DynamicContentCommands {
-  // constructor(editor, opts = {}) {
-  //   console.warn({ editor });
-  //   this.editor = editor;
-  //   this.opts = opts;
-  //   this.dcService = new DynamicContentService();
-  // }
-
   /**
    * Launch Code Editor popup
    */
-  static launchCodeEdit(editor, sender) {
-    const codeEditor = new CodeEditor(editor, this.opts);
-    console.warn({ editor });
+  // static launchCodeEdit(editor, sender) {
+  //   const codeEditor = new CodeEditor(editor, this.opts);
 
-    if (sender) {
-      sender.set('active', 0);
-    }
+  //   if (sender) {
+  //     sender.set('active', 0);
+  //   }
 
-    // Transform DC to token
-    this.dcService.grapesConvertDynamicContentSlotsToTokens(editor);
-    console.warn({ codeEditor });
-    codeEditor.showCodePopup();
-  }
+  //   // Transform DC to token
+  //   console.debug('Transform DC to token');
+  //   DynamicContentService.grapesConvertDynamicContentSlotsToTokens(editor);
+  //   codeEditor.showCodePopup();
+  // }
 
-  static launchDynamicContent(editor) {
-    // const { target } = options;
-    // const component = target || editor.getSelected();
-    DynamicContentCommands.showCodePopup(editor);
+  static launchDynamicContent(editor, sender, options = {}) {
+    const { target } = options;
+    const component = target || editor.getSelected();
+
+    const dynamicContent = new DynamicContent(editor);
+    console.log('command: launchDynamicContent : show popup',component);
+    dynamicContent.showCodePopup(component);
 
     // Transform DC to token
     DynamicContentService.grapesConvertDynamicContentSlotsToTokens(editor);
   }
 
-  // Build popup content, Dynamic Content area and buttons
-  static buildCodePopup() {
-
-    const codePopup = document.createElement('div');
-    const content = document.createElement('div');
-    content.setAttribute('id', 'dynamic-content-popup');
-    codePopup.appendChild(content);
-
-    // const btnEdit = document.createElement('button');
-    // const btnLabel = Mautic.translate('grapesjsbuilder.dynamicContentBtnLabel');
-    // btnEdit.innerHTML = btnLabel;
-    // btnEdit.className = `${cfg.stylePrefix}btn-prim ${cfg.stylePrefix}btn-dynamic-content`;
-    // btnEdit.onclick = DynamicContentCommands.updateCode.bind(this);
-    // codePopup.appendChild(btnEdit);
-
-    return codePopup;
-  }
-
-  // Load content and show popup
-  static showCodePopup(editor) {
-    // this.updatePopupContents(component);
-    const codePopup = DynamicContentCommands.buildCodePopup(editor);
-    const title = Mautic.translate('grapesjsbuilder.dynamicContentBlockLabel');
-
-    editor.Modal.setContent('');
-    editor.Modal.setContent(codePopup);
-    editor.Modal.setTitle(title);
-    editor.Modal.open();
-  }
-
-  // Close popup
-  static updateCode(editor) {
-    console.warn('updateCode button', editor);
-    this.Modal.close();
-  }
-
   /**
-   * Load Dynamic Content editor and append to the Modal
-   * @param {*} component
+   * Convert dynamic content tokens to slot and load content
+   * used in grapesjs-preset-mautic
    */
-  updatePopupContents(component) {
-    const self = this;
-    const popupContent = this.codePopup.querySelector('#dynamic-content-popup');
-    const attributes = component.getAttributes();
-    const focusForm = mQuery(`#emailform_dynamicContent_${attributes['data-param-dec-id']}`);
+  static grapesConvertDynamicContentTokenToSlot(editor) {
+    const dc = editor.DomComponents;
 
-    // Remove Mautic Froala and reload one with custom setting
-    focusForm.find('textarea.editor').each(function () {
-      const buttons = self.opts.dynamicContentFroalaButtons;
-      const froalaOptions = {
-        toolbarButtons: buttons,
-        toolbarButtonsMD: buttons,
-        toolbarButtonsSM: buttons,
-        toolbarButtonsXS: buttons,
-        toolbarSticky: false,
-        linkList: [],
-        imageEditButtons: [
-          'imageReplace',
-          'imageAlign',
-          'imageRemove',
-          'imageAlt',
-          'imageSize',
-          '|',
-          'imageLink',
-          'linkOpen',
-          'linkEdit',
-          'linkRemove',
-        ],
-      };
+    const dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
 
-      mQuery(this).froalaEditor('destroy');
-      mQuery(this).froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, froalaOptions));
-    });
-
-    // Show if hidden
-    focusForm.removeClass('fade');
-    // Hide delete default button
-    focusForm.find('.tab-pane:first').find('.remove-item').hide();
-    // Insert inside popup
-    mQuery(popupContent).empty().append(focusForm.detach());
+    if (dynamicContents.length) {
+      dynamicContents.forEach((dynamicContent) => {
+        DynamicContentService.manageDynamicContentTokenToSlot(dynamicContent);
+      });
+    }
   }
 }

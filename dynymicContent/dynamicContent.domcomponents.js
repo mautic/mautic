@@ -65,12 +65,12 @@ export default class DynamicContentDomComponents {
       events: {
         dblclick: 'onActive',
       },
-      onActive() {
-        console.warn('onActive', this.model);
-        const target = this.model;
+      // onActive() {
+      //   console.warn('onActive', this.model);
+      //   const target = this.model;
 
-        this.em.get('Commands').run('preset-mautic:dynamic-content', { target });
-      },
+      //   this.em.get('Commands').run('preset-mautic:dynamic-content', { target });
+      // },
     });
 
     // add the Dynamic Content component

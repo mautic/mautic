@@ -1,3 +1,4 @@
+import DynamicContentCommands from './dynamicContent.commands';
 import DynamicContentService from './dynamicContent.service';
 
 export default class DynamicContentEvents {
@@ -13,9 +14,10 @@ export default class DynamicContentEvents {
   onComponentAdd() {
     this.editor.on('component:add', (component) => {
       // Create dynamic-content on Mautic side
-      console.warn(component.get('type'));
+      console.warn('component:add');
       if (component.get('type') === 'dynamic-content') {
         this.dcService.manageDynamicContentTokenToSlot(component);
+        DynamicContentCommands.launchDynamicContent(this.editor, null, { target: component });
       }
     });
   }

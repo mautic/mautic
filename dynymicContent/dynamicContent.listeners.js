@@ -1,3 +1,4 @@
+import DynamicContentCommands from './dynamicContent.commands';
 import DynamicContentService from './dynamicContent.service';
 
 export default class DynamicContentListeners {
@@ -14,6 +15,6 @@ export default class DynamicContentListeners {
    * On editor load: convert tokens to slots
    */
   onLoad() {
-    this.editor.on('load', this.dcs.grapesConvertDynamicContentTokenToSlot);
+    this.editor.on('load', DynamicContentCommands.grapesConvertDynamicContentTokenToSlot);
   }
 }

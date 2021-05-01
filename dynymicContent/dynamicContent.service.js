@@ -7,26 +7,11 @@ export default class DynamicContentService {
   }
 
   /**
-   * Convert dynamic content tokens to slot and load content
-   * used in grapesjs-preset-mautic
-   */
-  grapesConvertDynamicContentTokenToSlot(editor) {
-    const dc = editor.DomComponents;
-
-    const dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
-
-    if (dynamicContents.length) {
-      dynamicContents.forEach((dynamicContent) => {
-        this.manageDynamicContentTokenToSlot(dynamicContent);
-      });
-    }
-  }
-
-  /**
    * Convert a text token to an editor UI
    * @param {JQuery Object} component
    */
   manageDynamicContentTokenToSlot(component) {
+    console.log('manageDynamicContentTokenToSlot');
     const regex = RegExp(/\{dynamiccontent="(.*)"\}/, 'g');
 
     const content = component.get('content');
