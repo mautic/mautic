@@ -11,7 +11,7 @@
 
 namespace Mautic\UserBundle\Security\SAML\Store;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use LightSaml\Provider\TimeProvider\TimeProviderInterface;
 use LightSaml\Store\Id\IdStoreInterface;
 use Mautic\UserBundle\Entity\IdEntry;

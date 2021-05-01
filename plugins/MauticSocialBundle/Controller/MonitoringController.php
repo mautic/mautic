@@ -434,7 +434,7 @@ class MonitoringController extends FormController
         }
 
         // Audit Log
-        $logs = $this->getModel('core.auditLog')->getLogForObject('monitoring', $objectId);
+        $logs = $this->getModel('core.auditlog')->getLogForObject('monitoring', $objectId);
 
         $returnUrl = $this->generateUrl(
             'mautic_social_action',
@@ -663,6 +663,6 @@ class MonitoringController extends FormController
             'ipAddress' => $this->container->get('mautic.helper.ip_lookup')->getIpAddressFromRequest(),
         ];
 
-        $this->getModel('core.auditLog')->writeToLog($log);
+        $this->getModel('core.auditlog')->writeToLog($log);
     }
 }
