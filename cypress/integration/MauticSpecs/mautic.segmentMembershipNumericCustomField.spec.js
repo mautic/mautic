@@ -267,7 +267,7 @@ context("Verify segment membership tests with numeric custom field", () => {
     contact.waitTillSearchResultGetsDisplayed();
     search.selectParentCheckBox.click({ force: true });
     search.selectParentsOptionsDropdown.click();
-    search.selectBatchdeleteButton.click();
+    search.selectBatchdeleteButton.click({force: true});
     search.confirmDeleteButton.click();
   });
 

@@ -148,7 +148,7 @@ context("Verify segment membership based on Name ,City and Company", () => {
     contact.waitTillSearchResultGetsDisplayed();
     search.selectParentCheckBox.click({ force: true });
     search.selectParentsOptionsDropdown.click();
-    search.selectBatchdeleteButton.click();
+    search.selectBatchdeleteButton.click({force: true});
     search.confirmDeleteButton.click();
   })
 
