@@ -134,7 +134,7 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
-                        <?php 
+                        <?php
                         foreach ($item['config']['builder'] as $builder) {
                             ?>
                             <span style="white-space: nowrap;">
