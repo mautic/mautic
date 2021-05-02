@@ -76,7 +76,8 @@ class CampaignRepositoryTest extends TestCase
 
         $queryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['select', 'from', 'where', 'setParameter', 'andWhere', 'getQuery'])
+            ->onlyMethods(['select', 'from', 'where', 'setParameter', 'andWhere'])
+            ->addMethods(['getQuery'])
             ->getMock();
 
         $this->entityManager

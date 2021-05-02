@@ -63,7 +63,8 @@ final class ObjectMappingRepositoryTest extends TestCase
         // This is terrible, but the Query class is final and AbstractQuery doesn't have some methods used.
         $this->query = $this->getMockBuilder(AbstractQuery::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['setParameters', 'setFirstResult', 'setMaxResults', 'getSingleResult', 'getSQL', '_doExecute'])
+            ->onlyMethods(['setParameters', 'getSingleResult', 'getSQL', '_doExecute'])
+            ->addMethods(['setFirstResult', 'setMaxResults'])
             ->getMock();
 
         $this->entityManager->expects($this->once())

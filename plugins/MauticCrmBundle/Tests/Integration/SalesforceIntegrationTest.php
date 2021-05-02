@@ -180,7 +180,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     public function testThatLeadsAreOnlyCreatedIfEnabled()
     {
         $this->sfObjects     = ['Contact'];
-        $this->sfMockMethods = ['makeRequest', 'findLeadsToCreate', 'getMauticContactsToCreate'];
+        $this->sfMockMethods = ['makeRequest', 'getMauticContactsToCreate'];
 
         $sf = $this->getSalesforceIntegration();
         $sf->expects($this->never())
@@ -1003,6 +1003,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 $this->doNotContact,
             ])
             ->onlyMethods($this->sfMockMethods)
+            ->addMethods(['findLeadsToCreate'])
             ->getMock();
 
         $sf->method('makeRequest')
