@@ -94,7 +94,6 @@ export default (editor, opts = {}) => {
   }
 
   // add editor close button
-  console.warn({ editor });
   const btnClose = new ButtonClose(editor);
   btnClose.addCommand();
   btnClose.addButton();

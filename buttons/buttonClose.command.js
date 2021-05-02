@@ -1,7 +1,7 @@
 import DynamicContentService from '../dynymicContent/dynamicContent.service';
 
 export default class ButtonCloseCommands {
-  closeEditorPageHtml(editor) {
+  static closeEditorPageHtml(editor) {
     if (!editor) {
       throw new Error('no page-html editor');
     }
@@ -13,7 +13,7 @@ export default class ButtonCloseCommands {
     //   // const fullHtml = editor.getHtml();
     //   fullHtml.head.innerHTML = this.head.innerHTML;
     // }
-
+    console.warn('close');
     DynamicContentService.grapesConvertDynamicContentSlotsToTokens(editor);
 
     // Combine editor styles and editor html and save it to Mautic textarea
@@ -24,10 +24,10 @@ export default class ButtonCloseCommands {
     mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
 
     // Reset HTML
-    this.resetHtml(editor);
+    ButtonCloseCommands.resetHtml(editor);
   }
 
-  closeEditorEmailMjml(editor) {
+  static closeEditorEmailMjml(editor) {
     if (!editor) {
       throw new Error('no email-mjml editor');
     }
@@ -37,7 +37,7 @@ export default class ButtonCloseCommands {
 
     // Try catch for mjml parser error
     try {
-      code = this.editor.runCommand('mjml-get-code');
+      code = editor.runCommand('mjml-get-code');
     } catch (error) {
       console.log(error.message);
       alert('Errors inside your template. Template will not be saved.');
@@ -50,7 +50,7 @@ export default class ButtonCloseCommands {
     }
 
     // Reset HTML
-    this.resetHtml(editor);
+    ButtonCloseCommands.resetHtml(editor);
   }
 
   static closeEditorEmailHtml(editor) {
@@ -69,7 +69,7 @@ export default class ButtonCloseCommands {
     // const fullHtml = parser.parseFromString(this.canvasContent, 'text/html');
 
     // Reset HTML
-    this.resetHtml(editor);
+    ButtonCloseCommands.resetHtml(editor);
   }
 
   static resetHtml(editor) {

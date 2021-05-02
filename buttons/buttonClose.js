@@ -6,6 +6,11 @@ export default class ButtonClose {
   editor;
 
   /**
+   * The close command based on the editor mode
+   */
+  command;
+
+  /**
    * Add close button with save for Mautic
    */
   constructor(editor) {
@@ -13,28 +18,23 @@ export default class ButtonClose {
       throw new Error('no editor');
     }
     this.editor = editor;
-
-    const command = this.getCommand();
-
-    this.addButton(command);
-    this.addCommand(command);
+    this.command = this.getCommand();
   }
 
-  addButton(command) {
+  addButton() {
     this.editor.Panels.addButton('views', [
       {
         id: 'close',
         className: 'fa fa-times-circle',
         attributes: { title: 'Close' },
-        command,
+        command: this.command,
       },
     ]);
   }
 
-  addCommand(command) {
-    const cmd = this.editor.Commands;
-    cmd.add(command, {
-      run: ButtonCloseCommands.closeEditorPageHtml,
+  addCommand() {
+    this.editor.Commands.add(this.command, {
+      run: this.getCallback(),
     });
   }
 
@@ -45,12 +45,31 @@ export default class ButtonClose {
     const mode = UtilService.getMode(this.editor);
 
     if (mode === UtilService.modePageHtml) {
-      return 'mautic-editor-email-html-close';
-    } else if (mode === UtilService.modeEmailHtml) {
-      return 'mautic-editor-email-html-close';
-    } else if (mode === UtilService.modeEmailMjml) {
+      return 'mautic-editor-page-html-close';
+    }
+    if (mode === UtilService.modeEmailHtml) {
       return 'mautic-editor-email-html-close';
     }
+    if (mode === UtilService.modeEmailMjml) {
+      return 'mautic-editor-email-mjml-close';
+    }
     throw new Error(`no valid builder mode: ${mode}`);
+  }
+
+  /**
+   * get the actual Command/Function to be executed on closing of the editor
+   * @returns Function
+   */
+  getCallback() {
+    if (this.command === 'mautic-editor-page-html-close') {
+      return ButtonCloseCommands.closeEditorPageHtml;
+    }
+    if (this.command === 'mautic-editor-email-html-close') {
+      return ButtonCloseCommands.closeEditorEmailHtml;
+    }
+    if (this.command === 'mautic-editor-page-html-close') {
+      return ButtonCloseCommands.closeEditorEmailMjml;
+    }
+    throw new Error(`no valid command: ${this.command}`);
   }
 }
