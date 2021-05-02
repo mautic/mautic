@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2017 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -18,49 +20,51 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetDwcBySlotNameWithPublished()
+    public function testGetDwcBySlotNameWithPublished(): void
     {
         $mockModel = $this->getMockBuilder(DynamicContentModel::class)
             ->disableOriginalConstructor()
             ->setMethods(['getEntities'])
             ->getMock();
 
-        $mockModel->expects($this->at(0))
+        $mockModel->expects($this->exactly(2))
             ->method('getEntities')
-            ->with([
-                'filter' => [
-                    'where' => [
-                        [
-                            'col'  => 'e.slotName',
-                            'expr' => 'eq',
-                            'val'  => 'test',
+            ->withConsecutive(
+                [
+                    [
+                        'filter' => [
+                            'where' => [
+                                [
+                                    'col'  => 'e.slotName',
+                                    'expr' => 'eq',
+                                    'val'  => 'test',
+                                ],
+                                [
+                                    'col'  => 'e.isPublished',
+                                    'expr' => 'eq',
+                                    'val'  => 1,
+                                ],
+                            ],
                         ],
-                        [
-                            'col'  => 'e.isPublished',
-                            'expr' => 'eq',
-                            'val'  => 1,
-                        ],
+                        'ignore_paginator' => true,
                     ],
                 ],
-                'ignore_paginator' => true,
-            ])
-            ->willReturn(true);
-
-        $mockModel->expects($this->at(1))
-            ->method('getEntities')
-            ->with([
-                'filter' => [
-                    'where' => [
-                        [
-                            'col'  => 'e.slotName',
-                            'expr' => 'eq',
-                            'val'  => 'secondtest',
+                [
+                    [
+                        'filter' => [
+                            'where' => [
+                                [
+                                    'col'  => 'e.slotName',
+                                    'expr' => 'eq',
+                                    'val'  => 'secondtest',
+                                ],
+                            ],
                         ],
+                        'ignore_paginator' => true,
                     ],
-                ],
-                'ignore_paginator' => true,
-            ])
-            ->willReturn(false);
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
         $mockDispatcher      = $this->createMock(EventDispatcher::class);
