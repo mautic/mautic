@@ -496,10 +496,10 @@ class CampaignSubscriber implements EventSubscriberInterface
                         $lead->getId(), $event->getConfig()['field'], $triggerDate);
                 }
             } else {
-                $operators        = $this->leadModel->getFilterExpressionFunctions();
-                $field            = $event->getConfig()['field'];
-                $value            = $event->getConfig()['value'];
-                $fields           = $this->getFields($lead);
+                $operators = $this->leadModel->getFilterExpressionFunctions();
+                $field     = $event->getConfig()['field'];
+                $value     = $event->getConfig()['value'];
+                $fields    = $this->getFields($lead);
 
                 $result = $this->leadFieldModel->getRepository()->compareValue(
                     $lead->getId(),
