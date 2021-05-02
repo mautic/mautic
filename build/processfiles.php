@@ -41,9 +41,6 @@ system('rm -f vendor/babdev/transifex/.scrutinizer.yml');
 // doctrine/common
 system('rm -f vendor/doctrine/common/UPGRADE_TO*');
 
-// doctrine/doctrine-cache-bundle
-system('rm -f vendor/doctrine/doctrine-cache-bundle/Doctrine/Bundle/DoctrineCacheBundle/ruleset.xml');
-
 // doctrine/migrations
 system('rm -f vendor/doctrine/migrations/build.properties.dev');
 

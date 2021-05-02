@@ -287,6 +287,10 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('render')
             ->willReturn($renderedContent);
 
+        $engine->expects(self::once())
+            ->method('supports')
+            ->willReturn(true);
+
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(true);
 
@@ -299,13 +303,14 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->with((int) $widgetId)
             ->willReturn($widget);
 
-        $this->containerMock->expects(self::exactly(2))
+        $this->containerMock->expects(self::exactly(3))
             ->method('get')
             ->withConsecutive(
                 ['mautic.dashboard.widget'],
+                ['templating'],
                 ['templating']
             )
-            ->willReturnOnConsecutiveCalls($widgetService, $engine);
+            ->willReturnOnConsecutiveCalls($widgetService, $engine, $engine);
 
         $this->containerMock->expects(self::once())
             ->method('has')
