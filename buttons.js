@@ -1,20 +1,22 @@
+import ButtonClose from "./buttons/buttonClose";
+
 export default (editor, opts = {}) => {
   const { $ } = editor;
   const pm = editor.Panels;
 
   // Add function within builder to edit source code
-  if (opts.sourceEdit) {
-    pm.addButton('options', [
-      {
-        id: 'code-edit',
-        className: 'fa fa-edit',
-        command: 'preset-mautic:code-edit',
-        attributes: {
-          title: opts.sourceEditModalTitle,
-        },
-      },
-    ]);
-  }
+  // if (opts.sourceEdit) {
+  //   pm.addButton('options', [
+  //     {
+  //       id: 'code-edit',
+  //       className: 'fa fa-edit',
+  //       command: 'preset-mautic:code-edit',
+  //       attributes: {
+  //         title: opts.sourceEditModalTitle,
+  //       },
+  //     },
+  //   ]);
+  // }
 
   // Disable Import code button
   if (!opts.showImportButton) {
@@ -90,6 +92,12 @@ export default (editor, opts = {}) => {
   if (toggleImages !== null) {
     pm.removeButton('options', 'gjs-toggle-images');
   }
+
+  // add editor close button
+  console.warn({ editor });
+  const btnClose = new ButtonClose(editor);
+  btnClose.addCommand();
+  btnClose.addButton();
 
   // Do stuff on load
   editor.on('load', () => {

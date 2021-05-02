@@ -4,7 +4,8 @@ import DynamicContent from './dynamicContent';
 
 export default class DynamicContentCommands {
   /**
-   * Launch Code Editor popup
+   * Launch Code Editor popup. 
+   * where do we need code editor?
    */
   // static launchCodeEdit(editor, sender) {
   //   const codeEditor = new CodeEditor(editor, this.opts);
@@ -29,11 +30,10 @@ export default class DynamicContentCommands {
 
     // Transform DC to token
     DynamicContentService.grapesConvertDynamicContentSlotsToTokens(editor);
-  }
+  } 
 
   /**
    * Convert dynamic content tokens to slot and load content
-   * used in grapesjs-preset-mautic
    */
   static grapesConvertDynamicContentTokenToSlot(editor) {
     const dc = editor.DomComponents;
