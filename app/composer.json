@@ -107,9 +107,8 @@
     "composer/package-versions-deprecated": "1.11.99.1",
     "phpoffice/phpspreadsheet": "^1.15",
     "predis/predis": "^1.1",
-    "composer/installers": "^1.10",
+    "composer/installers": "^1.11",
     "mautic/plugin-grapesjs-builder": "1.0-RC4",
-
     "symfony/web-profiler-bundle": "~4.4.0",
     "symfony/var-dumper": "~4.4.0",
     "symfony/browser-kit": "~4.4.0",
@@ -151,19 +150,6 @@
         },
         "extra": {
           "installer-name": "GrapesJsBuilderBundle"
-        }
-      }
-    },
-    {
-      "type": "package",
-      "package": {
-        "name": "composer/installers",
-        "version": "1.10",
-        "type": "composer-plugin",
-        "source": {
-          "url": "https://github.com/nickveenhof/installers.git",
-          "type": "git",
-          "reference": "patch-2"
         }
       }
     }
