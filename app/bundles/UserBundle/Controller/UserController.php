@@ -136,7 +136,7 @@ class UserController extends FormController
                     $sendEmail         = true;
                 }
 
-                $encoder  = $this->get('security.encoder_factory')->getEncoder($user);
+                $encoder  = $this->get('security.password_encoder');
                 $password = $model->checkNewPassword($user, $encoder, $submittedPassword);
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
