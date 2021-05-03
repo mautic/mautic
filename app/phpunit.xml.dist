@@ -27,7 +27,6 @@
     </testsuite>
     <testsuite name="Plugin tests">
       <directory>./../plugins/*Bundle/Tests</directory>
-      <directory>./../plugins/MauticTagManagerBundle/Tests</directory>
       <exclude>./../plugins/MauticCrmBundle/Tests/Pipedrive</exclude>
     </testsuite>
     <testsuite name="Middleware tests">
