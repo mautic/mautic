@@ -12,7 +12,7 @@ mariadb_version: "10.3"
 mysql_version: ""
 provider: default
 use_dns_when_possible: true
-composer_version: "1"
+composer_version: "2"
 webimage_extra_packages: [php7.4-imap]
 hooks:
   post-start:

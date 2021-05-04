@@ -16,9 +16,9 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-        matrix:
-          php-versions: ['7.3', '7.4']
-          db-types: ['mysql', 'mariadb']
+      matrix:
+        php-versions: ['7.4']
+        db-types: ['mysql', 'mariadb']
   
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
@@ -58,13 +58,21 @@ jobs:
       run: echo "SYMFONY_ENV=test" >> $GITHUB_ENV
 
     - name: Install dependencies
-      # Force Composer to v1.10
       run: |
-        composer self-update --1
-        composer global require hirak/prestissimo
         composer validate
         composer install --prefer-dist --no-progress --no-suggest
-    
+
+    - name: Temp install Mautic first due to failing tests
+      env:
+        mysql_port: ${{ job.services.mysql.ports[3306] }}
+        mariadb_port: ${{ job.services.mariadb.ports[3306] }}
+      run: |
+        export DB_PORT_STRING="${{ matrix.db-types }}_port"
+        export DB_PORT=${!DB_PORT_STRING}
+
+        cp ./.github/ci-files/local.php ./app/config/local.php
+        php bin/console mautic:install --force http://localhost
+
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
         export DB_PORT_STRING="${{ matrix.db-types }}_port"
@@ -72,13 +80,26 @@ jobs:
 
         if [[ "${{ matrix.php-versions }}" == "7.4" ]] && [[ "${{ matrix.db-types }}" == "mysql" ]]; then
           composer test -- --coverage-clover=coverage.xml
-          bash <(curl -s https://codecov.io/bash)
         else
           composer test
         fi
       env:
         mysql_port: ${{ job.services.mysql.ports[3306] }}
         mariadb_port: ${{ job.services.mariadb.ports[3306] }}
+
+    - name: Run Pipedrive tests separately due to bug
+      run: |
+        export DB_PORT_STRING="${{ matrix.db-types }}_port"
+        export DB_PORT=${!DB_PORT_STRING}
+
+        composer test -- plugins/MauticCrmBundle/Tests/Pipedrive
+
+    - name: Upload coverage report
+      if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' }}
+      uses: codecov/codecov-action@v1
+      with:
+        files: ./coverage.xml
+        fail_ci_if_error: true
 
     - name: Slack Notification if tests fail
       uses: rtCamp/action-slack-notify@v2
@@ -87,12 +108,20 @@ jobs:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'
 
+    - name: Store log artifacts
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: logs-${{ matrix.php-versions }}-${{ matrix.db-types }}
+        path: ./var/logs/*
+
   misc:
     runs-on: ubuntu-latest
 
     strategy:
-        matrix:
-          commands: ['PHPSTAN', 'Rector', 'CS Fixer']
+      fail-fast: false
+      matrix:
+        commands: ['PHPSTAN', 'CS Fixer']
 
     name: ${{ matrix.commands }}
 
@@ -106,10 +135,7 @@ jobs:
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Install dependencies
-      # Force Composer to v1.10
       run: |
-        composer self-update --1
-        composer global require hirak/prestissimo
         composer validate
         composer install --prefer-dist --no-progress --no-suggest
     
