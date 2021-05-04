@@ -38,7 +38,7 @@ class TriggerApiController extends CommonApiController
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $method            = $this->request->getMethod();
-        $triggerEventModel = $this->getModel('point.triggerEvent');
+        $triggerEventModel = $this->getModel('point.triggerevent');
         $isNew             = false;
 
         // Set timestamps
@@ -100,7 +100,7 @@ class TriggerApiController extends CommonApiController
      */
     protected function createTriggerEventEntityForm($entity)
     {
-        return $this->getModel('point.triggerEvent')->createForm(
+        return $this->getModel('point.triggerevent')->createForm(
             $entity,
             $this->get('form.factory'),
             null,
