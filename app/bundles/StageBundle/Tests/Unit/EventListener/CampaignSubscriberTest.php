@@ -442,14 +442,13 @@ final class CampaignSubscriberTest extends TestCase
 
     private function createTranslatorMock(): TranslatorInterface
     {
-        return new class() implements TranslatorInterface
-        {
-            public function trans($id, array $parameters = array(), $domain = null, $locale = null)
+        return new class() implements TranslatorInterface {
+            public function trans($id, array $parameters = [], $domain = null, $locale = null)
             {
                 return '[trans]'.$id.'[/trans]';
             }
 
-            public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
+            public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
             {
                 return '[trans]'.$id.'[/trans]';
             }
