@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -54,7 +56,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $this->formatterHelper               = new FormatterHelper($this->dateHelper, $this->translator);
     }
 
-    public function testStrictHtmlFormatIsRemovingScriptTags()
+    public function testStrictHtmlFormatIsRemovingScriptTags(): void
     {
         $sample = '<a href="/index_dev.php/s/webhooks/view/31" data-toggle="ajax">test</a> has been stopped because the response HTTP code was 410, which means the reciever doesn\'t want us to send more requests.<script>console.log(\'script is running\');</script><SCRIPT>console.log(\'CAPITAL script is running\');</SCRIPT>';
 
@@ -65,16 +67,12 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testBooleanFormat()
+    public function testBooleanFormat(): void
     {
-        $this->translator->expects($this->at(0))
+        $this->translator->expects($this->exactly(2))
             ->method('trans')
-            ->with('mautic.core.yes')
-            ->willReturn('yes');
-        $this->translator->expects($this->at(1))
-            ->method('trans')
-            ->with('mautic.core.no')
-            ->willReturn('no');
+            ->withConsecutive(['mautic.core.yes'], ['mautic.core.no'])
+            ->willReturnOnConsecutiveCalls('yes', 'no');
 
         $result = $this->formatterHelper->_(1, 'bool');
         $this->assertEquals('yes', $result);

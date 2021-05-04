@@ -36,11 +36,11 @@ class NotifierTest extends MauticMysqlTestCase
         $leads = $leadRepository->findBy([], [], 2);
 
         /** @var SyncIntegrationsHelper $syncIntegrationsHelper */
-        $syncIntegrationsHelper = $this->container->get('mautic.integrations.helper.sync_integrations');
+        $syncIntegrationsHelper = self::$container->get('mautic.integrations.helper.sync_integrations');
         $syncIntegrationsHelper->addIntegration(new ExampleIntegration(new ExampleSyncDataExchange()));
 
         /** @var Notifier $notifier */
-        $notifier = $this->container->get('mautic.integrations.sync.notifier');
+        $notifier = self::$container->get('mautic.integrations.sync.notifier');
 
         $contactNotification = new NotificationDAO(
             new ObjectChangeDAO(
