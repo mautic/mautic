@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 
-class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
+class AnonymizeIpCommandTest extends MauticMysqlTestCase
 {
     public function testAnonymizeIpCommand(): void
     {
