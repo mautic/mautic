@@ -17,7 +17,7 @@ use Mautic\StageBundle\EventListener\CampaignSubscriber;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 final class CampaignSubscriberTest extends TestCase
 {
@@ -57,7 +57,7 @@ final class CampaignSubscriberTest extends TestCase
             }
         };
 
-        $subscriber = new CampaignSubscriber($contactModel, $stageModel, new StubTranslator());
+        $subscriber = new CampaignSubscriber($contactModel, $stageModel, $this->createTranslatorMock());
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
@@ -118,7 +118,7 @@ final class CampaignSubscriberTest extends TestCase
             }
         };
 
-        $subscriber = new CampaignSubscriber($contactModel, $stageModel, new StubTranslator());
+        $subscriber = new CampaignSubscriber($contactModel, $stageModel, $this->createTranslatorMock());
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
@@ -187,7 +187,7 @@ final class CampaignSubscriberTest extends TestCase
             }
         };
 
-        $subscriber = new CampaignSubscriber($contactModel, $stageModel, new StubTranslator());
+        $subscriber = new CampaignSubscriber($contactModel, $stageModel, $this->createTranslatorMock());
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
@@ -260,7 +260,7 @@ final class CampaignSubscriberTest extends TestCase
             }
         };
 
-        $subscriber = new CampaignSubscriber($contactModel, $stageModel, new StubTranslator());
+        $subscriber = new CampaignSubscriber($contactModel, $stageModel, $this->createTranslatorMock());
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
@@ -342,7 +342,7 @@ final class CampaignSubscriberTest extends TestCase
             }
         };
 
-        $subscriber = new CampaignSubscriber($contactModel, $stageModel, new StubTranslator());
+        $subscriber = new CampaignSubscriber($contactModel, $stageModel, $this->createTranslatorMock());
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
@@ -428,7 +428,7 @@ final class CampaignSubscriberTest extends TestCase
             }
         };
 
-        $subscriber = new CampaignSubscriber($contactModel, $stageModel, new StubTranslator());
+        $subscriber = new CampaignSubscriber($contactModel, $stageModel, $this->createTranslatorMock());
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
@@ -438,5 +438,28 @@ final class CampaignSubscriberTest extends TestCase
         Assert::assertSame([], $log->getMetadata());
         Assert::assertSame(444, $contact->getStage()->getId());
         Assert::assertSame(['stage' => [444, 123]], $contact->getChanges());
+    }
+
+    private function createTranslatorMock(): TranslatorInterface
+    {
+        return new class() implements TranslatorInterface {
+            public function trans($id, array $parameters = [], $domain = null, $locale = null)
+            {
+                return '[trans]'.$id.'[/trans]';
+            }
+
+            public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
+            {
+                return '[trans]'.$id.'[/trans]';
+            }
+
+            public function setLocale($locale)
+            {
+            }
+
+            public function getLocale()
+            {
+            }
+        };
     }
 }
