@@ -286,6 +286,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addInverseJoinColumn('ip_id', 'id', true, false, 'CASCADE')
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
             ->setIndexBy('ipAddress')
+            ->cascadeDetach()
+            ->cascadeMerge()
+            ->cascadePersist()
             ->build();
 
         $builder->createOneToMany('pushIds', 'Mautic\NotificationBundle\Entity\PushID')
