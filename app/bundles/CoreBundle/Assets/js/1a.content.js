@@ -1004,12 +1004,15 @@ Mautic.destroyChosen = function(el) {
 
 /**
  * Activate a typeahead lookup
- *
- * @param field
- * @param target
- * @param options
  */
 Mautic.activateFieldTypeahead = function (field, target, options, action) {
+    var fieldId = '#' + field;
+    var fieldEl = mQuery('#' + field);
+
+    if (fieldEl.length && fieldEl.parent('.twitter-typeahead').length) {
+        return; // If the parent exist then the typeahead was already initialized. Abort.
+    }
+
     if (options && typeof options === 'String') {
         var keys = values = [];
 
@@ -1021,7 +1024,7 @@ Mautic.activateFieldTypeahead = function (field, target, options, action) {
             values = options[0].split('|');
         }
 
-        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
+        var fieldTypeahead = Mautic.activateTypeahead(fieldId, {
             dataOptions: values,
             dataOptionKeys: keys,
             minLength: 0
@@ -1037,14 +1040,14 @@ Mautic.activateFieldTypeahead = function (field, target, options, action) {
             typeAheadOptions.limit = options.limit;
         }
 
-        var fieldTypeahead = Mautic.activateTypeahead('#' + field, typeAheadOptions);
+        var fieldTypeahead = Mautic.activateTypeahead(fieldId, typeAheadOptions);
     }
 
     var callback = function (event, datum) {
-        if (mQuery("#" + field).length && datum["value"]) {
-            mQuery("#" + field).val(datum["value"]);
+        if (fieldEl.length && datum["value"]) {
+            fieldEl.val(datum["value"]);
 
-            var lookupCallback = mQuery('#' + field).data("lookup-callback");
+            var lookupCallback = mQuery(fieldId).data('lookup-callback');
             if (lookupCallback && typeof Mautic[lookupCallback] == 'function') {
                 Mautic[lookupCallback](field, datum);
             }
