@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\Assert;
-use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -74,7 +74,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $event = new ReportBuilderEvent(new StubTranslator(), $channelListHelper, ReportSubscriber::CONTEXT_ASSET_DOWNLOAD, [], $reportHelper);
+        $event = new ReportBuilderEvent($this->createTranslatorMock(), $channelListHelper, ReportSubscriber::CONTEXT_ASSET_DOWNLOAD, [], $reportHelper);
 
         $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository);
 
@@ -117,5 +117,28 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ],
             $event->getTables()['asset.downloads']['columns']['a.unique_download_count']
         );
+    }
+
+    private function createTranslatorMock(): TranslatorInterface
+    {
+        return new class() implements TranslatorInterface {
+            public function trans($id, array $parameters = [], $domain = null, $locale = null)
+            {
+                return '[trans]'.$id.'[/trans]';
+            }
+
+            public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
+            {
+                return '[trans]'.$id.'[/trans]';
+            }
+
+            public function setLocale($locale)
+            {
+            }
+
+            public function getLocale()
+            {
+            }
+        };
     }
 }
