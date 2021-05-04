@@ -109,8 +109,8 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
         // date object
         yield [
-            DateTime::createFromFormat('Y-m-d H:i:s', null, new \DateTimeZone('UTC')),
-            DateTime::createFromFormat('Y-m-d H:i:s', null, new \DateTimeZone('UTC')),
+            DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
+            DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
         ];
     }
 }
