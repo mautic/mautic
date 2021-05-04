@@ -150,37 +150,6 @@
     {
       "type": "git",
       "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
-    },
-    {
-      "type": "package",
-      "package": {
-        "name": "composer/installers",
-        "version": "1.11",
-        "type": "composer-plugin",
-        "source": {
-          "url": "https://github.com/nickveenhof/installers.git",
-          "type": "git",
-          "reference": "patch-2"
-        },
-        "autoload": {
-          "psr-4": {
-            "Composer\\Installers\\": "src/Composer/Installers"
-          }
-        },
-        "extra": {
-          "class": "Composer\\Installers\\Plugin",
-          "branch-alias": {
-            "dev-main": "1.x-dev"
-          }
-        },
-        "replace": {
-          "shama/baton": "*",
-          "roundcube/plugin-installer": "*"
-        },
-        "require": {
-          "composer-plugin-api": "^1.0 || ^2.0"
-        }
-      }
     }
   ],
   "minimum-stability": "dev",

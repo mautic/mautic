@@ -4,9 +4,9 @@
   "type": "project",
   "description": "Mautic Open Source Distribution",
   "require": {
-    "composer/installers": "^1.10",
+    "composer/installers": "^1.11",
     "mautic/core-lib": "self.version",
-    "mautic/grapes-js-builder-bundle": "dev-do-not-require-composer-plugin"
+    "mautic/grapes-js-builder-bundle": "dev-mautic3x"
   },
   "require-dev": {
     "symfony/web-profiler-bundle": "~4.4.0",
@@ -42,42 +42,6 @@
     {
       "type": "git",
       "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
-    },
-    {
-      "type": "package",
-      "package": {
-        "name": "composer/installers",
-        "version": "1.11",
-        "type": "composer-plugin",
-        "source": {
-          "url": "https://github.com/nickveenhof/installers.git",
-          "type": "git",
-          "reference": "patch-2"
-        },
-        "autoload": {
-          "psr-4": {
-            "Composer\\Installers\\": "src/Composer/Installers"
-          }
-        },
-        "autoload-dev": {
-          "psr-4": {
-            "Composer\\Installers\\Test\\": "tests/Composer/Installers/Test"
-          }
-        },
-        "extra": {
-          "class": "Composer\\Installers\\Plugin",
-          "branch-alias": {
-            "dev-main": "1.x-dev"
-          }
-        },
-        "replace": {
-          "shama/baton": "*",
-          "roundcube/plugin-installer": "*"
-        },
-        "require": {
-          "composer-plugin-api": "^1.0 || ^2.0"
-        }
-      }
     }
   ],
   "conflict": {
