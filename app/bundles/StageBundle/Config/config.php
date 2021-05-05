@@ -63,6 +63,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.stage.model.stage',
+                    'translator',
                 ],
             ],
             'mautic.stage.subscriber' => [

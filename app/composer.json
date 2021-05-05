@@ -106,55 +106,41 @@
     "symfony/lock": "^5.1",
     "composer/package-versions-deprecated": "1.11.99.1",
     "phpoffice/phpspreadsheet": "^1.15",
-    "predis/predis": "^1.1",
-    "composer/installers": "^1.10",
-    "mautic/plugin-grapesjs-builder": "1.0-RC4",
-    "mautic/plugin-citrix": "main-dev",
-    "mautic/plugin-clearbit": "main-dev",
-    "mautic/plugin-cloudstorage": "main-dev",
-    "mautic/plugin-crm": "main-dev",
-    "mautic/plugin-emailmarketing": "main-dev",
-    "mautic/plugin-focus": "main-dev",
-    "mautic/plugin-fullcontact": "main-dev",
-    "mautic/plugin-gmail": "main-dev",
-    "mautic/plugin-outlook": "main-dev",
-    "mautic/plugin-social": "main-dev",
-    "mautic/plugin-zapier": "main-dev",
-    "mautic/theme-aurora": "dev-main",
-    "mautic/theme-blank": "dev-main",
-    "mautic/theme-blank-grapejs": "dev-main",
-    "mautic/theme-brienz": "dev-main",
-    "mautic/theme-cards": "dev-main",
-    "mautic/theme-confirmme": "dev-main",
-    "mautic/theme-fresh-center": "dev-main",
-    "mautic/theme-fresh-fixed": "dev-main",
-    "mautic/theme-fresh-left": "dev-main",
-    "mautic/theme-fresh-wide": "dev-main",
-    "mautic/theme-goldstar": "dev-main",
-    "mautic/theme-neopolitan": "dev-main",
-    "mautic/theme-oxygen": "dev-main",
-    "mautic/theme-paprika": "dev-main",
-    "mautic/theme-skyline": "dev-main",
-    "mautic/theme-sparse": "dev-main",
-    "mautic/theme-sunday": "dev-main",
-    "mautic/theme-vibrant": "dev-main"
+    "predis/predis": "^1.1"
   },
-  "require-dev": {
-    "symfony/web-profiler-bundle": "~4.4.0",
-    "symfony/var-dumper": "~4.4.0",
-    "symfony/browser-kit": "~4.4.0",
-    "symfony/dom-crawler": "~4.4.0",
-    "mautic/transifex": "^4.0",
-    "http-interop/http-factory-guzzle": "^1.0",
-    "webfactory/exceptions-bundle": "~4.3",
-    "friendsofphp/php-cs-fixer": "~2.16.1",
-    "liip/test-fixtures-bundle": "^1.6",
-    "phpstan/phpstan": "0.12.25",
-    "rector/rector-prefixed": "0.6.13",
-    "symfony/phpunit-bridge": "~5.1.0",
-    "phpunit/phpunit": "^9.5",
-    "liip/functional-test-bundle": "^4.2",
-    "php-http/mock-client": "^1.4"
+  "replace": {
+    "mautic/plugin-citrix": "self.version",
+    "mautic/plugin-clearbit": "self.version",
+    "mautic/plugin-cloudstorage": "self.version",
+    "mautic/plugin-crm": "self.version",
+    "mautic/plugin-emailmarketing": "self.version",
+    "mautic/plugin-focus": "self.version",
+    "mautic/plugin-fullcontact": "self.version",
+    "mautic/plugin-gmail": "self.version",
+    "mautic/plugin-outlook": "self.version",
+    "mautic/plugin-social": "self.version",
+    "mautic/plugin-zapier": "self.version",
+    "mautic/theme-coffee": "self.version",
+    "mautic/theme-mauve": "self.version",
+    "mautic/theme-nature": "self.version",
+    "mautic/theme-aurora": "self.version",
+    "mautic/theme-blank": "self.version",
+    "mautic/theme-blank-grapejs": "self.version",
+    "mautic/theme-brienz": "self.version",
+    "mautic/theme-cards": "self.version",
+    "mautic/theme-confirmme": "self.version",
+    "mautic/theme-fresh-center": "self.version",
+    "mautic/theme-fresh-fixed": "self.version",
+    "mautic/theme-fresh-left": "self.version",
+    "mautic/theme-fresh-wide": "self.version",
+    "mautic/theme-goldstar": "self.version",
+    "mautic/theme-neopolitan": "self.version",
+    "mautic/theme-oxygen": "self.version",
+    "mautic/theme-paprika": "self.version",
+    "mautic/theme-skyline": "self.version",
+    "mautic/theme-sparse": "self.version",
+    "mautic/theme-sunday": "self.version",
+    "mautic/theme-vibrant": "self.version"
   },
   "repositories": [
     {
@@ -164,38 +150,6 @@
     {
       "type": "git",
       "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
-    },
-    {
-      "type": "package",
-      "package": {
-        "name": "mautic/plugin-grapesjs-builder",
-        "version": "1.0-RC4",
-        "type": "mautic-plugin",
-        "source": {
-          "url": "https://github.com/mautic/plugin-grapesjs-builder.git",
-          "type": "git",
-          "reference": "1.0-RC4"
-        },
-        "require": {
-          "composer/installers": "~1.0"
-        },
-        "extra": {
-          "installer-name": "GrapesJsBuilderBundle"
-        }
-      }
-    },
-    {
-      "type": "package",
-      "package": {
-        "name": "composer/installers",
-        "version": "1.10",
-        "type": "composer-plugin",
-        "source": {
-          "url": "https://github.com/nickveenhof/installers.git",
-          "type": "git",
-          "reference": "patch-2"
-        }
-      }
     }
   ],
   "minimum-stability": "dev",
