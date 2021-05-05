@@ -130,8 +130,7 @@ class IpLookupHelper
     {
         static $ipAddresses       = [];
         $request                  = $this->requestStack->getCurrentRequest();
-        $isEnabledIpAnonymization = $this->coreParametersHelper->get('anonymize_ip', false);
-        $isEnabledIpAnonymization = $isEnabledIpAnonymization ? $isEnabledIpAnonymization : false;
+        $isEnabledIpAnonymization = true === $this->coreParametersHelper->get('anonymize_ip', false);
         if (null === $ip) {
             $ip = $this->getIpAddressFromRequest();
         }

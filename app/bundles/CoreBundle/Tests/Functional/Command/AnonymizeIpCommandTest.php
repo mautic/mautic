@@ -26,8 +26,8 @@ class AnonymizeIpCommandTest extends MauticMysqlTestCase
 
         $this->runCommand(AnonymizeIpCommand::COMMAND_NAME);
 
-        $eventLogs = $this->em->getRepository(IpAddress::class)->findAll();
-        Assert::assertCount(0, $eventLogs);
+        $ipAddressList = $this->em->getRepository(IpAddress::class)->findAll();
+        Assert::assertCount(0, $ipAddressList);
     }
 
     private function createIpAddress(): IpAddress
