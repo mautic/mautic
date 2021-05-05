@@ -13,7 +13,7 @@
     "symfony/var-dumper": "~4.4.0",
     "symfony/browser-kit": "~4.4.0",
     "symfony/dom-crawler": "~4.4.0",
-    "mautic/transifex": "^4.0",
+    "mautic/transifex": "^4.1",
     "http-interop/http-factory-guzzle": "^1.0",
     "webfactory/exceptions-bundle": "~4.3",
     "friendsofphp/php-cs-fixer": "~2.16.1",

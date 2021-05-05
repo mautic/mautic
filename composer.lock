@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9f60b2e01aac821aa7ffe07062daaddb",
+    "content-hash": "05c8771e59208f1bb2ef6a095477cba9",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.180.0",
+            "version": "3.180.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "761d06d3d320bd1a0114f9d937eccd1613e1913b"
+                "reference": "88b91af651a9affd384b184332a4d52d69ab7c81"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/761d06d3d320bd1a0114f9d937eccd1613e1913b",
-                "reference": "761d06d3d320bd1a0114f9d937eccd1613e1913b",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/88b91af651a9affd384b184332a4d52d69ab7c81",
+                "reference": "88b91af651a9affd384b184332a4d52d69ab7c81",
                 "shasum": ""
             },
             "require": {
@@ -92,9 +92,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.180.0"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.180.2"
             },
-            "time": "2021-05-03T20:41:22+00:00"
+            "time": "2021-05-05T02:47:28+00:00"
         },
         {
             "name": "bandwidth-throttle/token-bucket",
@@ -3593,21 +3593,21 @@
         },
         {
             "name": "joomla/filter",
-            "version": "1.3.5",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/filter.git",
-                "reference": "ee1d870b5c188056745e1dd3cece21522e2158b8"
+                "reference": "2b476d60a7228ada411aa5d21e361efff76873e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/filter/zipball/ee1d870b5c188056745e1dd3cece21522e2158b8",
-                "reference": "ee1d870b5c188056745e1dd3cece21522e2158b8",
+                "url": "https://api.github.com/repos/joomla-framework/filter/zipball/2b476d60a7228ada411aa5d21e361efff76873e0",
+                "reference": "2b476d60a7228ada411aa5d21e361efff76873e0",
                 "shasum": ""
             },
             "require": {
                 "joomla/string": "~1.3|~2.0",
-                "php": "^5.3.10|~7.0"
+                "php": "^5.3.10|~7.0|^8.0"
             },
             "require-dev": {
                 "joomla/coding-standards": "~2.0@alpha",
@@ -3617,6 +3617,7 @@
             "suggest": {
                 "joomla/language": "Required only if you want to use `OutputFilter::stringURLSafe`."
             },
+            "default-branch": true,
             "type": "joomla-package",
             "extra": {
                 "branch-alias": {
@@ -3643,7 +3644,17 @@
                 "issues": "https://github.com/joomla-framework/filter/issues",
                 "source": "https://github.com/joomla-framework/filter/tree/master"
             },
-            "time": "2018-05-26T15:48:53+00:00"
+            "funding": [
+                {
+                    "url": "https://community.joomla.org/sponsorship-campaigns.html",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/joomla",
+                    "type": "github"
+                }
+            ],
+            "time": "2021-03-29T11:15:36+00:00"
         },
         {
             "name": "joomla/string",
@@ -5044,7 +5055,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "f5660cc67f1e86a6b927f11cc713b9d76cfc0906"
+                "reference": "b1e5560ce8d4038af506ea91b0cb229d8fba0fd2"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5071,7 +5082,7 @@
                 "ip2location/ip2location-php": "^7.2",
                 "jbroadway/urlify": "^1.0",
                 "jms/serializer-bundle": "^3.8.0",
-                "joomla/filter": "~1.3.5",
+                "joomla/filter": "1.x-dev",
                 "kamermans/guzzle-oauth2-subscriber": "^1.0",
                 "knplabs/gaufrette": "~0.9.0",
                 "knplabs/knp-menu-bundle": "^3.0",
@@ -14077,21 +14088,21 @@
         },
         {
             "name": "mautic/transifex",
-            "version": "4.0.0",
+            "version": "4.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/Transifex-API.git",
-                "reference": "caa46c645d63b2ef84171d2fce69bb5978827eff"
+                "reference": "5dca817cdc5dd5fd231c07bfe4a8d80038b3efcd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mautic/Transifex-API/zipball/caa46c645d63b2ef84171d2fce69bb5978827eff",
-                "reference": "caa46c645d63b2ef84171d2fce69bb5978827eff",
+                "url": "https://api.github.com/repos/mautic/Transifex-API/zipball/5dca817cdc5dd5fd231c07bfe4a8d80038b3efcd",
+                "reference": "5dca817cdc5dd5fd231c07bfe4a8d80038b3efcd",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": "~7.2",
+                "php": "~7.2|^8.0",
                 "psr/http-client": "^1.0",
                 "psr/http-factory": "^1.0",
                 "psr/http-message": "^1.0"
@@ -14132,9 +14143,9 @@
             ],
             "support": {
                 "issues": "https://github.com/mautic/Transifex-API/issues",
-                "source": "https://github.com/mautic/Transifex-API/tree/4.0.0"
+                "source": "https://github.com/mautic/Transifex-API/tree/4.1.0"
             },
-            "time": "2020-01-07T08:33:18+00:00"
+            "time": "2021-04-24T08:21:49+00:00"
         },
         {
             "name": "myclabs/deep-copy",
