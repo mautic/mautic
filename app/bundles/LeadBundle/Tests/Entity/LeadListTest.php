@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\LeadList;
+use PHPUnit\Framework\Assert;
 
 final class LeadListTest extends \PHPUnit\Framework\TestCase
 {
@@ -159,5 +160,49 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
             ],
             $entity->getFilters()
         );
+    }
+
+    /**
+     * @dataProvider setIsGlobalDataProvider
+     */
+    public function testSetIsGlobal($value, $expected, array $changes): void
+    {
+        $segment = new LeadList();
+        $segment->setIsGlobal($value);
+
+        Assert::assertSame($expected, $segment->getIsGlobal());
+        Assert::assertSame($changes, $segment->getChanges());
+    }
+
+    public function setIsGlobalDataProvider(): iterable
+    {
+        yield [null, false, ['isGlobal' => [true, false]]];
+        yield [true, true, []];
+        yield [false, false, ['isGlobal' => [true, false]]];
+        yield ['', false, ['isGlobal' => [true, false]]];
+        yield [0, false, ['isGlobal' => [true, false]]];
+        yield ['string', true, []];
+    }
+
+    /**
+     * @dataProvider setIsPreferenceCenterDataProvider
+     */
+    public function testSetIsPreferenceCenter($value, $expected, array $changes): void
+    {
+        $segment = new LeadList();
+        $segment->setIsPreferenceCenter($value);
+
+        Assert::assertSame($expected, $segment->getIsPreferenceCenter());
+        Assert::assertSame($changes, $segment->getChanges());
+    }
+
+    public function setIsPreferenceCenterDataProvider(): iterable
+    {
+        yield [null, false, []];
+        yield [true, true, ['isPreferenceCenter' => [false, true]]];
+        yield [false, false, []];
+        yield ['', false, []];
+        yield [0, false, []];
+        yield ['string', true, ['isPreferenceCenter' => [false, true]]];
     }
 }
