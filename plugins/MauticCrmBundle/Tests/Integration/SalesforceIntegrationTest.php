@@ -708,6 +708,22 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         }
     }
 
+    public function testAmendLeadDataBeforePush()
+    {
+        $input = ['first', false, 'first|second', 1];
+
+        $output = ['first', false, 'first;second', 1];
+
+        $sf = $this->getSalesforceIntegration();
+        $sf->amendLeadDataBeforePush($input);
+
+        self::assertSame($input, $output);
+        self::assertEquals('string', gettype($output[0]));
+        self::assertEquals('boolean', gettype($output[1]));
+        self::assertEquals('string', gettype($output[2]));
+        self::assertEquals('integer', gettype($output[3]));
+    }
+
     /**
      * @param string $name
      * @param int    $max
@@ -1105,9 +1121,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                         return $results;
                     }
 
-                    $results = $this->getLeadsToUpdate($object, $args[3], $max, $specificObject);
-
-                    return $results;
+                    return $this->getLeadsToUpdate($object, $args[3], $max, $specificObject);
                 }
             );
     }
@@ -1290,13 +1304,12 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
      */
     protected function getSalesforceDNCHistory($object, $priority)
     {
-        $records      = [];
         $datePriority = [
             'SF'     => '2017-10-16T00:43:43.000+0000',
             'Mautic' => '2017-10-16T18:43:43.000+0000',
             ];
 
-        $records = [
+        return [
             'totalSize' => 3,
             'done'      => 1,
             'records'   => [
@@ -1324,8 +1337,6 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 ],
             ],
         ];
-
-        return $records;
     }
 
     /**
@@ -1390,11 +1401,11 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 $parts     = explode('-', $subrequest['referenceId']);
 
                 if (3 === count($parts)) {
-                    list($contactId, $sfObject, $id) = $parts;
+                    [$contactId, $sfObject, $id] = $parts;
                 } elseif (2 === count($parts)) {
-                    list($contactId, $sfObject) = $parts;
+                    [$contactId, $sfObject] = $parts;
                 } elseif (4 === count($parts)) {
-                    list($contactId, $sfObject, $empty, $campaignId) = $parts;
+                    [$contactId, $sfObject, $empty, $campaignId] = $parts;
                 }
                 $response[] = [
                     'body' => [
