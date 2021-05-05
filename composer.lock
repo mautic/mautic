@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b84a15e9e61bb3654a2a5deda1e51b19",
+    "content-hash": "9f60b2e01aac821aa7ffe07062daaddb",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -5040,11 +5040,11 @@
         },
         {
             "name": "mautic/core-lib",
-            "version": "3.3.x-dev",
+            "version": "3.2.x-dev",
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "46d67c6e1c198932503700e04dfc06e74678e4e9"
+                "reference": "f5660cc67f1e86a6b927f11cc713b9d76cfc0906"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5080,7 +5080,7 @@
                 "matomo/device-detector": "^4.0",
                 "misd/phone-number-bundle": "^1.1",
                 "mrclay/minify": "2.2.0",
-                "noxlogic/ratelimit-bundle": "^1.11",
+                "noxlogic/ratelimit-bundle": "^1.17",
                 "oneup/uploader-bundle": "^3.1.0",
                 "php": ">=7.4.0 <8.1",
                 "php-amqplib/rabbitmq-bundle": "^2.5.1",
@@ -16743,7 +16743,6 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "mautic/core-lib": 20,
         "mautic/grapes-js-builder-bundle": 20
     },
     "prefer-stable": true,

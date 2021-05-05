@@ -5,7 +5,7 @@
   "description": "Mautic Open Source Distribution",
   "require": {
     "composer/installers": "^1.11",
-    "mautic/core-lib": "self.version",
+    "mautic/core-lib": "*",
     "mautic/grapes-js-builder-bundle": "dev-mautic3x"
   },
   "require-dev": {

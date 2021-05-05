@@ -90,7 +90,7 @@
     "simshaun/recurr": "^3.0",
     "ramsey/uuid": "^3.7",
     "sendgrid/sendgrid": "~6.0",
-    "noxlogic/ratelimit-bundle": "^1.11",
+    "noxlogic/ratelimit-bundle": "^1.17",
     "knplabs/knp-menu-bundle": "^3.0",
     "guzzlehttp/oauth-subscriber": "^0.5.0",
     "helios-ag/fm-elfinder-bundle": "^10.1",
