@@ -52,14 +52,12 @@ class AppKernel extends Kernel
         /**
          * This is required for Doctrine's automatic database detection. When Mautic hasn't been
          * installed yet, we don't have a database to connect to, causing automatic database platform
-         * detection to fail. We use the MAUTIC_DB_CONFIGURED constant to temporarily set a server_version
+         * detection to fail. We use the MAUTIC_DB_SERVER_VERSION constant to temporarily set a server_version
          * if no database settings have been provided yet.
          */
-        if (!defined('MAUTIC_DB_NOT_CONFIGURED')) {
+        if (!defined('MAUTIC_DB_SERVER_VERSION')) {
             $localConfigFile = ParameterLoader::getLocalConfigFile($this->getRootDir(), false);
-            if (!file_exists($localConfigFile)) {
-                define('MAUTIC_DB_NOT_CONFIGURED', true);
-            }
+            define('MAUTIC_DB_SERVER_VERSION', file_exists($localConfigFile) ? null : '5.7');
         }
 
         parent::__construct($environment, $debug);
