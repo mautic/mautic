@@ -72,7 +72,7 @@ class CalendarSubscriber implements EventSubscriberInterface
             ->setParameter('start', $dates['start_date'])
             ->setParameter('end', $dates['end_date'])
             ->setFirstResult(0)
-            ->setMaxResults(100);
+            ->setMaxResults(1000);
 
         $results = $query->execute()->fetchAll();
 
