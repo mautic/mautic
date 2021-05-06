@@ -1558,7 +1558,7 @@ class LeadModel extends FormModel
             }
 
             if (null !== $company) {
-                $this->companyModel->addLeadToCompany($company, $lead);
+                $this->companyModel->addLeadToCompany([$company['id']], $lead);
             }
 
             if ($eventLog) {
