@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -51,23 +52,25 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
         $this->em->persist($frequencyRule);
         $this->em->flush();
 
-        $this->connection->insert($this->prefix.'email_stats', [
-            'lead_id'           => $lead->getId(),
-            'email_address'     => 'testemail@test.test',
-            'date_sent'         => (new \DateTime())->format('Y-m-d H:i:s'),
-            'is_read'           => 1,
-            'is_failed'         => 0,
-            'viewed_in_browser' => 0,
-        ]);
+        $emailStats1 = new Stat();
+        $emailStats1->setLead($lead);
+        $emailStats1->setEmailAddress('testemail@test.test');
+        $emailStats1->setDateSent(new \DateTime());
+        $emailStats1->setIsRead(true);
+        $emailStats1->setIsFailed(false);
+        $emailStats1->setViewedInBrowser(false);
 
-        $this->connection->insert($this->prefix.'email_stats', [
-            'lead_id'           => $lead->getId(),
-            'email_address'     => 'testemail2@test.test',
-            'date_sent'         => (new \DateTime())->format('Y-m-d H:i:s'),
-            'is_read'           => 1,
-            'is_failed'         => 0,
-            'viewed_in_browser' => 0,
-        ]);
+        $emailStats2 = new Stat();
+        $emailStats2->setLead($lead);
+        $emailStats2->setEmailAddress('testemail@test.test');
+        $emailStats2->setDateSent(new \DateTime());
+        $emailStats2->setIsRead(true);
+        $emailStats2->setIsFailed(false);
+        $emailStats2->setViewedInBrowser(false);
+
+        $this->em->persist($emailStats1);
+        $this->em->persist($emailStats2);
+        $this->em->flush();
 
         $violations         = $this->frequencyRuleRepository->getAppliedFrequencyRules('email', [1], 1, 1, 'email_stats', 'lead_id', 'date_sent');
         $expectedViolations = [
