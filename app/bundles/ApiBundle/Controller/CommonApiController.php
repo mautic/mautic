@@ -796,6 +796,8 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
                 'ignore_paginator' => true,
             ]
         );
+        // It must be associative because the order of entities has changed
+        $idHelper->setIsAssociative(true);
 
         [$entities, $total] = $prepareForSerialization
                 ?
