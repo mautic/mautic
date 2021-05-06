@@ -88,7 +88,7 @@ class LeadTriggerLog
      */
     public function setIpAddress($ipAddress)
     {
-        $this->ipAddress = !$ipAddress->getIsAnonymize() ? $ipAddress : null;
+        $this->ipAddress = !$ipAddress->isAnonymizationEnabled() ? $ipAddress : null;
     }
 
     /**
