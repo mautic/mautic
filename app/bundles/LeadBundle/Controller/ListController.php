@@ -266,12 +266,16 @@ class ListController extends FormController
      *
      * @return Response
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function editAction($objectId, $ignorePost = false, bool $isNew = false)
     {
         $postActionVars = $this->getPostActionVars($objectId);
 
         try {
             $segment = $this->getSegment($objectId);
+
+            if ($isNew) {
+                $segment->setNew();
+            }
 
             return $this->createSegmentModifyResponse(
                 $segment,
