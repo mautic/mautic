@@ -185,6 +185,7 @@ jobs:
         # Note: if you update the PHP version here, make sure to update libapache-mod-php7.4 below as well!
         php-version: 7.4
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+        ini-values: max_execution_time=180
 
     - name: Install Apache
       run: |
