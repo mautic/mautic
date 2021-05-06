@@ -13,8 +13,6 @@ use PHPUnit\Framework\Assert;
 
 class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     /**
      * @var FrequencyRuleRepository
      */
@@ -72,7 +70,7 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
         $this->em->persist($emailStats2);
         $this->em->flush();
 
-        $violations         = $this->frequencyRuleRepository->getAppliedFrequencyRules('email', [1], 1, 1, 'email_stats', 'lead_id', 'date_sent');
+        $violations         = $this->frequencyRuleRepository->getAppliedFrequencyRules('email', [1], 1, 'DAY', 'email_stats', 'lead_id', 'date_sent');
         $expectedViolations = [
             0 => [
                     'lead_id'          => '1',
