@@ -885,17 +885,17 @@ return [
                 'arguments' => [
                     \Mautic\LeadBundle\Entity\Company::class,
                 ],
+                'methodCalls' => [
+                    'setUniqueIdentifiersOperator' => [
+                        '%mautic.company_unique_identifiers_operator%',
+                    ],
+                ],
             ],
             'mautic.lead.repository.company_lead' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\LeadBundle\Entity\CompanyLead::class,
-                ],
-                'methodCalls' => [
-                    'setUniqueIdentifiersOperator' => [
-                        '%mautic.company_unique_identifiers_operator%',
-                    ],
                 ],
             ],
             'mautic.lead.repository.stages_lead_log' => [
