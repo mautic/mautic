@@ -39,7 +39,6 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
         $lead->setPhone('555-666-777');
 
         $this->em->persist($lead);
-        $this->em->flush();
 
         /** @var FrequencyRule $frequencyRule */
         $frequencyRule = new FrequencyRule();
@@ -50,7 +49,6 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
         $frequencyRule->setLead($lead);
 
         $this->em->persist($frequencyRule);
-        $this->em->flush();
 
         $emailStats1 = new Stat();
         $emailStats1->setLead($lead);
