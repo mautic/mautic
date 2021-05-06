@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
 
@@ -71,9 +72,13 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $listModel = $this->getMockBuilder(ListModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $companyModel = $this->getMockBuilder(CompanyModel::class)
             ->setMethodsExcept(['setFieldValues'])
-            ->setConstructorArgs([$this->fieldModel, $this->session, $emailValidator])
+            ->setConstructorArgs([$this->fieldModel, $this->session, $emailValidator, $listModel])
             ->getMock();
         $companyModel->expects($this->once())
             ->method('organizeFieldsByGroup')
