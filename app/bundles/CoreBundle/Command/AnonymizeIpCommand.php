@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Command;
 
+use Doctrine\DBAL\DBALException;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\ExitCode;
 use Symfony\Component\Console\Command\Command;
@@ -43,7 +44,14 @@ class AnonymizeIpCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->ipAddressRepository->deleteAllIpAddress();
+        try {
+            $deletedRows = $this->ipAddressRepository->deleteAllIpAddress();
+            $output->writeln(sprintf('<info>%s IP addresses have been deleted</info>', $deletedRows));
+        } catch (DBALException $e) {
+            $output->writeln(sprintf('<error>Deletion of IP addresses failed because of database error: %s</error>', $e->getMessage()));
+
+            return ExitCode::FAILURE;
+        }
 
         return ExitCode::SUCCESS;
     }

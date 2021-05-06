@@ -115,12 +115,19 @@ SQL;
         }
     }
 
-    public function deleteAllIpAddress(): void
+    /**
+     * @throws DBALException
+     */
+    public function deleteAllIpAddress(): int
     {
-        $table_name = $this->getTableName();
-        $sql        = "DELETE FROM {$table_name} LIMIT ".self::DELETE_BATCH_SIZE;
-        $conn       = $this->getEntityManager()->getConnection();
-        while ($conn->executeQuery($sql)->rowCount()) {
+        $totalDeletedIps = 0;
+        $table_name      = $this->getTableName();
+        $sql             = "DELETE FROM {$table_name} LIMIT ".self::DELETE_BATCH_SIZE;
+        $conn            = $this->getEntityManager()->getConnection();
+        while ($deletedRecords = $conn->executeQuery($sql)->rowCount()) {
+            $totalDeletedIps += $deletedRecords;
         }
+
+        return $totalDeletedIps;
     }
 }

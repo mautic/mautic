@@ -24,7 +24,7 @@ class IpAddress
     /**
      * @var bool
      */
-    private $isAnonymizeOn = false;
+    private $isAnonymizeEnabled = false;
 
     /**
      * Set by factory of configured IPs to not track.
@@ -181,14 +181,14 @@ class IpAddress
 
     public function setIsAnonymize(bool $isAnonymize): IpAddress
     {
-        $this->isAnonymizeOn = $isAnonymize;
+        $this->isAnonymizeEnabled = $isAnonymize;
 
         return $this;
     }
 
-    public function getIsAnonymize(): bool
+    public function isAnonymizationEnabled(): bool
     {
-        return $this->isAnonymizeOn;
+        return $this->isAnonymizeEnabled;
     }
 
     /**

@@ -130,7 +130,7 @@ class IpLookupHelper
     {
         static $ipAddresses       = [];
         $request                  = $this->requestStack->getCurrentRequest();
-        $isEnabledIpAnonymization = (bool) $this->coreParametersHelper->get('anonymize_ip');
+        $isIpAnonymizationEnabled = true === $this->coreParametersHelper->get('anonymize_ip', false);
         if (null === $ip) {
             $ip = $this->getIpAddressFromRequest();
         }
@@ -145,7 +145,7 @@ class IpLookupHelper
         if (empty($ipAddresses[$ip])) {
             $ipAddress = null;
             $saveIp    = false;
-            if (!$isEnabledIpAnonymization) {
+            if (!$isIpAnonymizationEnabled) {
                 $repo      = $this->em->getRepository('MauticCoreBundle:IpAddress');
                 $ipAddress = $repo->findOneByIpAddress($ip);
                 $saveIp    = (null === $ipAddress);
@@ -156,7 +156,7 @@ class IpLookupHelper
                 $ipAddress->setIpAddress($ip);
             }
 
-            $ipAddress->setIsAnonymize($isEnabledIpAnonymization);
+            $ipAddress->setIsAnonymize($isIpAnonymizationEnabled);
 
             // Ensure the do not track list is inserted
             if (!is_array($this->doNotTrackIps)) {
@@ -191,7 +191,7 @@ class IpLookupHelper
             }
 
             $details = $ipAddress->getIpDetails();
-            if ($ipAddress->isTrackable() && !$isEnabledIpAnonymization && empty($details['city'])) {
+            if ($ipAddress->isTrackable() && !$isIpAnonymizationEnabled && empty($details['city'])) {
                 // Get the IP lookup service
 
                 // Fetch the data

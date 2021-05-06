@@ -259,7 +259,7 @@ class LeadEventLog implements ChannelInterface
      */
     public function setIpAddress(IpAddress $ipAddress)
     {
-        $this->ipAddress = !$ipAddress->getIsAnonymize() ? $ipAddress : null;
+        $this->ipAddress = !$ipAddress->isAnonymizationEnabled() ? $ipAddress : null;
 
         return $this;
     }

@@ -32,7 +32,7 @@ final class Version20210426080311 extends PreUpAssertionMigration
 {
     const COLUMN_NAME            = 'ip_id';
     const PRIMARY_ID_COLUMN_NAME = 'id';
-    private $associated_tables   = [
+    private $associatedTables    = [
         Download::TABLE_NAME         => false,
         LeadEventLog::TABLE_NAME     => true,
         StatDevice::TABLE_NAME       => true,
@@ -51,7 +51,7 @@ final class Version20210426080311 extends PreUpAssertionMigration
 
     protected function preUpAssertions(): void
     {
-        foreach ($this->associated_tables as $tableName => $allowNull) {
+        foreach ($this->associatedTables as $tableName => $allowNull) {
             $this->skipAssertion(function (Schema $schema) use ($tableName) {
                 return $this->isChangesExecuted($schema, $tableName);
             }, sprintf('On delete %s already updated for foreign key %s in table %s', $this->getOnDeleteValue($tableName), $this->getForeignKeyName($tableName), $tableName));
@@ -68,7 +68,7 @@ final class Version20210426080311 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        foreach ($this->associated_tables as $tableName => $allowNull) {
+        foreach ($this->associatedTables as $tableName => $allowNull) {
             $table = $schema->getTable($this->getPrefixedTableName($tableName));
             $table->removeForeignKey($this->getForeignKeyName($tableName));
             $table->addForeignKeyConstraint($this->getPrefixedTableName(IpAddress::TABLE_NAME),

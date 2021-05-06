@@ -250,7 +250,7 @@ class PointsChangeLog
      */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
     {
-        $this->ipAddress = !$ipAddress->getIsAnonymize() ? $ipAddress : null;
+        $this->ipAddress = !$ipAddress->isAnonymizationEnabled() ? $ipAddress : null;
 
         return $this;
     }

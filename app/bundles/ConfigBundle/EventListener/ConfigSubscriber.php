@@ -52,16 +52,16 @@ class ConfigSubscriber implements EventSubscriberInterface
     public function onConfigPostSave(ConfigEvent $event): void
     {
         if ($originalNormData = $event->getOriginalNormData()) {
-            $norData = $event->getNormData();
+            $normData = $event->getNormData();
             // We have something to log
             $this->configChangeLogger
                 ->setOriginalNormData($originalNormData)
-                ->log($norData);
+                ->log($normData);
 
-            $oldAnonymize_ip = $originalNormData['trackingconfig']['parameters']['anonymize_ip'];
-            $newAnonymize_ip = $norData['trackingconfig']['anonymize_ip'];
+            $oldAnonymizeIp = $originalNormData['trackingconfig']['parameters']['anonymize_ip'];
+            $newAnonymizeIp = $normData['trackingconfig']['anonymize_ip'];
 
-            if ($oldAnonymize_ip !== $newAnonymize_ip && $newAnonymize_ip && !$this->coreParametersHelper->get('delete_ip_address_in_background', false)) {
+            if ($oldAnonymizeIp !== $newAnonymizeIp && $newAnonymizeIp && !$this->coreParametersHelper->get('delete_ip_address_in_background', false)) {
                 $this->ipAddressRepository->deleteAllIpAddress();
             }
         }
