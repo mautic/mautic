@@ -70,13 +70,19 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     private $repoSetup = false;
 
     /**
+     * @var ListModel
+     */
+    private $listModel;
+
+    /**
      * CompanyModel constructor.
      */
-    public function __construct(FieldModel $leadFieldModel, Session $session, EmailValidator $validator)
+    public function __construct(FieldModel $leadFieldModel, Session $session, EmailValidator $validator, ListModel $listModel)
     {
         $this->leadFieldModel = $leadFieldModel;
         $this->session        = $session;
         $this->emailValidator = $validator;
+        $this->listModel      = $listModel;
     }
 
     /**
@@ -861,6 +867,14 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         if ($persist) {
             $this->saveEntity($company);
+        }
+
+        if (null !== $list && $company->getId()) {
+            $companyContactIds = $this->getCompanyLeadRepository()->getCompanyLeads($company->getId());
+            $contactIds        = array_column($companyContactIds, 'lead_id');
+            foreach ($contactIds as $contactId) {
+                $this->listModel->addLead($contactId, [$list], true);
+            }
         }
 
         return $merged;
