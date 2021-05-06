@@ -772,6 +772,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         $company = $this->importCompany($fields, $data, $owner, false);
 
+        if (null === $company) {
+            throw new \Exception($this->translator->trans('mautic.company.error.notfound', [], 'flashes'));
+        }
+
         $merged = !$company->isNew();
 
         $this->saveEntity($company);
@@ -891,7 +895,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         // Set profile data using the form so that values are validated
         $fieldData = [];
-        foreach ($fields as $entityField => $importField) {
+        foreach ($fields as $importField => $entityField) {
             // Prevent overwriting existing data with empty data
             if (array_key_exists($importField, $data) && !is_null($data[$importField]) && '' != $data[$importField]) {
                 $fieldData[$entityField] = $data[$importField];
