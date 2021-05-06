@@ -135,6 +135,7 @@ jobs:
       with:
         php-version: 7.4
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+        ini-values: max_execution_time=360
 
     - name: Install dependencies
       run: |
