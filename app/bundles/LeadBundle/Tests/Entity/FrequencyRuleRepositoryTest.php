@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Assert;
 
 class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
 {
@@ -16,10 +17,15 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
      */
     private $frequencyRuleRepository;
 
+    /**
+     * @var string
+     */
+    private $prefix;
+
     protected function setUp(): void
     {
         parent::setUp();
-
+        $this->prefix                  = self::$container->getParameter('mautic.db_table_prefix');
         $this->frequencyRuleRepository = self::$container->get('mautic.lead.repository.frequency_rule');
     }
 
@@ -34,14 +40,41 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
         /** @var FrequencyRule $frequencyRule */
         $frequencyRule = new FrequencyRule();
         $frequencyRule->setFrequencyNumber(1);
-        $frequencyRule->setFrequencyTime(1);
+        $frequencyRule->setFrequencyTime('DAY');
         $frequencyRule->setChannel('email');
-
+        $frequencyRule->setDateAdded(new \DateTime());
+        $frequencyRule->setLead($lead);
+        $lead->addFrequencyRule($frequencyRule);
 
         $this->em->persist($lead);
         $this->em->flush();
 
-        $data = $this->frequencyRuleRepository->getAppliedFrequencyRules('email', [1], 1, 1, 'email_stats', 'lead_id', 'date_sent');
-        $this->addToAssertionCount(1);
+        $this->connection->insert($this->prefix.'email_stats', [
+            'lead_id'           => $lead->getId(),
+            'email_address'     => 'testemail@test.test',
+            'date_sent'         => (new \DateTime())->format('Y-m-d H:i:s'),
+            'is_read'           => 1,
+            'is_failed'         => 0,
+            'viewed_in_browser' => 0,
+        ]);
+
+        $this->connection->insert($this->prefix.'email_stats', [
+            'lead_id'           => $lead->getId(),
+            'email_address'     => 'testemail2@test.test',
+            'date_sent'         => (new \DateTime())->format('Y-m-d H:i:s'),
+            'is_read'           => 1,
+            'is_failed'         => 0,
+            'viewed_in_browser' => 0,
+        ]);
+
+        $violations         = $this->frequencyRuleRepository->getAppliedFrequencyRules('email', [1], 1, 1, 'email_stats', 'lead_id', 'date_sent');
+        $expectedViolations = [
+            0 => [
+                    'lead_id'          => '1',
+                    'frequency_number' => '1',
+                    'frequency_time'   => 'DAY',
+                ],
+        ];
+        Assert::assertSame($expectedViolations, $violations);
     }
 }
