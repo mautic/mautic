@@ -13,6 +13,8 @@ use PHPUnit\Framework\Assert;
 
 class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     /**
      * @var FrequencyRuleRepository
      */
