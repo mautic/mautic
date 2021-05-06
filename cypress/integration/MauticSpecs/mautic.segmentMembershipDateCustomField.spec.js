@@ -81,9 +81,10 @@ context("Verify segment membership tests with date custom field", () => {
     contact.firstName.type(contactFirstName);
     contact.lastName.type("contact2");
     contact.leadEmail.type(contactFirstName + "contact2@mailtest.mautic.org");
-    contact.dateFieldOne.type('2021-02-04')
-    contact.dateFieldSecond.type('2021-02-05')
-    contact.booleanCustomField_No.click()
+    contact.dateFieldOne.type('2021-02-04');
+    contact.dateFieldSecond.type('2021-02-05');
+    cy.wait(1000);
+    contact.booleanCustomField_No.click();
     contact.SaveButton.click();
     contact.closeButton.click({ force: true });
     contact.waitForContactCreation();
@@ -262,6 +263,7 @@ context("Verify segment membership tests with date custom field", () => {
     cy.visit('/s/contacts?search=' + contactFirstName);
     contact.waitTillSearchResultGetsDisplayed();
     search.selectParentCheckBox.click({ force: true });
+    cy.wait(1000);
     search.selectParentsOptionsDropdown.click();
     search.selectBatchdeleteButton.click({force: true});
     search.confirmDeleteButton.click();

@@ -83,6 +83,7 @@ context("Verify segment membership tests with numeric custom field", () => {
     contact.leadEmail.type(contactFirstName + "contact2@mailtest.mautic.org");
     contact.numericFieldOne.type('0')
     contact.numericFieldSecond.type('4')
+    cy.wait(1000);
     contact.booleanCustomField_No.click()
     contact.SaveButton.click();
     contact.closeButton.click({ force: true });
@@ -266,6 +267,7 @@ context("Verify segment membership tests with numeric custom field", () => {
     cy.visit('/s/contacts?search=' + contactFirstName);
     contact.waitTillSearchResultGetsDisplayed();
     search.selectParentCheckBox.click({ force: true });
+    cy.wait(1000);
     search.selectParentsOptionsDropdown.click();
     search.selectBatchdeleteButton.click({force: true});
     search.confirmDeleteButton.click();
