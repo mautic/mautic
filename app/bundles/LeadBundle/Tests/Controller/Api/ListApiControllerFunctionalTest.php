@@ -27,7 +27,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
         /* @var ListModel $listModel */
-        $this->listModel = $this->container->get('mautic.lead.model.list');
+        $this->listModel = self::$container->get('mautic.lead.model.list');
     }
 
     public function testSingleSegmentWorkflow()
@@ -36,7 +36,6 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'name'        => 'API segment',
             'description' => 'Segment created via API test',
             'filters'     => [
-                // Legacy structure.
                 [
                     'object'   => 'lead',
                     'glue'     => 'and',
@@ -47,35 +46,12 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
                     'operator' => '=',
                 ],
                 [
-                    'object'   => 'lead',
                     'glue'     => 'and',
-                    'field'    => 'owner_id',
-                    'type'     => 'lookup_id',
-                    'operator' => '=',
-                    'display'  => 'John Doe',
-                    'filter'   => '4',
-                ],
-                // Current structure.
-                [
-                    'object'     => 'lead',
-                    'glue'       => 'and',
-                    'field'      => 'city',
-                    'type'       => 'text',
-                    'properties' => ['filter' => 'Prague'],
-                    'operator'   => '=',
-                ],
-                [
-                    'object'     => 'lead',
-                    'glue'       => 'and',
-                    'field'      => 'owner_id',
-                    'type'       => 'lookup_id',
-                    'operator'   => '=',
-                    'display'    => 'outdated name',
-                    'filter'     => 'outdated_id',
-                    'properties' => [
-                        'display' => 'John Doe',
-                        'filter'  => '4',
-                    ],
+                    'field'    => 'email',
+                    'object'   => 'lead',
+                    'type'     => 'email',
+                    'operator' => '!empty',
+                    'display'  => '',
                 ],
             ],
         ];
