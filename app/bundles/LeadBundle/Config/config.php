@@ -815,10 +815,6 @@ return [
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'segment_in_use',
             ],
-            'mautic.lead.validator.custom_field' => [
-                'class'     => \Mautic\LeadBundle\Validator\CustomFieldValidator::class,
-                'arguments' => ['mautic.lead.model.field', 'translator'],
-            ],
             'mautic.lead.event.dispatcher' => [
                 'class'     => \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::class,
                 'arguments' => [
