@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\FieldModel;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ContactDeduperTest extends \PHPUnit\Framework\TestCase
 {
@@ -34,6 +35,11 @@ class ContactDeduperTest extends \PHPUnit\Framework\TestCase
      */
     private $leadRepository;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $dispatcher;
+
     protected function setUp(): void
     {
         $this->fieldModel = $this->getMockBuilder(FieldModel::class)
@@ -45,6 +51,10 @@ class ContactDeduperTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $this->leadRepository = $this->getMockBuilder(LeadRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->dispatcher = $this->getMockBuilder(EventDispatcher::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -160,7 +170,8 @@ class ContactDeduperTest extends \PHPUnit\Framework\TestCase
         return new ContactDeduper(
             $this->fieldModel,
             $this->contactMerger,
-            $this->leadRepository
+            $this->leadRepository,
+            $this->dispatcher
         );
     }
 }
