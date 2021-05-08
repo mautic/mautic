@@ -8,7 +8,7 @@ export default class DynamicContentEvents {
 
   constructor(editor) {
     this.editor = editor;
-    this.dcService = new DynamicContentService();
+    this.dcService = new DynamicContentService(this.editor);
     this.dccmd = new DynamicContentCommands(this.editor);
   }
 
@@ -22,22 +22,11 @@ export default class DynamicContentEvents {
   }
 
   // @todo remove? not used
-  // modalClose() {
-  //   const commands = this.editor.Commands;
-
-  //   const cmdDynamicContent = 'preset-mautic:dynamic-content-open';
-  //   // Launch preset-mautic:dynamic-content-open command stop
-  //   if (commands.isActive(cmdDynamicContent)) {
-  //     commands.stop(cmdDynamicContent, { editor: this.editor });
-  //   }
-
   //   const modalContent = mQuery('#dynamic-content-popup');
-
   //   // On modal close -> move editor within Mautic
   //   if (modalContent) {
   //     const dynamicContentContainer = mQuery('#dynamicContentContainer');
   //     const content = mQuery(modalContent).contents().first();
-
   //     dynamicContentContainer.append(content.detach());
   //   }
   // }

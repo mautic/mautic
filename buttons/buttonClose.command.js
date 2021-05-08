@@ -1,11 +1,4 @@
-import DynamicContentService from '../dynymicContent/dynamicContent.service';
-
 export default class ButtonCloseCommands {
-  dcService;
-
-  constructor() {
-    this.dcService = new DynamicContentService();
-  }
 
   static closeEditorPageHtml(editor) {
     if (!editor) {

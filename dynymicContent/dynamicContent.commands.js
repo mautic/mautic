@@ -11,7 +11,7 @@ export default class DynamicContentCommands {
   logger;
 
   constructor(editor) {
-    this.dcService = new DynamicContentService();
+    this.dcService = new DynamicContentService(editor);
     this.logger = new Logger(editor);
   }
 

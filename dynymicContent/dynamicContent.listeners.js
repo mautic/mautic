@@ -1,5 +1,3 @@
-import DynamicContentCommands from './dynamicContent.commands';
-
 export default class DynamicContentListeners {
   editor;
 
