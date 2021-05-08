@@ -1,7 +1,7 @@
 import DynamicContentCommands from './dynymicContent/dynamicContent.commands';
 
 export default (editor) => {
-  const dynamicContentCmd = new DynamicContentCommands();
+  const dynamicContentCmd = new DynamicContentCommands(editor);
 
   // Launch Dynamic Content popup: new or edit
   // Once the command is active, it has to be stopped before it can be run again.

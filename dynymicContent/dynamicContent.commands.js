@@ -1,12 +1,18 @@
+import Logger from '../logger';
 import DynamicContentService from './dynamicContent.service';
 
 export default class DynamicContentCommands {
   editor;
 
+  dcPopup;
+
   dcService;
 
-  constructor() {
+  logger;
+
+  constructor(editor) {
     this.dcService = new DynamicContentService();
+    this.logger = new Logger(editor);
   }
 
   launchDynamicContentPopup(editor, sender, options) {
@@ -25,10 +31,11 @@ export default class DynamicContentCommands {
 
     const dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
     if (dynamicContents.length) {
-      dynamicContents.forEach((dynamicContent) => {
-        this.dcService.manageDynamicContentTokenToSlot(dynamicContent);
-      });
+      this.logger.log('no dynamic content tokens found');
     }
+    dynamicContents.forEach((dynamicContent) => {
+      this.dcService.manageDynamicContentTokenToSlot(dynamicContent);
+    });
   }
 
   /**
@@ -36,32 +43,32 @@ export default class DynamicContentCommands {
    * Dynamic Content => {dynamicContent}
    *
    * @param editor
+   * @returns integer nr of dynamic content slots found
    */
   // eslint-disable-next-line class-methods-use-this
   convertDynamicContentSlotsToTokens(editor) {
-    const dc = editor.DomComponents;
-    // console.warn('grapesConvertDynamicContentSlotsToTokens');
-    const dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
+    // get all dynamic content elements loaded in the editor
+    const dynamicContents = editor.DomComponents.getWrapper().find('[data-slot="dynamicContent"]');
 
-    if (dynamicContents.length) {
-      dynamicContents.forEach((dynamicContent) => {
-        const attributes = dynamicContent.getAttributes();
-        const decId = attributes['data-param-dec-id'];
+    dynamicContents.forEach((dynamicContent) => {
+      const attributes = dynamicContent.getAttributes();
+      const decId = attributes['data-param-dec-id'];
 
-        // If it's not a token -> convert to token
-        if (decId) {
-          const dynConId = `#emailform_dynamicContent_${attributes['data-param-dec-id']}`;
+      // If it's not a token -> convert to token
+      if (decId) {
+        const dynConId = `#emailform_dynamicContent_${attributes['data-param-dec-id']}`;
 
-          const dynConTarget = mQuery(dynConId);
-          const dynConName = dynConTarget.find(`${dynConId}_tokenName`).val();
-          const dynConToken = `{dynamiccontent="${dynConName}"}`;
+        const dynConTarget = mQuery(dynConId);
+        const dynConName = dynConTarget.find(`${dynConId}_tokenName`).val();
+        const dynConToken = `{dynamiccontent="${dynConName}"}`;
 
-          // Clear id because it's reloaded by Mautic and this prevent slot to be destroyed by GrapesJs destroy event on close.
-          dynamicContent.addAttributes({ 'data-param-dec-id': '' });
-          dynamicContent.set('content', dynConToken);
-        }
-      });
-    }
+        // Clear id because it's reloaded by Mautic and this prevent slot to be destroyed by GrapesJs destroy event on close.
+        dynamicContent.addAttributes({ 'data-param-dec-id': '' });
+        dynamicContent.set('content', dynConToken);
+      }
+    });
+
+    return dynamicContents.length;
   }
 
   /**
@@ -70,15 +77,15 @@ export default class DynamicContentCommands {
    */
   // eslint-disable-next-line class-methods-use-this
   showDynamicContentEditor(editor, options) {
-    let dcPopup = DynamicContentCommands.buildDynamicContentPopup();
+    this.dcPopup = DynamicContentCommands.buildDynamicContentPopup();
 
-    dcPopup = DynamicContentCommands.addDynamicContentEditor(editor, options, dcPopup);
+    this.addDynamicContentEditor(editor, options);
 
     const title = Mautic.translate('grapesjsbuilder.dynamicContentBlockLabel');
     const modal = editor.Modal;
     modal.setTitle(title);
 
-    editor.Modal.setContent(dcPopup);
+    editor.Modal.setContent(this.dcPopup);
     modal.open();
     modal.onceClose(() => editor.stopCommand('preset-mautic:dynamic-content-open'));
   }
@@ -102,7 +109,7 @@ export default class DynamicContentCommands {
   /**
    * Load Dynamic Content editor and append to the codePopup Modal
    */
-  static addDynamicContentEditor(editor, options, dcPopup) {
+  addDynamicContentEditor(editor, options) {
     const { target } = options;
     const dcComponent = target || editor.getSelected();
     if (!dcComponent) {
@@ -110,8 +117,7 @@ export default class DynamicContentCommands {
     }
 
     const attributes = dcComponent.getAttributes();
-    console.warn(attributes);
-    console.warn(attributes['data-param-dec-id']);
+
     // const popupContent = dcPopup.querySelector('#dynamic-content-popup');
 
     // do we need both?
@@ -130,7 +136,6 @@ export default class DynamicContentCommands {
     focusForm.find('.tab-pane:first').find('.remove-item').hide();
 
     // Insert inside popup
-    mQuery(dcPopup).empty().append(focusForm.detach());
-    return dcPopup;
+    mQuery(this.dcPopup).empty().append(focusForm.detach());
   }
 }

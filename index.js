@@ -40,6 +40,7 @@ export default (editor, opts = {}) => {
       'insertImage',
       'html',
     ],
+    logFilter: 'log:debug',
     ...opts,
   };
 
@@ -365,5 +366,5 @@ export default (editor, opts = {}) => {
   loadEvents(editor, config);
   loadButtons(editor, config);
   loadBlocks(editor, config);
-  loadListeners(editor);
+  loadListeners(editor, config);
 };
