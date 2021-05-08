@@ -9,18 +9,19 @@ export default class DynamicContentCommands {
     this.dcService = new DynamicContentService();
   }
 
-  launchDynamicContent(editor, sender, options) {
+  launchDynamicContentPopup(editor, sender, options) {
     this.showCodePopup(editor, options);
 
     // Transform DC to token
-    this.dcService.grapesConvertDynamicContentSlotsToTokens(editor);
+    editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
   }
 
   /**
    * Convert dynamic content tokens to slot and load content
+   * {dynamiccontent} => Dynamic Content
    */
   // eslint-disable-next-line class-methods-use-this
-  grapesConvertDynamicContentTokenToSlot(editor, sender, options) {
+  convertDynamicContentTokenToSlot(editor) {
     const getHtml = editor.getHtml();
     const dc = editor.DomComponents;
 
@@ -28,6 +29,39 @@ export default class DynamicContentCommands {
     if (dynamicContents.length) {
       dynamicContents.forEach((dynamicContent) => {
         this.dcService.manageDynamicContentTokenToSlot(dynamicContent);
+      });
+    }
+  }
+
+  /**
+   * Convert dynamic content slots to tokens
+   * Dynamic Content => {dynamicContent}
+   *
+   * @param editor
+   */
+  // eslint-disable-next-line class-methods-use-this
+  convertDynamicContentSlotsToTokens(editor) {
+    const dc = editor.DomComponents;
+    // console.warn('grapesConvertDynamicContentSlotsToTokens');
+    const dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
+
+    if (dynamicContents.length) {
+      dynamicContents.forEach((dynamicContent) => {
+        const attributes = dynamicContent.getAttributes();
+        const decId = attributes['data-param-dec-id'];
+
+        // If it's not a token -> convert to token
+        if (decId !== '') {
+          const dynConId = `#emailform_dynamicContent_${attributes['data-param-dec-id']}`;
+
+          const dynConTarget = mQuery(dynConId);
+          const dynConName = dynConTarget.find(`${dynConId}_tokenName`).val();
+          const dynConToken = `{dynamiccontent="${dynConName}"}`;
+
+          // Clear id because it's reloaded by Mautic and this prevent slot to be destroyed by GrapesJs destroy event on close.
+          dynamicContent.addAttributes({ 'data-param-dec-id': '' });
+          dynamicContent.set('content', dynConToken);
+        }
       });
     }
   }

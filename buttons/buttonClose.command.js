@@ -1,6 +1,12 @@
 import DynamicContentService from '../dynymicContent/dynamicContent.service';
 
 export default class ButtonCloseCommands {
+  dcService;
+
+  constructor() {
+    this.dcService = new DynamicContentService();
+  }
+
   static closeEditorPageHtml(editor) {
     if (!editor) {
       throw new Error('no page-html editor');
@@ -14,7 +20,7 @@ export default class ButtonCloseCommands {
     //   fullHtml.head.innerHTML = this.head.innerHTML;
     // }
     console.warn('close');
-    DynamicContentService.grapesConvertDynamicContentSlotsToTokens(editor);
+    editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
 
     // Combine editor styles and editor html and save it to Mautic textarea
     // This part is different from other modes
@@ -31,7 +37,7 @@ export default class ButtonCloseCommands {
     if (!editor) {
       throw new Error('no email-mjml editor');
     }
-    DynamicContentService.grapesConvertDynamicContentSlotsToTokens(editor);
+    editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
 
     let code = '';
 
@@ -58,7 +64,7 @@ export default class ButtonCloseCommands {
       throw new Error('no email-html editor');
     }
 
-    DynamicContentService.grapesConvertDynamicContentSlotsToTokens(editor);
+    editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
 
     // Update textarea for save
     const innerHTML = editor.runCommand('gjs-get-inlined-html');

@@ -90,38 +90,6 @@ export default class DynamicContentService {
     }
   }
 
-  /**
-   * Convert dynamic content slots to tokens
-   *
-   * @param editor
-   */
-  // eslint-disable-next-line class-methods-use-this
-  grapesConvertDynamicContentSlotsToTokens(editor) {
-    const dc = editor.DomComponents;
-    // console.warn('grapesConvertDynamicContentSlotsToTokens');
-    const dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
-
-    if (dynamicContents.length) {
-      dynamicContents.forEach((dynamicContent) => {
-        const attributes = dynamicContent.getAttributes();
-        const decId = attributes['data-param-dec-id'];
-
-        // If it's not a token -> convert to token
-        if (decId !== '') {
-          const dynConId = `#emailform_dynamicContent_${attributes['data-param-dec-id']}`;
-
-          const dynConTarget = mQuery(dynConId);
-          const dynConName = dynConTarget.find(`${dynConId}_tokenName`).val();
-          const dynConToken = `{dynamiccontent="${dynConName}"}`;
-
-          // Clear id because it's reloaded by Mautic and this prevent slot to be destroyed by GrapesJs destroy event on close.
-          dynamicContent.addAttributes({ 'data-param-dec-id': '' });
-          dynamicContent.set('content', dynConToken);
-        }
-      });
-    }
-  }
-
   getDynamicContentTabs() {
     mQuery('#dynamicContentTabs a').each((index, value) => {
       if (value.href.indexOf('javascript') >= 0) {
