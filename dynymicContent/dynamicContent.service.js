@@ -11,7 +11,6 @@ export default class DynamicContentService {
    * @param {JQuery Object} component
    */
   manageDynamicContentTokenToSlot(component) {
-    console.log('manageDynamicContentTokenToSlot');
     const regex = RegExp(/\{dynamiccontent="(.*)"\}/, 'g');
 
     const content = component.get('content');
@@ -71,8 +70,8 @@ export default class DynamicContentService {
    *
    * @param component
    */
-   // eslint-disable-next-line class-methods-use-this
-   deleteDynamicContentItem(component) {
+  // eslint-disable-next-line class-methods-use-this
+  deleteDynamicContentItem(component) {
     const attributes = component.getAttributes();
 
     // Only delete if we click on trash, not when GrapesJs is destroyed
@@ -93,13 +92,13 @@ export default class DynamicContentService {
 
   /**
    * Convert dynamic content slots to tokens
-   * Used in grapesjs-preset-mautic
    *
    * @param editor
    */
-  static grapesConvertDynamicContentSlotsToTokens(editor) {
+  // eslint-disable-next-line class-methods-use-this
+  grapesConvertDynamicContentSlotsToTokens(editor) {
     const dc = editor.DomComponents;
-
+    // console.warn('grapesConvertDynamicContentSlotsToTokens');
     const dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
 
     if (dynamicContents.length) {

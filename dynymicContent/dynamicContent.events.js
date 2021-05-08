@@ -9,17 +9,7 @@ export default class DynamicContentEvents {
   constructor(editor) {
     this.editor = editor;
     this.dcService = new DynamicContentService();
-  }
-
-  onComponentAdd() {
-    this.editor.on('component:add', (component) => {
-      // Create dynamic-content on Mautic side
-      console.warn('component:add');
-      if (component.get('type') === 'dynamic-content') {
-        this.dcService.manageDynamicContentTokenToSlot(component);
-        DynamicContentCommands.launchDynamicContent(this.editor, null, { target: component });
-      }
-    });
+    this.dccmd = new DynamicContentCommands(this.editor);
   }
 
   onComponentRemove() {
@@ -32,23 +22,23 @@ export default class DynamicContentEvents {
   }
 
   // @todo remove? not used
-  modalClose() {
-    const commands = this.editor.Commands;
+  // modalClose() {
+  //   const commands = this.editor.Commands;
 
-    const cmdDynamicContent = 'preset-mautic:dynamic-content';
-    // Launch preset-mautic:dynamic-content command stop
-    if (commands.isActive(cmdDynamicContent)) {
-      commands.stop(cmdDynamicContent, { editor: this.editor });
-    }
+  //   const cmdDynamicContent = 'preset-mautic:dynamic-content-open';
+  //   // Launch preset-mautic:dynamic-content-open command stop
+  //   if (commands.isActive(cmdDynamicContent)) {
+  //     commands.stop(cmdDynamicContent, { editor: this.editor });
+  //   }
 
-    const modalContent = mQuery('#dynamic-content-popup');
+  //   const modalContent = mQuery('#dynamic-content-popup');
 
-    // On modal close -> move editor within Mautic
-    if (modalContent) {
-      const dynamicContentContainer = mQuery('#dynamicContentContainer');
-      const content = mQuery(modalContent).contents().first();
+  //   // On modal close -> move editor within Mautic
+  //   if (modalContent) {
+  //     const dynamicContentContainer = mQuery('#dynamicContentContainer');
+  //     const content = mQuery(modalContent).contents().first();
 
-      dynamicContentContainer.append(content.detach());
-    }
-  }
+  //     dynamicContentContainer.append(content.detach());
+  //   }
+  // }
 }
