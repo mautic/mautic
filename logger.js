@@ -9,24 +9,31 @@ export default class Logger {
     this.editor = editor;
   }
 
-  debug(msg) {
-    this.log(msg, 'debug');
+  debug(msg, params = {}) {
+    this.log(msg, params, 'debug');
   }
 
-  info(msg) {
-    this.log(msg, 'info');
+  info(msg, params = {}) {
+    this.log(msg, params, 'info');
   }
 
-  warning(msg) {
-    this.log(msg, 'warning');
+  warning(msg, params = {}) {
+    this.log(msg, params, 'warning');
   }
 
-  error(msg) {
-    this.log(msg, 'error');
+  error(msg, params = {}) {
+    this.log(msg, params, 'error');
   }
 
-  log(msg, level = 'debug') {
-    this.editor.log(msg, { ns: Logger.namespace, level });
+  /**
+   *
+   * @param {string} msg log message
+   * @param {object} params optional params
+   * @param {string} level  log level
+   */
+  log(msg, params, level = 'debug') {
+    const options = { ...{ ns: Logger.namespace, level }, ...params };
+    this.editor.log(msg, options);
   }
 
   /**
@@ -34,7 +41,7 @@ export default class Logger {
    * @param {string} filter `log`, `log:info`, `grapesjs-preset`, `grapesjs-preset:info`
    */
   addListener(filter = 'log:debug') {
-    // find the severity for debug, info, warning. 
+    // find the severity for debug, info, warning.
     const displaySeverity = Logger.filters.findIndex((element) => element === filter);
 
     // severity only works with items in Logger.filters. All other filters are applied directly
