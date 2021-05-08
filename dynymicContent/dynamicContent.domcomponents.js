@@ -8,7 +8,7 @@ export default class DynamicContentDomComponents {
   addDynamicContentType() {
     // Not sure this is still used. https://grapesjs.com/docs/modules/Components.html#define-custom-component-type
     function isComponent(el) {
-      console.trace('isComponent has been called');
+      console.trace('we use it: isComponent has been called');
       if (el.getAttribute && el.getAttribute('data-slot') === 'dynamicContent') {
         console.warn('itistrue', el.getAttribute);
         return {
@@ -63,9 +63,11 @@ export default class DynamicContentDomComponents {
       events: {
         dblclick: 'onActive',
       },
+      // maybe use onRender for token to slot conversion
       // open the dynamic content modal if the editor is added or double clicked
       onActive() {
         const target = this.model;
+        this.em.get('Commands').run('preset-mautic:dynamic-content-tokens-to-slots');
         this.em.get('Commands').run('preset-mautic:dynamic-content-open', { target });
       },
     });
