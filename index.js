@@ -1,3 +1,4 @@
+import Logger from './logger';
 import loadComponents from './components';
 import loadCommands from './commands';
 import loadButtons from './buttons';
@@ -43,6 +44,9 @@ export default (editor, opts = {}) => {
     logFilter: 'log:debug',
     ...opts,
   };
+
+  const logger = new Logger(editor);
+  logger.addListener(config.logFilter, editor);
 
   // Extend the original `image` and add a confirm dialog before removing it
   am.addType('image', {
@@ -361,10 +365,10 @@ export default (editor, opts = {}) => {
   }
 
   // Load other parts
-  loadComponents(editor, config);
   loadCommands(editor, config);
+  loadListeners(editor, config);
+  loadComponents(editor, config);
   loadEvents(editor, config);
   loadButtons(editor, config);
   loadBlocks(editor, config);
-  loadListeners(editor, config);
 };

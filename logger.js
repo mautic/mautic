@@ -35,16 +35,16 @@ export default class Logger {
    */
   addListener(filter = 'log:debug') {
     // find the severity for debug, info, warning. 
-    const severity = Logger.filters.findIndex((element) => element === filter);
+    const displaySeverity = Logger.filters.findIndex((element) => element === filter);
 
     // severity only works with items in Logger.filters. All other filters are applied directly
-    if (severity === -1) {
+    if (displaySeverity === -1) {
       // this.editor.on(filter, (msg, opts) => console.info(msg, opts));
     } else {
       // listen for all logs with a severity > than the current setting.
-      Logger.filters.forEach((item, index) => {
+      Logger.filters.forEach((item, severity) => {
         // @todo severity >1 (warning and error) is already logged via backbone. find out how it works.
-        if (severity <= index && severity < 1) {
+        if (displaySeverity <= severity && severity <= 1) {
           this.editor.on(item, (msg, opts) => console.info(msg, opts));
         }
       });
