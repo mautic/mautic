@@ -3,6 +3,8 @@ export default class Logger {
 
   static namespace = 'grapesjs-preset';
 
+  static filters = ['log:debug', 'log:info', 'log:warning'];
+
   constructor(editor) {
     this.editor = editor;
   }
@@ -19,15 +21,33 @@ export default class Logger {
     this.log(msg, 'warning');
   }
 
+  error(msg) {
+    this.log(msg, 'error');
+  }
+
   log(msg, level = 'debug') {
     this.editor.log(msg, { ns: Logger.namespace, level });
   }
 
   /**
    * What kind of logs to display
-   * @param {string} filter `log`, `log:info`, `log-from-plugin-x`, `log-from-plugin-x:info`
+   * @param {string} filter `log`, `log:info`, `grapesjs-preset`, `grapesjs-preset:info`
    */
   addListener(filter = 'log:debug') {
-    this.editor.on(filter, (msg, opts) => console.info(msg, opts));
+    // find the severity for debug, info, warning. 
+    const severity = Logger.filters.findIndex((element) => element === filter);
+
+    // severity only works with items in Logger.filters. All other filters are applied directly
+    if (severity === -1) {
+      // this.editor.on(filter, (msg, opts) => console.info(msg, opts));
+    } else {
+      // listen for all logs with a severity > than the current setting.
+      Logger.filters.forEach((item, index) => {
+        // @todo severity >1 (warning and error) is already logged via backbone. find out how it works.
+        if (severity <= index && severity < 1) {
+          this.editor.on(item, (msg, opts) => console.info(msg, opts));
+        }
+      });
+    }
   }
 }

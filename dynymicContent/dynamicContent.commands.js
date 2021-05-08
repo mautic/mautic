@@ -31,7 +31,7 @@ export default class DynamicContentCommands {
 
     const dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
     if (dynamicContents.length) {
-      this.logger.log('no dynamic content tokens found');
+      this.logger.error('no dynamic content tokens found');
     }
     dynamicContents.forEach((dynamicContent) => {
       this.dcService.manageDynamicContentTokenToSlot(dynamicContent);
