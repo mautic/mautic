@@ -27,11 +27,9 @@ export default class DynamicContentCommands {
    * {dynamiccontent} => Dynamic Content
    */
   convertDynamicContentTokenToSlot(editor) {
-    const dc = editor.DomComponents;
-
-    const dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
-    if (dynamicContents.length) {
-      this.logger.error('no dynamic content tokens found');
+    const dynamicContents = editor.DomComponents.getWrapper().find('[data-slot="dynamicContent"]');
+    if (dynamicContents.length <= 0) {
+      this.logger.debug('no dynamic content tokens found');
     }
     dynamicContents.forEach((dynamicContent) => {
       this.dcService.manageDynamicContentTokenToSlot(dynamicContent);

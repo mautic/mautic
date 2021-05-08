@@ -38,6 +38,8 @@ export default class DynamicContentDomComponents {
         },
       },
 
+      // <div data-gjs-type="dynamic-content" draggable="true" data-highlightable="1" data-slot="dynamicContent" id="i49ni" data-param-dec-id="2" class="gjs-selected">Dynamic Content 3</div>
+
       /**
        * Initilize the component
        */
