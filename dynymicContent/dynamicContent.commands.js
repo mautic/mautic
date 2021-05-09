@@ -61,7 +61,7 @@ export default class DynamicContentCommands {
         const dynConToken = `{dynamiccontent="${dynConName}"}`;
 
         // Clear id because it's reloaded by Mautic and this prevent slot to be destroyed by GrapesJs destroy event on close.
-        dynamicContent.addAttributes({ 'data-param-dec-id': '' });
+        // dynamicContent.addAttributes({ 'data-param-dec-id': '' });
         dynamicContent.set('content', dynConToken);
       }
     });
@@ -115,7 +115,6 @@ export default class DynamicContentCommands {
     }
 
     const attributes = dcComponent.getAttributes();
-
     // const popupContent = dcPopup.querySelector('#dynamic-content-popup');
 
     // do we need both?
@@ -125,7 +124,9 @@ export default class DynamicContentCommands {
     // get the dynamic content editor
     const focusForm = mQuery(`#emailform_dynamicContent_${attributes['data-param-dec-id']}`);
     if (focusForm.length <= 0) {
-      throw new Error(`No dynamicContent email form found for ${attributes['data-param-dec-id']}`);
+      throw new Error(
+        `No dynamicContent email form found for '${attributes['data-param-dec-id']}'`
+      );
     }
 
     // Show if hidden

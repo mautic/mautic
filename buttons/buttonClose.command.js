@@ -1,5 +1,4 @@
 export default class ButtonCloseCommands {
-
   static closeEditorPageHtml(editor) {
     if (!editor) {
       throw new Error('no page-html editor');
@@ -12,7 +11,7 @@ export default class ButtonCloseCommands {
     //   // const fullHtml = editor.getHtml();
     //   fullHtml.head.innerHTML = this.head.innerHTML;
     // }
-    console.warn('close');
+
     editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
 
     // Combine editor styles and editor html and save it to Mautic textarea
