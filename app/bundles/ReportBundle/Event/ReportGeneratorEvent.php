@@ -323,9 +323,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function addCompanyLeftJoin(QueryBuilder $queryBuilder, $companyPrefix = self::COMPANY_PREFIX, $contactPrefix = self::CONTACT_PREFIX)
     {
-        $queryParts =  $queryBuilder->getQueryParts();
+        $queryParts    =  $queryBuilder->getQueryParts();
         $alreadyJoined = isset($queryParts['join']['companies_lead']);
-        if ($this->usesColumnWithPrefix($companyPrefix) && !$alreadyJoined) {        
+        if (!$alreadyJoined && $this->usesColumnWithPrefix($companyPrefix)) {
             $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', $contactPrefix.'.id = companies_lead.lead_id');
             $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', $companyPrefix, 'companies_lead.company_id = '.$companyPrefix.'.id');
         }
