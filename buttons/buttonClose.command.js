@@ -74,12 +74,14 @@ export default class ButtonCloseCommands {
     mQuery('.builder').removeClass('builder-active').addClass('hide');
     mQuery('html').css('font-size', '');
     mQuery('body').css('overflow-y', '');
+    mQuery('.builder-panel').css('display', 'none');
 
     // Destroy GrapesJS
+    // Dont destroy grapesjs. Just hide it. Will be auto destroyed if user
+    // loads a new page.
     // workaround: throws typeError: Cannot read property 'trigger'
     // since editior is destroyed, command can not be stopped anymore
-    mQuery('.builder-panel').css('display', 'none');
-    setTimeout(() => editor.destroy(), 1000);
+    // setTimeout(() => editor.destroy(), 1000);
     // editor.destroy();
   }
 }
