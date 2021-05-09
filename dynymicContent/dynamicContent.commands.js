@@ -54,7 +54,7 @@ export default class DynamicContentCommands {
 
       // If it's not a token -> convert to token
       if (decId) {
-        const dynConId = `#emailform_dynamicContent_${attributes['data-param-dec-id']}`;
+        const dynConId = DynamicContentCommands.getDcStoreId(attributes['data-param-dec-id']);
 
         const dynConTarget = mQuery(dynConId);
         const dynConName = dynConTarget.find(`${dynConId}_tokenName`).val();
@@ -102,8 +102,6 @@ export default class DynamicContentCommands {
     return codePopup;
   }
 
-  // undo last commit before next commit!!
-
   /**
    * Load Dynamic Content editor and append to the codePopup Modal
    */
@@ -122,7 +120,7 @@ export default class DynamicContentCommands {
     // console.warn({ popupContent });
 
     // get the dynamic content editor
-    const focusForm = mQuery(`#emailform_dynamicContent_${attributes['data-param-dec-id']}`);
+    const focusForm = mQuery(DynamicContentCommands.getDcStoreId(attributes['data-param-dec-id']));
     if (focusForm.length <= 0) {
       throw new Error(
         `No dynamicContent email form found for '${attributes['data-param-dec-id']}'`
@@ -136,5 +134,48 @@ export default class DynamicContentCommands {
 
     // Insert inside popup
     mQuery(this.dcPopup).empty().append(focusForm.detach());
+  }
+
+  /**
+   * Delete DynamicContent on Mautic side
+   *
+   * @param component
+   */
+  // eslint-disable-next-line class-methods-use-this
+  deleteDynamicContentStoreItem(editor, sender, options) {
+    const { component } = options;
+    const attributes = component.getAttributes();
+    if (!attributes['data-param-dec-id']) {
+      this.logger.warning('no dec-id found. Can not delete', attributes);
+    }
+
+    const dcStoreId = DynamicContentCommands.getDcStoreId(attributes['data-param-dec-id']);
+    const dcStoreItem = mQuery(dcStoreId);
+    if (!dcStoreItem) {
+      this.logger.warning('No DynamicContent store item found', { dcStoreId });
+    }
+
+    // remove the store item
+    dcStoreItem.find('a.remove-item:first').click();
+    // remove store navigation item
+    const dynCon = mQuery('.dynamicContentFilterContainer').find(`a[href='${dcStoreId}']`);
+    if (!dynCon || !dynCon.parent()) {
+      this.logger.warning('No DynamicContent store item to delete found', { dcStoreId });
+    }
+    dynCon.parent().remove();
+    this.logger.debug('DynamicContent store item removed', { dcStoreId });
+  }
+
+  /**
+   * Get the DynamicContent identifier of the html store item
+   * e.g. emailform_dynamicContent_0
+   * @param {integer} id
+   * @returns string
+   */
+  static getDcStoreId(id) {
+    if (id <= 0) {
+      throw new Error('no dynamic content ID');
+    }
+    return `#emailform_dynamicContent_${id}`;
   }
 }

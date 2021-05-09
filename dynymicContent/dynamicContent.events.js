@@ -16,7 +16,7 @@ export default class DynamicContentEvents {
     this.editor.on('component:remove', (component) => {
       // Delete dynamic-content on Mautic side
       if (component.get('type') === 'dynamic-content') {
-        this.dcService.deleteDynamicContentItem(component);
+        this.editor.runCommand('preset-mautic:dynamic-content-delete-store-item', { component });
       }
     });
   }

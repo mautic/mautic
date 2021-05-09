@@ -104,31 +104,6 @@ export default class DynamicContentService {
   }
 
   /**
-   * Delete DC on Mautic side
-   *
-   * @param component
-   */
-  // eslint-disable-next-line class-methods-use-this
-  deleteDynamicContentItem(component) {
-    const attributes = component.getAttributes();
-
-    // Only delete if we click on trash, not when GrapesJs is destroyed
-    if (attributes['data-param-dec-id'] !== '') {
-      const dynConId = `#emailform_dynamicContent_${attributes['data-param-dec-id']}`;
-      const dynConTarget = mQuery(dynConId);
-
-      if (dynConTarget) {
-        dynConTarget.find('a.remove-item:first').click();
-        // remove vertical tab in outside form
-        const dynCon = mQuery('.dynamicContentFilterContainer').find(`a[href=${dynConId}]`);
-        if (dynCon && dynCon.parent()) {
-          dynCon.parent().remove();
-        }
-      }
-    }
-  }
-
-  /**
    * Load all
    */
   getDynamicContentTabs() {

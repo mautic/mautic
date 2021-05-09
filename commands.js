@@ -16,6 +16,10 @@ export default (editor) => {
   editor.Commands.add('preset-mautic:dynamic-content-tokens-to-slots', {
     run: (edtr) => dynamicContentCmd.convertDynamicContentTokenToSlot(edtr),
   });
+  editor.Commands.add('preset-mautic:dynamic-content-delete-store-item', {
+    run: (edtr, sender, options) =>
+      dynamicContentCmd.deleteDynamicContentStoreItem(edtr, sender, options),
+  });
 
   // Open popup to edit the canvas source code
   // @todo: why is this run on editor start?

@@ -72,6 +72,14 @@ export default class DynamicContentDomComponents {
         this.em.get('Commands').run('preset-mautic:dynamic-content-tokens-to-slots');
         this.em.get('Commands').run('preset-mautic:dynamic-content-open', { target });
       },
+      // does not work: gets removed when Sorting (by grapesjs)
+      // removed() {
+      //   // Delete dynamic-content on Mautic side
+      //   const component = this.model;
+      //   this.em
+      //     .get('Commands')
+      //     .run('preset-mautic:dynamic-content-delete-store-item', { component });
+      // },
     });
 
     // add the Dynamic Content component
