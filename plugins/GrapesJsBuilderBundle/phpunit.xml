@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
+<phpunit
+    backupGlobals               = "false"
+    backupStaticAttributes      = "false"
+    colors                      = "true"
+    convertErrorsToExceptions   = "true"
+    convertNoticesToExceptions  = "true"
+    convertWarningsToExceptions = "true"
+    processIsolation            = "false"
+    stopOnFailure               = "false"
+    syntaxCheck                 = "false"
+    bootstrap                   = "autoload.php" >
+
+    <testsuites>
+        <testsuite name="unit">
+            <directory>Tests/Unit</directory>
+        </testsuite>
+        <testsuite name="functional">
+            <directory>Tests/Functional</directory>
+        </testsuite>
+        <testsuite name="all">
+            <directory>Tests/Unit</directory>
+            <directory>Tests/Functional</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <server name="KERNEL_DIR" value="../../app" />
+    </php>
+
+    <filter>
+        <whitelist>
+            <directory>*</directory>
+            <exclude>
+                <directory>Assets</directory>
+                <directory>Config</directory>
+                <directory>Tests</directory>
+                <directory>Translations</directory>
+                <directory>Views</directory>
+                <directory>vendor</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+
+</phpunit>
