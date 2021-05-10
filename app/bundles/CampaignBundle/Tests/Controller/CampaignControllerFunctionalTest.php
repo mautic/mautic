@@ -4,337 +4,230 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Controller;
 
-use Mautic\CampaignBundle\Command\SummarizeCommand;
+use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
-use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class CampaignControllerFunctionalTest extends AbstractCampaignTest
 {
-    private const CAMPAIGN_SUMMARY_PARAM = 'campaign_use_summary';
-
-    private const CAMPAIGN_RANGE_PARAM   = 'campaign_by_range';
-
+    private const CAMPAIGN_NAME = 'Campaign Event Functional test';
     /**
      * @var CampaignModel
      */
-    private $campaignModel;
+    protected $campaignModel;
 
     /**
-     * @var string
+     * @var EntityManager
      */
-    private $campaignLeadsLabel;
+    protected $em;
 
-    protected function setUp(): void
+    /**
+     * index action test.
+     */
+    public function testIndexAction(): void
     {
-        $functionForUseSummary = ['testCampaignContactCountThroughStatsWithSummary',
-            'testCampaignContactCountOnCanvasWithSummaryWithoutRange', 'testCampaignContactCountOnCanvasWithSummaryAndRange',
-            'testCampaignCountsBeforeSummarizeCommandWithSummaryWithoutRange', 'testCampaignCountsBeforeSummarizeCommandWithSummaryAndRange',
-            'testCampaignCountsAfterSummarizeCommandWithSummaryWithoutRange', 'testCampaignCountsAfterSummarizeCommandWithSummaryAndRange',
-            'testCampaignPendingCountsWithSummaryWithoutRange', 'testCampaignPendingCountsWithSummaryAndRange', ];
-        $functionForUseRange = ['testCampaignContactCountOnCanvasWithoutSummaryWithRange', 'testCampaignContactCountOnCanvasWithSummaryAndRange',
-            'testCampaignCountsBeforeSummarizeCommandWithoutSummaryWithRange', 'testCampaignCountsBeforeSummarizeCommandWithSummaryAndRange',
-            'testCampaignCountsAfterSummarizeCommandWithoutSummaryWithRange', 'testCampaignCountsAfterSummarizeCommandWithSummaryAndRange',
-            'testCampaignPendingCountsWithoutSummaryAndRange', 'testCampaignPendingCountsWithoutSummaryWithRange', ];
-        $this->configParams[self::CAMPAIGN_SUMMARY_PARAM] = in_array($this->getName(), $functionForUseSummary);
-        $this->configParams[self::CAMPAIGN_RANGE_PARAM]   = in_array($this->getName(), $functionForUseRange);
-        parent::setUp();
+        $this->client->request('GET', '/s/campaigns');
+        $response = $this->client->getResponse();
 
-        $model = static::getContainer()->get(CampaignModel::class);
+        $this->assertSame(200, $response->getStatusCode());
 
-        $this->campaignModel                                           = $model;
-        $this->campaignLeadsLabel                                      = static::getContainer()->get('translator')->trans('mautic.campaign.campaign.leads');
-        $this->configParams['delete_campaign_event_log_in_background'] = false;
+        // check page layout
+        $crawler = new Crawler($response->getContent());
+        $class   = $crawler->filter('h4.fw-sb')->getNode(0)->getNodePath();
+        $this->assertEquals('/html/body/div[4]/div/div/div[1]/div/div[1]/div/div[1]/h4', $class);
     }
 
-    public function testCampaignContactCountThroughStatsWithSummary(): void
+    public function testCreateCampaignAction(): void
     {
-        $this->campaignContactCountThroughStats();
+        $crawler = $this->client->request('GET', '/s/campaigns/new');
+        $this->assertSame(200, $this->client->getResponse()->getStatusCode());
+        $form = $crawler->selectButton('campaign_buttons_apply')->form();
+        $form['campaign[name]']->setValue(self::CAMPAIGN_NAME);
+
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        // get campaign id
+        $campaign = $this->em->getRepository(Campaign::class)->findOneBy(['name' => self::CAMPAIGN_NAME]);
+        $id       = $campaign->getId();
+
+        // campaign edit page
+        $crawler = $this->client->request('GET', '/s/campaigns/edit/'.$id);
+        $this->assertSame(200, $this->client->getResponse()->getStatusCode());
+
+        $form = $crawler->selectButton('campaign_buttons_apply')->form();
+
+        $form['campaign[name]']->setValue('Campaign new name');
+
+        $this->client->submit($form);
+
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $campaign = $this->em->getRepository(Campaign::class)->getEntity($id);
+        $this->assertEquals('Campaign new name', $campaign->getName());
+
+        // clone campaign
+        $this->client->request('GET', '/s/campaigns/clone/'.$id);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $campaign = $this->em->getRepository(Campaign::class)->findOneBy(['name' => 'Campaign new name - clone']);
+        $cloneId  = $campaign->getId();
+        $this->assertTrue($cloneId > 0);
+        $this->assertTrue($cloneId !== $id);
+
+        // and finally delete campaign
+        $this->client->request('POST', '/s/campaigns/delete/'.$id);
+        // redirect
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+
+        $this->client->followRedirect();
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $campaign = $this->em->getRepository(Campaign::class)->findOneBy(['name' => 'Campaign new name']);
+        $this->assertNull($campaign);
+
+        $this->client->request('POST', '/s/campaigns/delete/'.$cloneId);
+        $this->client->followRedirect();
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $campaign = $this->em->getRepository(Campaign::class)->findOneBy(['name' => 'Campaign new name - clone']);
+        $this->assertNull($campaign);
     }
 
-    public function testCampaignContactCountThroughStatsWithoutSummary(): void
+    public function testViewActionHtmlVariant(): void
     {
-        $this->campaignContactCountThroughStats();
-    }
+        $campaign = $this->saveSomeCampaignLeadEventLogs();
 
-    public function testCampaignContactCountOnCanvasWithoutSummaryAndRange(): void
-    {
-        $this->campaignContactCountOnCanvas();
-    }
+        // check contact count
+        $this->client->request('GET', sprintf('/s/campaigns/view/%s', $campaign->getId()));
+        $response = $this->client->getResponse();
+        Assert::assertTrue($response->isOk());
 
-    public function testCampaignContactCountOnCanvasWithSummaryWithoutRange(): void
-    {
-        $this->campaignContactCountOnCanvas();
-    }
+        $crawler = new Crawler($response->getContent());
+        $node    = $crawler->filter('button:contains("View Details")')->getNode(0);
 
-    public function testCampaignContactCountOnCanvasWithoutSummaryWithRange(): void
-    {
-        $this->campaignContactCountOnCanvas();
-    }
+        // extract "data-stats-event-id" from a button
+        $eventId = $node->attributes->getNamedItem('data-stats-event-id')->value;
+        $event   = $this->em->getRepository(Event::class)->find($eventId);
+        $this->assertSame(Event::TYPE_DECISION, $event->getEventType());
 
-    public function testCampaignContactCountOnCanvasWithSummaryAndRange(): void
-    {
-        $this->campaignContactCountOnCanvas();
-    }
+        // check data is OK
+        $this->assertSame(2, $event->getStats()['count']);
+        $this->assertSame(0, $event->getStats()['failed']);
+        $this->assertSame(2, $event->getStats()['processed']);
+        $this->assertSame(100, $event->getStats()['progress']);
 
-    public function testCampaignCountsBeforeSummarizeCommandWithoutSummaryAndRange(): void
-    {
-        $this->getCountAndDetails(false, false, 100, 2, 0);
-    }
+        // check contact count
+        $campaignId = $campaign->getId();
+        // "pending" contacts
+        $pendingContactsCount = $this->campaignModel->getRepository()->getCampaignLeadCount($campaignId, null, []);
+        $this->assertSame(2, $pendingContactsCount);
 
-    public function testCampaignCountsBeforeSummarizeCommandWithSummaryWithoutRange(): void
-    {
-        $this->getCountAndDetails(false, false, 0, 0, 0);
-    }
+        // all campaign contacts
+        $allContactsCount = $this->campaignModel->getRepository()->getCampaignLeadCount($campaignId);
+        $this->assertSame(2, $allContactsCount);
 
-    public function testCampaignCountsBeforeSummarizeCommandWithoutSummaryWithRange(): void
-    {
-        $this->getCountAndDetails(false, false, 100, 2, 0);
-    }
+        // Manually remove contact to make sure the counts can filter them out
+        $campaignLeadRepo = $this->campaignModel->getCampaignLeadRepository();
+        $contact          = $campaignLeadRepo->findOneBy(['lead' => 2, 'campaign' => $campaignId]);
+        $contact->setManuallyRemoved(true);
+        $campaignLeadRepo->saveEntity($contact);
 
-    public function testCampaignCountsBeforeSummarizeCommandWithSummaryAndRange(): void
-    {
-        $this->getCountAndDetails(false, false, 0, 0, 0);
-    }
+        // Contacts with at least one positive event log
+        $logsCount = $this->campaignModel->getRepository()->getCampaignLeadCount($campaignId, null, []);
+        $this->assertSame(1, $logsCount);
 
-    public function testCampaignCountsAfterSummarizeCommandWithoutSummaryAndRange(): void
-    {
-        $this->getCountAndDetails(false, true, 100, 2, 0);
-    }
+        // All contacts except those who were manually removed
+        $allContactsCount = $this->campaignModel->getRepository()->getCampaignLeadCount($campaignId);
+        $this->assertSame(1, $allContactsCount);
 
-    public function testCampaignCountsAfterSummarizeCommandWithSummaryWithoutRange(): void
-    {
-        $this->getCountAndDetails(false, true, 100, 2, 0);
-    }
-
-    public function testCampaignCountsAfterSummarizeCommandWithoutSummaryWithRange(): void
-    {
-        $this->getCountAndDetails(false, true, 100, 2, 0);
-    }
-
-    public function testCampaignCountsAfterSummarizeCommandWithSummaryAndRange(): void
-    {
-        $this->getCountAndDetails(false, true, 100, 2, 0);
-    }
-
-    public function testCampaignPendingCountsWithoutSummaryAndRange(): void
-    {
-        $this->getCountAndDetails(true, true, 100, 2, 1);
-    }
-
-    public function testCampaignPendingCountsWithSummaryWithoutRange(): void
-    {
-        $this->getCountAndDetails(true, true, 100, 2, 1);
-    }
-
-    public function testCampaignPendingCountsWithoutSummaryWithRange(): void
-    {
-        $this->getCountAndDetails(true, true, 100, 2, 1);
-    }
-
-    public function testCampaignPendingCountsWithSummaryAndRange(): void
-    {
-        $this->getCountAndDetails(true, true, 100, 2, 1);
-    }
-
-    private function getStatTotalContacts(int $campaignId): int
-    {
+        // check metrics action
         $from = date('Y-m-d', strtotime('-2 months'));
         $to   = date('Y-m-d', strtotime('-1 month'));
 
         $stats = $this->campaignModel->getCampaignMetricsLineChartData(
             null,
-            new \DateTime($from),
-            new \DateTime($to),
+            new \DateTime('2020-10-21'),
+            new \DateTime('2020-11-22'),
             null,
-            ['campaign_id' => $campaignId]
+            ['groupBy' => 'h']
         );
-        $datasets      = $stats['datasets'] ?? [];
 
-        return $this->processTotalContactStats($datasets);
+        $this->checkCampaignMetrics($stats);
     }
 
-    private function getCanvasTotalContacts(int $campaignId): int
+    private function checkCampaignMetrics(array $stats): void
     {
-        $from = date('Y-m-d', strtotime('-2 months'));
-        $to   = date('Y-m-d', strtotime('-1 month'));
-        $this->client->request('GET', sprintf('s/campaigns/graph/%d/%s/%s', $campaignId, $from, $to));
-        $response      = $this->client->getResponse();
-        $body          = json_decode($response->getContent(), true);
-        $crawler       = new Crawler($body['newContent']);
-        $canvasJson    = trim($crawler->filter('canvas')->html());
-        $canvasData    = json_decode($canvasJson, true);
-        $datasets      = $canvasData['datasets'] ?? [];
-        $this->client->restart();
-
-        return $this->processTotalContactStats($datasets);
-    }
-
-    /**
-     * @param array<string, array<int|string>> $datasets
-     */
-    private function processTotalContactStats(array $datasets): int
-    {
-        $totalContacts = 0;
-
-        foreach ($datasets as $dataset) {
-            if ($dataset['label'] === $this->campaignLeadsLabel) {
-                $data          = $dataset['data'] ?? [];
-                $totalContacts = array_sum($data);
-                break;
-            }
+        $labels = $stats['labels'];
+        $this->assertCount(792, $labels);
+        foreach ($labels as $label) {
+            $this->assertMatchesRegularExpression('/^[A-Z]{3} \d\d?, \d\d?:/', $label);
         }
 
-        return $totalContacts;
+        $datasets = $stats['datasets'];
+        $this->assertCount(4, $datasets);
+
+        $pending    = $datasets[0];
+        $completed  = $datasets[1];
+        $notriggers = $datasets[2];
+        $failed     = $datasets[3];
+
+        $this->assertEquals('Pending', $pending['label']);
+        $this->assertEquals('rgba(219, 136, 14, 0.8)', $pending['backgroundColor']);
+        $this->assertEquals('rgba(219, 136, 14, 0.8)', $pending['borderColor']);
+        $this->assertEquals(false, $pending['fill']);
+
+        $this->assertEquals('Completed', $completed['label']);
+        $this->assertEquals('rgba(44, 151, 71, 0.8)', $completed['backgroundColor']);
+        $this->assertEquals('rgba(44, 151, 71, 0.8)', $completed['borderColor']);
+        $this->assertEquals(false, $completed['fill']);
+
+        $this->assertEquals('Triggered but not executed', $notriggers['label']);
+        $this->assertEquals('rgba(134, 65, 244, 0.8)', $notriggers['backgroundColor']);
+        $this->assertEquals('rgba(134, 65, 244, 0.8)', $notriggers['borderColor']);
+        $this->assertEquals(false, $notriggers['fill']);
+
+        $this->assertEquals('Failed', $failed['label']);
+        $this->assertEquals('rgba(188, 38, 28, 0.8)', $failed['backgroundColor']);
+        $this->assertEquals('rgba(188, 38, 28, 0.8)', $failed['borderColor']);
+        $this->assertEquals(false, $failed['fill']);
+
+        $this->assertCount(792, $pending['data']);
+        $this->assertCount(792, $completed['data']);
+        $this->assertCount(792, $notriggers['data']);
+        $this->assertCount(792, $failed['data']);
+
+        $this->assertEquals(0, array_sum($completed['data']));
+        $this->assertEquals(0, array_sum($notriggers['data']));
+        $this->assertEquals(0, array_sum($failed['data']));
     }
 
-    private function getCrawlers(int $campaignId): Crawler
+    public function testCampaignEventLeadLogs(): void
     {
-        $from = date('Y-m-d', strtotime('-2 months'));
-        $to   = date('Y-m-d', strtotime('-1 month'));
-        $url  = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaignId, $from, $to);
-        $this->client->request('GET', $url);
-        $response = $this->client->getResponse();
-        $body     = json_decode($response->getContent(), true);
-        $this->client->restart();
-
-        return new Crawler($body['actions']);
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function getActionCounts(int $campaignId): array
-    {
-        $crawler        = $this->getCrawlers($campaignId);
-        $successPercent = trim($crawler->filter('.campaign-event-list')->filter('span')->eq(0)->html());
-        $completed      = trim($crawler->filter('.campaign-event-list')->filter('span')->eq(1)->html());
-        $pending        = trim($crawler->filter('.campaign-event-list')->filter('span')->eq(2)->html());
-
-        return [
-            'successPercent' => $successPercent,
-            'completed'      => $completed,
-            'pending'        => $pending,
-        ];
-    }
-
-    private function campaignContactCountThroughStats(): void
-    {
-        $campaign   = $this->saveSomeCampaignLeadEventLogs();
+        $campaign   = $this->saveSomeCampaignLeadEventLogs(true);
         $campaignId = $campaign->getId();
+        $eventId    = $campaign->getAllEvents()['decision'][0]->getId();
 
-        $totalContacts = $this->getStatTotalContacts($campaignId);
-        Assert::assertSame(2, $totalContacts);
-    }
-
-    private function campaignContactCountOnCanvas(): void
-    {
-        $campaign      = $this->saveSomeCampaignLeadEventLogs();
-        $campaignId    = $campaign->getId();
-        $totalContacts = $this->getCanvasTotalContacts($campaignId);
-        Assert::assertSame(2, $totalContacts);
-    }
-
-    private function getCountAndDetails(bool $emulatePendingCount, bool $runCommand, int $expectedSuccessPercent, int $expectedCompleted, int $expectedPending): void
-    {
-        $campaign   = $this->saveSomeCampaignLeadEventLogs($emulatePendingCount);
-        $campaignId = $campaign->getId();
-
-        if ($runCommand) {
-            $this->testSymfonyCommand(
-                SummarizeCommand::NAME,
-                [
-                    '--env'       => 'test',
-                    '--max-hours' => 768,
-                ]
-            );
-        }
-
-        $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame($expectedSuccessPercent.'%', $actionCounts['successPercent']);
-        Assert::assertSame($expectedCompleted, (int) $actionCounts['completed']);
-        Assert::assertSame($expectedPending, (int) $actionCounts['pending']);
-    }
-
-    public function testDeleteCampaign(): void
-    {
-        $lead              = $this->createLead();
-        $campaign          = $this->createCampaign();
-        $event             = $this->createEvent('Event 1', $campaign);
-        $this->createEventLog($lead, $event, $campaign);
-
-        $this->client->request(Request::METHOD_POST, '/s/campaigns/delete/'.$campaign->getId());
-
+        // Check the stats based on different date ranges
+        $this->client->request('GET', sprintf('s/campaigns/events/stats/%d/%s/%s', $eventId, '2020-10-24 13:20:44', '2020-11-22 16:34:00'));
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        $this->assertTrue($response->isOk());
+        $body = json_decode($response->getContent(), true);
+        $this->assertCount(1, $body['related']);
+        $this->assertCount(2, $body['data']);
 
-        $eventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
-        Assert::assertCount(0, $eventLogs);
-    }
-
-    private function createLead(): Lead
-    {
-        $lead = new Lead();
-        $lead->setFirstname('Test');
-        $this->em->persist($lead);
-        $this->em->flush();
-
-        return $lead;
-    }
-
-    private function createCampaign(): Campaign
-    {
-        $campaign = new Campaign();
-        $campaign->setName('My campaign');
-        $this->em->persist($campaign);
-        $this->em->flush();
-
-        return $campaign;
-    }
-
-    private function createEvent(string $name, Campaign $campaign): Event
-    {
-        $event = new Event();
-        $event->setName($name);
-        $event->setCampaign($campaign);
-        $event->setType('email.send');
-        $event->setEventType('action');
-        $this->em->persist($event);
-        $this->em->flush();
-
-        return $event;
-    }
-
-    private function createEventLog(Lead $lead, Event $event, Campaign $campaign): LeadEventLog
-    {
-        $leadEventLog = new LeadEventLog();
-        $leadEventLog->setLead($lead);
-        $leadEventLog->setEvent($event);
-        $leadEventLog->setCampaign($campaign);
-        $this->em->persist($leadEventLog);
-        $this->em->flush();
-
-        return $leadEventLog;
-    }
-
-    public function testCampaignView(): void
-    {
-        $campaign = $this->saveSomeCampaignLeadEventLogs();
-        $crawler  = $this->client->request('GET', sprintf('/s/campaigns/view/%d', $campaign->getId()));
+        $this->client->request('GET', sprintf('s/campaigns/events/stats/%d/%s/%s', $eventId, '2020-10-24 13:20:44', '2020-10-24 13:20:44'));
         $response = $this->client->getResponse();
-        self::assertTrue($response->isOk());
-        self::assertStringContainsString('Campaign ABC', $response->getContent());
-        self::assertSame('', trim($crawler->filter('#decisions-container')->text()));
-        self::assertSame('', trim($crawler->filter('#actions-container')->text()));
-        self::assertSame('', trim($crawler->filter('#conditions-container')->text()));
-        self::assertSame('', trim($crawler->filter('#campaign-graph-div')->text()));
+        $this->assertTrue($response->isOk());
+        $body = json_decode($response->getContent(), true);
+        $this->assertCount(0, $body['related']);
+        $this->assertCount(0, $body['data']);
     }
 
     public function testCampaignViewEvents(): void
@@ -342,11 +235,150 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         $from     = date('Y-m-d', strtotime('-2 months'));
         $to       = date('Y-m-d', strtotime('-1 month'));
         $campaign = $this->saveSomeCampaignLeadEventLogs();
-        $this->client->request('GET', sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $from, $to));
+        $this->client->request('GET', sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), '2020-11-20 16:34:00', '2020-11-22 16:34:00'));
         $response = $this->client->getResponse();
-        self::assertTrue($response->isOk());
+
         $body     = json_decode($response->getContent(), true);
         self::assertCount(2, $body);
         self::arrayHasKey('actions');
+        self::assertStringContainsString('100% 2 0 Event A mautic.campaign.type.a 100% 2 0 Event B mautic.campaign.type.b', preg_replace('/\s+/', ' ', strip_tags($body['actions'])));
+    }
+
+    public function testCampaignViewGraph(): void
+    {
+        $campaign = $this->saveSomeCampaignLeadEventLogs();
+        $this->client->request('GET', sprintf('s/campaigns/graph/%d/%s/%s', $campaign->getId(), '2020-10-21', '2020-11-22'));
+        $response = $this->client->getResponse();
+
+        $body = json_decode($response->getContent(), true);
+        self::assertCount(1, $body);
+        self::arrayHasKey('graph');
+        self::assertStringContainsString('cy.elements', $body['graph']);
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->em            = self::$kernel->getContainer()->get('doctrine.orm.entity_manager');
+        $this->campaignModel = self::$kernel->getContainer()->get('mautic.campaign.model.campaign');
+    }
+
+    /**
+     * Create a campaign, two events, and two contacts who moved through those events.
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function saveSomeCampaignLeadEventLogs(bool $decision = false): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Campaign event log test');
+        $campaign->setCanvasSettings(['settings' => [], 'nodes' => []]);
+
+        $now    = new \DateTime();
+        $events = [];
+        // Create action event A
+        $events['a'] = new Event();
+
+        if ($decision) {
+            $events['a']->setEventType(Event::TYPE_DECISION);
+            $events['a']->setTriggerMode(Event::TRIGGER_MODE_IMMEDIATE);
+            $events['a']->setName('Event A');
+            $events['a']->setType('mautic.campaign.type.a');
+
+            // Create action event C
+            $events['c'] = new Event();
+            $events['c']->setEventType(Event::TYPE_DECISION);
+            $events['c']->setTriggerMode(Event::TRIGGER_MODE_IMMEDIATE);
+            $events['c']->setName('Event C');
+            $events['c']->setType('mautic.campaign.type.c');
+
+            $events['a']->setChildrenFlowIds([3]);
+            $events['a']->setPositionX(100);
+            $events['a']->setPositionY(100);
+            $events['c']->setParentId($events['a']->getId());
+            $events['c']->setPositionX(200);
+            $events['c']->setPositionY(200);
+        } else {
+            $events['a']->setEventType(Event::TYPE_ACTION);
+            $events['a']->setTriggerMode(Event::TRIGGER_MODE_IMMEDIATE);
+            $events['a']->setName('Event A');
+            $events['a']->setType('mautic.campaign.type.a');
+        }
+
+        // Create action event B
+        $events['b'] = new Event();
+        $events['b']->setEventType(Event::TYPE_ACTION);
+        $events['b']->setTriggerMode(Event::TRIGGER_MODE_IMMEDIATE);
+        $events['b']->setName('Event B');
+        $events['b']->setType('mautic.campaign.type.b');
+
+        foreach ($events as $key => $event) {
+            $campaign->addEvent($key, $event);
+            $this->em->persist($event);
+        }
+
+        // Save campaign
+        $this->campaignModel->saveEntity($campaign);
+
+        // Create a lead
+        $lead1 = $this->createLeads(1)[0];
+        $lead2 = $this->createLeads(1, 2)[0];
+
+        // Add lead to the campaign
+        $campaignLead1 = new CampaignLead();
+        $campaignLead1->setCampaign($campaign);
+        $campaignLead1->setLead($lead1);
+        $campaignLead1->setDateAdded($now);
+        $this->em->persist($campaignLead1);
+
+        $campaignLead2 = new CampaignLead();
+        $campaignLead2->setCampaign($campaign);
+        $campaignLead2->setLead($lead2);
+        $campaignLead2->setDateAdded($now);
+        $this->em->persist($campaignLead2);
+
+        // Trigger events for lead 1
+        $this->addLeadEventLog($lead1, $events['a'], true, $campaign);
+        $this->addLeadEventLog($lead1, $events['b'], true, $campaign);
+
+        // Trigger events for lead 2
+        $this->addLeadEventLog($lead2, $events['a'], true, $campaign);
+        $this->addLeadEventLog($lead2, $events['b'], true, $campaign);
+
+        // Make sure that events counts are there
+        foreach ($events as $event) {
+            $this->preloadEventCounts($event);
+        }
+
+        $this->em->flush();
+        $this->em->clear();
+
+        return $campaign;
+    }
+
+    private function addLeadEventLog(object $lead, Event $event, bool $isScheduled, Campaign $campaign): void
+    {
+        $log = new LeadEventLog();
+        $log->setLead($lead);
+        $log->setEvent($event);
+        $log->setCampaign($campaign);
+        $log->setDateTriggered(new \DateTime());
+        $log->setIsScheduled($isScheduled);
+        $this->em->persist($log);
+    }
+
+    private function preloadEventCounts(Event $event): void
+    {
+        $qb     = $this->em->getConnection()->createQueryBuilder();
+        $counts = $qb->select('COUNT(*) as count, SUM(ll.is_scheduled) as scheduled, SUM(ll.triggered) as triggered')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
+            ->where(
+                $qb->expr()->and(
+                    $qb->expr()->eq('ll.event_id', $event->getId())
+                )
+            )->execute()->fetchAssociative();
+
+        $event->setTriggerCount($counts['triggered']);
+        $event->setExecutionCount($counts['count'] - $counts['scheduled']);
     }
 }

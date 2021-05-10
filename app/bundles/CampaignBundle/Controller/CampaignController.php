@@ -2,6 +2,9 @@
 
 namespace Mautic\CampaignBundle\Controller;
 
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\DBAL\Cache\CacheException;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -156,8 +159,8 @@ class CampaignController extends AbstractStandardFormController
         $objectId,
         $page = 1,
         $count = null,
-        \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null,
+        DateTimeInterface $dateFrom = null,
+        DateTimeInterface $dateTo = null
     ) {
         $session = $request->getSession();
         $session->set('mautic.campaign.contact.page', $page);
@@ -197,20 +200,24 @@ class CampaignController extends AbstractStandardFormController
         $events          = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($objectId);
         $dateFrom        = null;
         $dateTo          = null;
+<<<<<<< HEAD
         $dateToPlusOne   = null;
+=======
+        $this->setCoreParametersHelper($this->get('mautic.config'));
+>>>>>>> 7a0e5d2240 (Merge pull request #1372 from acquia/MAUT-5363)
         if ($this->coreParametersHelper->get('campaign_by_range')) {
-            $dateFrom      = new \DateTimeImmutable($dateFromValue);
-            $dateTo        = new \DateTimeImmutable($dateToValue);
-            $dateToPlusOne = $dateTo->modify('+1 day');
+            $dateFrom = new DateTimeImmutable($dateFromValue);
+            $dateTo   = new DateTimeImmutable($dateToValue);
+            $dateTo   = $dateTo->modify('+1 day');
         }
 
-        $leadCount = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($objectId);
-        $logCounts = $this->processCampaignLogCounts($objectId, $dateFrom, $dateToPlusOne);
+        $hasCampaignLeads = $this->getCampaignModel()->getRepository()->hasCampaignLeads($objectId);
+        $logCounts        = $this->processCampaignLogCounts($objectId, $dateFrom, $dateTo);
 
         $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
         $campaignLogCountsProcessed = $logCounts['campaignLogCountsProcessed'] ?? [];
 
-        $this->processCampaignEvents($events, $leadCount, $campaignLogCounts, $campaignLogCountsProcessed);
+        $this->processCampaignEvents($events, $hasCampaignLeads, $campaignLogCounts, $campaignLogCountsProcessed);
         $sortedEvents           = $this->processCampaignEventsFromParentCondition($events);
 
         $sourcesList     = $this->getCampaignModel()->getSourceLists();
@@ -244,8 +251,8 @@ class CampaignController extends AbstractStandardFormController
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $stats           = $this->getCampaignModel()->getCampaignMetricsLineChartData(
             null,
-            new \DateTime($dateRangeForm->get('date_from')->getData()),
-            new \DateTime($dateRangeForm->get('date_to')->getData()),
+            new DateTime($dateRangeForm->get('date_from')->getData()),
+            new DateTime($dateRangeForm->get('date_to')->getData()),
             null,
             ['campaign_id' => $objectId]
         );
@@ -643,12 +650,21 @@ class CampaignController extends AbstractStandardFormController
     protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, $isClone = false)
     {
         $sessionId = $this->getCampaignSessionId($entity, $action, $objectId);
+<<<<<<< HEAD
         // set added/updated events
         [$this->modifiedEvents, $this->deletedEvents, $this->campaignEvents] = $this->getSessionEvents($sessionId);
 
         // set added/updated sources
         [$this->addedSources, $this->deletedSources, $campaignSources]     = $this->getSessionSources($sessionId, $isClone);
         $this->connections                                                 = $this->getSessionCanvasSettings($sessionId);
+=======
+        //set added/updated events
+        [$this->modifiedEvents, $this->deletedEvents, $this->campaignEvents] = $this->getSessionEvents($sessionId);
+
+        //set added/updated sources
+        [$this->addedSources, $this->deletedSources, $campaignSources] = $this->getSessionSources($sessionId, $isClone);
+        $this->connections                                             = $this->getSessionCanvasSettings($sessionId);
+>>>>>>> 7a0e5d2240 (Merge pull request #1372 from acquia/MAUT-5363)
 
         if ($isPost) {
             $this->getCampaignModel()->setCanvasSettings($entity, $this->connections, false, $this->modifiedEvents);
@@ -833,7 +849,7 @@ class CampaignController extends AbstractStandardFormController
 
         $joinLists = $joinForms = false;
         if (!empty($currentFilters)) {
-            $listIds = $catIds = [];
+            $listIds = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 $listFilters['filters']['groups']['mautic.campaign.leadsource.'.$type]['values'] = $typeFilters;
 
@@ -1108,10 +1124,11 @@ class CampaignController extends AbstractStandardFormController
      *
      * @throws CacheException
      */
-    private function processCampaignLogCounts(int $id, ?\DateTimeImmutable $dateFrom, ?\DateTimeImmutable $dateToPlusOne): array
+    private function processCampaignLogCounts(int $id, ?DateTimeInterface $dateFrom, ?DateTimeInterface $dateTo): array
     {
         if ($this->coreParametersHelper->get('campaign_use_summary')) {
             /** @var SummaryRepository $summaryRepo */
+<<<<<<< HEAD
             $summaryRepo                = $this->doctrine->getManager()->getRepository(Summary::class);
             $campaignLogCounts          = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateToPlusOne);
             $campaignLogCountsProcessed = $this->getCampaignLogCountsProcessed($campaignLogCounts);
@@ -1120,6 +1137,16 @@ class CampaignController extends AbstractStandardFormController
             $eventLogRepo               = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
             $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, true, $dateFrom, $dateToPlusOne);
             $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateToPlusOne);
+=======
+            $summaryRepo                = $this->getDoctrine()->getManager()->getRepository(Summary::class);
+            $campaignLogCounts          = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateTo);
+            $campaignLogCountsProcessed = $this->getCampaignLogCountsProcessed($campaignLogCounts);
+        } else {
+            /** @var LeadEventLogRepository $eventLogRepo */
+            $eventLogRepo               = $this->getDoctrine()->getManager()->getRepository(LeadEventLog::class);
+            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, true, $dateFrom, $dateTo);
+            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateTo);
+>>>>>>> 7a0e5d2240 (Merge pull request #1372 from acquia/MAUT-5363)
         }
 
         return [
@@ -1135,7 +1162,7 @@ class CampaignController extends AbstractStandardFormController
      */
     private function processCampaignEvents(
         array &$events,
-        int $leadCount,
+        bool $hasCampaignLeads,
         array $campaignLogCounts,
         array $campaignLogCountsProcessed,
     ): void {
@@ -1155,7 +1182,7 @@ class CampaignController extends AbstractStandardFormController
                 [$totalNo, $totalYes]        = $campaignLogCounts[$event['id']];
                 $total                       = $totalYes + $totalNo;
 
-                if ($leadCount) {
+                if ($hasCampaignLeads) {
                     $event['percent']    = min(100, max(0, round(($loggedCount / $total) * 100, 1)));
                     $event['yesPercent'] = min(100, max(0, round(($totalYes / $total) * 100, 1)));
                     $event['noPercent']  = min(100, max(0, round(($totalNo / $total) * 100, 1)));

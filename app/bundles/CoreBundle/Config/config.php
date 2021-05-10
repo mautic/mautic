@@ -184,6 +184,20 @@ return [
                     '%router.request_context.base_url%',
                 ],
             ],
+            'mautic.core.subscriber.editor_assets' => [
+                'class'       => Mautic\CoreBundle\EventListener\EditorFontsSubscriber::class,
+                'arguments'   => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.core.subscriber.migration_command' => [
+                'class'       => Mautic\CoreBundle\EventListener\MigrationCommandSubscriber::class,
+                'arguments'   => [
+                    'mautic.database.version.provider',
+                    'mautic.generated.columns.provider',
+                    'database_connection',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.dynamic_content_filter_entry_filters' => [

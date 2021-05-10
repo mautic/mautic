@@ -153,8 +153,8 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('listTableColumns')
             ->willReturn(['id' => new \stdClass()]);
 
-        $this->connection->expects($this->once())
-            ->method('executeQuery');
+        $this->connection->expects($this->atLeastOnce())
+            ->method('query');
 
         $this->subscriber->addGeneratedColumns($this->event);
     }

@@ -125,6 +125,230 @@ return [
     ],
 
     'services' => [
+        'events' => [
+            'mautic.campaign.subscriber'                          => [
+                'class'     => Mautic\CampaignBundle\EventListener\CampaignSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                    'mautic.campaign.service.campaign',
+                    'mautic.core.service.flashbag',
+                ],
+            ],
+            'mautic.campaign.subscriber.campaign_event_delete'                    => [
+                'class'       => Mautic\CampaignBundle\EventListener\CampaignEventDeleteSubscriber::class,
+                'arguments'   => [
+                    'mautic.campaign.repository.lead_event_log',
+                    'mautic.helper.campaign_config',
+                    'mautic.campaign.model.campaign',
+                    'mautic.campaign.model.event',
+                ],
+            ],
+            'mautic.campaign.leadbundle.subscriber'               => [
+                'class'     => Mautic\CampaignBundle\EventListener\LeadSubscriber::class,
+                'arguments' => [
+                    'mautic.campaign.membership.manager',
+                    'mautic.campaign.event_collector',
+                    'mautic.campaign.model.campaign',
+                    'mautic.lead.model.lead',
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                    'router',
+                    'mautic.security',
+                ],
+            ],
+            'mautic.campaign.calendarbundle.subscriber'           => [
+                'class'     => Mautic\CampaignBundle\EventListener\CalendarSubscriber::class,
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
+                    'translator',
+                    'router',
+                ],
+            ],
+            'mautic.campaign.pointbundle.subscriber'              => [
+                'class' => Mautic\CampaignBundle\EventListener\PointSubscriber::class,
+            ],
+            'mautic.campaign.search.subscriber'                   => [
+                'class'     => Mautic\CampaignBundle\EventListener\SearchSubscriber::class,
+                'arguments' => [
+                    'mautic.campaign.model.campaign',
+                    'mautic.security',
+                    'mautic.helper.templating',
+                ],
+            ],
+            'mautic.campaign.dashboard.subscriber'                => [
+                'class'     => Mautic\CampaignBundle\EventListener\DashboardSubscriber::class,
+                'arguments' => [
+                    'mautic.campaign.model.campaign',
+                    'mautic.campaign.model.event',
+                ],
+            ],
+            'mautic.campaignconfigbundle.subscriber'              => [
+                'class' => Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
+            ],
+            'mautic.campaign.stats.subscriber'                    => [
+                'class'     => Mautic\CampaignBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'mautic.security',
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.campaign.report.subscriber'                   => [
+                'class'     => Mautic\CampaignBundle\EventListener\ReportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.company_report_data',
+                ],
+            ],
+            'mautic.campaign.action.change_membership.subscriber' => [
+                'class'     => Mautic\CampaignBundle\EventListener\CampaignActionChangeMembershipSubscriber::class,
+                'arguments' => [
+                    'mautic.campaign.membership.manager',
+                    'mautic.campaign.model.campaign',
+                ],
+            ],
+            'mautic.campaign.action.jump_to_event.subscriber'     => [
+                'class'     => Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber::class,
+                'arguments' => [
+                    'mautic.campaign.repository.event',
+                    'mautic.campaign.event_executioner',
+                    'translator',
+                ],
+            ],
+            'mautic.campaign.event.subscriber'                    => [
+                'class'     => Mautic\CampaignBundle\EventListener\CampaignEventSubscriber::class,
+                'arguments' => [
+                    'mautic.campaign.repository.event',
+                    'mautic.campaign.helper.notification',
+                    'mautic.campaign.model.campaign',
+                    'mautic.campaign.repository.lead_event_log',
+                ],
+            ],
+            'mautic.campaign.update.subscriber'                   => [
+                'class' => Mautic\CampaignBundle\EventListener\CampaignUpdateSubscriber::class,
+            ],
+            'mautic.campaign.generated_columns.subscriber' => [
+                'class' => Mautic\CampaignBundle\EventListener\GeneratedColumnSubscriber::class,
+            ],
+        ],
+        'forms'        => [
+            'mautic.campaign.type.form'                 => [
+                'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignType',
+                'arguments' => 'mautic.security',
+            ],
+            'mautic.campaignrange.type.action'          => [
+                'class' => 'Mautic\CampaignBundle\Form\Type\EventType',
+            ],
+            'mautic.campaign.type.campaignlist'         => [
+                'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignListType',
+                'arguments' => [
+                    'mautic.campaign.model.campaign',
+                    'translator',
+                    'mautic.security',
+                ],
+            ],
+            'mautic.campaign.type.trigger.leadchange'   => [
+                'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventLeadChangeType',
+            ],
+            'mautic.campaign.type.action.addremovelead' => [
+                'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType',
+            ],
+            'mautic.campaign.type.action.jump_to_event' => [
+                'class' => Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType::class,
+            ],
+            'mautic.campaign.type.canvassettings'       => [
+                'class' => 'Mautic\CampaignBundle\Form\Type\EventCanvasSettingsType',
+            ],
+            'mautic.campaign.type.leadsource'           => [
+                'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType',
+                'arguments' => 'mautic.factory',
+            ],
+            'mautic.form.type.campaignconfig'           => [
+                'class'     => 'Mautic\CampaignBundle\Form\Type\ConfigType',
+                'arguments' => 'translator',
+            ],
+        ],
+        'models' => [
+            'mautic.campaign.model.campaign' => [
+                'class'     => Mautic\CampaignBundle\Model\CampaignModel::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.list',
+                    'mautic.form.model.form',
+                    'mautic.campaign.event_collector',
+                    'mautic.campaign.membership.builder',
+                    'mautic.generated.columns.provider',
+                ],
+            ],
+            'mautic.campaign.model.event'     => [
+                'class'     => Mautic\CampaignBundle\Model\EventModel::class,
+                'arguments' => [
+                    'mautic.user.model.user',
+                    'mautic.core.model.notification',
+                    'mautic.campaign.model.campaign',
+                    'mautic.lead.model.lead',
+                    'mautic.helper.ip_lookup',
+                    'mautic.campaign.executioner.realtime',
+                    'mautic.campaign.executioner.kickoff',
+                    'mautic.campaign.executioner.scheduled',
+                    'mautic.campaign.executioner.inactive',
+                    'mautic.campaign.event_executioner',
+                    'mautic.campaign.event_collector',
+                    'mautic.campaign.dispatcher.action',
+                    'mautic.campaign.dispatcher.condition',
+                    'mautic.campaign.dispatcher.decision',
+                    'mautic.campaign.repository.lead_event_log',
+                ],
+            ],
+            'mautic.campaign.model.event_log' => [
+                'class'     => 'Mautic\CampaignBundle\Model\EventLogModel',
+                'arguments' => [
+                    'mautic.campaign.model.event',
+                    'mautic.campaign.model.campaign',
+                    'mautic.helper.ip_lookup',
+                    'mautic.campaign.scheduler',
+                ],
+            ],
+            'mautic.campaign.model.summary' => [
+                'class'     => Mautic\CampaignBundle\Model\SummaryModel::class,
+            ],
+        ],
+        'repositories' => [
+            'mautic.campaign.repository.campaign' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    Mautic\CampaignBundle\Entity\Campaign::class,
+                ],
+            ],
+            'mautic.campaign.repository.lead' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    Mautic\CampaignBundle\Entity\Lead::class,
+                ],
+            ],
+            'mautic.campaign.repository.event' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    Mautic\CampaignBundle\Entity\Event::class,
+                ],
+            ],
+            'mautic.campaign.repository.lead_event_log' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    Mautic\CampaignBundle\Entity\LeadEventLog::class,
+                ],
+            ],
+            'mautic.campaign.repository.summary' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    Mautic\CampaignBundle\Entity\Summary::class,
+                ],
+            ],
+        ],
         'execution'    => [
             'mautic.campaign.contact_finder.kickoff'  => [
                 'class'     => Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder::class,

@@ -6,25 +6,107 @@ namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Mapping\GeneratedColumn;
 
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
-class GeneratedColumnsTest extends \PHPUnit\Framework\TestCase
+class GeneratedColumnsTest extends TestCase
 {
-    public function testAllGettersAndSeters(): void
+    /**
+     * @var GeneratedColumns
+     */
+    private $generatedColumns;
+
+    protected function setUp(): void
     {
-        $generatedColumn1 = new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important');
-        $generatedColumn2 = new GeneratedColumn('page_hits2', 'generated_hit_date2', 'DATE', 'not important');
+        parent::setUp();
+        $this->generatedColumns = new GeneratedColumns();
+    }
 
-        $generatedColumn2->setOriginalDateColumn('date_hit', 'd');
+    public function testIterator(): void
+    {
+        $columns = [
+            new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'),
+            new GeneratedColumn('page_hits2', 'generated_hit_date2', 'DATE', 'not important'),
+        ];
 
-        $generatedColumns = new GeneratedColumns();
+        foreach ($columns as $column) {
+            $this->generatedColumns->add($column);
+        }
 
-        $generatedColumns->add($generatedColumn1);
-        $generatedColumns->add($generatedColumn2);
+        Assert::assertSame(count($columns), count($this->generatedColumns));
 
-        $this->assertCount(2, $generatedColumns);
-        $this->assertSame($generatedColumn2, $generatedColumns->getForOriginalDateColumnAndUnit('date_hit', 'd'));
+        foreach ($this->generatedColumns as $index => $column) {
+            Assert::assertSame($columns[$index], $column);
+        }
+    }
+
+    public function testGetForOriginalDateColumnAndUnitDoesNotRespectTableName(): void
+    {
+        $generatedColumn1 = new GeneratedColumn('page_hits', 'generated_added_date', 'DATE', 'not important');
+        $generatedColumn1->setOriginalDateColumn('date_added', 'd');
+        $this->generatedColumns->add($generatedColumn1);
+
+        $generatedColumn2 = new GeneratedColumn('downloads', 'generated_added_date', 'DATE', 'not important');
+        $generatedColumn2->setOriginalDateColumn('date_added', 'd');
+        $this->generatedColumns->add($generatedColumn2);
+
+        /* @noinspection PhpDeprecationInspection */
+        $this->assertSame($generatedColumn2, $this->generatedColumns->getForOriginalDateColumnAndUnit('date_added', 'd'));
+    }
+
+    /**
+     * @dataProvider dataGetForOriginalDateColumnAndUnitUnexpectedValue
+     */
+    public function testGetForOriginalDateColumnAndUnitUnexpectedValueIsThrown(string $column, string $unit): void
+    {
+        $generatedColumn = new GeneratedColumn('page_hits', 'generated_added_date', 'DATE', 'not important');
+        $generatedColumn->setOriginalDateColumn('date_added', 'd');
+        $this->generatedColumns->add($generatedColumn);
 
         $this->expectException(\UnexpectedValueException::class);
-        $generatedColumns->getForOriginalDateColumnAndUnit('not-found', 'd');
+        /* @noinspection PhpDeprecationInspection */
+        $this->generatedColumns->getForOriginalDateColumnAndUnit($column, $unit);
+    }
+
+    public function dataGetForOriginalDateColumnAndUnitUnexpectedValue(): iterable
+    {
+        yield ['date_added', 'Y'];
+        yield ['date_updated', 'd'];
+        yield ['non-existent', 'i'];
+    }
+
+    public function testGetGeneratedColumnForDateColumnRespectsTableName(): void
+    {
+        $generatedColumn1 = new GeneratedColumn('page_hits', 'generated_added_date', 'DATE', 'not important');
+        $generatedColumn1->setOriginalDateColumn('date_added', 'd');
+        $this->generatedColumns->add($generatedColumn1);
+
+        $generatedColumn2 = new GeneratedColumn('downloads', 'generated_added_date', 'DATE', 'not important');
+        $generatedColumn2->setOriginalDateColumn('date_added', 'd');
+        $this->generatedColumns->add($generatedColumn2);
+
+        $this->assertSame($generatedColumn1, $this->generatedColumns->getGeneratedColumnForDateColumn('page_hits', 'date_added', 'd'));
+        $this->assertSame($generatedColumn2, $this->generatedColumns->getGeneratedColumnForDateColumn('downloads', 'date_added', 'd'));
+    }
+
+    /**
+     * @dataProvider dataGetGeneratedColumnForDateColumnUnexpectedValue
+     */
+    public function testGetGeneratedColumnForDateColumnUnexpectedValueIsThrown(string $table, string $column, string $unit): void
+    {
+        $generatedColumn = new GeneratedColumn('page_hits', 'generated_added_date', 'DATE', 'not important');
+        $generatedColumn->setOriginalDateColumn('date_added', 'd');
+        $this->generatedColumns->add($generatedColumn);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->generatedColumns->getGeneratedColumnForDateColumn($table, $column, $unit);
+    }
+
+    public function dataGetGeneratedColumnForDateColumnUnexpectedValue(): iterable
+    {
+        yield ['page_hits', 'date_added', 'Y'];
+        yield ['page_hits', 'date_updated', 'd'];
+        yield ['non-existent', 'date_added', 'd'];
+        yield ['non-existent', 'non-existent', 'i'];
     }
 }

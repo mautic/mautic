@@ -12,14 +12,21 @@ use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChartQueryTest extends \PHPUnit\Framework\TestCase
+class ChartQueryTest extends TestCase
 {
-    private \DateTime $dateFrom;
+    /**
+     * @var \DateTime
+     */
+    private $dateFrom;
 
     private DateTimeHelper $dateTimeHelper;
 
-    private \DateTime $dateTo;
+    /**
+     * @var \DateTime
+     */
+    private $dateTo;
 
     /**
      * @var MockObject|Connection
@@ -87,10 +94,11 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
 
         $generatedColumn->addIndexColumn('email_id');
+        $generatedColumn->setFilterDateColumn('generated_sent_date');
         $generatedColumn->setOriginalDateColumn($this->dateColumn, $this->unit);
         $generatedColumns->add($generatedColumn);
 
-        $generatedColumnsProvider->expects($this->once())
+        $generatedColumnsProvider->expects($this->exactly(2))
             ->method('getGeneratedColumns')
             ->willReturn($generatedColumns);
 
@@ -101,12 +109,39 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
             ->with('t.generated_sent_date AS date, COUNT(*) AS count');
 
         $this->queryBuilder->expects($this->once())
+            ->method('andWhere')
+            ->with('t.generated_sent_date BETWEEN :dateFrom AND :dateTo');
+
+        $this->queryBuilder->expects($this->once())
             ->method('groupBy')
             ->with('t.generated_sent_date');
 
         $this->queryBuilder->expects($this->once())
             ->method('orderBy')
             ->with('t.generated_sent_date');
+
+        $this->queryBuilder->method('getQueryPart')
+            ->willReturnMap(
+                [
+                    ['from', [[
+                        'table' => 'emails',
+                        'alias' => 'e',
+                    ]]],
+                    [
+                        'join',
+                        [
+                            'e' => [
+                                [
+                                    'joinType'      => 'inner',
+                                    'joinTable'     => 'email_stats',
+                                    'joinAlias'     => 't',
+                                    'joinCondition' => 't.id = e.id',
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            );
 
         $this->chartQuery->prepareTimeDataQuery('email_stats', $this->dateColumn);
     }
