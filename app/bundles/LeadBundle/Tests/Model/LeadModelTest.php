@@ -270,7 +270,9 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
         $this->fieldModelMock->method('getFieldList')->willReturn([]);
         $this->companyLeadRepositoryMock->method('getEntitiesByLead')->willReturn([]);
-        $this->companyModelMock->expects($this->once())->method('getEntities')->willReturn([]);
+        $this->companyModelMock->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([]);
 
         $this->leadModel->saveEntity($entity);
 
