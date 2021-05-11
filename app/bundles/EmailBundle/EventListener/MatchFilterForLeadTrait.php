@@ -10,6 +10,8 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Mautic\LeadBundle\Segment\OperatorOptions;
+
 /**
  * Trait MatchFilterForLeadTrait.
  */
@@ -63,6 +65,7 @@ trait MatchFilterForLeadTrait
                 $groups[$groupNum] = false;
             }
 
+            /** @var string $leadVal */
             $leadVal   = ($isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']]);
             $filterVal = $data['filter'];
 
@@ -159,29 +162,11 @@ trait MatchFilterForLeadTrait
                     $filterVal         = str_replace('%', '.*', $filterVal);
                     $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/', $leadVal);
                     break;
-                case 'in':
-                    $leadValMatched = false;
-                    foreach ($leadVal as $v) {
-                        if (in_array($v, $filterVal)) {
-                            $leadValMatched = true;
-                            // Break once we find a match
-                            break;
-                        }
-                    }
-                    $groups[$groupNum] = $leadValMatched;
+                case OperatorOptions::IN:
+                    $groups[$groupNum] = in_array($leadVal, $filterVal);
                     break;
-                case '!in':
-                    $leadValNotMatched = true;
-
-                    foreach ($leadVal as $v) {
-                        if (in_array($v, $filterVal)) {
-                            $leadValNotMatched = false;
-                            // Break once we find a match
-                            break;
-                        }
-                    }
-
-                    $groups[$groupNum] = $leadValNotMatched;
+                case OperatorOptions::NOT_IN:
+                    $groups[$groupNum] = !in_array($leadVal, $filterVal);
                     break;
                 case 'regexp':
                     $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/i', $leadVal);
