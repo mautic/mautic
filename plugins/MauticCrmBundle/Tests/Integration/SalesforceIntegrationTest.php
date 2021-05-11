@@ -149,6 +149,9 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     public function testThatMultipleSfLeadsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated()
     {
+        $this->companyModel->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([]);
         $this->specialSfCase = self::SC_MULTIPLE_SF_LEADS;
         $sf                  = $this->getSalesforceIntegration(2, 0, 2, 0, 'Lead');
         $sf->pushLeads();
@@ -164,6 +167,9 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     public function testThatMultipleSfContactsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated()
     {
+        $this->companyModel->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([]);
         $this->specialSfCase = self::SC_MULTIPLE_SF_CONTACTS;
         $sf                  = $this->getSalesforceIntegration(2, 0, 0, 2, 'Contact');
         $sf->pushLeads();

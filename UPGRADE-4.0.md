@@ -70,5 +70,7 @@
     * \Mautic\WebhookBundle\Entity\Webhook::addQueues() removed and there is no replacement
     * \Mautic\WebhookBundle\Entity\Webhook::addQueue() removed and there is no replacement
     * \Mautic\WebhookBundle\Entity\Webhook::removeQueue() removed and there is no replacement
+*   Support for unique fields for companies
+    * Mautic never use unique fields for companies and use hard coded algorithm to match duplicate companies. Mautic 4 add support with Company Name as default unique field. You can configure any other fields and also expression between fields (AND/OR) in Configuration.
 
     
