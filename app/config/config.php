@@ -123,6 +123,11 @@ $container->loadFromExtension('doctrine', [
         'auto_generate_proxy_classes' => '%kernel.debug%',
         'auto_mapping'                => true,
         'mappings'                    => $bundleMetadataBuilder->getOrmConfig(),
+        'dql'                         => [
+            'string_functions' => [
+                'match' => \DoctrineExtensions\Query\Mysql\MatchAgainst::class,
+            ],
+        ],
     ],
 ]);
 
