@@ -11,16 +11,3 @@ coverage:
         # at 0% coverage, as long as the project's total
         # coverage (e.g. 36%) doesn't decrease.
         target: 0%
-
-ignore:
-  - "app/bundles/*Bundle/Config/*"
-  - "app/bundles/*Bundle/DataFixtures/**"
-  - "app/bundles/*Bundle/Tests/**"
-  - "app/bundles/*Bundle/Translations/**"
-  - "app/bundles/*Bundle/Views/**"
-  - "plugins/*Bundle/Config/**"
-  - "plugins/*Bundle/Tests/**"
-  - "plugins/*Bundle/Translations/**"
-  - "plugins/*Bundle/Views/**"
-  - "app/middlewares/Tests/**"
-  - "app/bundles/CoreBundle/Test/**"
