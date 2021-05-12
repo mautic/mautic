@@ -32,6 +32,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "npracht",
+      "name": "Norman Pracht - Webmecanik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14075239?v=4",
+      "profile": "https://www.webmecanik.com",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
