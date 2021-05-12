@@ -5,6 +5,7 @@
 *   Symfony 4
     *   Symfony deprecations were removed or refactored [https://github.com/symfony/symfony/blob/4.4/UPGRADE-4.0.md](https://github.com/symfony/symfony/blob/4.4/UPGRADE-4.0.md)
     *   Services are now private by default in Symfony 4. Mautic has a "hack" to register its own services as public but dependency injection should be preferred for Commands, Controllers, and services. Some Symfony services may no longer be available to the Controller via the Container.
+    *   \Mautic\CoreBundle\Form\Type\YesNoButtonGroupType now uses false/true values which Symfony 4 will convert to empty values for No in the UI. This shouldn't cause issues for most unless the field is using a NotBlank constraint, which is no longer valid, or submitting a form via a functional test with 0 as the value of a YesNoButtonGroupType field. 
 *   Packages removed
     *   debril/rss-atom-bundle removed
     *   egeloen/ordered-form-bundle removed
@@ -69,5 +70,7 @@
     * \Mautic\WebhookBundle\Entity\Webhook::addQueues() removed and there is no replacement
     * \Mautic\WebhookBundle\Entity\Webhook::addQueue() removed and there is no replacement
     * \Mautic\WebhookBundle\Entity\Webhook::removeQueue() removed and there is no replacement
+*   Support for unique fields for companies
+    * Mautic never use unique fields for companies and use hard coded algorithm to match duplicate companies. Mautic 4 add support with Company Name as default unique field. You can configure any other fields and also expression between fields (AND/OR) in Configuration.
 
     
