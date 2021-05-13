@@ -109,6 +109,7 @@
     "predis/predis": "^1.1"
   },
   "replace": {
+    "mautic/grapes-js-builder-bundle": "self.version",
     "mautic/plugin-citrix": "self.version",
     "mautic/plugin-clearbit": "self.version",
     "mautic/plugin-cloudstorage": "self.version",
