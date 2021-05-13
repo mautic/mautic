@@ -3,34 +3,12 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" bootstrap="autoload.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
   <coverage>
     <include>
-      <directory>bundles</directory>
-      <directory>./../plugins</directory>
-      <directory>middlewares</directory>
+      <directory>./../plugins/MauticTagManagerBundle</directory>
     </include>
-    <exclude>
-      <directory>bundles/*Bundle/Config</directory>
-      <directory>bundles/*Bundle/DataFixtures</directory>
-      <directory>bundles/*Bundle/Tests</directory>
-      <directory>bundles/*Bundle/Translations</directory>
-      <directory>bundles/*Bundle/Views</directory>
-      <directory>./../plugins/*Bundle/Config</directory>
-      <directory>./../plugins/*Bundle/Tests</directory>
-      <directory>./../plugins/*Bundle/Translations</directory>
-      <directory>./../plugins/*Bundle/Views</directory>
-      <directory>middlewares/Tests</directory>
-      <directory>bundles/CoreBundle/Test</directory>
-    </exclude>
   </coverage>
   <testsuites>
-    <testsuite name="Project Test Suite">
-      <directory>bundles/*Bundle/Tests</directory>
-    </testsuite>
     <testsuite name="Plugin tests">
-      <directory>./../plugins/*Bundle/Tests</directory>
-      <exclude>./../plugins/MauticCrmBundle/Tests/Pipedrive</exclude>
-    </testsuite>
-    <testsuite name="Middleware tests">
-      <directory>middlewares/Tests</directory>
+      <directory>./../plugins/MauticTagManagerBundle/Tests</directory>
     </testsuite>
   </testsuites>
   <php>
