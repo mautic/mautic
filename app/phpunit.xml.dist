@@ -3,12 +3,12 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" bootstrap="autoload.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
   <coverage>
     <include>
-      <directory>./../plugins/MauticTagManagerBundle</directory>
+      <directory>../plugins/MauticTagManagerBundle</directory>
     </include>
   </coverage>
   <testsuites>
     <testsuite name="Plugin tests">
-      <directory>./../plugins/MauticTagManagerBundle/Tests</directory>
+      <directory>../plugins/MauticTagManagerBundle/Tests</directory>
     </testsuite>
   </testsuites>
   <php>
