@@ -918,6 +918,11 @@ return [
                 'arguments' => [
                     \Mautic\LeadBundle\Entity\Lead::class,
                 ],
+                'methodCalls' => [
+                    'setUniqueIdentifiersOperator' => [
+                        '%mautic.contact_unique_identifiers_operator%',
+                    ],
+                ],
             ],
             'mautic.lead.repository.frequency_rule' => [
                 'class'     => \Mautic\LeadBundle\Entity\FrequencyRuleRepository::class,
@@ -1478,5 +1483,7 @@ return [
         ],
         \Mautic\LeadBundle\Field\Settings\BackgroundSettings::CREATE_CUSTOM_FIELD_IN_BACKGROUND => false,
         'company_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
+        'contact_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
+
     ],
 ];
