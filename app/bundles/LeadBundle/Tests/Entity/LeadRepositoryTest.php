@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
@@ -216,5 +217,24 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
             [1, 2],
             $repo->getContactIdsByEmails($emails)
         );
+    }
+
+    public function testGetUniqueIdentifiersOperator()
+    {
+        $mockEm       = $this->createMock(EntityManager::class);
+        $mockMetadata = $this->createMock(ClassMetadata::class);
+
+        $leadRepository = new LeadRepository($mockEm, $mockMetadata);
+        $leadRepository->setUniqueIdentifiersOperator(CompositeExpression::TYPE_AND);
+
+        $reflection = new \ReflectionClass(LeadRepository::class);
+        $refMethod  = $reflection->getMethod('getUniqueIdentifiersWherePart');
+        $refMethod->setAccessible(true);
+
+        $this->assertEquals('andWhere', $refMethod->invoke($leadRepository));
+
+        $leadRepository->setUniqueIdentifiersOperator(CompositeExpression::TYPE_OR);
+
+        $this->assertEquals('orWhere', $refMethod->invoke($leadRepository));
     }
 }
