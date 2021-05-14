@@ -87,7 +87,7 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $mock = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getEntityManager'])
+            ->onlyMethods(['getEntityManager'])
             ->getMock();
 
         $mock->method('getEntityManager')
@@ -111,13 +111,13 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
     {
         $mock = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getEntities', 'buildQueryForGetLeadsByFieldValue'])
+            ->onlyMethods(['getEntities', 'buildQueryForGetLeadsByFieldValue'])
             ->getMock();
 
         // Mock the
         $mockEntity = $this->getMockBuilder(Lead::class)
             ->disableOriginalConstructor()
-            ->setMethods(['loadMetadata'])
+            ->onlyMethods(['loadMetadata'])
             ->getMock();
 
         $mockEntity->setEmail('test@example.com');

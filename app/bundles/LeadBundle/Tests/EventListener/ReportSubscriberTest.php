@@ -891,7 +891,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $mockStmt = $this->getMockBuilder(PDOStatement::class)
             ->disableOriginalConstructor()
-            ->setMethods(['fetchAll'])
+            ->onlyMethods(['fetchAll'])
             ->getMock();
 
         $this->reportGraphEventMock->expects($this->once())
@@ -900,7 +900,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $mockChartQuery = $this->getMockBuilder(ChartQuery::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'modifyCountQuery',
                 'modifyTimeDataQuery',
                 'loadAndBuildTimeData',
