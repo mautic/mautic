@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -31,7 +31,7 @@ use Symfony\Component\Security\Http\Authentication\SimpleFormAuthenticatorInterf
 class FormAuthenticator implements SimpleFormAuthenticatorInterface
 {
     /**
-     * @var UserPasswordEncoderInterface
+     * @var UserPasswordEncoder
      */
     protected $encoder;
 
@@ -52,7 +52,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
 
     public function __construct(
         IntegrationHelper $integrationHelper,
-        UserPasswordEncoderInterface $encoder,
+        UserPasswordEncoder $encoder,
         EventDispatcherInterface $dispatcher,
         RequestStack $requestStack
     ) {
