@@ -81,7 +81,6 @@ class ContactObjectSubscriber implements EventSubscriberInterface
                 $event->getUpdateObjects()
             )
         );
-        $event->stopPropagation();
     }
 
     public function createContacts(InternalObjectCreateEvent $event): void
@@ -91,7 +90,6 @@ class ContactObjectSubscriber implements EventSubscriberInterface
         }
 
         $event->setObjectMappings($this->contactObjectHelper->create($event->getCreateObjects()));
-        $event->stopPropagation();
     }
 
     public function findContactsByIds(InternalObjectFindEvent $event): void

@@ -34,6 +34,10 @@ class UpdatedObjectMappingDAO
      * @var \DateTime
      */
     private $objectModifiedDate;
+    /**
+     * @var mixed
+     */
+    private $internalObjectId;
 
     /**
      * @param string $integration
@@ -44,7 +48,8 @@ class UpdatedObjectMappingDAO
         $integration,
         $integrationObjectName,
         $integrationObjectId,
-        \DateTimeInterface $objectModifiedDate
+        \DateTimeInterface $objectModifiedDate,
+        $internalObjectId
     ) {
         $this->integration           = $integration;
         $this->integrationObjectName = $integrationObjectName;
@@ -53,6 +58,7 @@ class UpdatedObjectMappingDAO
             $objectModifiedDate->format('Y-m-d H:i:s'),
             $objectModifiedDate->getTimezone()
         ) : $objectModifiedDate;
+        $this->internalObjectId = $internalObjectId;
     }
 
     public function getIntegration(): string
@@ -76,5 +82,13 @@ class UpdatedObjectMappingDAO
     public function getObjectModifiedDate(): \DateTimeInterface
     {
         return $this->objectModifiedDate;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getInternalObjectId()
+    {
+        return $this->internalObjectId;
     }
 }
