@@ -385,7 +385,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         // The availableLeadFields property should start empty.
         $this->assertEquals([], $mockLeadModel->getAvailableLeadFields());
 
-        list($contact, $fields) = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John'], null, true, true);
+        [$contact, $fields] = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John'], null, true, true);
         $this->assertEquals(['email' => 'Email'], $mockLeadModel->getAvailableLeadFields());
         $this->assertEquals('john@doe.com', $contact->getEmail());
         $this->assertNull($contact->getFirstname());
@@ -400,7 +400,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $leadEventLog  = new LeadEventLog();
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['saveEntity', 'checkForDuplicateContact'])
+            ->setMethods(['saveEntity', 'checkForDuplicateContact', 'setFieldValues'])
             ->getMock();
 
         $mockUserModel = $this->getMockBuilder(UserHelper::class)
@@ -424,6 +424,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockLeadModel->expects($this->once())->method('saveEntity')->willThrowException(new \Exception());
         $mockLeadModel->expects($this->once())->method('checkForDuplicateContact')->willReturn(new Lead());
+        $mockLeadModel->expects($this->once())->method('setFieldValues');
 
         try {
             $mockLeadModel->import([], [], null, null, null, true, $leadEventLog);
@@ -441,7 +442,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $lead          = new Lead();
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['saveEntity', 'checkForDuplicateContact'])
+            ->setMethods(['saveEntity', 'checkForDuplicateContact', 'setFieldValues'])
             ->getMock();
 
         $mockUserModel = $this->getMockBuilder(UserHelper::class)
@@ -464,6 +465,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->setProperty($mockLeadModel, LeadModel::class, 'leadFields', [['alias' => 'email', 'type' => 'email', 'defaultValue' => '']]);
 
         $mockLeadModel->expects($this->once())->method('checkForDuplicateContact')->willReturn($lead);
+        $mockLeadModel->expects($this->once())->method('setFieldValues');
 
         try {
             $mockLeadModel->import([], [], null, null, null, true, $leadEventLog);
