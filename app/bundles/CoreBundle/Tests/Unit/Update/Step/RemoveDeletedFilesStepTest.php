@@ -68,10 +68,14 @@ class RemoveDeletedFilesStepTest extends AbstractStepTest
 
         $step = $this->getStep();
 
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
+
         $step->execute($this->progressBar, $this->input, $this->output);
 
-        $this->assertFileNotExists($resourcePath.'/delete_me.txt');
-        $this->assertFileNotExists($resourcePath.'/deleted_files.txt');
+        $this->assertFileDoesNotExist($resourcePath.'/delete_me.txt');
+        $this->assertFileDoesNotExist($resourcePath.'/deleted_files.txt');
     }
 
     public function testNonExistentFileIsIgnored()
@@ -79,18 +83,22 @@ class RemoveDeletedFilesStepTest extends AbstractStepTest
         $resourcePath = __DIR__.'/resources';
         file_put_contents($resourcePath.'/deleted_files.txt', '["delete_me.txt"]');
 
-        $this->assertFileNotExists($resourcePath.'/delete_me.txt');
+        $this->assertFileDoesNotExist($resourcePath.'/delete_me.txt');
 
         $this->pathsHelper->method('getRootPath')
             ->willReturn($resourcePath);
 
         $step = $this->getStep();
 
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
+
         $step->execute($this->progressBar, $this->input, $this->output);
         $this->logger->expects($this->never())
             ->method('error');
 
-        $this->assertFileNotExists($resourcePath.'/deleted_files.txt');
+        $this->assertFileDoesNotExist($resourcePath.'/deleted_files.txt');
     }
 
     private function getStep(): RemoveDeletedFilesStep

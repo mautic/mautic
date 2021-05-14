@@ -1,0 +1,62 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "dennisameling",
+      "name": "Dennis Ameling",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17739158?v=4",
+      "profile": "https://twitter.com/dennisameling",
+      "contributions": [
+        "code",
+        "userTesting"
+      ]
+    },
+    {
+      "login": "mabumusa1",
+      "name": "Mohammad Abu Musa",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12627658?v=4",
+      "profile": "https://steercampaign.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "escopecz",
+      "name": "John Linhart",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1235442?v=4",
+      "profile": "http://johnlinhart.com",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "npracht",
+      "name": "Norman Pracht - Webmecanik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14075239?v=4",
+      "profile": "https://www.webmecanik.com",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "kuzmany",
+      "name": "Zdeno Kuzmany",
+      "avatar_url": "https://avatars.githubusercontent.com/u/462477?v=4",
+      "profile": "https://webmecanik.com",
+      "contributions": [
+        "userTesting",
+        "review"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "mautic",
+  "projectOwner": "mautic",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
