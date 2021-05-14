@@ -32,6 +32,25 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "npracht",
+      "name": "Norman Pracht - Webmecanik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14075239?v=4",
+      "profile": "https://www.webmecanik.com",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "kuzmany",
+      "name": "Zdeno Kuzmany",
+      "avatar_url": "https://avatars.githubusercontent.com/u/462477?v=4",
+      "profile": "https://webmecanik.com",
+      "contributions": [
+        "userTesting",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,

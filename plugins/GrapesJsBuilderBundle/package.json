@@ -1,0 +1,51 @@
+{
+  "name": "grapesjsbuilderbundle",
+  "version": "1.0.0",
+  "description": "⚠️ This Plugin is still Beta! It works great already and we're developing it actively! Please use it and report everything inside the \"Issues\" here in Github. ⚠️",
+  "main": "index.js",
+  "scripts": {
+    "build": "parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist",
+    "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist --no-minify ",
+    "lint": "eslint Assets/library/js/",
+    "prettier": "node_modules/.bin/prettier -w Assets/library/js/",
+    "prettier-check": "node_modules/.bin/prettier -c Assets/library/js/",
+    "start-helloWorld": "parcel Demo/helloWorld/index.html",
+    "start-mautic": "cp -r Demo/data dist && parcel Demo/mautic/index.html",
+    "update-mautic-preset": "npm uninstall grapesjs-preset-mautic && npm install mautic/grapesjs-preset-mautic#master"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mautic/plugin-grapesjs-builder.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mautic/plugin-grapesjs-builder/issues"
+  },
+  "homepage": "https://github.com/mautic/plugin-grapesjs-builder#readme",
+  "dependencies": {
+    "grapesjs": "^0.16.44",
+    "grapesjs-mjml": "^0.4.2",
+    "grapesjs-parser-postcss": "^0.1.1",
+    "grapesjs-preset-mautic": "github:mautic/grapesjs-preset-mautic#master",
+    "grapesjs-preset-newsletter": "^0.2.20",
+    "grapesjs-preset-webpage": "^0.1.11"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.16",
+    "@babel/core": "^7.12.16",
+    "@babel/plugin-proposal-class-properties": "^7.12.13",
+    "@babel/plugin-transform-runtime": "^7.12.15",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.20.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react": "^7.22.0",
+    "eslint-plugin-react-hooks": "^1.7.0",
+    "parcel-bundler": "^1.12.4",
+    "prettier": "^2.2.1"
+  }
+}
