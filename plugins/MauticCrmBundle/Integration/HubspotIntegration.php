@@ -376,7 +376,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                 case 'date':
                 case 'datetime':
                     $fieldsValues[$key] = date("Y-m-d H:i:s", ((int) $field['value'])/1000);;
-                    continue;
+                    break;
                 default:
                     $value              = str_replace(';', '|', $field['value']);
                     $fieldsValues[$key] = $value;
