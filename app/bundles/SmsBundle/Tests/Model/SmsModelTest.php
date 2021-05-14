@@ -22,7 +22,7 @@ class SmsModelTest extends \PHPUnit\Framework\TestCase
         // Partial mock, mocks just getRepository
         $smsModel = $this->getMockBuilder(SmsModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getRepository'])
+            ->onlyMethods(['getRepository'])
             ->getMock();
         $smsModel->method('getRepository')
             ->willReturn($repositoryMock);
