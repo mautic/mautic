@@ -80,6 +80,7 @@ jobs:
 
         if [[ "${{ matrix.php-versions }}" == "7.4" ]] && [[ "${{ matrix.db-types }}" == "mysql" ]]; then
           composer test -- --coverage-clover=coverage.xml
+          cat ./coverage.xml
         else
           composer test
         fi
