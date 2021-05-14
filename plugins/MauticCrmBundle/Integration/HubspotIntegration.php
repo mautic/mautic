@@ -220,8 +220,20 @@ class HubspotIntegration extends CrmAbstractIntegration
                         $leadFields = $this->getApiHelper()->getLeadFields($object);
                         if (isset($leadFields)) {
                             foreach ($leadFields as $fieldInfo) {
+
+                                switch ($fieldInfo['type']) {
+                                    case 'datetime':
+                                        $type = 'datetime';
+                                        break;
+                                    case 'date':
+                                        $type = 'date';
+                                        break;
+                                    default:
+                                        $type = 'string';
+                                }
+
                                 $hubsFields[$object][$fieldInfo['name']] = [
-                                    'type'     => 'string',
+                                    'type'     => $type,
                                     'label'    => $fieldInfo['label'],
                                     'required' => ('email' === $fieldInfo['name']),
                                 ];
@@ -355,14 +367,26 @@ class HubspotIntegration extends CrmAbstractIntegration
         if (!isset($data['properties'])) {
             return [];
         }
+
+        $fields = $this->getAvailableLeadFields()['contacts'] ?? [];
+
         foreach ($data['properties'] as $key => $field) {
-            $value              = str_replace(';', '|', $field['value']);
-            $fieldsValues[$key] = $value;
-        }
-        if ('Lead' == $object && !isset($fieldsValues['email'])) {
-            foreach ($data['identity-profiles'][0]['identities'] as $identifiedProfile) {
-                if ('EMAIL' == $identifiedProfile['type']) {
-                    $fieldsValues['email'] = $identifiedProfile['value'];
+
+            switch ($fields[$key]['type'] ?? null) {
+                case 'date':
+                case 'datetime':
+                    $fieldsValues[$key] = date("Y-m-d H:i:s", ((int) $field['value'])/1000);;
+                    continue;
+                default:
+                    $value              = str_replace(';', '|', $field['value']);
+                    $fieldsValues[$key] = $value;
+            }
+
+            if ('Lead' == $object && !isset($fieldsValues['email'])) {
+                foreach ($data['identity-profiles'][0]['identities'] as $identifiedProfile) {
+                    if ('EMAIL' == $identifiedProfile['type']) {
+                        $fieldsValues['email'] = $identifiedProfile['value'];
+                    }
                 }
             }
         }
