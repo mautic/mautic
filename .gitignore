@@ -79,6 +79,7 @@
 !/media/images/.htaccess
 
 /plugins/*
+!/plugins/GrapesJsBuilderBundle
 !/plugins/MauticCitrixBundle
 !/plugins/MauticClearbitBundle
 !/plugins/MauticCloudStorageBundle
@@ -92,6 +93,7 @@
 !/plugins/MauticSocialBundle
 !/plugins/MauticZapierBundle
 !/plugins/index.html
+!/plugins/.gitkeep
 
 /themes/*
 !/themes/aurora
