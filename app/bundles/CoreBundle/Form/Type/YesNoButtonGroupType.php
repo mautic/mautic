@@ -54,7 +54,7 @@ class YesNoButtonGroupType extends AbstractType
                         return null;
                     }
 
-                    return (is_string($choiceKey) && !is_numeric($choiceKey)) ? $choiceKey : (int) $choiceKey;
+                    return (is_string($choiceKey) && !is_numeric($choiceKey)) ? $choiceKey : (bool) $choiceKey;
                 },
                 'expanded'          => true,
                 'multiple'          => false,
@@ -63,9 +63,9 @@ class YesNoButtonGroupType extends AbstractType
                 'placeholder'       => false,
                 'required'          => false,
                 'no_label'          => 'mautic.core.form.no',
-                'no_value'          => 0,
+                'no_value'          => false,
                 'yes_label'         => 'mautic.core.form.yes',
-                'yes_value'         => 1,
+                'yes_value'         => true,
             ]
         );
     }

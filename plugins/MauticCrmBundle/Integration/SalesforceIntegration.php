@@ -2583,7 +2583,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         // normalize for multiselect field
         foreach ($mappedData as &$data) {
-            $data = str_replace('|', ';', $data);
+            if (is_string($data)) {
+                $data = str_replace('|', ';', $data);
+            }
         }
 
         $mappedData = StateValidationHelper::validate($mappedData);
