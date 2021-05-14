@@ -53,7 +53,7 @@ jobs:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
         coverage: pcov
-        ini-values: pcov.directory=.
+        ini-values: pcov.directory=., pcov.exclude="~tests|themes|vendor~"
     
     - name: Set SYMFONY_ENV to test
       run: echo "SYMFONY_ENV=test" >> $GITHUB_ENV
