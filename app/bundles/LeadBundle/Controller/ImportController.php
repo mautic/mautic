@@ -236,7 +236,7 @@ class ImportController extends FormController
 
                 $inProgress = $session->get('mautic.'.$object.'.import.inprogress', false);
                 $checks     = $session->get('mautic.'.$object.'.import.progresschecks', 1);
-                if (true || !$inProgress || $checks > 5) {
+                if (!$inProgress || $checks > 5) {
                     $session->set('mautic.'.$object.'.import.inprogress', true);
                     $session->set('mautic.'.$object.'.import.progresschecks', 1);
 
@@ -654,13 +654,9 @@ class ImportController extends FormController
     /**
      * Support non-index pages such as modal forms.
      *
-     * @param string $route
-     * @param array  $parameters
-     * @param int    $referenceType
-     *
      * @return bool|string
      */
-    public function generateUrl($route, $parameters = [], $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
         if (!isset($parameters['object'])) {
             $parameters['object'] = $this->request->get('object', 'contacts');

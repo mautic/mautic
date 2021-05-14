@@ -13,7 +13,7 @@ namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use Mautic\ApiBundle\ApiEvents;
@@ -43,7 +43,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * Class CommonApiController.
  */
-class CommonApiController extends FOSRestController implements MauticController
+class CommonApiController extends AbstractFOSRestController implements MauticController
 {
     use RequestTrait;
     use FormErrorMessagesTrait;
@@ -796,6 +796,8 @@ class CommonApiController extends FOSRestController implements MauticController
                 'ignore_paginator' => true,
             ]
         );
+        // It must be associative because the order of entities has changed
+        $idHelper->setIsAssociative(true);
 
         [$entities, $total] = $prepareForSerialization
                 ?
@@ -959,45 +961,16 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function prepareEntityResultsToArray($results, $callback = null)
     {
-        if ($results instanceof Paginator) {
-            $totalCount = count($results);
-        } elseif (isset($results['count'])) {
+        if (is_array($results) && isset($results['count'])) {
             $totalCount = $results['count'];
             $results    = $results['results'];
         } else {
             $totalCount = count($results);
         }
 
-        //we have to convert them from paginated proxy functions to entities in order for them to be
-        //returned by the serializer/rest bundle
-        $entities = [];
-        foreach ($results as $key => $r) {
-            if (is_array($r) && isset($r[0])) {
-                //entity has some extra something something tacked onto the entities
-                if (is_object($r[0])) {
-                    foreach ($r as $k => $v) {
-                        if (0 === $k) {
-                            continue;
-                        }
+        $entityResultHelper = $this->get('mautic.api.helper.entity_result');
 
-                        $r[0]->$k = $v;
-                    }
-                    $entities[$key] = $r[0];
-                } elseif (is_array($r[0])) {
-                    foreach ($r[0] as $k => $v) {
-                        $r[$k] = $v;
-                    }
-                    unset($r[0]);
-                    $entities[$key] = $r;
-                }
-            } else {
-                $entities[$key] = $r;
-            }
-
-            if (is_callable($callback)) {
-                $callback($entities[$key]);
-            }
-        }
+        $entities = $entityResultHelper->getArray($results, $callback);
 
         return [$entities, $totalCount];
     }
