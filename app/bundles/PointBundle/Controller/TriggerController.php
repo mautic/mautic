@@ -365,7 +365,7 @@ class TriggerController extends FormController
 
                         //delete entities
                         if (count($deletedEvents)) {
-                            $this->getModel('point.triggerEvent')->deleteEntities($deletedEvents);
+                            $this->getModel('point.triggerevent')->deleteEntities($deletedEvents);
                         }
 
                         $this->addFlash('mautic.core.notice.updated', [
