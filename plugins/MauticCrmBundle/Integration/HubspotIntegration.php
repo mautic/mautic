@@ -220,7 +220,6 @@ class HubspotIntegration extends CrmAbstractIntegration
                         $leadFields = $this->getApiHelper()->getLeadFields($object);
                         if (isset($leadFields)) {
                             foreach ($leadFields as $fieldInfo) {
-
                                 switch ($fieldInfo['type']) {
                                     case 'datetime':
                                         $type = 'datetime';
@@ -371,11 +370,10 @@ class HubspotIntegration extends CrmAbstractIntegration
         $fields = $this->getAvailableLeadFields()['contacts'] ?? [];
 
         foreach ($data['properties'] as $key => $field) {
-
             switch ($fields[$key]['type'] ?? null) {
                 case 'date':
                 case 'datetime':
-                    $fieldsValues[$key] = date("Y-m-d H:i:s", ((int) $field['value'])/1000);;
+                    $fieldsValues[$key] = date('Y-m-d H:i:s', ((int) $field['value']) / 1000);
                     break;
                 default:
                     $value              = str_replace(';', '|', $field['value']);
