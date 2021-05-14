@@ -17,6 +17,8 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\FieldsBuilder;
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -32,9 +34,16 @@ class ReportSubscriberTest extends TestCase
      */
     private $subscriber;
 
+    /**
+     * @var FieldsBuilder|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $fieldBuilderMock;
+
     public function setUp(): void
     {
         parent::setUp();
+        $this->fieldBuilderMock = $this->createMock(FieldsBuilder::class);
+
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->companyReportData    = $this->createMock(CompanyReportData::class);
@@ -154,6 +163,7 @@ class ReportSubscriberTest extends TestCase
                 'addCampaignByChannelJoin',
                 'applyDateFilters',
                 'setQueryBuilder',
+                'getReport',
             ])
             ->getMock();
 

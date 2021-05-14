@@ -107,6 +107,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.company_report_data',
                     'mautic.asset.repository.download',
+                    'mautic.lead.reportbundle.fields_builder',
                 ],
             ],
             'mautic.asset.builder.subscriber' => [

@@ -14,6 +14,7 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -35,10 +36,16 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $submissionRepository;
 
-    public function __construct(CompanyReportData $companyReportData, SubmissionRepository $submissionRepository)
+    /**
+     * @var FieldsBuilder
+     */
+    private $fieldsBuilder;
+
+    public function __construct(CompanyReportData $companyReportData, SubmissionRepository $submissionRepository, FieldsBuilder $fieldsBuilder)
     {
         $this->companyReportData    = $companyReportData;
         $this->submissionRepository = $submissionRepository;
+        $this->fieldsBuilder     = $fieldsBuilder;
     }
 
     /**
@@ -108,7 +115,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
             $companyColumns = $this->companyReportData->getCompanyData();
 
-            $formSubmissionColumns = array_merge(
+            $formSubmissionColumns = $filters = array_merge(
                 $submissionColumns,
                 $columns,
                 $event->getCampaignByChannelColumns(),
@@ -117,9 +124,12 @@ class ReportSubscriber implements EventSubscriberInterface
                 $companyColumns
             );
 
+            $this->fieldsBuilder->appendSegmentFilter($filters);
+
             $data = [
                 'display_name' => 'mautic.form.report.submission.table',
                 'columns'      => $formSubmissionColumns,
+                'filters'      => $filters,
             ];
             $event->addTable(self::CONTEXT_FORM_SUBMISSION, $data, self::CONTEXT_FORMS);
 
@@ -161,6 +171,10 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 if ($this->companyReportData->eventHasCompanyColumns($event)) {
                     $event->addCompanyLeftJoin($qb);
+                }
+
+                if ($event->hasFilter('s.leadlist_id')) {
+                    $qb->join('fs', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = fs.lead_id AND s.manually_removed = 0');
                 }
 
                 break;

@@ -205,6 +205,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.company_report_data',
                     'mautic.form.repository.submission',
+                    'mautic.lead.reportbundle.fields_builder',
                 ],
             ],
             'mautic.form.campaignbundle.subscriber' => [

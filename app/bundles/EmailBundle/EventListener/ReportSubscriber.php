@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -166,16 +167,23 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $statRepository;
 
+    /**
+     * @var FieldsBuilder
+     */
+    private $fieldsBuilder;
+
     public function __construct(
         Connection $db,
         CompanyReportData $companyReportData,
         StatRepository $statRepository,
-        GeneratedColumnsProviderInterface $generatedColumnsProvider
+        GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        FieldsBuilder $fieldsBuilder
     ) {
         $this->db                       = $db;
         $this->companyReportData        = $companyReportData;
         $this->statRepository           = $statRepository;
         $this->generatedColumnsProvider = $generatedColumnsProvider;
+        $this->fieldsBuilder            = $fieldsBuilder;
     }
 
     /**
@@ -289,16 +297,23 @@ class ReportSubscriber implements EventSubscriberInterface
                 'formula' => 'IF(es.date_read IS NOT NULL, TIMEDIFF(es.date_read, es.date_sent), \'-\')',
             ];
 
+            $companyColumns = $this->companyReportData->getCompanyData();
+
+            $columns = $filters = array_merge(
+                $columns,
+                self::EMAIL_STATS_COLUMNS,
+                $event->getCampaignByChannelColumns(),
+                $event->getLeadColumns(),
+                $event->getIpColumn(),
+                $companyColumns
+            );
+
+            $this->fieldsBuilder->appendSegmentFilter($filters);
+
             $data = [
                 'display_name' => 'mautic.email.stats.report.table',
-                'columns'      => array_merge(
-                    $columns,
-                    self::EMAIL_STATS_COLUMNS,
-                    $event->getCampaignByChannelColumns(),
-                    $event->getLeadColumns(),
-                    $event->getIpColumn(),
-                    $this->companyReportData->getCompanyData()
-                ),
+                'columns'      => $columns,
+                'filters'      => $filters,
             ];
             $event->addTable(self::CONTEXT_EMAIL_STATS, $data, self::CONTEXT_EMAILS);
 
@@ -403,7 +418,6 @@ class ReportSubscriber implements EventSubscriberInterface
                         $qbcut->andWhere($qb->expr()->in('cut2.channel_id', ":{$filterParam}"));
                         $qb->setParameter($filterParam, $event->getFilterValues('e.id'), Connection::PARAM_INT_ARRAY);
                     }
-
                     $qb->leftJoin(
                         self::EMAIL_STATS_PREFIX,
                         "({$qbcut->getSQL()})",
@@ -422,6 +436,10 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 if ($this->companyReportData->eventHasCompanyColumns($event)) {
                     $event->addCompanyLeftJoin($qb);
+                }
+
+                if ($event->hasFilter('s.leadlist_id')) {
+                    $qb->join('es', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = es.lead_id AND s.manually_removed = 0');
                 }
 
                 break;

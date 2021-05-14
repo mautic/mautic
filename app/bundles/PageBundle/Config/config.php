@@ -131,6 +131,7 @@ return [
                     'mautic.lead.model.company_report_data',
                     'mautic.page.repository.hit',
                     'translator',
+                    'mautic.lead.reportbundle.fields_builder',
                 ],
             ],
             'mautic.page.campaignbundle.subscriber' => [
