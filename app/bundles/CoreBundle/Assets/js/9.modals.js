@@ -304,8 +304,10 @@ Mautic.showConfirmation = function (el) {
     if (typeof cancelButton != 'undefined') {
         confirmFooterDiv.append(cancelButton);
     }
-
-    confirmFooterDiv.append(confirmButton);
+    
+    if (confirmText) {
+        confirmFooterDiv.append(confirmButton);
+    }
 
     confirmContentDiv.append(confirmHeaderDiv);
     confirmContentDiv.append(confirmFooterDiv);

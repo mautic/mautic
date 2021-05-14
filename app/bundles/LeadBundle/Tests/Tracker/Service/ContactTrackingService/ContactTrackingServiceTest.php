@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2017 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -17,36 +19,34 @@ use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingService;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class ContactTrackingServiceTest.
- */
 final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|CookieHelper
      */
     private $cookieHelperMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|LeadDeviceRepository
      */
     private $leadDeviceRepositoryMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|LeadRepository
      */
     private $leadRepositoryMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|RequestStack
      */
     private $requestStackMock;
 
     /**
-     * @var MergeRecordRepository
+     * @var MockObject|MergeRecordRepository
      */
     private $mergeRecordRepository;
 
@@ -59,12 +59,11 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $this->mergeRecordRepository    = $this->createMock(MergeRecordRepository::class);
     }
 
-    public function testGetTrackedIdentifier()
+    public function testGetTrackedIdentifier(): void
     {
-        // Parameters
         $trackingId = 'randomTrackingId';
 
-        $this->cookieHelperMock->expects($this->at(0))
+        $this->cookieHelperMock->expects($this->once())
             ->method('getCookie')
             ->with('mautic_session_id', null)
             ->willReturn($trackingId);
@@ -73,10 +72,9 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($trackingId, $contactTrackingService->getTrackedIdentifier());
     }
 
-    public function testGetTrackedLeadNoRequest()
+    public function testGetTrackedLeadNoRequest(): void
     {
-        // __construct
-        $this->requestStackMock->expects($this->at(0))
+        $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn(null);
 
@@ -84,18 +82,15 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($contactTrackingService->getTrackedLead());
     }
 
-    public function testGetTrackedLeadNoTrackedIdentifier()
+    public function testGetTrackedLeadNoTrackedIdentifier(): void
     {
-        // Parameters
         $requestMock = $this->createMock(Request::class);
 
-        // __construct
-        $this->requestStackMock->expects($this->at(0))
+        $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($requestMock);
 
-        // getTrackedIdentifier()
-        $this->cookieHelperMock->expects($this->at(0))
+        $this->cookieHelperMock->expects($this->once())
             ->method('getCookie')
             ->with('mautic_session_id', null)
             ->willReturn(null);
@@ -107,29 +102,24 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
     /**
      * Test no lead id found.
      */
-    public function testGetTrackedLeadNoLeadId()
+    public function testGetTrackedLeadNoLeadId(): void
     {
-        // Parameters
         $requestMock = $this->createMock(Request::class);
         $trackingId  = 'randomTrackingId';
 
-        // __construct
-        $this->requestStackMock->expects($this->at(0))
+        $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($requestMock);
 
-        // getTrackedIdentifier()
-        $this->cookieHelperMock->expects($this->at(0))
+        $this->cookieHelperMock->expects($this->exactly(2))
             ->method('getCookie')
-            ->with('mautic_session_id', null)
-            ->willReturn($trackingId);
+            ->withConsecutive(
+                ['mautic_session_id', null],
+                [$trackingId, null]
+            )
+            ->willReturnOnConsecutiveCalls($trackingId, null);
 
-        $this->cookieHelperMock->expects($this->at(1))
-            ->method('getCookie')
-            ->with($trackingId, null)
-            ->willReturn(null);
-
-        $requestMock->expects($this->at(0))
+        $requestMock->expects($this->once())
             ->method('get')
             ->with('mtc_id', null)
             ->willReturn(null);
@@ -141,35 +131,30 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
     /**
      * Test lead id found in request but no lead entity found.
      */
-    public function testGetTrackedLeadRequestLeadIdAndNoLeadFound()
+    public function testGetTrackedLeadRequestLeadIdAndNoLeadFound(): void
     {
-        // Parameters
         $requestMock = $this->createMock(Request::class);
         $trackingId  = 'randomTrackingId';
         $leadId      = 1;
 
-        // __construct
-        $this->requestStackMock->expects($this->at(0))
+        $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($requestMock);
 
-        // getTrackedIdentifier()
-        $this->cookieHelperMock->expects($this->at(0))
+        $this->cookieHelperMock->expects($this->exactly(2))
             ->method('getCookie')
-            ->with('mautic_session_id', null)
-            ->willReturn($trackingId);
+            ->withConsecutive(
+                ['mautic_session_id', null],
+                [$trackingId, null]
+            )
+            ->willReturnOnConsecutiveCalls($trackingId, null);
 
-        $this->cookieHelperMock->expects($this->at(1))
-            ->method('getCookie')
-            ->with($trackingId, null)
-            ->willReturn(null);
-
-        $requestMock->expects($this->at(0))
+        $requestMock->expects($this->once())
             ->method('get')
             ->with('mtc_id', null)
             ->willReturn($leadId);
 
-        $this->leadRepositoryMock->expects($this->at(0))
+        $this->leadRepositoryMock->expects($this->once())
             ->method('getEntity')
             ->with($leadId)
             ->willReturn(null);
@@ -181,40 +166,36 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
     /**
      * Test lead id found in request and another device is already tracked and associated with lead.
      */
-    public function testGetTrackedLeadRequestLeadIdAndAnotherDeviceAlreadyTracked()
+    public function testGetTrackedLeadRequestLeadIdAndAnotherDeviceAlreadyTracked(): void
     {
-        // Parameters
         $requestMock = $this->createMock(Request::class);
         $trackingId  = 'randomTrackingId';
         $leadId      = 1;
         $leadMock    = $this->createMock(Lead::class);
 
-        // __construct
-        $this->requestStackMock->expects($this->at(0))
+        $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($requestMock);
 
-        // getTrackedIdentifier()
-        $this->cookieHelperMock->expects($this->at(0))
+        $this->cookieHelperMock->expects($this->exactly(2))
             ->method('getCookie')
-            ->with('mautic_session_id', null)
-            ->willReturn($trackingId);
+            ->withConsecutive(
+                ['mautic_session_id', null],
+                [$trackingId, null]
+            )
+            ->willReturnOnConsecutiveCalls($trackingId, null);
 
-        $this->cookieHelperMock->expects($this->at(1))
-            ->method('getCookie')
-            ->with($trackingId, null)
-            ->willReturn(null);
-
-        $requestMock->expects($this->at(0))
+        $requestMock->expects($this->once())
             ->method('get')
             ->with('mtc_id', null)
             ->willReturn($leadId);
 
-        $this->leadRepositoryMock->expects($this->at(0))
+        $this->leadRepositoryMock->expects($this->once())
             ->method('getEntity')
             ->with($leadId)
             ->willReturn($leadMock);
-        $this->leadDeviceRepositoryMock->expects($this->at(0))
+
+        $this->leadDeviceRepositoryMock->expects($this->once())
             ->method('isAnyLeadDeviceTracked')
             ->with($leadMock)
             ->willReturn(true);
@@ -226,40 +207,36 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
     /**
      * Test lead id found in request and another device is not tracked and associated with lead.
      */
-    public function testGetTrackedLeadRequestLeadIdAndAnotherDeviceNotTracked()
+    public function testGetTrackedLeadRequestLeadIdAndAnotherDeviceNotTracked(): void
     {
-        // Parameters
         $requestMock = $this->createMock(Request::class);
         $trackingId  = 'randomTrackingId';
         $leadId      = 1;
         $leadMock    = $this->createMock(Lead::class);
 
-        // __construct
-        $this->requestStackMock->expects($this->at(0))
+        $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($requestMock);
 
-        // getTrackedIdentifier()
-        $this->cookieHelperMock->expects($this->at(0))
+        $this->cookieHelperMock->expects($this->exactly(2))
             ->method('getCookie')
-            ->with('mautic_session_id', null)
-            ->willReturn($trackingId);
+            ->withConsecutive(
+                ['mautic_session_id', null],
+                [$trackingId, null]
+            )
+            ->willReturnOnConsecutiveCalls($trackingId, null);
 
-        $this->cookieHelperMock->expects($this->at(1))
-            ->method('getCookie')
-            ->with($trackingId, null)
-            ->willReturn(null);
-
-        $requestMock->expects($this->at(0))
+        $requestMock->expects($this->once())
             ->method('get')
             ->with('mtc_id', null)
             ->willReturn($leadId);
 
-        $this->leadRepositoryMock->expects($this->at(0))
+        $this->leadRepositoryMock->expects($this->once())
             ->method('getEntity')
             ->with($leadId)
             ->willReturn($leadMock);
-        $this->leadDeviceRepositoryMock->expects($this->at(0))
+
+        $this->leadDeviceRepositoryMock->expects($this->once())
             ->method('isAnyLeadDeviceTracked')
             ->with($leadMock)
             ->willReturn(false);
@@ -271,35 +248,31 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
     /**
      * Test lead id found in request and another device is not tracked and associated with lead.
      */
-    public function testGetTrackedLeadCookieLeadIdAndAnotherDeviceNotTracked()
+    public function testGetTrackedLeadCookieLeadIdAndAnotherDeviceNotTracked(): void
     {
-        // Parameters
         $requestMock = $this->createMock(Request::class);
         $trackingId  = 'randomTrackingId';
         $leadId      = 1;
         $leadMock    = $this->createMock(Lead::class);
 
-        // __construct
-        $this->requestStackMock->expects($this->at(0))
+        $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($requestMock);
 
-        // getTrackedIdentifier()
-        $this->cookieHelperMock->expects($this->at(0))
+        $this->cookieHelperMock->expects($this->exactly(2))
             ->method('getCookie')
-            ->with('mautic_session_id', null)
-            ->willReturn($trackingId);
+            ->withConsecutive(
+                ['mautic_session_id', null],
+                [$trackingId, null]
+            )
+            ->willReturnOnConsecutiveCalls($trackingId, $leadId);
 
-        $this->cookieHelperMock->expects($this->at(1))
-            ->method('getCookie')
-            ->with($trackingId, null)
-            ->willReturn($leadId);
-
-        $this->leadRepositoryMock->expects($this->at(0))
+        $this->leadRepositoryMock->expects($this->once())
             ->method('getEntity')
             ->with($leadId)
             ->willReturn($leadMock);
-        $this->leadDeviceRepositoryMock->expects($this->at(0))
+
+        $this->leadDeviceRepositoryMock->expects($this->once())
             ->method('isAnyLeadDeviceTracked')
             ->with($leadMock)
             ->willReturn(false);
@@ -308,10 +281,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($leadMock, $contactTrackingService->getTrackedLead());
     }
 
-    /**
-     * @return ContactTrackingService
-     */
-    private function getContactTrackingService()
+    private function getContactTrackingService(): ContactTrackingService
     {
         return new ContactTrackingService(
             $this->cookieHelperMock,
