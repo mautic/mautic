@@ -32,7 +32,7 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
      */
     private $fixture;
 
-    protected ?ContainerInterface $tempContainer;
+    protected ContainerInterface $tempContainer;
 
     protected function setUp(): void
     {
