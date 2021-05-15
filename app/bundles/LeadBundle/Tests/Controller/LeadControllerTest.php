@@ -12,6 +12,7 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -66,8 +67,8 @@ class LeadControllerTest extends MauticMysqlTestCase
             [
                 'leadlist[name]'               => 'Segment 1',
                 'leadlist[alias]'              => 'segment-1',
-                'leadlist[isGlobal]'           => '0',
-                'leadlist[isPreferenceCenter]' => '0',
+                'leadlist[isGlobal]'           => '',
+                'leadlist[isPreferenceCenter]' => '',
                 'leadlist[isPublished]'        => '1',
                 'leadlist[publicName]'         => 'Segment 1',
                 'leadlist[category]'           => '1',
@@ -333,5 +334,26 @@ class LeadControllerTest extends MauticMysqlTestCase
         $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
         $expectedPlaceholder = self::$container->get('translator')->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
+    }
+
+    public function testAddContactsErrorMessage()
+    {
+        /** @var FieldModel $fieldModel */
+        $fieldModel     = self::getContainer()->get('mautic.lead.model.field');
+        $firstnameField = $fieldModel->getEntity(2);
+        $firstnameField->setIsRequired(true);
+        $fieldModel->getRepository()->saveEntity($firstnameField);
+
+        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues(
+            [
+            ]
+        );
+
+        $this->client->submit($form);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertStringContainsString('firstname: This field is required.', $clientResponse->getContent());
     }
 }

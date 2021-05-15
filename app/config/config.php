@@ -183,6 +183,7 @@ $container->loadFromExtension('oneup_uploader', [
 //FOS Rest for API
 $container->loadFromExtension('fos_rest', [
     'routing_loader' => false,
+    'body_listener'  => true,
     'view'           => [
         'formats' => [
             'json' => true,
@@ -300,6 +301,21 @@ $container->loadFromExtension('fm_elfinder', [
             'relative_path'   => false,
             'connector'       => [
                 'debug' => '%kernel.debug%',
+                'binds' => [
+                    'upload.pre mkdir.pre mkfile.pre rename.pre archive.pre ls.pre' => [
+                        'Plugin.Sanitizer.cmdPreprocess',
+                    ],
+                    'upload.presave paste.copyfrom'                                 => [
+                        'Plugin.Sanitizer.onUpLoadPreSave',
+                    ],
+                ],
+                'plugins' => [
+                    'Sanitizer' => [
+                        'enable'   => true,
+                        'targets'  => [' ', '\\', '/', ':', '*', '?', '"', '<', '>', '|'], // target chars
+                        'replace'  => '-', // replace to this
+                    ],
+                ],
                 'roots' => [
                     'local' => [
                         'driver'    => 'Flysystem',

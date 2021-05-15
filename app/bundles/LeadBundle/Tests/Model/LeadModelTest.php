@@ -270,7 +270,9 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
         $this->fieldModelMock->method('getFieldList')->willReturn([]);
         $this->companyLeadRepositoryMock->method('getEntitiesByLead')->willReturn([]);
-        $this->companyModelMock->expects($this->once())->method('getEntities')->willReturn([]);
+        $this->companyModelMock->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([]);
 
         $this->leadModel->saveEntity($entity);
 
@@ -323,7 +325,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getRepository'])
+            ->onlyMethods(['getRepository'])
             ->getMock();
 
         $mockLeadModel->expects($this->once())
@@ -366,7 +368,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getRepository'])
+            ->onlyMethods(['getRepository'])
             ->getMock();
 
         $mockLeadModel->expects($this->once())
@@ -398,7 +400,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $leadEventLog  = new LeadEventLog();
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['saveEntity', 'checkForDuplicateContact'])
+            ->onlyMethods(['saveEntity', 'checkForDuplicateContact'])
             ->getMock();
 
         $mockUserModel = $this->getMockBuilder(UserHelper::class)
@@ -412,7 +414,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['extractCompanyDataFromImport'])
+            ->onlyMethods(['extractCompanyDataFromImport'])
             ->getMock();
 
         $mockCompanyModel->expects($this->once())->method('extractCompanyDataFromImport')->willReturn([[], []]);
@@ -439,7 +441,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $lead          = new Lead();
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['saveEntity', 'checkForDuplicateContact'])
+            ->onlyMethods(['saveEntity', 'checkForDuplicateContact'])
             ->getMock();
 
         $mockUserModel = $this->getMockBuilder(UserHelper::class)
@@ -453,7 +455,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['extractCompanyDataFromImport'])
+            ->onlyMethods(['extractCompanyDataFromImport'])
             ->getMock();
 
         $mockCompanyModel->expects($this->once())->method('extractCompanyDataFromImport')->willReturn([[], []]);
