@@ -182,17 +182,12 @@ $container->loadFromExtension('oneup_uploader', [
 
 //FOS Rest for API
 $container->loadFromExtension('fos_rest', [
-    'routing_loader' => [
-        'default_format' => 'json',
-        'include_format' => false,
-    ],
-    'view' => [
+    'routing_loader' => false,
+    'body_listener'  => true,
+    'view'           => [
         'formats' => [
             'json' => true,
             'xml'  => false,
-            'html' => false,
-        ],
-        'templating_formats' => [
             'html' => false,
         ],
     ],
@@ -212,7 +207,7 @@ $container->loadFromExtension('jms_serializer', [
         'lower_case' => false,
     ],
     'metadata' => [
-        'cache'          => 'none',
+        'cache'          => 'file',
         'auto_detection' => false,
         'directories'    => $bundleMetadataBuilder->getSerializerConfig(),
     ],
@@ -306,6 +301,21 @@ $container->loadFromExtension('fm_elfinder', [
             'relative_path'   => false,
             'connector'       => [
                 'debug' => '%kernel.debug%',
+                'binds' => [
+                    'upload.pre mkdir.pre mkfile.pre rename.pre archive.pre ls.pre' => [
+                        'Plugin.Sanitizer.cmdPreprocess',
+                    ],
+                    'upload.presave paste.copyfrom'                                 => [
+                        'Plugin.Sanitizer.onUpLoadPreSave',
+                    ],
+                ],
+                'plugins' => [
+                    'Sanitizer' => [
+                        'enable'   => true,
+                        'targets'  => [' ', '\\', '/', ':', '*', '?', '"', '<', '>', '|'], // target chars
+                        'replace'  => '-', // replace to this
+                    ],
+                ],
                 'roots' => [
                     'local' => [
                         'driver'    => 'Flysystem',
