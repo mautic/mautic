@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -16,32 +18,33 @@ use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject
      */
     private $contactMock5;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject
      */
     private $contactMock6;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject
      */
     private $contactModelMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject
      */
     private $doNotContactMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject
      */
     private $translatorMock;
 
@@ -52,6 +55,8 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->contactMock5     = $this->createMock(Lead::class);
         $this->contactMock6     = $this->createMock(Lead::class);
         $this->contactModelMock = $this->createMock(LeadModel::class);
@@ -66,23 +71,18 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
         $this->contactMock5->method('getId')->willReturn(5);
     }
 
-    public function testUpdateEntityAccess()
+    public function testUpdateEntityAccess(): void
     {
         $contacts = [5, 6];
 
-        $this->contactModelMock->expects($this->at(0))
+        $this->contactModelMock->expects($this->once())
             ->method('getLeadsByIds')
             ->with($contacts)
             ->willReturn([$this->contactMock5, $this->contactMock6]);
 
-        $this->contactModelMock->expects($this->at(1))
+        $this->contactModelMock->expects($this->exactly(2))
             ->method('canEditContact')
-            ->with($this->contactMock5)
-            ->willReturn(false);
-
-        $this->contactModelMock->expects($this->at(2))
-            ->method('canEditContact')
-            ->with($this->contactMock6)
+            ->withConsecutive([$this->contactMock5], [$this->contactMock6])
             ->willReturn(false);
 
         $this->contactModelMock->expects($this->never())
@@ -91,23 +91,23 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
         $this->actionModel->update($contacts, [], [], '');
     }
 
-    public function testSubscribeContactToEmailChannel()
+    public function testSubscribeContactToEmailChannel(): void
     {
         $contacts           = [5];
         $subscribedChannels = ['email', 'sms']; // Subscribe contact to these channels
 
-        $this->contactModelMock->expects($this->at(0))
+        $this->contactModelMock->expects($this->once())
             ->method('getLeadsByIds')
             ->with($contacts)
             ->willReturn([$this->contactMock5]);
 
-        $this->contactModelMock->expects($this->at(1))
+        $this->contactModelMock->expects($this->once())
             ->method('canEditContact')
             ->with($this->contactMock5)
             ->willReturn(true);
 
         // Contact is already subscribed to the SMS channel but not to email
-        $this->contactModelMock->expects($this->at(2))
+        $this->contactModelMock->expects($this->once())
             ->method('getContactChannels')
             ->with($this->contactMock5)
             ->willReturn(['sms' => 'sms']);
@@ -121,7 +121,7 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
             ->method('removeDncForContact')
             ->with(5, 'email');
 
-        $this->contactModelMock->expects($this->at(3))
+        $this->contactModelMock->expects($this->once())
             ->method('getPreferenceChannels')
             ->willReturn(['Email' => 'email', 'Text Message' => 'sms']);
 
@@ -131,23 +131,23 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
         $this->actionModel->update($contacts, $subscribedChannels);
     }
 
-    public function testSubscribeContactWhoUnsubscribedToEmailChannel()
+    public function testSubscribeContactWhoUnsubscribedToEmailChannel(): void
     {
         $contacts           = [5];
         $subscribedChannels = ['email', 'sms']; // Subscribe contact to these channels
 
-        $this->contactModelMock->expects($this->at(0))
+        $this->contactModelMock->expects($this->once())
             ->method('getLeadsByIds')
             ->with($contacts)
             ->willReturn([$this->contactMock5]);
 
-        $this->contactModelMock->expects($this->at(1))
+        $this->contactModelMock->expects($this->once())
             ->method('canEditContact')
             ->with($this->contactMock5)
             ->willReturn(true);
 
         // Contact is already subscribed to the SMS channel but not to email
-        $this->contactModelMock->expects($this->at(2))
+        $this->contactModelMock->expects($this->once())
             ->method('getContactChannels')
             ->with($this->contactMock5)
             ->willReturn(['sms' => 'sms']);
@@ -160,7 +160,7 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
         $this->doNotContactMock->expects($this->never())
             ->method('removeDncForContact');
 
-        $this->contactModelMock->expects($this->at(3))
+        $this->contactModelMock->expects($this->once())
             ->method('getPreferenceChannels')
             ->willReturn(['Email' => 'email', 'Text Message' => 'sms']);
 
@@ -170,22 +170,22 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
         $this->actionModel->update($contacts, $subscribedChannels);
     }
 
-    public function testUnsubscribeContactFromSmsChannel()
+    public function testUnsubscribeContactFromSmsChannel(): void
     {
         $contacts           = [5];
         $subscribedChannels = []; // Unsubscribe contact from missing
 
-        $this->contactModelMock->expects($this->at(0))
+        $this->contactModelMock->expects($this->once())
             ->method('getLeadsByIds')
             ->with($contacts)
             ->willReturn([$this->contactMock5]);
 
-        $this->contactModelMock->expects($this->at(1))
+        $this->contactModelMock->expects($this->once())
             ->method('canEditContact')
             ->with($this->contactMock5)
             ->willReturn(true);
 
-        $this->contactModelMock->expects($this->at(2))
+        $this->contactModelMock->expects($this->once())
             ->method('getContactChannels')
             ->with($this->contactMock5)
             ->willReturn(['sms' => 'sms']);
@@ -193,24 +193,15 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
         $this->doNotContactMock->expects($this->never())
             ->method('isContactable');
 
-        $this->contactModelMock->expects($this->at(3))
+        $this->contactModelMock->expects($this->once())
             ->method('getPreferenceChannels')
             ->willReturn(['Email' => 'email', 'Text Message' => 'sms']);
 
-        $this->doNotContactMock->expects($this->at(0))
+        $this->doNotContactMock->expects($this->exactly(2))
             ->method('addDncForContact')
-            ->with(
-                5,
-                'email',
-                DNC::MANUAL
-            );
-
-        $this->doNotContactMock->expects($this->at(1))
-            ->method('addDncForContact')
-            ->with(
-                5,
-                'sms',
-                DNC::MANUAL
+            ->withConsecutive(
+                [5, 'email', DNC::MANUAL],
+                [5, 'sms', DNC::MANUAL]
             );
 
         $this->actionModel->update($contacts, $subscribedChannels);
