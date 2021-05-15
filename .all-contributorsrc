@@ -41,6 +41,16 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "kuzmany",
+      "name": "Zdeno Kuzmany",
+      "avatar_url": "https://avatars.githubusercontent.com/u/462477?v=4",
+      "profile": "https://webmecanik.com",
+      "contributions": [
+        "userTesting",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
