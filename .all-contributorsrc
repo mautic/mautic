@@ -90,6 +90,16 @@
         "userTesting",
         "review"
       ]
+    },
+    {
+      "login": "anton-vlasenko",
+      "name": "Anton Vlasenko",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43744263?v=4",
+      "profile": "https://github.com/anton-vlasenko",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
