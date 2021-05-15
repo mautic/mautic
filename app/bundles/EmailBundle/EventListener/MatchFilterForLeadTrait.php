@@ -179,6 +179,16 @@ trait MatchFilterForLeadTrait
                 case '!regexp':
                     $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/i', $leadVal);
                     break;
+                case 'startsWith':
+                    $groups[$groupNum] = 0 === strncmp($leadVal, $filterVal, strlen($filterVal));
+                    break;
+                case 'endsWith':
+                    $endOfString       = substr($leadVal, strlen($leadVal) - strlen($filterVal));
+                    $groups[$groupNum] = 0 === strcmp($endOfString, $filterVal);
+                    break;
+                case 'contains':
+                    $groups[$groupNum] = false !== strpos((string) $leadVal, (string) $filterVal);
+                    break;
             }
         }
 

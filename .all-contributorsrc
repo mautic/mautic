@@ -32,6 +32,104 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "npracht",
+      "name": "Norman Pracht - Webmecanik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14075239?v=4",
+      "profile": "https://www.webmecanik.com",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "kuzmany",
+      "name": "Zdeno Kuzmany",
+      "avatar_url": "https://avatars.githubusercontent.com/u/462477?v=4",
+      "profile": "https://webmecanik.com",
+      "contributions": [
+        "userTesting",
+        "review",
+        "code"
+      ]
+    },
+    {
+      "login": "stevedrobinson",
+      "name": "Steve Robinson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/866855?v=4",
+      "profile": "https://github.com/stevedrobinson",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "snoblucha",
+      "name": "Petr Šnobl",
+      "avatar_url": "https://avatars.githubusercontent.com/u/265586?v=4",
+      "profile": "https://github.com/snoblucha",
+      "contributions": [
+        "code",
+        "bug"
+      ]
+    },
+    {
+      "login": "luguenth",
+      "name": "Lukas Günther",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9964009?v=4",
+      "profile": "https://github.com/luguenth",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "rcheesley",
+      "name": "Ruth Cheesley",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2930593?v=4",
+      "profile": "https://www.ruthcheesley.co.uk",
+      "contributions": [
+        "userTesting",
+        "review"
+      ]
+    },
+    {
+      "login": "anton-vlasenko",
+      "name": "Anton Vlasenko",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43744263?v=4",
+      "profile": "https://github.com/anton-vlasenko",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "fedys",
+      "name": "Miroslav Fedeleš",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6388925?v=4",
+      "profile": "https://www.linkedin.com/in/miroslavfedeles",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "gabepri",
+      "name": "gabepri",
+      "avatar_url": "https://avatars.githubusercontent.com/u/73728034?v=4",
+      "profile": "https://github.com/gabepri",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "incentfit",
+      "name": "incentfit",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13243272?v=4",
+      "profile": "https://incentfit.com",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
