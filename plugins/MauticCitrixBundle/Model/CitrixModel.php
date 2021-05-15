@@ -65,6 +65,7 @@ class CitrixModel extends FormModel
      * @param Lead      $lead
      * @param string    $eventType
      * @param \DateTime $eventDate
+     * @param string    $joinURL
      *
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -72,7 +73,7 @@ class CitrixModel extends FormModel
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
-    public function addEvent($product, $email, $eventName, $eventDesc, $eventType, $lead, \DateTime $eventDate = null)
+    public function addEvent($product, $email, $eventName, $eventDesc, $eventType, $lead, \DateTime $eventDate = null, $joinURL = null)
     {
         if (!CitrixProducts::isValidValue($product) || !CitrixEventTypes::isValidValue($eventType)) {
             CitrixHelper::log('addEvent: incorrect data');
@@ -89,6 +90,10 @@ class CitrixModel extends FormModel
 
         if (null !== $eventDate) {
             $citrixEvent->setEventDate($eventDate);
+        }
+
+        if (null !== $joinURL) {
+            $citrixEvent->setEventDesc($eventDesc.'_!'.$joinURL);
         }
 
         $this->em->persist($citrixEvent);
@@ -322,7 +327,11 @@ class CitrixModel extends FormModel
         // Add events
         if (0 !== count($contactsToAdd)) {
             $searchEmails = array_keys($contactsToAdd);
-            $leads        = $this->leadModel->getRepository()->getLeadsByFieldValue('email', $searchEmails, null, true);
+            $leads        = array_change_key_case(
+                $this->leadModel->getRepository()->getLeadsByFieldValue('email', $searchEmails, null, true),
+                CASE_LOWER
+            );
+
             foreach ($contactsToAdd as $email => $info) {
                 if (!isset($leads[strtolower($email)])) {
                     $lead = (new Lead())

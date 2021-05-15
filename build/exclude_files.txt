@@ -34,7 +34,7 @@ node_modules/*
 package-lock.json
 package.json
 phpstan.neon
-rector.yaml
+rector.php
 tests/*
 vendor/babdev/*
 vendor/liip/*

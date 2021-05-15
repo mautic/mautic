@@ -163,7 +163,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
                     $row['reason'] = $this->getDncReasonLabel($row['reason']);
                 }
 
-                if (isset($row['channel']) && $row['channel_id']) {
+                if (isset($row['channel']) && isset($row['channel_id'])) {
                     $href              = $this->router->generate('mautic_'.$row['channel'].'_action', ['objectAction' => 'view', 'objectId' => $row['channel_id']]);
                     $row['channel']    = '<a href="'.$href.'" data-toggle="ajax">'.$this->channelListHelper->getChannelLabel($row['channel']).'</a>';
                     $row['channel_id'] = '<a href="'.$href.'" data-toggle="ajax">'.$row['channel_id'].'</a>';
