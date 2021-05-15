@@ -21,10 +21,7 @@ use Symfony\Component\Form\FormBuilder;
  */
 class OneSignalIntegration extends AbstractIntegration
 {
-    /**
-     * @var bool
-     */
-    protected $coreIntegration = true;
+    protected bool $coreIntegration = true;
 
     /**
      * {@inheritdoc}
