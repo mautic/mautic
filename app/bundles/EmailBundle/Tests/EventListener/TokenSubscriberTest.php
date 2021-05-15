@@ -101,7 +101,7 @@ CONTENT
         /** @var TokenSubscriber $subscriber */
         $subscriber = $this->getMockBuilder(TokenSubscriber::class)
             ->setConstructorArgs([$dispatcher, $primaryCompanyHelper])
-            ->setMethods(null)
+            ->onlyMethods([])
             ->getMock();
 
         $dispatcher->addSubscriber($subscriber);
