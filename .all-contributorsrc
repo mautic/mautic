@@ -60,6 +60,16 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "snoblucha",
+      "name": "Petr Šnobl",
+      "avatar_url": "https://avatars.githubusercontent.com/u/265586?v=4",
+      "profile": "https://github.com/snoblucha",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
