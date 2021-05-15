@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -83,6 +83,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://webmecanik.com"><img src="https://avatars.githubusercontent.com/u/462477?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Zdeno Kuzmany</b></sub></a><br /><a href="#userTesting-kuzmany" title="User Testing">📓</a> <a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Akuzmany" title="Reviewed Pull Requests">👀</a></td>
     <td align="center"><a href="https://github.com/stevedrobinson"><img src="https://avatars.githubusercontent.com/u/866855?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Steve Robinson</b></sub></a><br /><a href="#userTesting-stevedrobinson" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/snoblucha"><img src="https://avatars.githubusercontent.com/u/265586?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Petr Šnobl</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=snoblucha" title="Code">💻</a> <a href="https://github.com/mautic/mautic/issues?q=author%3Asnoblucha" title="Bug reports">🐛</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/luguenth"><img src="https://avatars.githubusercontent.com/u/9964009?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Lukas Günther</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=luguenth" title="Code">💻</a> <a href="https://github.com/mautic/mautic/commits?author=luguenth" title="Documentation">📖</a></td>
   </tr>
 </table>
 
