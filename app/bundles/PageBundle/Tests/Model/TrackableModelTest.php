@@ -36,7 +36,7 @@ class TrackableModelTest extends TestCase
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
-            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
+            ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
             ->getMock();
 
         $mockModel->expects($this->once())
@@ -84,7 +84,7 @@ class TrackableModelTest extends TestCase
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
-            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
+            ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
             ->getMock();
 
         $mockModel->expects($this->once())
@@ -616,7 +616,7 @@ TEXT;
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
-            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
+            ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
             ->getMock();
 
         $mockModel->expects($this->once())
