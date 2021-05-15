@@ -26,7 +26,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         /** @var CompanyModel $companyModel */
         $companyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(null)
+            ->onlyMethods([])
             ->getMock();
 
         $company = new Company();

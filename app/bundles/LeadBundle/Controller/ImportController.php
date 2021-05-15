@@ -236,7 +236,7 @@ class ImportController extends FormController
 
                 $inProgress = $session->get('mautic.'.$object.'.import.inprogress', false);
                 $checks     = $session->get('mautic.'.$object.'.import.progresschecks', 1);
-                if (true || !$inProgress || $checks > 5) {
+                if (!$inProgress || $checks > 5) {
                     $session->set('mautic.'.$object.'.import.inprogress', true);
                     $session->set('mautic.'.$object.'.import.progresschecks', 1);
 

@@ -11,6 +11,8 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\IpLookup\GeobytesLookup;
 
 class GeobytesLookupTest extends \PHPUnit\Framework\TestCase
@@ -20,15 +22,10 @@ class GeobytesLookupTest extends \PHPUnit\Framework\TestCase
     public function testIpLookupSuccessful()
     {
         // Mock http connector
-        $mockHttp = $this->getMockBuilder('Joomla\Http\Http')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockHttp = $this->createMock(Client::class);
 
         // Mock a successful response
-        $mockResponse = $this->getMockBuilder('Joomla\Http\Response')
-            ->getMock();
-        $mockResponse->code = 200;
-        $mockResponse->body = '{"geobytesforwarderfor":"","geobytesremoteip":"1.2.3.4","geobytesipaddress":"192.30.252.131","geobytescertainty":"100","geobytesinternet":"US","geobytescountry":"United States","geobytesregionlocationcode":"USMD","geobytesregion":"Maryland","geobytescode":"MD","geobyteslocationcode":"USMDKNOX","geobytescity":"Knoxville","geobytescityid":"29706","geobytesfqcn":"Knoxville, MD, United States","geobyteslatitude":"39.352600","geobyteslongitude":"-77.664101","geobytescapital":"Washington, DC","geobytestimezone":"-05:00","geobytesnationalitysingular":"American","geobytespopulation":"278058881","geobytesnationalityplural":"Americans","geobytesmapreference":"North America ","geobytescurrency":"US Dollar","geobytescurrencycode":"USD","geobytestitle":"The United States"}';
+        $mockResponse = new Response(200, [], '{"geobytesforwarderfor":"","geobytesremoteip":"1.2.3.4","geobytesipaddress":"192.30.252.131","geobytescertainty":"100","geobytesinternet":"US","geobytescountry":"United States","geobytesregionlocationcode":"USMD","geobytesregion":"Maryland","geobytescode":"MD","geobyteslocationcode":"USMDKNOX","geobytescity":"Knoxville","geobytescityid":"29706","geobytesfqcn":"Knoxville, MD, United States","geobyteslatitude":"39.352600","geobyteslongitude":"-77.664101","geobytescapital":"Washington, DC","geobytestimezone":"-05:00","geobytesnationalitysingular":"American","geobytespopulation":"278058881","geobytesnationalityplural":"Americans","geobytesmapreference":"North America ","geobytescurrency":"US Dollar","geobytescurrencycode":"USD","geobytestitle":"The United States"}');
 
         $mockHttp->expects($this->once())
             ->method('get')
