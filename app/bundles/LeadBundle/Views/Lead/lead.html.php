@@ -229,6 +229,8 @@ $view['slots']->set(
                                                             <a href="<?php echo $view->escape($field['value']); ?>" target="_blank">
                                                                 <?php echo $field['value']; ?>
                                                             </a>
+                                                        <?php elseif (is_string($field['value']) && 'datetime' === $field['type']): ?>
+                                                            <?php echo $view['date']->toFullConcat($field['value'], 'UTC'); ?>
                                                         <?php else: ?>
                                                             <?php echo $view->escape($field['normalizedValue']); ?>
                                                         <?php endif; ?>

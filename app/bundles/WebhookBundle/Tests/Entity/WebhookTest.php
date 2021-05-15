@@ -12,6 +12,7 @@
 namespace Mautic\WebhookBundle\Tests\Entity;
 
 use Mautic\WebhookBundle\Entity\Webhook;
+use PHPUnit\Framework\Assert;
 
 class WebhookTest extends \PHPUnit\Framework\TestCase
 {
@@ -34,5 +35,25 @@ class WebhookTest extends \PHPUnit\Framework\TestCase
         $webhook = new Webhook();
         $webhook->setDateModified((new \DateTime())->modify('-2 hours'));
         $this->assertTrue($webhook->wasModifiedRecently());
+    }
+
+    public function testTriggersFromApiAreStoredAsEvents(): void
+    {
+        $webhook  = new Webhook();
+        $triggers = [
+            'mautic.company_post_save',
+            'mautic.company_post_delete',
+            'mautic.lead_channel_subscription_changed',
+        ];
+
+        $webhook->setTriggers($triggers);
+
+        $events = $webhook->getEvents();
+        Assert::assertCount(3, $events);
+
+        foreach ($events as $key => $event) {
+            Assert::assertEquals($event->getEventType(), $triggers[$key]);
+            Assert::assertSame($webhook, $event->getWebhook());
+        }
     }
 }

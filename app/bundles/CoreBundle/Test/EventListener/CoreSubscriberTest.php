@@ -171,7 +171,7 @@ class CoreSubscriberTest extends TestCase
 
         $request    = $this->createMock(Request::class);
         $controller = $this->getMockBuilder(MauticController::class)
-            ->setMethods(['initialize', 'setRequest', 'setFactory', 'setUser', 'setCoreParametersHelper', 'setDispatcher', 'setTranslator', 'setFlashBag'])
+            ->onlyMethods(['initialize', 'setRequest', 'setFactory', 'setUser', 'setCoreParametersHelper', 'setDispatcher', 'setTranslator', 'setFlashBag'])
             ->getMock();
         $controllers = [$controller];
 

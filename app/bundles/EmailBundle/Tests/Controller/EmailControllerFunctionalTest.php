@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -35,18 +37,16 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
      * Ensure there is no query for DNC reasons if there are no contacts who received the email
      * because it loads the whole DNC table if no contact IDs are provided. It can lead to
      * memory limit error if the DNC table is big.
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
-    public function testProfileEmailDetailPageForUnsentEmail()
+    public function testProfileEmailDetailPageForUnsentEmail(): void
     {
-        $segment = new LeadList();
-        $segment->setName('Segment A');
-        $segment->setPublicName('Segment A');
-        $segment->setAlias('segment-a');
-        $email = new Email();
-        $email->setName('Email A');
-        $email->setSubject('Email A Subject');
-        $email->setEmailType('list');
+        $segment = $this->createSegment();
+        $email   = $this->createEmail();
         $email->addList($segment);
+
         $this->em->persist($segment);
         $this->em->persist($email);
         $this->em->flush();
@@ -73,17 +73,14 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     /**
      * On the other hand there should be the query for DNC reasons if there are contacts who received the email.
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
-    public function testProfileEmailDetailPageForSentEmail()
+    public function testProfileEmailDetailPageForSentEmail(): void
     {
-        $segment = new LeadList();
-        $segment->setName('Segment A');
-        $segment->setPublicName('Segment A');
-        $segment->setAlias('segment-a');
-        $email = new Email();
-        $email->setName('Email A');
-        $email->setSubject('Email A Subject');
-        $email->setEmailType('list');
+        $segment = $this->createSegment();
+        $email   = $this->createEmail();
         $email->addList($segment);
         $contact = new Lead();
         $contact->setEmail('john@doe.email');
@@ -116,5 +113,44 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         Assert::assertCount(1, $dncQueries, 'DNC query not found. '.var_export($queries, true));
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function testSegmentEmailTranslationLookUp(): void
+    {
+        $segment = $this->createSegment();
+        $email   = $this->createEmail();
+        $email->addList($segment);
+
+        $this->em->persist($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        $html    = $crawler->filterXPath("//select[@id='emailform_segmentTranslationParent']//optgroup")->html();
+        self::assertSame('<option value="'.$email->getId().'">'.$email->getName().'</option>', trim($html));
+    }
+
+    private function createSegment(string $suffix = 'A'): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName("Segment $suffix");
+        $segment->setPublicName("Segment $suffix");
+        $segment->setAlias("segment-$suffix");
+
+        return $segment;
+    }
+
+    private function createEmail(string $suffix = 'A', string $emailType = 'list')
+    {
+        $email = new Email();
+        $email->setName("Email $suffix");
+        $email->setSubject("Email $suffix Subject");
+        $email->setEmailType($emailType);
+
+        return $email;
     }
 }

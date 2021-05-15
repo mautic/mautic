@@ -136,7 +136,7 @@ return [
                     'translator',
                     'kernel',
                     'validator',
-                    'security.encoder_factory',
+                    'security.password_encoder',
                 ],
             ],
         ],

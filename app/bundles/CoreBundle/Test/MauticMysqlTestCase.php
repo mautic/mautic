@@ -53,6 +53,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             $this->prepareDatabase();
         }
 
+        $this->restoreShellVerbosity();
+
         parent::tearDown();
     }
 
@@ -206,5 +208,18 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             file_put_contents($sqlDumpFile, $file);
         }
         fclose($f);
+    }
+
+    /**
+     * Restores the shell verbosity that might be set by Symfony console globally.
+     *
+     * @see \Symfony\Component\Console\Application::configureIO()
+     */
+    private function restoreShellVerbosity(): void
+    {
+        $defaultVerbosity=0;
+        putenv('SHELL_VERBOSITY='.$defaultVerbosity);
+        $_ENV['SHELL_VERBOSITY']    = $defaultVerbosity;
+        $_SERVER['SHELL_VERBOSITY'] = $defaultVerbosity;
     }
 }

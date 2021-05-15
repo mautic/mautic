@@ -14,7 +14,7 @@
     <?php
     foreach ($fields as $field) {
         if (isset($field[$column]['value'])) {
-            echo $view->escape($field[$column]['value']);
+            echo $view->escape($view['formatter']->normalizeStringValue($field[$column]['value']));
         }
     }
     ?>

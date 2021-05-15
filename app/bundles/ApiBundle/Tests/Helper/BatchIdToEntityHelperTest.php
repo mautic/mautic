@@ -13,6 +13,7 @@ namespace Mautic\ApiBundle\Tests\Helper;
 
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 class BatchIdToEntityHelperTest extends TestCase
@@ -201,5 +202,50 @@ class BatchIdToEntityHelperTest extends TestCase
         $helper          = new BatchIdToEntityHelper($parameters);
         $orderedEntities = $helper->orderByOriginalKey($entities);
         $this->assertEquals([1, 2, 4], array_keys($orderedEntities));
+    }
+
+    public function testOriginalKeyOrderingForFullAssociativeArray()
+    {
+        $entityMock1 = $this->createMock(Lead::class);
+        $entityMock1
+            ->method('getId')
+            ->willReturn(1);
+        $entityMock2 = $this->createMock(Lead::class);
+        $entityMock2
+            ->method('getId')
+            ->willReturn(2);
+        $entityMock3 = $this->createMock(Lead::class);
+        $entityMock3
+            ->method('getId')
+            ->willReturn(3);
+        $entityMock4 = $this->createMock(Lead::class);
+        $entityMock4
+            ->method('getId')
+            ->willReturn(4);
+        $entities = [$entityMock4, $entityMock2, $entityMock1, $entityMock3];
+
+        $parameters = [
+            ['id' => 1, 'foo' => 'bar'],
+            ['id' => 2, 'foo' => 'bar'],
+            ['id' => 3, 'foo' => 'bar'],
+            ['id' => 4, 'foo' => 'bar'],
+        ];
+        $helper          = new BatchIdToEntityHelper($parameters);
+        $orderedEntities = $helper->orderByOriginalKey($entities);
+        $this->assertEquals([0, 1, 2, 3], array_keys($orderedEntities));
+        foreach ($parameters as $key => $contact) {
+            var_dump($orderedEntities[$key]->getId());
+            Assert::assertEquals($orderedEntities[$key]->getId(), $entities[$key]->getId());
+        }
+
+        $parameters = [
+            1 => ['id' => 1, 'foo' => 'bar'],
+            2 => ['id' => 2, 'foo' => 'bar'],
+            3 => ['id' => 3, 'foo' => 'bar'],
+            4 => ['id' => 4, 'foo' => 'bar'],
+        ];
+        $helper          = new BatchIdToEntityHelper($parameters);
+        $orderedEntities = $helper->orderByOriginalKey($entities);
+        $this->assertEquals([1, 2, 3, 4], array_keys($orderedEntities));
     }
 }

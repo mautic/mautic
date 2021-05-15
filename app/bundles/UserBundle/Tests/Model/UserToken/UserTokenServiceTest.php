@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2017 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -16,19 +18,17 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Mautic\UserBundle\Model\UserToken\UserTokenService;
+use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * Class UserTokenServiceTest.
- */
 class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|RandomHelperInterface
      */
     private $randomHelperMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|UserTokenRepositoryInterface
      */
     private $userTokenRepositoryMock;
 
@@ -39,33 +39,28 @@ class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Test UserToken generateSecret.
-     *
-     * Extra:
-     * Tests second attempt for generating secret if not unique secret was generated first time
+     * Tests second attempt for generating secret if not unique secret was generated first time.
      */
-    public function testGenerateSecret()
+    public function testGenerateSecret(): void
     {
         $secretLength    = 6;
         $randomSecret    = 'secret';
         $token           = new UserToken();
         $token->setAuthorizator('test-secret');
-        $this->randomHelperMock->expects($this->at(0))
+
+        $this->randomHelperMock->expects($this->exactly(2))
             ->method('generate')
             ->with($secretLength)
             ->willReturn($randomSecret);
-        $this->userTokenRepositoryMock->expects($this->at(0))
+
+        $this->userTokenRepositoryMock->expects($this->exactly(2))
             ->method('isSecretUnique')
             ->with($randomSecret)
-            ->willReturn(false); // Test second attempt to get unique secret
-        $this->randomHelperMock->expects($this->at(1))
-            ->method('generate')
-            ->with($secretLength)
-            ->willReturn($randomSecret);
-        $this->userTokenRepositoryMock->expects($this->at(1))
-            ->method('isSecretUnique')
-            ->with($randomSecret)
-            ->willReturn(true); // Ok now
+            ->willReturnOnConsecutiveCalls(
+                false, // Test second attempt to get unique secret
+                true // Ok now
+            );
+
         $userTokenService = $this->getUserTokenService();
         $secretToken      = $userTokenService->generateSecret($token, $secretLength);
         $this->assertSame($randomSecret, $secretToken->getSecret());
@@ -73,10 +68,7 @@ class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($secretToken->getExpiration());
     }
 
-    /**
-     * Test verify method.
-     */
-    public function testVerify()
+    public function testVerify(): void
     {
         $token        = new UserToken();
         $user         = new User();
@@ -85,28 +77,20 @@ class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
             ->setOneTimeOnly(true)
             ->setExpiration(null)
             ->setAuthorizator($authorizator);
-        $this->userTokenRepositoryMock->expects($this->at(0))
+
+        $this->userTokenRepositoryMock->expects($this->once())
             ->method('verify')
             ->with($token)
             ->willReturn(true);
-        $userTokenService = $this->getUserTokenService();
-        $this->assertTrue($userTokenService->verify($token));
+
+        $this->assertTrue($this->getUserTokenService()->verify($token));
     }
 
-    /**
-     * @return UserTokenService
-     */
-    private function getUserTokenService()
+    private function getUserTokenService(): UserTokenService
     {
-        // Prevent IDE from warning about different expected classes because of mock
-        /** @var RandomHelperInterface $randomHelperMock */
-        $randomHelperMock = $this->randomHelperMock;
-        /** @var UserTokenRepositoryInterface $userTokenRepositoryMock */
-        $userTokenRepositoryMock = $this->userTokenRepositoryMock;
-
         return new UserTokenService(
-            $randomHelperMock,
-            $userTokenRepositoryMock
+            $this->randomHelperMock,
+            $this->userTokenRepositoryMock
         );
     }
 }

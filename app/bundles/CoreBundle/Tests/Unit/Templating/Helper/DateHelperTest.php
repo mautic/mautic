@@ -110,4 +110,12 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame('00:00:00', $this->helper->toText($dateTime));
     }
+
+    public function testFullConcat()
+    {
+        date_default_timezone_set('Europe/Paris');
+        $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2021-02-21 18:00:00', new \DateTimeZone('UTC'));
+        $result   = $this->helper->toFullConcat($dateTime, 'UTC');
+        $this->assertEquals($result, 'February 21, 2021 7:00 pm');
+    }
 }

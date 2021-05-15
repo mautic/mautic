@@ -28,7 +28,7 @@ class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->fieldRepository = $this->createMock(LeadFieldRepository::class);
         $this->fieldModel      = $this->getMockBuilder(FieldModel::class)
-            ->setMethods(['cleanAlias', 'getRepository'])
+            ->onlyMethods(['cleanAlias', 'getRepository'])
             ->disableOriginalConstructor()
             ->getMock();
 

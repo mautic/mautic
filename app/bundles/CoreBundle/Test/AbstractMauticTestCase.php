@@ -29,16 +29,16 @@ abstract class AbstractMauticTestCase extends WebTestCase
         loadFixtureFiles as private traitLoadFixtureFiles;
     }
 
-    protected ?EntityManager $em;
-    protected ?Connection $connection;
-    protected ?KernelBrowser $client;
-    protected ?array $clientOptions = [];
-    protected ?array $clientServer  = [
+    protected EntityManager $em;
+    protected Connection $connection;
+    protected KernelBrowser $client;
+    protected array $clientOptions = [];
+    protected array $clientServer  = [
         'PHP_AUTH_USER' => 'admin',
         'PHP_AUTH_PW'   => 'mautic',
     ];
 
-    protected ?array $configParams = [
+    protected array $configParams = [
         'api_enabled'                       => true,
         'api_enable_basic_auth'             => true,
         'create_custom_field_in_background' => false,

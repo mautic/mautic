@@ -11,8 +11,10 @@
 
 namespace Mautic\ApiBundle\Controller;
 
+use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use OAuth2\OAuth2;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -212,6 +214,11 @@ class ClientController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
+                    // If the admin is creating API credentials, enable 'Client Credential' grant type
+                    if (ClientModel::API_MODE_OAUTH2 == $apiMode && $this->getUser()->getRole()->isAdmin()) {
+                        $client->addGrantType(OAuth2::GRANT_TYPE_CLIENT_CREDENTIALS);
+                    }
+                    $client->setRole($this->getUser()->getRole());
                     $model->saveEntity($client);
                     $this->addFlash(
                         'mautic.api.client.notice.created',

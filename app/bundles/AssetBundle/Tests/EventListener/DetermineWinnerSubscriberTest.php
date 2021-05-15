@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -11,16 +13,24 @@
 
 namespace Mautic\AssetBundle\Tests\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\EventListener\DetermineWinnerSubscriber;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\PageBundle\Entity\Page;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|EntityManagerInterface
+     */
     private $em;
+
+    /**
+     * @var MockObject|TranslatorInterface
+     */
     private $translator;
 
     /**
@@ -32,7 +42,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->em         = $this->createMock(EntityManager::class);
+        $this->em         = $this->createMock(EntityManagerInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->subscriber = new DetermineWinnerSubscriber($this->em, $this->translator);
     }
@@ -65,13 +75,8 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
                 ],
         ];
 
-        $this->translator->expects($this->at(0))
-            ->method('trans')
-            ->willReturn($transDownloads);
-
-        $this->translator->expects($this->at(1))
-            ->method('trans')
-            ->willReturn($transHits);
+        $this->translator->method('trans')
+            ->willReturnOnConsecutiveCalls($transDownloads, $transHits);
 
         $this->em->expects($this->once())
             ->method('getRepository')
