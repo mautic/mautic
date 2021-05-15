@@ -157,6 +157,28 @@ class ReportSubscriber implements EventSubscriberInterface
                 $companyColumns
             );
 
+            if ($event->checkContext([self::CONTEXT_LEADS])) {
+                $stageColumns = [
+                    'l.stage_id'           => [
+                        'label' => 'mautic.lead.report.attribution.stage_id',
+                        'type'  => 'int',
+                        'link'  => 'mautic_stage_action',
+                    ],
+                    's.name'               => [
+                        'alias' => 'stage_name',
+                        'label' => 'mautic.lead.report.attribution.stage_name',
+                        'type'  => 'string',
+                    ],
+                    's.date_added' => [
+                        'alias'   => 'stage_date_added',
+                        'label'   => 'mautic.lead.report.attribution.stage_date_added',
+                        'type'    => 'string',
+                        'formula' => '(SELECT MAX(stage_log.date_added) FROM '.MAUTIC_TABLE_PREFIX.'lead_stages_change_log stage_log WHERE stage_log.stage_id = l.stage_id AND stage_log.lead_id = l.id)',
+                    ],
+                ];
+                $columns      = array_merge($columns, $stageColumns);
+            }
+
             $data = [
                 'display_name' => 'mautic.lead.leads',
                 'columns'      => $columns,
@@ -239,6 +261,10 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 if ($event->usesColumn('i.ip_address')) {
                     $event->addLeadIpAddressLeftJoin($qb);
+                }
+
+                if ($event->hasColumn(['s.name']) || $event->hasFilter(['s.name'])) {
+                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'stages', 's', 's.id = l.stage_id');
                 }
 
                 if ($event->hasFilter('s.leadlist_id')) {
