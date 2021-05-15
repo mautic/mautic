@@ -212,6 +212,10 @@ class FormTestAbstract extends TestCase
             ->method('getIpAddress')
             ->willReturn(new IpAddress());
 
+        $companyModel->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([]);
+
         $submissionModel = new SubmissionModel(
             $ipLookupHelper,
             $templatingHelperMock,
