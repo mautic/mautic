@@ -24,7 +24,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
             'properties' => [],
         ],
         'textarea' => [
-            'properties' => [],
+            'properties' => [
+                'allowHtml' => [],
+            ],
         ],
         'multiselect' => [
             'properties' => [
