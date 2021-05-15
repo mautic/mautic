@@ -82,6 +82,6 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
 
         $this->prepareParametersFromRequest($this->form, $params);
 
-        Assert::assertSame($expectedValues, $params);
+        $this->assertSame($expectedValues, $params);
     }
 }
