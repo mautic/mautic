@@ -772,7 +772,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false)
     {
-        $company = $this->importCompany($fields, $data, $owner, false);
+        $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists);
 
         if (null === $company) {
             throw new \Exception($this->translator->trans('mautic.company.error.notfound', [], 'flashes'));
@@ -794,7 +794,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws \Exception
      */
-    public function importCompany($fields, $data, $owner = null, $persist = true)
+    public function importCompany($fields, $data, $owner = null, $persist = true, $skipIfExists = false)
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));
