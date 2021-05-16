@@ -24,7 +24,7 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     {
         $mockModel = $this->getMockBuilder(DynamicContentModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getEntities'])
+            ->onlyMethods(['getEntities'])
             ->getMock();
 
         $mockModel->expects($this->exactly(2))
