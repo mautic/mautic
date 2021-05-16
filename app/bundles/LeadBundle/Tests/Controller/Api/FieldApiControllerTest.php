@@ -47,7 +47,7 @@ class FieldApiControllerTest extends CampaignTestAbstract
         ];
 
         $request = $this->getMockBuilder(Request::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->disableOriginalConstructor()
             ->getMock();
 
