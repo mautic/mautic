@@ -720,6 +720,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setFromAddress($fromAddress)
     {
+        $this->isChanged('fromAddress', $fromAddress);
         $this->fromAddress = $fromAddress;
 
         return $this;
@@ -740,6 +741,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setFromName($fromName)
     {
+        $this->isChanged('fromName', $fromName);
         $this->fromName = $fromName;
 
         return $this;
@@ -760,6 +762,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setReplyToAddress($replyToAddress)
     {
+        $this->isChanged('replyToAddress', $replyToAddress);
         $this->replyToAddress = $replyToAddress;
 
         return $this;
@@ -780,6 +783,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setBccAddress($bccAddress)
     {
+        $this->isChanged('bccAddress', $bccAddress);
         $this->bccAddress = $bccAddress;
 
         return $this;

@@ -486,4 +486,60 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         return $q->execute()->fetchAll();
     }
+
+    public function getCompaniesByUniqueFields(array $uniqueFieldsWithData, int $companyId = null, int $limit = null)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('c.*')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'c');
+
+        // loop through the fields and
+        foreach ($uniqueFieldsWithData as $col => $val) {
+            $q->{$this->getUniqueIdentifiersWherePart()}("c.$col = :".$col)
+                ->setParameter($col, $val);
+        }
+
+        // if we have a lead ID lets use it
+        if (!empty($companyId)) {
+            // make sure that its not the id we already have
+            $q->andWhere('c.id != :companyId')
+                ->setParameter('companyId', $companyId);
+        }
+
+        if ($limit) {
+            $q->setMaxResults($limit);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        // Collect the IDs
+        $companies = [];
+        foreach ($results as $r) {
+            $companies[$r['id']] = $r;
+        }
+
+        // Get entities
+        $q = $this->getEntityManager()->createQueryBuilder()
+            ->select('c')
+            ->from(Company::class, 'c');
+
+        $q->where(
+            $q->expr()->in('c.id', ':ids')
+        )
+            ->setParameter('ids', array_keys($companies))
+            ->orderBy('c.dateAdded', 'DESC')
+            ->addOrderBy('c.id', 'DESC');
+
+        $entities = $q->getQuery()
+            ->getResult();
+
+        /** @var Company $company */
+        foreach ($entities as $company) {
+            $company->setFields(
+                $this->formatFieldValues($companies[$company->getId()], true, 'company')
+            );
+        }
+
+        return $entities;
+    }
 }

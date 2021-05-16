@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\EmailBundle\Helper\EmailValidator;
+use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
@@ -25,6 +26,7 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
+use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Form\Type\CompanyType;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
@@ -70,13 +72,19 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     private $repoSetup = false;
 
     /**
+     * @var CompanyDeduper
+     */
+    private $companyDeduper;
+
+    /**
      * CompanyModel constructor.
      */
-    public function __construct(FieldModel $leadFieldModel, Session $session, EmailValidator $validator)
+    public function __construct(FieldModel $leadFieldModel, Session $session, EmailValidator $validator, CompanyDeduper $companyDeduper)
     {
         $this->leadFieldModel = $leadFieldModel;
         $this->session        = $session;
         $this->emailValidator = $validator;
+        $this->companyDeduper = $companyDeduper;
     }
 
     /**
@@ -726,6 +734,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $companyFields  = [];
         $internalFields = $this->fetchCompanyFields();
 
+        if (!isset($mappedFields['companyname']) && isset($mappedFields['company'])) {
+            $mappedFields['companyname'] = $mappedFields['company'];
+
+            unset($mappedFields['company']);
+        }
+
         foreach ($mappedFields as $mauticField => $importField) {
             foreach ($internalFields as $entityField) {
                 if ($entityField['alias'] === $mauticField) {
@@ -756,28 +770,37 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
     {
-        $fields = array_flip($fields);
+        $company = $this->importCompany($fields, $data, $owner, false);
 
-        // Let's check for an existing company by name
-        $hasName  = (!empty($fields['companyname']) && !empty($data[$fields['companyname']]));
-        $hasEmail = (!empty($fields['companyemail']) && !empty($data[$fields['companyemail']]));
-
-        if ($hasEmail) {
-            $this->emailValidator->validate($data[$fields['companyemail']], false);
+        if (null === $company) {
+            throw new \Exception($this->translator->trans('mautic.company.error.notfound', [], 'flashes'));
         }
 
-        if ($hasName) {
-            $companyName    = isset($fields['companyname']) ? $data[$fields['companyname']] : null;
-            $companyCity    = isset($fields['companycity']) ? $data[$fields['companycity']] : null;
-            $companyCountry = isset($fields['companycountry']) ? $data[$fields['companycountry']] : null;
-            $companyState   = isset($fields['companystate']) ? $data[$fields['companystate']] : null;
+        $merged = !$company->isNew();
 
-            $found   = $companyName ? $this->getRepository()->identifyCompany($companyName, $companyCity, $companyCountry, $companyState) : false;
-            $company = ($found) ? $this->em->getReference('MauticLeadBundle:Company', $found['id']) : new Company();
-            $merged  = $found;
-        } else {
+        $this->saveEntity($company);
+
+        return $merged;
+    }
+
+    /**
+     * @param array $fields
+     * @param array $data
+     * @param null  $owner
+     *
+     * @return bool|null
+     *
+     * @throws \Exception
+     */
+    public function importCompany($fields, $data, $owner = null, $persist = true)
+    {
+        try {
+            $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));
+        } catch (UniqueFieldNotFoundException $uniqueFieldNotFoundException) {
             return null;
         }
+
+        $company = !empty($duplicateCompanies) ? $duplicateCompanies[0] : new Company();
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
             $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);
@@ -813,14 +836,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $company->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
         }
 
-        // Set profile data using the form so that values are validated
-        $fieldData = [];
-        foreach ($fields as $entityField => $importField) {
-            // Prevent overwriting existing data with empty data
-            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && '' != $data[$importField]) {
-                $fieldData[$entityField] = $data[$importField];
-            }
-        }
+        $fieldData = $this->getFieldData($fields, $data);
 
         $fieldErrors = [];
 
@@ -863,6 +879,29 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->saveEntity($company);
         }
 
-        return $merged;
+        return $company;
+    }
+
+    public function checkForDuplicateCompanies(array $queryFields)
+    {
+        return $this->companyDeduper->checkForDuplicateCompanies($queryFields);
+    }
+
+    /**
+     * @param array $fields
+     * @param array $data
+     */
+    protected function getFieldData($fields, $data): array
+    {
+        // Set profile data using the form so that values are validated
+        $fieldData = [];
+        foreach ($fields as $importField => $entityField) {
+            // Prevent overwriting existing data with empty data
+            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && '' != $data[$importField]) {
+                $fieldData[$entityField] = $data[$importField];
+            }
+        }
+
+        return $fieldData;
     }
 }

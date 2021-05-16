@@ -388,9 +388,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
                 $uniqueLeadFieldData[$leadField] = $value;
             }
-            if (isset($leadFieldTypes[$leadField]['type']) && 'text' == $leadFieldTypes[$leadField]['type']) {
-                $matchedFields[$leadField] = substr($value, 0, 255);
-            }
+
+            $fieldType                 = isset($leadFieldTypes[$leadField]['type']) ? $leadFieldTypes[$leadField]['type'] : '';
+            $matchedFields[$leadField] = $this->limitString($value, $fieldType);
         }
 
         if (count(array_diff_key($uniqueLeadFields, $matchedFields)) == count($uniqueLeadFields)) {
@@ -657,5 +657,24 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
 
         return $matchedFields;
+    }
+
+    /**
+     * Limits the string.
+     *
+     * @param mixed  $value
+     * @param string $fieldType
+     *
+     * @return mixed
+     */
+    protected function limitString($value, $fieldType = '')
+    {
+        // We must not convert boolean values to string, otherwise "false" will be converted to an empty string.
+        // "False" has to be converted to 0 instead.
+        if (('text' == $fieldType) && !is_bool($value)) {
+            return substr($value, 0, 255);
+        }
+
+        return $value;
     }
 }

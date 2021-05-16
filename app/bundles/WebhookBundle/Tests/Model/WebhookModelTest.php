@@ -11,7 +11,9 @@
 
 namespace Mautic\WebhookBundle\Tests\Model;
 
+use DateTime;
 use Doctrine\ORM\EntityManager;
+use GuzzleHttp\Psr7\Response;
 use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -77,7 +79,6 @@ class WebhookModelTest extends TestCase
         $this->userHelper            = $this->createMock(UserHelper::class);
         $this->webhookRepository     = $this->createMock(WebhookRepository::class);
         $this->httpClientMock        = $this->createMock(Client::class);
-        $this->entityManagerMock     = $this->createMock(EntityManager::class);
         $this->eventDispatcherMock   = $this->createMock(EventDispatcher::class);
         $this->model                 = $this->initModel();
     }
@@ -141,7 +142,7 @@ class WebhookModelTest extends TestCase
         $event->setEventType('leads');
         $queueMock->method('getPayload')->willReturn('{"the": "payload"}');
         $queueMock->method('getEvent')->willReturn($event);
-        $queueMock->method('getDateAdded')->willReturn(new \DateTime('2018-04-10T15:04:57+00:00'));
+        $queueMock->method('getDateAdded')->willReturn(new DateTime('2018-04-10T15:04:57+00:00'));
         $queueMock->method('getId')->willReturn(12);
 
         $queueRepositoryMock = $this->createMock(WebhookQueueRepository::class);
@@ -188,7 +189,7 @@ class WebhookModelTest extends TestCase
         $event->setEventType('leads');
         $queue->setPayload('{"the": "payload"}');
         $queue->setEvent($event);
-        $queue->setDateAdded(new \DateTime('2018-04-10T15:04:57+00:00'));
+        $queue->setDateAdded(new DateTime('2018-04-10T15:04:57+00:00'));
 
         $this->parametersHelperMock->method('get')
             ->willReturnCallback(function ($param) {
@@ -209,6 +210,52 @@ class WebhookModelTest extends TestCase
         ];
 
         $this->assertEquals($expectedPayload, $this->initModel()->getWebhookPayload($webhook, $queue));
+    }
+
+    public function testProcessWebhook(): void
+    {
+        $webhook = new Webhook();
+        $webhook->setWebhookUrl('test-webhook.com');
+
+        $event = new Event();
+        $event->setEventType('mautic.email_on_send');
+
+        $queue = new class() extends WebhookQueue {
+            public function getId(): int
+            {
+                return 1;
+            }
+        };
+        $queue->setPayload('{"payload": "some data"}');
+        $queue->setEvent($event);
+        $queue->setDateAdded(new DateTime('2021-04-01T16:00:00+00:00'));
+
+        $webhookQueueRepoMock = $this->createMock(WebhookQueueRepository::class);
+
+        $this->entityManagerMock
+            ->method('getRepository')
+            ->with(WebhookQueue::class)
+            ->willReturn($webhookQueueRepoMock);
+
+        $webhookQueueRepoMock
+            ->method('deleteQueuesById')
+            ->with([1])
+            ->willReturn(null);
+
+        $responsePayload = [
+            'mautic.email_on_send' => [
+                [
+                    'payload'   => 'some data',
+                    'timestamp' => '2021-04-01T16:00:00+00:00',
+                ],
+            ],
+        ];
+        $this->httpClientMock
+            ->method('post')
+            ->with('test-webhook.com', $responsePayload)
+            ->willReturn(new Response(200, [], 'Success'));
+
+        self::assertTrue($this->model->processWebhook($webhook, $queue));
     }
 
     private function initModel(): WebhookModel

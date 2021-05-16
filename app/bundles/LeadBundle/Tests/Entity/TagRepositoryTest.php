@@ -24,7 +24,7 @@ class TagRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $mockRepository = $this->getMockBuilder(TagRepository::class)
             ->disableOriginalConstructor()
-            ->setMethods(['findOneBy'])
+            ->onlyMethods(['findOneBy'])
             ->getMock();
 
         $mockRepository->expects($this->once())
@@ -39,7 +39,7 @@ class TagRepositoryTest extends \PHPUnit\Framework\TestCase
     {
         $mockRepository = $this->getMockBuilder(TagRepository::class)
             ->disableOriginalConstructor()
-            ->setMethods(['findOneBy'])
+            ->onlyMethods(['findOneBy'])
             ->getMock();
 
         $mockRepository->expects($this->once())

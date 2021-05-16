@@ -454,6 +454,23 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
         switch ($event) {
             case 'leads':
+                $expected['leads']['columns']['l.stage_id'] = [
+                    'label' => null,
+                    'type'  => 'int',
+                    'link'  => 'mautic_stage_action',
+                    'alias' => 'stage_id',
+                ];
+                $expected['leads']['columns']['s.name'] = [
+                    'alias' => 'stage_name',
+                    'label' => null,
+                    'type'  => 'string',
+                ];
+                $expected['leads']['columns']['s.date_added'] = [
+                    'alias'   => 'stage_date_added',
+                    'label'   => null,
+                    'type'    => 'string',
+                    'formula' => '(SELECT MAX(stage_log.date_added) FROM lead_stages_change_log stage_log WHERE stage_log.stage_id = l.stage_id AND stage_log.lead_id = l.id)',
+                ];
                 break;
             case 'contact.frequencyrules':
                 $expected['contact.frequencyrules'] = [
@@ -891,7 +908,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $mockStmt = $this->getMockBuilder(PDOStatement::class)
             ->disableOriginalConstructor()
-            ->setMethods(['fetchAll'])
+            ->onlyMethods(['fetchAll'])
             ->getMock();
 
         $this->reportGraphEventMock->expects($this->once())
@@ -900,7 +917,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $mockChartQuery = $this->getMockBuilder(ChartQuery::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'modifyCountQuery',
                 'modifyTimeDataQuery',
                 'loadAndBuildTimeData',
