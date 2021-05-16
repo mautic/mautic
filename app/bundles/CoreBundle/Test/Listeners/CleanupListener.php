@@ -13,12 +13,11 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Test\Listeners;
 
-use LogicException;
+use Closure;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestListener;
 use PHPUnit\Framework\TestListenerDefaultImplementation;
 use ReflectionObject;
-use ReflectionProperty;
 
 /**
  * Prevents memory leaks by resetting all the test properties.
@@ -33,24 +32,17 @@ class CleanupListener implements TestListener
 
         foreach ($reflection->getProperties() as $property) {
             if (!$property->isStatic() && 0 !== strpos($property->getDeclaringClass()->getName(), 'PHPUnit\\')) {
-                $this->assertTypeIsNullable($property);
-                $property->setAccessible(true);
-                $property->setValue($test, null);
+                $this->unsetProperty($test, $property->getName());
             }
         }
     }
 
-    private function assertTypeIsNullable(ReflectionProperty $property): void
+    private function unsetProperty(object $object, string $property): void
     {
-        if (PHP_VERSION_ID < 70400) {
-            return;
-        }
+        $closure = function (object $object) use ($property) {
+            unset($object->$property);
+        };
 
-        /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
-        $type = $property->getType();
-
-        if ($type && !$type->allowsNull()) {
-            throw new LogicException(sprintf('Property "%s::$%s" must be nullable to prevent memory leaks', $property->getDeclaringClass()->getName(), $property->getName()));
-        }
+        Closure::bind($closure, null, $object)($object);
     }
 }

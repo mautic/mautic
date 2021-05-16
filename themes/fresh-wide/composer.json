@@ -2,7 +2,6 @@
   "name": "mautic/theme-fresh-wide",
   "description": "Mautic Fresh Wide Theme",
   "type": "mautic-theme",
-  "version": "1.0",
   "keywords": ["mautic","theme"],
   "extra": {
     "install-directory-name": "fresh-wide"

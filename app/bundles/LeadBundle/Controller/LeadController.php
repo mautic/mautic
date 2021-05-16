@@ -520,6 +520,13 @@ class LeadController extends FormController
                     } else {
                         return $this->editAction($lead->getId(), true);
                     }
+                } else {
+                    $formErrors = $this->getFormErrorMessages($form);
+                    $this->addFlash(
+                        $this->getFormErrorMessage($formErrors),
+                        [],
+                        'error'
+                    );
                 }
             } else {
                 $viewParameters = ['page' => $page];
@@ -689,6 +696,13 @@ class LeadController extends FormController
                                 ]
                             ),
                         ]
+                    );
+                } else {
+                    $formErrors = $this->getFormErrorMessages($form);
+                    $this->addFlash(
+                        $this->getFormErrorMessage($formErrors),
+                        [],
+                        'error'
                     );
                 }
             } else {

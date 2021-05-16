@@ -4,15 +4,27 @@
   "type": "project",
   "description": "Mautic Open Source Distribution",
   "require": {
-    "composer/installers": "^1.10",
-    "mautic/core-composer-scaffold": "4.x-dev",
-    "mautic/core-dev": "4.x-dev",
-    "mautic/core-project-message": "4.x-dev",
-    "mautic/core-recommended": "4.x-dev",
-    "mautic/theme-coffee": "dev-main",
-    "mautic/theme-mauve": "dev-main",
-    "mautic/theme-nature": "dev-main"
+    "composer/installers": "^1.11",
+    "mautic/core-lib": "self.version",
+    "mautic/grapes-js-builder-bundle": "dev-mautic3x"
   },
+  "require-dev": {
+    "symfony/web-profiler-bundle": "~4.4.0",
+    "symfony/var-dumper": "~4.4.0",
+    "symfony/browser-kit": "~4.4.0",
+    "symfony/dom-crawler": "~4.4.0",
+    "mautic/transifex": "^4.0",
+    "http-interop/http-factory-guzzle": "^1.0",
+    "webfactory/exceptions-bundle": "~4.3",
+    "friendsofphp/php-cs-fixer": "~2.16.1",
+    "liip/test-fixtures-bundle": "^1.6",
+    "phpstan/phpstan": "0.12.25",
+    "rector/rector-prefixed": "^0.6.13",
+    "symfony/phpunit-bridge": "~5.1.0",
+    "phpunit/phpunit": "^9.5",
+    "liip/functional-test-bundle": "^4.2",
+    "php-http/mock-client": "^1.4"
+  },  
   "autoload": {
     "psr-4": {
       "MauticPlugin\\": "plugins/"
@@ -20,79 +32,16 @@
   },
   "repositories": [
     {
+      "type": "path",
+      "url": "app"
+    },
+    {
       "type": "git",
       "url": "https://github.com/mautic/BazingaOAuthServerBundle.git"
     },
     {
       "type": "git",
       "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
-    },
-    {
-      "type": "package",
-      "package": {
-        "name": "mautic/plugin-grapesjs-builder",
-        "version": "1.0-RC4",
-        "type": "mautic-plugin",
-        "source": {
-          "url": "https://github.com/mautic/plugin-grapesjs-builder.git",
-          "type": "git",
-          "reference": "1.0-RC4"
-        },
-        "require": {
-          "composer/installers": "~1.0"
-        },
-        "extra": {
-          "installer-name": "GrapesJsBuilderBundle"
-        }
-      }
-    },
-    {
-      "type": "package",
-      "package": {
-        "name": "composer/installers",
-        "version": "1.11",
-        "type": "composer-plugin",
-        "source": {
-          "url": "https://github.com/nickveenhof/installers.git",
-          "type": "git",
-          "reference": "patch-2"
-        },
-        "autoload": {
-          "psr-4": {
-            "Composer\\Installers\\": "src/Composer/Installers"
-          }
-        },
-        "autoload-dev": {
-          "psr-4": {
-            "Composer\\Installers\\Test\\": "tests/Composer/Installers/Test"
-          }
-        },
-        "extra": {
-          "class": "Composer\\Installers\\Plugin",
-          "branch-alias": {
-            "dev-main": "1.x-dev"
-          }
-        },
-        "replace": {
-          "shama/baton": "*",
-          "roundcube/plugin-installer": "*"
-        },
-        "require": {
-          "composer-plugin-api": "^1.0 || ^2.0"
-        },
-        "require-dev": {
-          "composer/composer": "1.6.* || ^2.0",
-          "composer/semver": "^1 || ^3",
-          "symfony/phpunit-bridge": "^4.2 || ^5",
-          "phpstan/phpstan": "^0.12.55",
-          "symfony/process": "^2.3",
-          "phpstan/phpstan-phpunit": "^0.12.16"
-        },
-        "scripts": {
-          "test": "SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT=1 vendor/bin/simple-phpunit",
-          "phpstan": "vendor/bin/phpstan analyse"
-        }
-      }
     }
   ],
   "conflict": {

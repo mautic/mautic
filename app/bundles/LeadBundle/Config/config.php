@@ -538,6 +538,16 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.lead.serializer.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\SerializerSubscriber::class,
+                'arguments' => [
+                    'request_stack',
+                ],
+                'tag'          => 'jms_serializer.event_subscriber',
+                'tagArguments' => [
+                    'event' => \JMS\Serializer\EventDispatcher\Events::POST_SERIALIZE,
+                ],
+            ],
             'mautic.lead.subscriber.donotcontact' => [
                 'class'     => \Mautic\LeadBundle\EventListener\DoNotContactSubscriber::class,
                 'arguments' => [
@@ -813,6 +823,13 @@ return [
                     'mautic.lead.repository.lead',
                 ],
             ],
+            'mautic.company.deduper' => [
+                'class'     => \Mautic\LeadBundle\Deduplicate\CompanyDeduper::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'mautic.lead.repository.company',
+                ],
+            ],
             'mautic.lead.helper.primary_company' => [
                 'class'     => \Mautic\LeadBundle\Helper\PrimaryCompanyHelper::class,
                 'arguments' => [
@@ -863,6 +880,11 @@ return [
                 'arguments' => [
                     \Mautic\LeadBundle\Entity\Company::class,
                 ],
+                'methodCalls' => [
+                    'setUniqueIdentifiersOperator' => [
+                        '%mautic.company_unique_identifiers_operator%',
+                    ],
+                ],
             ],
             'mautic.lead.repository.company_lead' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
@@ -890,6 +912,11 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\LeadBundle\Entity\Lead::class,
+                ],
+                'methodCalls' => [
+                    'setUniqueIdentifiersOperator' => [
+                        '%mautic.contact_unique_identifiers_operator%',
+                    ],
                 ],
             ],
             'mautic.lead.repository.frequency_rule' => [
@@ -1184,6 +1211,7 @@ return [
                     'mautic.lead.model.field',
                     'session',
                     'mautic.validator.email',
+                    'mautic.company.deduper',
                 ],
             ],
             'mautic.lead.model.import' => [
@@ -1449,5 +1477,7 @@ return [
             '6' => 'id',
         ],
         \Mautic\LeadBundle\Field\Settings\BackgroundSettings::CREATE_CUSTOM_FIELD_IN_BACKGROUND => false,
+        'company_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
+        'contact_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
     ],
 ];
