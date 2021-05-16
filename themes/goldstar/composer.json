@@ -2,7 +2,6 @@
   "name": "mautic/theme-goldstar",
   "description": "Mautic Goldstar Theme",
   "type": "mautic-theme",
-  "version": "1.0",
   "keywords": ["mautic","theme"],
   "extra": {
     "install-directory-name": "goldstar"
