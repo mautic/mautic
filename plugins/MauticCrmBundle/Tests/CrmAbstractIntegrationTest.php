@@ -81,7 +81,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 
         $companyModel = $this->getMockBuilder(CompanyModel::class)
             ->setMethodsExcept(['setFieldValues'])
-            ->setConstructorArgs([$this->fieldModel, $this->session, $emailValidator, $listModel])
+            ->setConstructorArgs([$this->fieldModel, $this->session, $emailValidator, $listModel, $companyDeduper])
             ->getMock();
         $companyModel->expects($this->any())
             ->method('fetchCompanyFields')
