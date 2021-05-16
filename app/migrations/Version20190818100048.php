@@ -10,8 +10,8 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
@@ -24,7 +24,7 @@ class Version20190818100048 extends AbstractMauticMigration
         $smsTable      = $schema->getTable(MAUTIC_TABLE_PREFIX.'sms_messages');
         $smsStatsTable = $schema->getTable(MAUTIC_TABLE_PREFIX.'sms_message_stats');
         if ($smsStatsTable->hasColumn('is_delivered') && $smsStatsTable->hasColumn('is_read') && $smsStatsTable->hasColumn('is_failed') && $smsTable->hasColumn('delivered_count') && $smsTable->hasColumn('read_count') && $smsTable->hasColumn('failed_count') && $smsTable->hasColumn('properties')) {
-            throw new SkipMigrationException('Schema includes this migration');
+            throw new SkipMigration('Schema includes this migration');
         }
     }
 
