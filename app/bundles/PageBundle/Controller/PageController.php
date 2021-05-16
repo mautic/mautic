@@ -822,6 +822,9 @@ class PageController extends FormController
         }
 
         $template = InputHelper::clean($this->request->query->get('template'));
+        if (empty($template)) {
+            throw new \InvalidArgumentException('No template found');
+        }
         $slots    = $this->factory->getTheme($template)->getSlots('page');
 
         //merge any existing changes
@@ -999,8 +1002,9 @@ class PageController extends FormController
         }
 
         $slotsHelper->start('builder'); ?>
-        <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
-        <?php
+<input type="hidden" id="builder_entity_id"
+    value="<?php echo $entity->getSessionId(); ?>" />
+<?php
         $slotsHelper->stop();
     }
 }

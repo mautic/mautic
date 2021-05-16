@@ -60,6 +60,8 @@
     ```
 
     * `mautic.http.connector` has been removed in favor of `mautic.http.client`. See the example above on how to use it in your class constructors.
+*   IntegrationsBundle
+    * The `IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE` event was moved to a slightly later point in time. Thanks to this change, plugin developers can actually get the updated values that were submitted by the user. This way, listeners can modify values before persisting them to the database. This brings the functionality in line with `ConfigEvents::CONFIG_PRE_SAVE`.
 
 *   PluginBundle
     * If you extend `AbstractIntegration` and use the method `makeRequest`, including `$options['return_raw']`, you will now get `\Psr\Http\Message\ResponseInterface` as the response type (was `\Joomla\CMS\Http\Response`)
@@ -70,5 +72,7 @@
     * \Mautic\WebhookBundle\Entity\Webhook::addQueues() removed and there is no replacement
     * \Mautic\WebhookBundle\Entity\Webhook::addQueue() removed and there is no replacement
     * \Mautic\WebhookBundle\Entity\Webhook::removeQueue() removed and there is no replacement
+*   Support for unique fields for companies
+    * Mautic never use unique fields for companies and use hard coded algorithm to match duplicate companies. Mautic 4 add support with Company Name as default unique field. You can configure any other fields and also expression between fields (AND/OR) in Configuration.
 
     

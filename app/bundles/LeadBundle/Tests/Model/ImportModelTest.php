@@ -62,7 +62,7 @@ class ImportModelTest extends StandardImportTestHelper
     {
         $entity = $this->initImportEntity();
         $model  = $this->getMockBuilder(ImportModel::class)
-            ->setMethods(['getParallelImportLimit', 'getRepository'])
+            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -71,7 +71,7 @@ class ImportModelTest extends StandardImportTestHelper
             ->will($this->returnValue(4));
 
         $repository = $this->getMockBuilder(ImportRepository::class)
-            ->setMethods(['countImportsWithStatuses'])
+            ->onlyMethods(['countImportsWithStatuses'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -92,7 +92,7 @@ class ImportModelTest extends StandardImportTestHelper
     {
         $entity = $this->initImportEntity();
         $model  = $this->getMockBuilder(ImportModel::class)
-            ->setMethods(['getParallelImportLimit', 'getRepository'])
+            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -101,7 +101,7 @@ class ImportModelTest extends StandardImportTestHelper
             ->will($this->returnValue(4));
 
         $repository = $this->getMockBuilder(ImportRepository::class)
-            ->setMethods(['countImportsWithStatuses'])
+            ->onlyMethods(['countImportsWithStatuses'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -122,7 +122,7 @@ class ImportModelTest extends StandardImportTestHelper
     {
         $entity = $this->initImportEntity();
         $model  = $this->getMockBuilder(ImportModel::class)
-            ->setMethods(['getParallelImportLimit', 'getRepository'])
+            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -131,7 +131,7 @@ class ImportModelTest extends StandardImportTestHelper
             ->will($this->returnValue(6));
 
         $repository = $this->getMockBuilder(ImportRepository::class)
-            ->setMethods(['countImportsWithStatuses'])
+            ->onlyMethods(['countImportsWithStatuses'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -151,7 +151,7 @@ class ImportModelTest extends StandardImportTestHelper
     public function testBeginImportWhenParallelLimitHit()
     {
         $model = $this->getMockBuilder(ImportModel::class)
-            ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'getParallelImportLimit'])
+            ->onlyMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'getParallelImportLimit'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -187,7 +187,7 @@ class ImportModelTest extends StandardImportTestHelper
     public function testBeginImportWhenDatabaseException()
     {
         $model = $this->getMockBuilder(ImportModel::class)
-            ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'logDebug', 'process'])
+            ->onlyMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'logDebug', 'process'])
             ->disableOriginalConstructor()
             ->getMock();
 
