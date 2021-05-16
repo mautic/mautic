@@ -61,9 +61,6 @@ class CallbackHelperTest extends \PHPUnit\Framework\TestCase
         $replyEvent = new ReplyEvent();
         $replyEvent->setMessage('test');
 
-        $replyEvent = new ReplyEvent();
-        $replyEvent->setMessage('test');
-
         $handler->expects($this->once())
             ->method('getEvent')
             ->willReturn($replyEvent);
@@ -100,6 +97,11 @@ class CallbackHelperTest extends \PHPUnit\Framework\TestCase
             }
 
             public function getTransportName()
+            {
+                return '';
+            }
+
+            public function getEvent(Request $request)
             {
                 return '';
             }
