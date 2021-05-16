@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
@@ -32,6 +34,7 @@ use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Provider\UserProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -39,29 +42,124 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadModelTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|RequestStack
+     */
     private $requestStackMock;
+
+    /**
+     * @var MockObject|CookieHelper
+     */
     private $cookieHelperMock;
+
+    /**
+     * @var MockObject|IpLookupHelper
+     */
     private $ipLookupHelperMock;
+
+    /**
+     * @var MockObject|PathsHelper
+     */
     private $pathsHelperMock;
+
+    /**
+     * @var MockObject|IntegrationHelper
+     */
     private $integrationHelperkMock;
+
+    /**
+     * @var MockObject|FieldModel
+     */
     private $fieldModelMock;
+
+    /**
+     * @var MockObject|ListModel
+     */
     private $listModelMock;
+
+    /**
+     * @var MockObject|FormFactory
+     */
     private $formFactoryMock;
+
+    /**
+     * @var MockObject|CompanyModel
+     */
     private $companyModelMock;
+
+    /**
+     * @var MockObject|CategoryModel
+     */
     private $categoryModelMock;
+
+    /**
+     * @var MockObject|ChannelListHelper
+     */
     private $channelListHelperMock;
+
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
     private $coreParametersHelperMock;
+
+    /**
+     * @var MockObject|EmailValidator
+     */
     private $emailValidatorMock;
+
+    /**
+     * @var MockObject|UserProvider
+     */
     private $userProviderMock;
+
+    /**
+     * @var MockObject|ContactTracker
+     */
     private $contactTrackerMock;
+
+    /**
+     * @var MockObject|DeviceTracker
+     */
     private $deviceTrackerMock;
+
+    /**
+     * @var MockObject|LegacyLeadModel
+     */
     private $legacyLeadModelMock;
+
+    /**
+     * @var MockObject|IpAddressModel
+     */
     private $ipAddressModelMock;
+
+    /**
+     * @var MockObject|LeadRepository
+     */
     private $leadRepositoryMock;
+
+    /**
+     * @var MockObject|CompanyLeadRepository
+     */
     private $companyLeadRepositoryMock;
+
+    /**
+     * @var MockObject|UserHelper
+     */
     private $userHelperMock;
+
+    /**
+     * @var MockObject|EventDispatcherInterface
+     */
     private $dispatcherMock;
+
+    /**
+     * @var MockObject|EntityManager
+     */
     private $entityManagerMock;
+
+    /**
+     * @var LeadModel
+     */
     private $leadModel;
 
     protected function setUp(): void
@@ -119,7 +217,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->companyModelMock->method('getCompanyLeadRepository')->willReturn($this->companyLeadRepositoryMock);
     }
 
-    public function testIpLookupDoesNotAddCompanyIfConfiguredSo()
+    public function testIpLookupDoesNotAddCompanyIfConfiguredSo(): void
     {
         $this->mockGetLeadRepository();
 
@@ -130,8 +228,14 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $entity->addIpAddress($ipAddress);
 
-        $this->coreParametersHelperMock->expects($this->at(0))->method('get')->with('anonymize_ip', false)->willReturn(false);
-        $this->coreParametersHelperMock->expects($this->at(1))->method('get')->with('ip_lookup_create_organization', false)->willReturn(false);
+        $this->coreParametersHelperMock->expects($this->exactly(2))
+            ->method('get')
+            ->withConsecutive(
+                ['anonymize_ip', false],
+                ['ip_lookup_create_organization', false]
+            )
+            ->willReturn(false);
+
         $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
         $this->fieldModelMock->method('getFieldList')->willReturn([]);
         $this->companyLeadRepositoryMock->expects($this->never())->method('getEntitiesByLead');
@@ -143,7 +247,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(empty($entity->getUpdatedFields()['company']));
     }
 
-    public function testIpLookupAddsCompanyIfDoesNotExistInEntity()
+    public function testIpLookupAddsCompanyIfDoesNotExistInEntity(): void
     {
         $this->mockGetLeadRepository();
 
@@ -155,13 +259,20 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $entity->addIpAddress($ipAddress);
 
-        $this->coreParametersHelperMock->expects($this->at(0))->method('get')->with('anonymize_ip', false)->willReturn(false);
-        $this->coreParametersHelperMock->expects($this->at(1))->method('get')->with('ip_lookup_create_organization', false)->willReturn(true);
+        $this->coreParametersHelperMock->expects($this->exactly(2))
+            ->method('get')
+            ->withConsecutive(
+                ['anonymize_ip', false],
+                ['ip_lookup_create_organization', false]
+            )
+            ->willReturnOnConsecutiveCalls(false, true);
 
         $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
         $this->fieldModelMock->method('getFieldList')->willReturn([]);
         $this->companyLeadRepositoryMock->method('getEntitiesByLead')->willReturn([]);
-        $this->companyModelMock->expects($this->once())->method('getEntities')->willReturn([]);
+        $this->companyModelMock->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([]);
 
         $this->leadModel->saveEntity($entity);
 
@@ -169,7 +280,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($companyFromIpLookup, $entity->getUpdatedFields()['company']);
     }
 
-    public function testIpLookupAddsCompanyIfExistsInEntity()
+    public function testIpLookupAddsCompanyIfExistsInEntity(): void
     {
         $this->mockGetLeadRepository();
 
@@ -194,14 +305,14 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($entity->getUpdatedFields()['company']));
     }
 
-    public function testCheckForDuplicateContact()
+    public function testCheckForDuplicateContact(): void
     {
-        $this->fieldModelMock->expects($this->at(0))
+        $this->fieldModelMock->expects($this->once())
             ->method('getFieldList')
             ->with(false, false, ['isPublished' => true, 'object' => 'lead'])
             ->willReturn(['email' => 'Email', 'firstname' => 'First Name']);
 
-        $this->fieldModelMock->expects($this->at(1))
+        $this->fieldModelMock->expects($this->once())
             ->method('getUniqueIdentifierFields')
             ->willReturn(['email' => 'Email']);
 
@@ -214,7 +325,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getRepository'])
+            ->onlyMethods(['getRepository'])
             ->getMock();
 
         $mockLeadModel->expects($this->once())
@@ -237,14 +348,14 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('John', $contact->getFirstname());
     }
 
-    public function testCheckForDuplicateContactForOnlyPubliclyUpdatable()
+    public function testCheckForDuplicateContactForOnlyPubliclyUpdatable(): void
     {
-        $this->fieldModelMock->expects($this->at(0))
+        $this->fieldModelMock->expects($this->once())
             ->method('getFieldList')
             ->with(false, false, ['isPublished' => true, 'object' => 'lead', 'isPubliclyUpdatable' => true])
             ->willReturn(['email' => 'Email']);
 
-        $this->fieldModelMock->expects($this->at(1))
+        $this->fieldModelMock->expects($this->once())
             ->method('getUniqueIdentifierFields')
             ->willReturn(['email' => 'Email']);
 
@@ -257,7 +368,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getRepository'])
+            ->onlyMethods(['getRepository'])
             ->getMock();
 
         $mockLeadModel->expects($this->once())
@@ -284,12 +395,12 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     /**
      * Test that the Lead won't be set to the LeadEventLog if the Lead save fails.
      */
-    public function testImportWillNotSetLeadToLeadEventLogWhenLeadSaveFails()
+    public function testImportWillNotSetLeadToLeadEventLogWhenLeadSaveFails(): void
     {
         $leadEventLog  = new LeadEventLog();
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['saveEntity', 'checkForDuplicateContact'])
+            ->onlyMethods(['saveEntity', 'checkForDuplicateContact'])
             ->getMock();
 
         $mockUserModel = $this->getMockBuilder(UserHelper::class)
@@ -303,7 +414,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['extractCompanyDataFromImport'])
+            ->onlyMethods(['extractCompanyDataFromImport'])
             ->getMock();
 
         $mockCompanyModel->expects($this->once())->method('extractCompanyDataFromImport')->willReturn([[], []]);
@@ -330,7 +441,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $lead          = new Lead();
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['saveEntity', 'checkForDuplicateContact'])
+            ->onlyMethods(['saveEntity', 'checkForDuplicateContact'])
             ->getMock();
 
         $mockUserModel = $this->getMockBuilder(UserHelper::class)
@@ -344,7 +455,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['extractCompanyDataFromImport'])
+            ->onlyMethods(['extractCompanyDataFromImport'])
             ->getMock();
 
         $mockCompanyModel->expects($this->once())->method('extractCompanyDataFromImport')->willReturn([[], []]);
@@ -361,7 +472,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testSetFieldValuesWithStage()
+    public function testSetFieldValuesWithStage(): void
     {
         $lead = new Lead();
         $lead->setId(1);
@@ -384,15 +495,16 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->with(1)
             ->willReturn($stageMock);
 
-        $this->entityManagerMock->expects($this->at(0))
+        $this->entityManagerMock->expects($this->exactly(2))
             ->method('getRepository')
-            ->with('MauticLeadBundle:StagesChangeLog')
-            ->willReturn($stagesChangeLogRepo);
-
-        $this->entityManagerMock->expects($this->at(1))
-            ->method('getRepository')
-            ->with(Stage::class)
-            ->willReturn($stageRepositoryMock);
+            ->withConsecutive(
+                ['MauticLeadBundle:StagesChangeLog'],
+                [Stage::class]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $stagesChangeLogRepo,
+                $stageRepositoryMock
+            );
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->once())
@@ -403,7 +515,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->setFieldValues($lead, $data, false, false);
     }
 
-    public function testImportIsIgnoringContactWithNotFoundStage()
+    public function testImportIsIgnoringContactWithNotFoundStage(): void
     {
         $lead = new Lead();
         $lead->setId(1);
@@ -421,14 +533,16 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->with($data['stage'])
             ->willReturn(null);
 
-        $this->entityManagerMock->expects($this->at(0))
+        $this->entityManagerMock->expects($this->exactly(2))
             ->method('getRepository')
-            ->with('MauticLeadBundle:StagesChangeLog')
-            ->willReturn($stagesChangeLogRepo);
-        $this->entityManagerMock->expects($this->at(1))
-            ->method('getRepository')
-            ->with(Stage::class)
-            ->willReturn($stageRepositoryMock);
+            ->withConsecutive(
+                ['MauticLeadBundle:StagesChangeLog'],
+                [Stage::class]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $stagesChangeLogRepo,
+                $stageRepositoryMock
+            );
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->once())
@@ -442,7 +556,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->setFieldValues($lead, $data, false, false);
     }
 
-    public function testManipulatorIsLoggedOnlyOnce()
+    public function testManipulatorIsLoggedOnlyOnce(): void
     {
         $this->mockGetLeadRepository();
 
@@ -493,7 +607,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
      * @param string $property
      * @param mixed  $value
      */
-    private function setProperty($object, $class, $property, $value)
+    private function setProperty($object, $class, $property, $value): void
     {
         $reflectedProp = new \ReflectionProperty($class, $property);
         $reflectedProp->setAccessible(true);

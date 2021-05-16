@@ -1299,16 +1299,7 @@ class LeadModel extends FormModel
         [$companyFields, $companyData]     = $this->companyModel->extractCompanyDataFromImport($fields, $data);
 
         if (!empty($companyData)) {
-            $companyFields = array_flip($companyFields);
-            $this->companyModel->import($companyFields, $companyData, $owner, $list, $tags, $persist, $eventLog);
-            $companyFields = array_flip($companyFields);
-
-            $companyName    = isset($companyFields['companyname']) ? $companyData[$companyFields['companyname']] : null;
-            $companyCity    = isset($companyFields['companycity']) ? $companyData[$companyFields['companycity']] : null;
-            $companyCountry = isset($companyFields['companycountry']) ? $companyData[$companyFields['companycountry']] : null;
-            $companyState   = isset($companyFields['companystate']) ? $companyData[$companyFields['companystate']] : null;
-
-            $company = $this->companyModel->getRepository()->identifyCompany($companyName, $companyCity, $companyCountry, $companyState);
+            $company       = $this->companyModel->importCompany(array_flip($companyFields), $companyData);
         }
 
         foreach ($fields as $leadField => $importField) {
@@ -1559,6 +1550,7 @@ class LeadModel extends FormModel
 
             if (null !== $company) {
                 $this->companyModel->addLeadToCompany($company, $lead);
+                $this->setPrimaryCompany($company->getId(), $lead->getId());
             }
 
             if ($eventLog) {

@@ -74,7 +74,7 @@ class FormatterHelper extends Helper
                 }
                 break;
             case 'datetime':
-                $string = $this->dateHelper->toFull($val, 'utc');
+                $string = $this->dateHelper->toFullConcat($val, 'utc');
                 break;
             case 'time':
                 $string = $this->dateHelper->toTime($val, 'utc');
@@ -172,6 +172,24 @@ class FormatterHelper extends Helper
             },
             explode(',', $csv)
         );
+    }
+
+    /**
+     * Takes a string and returns a normalized representation of it.
+     *
+     * @param $string string
+     *
+     * @return string
+     */
+    public function normalizeStringValue($string)
+    {
+        $stringIsDate = \DateTime::createFromFormat('Y-m-d H:i:s', $string, new \DateTimeZone('UTC'));
+
+        if ($stringIsDate && ($string === $stringIsDate->format('Y-m-d H:i:s'))) {
+            return $this->_($stringIsDate, 'datetime');
+        }
+
+        return $this->_($string);
     }
 
     /**

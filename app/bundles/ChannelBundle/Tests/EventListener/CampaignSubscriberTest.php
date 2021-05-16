@@ -317,7 +317,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     private function getEvent()
     {
         $event = $this->getMockBuilder(Event::class)
-            ->setMethods(['getId'])
+            ->onlyMethods(['getId'])
             ->getMock();
         $event->method('getId')
             ->willReturn(1);
@@ -384,7 +384,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             );
 
         $log = $this->getMockBuilder(LeadEventLog::class)
-            ->setMethods(['getLead', 'getId'])
+            ->onlyMethods(['getLead', 'getId'])
             ->getMock();
         $log->method('getLead')
             ->willReturn($lead);
@@ -409,7 +409,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             );
 
         $log2 = $this->getMockBuilder(LeadEventLog::class)
-            ->setMethods(['getLead', 'getId'])
+            ->onlyMethods(['getLead', 'getId'])
             ->getMock();
         $log2->method('getLead')
             ->willReturn($lead2);
