@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
