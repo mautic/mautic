@@ -159,6 +159,59 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Copy of.
+     *
+     * @see \Mautic\LeadBundle\Tests\Segment\RandomParameterNameTest::testGenerateRandomParameterName
+     */
+    public function testGenerateRandomParameterName()
+    {
+        $expectedValues = [
+            'par0',
+            'par1',
+            'par2',
+            'par3',
+            'par4',
+            'par5',
+            'par6',
+            'par7',
+            'par8',
+            'par9',
+            'para',
+            'parb',
+            'parc',
+            'pard',
+            'pare',
+            'parf',
+            'parg',
+            'parh',
+            'pari',
+            'parj',
+            'park',
+            'parl',
+            'parm',
+            'parn',
+            'paro',
+            'parp',
+            'parq',
+            'parr',
+            'pars',
+            'part',
+            'paru',
+            'parv',
+            'parw',
+            'parx',
+            'pary',
+            'parz',
+            'par10',
+            'par11',
+        ];
+
+        foreach ($expectedValues as $expectedValue) {
+            self::assertSame($expectedValue, $this->repo->generateRandomParameterName());
+        }
+    }
+
+    /**
      * Calls a protected method from CommonRepository with provided argumetns.
      *
      * @param string $method name
