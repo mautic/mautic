@@ -419,7 +419,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         break;
                     case 'neq':
                         $columnValue = ":$paramName";
-                        $expression = $queryBuilder->expr()->orX(
+                        $expression  = $queryBuilder->expr()->orX(
                             $queryBuilder->expr()->isNull($filter['column']),
                             $queryBuilder->expr()->$exprFunction($filter['column'], $columnValue)
                         );
