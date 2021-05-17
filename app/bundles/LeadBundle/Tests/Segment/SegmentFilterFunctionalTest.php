@@ -12,6 +12,11 @@ use Mautic\LeadBundle\Segment\ContactSegmentService;
 class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 {
     /**
+     * @var array
+     */
+    private $leads = [];
+
+    /**
      * Test creates: contacts, segment
      * Test rebuilds segment
      * Test check that the right contacts are in the segment.
@@ -28,6 +33,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $countInSegment = $this->createLeads($contacts);
         $leadList       = $this->createSegment($segment);
         $this->buildSegment($leadList, $countInSegment);
+        $this->cleanAfterTest($leadList);
     }
 
     private function createLeads(array $contacts): int
@@ -36,6 +42,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         foreach ($contacts as $contact) {
             $lead = $this->createLead($contact);
             $this->em->persist($lead);
+            $this->leads[] = $lead;
             if ($contact['in_segment']) {
                 ++$countInSegment;
             }
@@ -111,6 +118,17 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
             $expectedCountInSegment,
             $segmentContacts[$segment->getId()]['count']
         );
+    }
+
+    private function cleanAfterTest($segment): void
+    {
+        $this->em->remove($segment);
+        foreach ($this->leads as $lead) {
+            $deleteLead = $this->em->getRepository(Lead::class)->find($lead->getId());
+            $this->em->remove($deleteLead);
+        }
+        $this->em->flush();
+        $this->leads = [];
     }
 
     /**
