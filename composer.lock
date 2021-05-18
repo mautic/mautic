@@ -5048,7 +5048,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "d4bda1ed111f8c4f9379ae7db3e423dce55ec7fe"
+                "reference": "b44c7813423fdc0ba4389e193950414150b3a9a8"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5155,6 +5155,7 @@
                 "mautic/plugin-gmail": "self.version",
                 "mautic/plugin-outlook": "self.version",
                 "mautic/plugin-social": "self.version",
+                "mautic/plugin-tagmanager": "self.version",
                 "mautic/plugin-zapier": "self.version",
                 "mautic/theme-aurora": "self.version",
                 "mautic/theme-blank": "self.version",
