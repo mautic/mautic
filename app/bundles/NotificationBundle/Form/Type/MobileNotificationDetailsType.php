@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class MobileNotificationDetailsType extends AbstractType
 {
@@ -53,7 +54,8 @@ class MobileNotificationDetailsType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.notification.form.mobile.ios_subtitle.tooltip',
                     ],
-                    'required' => false,
+                    'required'    => true,
+                    'constraints' => new NotBlank(),
                 ]
             );
             $builder->add(

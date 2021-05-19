@@ -183,6 +183,12 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->setChannel('notification', $notification->getId());
 
         // If for some reason the call failed, tell mautic to try again by return false
+
+        $responseBody = json_decode($response->body, true);
+        if (is_array($responseBody) && isset($responseBody['errors'][0])) {
+            return $event->setFailed($responseBody['errors'][0]);
+        }
+
         if (200 !== $response->code) {
             return $event->setResult(false);
         }

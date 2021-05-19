@@ -9,10 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $data = $event['extra']['log']['metadata'];
-if (isset($data['failed'])) {
-    return;
-}
 ?>
+<?php if (isset($data['failed'])): ?>
+    <p class="text-danger mt-0 mb-10"><i class="fa fa-warning"></i> <?php echo $view['translator']->trans('mautic.campaign.event.last_error').': '.$data['reason']; ?></p>
+    <?php return; ?>
+<?php endif; ?>
 
 <dl class="dl-horizontal">
     <dt><?php echo $view['translator']->trans('mautic.notification.timeline.status'); ?></dt>
