@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class LeadListSearchFunctionalTest extends MauticMysqlTestCase
 {
-    protected ?array $clientOptions = ['debug' => true];
+    protected array $clientOptions = ['debug' => true];
 
     /** @noinspection SqlResolve */
     public function testSegmentSearch(): void
