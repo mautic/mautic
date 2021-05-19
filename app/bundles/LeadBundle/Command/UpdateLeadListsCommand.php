@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -99,31 +100,31 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 $output->writeln('<error>'.$translator->trans('mautic.lead.list.rebuild.not_found', ['%id%' => $id]).'</error>');
             }
         } else {
-            $lists = $listModel->getEntities(
+            $segments = $listModel->getEntities(
                 [
                     'iterator_mode' => true,
                 ]
             );
 
-            while (false !== ($l = $lists->next())) {
-                // Get first item; using reset as the key will be the ID and not 0
-                $l = reset($l);
+            $segments = $this->getPrioritizedSegments($segments);
 
-                if ($l->isPublished()) {
-                    $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $l->getId()]).'</info>');
+            foreach ($segments as $segment) {
+                $output->writeln(
+                    '<info>'.$translator->trans(
+                        'mautic.lead.list.rebuild.rebuilding',
+                        ['%id%' => $segment->getId()]
+                    ).'</info>'
+                );
 
-                    $processed = $listModel->rebuildListLeads($l, $batch, $max, $output);
-                    $output->writeln(
-                        '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'."\n"
-                    );
-                }
-
-                unset($l);
+                $processed = $listModel->rebuildListLeads($segment, $batch, $max, $output);
+                $output->writeln(
+                    '<comment>'.$translator->trans(
+                        'mautic.lead.list.rebuild.leads_affected',
+                        ['%leads%' => $processed]
+                    ).'</comment>'."\n"
+                );
             }
-
-            unset($lists);
         }
-
         $this->completeRun();
 
         if ($enableTimeMeasurement) {
@@ -132,5 +133,44 @@ class UpdateLeadListsCommand extends ModeratedCommand
         }
 
         return 0;
+    }
+
+    /**
+     * Build based on filters. Segment membership filters process on the end.
+     *
+     * @param $segments
+     *
+     * @return LeadList[]
+     */
+    protected function getPrioritizedSegments($segments): array
+    {
+        $simpleSegments  = [];
+        $complexSegments = [];
+        while (false !== ($segment = $segments->next())) {
+            // Get first item; using reset as the key will be the ID and not 0
+            /** @var LeadList $segment */
+            $segment = reset($segment);
+            if ($segment->isPublished()) {
+                if (!$this->hasComplexFilter($segment->getFilters())) {
+                    $simpleSegments[] = $segment;
+                } else {
+                    $complexSegments[] = $segment;
+                }
+            }
+            unset($segment);
+        }
+
+        return array_merge($simpleSegments, $complexSegments);
+    }
+
+    protected function hasComplexFilter(array $filters): bool
+    {
+        foreach ($filters as $filter) {
+            if ('leadlist' == $filter['field']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
