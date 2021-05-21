@@ -20,6 +20,18 @@ if (empty($smsType)) {
 
 $customButtons = [];
 if (!$isEmbedded) {
+    $customButtons[] = [
+        'attr' => [
+            'class'       => 'btn btn-default btn-nospin',
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#MauticSharedModal',
+            'href'        => $view['router']->path('mautic_sms_action', ['objectAction' => 'sendExample', 'objectId' => $sms->getId()]),
+            'data-header' => $view['translator']->trans('mautic.email.send.example'),
+        ],
+        'iconClass' => 'fa fa-send',
+        'btnText'   => 'mautic.email.send.example',
+        'primary'   => true,
+    ];
     $view['slots']->set(
         'actions',
         $view->render(
