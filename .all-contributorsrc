@@ -166,6 +166,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "sensalot",
+      "name": "sensalot",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6697244?v=4",
+      "profile": "https://github.com/sensalot",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
