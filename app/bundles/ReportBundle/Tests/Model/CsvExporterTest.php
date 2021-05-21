@@ -26,7 +26,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         $dateHelperMock = $this->createMock(DateHelper::class);
 
         $dateHelperMock->expects($this->any())
-            ->method('toFull')
+            ->method('toFullConcat')
             ->willReturn('2017-10-01');
 
         $translator = $this->createMock(TranslatorInterface::class);

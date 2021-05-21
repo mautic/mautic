@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -218,25 +220,22 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $queryBuilderMock->method('execute')->willReturn($statementMock);
 
-        $eventMock->expects($this->at(0))
+        $eventMock->expects($this->once())
             ->method('getRequestedGraphs')
             ->willReturn(['mautic.email.graph.pie.read.ingored.unsubscribed.bounced']);
 
-        $eventMock->expects($this->at(1))
-            ->method('checkContext')
-            ->with(['email.stats', 'emails'])
+        $eventMock->method('checkContext')
+            ->withConsecutive(
+                [['email.stats', 'emails']],
+                ['emails']
+            )
             ->willReturn(true);
 
-        $eventMock->expects($this->at(2))
-            ->method('checkContext')
-            ->with('emails')
-            ->willReturn(true);
-
-        $eventMock->expects($this->at(3))
+        $eventMock->expects($this->once())
             ->method('getQueryBuilder')
             ->willReturn($queryBuilderMock);
 
-        $eventMock->expects($this->at(4))
+        $eventMock->expects($this->once())
             ->method('getOptions')
             ->willReturn(['chartQuery' => $chartQueryMock, 'translator' => $translatorMock]);
 
