@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-15-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -92,6 +92,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/gabepri"><img src="https://avatars.githubusercontent.com/u/73728034?v=4?s=100" width="100px;" alt=""/><br /><sub><b>gabepri</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Agabepri" title="Bug reports">🐛</a> <a href="https://github.com/mautic/mautic/commits?author=gabepri" title="Code">💻</a></td>
     <td align="center"><a href="https://incentfit.com"><img src="https://avatars.githubusercontent.com/u/13243272?v=4?s=100" width="100px;" alt=""/><br /><sub><b>incentfit</b></sub></a><br /><a href="#userTesting-incentfit" title="User Testing">📓</a></td>
     <td align="center"><a href="http://drahy.net"><img src="https://avatars.githubusercontent.com/u/12815758?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Lukáš Drahý</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=hluchas" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://about.me/alanhartless"><img src="https://avatars.githubusercontent.com/u/63312?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Alan Hartless (he/him)</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=alanhartless" title="Code">💻</a></td>
   </tr>
 </table>
 
