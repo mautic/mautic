@@ -97,6 +97,9 @@ trait CustomFieldsApiControllerTrait
                 }
 
                 // Some requests don't seem to have properties unserialized by default (even in M2)
+                if (!isset($fieldDefinition['properties'])) {
+                    $fieldDefinition['properties'] = [];
+                }
                 $properties = is_string($fieldDefinition['properties']) ? unserialize($fieldDefinition['properties']) : $fieldDefinition['properties'];
 
                 $fields[$group][$field]['value']           = empty($properties['scale']) ? (int) $fields[$group][$field]['value']

@@ -139,6 +139,51 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "alanhartless",
+      "name": "Alan Hartless (he/him)",
+      "avatar_url": "https://avatars.githubusercontent.com/u/63312?v=4",
+      "profile": "https://about.me/alanhartless",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "mohit-rocks",
+      "name": "Mohit Aghera",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2618452?v=4",
+      "profile": "http://mohitaghera.in",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "domparry",
+      "name": "Dom Parry",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19376765?v=4",
+      "profile": "https://github.com/domparry",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "sensalot",
+      "name": "sensalot",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6697244?v=4",
+      "profile": "https://github.com/sensalot",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "shinde-rahul",
+      "name": "Rahul Shinde",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1046788?v=4",
+      "profile": "https://github.com/shinde-rahul",
+      "contributions": [
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
