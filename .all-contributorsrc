@@ -157,6 +157,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "domparry",
+      "name": "Dom Parry",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19376765?v=4",
+      "profile": "https://github.com/domparry",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
