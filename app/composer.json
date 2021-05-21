@@ -121,6 +121,7 @@
     "mautic/plugin-outlook": "self.version",
     "mautic/plugin-social": "self.version",
     "mautic/plugin-zapier": "self.version",
+    "mautic/plugin-tagmanager": "self.version",
     "mautic/theme-coffee": "self.version",
     "mautic/theme-mauve": "self.version",
     "mautic/theme-nature": "self.version",
