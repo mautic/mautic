@@ -583,7 +583,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get contacts for a specific channel entity.
      *
-     * @param $args - same as getEntity/getEntities
+     * @param array  $args             same as getEntity/getEntities
      * @param        $joinTable
      * @param        $entityId
      * @param array  $filters
@@ -592,7 +592,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return array
      */
-    public function getEntityContacts($args, $joinTable, $entityId, $filters = [], $entityColumnName = 'id', array $additionalJoins = null, $contactColumnName = 'lead_id')
+    public function getEntityContacts($args, $joinTable, $entityId, $filters = [], $entityColumnName = 'id', array $additionalJoins = null, $contactColumnName = 'lead_id', \DateTimeInterface $dateFrom = null, \DateTimeInterface $dateTo = null)
     {
         $qb = $this->getEntitiesDbalQueryBuilder();
 
@@ -646,6 +646,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $qb->andWhere($expr);
                 }
             }
+        }
+
+        if ($dateFrom && $dateTo) {
+            $qb->andWhere('entity.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
         }
 
         $args['qb'] = $qb;

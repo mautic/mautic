@@ -11,7 +11,8 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Cache\QueryCacheProfile;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -22,9 +23,6 @@ class CampaignRepository extends CommonRepository
     use ContactLimiterTrait;
     use SlaveConnectionTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         $q = $this->getEntityManager()
@@ -47,8 +45,6 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object $entity
      * @param bool   $flush
      */
@@ -454,8 +450,10 @@ class CampaignRepository extends CommonRepository
      * @param array $pendingEvents List of specific events to rule out
      *
      * @return int
+     *
+     * @throws \Doctrine\DBAL\Cache\CacheException
      */
-    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [])
+    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [], \DateTimeInterface $dateFrom = null, \DateTimeInterface $dateTo = null)
     {
         $q = $this->getSlaveConnection()->createQueryBuilder();
 
@@ -467,12 +465,18 @@ class CampaignRepository extends CommonRepository
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
-            ->setParameter('false', false, Type::BOOLEAN);
+            ->setParameter('false', false, Types::BOOLEAN);
 
         if ($leadId) {
             $q->andWhere(
                 $q->expr()->eq('cl.lead_id', (int) $leadId)
             );
+        }
+
+        if ($dateFrom && $dateTo) {
+            $q->andWhere('cl.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
         }
 
         if (count($pendingEvents) > 0) {
@@ -486,12 +490,27 @@ class CampaignRepository extends CommonRepository
                     )
                 );
 
+            if ($dateFrom && $dateTo) {
+                $sq->andWhere('cl.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                    ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                    ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+            }
+
             $q->andWhere(
                 sprintf('NOT EXISTS (%s)', $sq->getSQL())
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        if ($q->getConnection()->getConfiguration()->getResultCacheImpl()) {
+            $results = $q->getConnection()->executeCacheQuery(
+                $q->getSQL(),
+                $q->getParameters(),
+                $q->getParameterTypes(),
+                new QueryCacheProfile(600, __METHOD__)
+            )->fetchAll();
+        } else {
+            $results = $q->execute()->fetchAll();
+        }
 
         return (int) $results[0]['lead_count'];
     }

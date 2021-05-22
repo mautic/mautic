@@ -117,7 +117,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
         ]);
 
         if (!count($entities)) {
-            throw new TransformationFailedException(sprintf('Tags for "%s" does not exist!', $id));
+            throw new TransformationFailedException(sprintf('Tags for "%s" does not exist!', implode(', ', $id)));
         }
 
         return $entities;

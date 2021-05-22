@@ -85,9 +85,6 @@ class KickoffExecutioner implements ExecutionerInterface
      */
     private $counter;
 
-    /**
-     * KickoffExecutioner constructor.
-     */
     public function __construct(
         LoggerInterface $logger,
         KickoffContactFinder $kickoffContactFinder,
@@ -128,6 +125,7 @@ class KickoffExecutioner implements ExecutionerInterface
             if ($this->progressBar) {
                 $this->progressBar->finish();
             }
+            $this->executioner->persistSummaries();
         }
 
         return $this->counter;
