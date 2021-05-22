@@ -25,11 +25,11 @@
   },
   "homepage": "https://github.com/mautic/plugin-grapesjs-builder#readme",
   "dependencies": {
-    "grapesjs": "^0.16.44",
+    "grapesjs": "^0.17.3",
     "grapesjs-mjml": "^0.4.2",
     "grapesjs-parser-postcss": "^0.1.1",
     "grapesjs-preset-mautic": "github:mautic/grapesjs-preset-mautic#master",
-    "grapesjs-preset-newsletter": "^0.2.20",
+    "grapesjs-preset-newsletter": "^0.2.21",
     "grapesjs-preset-webpage": "^0.1.11"
   },
   "devDependencies": {
