@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-19-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -99,6 +99,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/domparry"><img src="https://avatars.githubusercontent.com/u/19376765?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dom Parry</b></sub></a><br /><a href="#userTesting-domparry" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/sensalot"><img src="https://avatars.githubusercontent.com/u/6697244?v=4?s=100" width="100px;" alt=""/><br /><sub><b>sensalot</b></sub></a><br /><a href="#userTesting-sensalot" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/shinde-rahul"><img src="https://avatars.githubusercontent.com/u/1046788?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rahul Shinde</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Ashinde-rahul" title="Reviewed Pull Requests">👀</a></td>
+    <td align="center"><a href="https://github.com/jos0405"><img src="https://avatars.githubusercontent.com/u/4246909?v=4?s=100" width="100px;" alt=""/><br /><sub><b>jos0405</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=jos0405" title="Code">💻</a></td>
   </tr>
 </table>
 
