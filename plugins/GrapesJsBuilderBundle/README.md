@@ -89,15 +89,22 @@ npm install
 #### Configure babel, eslint, prettier
 use the template files provided. E.g. .eslintrc.temp
 
-### How to test standalone
+### How to develop and test Grapesjs standalone
 ```bash
+# for the bare grapesjs editor
 npm run start-helloWorld
-or
+
+# or for the light mautic experience (no dynamic content)
 npm run start-mautic
+
+# or for the full mautic experience
+npm run start-mautic-full
 ```
 
-In order for start-mautic to work a running ddev container has to be present. 
-If you are on some other development environment you need to update some paths in Demo/mautic/index.html
+#### Hints
+- In order for start-mautic to work a running ddev container has to be present. 
+- If you are on some other development environment you need to update some paths in the html files. E.g. Demo/mautic/index.html
+- In order to not get CORS errors we use the ip url of DDEV. (E.g. http://127.0.0.1:59367/). The port changes all the time. So make sure you use the correct port to load dependencies from Mautic (not relevant for helloWorld).
 
 ### How to build for production
 ```bash
