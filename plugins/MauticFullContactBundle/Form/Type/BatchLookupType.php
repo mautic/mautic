@@ -14,13 +14,14 @@ namespace MauticPlugin\MauticFullContactBundle\Form\Type;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class BatchLookupType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('ids', 'hidden');
+        $builder->add('ids', HiddenType::class);
 
         $builder->add(
             'buttons',
