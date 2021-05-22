@@ -23,8 +23,8 @@ export default (editor) => {
 
   // Open popup to edit the canvas source code
   // @todo: why is this run on editor start?
-  editor.Commands.add('preset-mautic:code-edit', {
-    run: DynamicContentCommands.launchCodeEdit,
-    stop: editor.runCommand('preset-mautic:dynamic-content-tokens-to-slots'),
-  });
+  // editor.Commands.add('preset-mautic:code-edit', {
+  //   run: DynamicContentCommands.launchCodeEdit,
+  //   stop: editor.runCommand('preset-mautic:dynamic-content-tokens-to-slots'),
+  // });
 };
