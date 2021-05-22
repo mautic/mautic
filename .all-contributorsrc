@@ -184,6 +184,24 @@
       "contributions": [
         "review"
       ]
+    },
+    {
+      "login": "jos0405",
+      "name": "jos0405",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4246909?v=4",
+      "profile": "https://github.com/jos0405",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "nickveenhof",
+      "name": "Nick Veenhof",
+      "avatar_url": "https://avatars.githubusercontent.com/u/161341?v=4",
+      "profile": "http://veenhof.be",
+      "contributions": [
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
