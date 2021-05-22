@@ -14,15 +14,19 @@ function launchBuilderGrapesjs(formName) {
   const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
   const fullHtml = parser.parseFromString(textareaHtml.val(), 'text/html');
 
-  const canvasContent = mQuery('textarea.builder-mjml').val() ? mQuery('textarea.builder-mjml').val() : fullHtml.body.innerHTML;
+  const canvasContent = fullHtml.body.innerHTML
+    ? fullHtml.body.innerHTML
+    : mQuery('textarea.builder-mjml').val();
 
   const assets = textareaAssets.val() ? JSON.parse(textareaAssets.val()) : [];
+  const { head } = fullHtml;
 
   const builder = new BuilderService(
     canvasContent,
     assets,
     textareaAssets.data('upload'),
-    textareaAssets.data('delete')
+    textareaAssets.data('delete'),
+    head
   );
 
   Mautic.showChangeThemeWarning = true;
@@ -100,11 +104,6 @@ function initSelectThemeGrapesjs(parentInitSelectTheme) {
   return childInitSelectTheme;
 }
 
-Mautic.grapesConvertDynamicContentTokenToSlot =
-  BuilderService.grapesConvertDynamicContentTokenToSlot;
-Mautic.grapesConvertDynamicContentSlotsToTokens =
-  BuilderService.grapesConvertDynamicContentSlotsToTokens;
-Mautic.manageDynamicContentTokenToSlot = BuilderService.manageDynamicContentTokenToSlot;
 Mautic.launchBuilder = launchBuilderGrapesjs;
 Mautic.initSelectTheme = initSelectThemeGrapesjs(Mautic.initSelectTheme);
 Mautic.setThemeHtml = setThemeHtml;
