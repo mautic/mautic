@@ -50362,7 +50362,7 @@ var UtilService = /*#__PURE__*/function () {
     value: function getMode(editor) {
       var cfg = editor.getConfig();
 
-      if (!cfg.pluginsOpts || !cfg.pluginsOpts.grapesjsmautic) {
+      if (!cfg.pluginsOpts || !cfg.pluginsOpts.grapesjsmautic || !cfg.pluginsOpts.grapesjsmautic.mode) {
         throw new Error('Wrong Mautic Grapesjs mode');
       }
 
@@ -50640,18 +50640,13 @@ var DynamicContentCommands = /*#__PURE__*/function () {
 
   }, {
     key: "convertDynamicContentTokenToSlot",
-    value: function convertDynamicContentTokenToSlot(editor) {
-      var _this = this;
-
-      var dynamicContents = editor.DomComponents.getWrapper().find('[data-slot="dynamicContent"]');
-
-      if (dynamicContents.length <= 0) {
-        this.logger.debug('no dynamic content tokens found');
-      }
-
-      dynamicContents.forEach(function (dynamicContent) {
-        _this.dcService.manageDynamicContentTokenToSlot(dynamicContent);
-      });
+    value: function convertDynamicContentTokenToSlot(editor) {// const dynamicContents = editor.DomComponents.getWrapper().find('[data-slot="dynamicContent"]');
+      // if (dynamicContents.length <= 0) {
+      //   this.logger.debug('no dynamic content tokens found');
+      // }
+      // dynamicContents.forEach((dynamicContent) => {
+      //   this.dcService.manageDynamicContentTokenToSlot(dynamicContent);
+      // });
     }
     /**
      * Convert dynamic content slots to tokens
@@ -51869,7 +51864,7 @@ var BuilderService = /*#__PURE__*/function () {
     }
   }, {
     key: "setPresetMauticConf",
-    value: function setPresetMauticConf() {
+    value: function setPresetMauticConf(mode) {
       this.presetMauticConf = {
         sourceEditBtnLabel: Mautic.translate('grapesjsbuilder.sourceEditBtnLabel'),
         sourceCancelBtnLabel: Mautic.translate('grapesjsbuilder.sourceCancelBtnLabel'),
@@ -51879,7 +51874,8 @@ var BuilderService = /*#__PURE__*/function () {
         categoryBlockLabel: Mautic.translate('grapesjsbuilder.categoryBlockLabel'),
         dynamicContentBlockLabel: Mautic.translate('grapesjsbuilder.dynamicContentBlockLabel'),
         dynamicContentBtnLabel: Mautic.translate('grapesjsbuilder.dynamicContentBtnLabel'),
-        dynamicContentModalTitle: Mautic.translate('grapesjsbuilder.dynamicContentModalTitle')
+        dynamicContentModalTitle: Mautic.translate('grapesjsbuilder.dynamicContentModalTitle'),
+        mode: mode
       };
     }
   }, {
@@ -51887,6 +51883,7 @@ var BuilderService = /*#__PURE__*/function () {
     value: function initPage() {
       var _pluginsOpts;
 
+      this.setPresetMauticConf('page-html');
       var styles = this.getStyles(); // Launch GrapesJS with body part
 
       this.editor = _grapesjs.default.init({
@@ -51914,7 +51911,8 @@ var BuilderService = /*#__PURE__*/function () {
   }, {
     key: "initEmailMjml",
     value: function initEmailMjml() {
-      // EmailBuilder -> MJML
+      this.setPresetMauticConf('email-mjml'); // EmailBuilder -> MJML
+
       this.editor = _grapesjs.default.init({
         clearOnRender: true,
         container: '.builder-panel',
@@ -51936,7 +51934,8 @@ var BuilderService = /*#__PURE__*/function () {
   }, {
     key: "initEmailHtml",
     value: function initEmailHtml() {
-      // Launch GrapesJS with body part
+      this.setPresetMauticConf('email-html'); // Launch GrapesJS with body part
+
       this.editor = _grapesjs.default.init({
         clearOnRender: true,
         container: '.builder-panel',

@@ -122,7 +122,7 @@ export default class BuilderService {
     this.setListeners();
   }
 
-  setPresetMauticConf() {
+  setPresetMauticConf(mode) {
     this.presetMauticConf = {
       sourceEditBtnLabel: Mautic.translate('grapesjsbuilder.sourceEditBtnLabel'),
       sourceCancelBtnLabel: Mautic.translate('grapesjsbuilder.sourceCancelBtnLabel'),
@@ -133,10 +133,13 @@ export default class BuilderService {
       dynamicContentBlockLabel: Mautic.translate('grapesjsbuilder.dynamicContentBlockLabel'),
       dynamicContentBtnLabel: Mautic.translate('grapesjsbuilder.dynamicContentBtnLabel'),
       dynamicContentModalTitle: Mautic.translate('grapesjsbuilder.dynamicContentModalTitle'),
+      mode,
     };
   }
 
   initPage() {
+    this.setPresetMauticConf('page-html');
+
     const styles = this.getStyles();
     // Launch GrapesJS with body part
     this.editor = grapesjs.init({
@@ -165,6 +168,8 @@ export default class BuilderService {
   }
 
   initEmailMjml() {
+    this.setPresetMauticConf('email-mjml');
+
     // EmailBuilder -> MJML
     this.editor = grapesjs.init({
       clearOnRender: true,
@@ -189,6 +194,8 @@ export default class BuilderService {
   }
 
   initEmailHtml() {
+    this.setPresetMauticConf('email-html');
+
     // Launch GrapesJS with body part
     this.editor = grapesjs.init({
       clearOnRender: true,
@@ -197,7 +204,6 @@ export default class BuilderService {
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-
       plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic],
       pluginsOpts: {
         grapesjsnewsletter: {},
