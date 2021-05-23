@@ -1,0 +1,302 @@
+.focus-builder {
+  .website-preview {
+    .viewport-switcher {
+      position: absolute;
+      left: 0;
+      top: 75px;
+      z-index: 1025;
+      .btn-viewport {
+        height: 50px;
+        width: 50px;
+        display: table;
+
+        i {
+          display: table-cell;
+          vertical-align: middle;
+        }
+      }
+    }
+
+    .website-placeholder {
+      z-index: 1020;
+    }
+  }
+
+  #websiteScreenshot {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: auto;
+    z-index: 0;
+
+    .screenshot-container {
+      overflow: hidden;
+    }
+
+    &.css-device {
+      .screenshot-container {
+        height: 392px;
+      }
+    }
+  }
+}
+
+.builder-panel-focus {
+  overflow-y: scroll;
+
+  #focusFormContent {
+    min-height: 1000px;
+  }
+
+  .panel-title a {
+    display: block;
+  }
+
+  .nav > li > a {
+    padding: 8px 16px;
+  }
+
+  .focus-hide {
+    display: none;
+  }
+
+  .focus-style.list-group-item, .focus-type.list-group-item {
+    background-color: #f5f5f5;
+    color: #555555;
+    cursor: pointer;
+
+    &:not(.focus-active):not(.focus-hover) {
+      i.fa {
+        color: #8393a2 !important;;
+      }
+    }
+  }
+
+  .focus-active, .focus-hover {
+    background-color: #ffffff !important;
+  }
+
+  .focus-type-form {
+    .visible-focus-type-form {
+      display: block !important;
+    }
+    .hidden-focus-type-form {
+      display: none !important;
+    }
+  }
+
+  .focus-type-notice {
+    .visible-focus-type-notice {
+      display: inherit !important;
+    }
+    .hidden-focus-type-notice {
+      display: none !important;
+    }
+  }
+
+  .focus-type-link {
+    .visible-focus-type-link {
+      display: inherit !important;
+    }
+    .hidden-focus-type-link {
+      display: none !important;
+    }
+  }
+
+  .focus-type-all {
+    .focus-type {
+      display: block !important;
+    }
+    .visible-focus-type-all {
+      display: inherit !important;
+    }
+    .hidden-focus-type-all {
+      display: none !important;
+    }
+  }
+
+  .focus-style-bar {
+    .visible-focus-style-bar {
+      display: block !important;
+    }
+    .hidden-focus-style-bar {
+      display: none !important;
+    }
+  }
+
+  .focus-style-modal {
+    .visible-focus-style-modal {
+      display: inherit !important;
+    }
+    .hidden-focus-style-modal {
+      display: none !important;
+    }
+  }
+
+  .focus-style-notification {
+    .visible-focus-style-notification {
+      display: inherit !important;
+    }
+    .hidden-focus-style-notification {
+      display: none !important;
+    }
+  }
+
+  .focus-style-page {
+    .visible-focus-style-page {
+      display: inherit !important;
+    }
+    .hidden-focus-style-page {
+      display: none !important;
+    }
+  }
+
+  .focus-style-all {
+    .focus-style {
+      display: block !important;
+    }
+    .visible-focus-style-all {
+      display: inherit !important;
+    }
+    .hidden-focus-style-all {
+      display: none !important;
+    }
+  }
+
+  .label-site-color {
+    width: 25px;
+    height: 10px;
+    display: block;
+    float: left;
+    margin-right: 3px;
+    cursor: hand;
+  }
+}
+
+/* =============================================================================
+  https://github.com/callmenick/CSS-Device-Mockups
+  Licensed under the MIT license.
+  Copyright 2014, Call Me Nick.
+
+  COMMON STUFF FOR CSS DEVICES
+============================================================================= */
+.css-device {
+  position: relative;
+  margin: 0 auto;
+}
+
+.css-device__image {
+  display: block;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: auto;
+}
+
+/* =============================================================================
+  MOBILE
+============================================================================= */
+.css-device--mobile {
+  width: 270px;
+  height: 500px;
+  border-top: solid 24px #ddd;
+  border-left: solid 12px #ddd;
+  border-right: solid 12px #ddd;
+  border-bottom: solid 48px #ddd;
+  border-radius: 12px;
+}
+
+.css-device--mobile::before {
+  display: block;
+  position: absolute;
+  top: 12px;
+  left: -14px;
+  width: 2px;
+  height: 12px;
+  background-color: #bbb;
+  box-shadow: 0 0 0 0 #bbb, 0 24px 0 0 #bbb;
+  border-radius: 2px 0 0 2px;
+  content: "";
+}
+
+.css-device--mobile::after {
+  display: block;
+  position: absolute;
+  bottom: -36px;
+  left: 50%;
+  margin-left: -12px;
+  width: 24px;
+  height: 24px;
+  background-color: #bbb;
+  border-radius: 12px;
+  content: "";
+}
+
+@media all and (min-width: 720px) {
+  .css-device--mobile {
+    width: 270px;
+    border-top: solid 36px #ddd;
+    border-left: solid 18px #ddd;
+    border-right: solid 18px #ddd;
+    border-bottom: solid 72px #ddd;
+    border-radius: 18px;
+  }
+
+  .css-device--mobile::before {
+    top: 18px;
+    left: -21px;
+    width: 3px;
+    height: 18px;
+    background-color: #bbb;
+    box-shadow: 0 0 0 0 #bbb, 0 36px 0 0 #bbb;
+    border-radius: 3px 0 0 3px;
+    content: "";
+  }
+
+  .css-device--mobile::after {
+    bottom: -54px;
+    margin-left: -18px;
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    content: "";
+  }
+}
+
+.focus-builder .website-preview .website-placeholder.has-error input, .focus-builder .website-preview .website-placeholder.has-error button {
+  border-color: #a94442;
+}
+
+#websiteScreenshot.mobile .screenshot-container{
+  position: absolute;
+  left : 50%;
+  width: 320px;
+  margin: 0px;
+  margin-top: 20px;
+}
+
+#websiteScreenshot.mobile .preview-body, #websiteScreenshot.mobile  #websiteCanvas {
+  margin: 0;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+  left : -50%;
+  width: 320px;
+  height: 568px;
+}
+
+#websiteScreenshot.mobile  #websiteCanvas {
+  z-index: 0;
+  border: 1px solid #000;
+}
+
+#websiteScreenshot.mobile  #websiteCanvas iframe {
+  height: 100%;
+  width: 320px;
+  border: 0;
+}

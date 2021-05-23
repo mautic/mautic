@@ -2,7 +2,6 @@
   "name": "mautic/theme-nature",
   "description": "Mautic Nature Theme",
   "type": "mautic-theme",
-  "version": "1.0",
   "keywords": ["mautic","theme"],
   "extra": {
     "install-directory-name": "nature"
