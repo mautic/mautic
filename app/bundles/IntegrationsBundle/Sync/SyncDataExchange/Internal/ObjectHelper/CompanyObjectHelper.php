@@ -196,7 +196,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
 
         foreach ($fields as $col => $val) {
             // Use andWhere because Mautic treats conflicting unique identifiers as different objects
-            $q->andWhere("c.$col = :".$col)
+            $q->{$this->repository->getUniqueIdentifiersWherePart()}("c.$col = :".$col)
                 ->setParameter($col, $val);
         }
 
