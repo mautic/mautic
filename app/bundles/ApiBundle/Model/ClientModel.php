@@ -28,6 +28,11 @@ class ClientModel extends FormModel
     /**
      * @var string
      */
+    const API_MODE_OAUTH2 = 'oauth2';
+
+    /**
+     * @var string
+     */
     private $apiMode = 'oauth1a';
 
     /**

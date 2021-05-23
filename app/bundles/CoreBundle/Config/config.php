@@ -258,6 +258,12 @@ return [
                     '%router.request_context.base_url%',
                 ],
             ],
+            'mautic.core.subscriber.editor_assets' => [
+                'class'       => \Mautic\CoreBundle\EventListener\EditorFontsSubscriber::class,
+                'arguments'   => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.button_group' => [
@@ -369,7 +375,7 @@ return [
                 'class' => \Mautic\CoreBundle\Helper\AppVersion::class,
             ],
             'mautic.helper.template.menu' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\MenuHelper',
+                'class'     => \Mautic\CoreBundle\Templating\Helper\MenuHelper::class,
                 'arguments' => ['knp_menu.helper'],
                 'alias'     => 'menu',
             ],
@@ -857,18 +863,18 @@ return [
                 ],
             ],
             'mautic.helper.language' => [
-                'class'     => 'Mautic\CoreBundle\Helper\LanguageHelper',
+                'class'     => \Mautic\CoreBundle\Helper\LanguageHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
                     'monolog.logger.mautic',
                     'mautic.helper.core_parameters',
-                    'mautic.http.connector',
+                    'mautic.http.client',
                 ],
             ],
             'mautic.helper.url' => [
                 'class'     => \Mautic\CoreBundle\Helper\UrlHelper::class,
                 'arguments' => [
-                    'mautic.http.connector',
+                    'mautic.http.client',
                     '%mautic.link_shortener_url%',
                     'monolog.logger.mautic',
                 ],
@@ -905,7 +911,7 @@ return [
                 'alias' => 'mautic',
             ],
             'mautic.menu.builder' => [
-                'class'     => 'Mautic\CoreBundle\Menu\MenuBuilder',
+                'class'     => \Mautic\CoreBundle\Menu\MenuBuilder::class,
                 'arguments' => [
                     'knp_menu.factory',
                     'knp_menu.matcher',
@@ -915,30 +921,24 @@ return [
             ],
             // IP Lookup
             'mautic.ip_lookup.factory' => [
-                'class'     => 'Mautic\CoreBundle\Factory\IpLookupFactory',
+                'class'     => \Mautic\CoreBundle\Factory\IpLookupFactory::class,
                 'arguments' => [
                     '%mautic.ip_lookup_services%',
                     'monolog.logger.mautic',
-                    'mautic.http.connector',
+                    'mautic.http.client',
                     '%kernel.cache_dir%',
                 ],
             ],
             'mautic.ip_lookup' => [
-                'class'     => 'Mautic\CoreBundle\IpLookup\AbstractLookup', // bogus just to make cache compilation happy
+                'class'     => \Mautic\CoreBundle\IpLookup\AbstractLookup::class, // bogus just to make cache compilation happy
                 'factory'   => ['@mautic.ip_lookup.factory', 'getService'],
                 'arguments' => [
                     '%mautic.ip_lookup_service%',
                     '%mautic.ip_lookup_auth%',
                     '%mautic.ip_lookup_config%',
-                    'mautic.http.connector',
+                    'mautic.http.client',
                 ],
             ],
-            // Other
-            'mautic.http.connector' => [
-                'class'   => 'Joomla\Http\Http',
-                'factory' => ['Joomla\Http\HttpFactory', 'getHttp'],
-            ],
-
             'mautic.native.connector' => [
                 'class'     => \Symfony\Contracts\HttpClient\HttpClientInterface::class,
                 'factory'   => [Symfony\Component\HttpClient\HttpClient::class, 'create'],
@@ -1614,5 +1614,91 @@ return [
         'stats_update_url'          => 'https://updates.mautic.org/stats/send', // set to empty in config file to disable
         'install_source'            => 'Mautic',
         'system_update_url'         => 'https://api.github.com/repos/mautic/mautic/releases',
+        'editor_fonts'              => [
+            [
+                'name' => 'Arial',
+                'font' => 'Arial, Helvetica Neue, Helvetica, sans-serif',
+            ],
+            [
+                'name' => 'Bitter',
+                'font' => 'Bitter, Georgia, Times, Times New Roman, serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Bitter',
+            ],
+            [
+                'name' => 'Courier New',
+                'font' => 'Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace',
+            ],
+            [
+                'name' => 'Droid Serif',
+                'font' => 'Droid Serif, Georgia, Times, Times New Roman, serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Droid+Serif',
+            ],
+            [
+                'name' => 'Georgia',
+                'font' => 'Georgia, Times, Times New Roman, serif',
+            ],
+            [
+                'name' => 'Helvetica',
+                'font' => 'Helvetica Neue, Helvetica, Arial, sans-serif',
+            ],
+            [
+                'name' => 'Lato',
+                'font' => 'Lato, Tahoma, Verdana, Segoe, sans-serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Lato',
+            ],
+            [
+                'name' => 'Lucida Sans Unicode',
+                'font' => 'Lucida Sans Unicode, Lucida Grande, Lucida Sans, Geneva, Verdana, sans-serif',
+            ],
+            [
+                'name' => 'Montserrat',
+                'font' => 'Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Montserrat',
+            ],
+            [
+                'name' => 'Open Sans',
+                'font' => 'Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Open+Sans',
+            ],
+            [
+                'name' => 'Roboto',
+                'font' => 'Roboto, Tahoma, Verdana, Segoe, sans-serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Roboto',
+            ],
+            [
+                'name' => 'Source Sans Pro',
+                'font' => 'Source Sans Pro, Tahoma, Verdana, Segoe, sans-serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Source+Sans+Pro',
+            ],
+            [
+                'name' => 'Tahoma',
+                'font' => 'Tahoma, Geneva, Segoe, sans-serif',
+            ],
+            [
+                'name' => 'Times New Roman',
+                'font' => 'TimesNewRoman, Times New Roman, Times, Beskerville, Georgia, serif',
+            ],
+            [
+                'name' => 'Trebuchet MS',
+                'font' => 'Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif',
+            ],
+            [
+                'name' => 'Ubuntu',
+                'font' => 'Ubuntu, Tahoma, Verdana, Segoe, sans-serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Ubuntu',
+            ],
+            [
+                'name' => 'Verdana',
+                'font' => 'Verdana, Geneva, sans-serif',
+            ],
+            [
+                'name' => 'ヒラギノ角ゴ Pro W3',
+                'font' => 'ヒラギノ角ゴ Pro W3, Hiragino Kaku Gothic Pro,Osaka, メイリオ, Meiryo, ＭＳ Ｐゴシック, MS PGothic, sans-serif',
+            ],
+            [
+                'name' => 'メイリオ',
+                'font' => 'メイリオ, Meiryo, ＭＳ Ｐゴシック, MS PGothic, ヒラギノ角ゴ Pro W3, Hiragino Kaku Gothic Pro,Osaka, sans-serif',
+            ],
+        ],
     ],
 ];

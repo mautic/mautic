@@ -19,33 +19,34 @@ use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class UserSummaryNotificationHelperTest extends TestCase
 {
     /**
-     * @var Writer|\PHPUnit\Framework\MockObject\MockObject
+     * @var Writer|MockObject
      */
     private $writer;
 
     /**
-     * @var UserHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var UserHelper|MockObject
      */
     private $userHelper;
 
     /**
-     * @var OwnerProvider|\PHPUnit\Framework\MockObject\MockObject
+     * @var OwnerProvider|MockObject
      */
     private $ownerProvider;
 
     /**
-     * @var RouteHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var RouteHelper|MockObject
      */
     private $routeHelper;
 
     /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var TranslatorInterface|MockObject
      */
     private $translator;
 
@@ -89,21 +90,14 @@ class UserSummaryNotificationHelperTest extends TestCase
         $this->userHelper->expects($this->never())
             ->method('getAdminUsers');
 
-        $this->translator->expects($this->at(0))
+        $this->translator->expects($this->exactly(4))
             ->method('trans')
-            ->with('mautic.integration.sync.user_notification.header', $this->anything())
-            ->willReturn('test');
-        $this->translator->expects($this->at(1))
-            ->method('trans')
-            ->with('test', $this->anything())
-            ->willReturn('test');
-        $this->translator->expects($this->at(2))
-            ->method('trans')
-            ->with('mautic.integration.sync.user_notification.header', $this->anything())
-            ->willReturn('test');
-        $this->translator->expects($this->at(3))
-            ->method('trans')
-            ->with('test', $this->anything())
+            ->withConsecutive(
+                ['mautic.integration.sync.user_notification.header', $this->anything()],
+                ['test', $this->anything()],
+                ['mautic.integration.sync.user_notification.header', $this->anything()],
+                ['test', $this->anything()]
+            )
             ->willReturn('test');
 
         $this->writer->expects($this->exactly(2))
@@ -135,21 +129,14 @@ class UserSummaryNotificationHelperTest extends TestCase
             ->method('getAdminUsers')
             ->willReturn([1]);
 
-        $this->translator->expects($this->at(0))
+        $this->translator->expects($this->exactly(4))
             ->method('trans')
-            ->with('mautic.integration.sync.user_notification.header', $this->anything())
-            ->willReturn('test');
-        $this->translator->expects($this->at(1))
-            ->method('trans')
-            ->with('test', $this->anything())
-            ->willReturn('test');
-        $this->translator->expects($this->at(2))
-            ->method('trans')
-            ->with('mautic.integration.sync.user_notification.header', $this->anything())
-            ->willReturn('test');
-        $this->translator->expects($this->at(3))
-            ->method('trans')
-            ->with('test', $this->anything())
+            ->withConsecutive(
+                ['mautic.integration.sync.user_notification.header', $this->anything()],
+                ['test', $this->anything()],
+                ['mautic.integration.sync.user_notification.header', $this->anything()],
+                ['test', $this->anything()]
+            )
             ->willReturn('test');
 
         $this->writer->expects($this->exactly(2))

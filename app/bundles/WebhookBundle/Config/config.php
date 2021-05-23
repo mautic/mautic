@@ -114,7 +114,7 @@ return [
             'mautic.webhook.campaign.helper' => [
                 'class'     => \Mautic\WebhookBundle\Helper\CampaignHelper::class,
                 'arguments' => [
-                    'mautic.http.connector',
+                    'mautic.http.client',
                     'mautic.lead.model.company',
                     'event_dispatcher',
                 ],
