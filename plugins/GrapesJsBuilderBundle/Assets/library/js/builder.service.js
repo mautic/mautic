@@ -3,17 +3,16 @@ import grapesjsmjml from 'grapesjs-mjml';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
+
 // @todo set to grapesjs preset path in node_modules
 // import grapesjsmautic from 'grapesjs-preset-mautic/src';
 import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
+import ContentService from './content.service';
 
 export default class BuilderService {
   presetMauticConf;
 
   editor;
-
-  // components that are on the canvas
-  canvasContent;
 
   assets;
 
@@ -21,13 +20,12 @@ export default class BuilderService {
 
   deletePath;
 
-  // HTMLHeadElement
-  head;
-
-  constructor(content, assets, uploadPath, deletePath, head) {
-    if (!content) {
-      throw Error('No HTML or MJML content found');
-    }
+  /**
+   * @param {*} assets
+   * @param {*} uploadPath
+   * @param {*} deletePath
+   */
+  constructor(assets, uploadPath, deletePath) {
     if (!uploadPath) {
       throw Error('No uploadPath found');
     }
@@ -37,11 +35,9 @@ export default class BuilderService {
     if (!assets || !assets[0]) {
       console.warn('no assets');
     }
-    this.canvasContent = content;
     this.assets = assets;
     this.uploadPath = uploadPath;
     this.deletePath = deletePath;
-    this.head = head;
   }
 
   /**
@@ -54,9 +50,10 @@ export default class BuilderService {
       throw Error('No editor found');
     }
 
-    this.editor.on('run:mautic-editor-email-mjml-close:before', () => {
-      mQuery('textarea.builder-html').val(this.canvasContent);
-    });
+    // @todo move to preset
+    // this.editor.on('run:mautic-editor-email-mjml-close:before', () => {
+    //   mQuery('textarea.builder-html').val(this.getBody());
+    // });
 
     this.editor.on('load', () => {
       const um = this.editor.UndoManager;
@@ -103,6 +100,10 @@ export default class BuilderService {
     });
   }
 
+  /**
+   * Initialize the grapesjs build in the
+   * correct mode
+   */
   initGrapesJS(object) {
     // disable mautic global shortcuts
     Mousetrap.reset();
@@ -110,7 +111,10 @@ export default class BuilderService {
     if (object === 'page') {
       this.editor = this.initPage();
     } else if (object === 'emailform') {
-      if (this.canvasContent && this.canvasContent.indexOf('<mjml>') !== -1) {
+      if (
+        ContentService.getOriginalContent().body &&
+        ContentService.getOriginalContent().indexOf('<mjml>') !== -1
+      ) {
         this.editor = this.initEmailMjml();
       } else {
         this.editor = this.initEmailHtml();
@@ -137,18 +141,20 @@ export default class BuilderService {
     };
   }
 
+  /**
+   * Initialize the builder in the landingapge mode
+   */
   initPage() {
     this.setPresetMauticConf('page-html');
 
-    const styles = this.getStyles();
     // Launch GrapesJS with body part
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: this.canvasContent,
+      components: ContentService.getOriginalContent().body,
       height: '100%',
       canvas: {
-        styles,
+        styles: ContentService.getStyles(),
       },
       storageManager: false, // https://grapesjs.com/docs/modules/Storage.html#basic-configuration
       assetManager: this.getAssetManagerConf(),
@@ -174,7 +180,7 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: this.canvasContent,
+      components: ContentService.getOriginalContent().body,
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
@@ -200,7 +206,7 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: this.canvasContent,
+      components: ContentService.getOriginalContent().body,
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
@@ -220,25 +226,6 @@ export default class BuilderService {
     });
 
     return this.editor;
-  }
-
-  /**
-   * Extract all stylesheets from the template <head>
-   */
-  getStyles() {
-    if (!this.head) {
-      return [];
-    }
-    const children = this.head.querySelectorAll('link');
-    const styles = [];
-
-    children.forEach((link) => {
-      if (link && link.rel === 'stylesheet') {
-        styles.push(link.href);
-      }
-    });
-
-    return styles;
   }
 
   /**
