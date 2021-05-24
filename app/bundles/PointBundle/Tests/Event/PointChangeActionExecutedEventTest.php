@@ -26,7 +26,7 @@ class PointChangeActionExecutedEventTest extends \PHPUnit\Framework\TestCase
 
     private $completedActions;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pointMock        = $this->createMock(Point::class);
         $this->leadMock         = $this->createMock(Lead::class);
