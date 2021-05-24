@@ -212,7 +212,8 @@
       "profile": "https://github.com/patrykgruszka",
       "contributions": [
         "code",
-        "doc"
+        "doc",
+        "test"
       ]
     },
     {
@@ -222,6 +223,15 @@
       "profile": "https://hartmut.io",
       "contributions": [
         "code"
+      ]
+    },
+    {
+      "login": "dsp76",
+      "name": "Dirk Spannaus",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1241376?v=4",
+      "profile": "https://www.twentyzen.com",
+      "contributions": [
+        "bug"
       ]
     }
   ],

@@ -1,10 +1,10 @@
 {
-  "name": "mautic/theme-confirmme",
-  "description": "Mautic Confirmme Theme",
+  "name": "mautic/theme-paprika",
+  "description": "Mautic Paprika Theme",
   "type": "mautic-theme",
   "keywords": ["mautic","theme"],
   "extra": {
-    "install-directory-name": "confirmme"
+    "install-directory-name": "paprika"
   },
   "minimum-stability": "dev",
   "require": {
