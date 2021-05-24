@@ -1,5 +1,5 @@
 /* eslint-disable no-else-return */
-import UtilService from '../util.service';
+import ContentService from '../content.service';
 import ButtonCloseCommands from './buttonClose.command';
 
 export default class ButtonClose {
@@ -42,15 +42,15 @@ export default class ButtonClose {
    * Get the close command based on the editor mode
    */
   getCommand() {
-    const mode = UtilService.getMode(this.editor);
+    const mode = ContentService.getMode(this.editor);
 
-    if (mode === UtilService.modePageHtml) {
+    if (mode === ContentService.modePageHtml) {
       return 'mautic-editor-page-html-close';
     }
-    if (mode === UtilService.modeEmailHtml) {
+    if (mode === ContentService.modeEmailHtml) {
       return 'mautic-editor-email-html-close';
     }
-    if (mode === UtilService.modeEmailMjml) {
+    if (mode === ContentService.modeEmailMjml) {
       return 'mautic-editor-email-mjml-close';
     }
     throw new Error(`no valid builder mode: ${mode}`);

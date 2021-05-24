@@ -5,6 +5,13 @@ export default class ContentService {
 
   static modePageHtml = 'page-html';
 
+  static isMjmlMode(editor) {
+    if (!editor) {
+      throw new Error('editor is required.');
+    }
+    return ContentService.getMode(editor) === ContentService.modeEmailMjml;
+  }
+
   static getMode(editor) {
     const cfg = editor.getConfig();
 
@@ -22,22 +29,19 @@ export default class ContentService {
   /**
    * Get the selected themes original or the users last saved
    * content from the db. Loaded via Mautic PHP into the textarea.
+   * @todo: add header for mjml
+   * @returns object  head and body as string
    */
   static getOriginalContent() {
     // Parse HTML theme/template
     const parser = new DOMParser();
     const textareaHtml = mQuery('textarea.builder-html');
-    const fullHtml = parser.parseFromString(textareaHtml.val(), 'text/html');
-
-    const content = fullHtml.body.innerHTML
-      ? fullHtml.body.innerHTML
-      : mQuery('textarea.builder-mjml').val();
-
-    const { head } = fullHtml;
+    const textareaMjml = mQuery('textarea.builder-mjml');
+    const htmlDocument = parser.parseFromString(textareaHtml.val(), 'text/html');
 
     return {
-      head,
-      content,
+      head: htmlDocument.head,
+      body: htmlDocument.body.innerHTML || textareaMjml.val(),
     };
   }
 }

@@ -1,25 +1,28 @@
+import ContentService from '../content.service';
+
 export default class ButtonCloseCommands {
   static closeEditorPageHtml(editor) {
+    const parser = new DOMParser();
+
     if (!editor) {
       throw new Error('no page-html editor');
     }
 
-    // restore the original <head> if set
-    // @todo
-    // if (this.head && this.head.innerHTML) {
-    //   // const fullHtml = parser.parseFromString(this.canvasContent, 'text/html');
-    //   // const fullHtml = editor.getHtml();
-    //   fullHtml.head.innerHTML = this.head.innerHTML;
-    // }
-
     editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
 
-    // Combine editor styles and editor html and save it to Mautic textarea
-    // This part is different from other modes
-    const fullHtml = `${editor.getHtml()}<style>${editor.getCss({
+    // Combine editor styles and editor html
+    const htmlCss = `${editor.getHtml()}<style>${editor.getCss({
       avoidProtected: true,
     })}</style>`;
-    mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
+    const htmlDocument = parser.parseFromString(htmlCss, 'text/html');
+
+    // get original header and add it to the html
+    const originalContent = ContentService.getOriginalContent();
+    if (originalContent.head) {
+      htmlDocument.head.innerHTML += originalContent.head.innerHTML;
+    }
+
+    ButtonCloseCommands.returnContentToTextarea(editor, htmlDocument.documentElement.outerHTML);
 
     // Reset HTML
     ButtonCloseCommands.resetHtml(editor);
@@ -42,10 +45,10 @@ export default class ButtonCloseCommands {
     }
 
     // Update textarea for save
-    if (!code.length) {
-      mQuery('textarea.builder-html').val(code.html);
-      mQuery('textarea.builder-mjml').val(editor.getHtml());
+    if (!code || !code.html) {
+      throw new Error('Could not generate html from MJML');
     }
+    ButtonCloseCommands.returnContentToTextarea(editor, editor.getHtml(), code.html);
 
     // Reset HTML
     ButtonCloseCommands.resetHtml(editor);
@@ -58,19 +61,31 @@ export default class ButtonCloseCommands {
 
     editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
 
-    // Update textarea for save
+    // Getting HTML with CSS inline (only available for "grapesjs-preset-newsletter"):
     const innerHTML = editor.runCommand('gjs-get-inlined-html');
-    console.warn({ innerHTML });
-    mQuery('textarea.builder-html').val(innerHTML);
-    // was: mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
-    // as reference: const parser = new DOMParser();
-    // const fullHtml = parser.parseFromString(this.canvasContent, 'text/html');
+
+    ButtonCloseCommands.returnContentToTextarea(editor, innerHTML);
 
     // Reset HTML
     ButtonCloseCommands.resetHtml(editor);
   }
 
-  static resetHtml(editor) {
+
+  /**
+   * Save the html and mjml
+   * @param {string} html
+   * @param {string} mjml
+   */
+   static returnContentToTextarea(editor, html, mjml) {
+    if (ContentService.isMjmlMode(editor)) {
+      mQuery('textarea.builder-html').val(html);
+      mQuery('textarea.builder-mjml').val(mjml);
+    } else {
+      mQuery('textarea.builder-html').val(html);
+    }
+  }
+
+  static resetHtml() {
     mQuery('.builder').removeClass('builder-active').addClass('hide');
     mQuery('html').css('font-size', '');
     mQuery('body').css('overflow-y', '');
