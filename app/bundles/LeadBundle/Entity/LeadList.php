@@ -142,6 +142,7 @@ class LeadList extends FormEntity
                     'publicName',
                     'alias',
                     'description',
+                    'category',
                 ]
             )
             ->addProperties(
