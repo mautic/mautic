@@ -92,11 +92,4 @@ class SubmissionModelTest extends FormTestAbstract
         $this->assertEquals('First', $method->invokeArgs($submissionModel, [1, $field]));
         $this->assertEquals('First, Second', $method->invokeArgs($submissionModel, [[1, 2], $field]));
     }
-
-    public function normalizeValuesProvider(): array
-    {
-        return [
-            [],
-        ];
-    }
 }
