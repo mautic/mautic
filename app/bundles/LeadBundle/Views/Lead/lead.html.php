@@ -227,7 +227,7 @@ $view['slots']->set(
                                                             <?php if (is_array($field['value'])): ?>
                                                                 <?php echo implode(', ', $field['value']); ?>
                                                             <?php else: ?>
-                                                                <?php echo str_replace('|', ', ' ,$view->escape($field['normalizedValue'])); ?>
+                                                                <?php echo str_replace('|', ', ', $view->escape($field['normalizedValue'])); ?>
                                                             <?php endif; ?>
                                                         <?php elseif (is_string($field['value']) && 'url' === $field['type']): ?>
                                                             <a href="<?php echo $view->escape($field['value']); ?>" target="_blank">
