@@ -1052,7 +1052,6 @@ class SubmissionModel extends CommonFormModel
             $value = implode(', ', $value);
         }
 
-
         return $value;
     }
 }
