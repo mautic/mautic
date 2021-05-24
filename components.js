@@ -1,11 +1,11 @@
 /* eslint-disable no-else-return */
 import DynamicContentDomComponents from './dynymicContent/dynamicContent.domcomponents';
-import UtilService from './util.service';
+import ContentService from './content.service';
 
 // https://grapesjs.com/docs/api/component.html
 export default (editor) => {
-  const mode = UtilService.getMode(editor);
-  if (mode === UtilService.modeEmailHtml) {
+  const mode = ContentService.getMode(editor);
+  if (mode === ContentService.modeEmailHtml) {
     const dcdc = new DynamicContentDomComponents(editor);
     dcdc.addDynamicContentType();
   }
