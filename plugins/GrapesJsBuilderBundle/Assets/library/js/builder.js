@@ -1,5 +1,4 @@
 import BuilderService from './builder.service';
-// import builder from './builder.service';
 
 /**
  * Launch builder
@@ -8,25 +7,13 @@ import BuilderService from './builder.service';
  * @param actionName
  */
 function launchBuilderGrapesjs(formName) {
-  // Parse HTML template
-  const parser = new DOMParser();
-  const textareaHtml = mQuery('textarea.builder-html');
   const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
-  const fullHtml = parser.parseFromString(textareaHtml.val(), 'text/html');
-
-  const canvasContent = fullHtml.body.innerHTML
-    ? fullHtml.body.innerHTML
-    : mQuery('textarea.builder-mjml').val();
-
   const assets = textareaAssets.val() ? JSON.parse(textareaAssets.val()) : [];
-  const { head } = fullHtml;
 
   const builder = new BuilderService(
-    canvasContent,
     assets,
     textareaAssets.data('upload'),
-    textareaAssets.data('delete'),
-    head
+    textareaAssets.data('delete')
   );
 
   Mautic.showChangeThemeWarning = true;
