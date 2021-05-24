@@ -20,22 +20,21 @@ export default class BuilderService {
 
   /**
    * @param {*} assets
-   * @param {*} uploadPath
-   * @param {*} deletePath
    */
-  constructor(assets, uploadPath, deletePath) {
-    if (!uploadPath) {
+  constructor(assets) {
+    if (!assets.conf.uploadPath) {
       throw Error('No uploadPath found');
     }
-    if (!deletePath) {
+    if (!assets.conf.deletePath) {
       throw Error('No deletePath found');
     }
-    if (!assets || !assets[0]) {
+    if (!assets.files || !assets.files[0]) {
       console.warn('no assets');
     }
-    this.assets = assets;
-    this.uploadPath = uploadPath;
-    this.deletePath = deletePath;
+
+    this.assets = assets.files;
+    this.uploadPath = assets.conf.uploadPath;
+    this.deletePath = assets.conf.deletePath;
   }
 
   /**

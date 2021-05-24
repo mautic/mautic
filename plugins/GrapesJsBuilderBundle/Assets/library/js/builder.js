@@ -1,4 +1,5 @@
 import BuilderService from './builder.service';
+import ContentService from './content.service';
 
 /**
  * Launch builder
@@ -7,14 +8,9 @@ import BuilderService from './builder.service';
  * @param actionName
  */
 function launchBuilderGrapesjs(formName) {
-  const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
-  const assets = textareaAssets.val() ? JSON.parse(textareaAssets.val()) : [];
+  const assets = ContentService.getAssets();
 
-  const builder = new BuilderService(
-    assets,
-    textareaAssets.data('upload'),
-    textareaAssets.data('delete')
-  );
+  const builder = new BuilderService(assets);
 
   Mautic.showChangeThemeWarning = true;
 
