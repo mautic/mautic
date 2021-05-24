@@ -10,8 +10,6 @@ import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
 import ContentService from './content.service';
 
 export default class BuilderService {
-  presetMauticConf;
-
   editor;
 
   assets;
@@ -122,8 +120,8 @@ export default class BuilderService {
     this.setListeners();
   }
 
-  setPresetMauticConf(mode) {
-    this.presetMauticConf = {
+  static getMauticConf(mode) {
+    return {
       sourceEditBtnLabel: Mautic.translate('grapesjsbuilder.sourceEditBtnLabel'),
       sourceCancelBtnLabel: Mautic.translate('grapesjsbuilder.sourceCancelBtnLabel'),
       sourceEditModalTitle: Mautic.translate('grapesjsbuilder.sourceEditModalTitle'),
@@ -141,8 +139,6 @@ export default class BuilderService {
    * Initialize the builder in the landingapge mode
    */
   initPage() {
-    this.setPresetMauticConf('page-html');
-
     // Launch GrapesJS with body part
     this.editor = grapesjs.init({
       clearOnRender: true,
@@ -153,7 +149,7 @@ export default class BuilderService {
         styles: ContentService.getStyles(),
       },
       storageManager: false, // https://grapesjs.com/docs/modules/Storage.html#basic-configuration
-      assetManager: this.getAssetManagerConf(),
+      assetManager: BuilderService.getMauticConf('page-html'),
       styleManager: {
         clearProperties: true, // Temp fix https://github.com/artf/grapesjs-preset-webpage/issues/27
       },
@@ -162,7 +158,7 @@ export default class BuilderService {
         [grapesjswebpage]: {
           formsOpts: false,
         },
-        grapesjsmautic: this.presetMauticConf,
+        grapesjsmautic: BuilderService.getMauticConf('page-html'),
       },
     });
 
@@ -170,8 +166,6 @@ export default class BuilderService {
   }
 
   initEmailMjml() {
-    this.setPresetMauticConf('email-mjml');
-
     // EmailBuilder -> MJML
     this.editor = grapesjs.init({
       clearOnRender: true,
@@ -184,7 +178,7 @@ export default class BuilderService {
       plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic],
       pluginsOpts: {
         grapesjsmjml: {},
-        grapesjsmautic: this.presetMauticConf,
+        grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
       },
     });
 
@@ -196,8 +190,7 @@ export default class BuilderService {
   }
 
   initEmailHtml() {
-    this.setPresetMauticConf('email-html');
-
+    
     // Launch GrapesJS with body part
     this.editor = grapesjs.init({
       clearOnRender: true,
@@ -209,7 +202,7 @@ export default class BuilderService {
       plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic],
       pluginsOpts: {
         grapesjsnewsletter: {},
-        grapesjsmautic: this.presetMauticConf,
+        grapesjsmautic: BuilderService.getMauticConf('email-html'),
       },
     });
 
@@ -222,15 +215,6 @@ export default class BuilderService {
     });
 
     return this.editor;
-  }
-
-  /**
-   * Add Mautic specific commands
-   */
-  addMauticCommands() {
-    if (!this.editor) {
-      throw Error('No editor found');
-    }
   }
 
   /**
@@ -275,23 +259,23 @@ export default class BuilderService {
   /**
    * Generate assets list from GrapesJs
    */
-  getAssetsList() {
-    const assetManager = this.editor.AssetManager;
-    const assets = assetManager.getAll();
-    const assetsList = [];
+  // getAssetsList() {
+  //   const assetManager = this.editor.AssetManager;
+  //   const assets = assetManager.getAll();
+  //   const assetsList = [];
 
-    assets.forEach((asset) => {
-      if (asset.get('type') === 'image') {
-        assetsList.push({
-          src: asset.get('src'),
-          width: asset.get('width'),
-          height: asset.get('height'),
-        });
-      } else {
-        assetsList.push(asset.get('src'));
-      }
-    });
+  //   assets.forEach((asset) => {
+  //     if (asset.get('type') === 'image') {
+  //       assetsList.push({
+  //         src: asset.get('src'),
+  //         width: asset.get('width'),
+  //         height: asset.get('height'),
+  //       });
+  //     } else {
+  //       assetsList.push(asset.get('src'));
+  //     }
+  //   });
 
-    return assetsList;
-  }
+  //   return assetsList;
+  // }
 }
