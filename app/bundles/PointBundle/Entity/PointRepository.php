@@ -88,7 +88,11 @@ class PointRepository extends CommonRepository
         $return = [];
 
         foreach ($results as $r) {
-            $return[$r['id']] = $r;
+            if (!empty($r['internal_id'])) {
+                $return[$r['id']][$r['internal_id']] = $r;
+            } else {
+                $return[$r['id']] = $r;
+            }
         }
 
         return $return;
