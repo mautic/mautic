@@ -67,7 +67,7 @@ export default class ButtonClose {
     if (this.command === 'mautic-editor-email-html-close') {
       return ButtonCloseCommands.closeEditorEmailHtml;
     }
-    if (this.command === 'mautic-editor-page-html-close') {
+    if (this.command === 'mautic-editor-email-mjml-close') {
       return ButtonCloseCommands.closeEditorEmailMjml;
     }
     throw new Error(`no valid command: ${this.command}`);
