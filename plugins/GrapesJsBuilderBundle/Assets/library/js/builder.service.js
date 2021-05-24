@@ -50,17 +50,13 @@ export default class BuilderService {
       throw Error('No editor found');
     }
 
-    // @todo move to preset
-    // this.editor.on('run:mautic-editor-email-mjml-close:before', () => {
-    //   mQuery('textarea.builder-html').val(this.getBody());
+    // Why would we not want to keep the history?
+    //
+    // this.editor.on('load', () => {
+    //   const um = this.editor.UndoManager;
+    //   // Clear stack of undo/redo
+    //   um.clear();
     // });
-
-    this.editor.on('load', () => {
-      const um = this.editor.UndoManager;
-
-      // Clear stack of undo/redo
-      um.clear();
-    });
 
     const keymaps = this.editor.Keymaps;
     let allKeymaps;
@@ -113,7 +109,7 @@ export default class BuilderService {
     } else if (object === 'emailform') {
       if (
         ContentService.getOriginalContent().body &&
-        ContentService.getOriginalContent().indexOf('<mjml>') !== -1
+        ContentService.getOriginalContent().body.indexOf('<mjml>') !== -1
       ) {
         this.editor = this.initEmailMjml();
       } else {
