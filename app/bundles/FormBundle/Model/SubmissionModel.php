@@ -343,12 +343,12 @@ class SubmissionModel extends CommonFormModel
                 $leadFieldMatches[$leadField] = $leadValue;
             }
 
+            $tokens["{formfield={$alias}}"] = $this->normalizeValue($value, $f);
+
             //convert array from checkbox groups and multiple selects
             if (is_array($value)) {
                 $value = implode(', ', $value);
             }
-
-            $tokens["{formfield={$alias}}"] = $value;
 
             //save the result
             if (false !== $f->getSaveResult()) {
@@ -1032,5 +1032,27 @@ class SubmissionModel extends CommonFormModel
         }
 
         return true;
+    }
+
+    private function normalizeValue($value, Field $f)
+    {
+        // select and multiselect normalization
+        if ($list = $f->getProperties()['list']['list'] ?? null) {
+            $options = array_combine(array_column($list, 'value'), array_column($list, 'label'));
+            if (is_array($value)) {
+                foreach ($value as $key => $item) {
+                    $value[$key] = $options[$item] ?? $item;
+                }
+            } else {
+                $value = $options[$value] ?? $value;
+            }
+        }
+
+        if (is_array($value)) {
+            $value = implode(', ', $value);
+        }
+
+
+        return $value;
     }
 }
