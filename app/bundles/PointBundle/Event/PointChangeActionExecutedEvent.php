@@ -32,7 +32,7 @@ class PointChangeActionExecutedEvent extends Event
     /**
      * @var bool
      */
-    private $result;
+    private $changePoints;
 
     /**
      * @var array
@@ -58,17 +58,17 @@ class PointChangeActionExecutedEvent extends Event
      */
     public function canChangePoints()
     {
-        return $this->result;
+        return $this->changePoints;
     }
 
     public function setSucceded()
     {
-        $this->result = true;
+        $this->changePoints = true;
     }
 
     public function setFailed()
     {
-        $this->result = false;
+        $this->changePoints = false;
     }
 
     /**
@@ -76,7 +76,7 @@ class PointChangeActionExecutedEvent extends Event
      */
     public function setStatusFromLogs()
     {
-        $this->result = !(isset($this->completedActions[$this->pointAction->getId()]));
+        $this->changePoints = !(isset($this->completedActions[$this->pointAction->getId()]));
     }
 
     /**
@@ -86,7 +86,7 @@ class PointChangeActionExecutedEvent extends Event
      */
     public function setStatusFromLogsForInternalId($internalId)
     {
-        $this->result = !isset($this->completedActions[$this->pointAction->getId()][$internalId]);
+        $this->changePoints = !isset($this->completedActions[$this->pointAction->getId()][$internalId]);
     }
 
     /**
