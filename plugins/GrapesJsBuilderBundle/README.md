@@ -102,9 +102,9 @@ npm run start-mautic-full
 ```
 
 #### Hints
-- In order for start-mautic to work a running ddev container has to be present. 
+- In order for start-mautic* to work a running ddev container has to be present. 
 - If you are on some other development environment you need to update some paths in the html files. E.g. Demo/mautic/index.html
-- In order to not get CORS errors we use the ip url of DDEV. (E.g. http://127.0.0.1:59367/). The port changes all the time. So make sure you use the correct port to load dependencies from Mautic (not relevant for helloWorld).
+- Tell Chrome to ignore cors issues: ?open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args --user-data-dir="/tmp/chrome_dev_test" --disable-web-security?
 
 ### How to build for production
 ```bash
