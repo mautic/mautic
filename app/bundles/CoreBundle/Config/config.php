@@ -683,6 +683,10 @@ return [
                 'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class,
                 'tag'   => 'container.env_var_processor',
             ],
+            'mautic.di.env_processor.mauticconst' => [
+                'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class,
+                'tag'   => 'container.env_var_processor',
+            ],
             'mautic.cipher.openssl' => [
                 'class'     => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
                 'arguments' => ['%kernel.environment%'],
@@ -1177,7 +1181,6 @@ return [
         'db_user'                         => '',
         'db_password'                     => '',
         'db_table_prefix'                 => '',
-        'db_server_version'               => '5.7',
         'locale'                          => 'en_US',
         'secret_key'                      => 'temp',
         'dev_hosts'                       => [],
