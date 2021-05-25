@@ -75,7 +75,7 @@ class CompanyReportData
     /**
      * @return bool
      */
-    public function eventHasCompanyFilters(ReportGeneratorEvent $event)
+    public function eventHasCompanyFilters(ReportGeneratorEvent $event): bool
     {
         $companyColumns = $this->getCompanyData();
         foreach ($companyColumns as $key => $column) {

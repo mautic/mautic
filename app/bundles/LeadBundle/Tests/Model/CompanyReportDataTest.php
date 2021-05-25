@@ -165,4 +165,71 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse($result);
     }
+
+    /**
+     * @covers \Mautic\LeadBundle\Model\CompanyReportData::eventHasCompanyFilters
+     */
+    public function testEventHasCompanyFilters()
+    {
+        $fieldModelMock = $this->getMockBuilder(FieldModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $eventMock = $this->getMockBuilder(ReportGeneratorEvent::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $field = new Field();
+        $field->setType('email');
+        $field->setAlias('email');
+        $field->setLabel('Email');
+
+        $fieldModelMock->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([$field]);
+
+        $eventMock->expects($this->once())
+            ->method('hasFilter')
+            ->with('comp.id')
+            ->willReturn(true);
+
+        $companyReportData = new CompanyReportData($fieldModelMock, $this->translator);
+
+        $result = $companyReportData->eventHasCompanyFilters($eventMock);
+
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Model\CompanyReportData::eventHasCompanyFilters
+     */
+    public function testEventDoesNotHaveCompanyFilters()
+    {
+        $fieldModelMock = $this->getMockBuilder(FieldModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $eventMock = $this->getMockBuilder(ReportGeneratorEvent::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $field = new Field();
+        $field->setType('email');
+        $field->setAlias('email');
+        $field->setLabel('Email');
+
+        $fieldModelMock->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([$field]);
+
+        $eventMock->expects($this->any())
+            ->method('hasFilter')
+            ->willReturn(false);
+
+        $companyReportData = new CompanyReportData($fieldModelMock, $this->translator);
+
+        $result = $companyReportData->eventHasCompanyFilters($eventMock);
+
+        $this->assertFalse($result);
+    }
 }
