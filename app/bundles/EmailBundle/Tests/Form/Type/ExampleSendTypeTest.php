@@ -1,12 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\LookupType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -28,17 +32,24 @@ class ExampleSendTypeTest extends TestCase
      */
     private MockObject $security;
 
+    /**
+     * @var UserHelper|MockObject
+     */
+    private $userHelperMock;
+
     public function setUp(): void
     {
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->security   = $this->createMock(CorePermissions::class);
-        $this->form       = new ExampleSendType($this->translator, $this->security);
+        $this->translator     = $this->createMock(TranslatorInterface::class);
+        $this->security       = $this->createMock(CorePermissions::class);
+        $this->userHelperMock = $this->createMock(UserHelper::class);
+        $this->form           = new ExampleSendType($this->translator, $this->security, $this->userHelperMock);
 
         parent::setUp();
     }
 
     public function testBuildFormWithoutContact(): void
     {
+        $userId  = 37;
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects(self::exactly(2))
             ->method('add')
@@ -67,9 +78,19 @@ class ExampleSendTypeTest extends TestCase
         $this->security->expects(self::once())
             ->method('isAdmin')
             ->willReturn(false);
+
+        $userMock = $this->createMock(User::class);
+        $userMock->expects(self::once())
+            ->method('getId')
+            ->willReturn($userId);
+
+        $this->userHelperMock->expects(self::once())
+            ->method('getUser')
+            ->willReturn($userMock);
+
         $this->security->expects(self::once())
             ->method('hasEntityAccess')
-            ->with('lead:leads:viewown', 'lead:leads:viewother')
+            ->with('lead:leads:viewown', 'lead:leads:viewother', $userId)
             ->willReturn(false);
 
         $this->form->buildForm($builder, []);
@@ -77,6 +98,7 @@ class ExampleSendTypeTest extends TestCase
 
     public function testBuildFormWithContact(): void
     {
+        $userId = 37;
         $this->translator->expects(self::exactly(2))
             ->method('trans')
             ->withConsecutive(
@@ -134,9 +156,19 @@ class ExampleSendTypeTest extends TestCase
         $this->security->expects(self::once())
             ->method('isAdmin')
             ->willReturn(false);
+
+        $userMock = $this->createMock(User::class);
+        $userMock->expects(self::once())
+            ->method('getId')
+            ->willReturn($userId);
+
+        $this->userHelperMock->expects(self::once())
+            ->method('getUser')
+            ->willReturn($userMock);
+
         $this->security->expects(self::once())
             ->method('hasEntityAccess')
-            ->with('lead:leads:viewown', 'lead:leads:viewother')
+            ->with('lead:leads:viewown', 'lead:leads:viewother', $userId)
             ->willReturn(true);
 
         $this->form->buildForm($builder, []);

@@ -12,18 +12,25 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 {
+    /**
+     * @var Swift_Transport
+     */
+    private $transport;
+
     protected function setUp(): void
     {
         $this->configParams['mailer_spool_type'] = 'file';
-
         parent::setUp();
+
+        $this->container->set('swiftmailer.transport.real', $this->transport = $this->createTransportFake());
     }
 
-    public function testSendEmail(): void
+    public function testSendExampleEmailWithContact(): void
     {
         $lead  = $this->createLead();
         $email = $this->createEmail();
         $this->em->flush();
+        $this->em->clear();
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
@@ -44,6 +51,30 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
             'Contact emails is test@domain.tld',
             $message->getBody()->toString()
         );
+    }
+
+    public function testSendExampleEmailWithOutContact(): void
+    {
+        $email = $this->createEmail();
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
+        $formCrawler = $crawler->filter('form[name=example_send]');
+        self::assertSame(1, $formCrawler->count());
+        $form = $formCrawler->form();
+        $form->setValues(['example_send[emails][list][0]' => 'admin@yoursite.com']);
+        $this->client->submit($form);
+
+        self::assertCount(1, $this->transport->messages);
+
+        $message = $this->transport->messages[0];
+
+        // Asserting email data
+        self::assertInstanceOf('Swift_Message', $message);
+        self::assertSame('admin@yoursite.com', key($message->getTo()));
+        self::assertContains('Email subject', $message->getSubject());
+        self::assertContains('Contact emails is [Email]', $message->getBody());
     }
 
     private function createEmail(): Email

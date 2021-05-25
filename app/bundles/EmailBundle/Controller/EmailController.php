@@ -1518,13 +1518,17 @@ class EmailController extends FormController
             $isValid     = $this->isFormValid($form);
             if (!$isCancelled && $isValid) {
                 $emails              = $form['emails']->getData()['list'];
-                // Use this contact data to fill email body content
-                $previewForContactId = (int) $form->getData()['contact_id'];
+                $previewForContactId = null;
 
-                if ($previewForContactId && (
-                    !$security->isAdmin()
-                    || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
-                )
+                // Use this contact data to fill email body content
+                if ($form->has('contact_id')) {
+                    $previewForContactId = (int) $form->getData()['contact_id'];
+                }
+
+                if ($previewForContactId &&
+                    (!$security->isAdmin() ||
+                        !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $user->getId())
+                    )
                 ) {
                     // disallow displaying contact information
                     $previewForContactId = null;

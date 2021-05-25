@@ -6,8 +6,10 @@ namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\LookupType;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -32,11 +34,18 @@ class ContentPreviewSettingsTypeTest extends TestCase
      */
     private $security;
 
+    /**
+     * @var UserHelper|MockObject
+     */
+    private $userHelperMock;
+
     protected function setUp(): void
     {
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->security   = $this->createMock(CorePermissions::class);
-        $this->form       = new ContentPreviewSettingsType($this->translator, $this->security);
+        $this->translator     = $this->createMock(TranslatorInterface::class);
+        $this->security       = $this->createMock(CorePermissions::class);
+        $this->userHelperMock = $this->createMock(UserHelper::class);
+        $this->form           = new ContentPreviewSettingsType($this->translator, $this->security, $this->userHelperMock);
+
         parent::setUp();
     }
 
@@ -74,9 +83,49 @@ class ContentPreviewSettingsTypeTest extends TestCase
         self::assertSame('content_preview_settings', $this->form->getBlockPrefix());
     }
 
+    public function testBuildFormWithTranslationAndVariantFieldNotAvailable(): void
+    {
+        $objectId = 1;
+        $options  = [
+            'objectId'      => $objectId,
+            'translations'  => [
+                'children' => [],
+            ],
+            'variants'     => [
+                'children' => [],
+            ],
+        ];
+
+        $this->translator->expects(self::exactly(2))
+            ->method('trans')
+            ->withConsecutive(
+                ['mautic.lead.list.form.startTyping'],
+                ['mautic.core.form.nomatches']
+            )->willReturnOnConsecutiveCalls(
+                'startTyping',
+                'nomatches'
+            );
+
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $builder->expects(self::once())
+            ->method('add')
+            ->withConsecutive(
+                $this->getContactFieldDefinition()
+            );
+
+        $this->security->expects(self::once())
+            ->method('isAdmin')
+            ->willReturn(true);
+        $this->security->expects(self::never())
+            ->method('hasEntityAccess');
+
+        $this->form->buildForm($builder, $options);
+    }
+
     public function testBuildFormWithTranslationAndVariantFieldNotAvailableAndNoAccessPermissions(): void
     {
         $objectId = 1;
+        $userId   = 37;
         $options  = [
             'objectId'      => $objectId,
             'translations'  => [
@@ -90,9 +139,19 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $this->security->expects(self::once())
             ->method('isAdmin')
             ->willReturn(false);
+
+        $userMock = $this->createMock(User::class);
+        $userMock->expects(self::once())
+            ->method('getId')
+            ->willReturn($userId);
+
+        $this->userHelperMock->expects(self::once())
+            ->method('getUser')
+            ->willReturn($userMock);
+
         $this->security->expects(self::once())
             ->method('hasEntityAccess')
-            ->with('lead:leads:viewown', 'lead:leads:viewother')
+            ->with('lead:leads:viewown', 'lead:leads:viewother', $userId)
             ->willReturn(false);
 
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -142,6 +201,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
 
     public function testBuildFormWithTranslationAndVariantFieldNotAvailableAndEntityPermissions(): void
     {
+        $userId   = 37;
         $objectId = 1;
         $options  = [
             'objectId'      => $objectId,
@@ -156,9 +216,19 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $this->security->expects(self::once())
             ->method('isAdmin')
             ->willReturn(false);
+
+        $userMock = $this->createMock(User::class);
+        $userMock->expects(self::once())
+            ->method('getId')
+            ->willReturn($userId);
+
+        $this->userHelperMock->expects(self::once())
+            ->method('getUser')
+            ->willReturn($userMock);
+
         $this->security->expects(self::once())
             ->method('hasEntityAccess')
-            ->with('lead:leads:viewown', 'lead:leads:viewother')
+            ->with('lead:leads:viewown', 'lead:leads:viewother', $userId)
             ->willReturn(true);
 
         $this->translator->expects(self::exactly(2))
@@ -240,6 +310,8 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $this->security->expects(self::once())
             ->method('isAdmin')
             ->willReturn(true);
+        $this->security->expects(self::never())
+            ->method('hasEntityAccess');
 
         $this->translator->expects(self::exactly(4))
             ->method('trans')

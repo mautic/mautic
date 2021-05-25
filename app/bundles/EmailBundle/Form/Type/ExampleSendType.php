@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\Form\Type;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\LookupType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -17,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ExampleSendType extends AbstractType
 {
-    public function __construct(private TranslatorInterface $translator, private CorePermissions $security)
+    public function __construct(private TranslatorInterface $translator, private CorePermissions $security, private UserHelper $userHelper)
     {
     }
 
@@ -34,9 +35,12 @@ class ExampleSendType extends AbstractType
             ]
         );
 
-        if ($this->security->isAdmin()
-            || $this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
-        ) {
+        if ($this->security->isAdmin() ||
+            $this->security->hasEntityAccess(
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                $this->userHelper->getUser()->getId()
+            )) {
             $builder->add(
                 'contact',
                 LookupType::class,
