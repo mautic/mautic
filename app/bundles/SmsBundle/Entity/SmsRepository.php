@@ -142,8 +142,6 @@ class SmsRepository extends CommonRepository
             ;
         $listIds = [];
         if ($lists) {
-            $lists->fetchAssociative();
-
             foreach ($lists as $list) {
                 $listIds[] = $list['leadlist_id'];
             }
