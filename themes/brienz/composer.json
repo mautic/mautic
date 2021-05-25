@@ -1,10 +1,10 @@
 {
-  "name": "mautic/theme-confirmme",
-  "description": "Mautic Confirmme Theme",
+  "name": "mautic/theme-brienz",
+  "description": "Mautic Brienz Theme",
   "type": "mautic-theme",
   "keywords": ["mautic","theme"],
   "extra": {
-    "install-directory-name": "confirmme"
+    "install-directory-name": "brienz"
   },
   "minimum-stability": "dev",
   "require": {
