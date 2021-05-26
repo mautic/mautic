@@ -150,4 +150,49 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertIsArray($segment['filters']);
         }
     }
+
+    public function testSegmentWithCategory(): void
+    {
+        $categoryPayload = [
+            'title'  => 'API Cat',
+            'alias'  => 'kitty',
+            'bundle' => 'segment',
+        ];
+        $this->client->request('POST', '/api/categories/new', $categoryPayload);
+        $clientResponse     = $this->client->getResponse();
+        $response           = json_decode($clientResponse->getContent(), true);
+        $categoryId         = $response['category']['id'];
+
+        $segmentPayload = [
+            'name'        => 'API segment',
+            'description' => 'Segment created via API test',
+            'category'    => $categoryId,
+        ];
+
+        // Create:
+        $this->client->request('POST', '/api/segments/new', $segmentPayload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        if (!empty($response['errors'][0])) {
+            $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);
+        }
+
+        $segmentId = $response['list']['id'];
+
+        // Get segment with category by id:
+        $this->client->request('GET', "/api/segments/{$segmentId}");
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertTrue($clientResponse->isOk());
+        $this->assertEquals($segmentPayload['category'], $response['list']['category']['id']);
+
+        // Search segments by category:
+        $this->client->request('GET', '/api/segments?search=category:kitty');
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertTrue($clientResponse->isOk());
+        $this->assertCount(1, $response['lists']);
+    }
 }
