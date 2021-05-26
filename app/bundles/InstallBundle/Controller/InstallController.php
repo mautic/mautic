@@ -101,14 +101,7 @@ class InstallController extends CommonController
                         $dbParams = (array) $formData;
 
                         $messages = $this->installer->createDatabaseStep($step, $dbParams);
-<<<<<<< HEAD
-                        if (is_bool($messages) && true === $messages) {
-                            // Refresh to install schema with new connection information in the container
-                            return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1.1]));
-                        } elseif (is_array($messages) && !empty($messages)) {
-=======
                         if (!empty($messages)) {
->>>>>>> Cleaned up the code a bit to not return multiple types (bool or array)
                             $this->handleInstallerErrors($form, $messages);
                             break;
                         }
