@@ -1,0 +1,4 @@
+{
+  "templateHtml": "",
+  "templateMjml": "<mjml>\n  <mj-body>\n    <mj-section>\n      <mj-column>\n        <mj-text font-size=\"20px\">Hello there!</mj-text>\n        <mj-text>This is MJML version of blank template for Mautic.</mj-text>\n        <mj-text>{unsubscribe_text} | {webview_text}</mj-text>\n      </mj-column>\n    </mj-section>\n  </mj-body>\n</mjml>"
+}

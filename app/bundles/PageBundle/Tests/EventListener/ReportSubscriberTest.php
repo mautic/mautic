@@ -67,7 +67,7 @@ class ReportSubscriberTest extends TestCase
     {
         $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'checkContext',
                 'addGraph',
                 'getStandardColumns',
@@ -127,7 +127,7 @@ class ReportSubscriberTest extends TestCase
     {
         $mockEvent = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'getContext',
                 'getQueryBuilder',
                 'addCategoryLeftJoin',
@@ -143,7 +143,7 @@ class ReportSubscriberTest extends TestCase
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->setMethods(['from', 'leftJoin'])
+            ->onlyMethods(['from', 'leftJoin'])
             ->getMock();
 
         $mockQueryBuilder->expects($this->once())
@@ -173,7 +173,7 @@ class ReportSubscriberTest extends TestCase
     {
         $mockEvent = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'getContext',
                 'getQueryBuilder',
                 'addCategoryLeftJoin',
@@ -193,7 +193,7 @@ class ReportSubscriberTest extends TestCase
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->setMethods(['from', 'leftJoin'])
+            ->onlyMethods(['from', 'leftJoin'])
             ->getMock();
 
         $mockQueryBuilder->expects($this->once())
@@ -223,7 +223,7 @@ class ReportSubscriberTest extends TestCase
     {
         $mockEvent = $this->getMockBuilder(ReportGraphEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods(['checkContext', 'getRequestedGraphs'])
+            ->onlyMethods(['checkContext', 'getRequestedGraphs'])
             ->getMock();
 
         $mockEvent->expects($this->once())
@@ -240,7 +240,7 @@ class ReportSubscriberTest extends TestCase
     {
         $mockEvent = $this->getMockBuilder(ReportGraphEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'checkContext',
                 'getQuerybuilder',
                 'getOptions',
@@ -258,12 +258,12 @@ class ReportSubscriberTest extends TestCase
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->setMethods(['expr', 'execute'])
+            ->onlyMethods(['expr', 'execute'])
             ->getMock();
 
         $mockStmt = $this->getMockBuilder(PDOStatement::class)
             ->disableOriginalConstructor()
-            ->setMethods(['fetchAll'])
+            ->onlyMethods(['fetchAll'])
             ->getMock();
 
         $mockStmt->expects($this->exactly(2))
@@ -297,7 +297,7 @@ class ReportSubscriberTest extends TestCase
 
         $mockChartQuery = $this->getMockBuilder(ChartQuery::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'modifyCountQuery',
                 'modifyTimeDataQuery',
                 'loadAndBuildTimeData',
