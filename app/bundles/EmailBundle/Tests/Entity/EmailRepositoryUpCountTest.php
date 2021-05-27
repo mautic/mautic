@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -17,12 +19,28 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\EmailBundle\Entity\EmailRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|Connection
+     */
     private $mockConnection;
+
+    /**
+     * @var MockObject|QueryBuilder
+     */
     private $queryBuilderMock;
+
+    /**
+     * @var MockObject|EntityManager
+     */
     private $em;
+
+    /**
+     * @var MockObject|ClassMetadata
+     */
     private $cm;
 
     /**
@@ -46,7 +64,7 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
         $this->em->method('getConnection')->willReturn($this->mockConnection);
     }
 
-    public function testUpCountWithNoIncrease()
+    public function testUpCountWithNoIncrease(): void
     {
         $this->queryBuilderMock->expects($this->never())
             ->method('update');
@@ -54,7 +72,7 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
         $this->repo->upCount(45, 'sent', 0);
     }
 
-    public function testUpCountWithId()
+    public function testUpCountWithId(): void
     {
         $this->queryBuilderMock->expects($this->once())
             ->method('update')
@@ -74,23 +92,21 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
         $this->repo->upCount(45);
     }
 
-    public function testUpCountWithVariant()
+    public function testUpCountWithVariant(): void
     {
         $this->queryBuilderMock->expects($this->once())
             ->method('update')
             ->with(MAUTIC_TABLE_PREFIX.'emails');
 
-        $this->queryBuilderMock->expects($this->at(1))
-            ->method('set')
-            ->with('read_count', 'read_count + 2');
+        $this->queryBuilderMock->method('set')
+            ->withConsecutive(
+                ['read_count', 'read_count + 2'],
+                ['variant_read_count', 'variant_read_count + 2']
+            );
 
         $this->queryBuilderMock->expects($this->once())
             ->method('where')
             ->with('id = 45');
-
-        $this->queryBuilderMock->expects($this->at(3))
-            ->method('set')
-            ->with('variant_read_count', 'variant_read_count + 2');
 
         $this->queryBuilderMock->expects($this->once())
             ->method('execute');
@@ -98,26 +114,19 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
         $this->repo->upCount(45, 'read', 2, true);
     }
 
-    public function testUpCountWithTwoErrors()
+    public function testUpCountWithTwoErrors(): void
     {
         $this->queryBuilderMock->expects($this->exactly(3))
-            ->method('execute');
-
-        $this->queryBuilderMock->expects($this->at(3))
             ->method('execute')
-            ->will($this->throwException(new DBALException()));
-
-        $this->queryBuilderMock->expects($this->at(4))
-            ->method('execute')
-            ->will($this->throwException(new DBALException()));
-
-        $this->queryBuilderMock->expects($this->at(5))
-            ->method('execute');
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new DBALException()),
+                $this->throwException(new DBALException())
+            );
 
         $this->repo->upCount(45);
     }
 
-    public function testUpCountWithFourErrors()
+    public function testUpCountWithFourErrors(): void
     {
         $this->queryBuilderMock->expects($this->exactly(3))
             ->method('execute')

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -16,49 +18,41 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher;
-use PHPUnit\Framework\MockObject\MockBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockBuilder|EventDispatcherInterface
+     * @var MockObject|EventDispatcherInterface
      */
     private $dispatcher;
 
+    /**
+     * @var MockObject|ConditionAccessor
+     */
+    private $config;
+
     protected function setUp(): void
     {
-        $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        parent::setUp();
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->config     = $this->createMock(ConditionAccessor::class);
     }
 
-    public function testConditionEventIsDispatched()
+    public function testConditionEventIsDispatched(): void
     {
-        $config = $this->getMockBuilder(ConditionAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config->expects($this->once())
+        $this->config->expects($this->once())
             ->method('getEventName')
             ->willReturn('something');
 
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->with('something', $this->isInstanceOf(ConditionEvent::class));
+            ->withConsecutive(
+                ['something', $this->isInstanceOf(ConditionEvent::class)],
+                [CampaignEvents::ON_EVENT_CONDITION_EVALUATION, $this->isInstanceOf(ConditionEvent::class)]
+            );
 
-        $this->dispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(CampaignEvents::ON_EVENT_CONDITION_EVALUATION, $this->isInstanceOf(ConditionEvent::class));
-
-        $this->getEventDispatcher()->dispatchEvent($config, new LeadEventLog());
-    }
-
-    /**
-     * @return ConditionDispatcher
-     */
-    private function getEventDispatcher()
-    {
-        return new ConditionDispatcher($this->dispatcher);
+        (new ConditionDispatcher($this->dispatcher))->dispatchEvent($this->config, new LeadEventLog());
     }
 }
