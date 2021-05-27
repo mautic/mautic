@@ -746,8 +746,10 @@ class PageModel extends FormModel
         $query['page_url'] = $this->getPageUrl($request, $page);
 
         // get all params from the url (actual url or passed in as page_url)
-        $queryUrl = $this->getQueryFromUrl($query['page_url']);
-        $query    = \array_merge($queryUrl, $query);
+        if (!empty($query['page_url'])) {
+            $queryUrl = $this->getQueryFromUrl($query['page_url']);
+            $query    = \array_merge($queryUrl, $query);
+        }
 
         // Process clickthrough if applicable
         if (!empty($query['ct'])) {

@@ -109,6 +109,7 @@
     "predis/predis": "^1.1"
   },
   "replace": {
+    "mautic/grapes-js-builder-bundle": "self.version",
     "mautic/plugin-citrix": "self.version",
     "mautic/plugin-clearbit": "self.version",
     "mautic/plugin-cloudstorage": "self.version",
@@ -120,6 +121,7 @@
     "mautic/plugin-outlook": "self.version",
     "mautic/plugin-social": "self.version",
     "mautic/plugin-zapier": "self.version",
+    "mautic/plugin-tagmanager": "self.version",
     "mautic/theme-coffee": "self.version",
     "mautic/theme-mauve": "self.version",
     "mautic/theme-nature": "self.version",
