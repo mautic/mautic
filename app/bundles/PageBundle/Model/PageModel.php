@@ -12,6 +12,7 @@
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -984,6 +985,38 @@ class PageModel extends FormModel
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_hit');
+
+        return $q->execute()->fetchAll();
+    }
+
+    /**
+     * Get a list of popular (by hits) tracking pages.
+     *
+     * @param int   $limit
+     * @param array $filters
+     *
+     * @return array
+     */
+    public function getPopularTrackedPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [])
+    {
+        $companyId  = ArrayHelper::pickValue('companyId', $filters);
+        $campaignId = ArrayHelper::pickValue('campaignId', $filters);
+        $segmentId  = ArrayHelper::pickValue('segmentId', $filters);
+
+        $q          = $this->em->getConnection()->createQueryBuilder();
+        // IF NULL in select statement is 3 times faster like where condition
+        $q->select('t.url_title, t.url, IFNULL(t.page_id AND t.email_id  AND t.redirect_id AND t.CODE = 200, COUNT(t.id)) AS hits')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 't')
+            ->orderBy('hits', 'DESC')
+            ->groupBy('t.url_title')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+
+        $chartQuery->applyDateFilters($q, 'date_hit');
+        $chartQuery->addCompanyFilter($q, $companyId);
+        $chartQuery->addCampaignFilter($q, $campaignId);
+        $chartQuery->addSegmentFilter($q, $segmentId);
 
         return $q->execute()->fetchAll();
     }

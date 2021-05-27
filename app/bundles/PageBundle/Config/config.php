@@ -188,6 +188,12 @@ return [
                     'router',
                 ],
             ],
+            'mautic.page.dashboard.best.tracking.pages.subscriber' => [
+                'class'     => \Mautic\PageBundle\EventListener\DashboardBestTrackingPagesSubscriber::class,
+                'arguments' => [
+                    'mautic.page.model.page',
+                ],
+            ],
             'mautic.page.js.subscriber' => [
                 'class'     => \Mautic\PageBundle\EventListener\BuildJsSubscriber::class,
                 'arguments' => [
