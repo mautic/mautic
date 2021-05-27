@@ -11,6 +11,7 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -181,12 +182,12 @@ class Asset extends FormEntity
             ->nullable()
             ->build();
 
-        $builder->createField('remotePath', 'text')
+        $builder->createField('remotePath', Types::TEXT)
             ->columnName('remote_path')
             ->nullable()
             ->build();
 
-        $builder->createField('originalFileName', 'string')
+        $builder->createField('originalFileName', Types::TEXT)
             ->columnName('original_file_name')
             ->nullable()
             ->build();
