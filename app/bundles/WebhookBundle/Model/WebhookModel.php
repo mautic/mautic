@@ -43,6 +43,8 @@ class WebhookModel extends FormModel
     const COMMAND_PROCESS   = 'command_process';
     const IMMEDIATE_PROCESS = 'immediate_process';
 
+    private const DELETE_BATCH_LIMIT = 5000;
+
     /**
      * Whet queue mode is turned on.
      *
@@ -317,14 +319,18 @@ class WebhookModel extends FormModel
             return false;
         }
 
-        $start = microtime(true);
+        $start            = microtime(true);
+        $webhookQueueRepo = $this->getQueueRepository();
 
         try {
             $response = $this->httpClient->post($webhook->getWebhookUrl(), $payload, $webhook->getSecret());
 
             // remove successfully processed queues from the Webhook object so they won't get stored again
-            foreach ($this->webhookQueueIdList as $queue) {
-                $webhook->removeQueue($queue);
+            $queueIds        = array_keys($this->webhookQueueIdList);
+            $chunkedQueueIds = array_chunk($queueIds, self::DELETE_BATCH_LIMIT);
+
+            foreach ($chunkedQueueIds as $queueIds) {
+                $webhookQueueRepo->deleteQueuesById($queueIds);
             }
 
             $responseBody = $response->getBody()->getContents();
@@ -365,9 +371,6 @@ class WebhookModel extends FormModel
         // Run this on command as well as immediate send because if switched from queue to immediate
         // it can have some rows in the queue which will be send in every webhook forever
         if (!empty($this->webhookQueueIdList)) {
-            /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
-            $webhookQueueRepo = $this->getQueueRepository();
-
             // delete all the queued items we just processed
             $webhookQueueRepo->deleteQueuesById(array_keys($this->webhookQueueIdList));
             $queueCount = $webhookQueueRepo->getQueueCountByWebhookId($webhook->getId());
