@@ -210,6 +210,14 @@ class BuilderSubscriber implements EventSubscriberInterface
                 SlotSeparatorType::class,
                 400
             );
+            $event->addSlotType(
+                'video',
+                $this->translator->trans('mautic.core.slot.label.video'),
+                'youtube',
+                'MauticCoreBundle:Slots:video.html.php',
+                'slot_video',
+                350
+            );
 
             $event->addSlotType(
                 'dynamicContent',

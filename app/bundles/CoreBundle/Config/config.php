@@ -318,6 +318,34 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.form.type.slot.image' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageType',
+                'alias' => 'slot_image',
+            ],
+            'mautic.form.type.slot.separator' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSeparatorType',
+                'alias' => 'slot_separator',
+            ],
+            'mautic.form.type.slot.video' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotVideoType',
+                'alias' => 'slot_video',
+            ],
+            'mautic.form.type.slot.imagecard' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCardType',
+                'alias' => 'slot_imagecard',
+            ],
+            'mautic.form.type.slot.imagecaption' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCaptionType',
+                'alias' => 'slot_imagecaption',
+            ],
+            'mautic.form.type.slot.socialshare' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialShareType',
+                'alias' => 'slot_socialshare',
+            ],
+            'mautic.form.type.slot.socialfollow' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialFollowType',
+                'alias' => 'slot_socialfollow',
+            ],
             'mautic.form.type.slot.segmentlist' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotSegmentListType',
                 'arguments' => [

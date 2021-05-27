@@ -1751,6 +1751,28 @@ Mautic.initSlotListeners = function() {
             params.slot.find('a').eq(0).attr('href', params.field.val());
         } else if (fieldParam === 'link-text') {
             params.slot.find('a').eq(0).text(params.field.val());
+        } else if (fieldParam === 'video-alt') {
+            params.slot.find('.video-thumbnail').attr('alt', params.field.val());
+            params.slot.find('.video-thumbnail').attr('title', params.field.val());
+        } else if (fieldParam === 'video-color') {
+            if (params.field.val() == 0) {
+                params.slot.find('.video-icon-play').attr('src', 'https://img.icons8.com/ios/200/FFFFFF/play-button-circled-filled.png');
+            } else if (params.field.val() == 1) {
+                params.slot.find('.video-icon-play').attr('src', 'https://img.icons8.com/ios/200/000000/play-button-circled-filled.png');
+            }
+        } else if (fieldParam === 'video-url') {
+            var videoUrl = params.field.val();
+            params.slot.find('.slot-video-link').attr('href', videoUrl);
+
+            videoUrl = videoUrl.replace(/(>|<)/gi, '').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+            if (videoUrl[2] !== undefined) {
+                ID = videoUrl[2].split(/[^0-9a-z_\-]/i);
+                ID = ID[0];
+            } else {
+                ID = videoUrl;
+            }
+            videoUrl = 'https://img.youtube.com/vi/' + ID + '/maxresdefault.jpg';
+            params.slot.find('.video-thumbnail').attr('src', videoUrl);
         } else if (fieldParam === 'float') {
             var values = ['left', 'center', 'right'];
             params.slot.find('a').parent().attr('align', values[params.field.val()]);
