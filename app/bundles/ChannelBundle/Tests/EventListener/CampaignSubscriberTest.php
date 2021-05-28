@@ -34,7 +34,9 @@ use Mautic\EmailBundle\Form\Type\EmailListType;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\SmsEvents;
 use Psr\Log\NullLogger;
@@ -76,6 +78,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
      * @var \PHPUnit\Framework\MockObject\MockObject|LegacyEventDispatcher
      */
     private $legacyDispatcher;
+
+    private $pageModel;
 
     protected function setUp(): void
     {
@@ -206,12 +210,17 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->pageModel = $this->getMockBuilder(PageModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $campaignSubscriber = new CampaignSubscriber(
             $this->messageModel,
             $this->eventDispatcher,
             $this->eventCollector,
             new NullLogger(),
-            $this->translator
+            $this->translator,
+            $this->pageModel
         );
 
         $this->dispatcher->addSubscriber($campaignSubscriber);
