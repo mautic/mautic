@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
+use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\LeadEventLog;
-use Symfony\Contracts\EventDispatcher\Event;
 
-final class ImportProcessEvent extends Event
+final class ImportProcessEvent extends CommonEvent
 {
     public Import $import;
     public LeadEventLog $eventLog;

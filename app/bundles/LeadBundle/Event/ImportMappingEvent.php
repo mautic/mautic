@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\CoreBundle\Event\CommonEvent;
 
-final class ImportMappingEvent extends Event
+final class ImportMappingEvent extends CommonEvent
 {
     public string $routeObjectName;
     public bool $objectSupported = false;

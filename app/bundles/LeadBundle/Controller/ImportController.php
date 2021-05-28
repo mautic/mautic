@@ -227,7 +227,7 @@ class ImportController extends FormController
                         [
                             'object'           => $object,
                             'action'           => $action,
-                            'all_fields'       => $mappingEvent->getFields(),
+                            'all_fields'       => $mappingEvent->fields,
                             'import_fields'    => $session->get('mautic.'.$object.'.import.importfields', []),
                             'line_count_limit' => $this->getLineCountLimit(),
                         ]
