@@ -66,9 +66,7 @@ class ClientModel extends FormModel
      */
     public function getRepository(): \Mautic\ApiBundle\Entity\oAuth2\ClientRepository
     {
-        if ('oauth2' == $this->apiMode) {
-            return $this->em->getRepository(Client::class);
-        }
+        return $this->em->getRepository(Client::class);
     }
 
     /**
@@ -97,8 +95,6 @@ class ClientModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return Client|null
      */
     public function getEntity($id = null): ?Client
     {
