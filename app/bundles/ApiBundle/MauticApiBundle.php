@@ -35,12 +35,4 @@ class MauticApiBundle extends Bundle
         $extension = $container->getExtension('security');
         $extension->addSecurityListenerFactory(new ApiFactory());
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'FOSOAuthServerBundle';
-    }
 }

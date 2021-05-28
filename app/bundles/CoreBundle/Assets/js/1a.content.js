@@ -584,81 +584,27 @@ Mautic.onPageLoad = function (container, response, inModal) {
             }
         }
     });
-
     Mautic.activateGlobalFroalaOptions();
     if (mQuery(container + ' textarea.editor').length) {
         mQuery(container + ' textarea.editor').each(function () {
-            var textarea = mQuery(this);
+            const textarea = mQuery(this);
+            const maxButtons = [[ 'Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'InsertToken', 'Sourcedialog', 'Maximize']]
+            let minButtons = [['Undo', 'Redo', '|', 'Bold', 'Italic', 'Underline']];
 
-            // init AtWho in a froala editor
-            if (textarea.hasClass('editor-builder-tokens')) {
-                textarea.on('froalaEditor.initialized', function (e, editor) {
-                    Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
-                });
-
-                textarea.on('froalaEditor.focus', function (e, editor) {
-                    Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
-                });
+            if (textarea.hasClass('editor-dynamic-content') || textarea.hasClass('editor-basic')) {
+                minButtons = [['Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'Sourcedialog', 'Maximize']];
             }
 
-            textarea.on('froalaEditor.blur', function (e, editor) {
-                editor.popups.hideAll();
-            });
-
-            var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
-            var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
-
-            if (textarea.hasClass('editor-email')) {
-                maxButtons = mQuery.grep(maxButtons, function(value) {
-                    return value != 'insertGatedVideo';
-                });
-
-                maxButtons.push('dynamicContent');
-            }
-
-            if (textarea.hasClass('editor-dynamic-content')) {
-                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
-            }
-
-            if (textarea.hasClass('editor-basic')) {
-                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'];
-            }
-
+            let ckEditorToolbar = minButtons;
             if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
-                var options = {
-                    // Set custom buttons with separator between them.
-                    toolbarButtons: maxButtons,
-                    toolbarButtonsMD: maxButtons,
-                    heightMin: 300,
-                    useClasses: false
-                };
-
-                if (textarea.hasClass('editor-basic-fullpage')) {
-                    options.fullPage = true;
-                    options.htmlAllowedTags = ['.*'];
-                    options.htmlAllowedAttrs = ['.*'];
-                    options.htmlRemoveTags = [];
-                    options.lineBreakerTags = [];
-                }
-
-                textarea.on('froalaEditor.focus', function (e, editor) {
-                    Mautic.showChangeThemeWarning = true;
-                });
-
-                textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, options));
-            } else {
-                textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
-                    // Set custom buttons with separator between them.
-                    toolbarButtons: minButtons,
-                    toolbarButtonsMD: minButtons,
-                    toolbarButtonsSM: minButtons,
-                    toolbarButtonsXS: minButtons,
-                    heightMin: 100,
-                    useClasses: false
-                }));
+                ckEditorToolbar = maxButtons;
             }
+
+            Mautic.ConvertFieldToCkeditor(textarea, ckEditorToolbar);
+
         });
     }
+
 
     //prevent auto closing dropdowns for dropdown forms
     if (mQuery(container + ' .dropdown-menu-form').length) {
@@ -838,9 +784,10 @@ Mautic.onPageUnload = function (container, response) {
             MauticVars.modalsReset = {};
         }
 
-        mQuery(container + ' textarea.editor').each(function () {
-            mQuery('textarea.editor').froalaEditor('destroy');
-        });
+        for(name in CKEDITOR.instances)
+        {
+            CKEDITOR.instances[name].destroy(true);
+        }
 
         //turn off shuffle events
         mQuery('html')

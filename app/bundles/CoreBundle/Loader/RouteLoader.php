@@ -79,7 +79,7 @@ class RouteLoader extends Loader
         $secureCollection->addCollection($this->import('.', 'uploader'));
 
         // Elfinder file manager
-        $collection->addCollection($this->import('@FMElfinderBundle/Resources/config/routing.yml'));
+        $collection->addCollection($this->import('@FMElfinderBundle/Resources/config/routing.yaml'));
 
         //API
         if ($this->coreParameters->get('api_enabled')) {

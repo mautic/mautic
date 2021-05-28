@@ -168,6 +168,16 @@ final class LeadEvents
     const LEAD_BUILD_SEARCH_COMMANDS = 'mautic.lead_build_search_commands';
 
     /**
+     * The mautic.company_build_search_commands event is dispatched when the search commands are built.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanyBuildSearchEvent instance.
+     *
+     * @var string
+     */
+    const COMPANY_BUILD_SEARCH_COMMANDS = 'mautic.company_build_search_commands';
+
+    /**
      * The mautic.current_lead_changed event is dispatched when the current lead is changed to another such as when
      * a new lead is created from a form submit.  This gives opportunity to update session data if applicable.
      *

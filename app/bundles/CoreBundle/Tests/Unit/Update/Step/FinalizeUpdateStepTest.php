@@ -90,8 +90,8 @@ class FinalizeUpdateStepTest extends AbstractStepTest
 
         $this->step->execute($this->progressBar, $this->input, $this->output);
 
-        $this->assertFileNotExists(__DIR__.'/resources/upgrade.php');
-        $this->assertFileNotExists(__DIR__.'/resources/lastUpdateCheck.txt');
+        $this->assertFileDoesNotExist(__DIR__.'/resources/upgrade.php');
+        $this->assertFileDoesNotExist(__DIR__.'/resources/lastUpdateCheck.txt');
 
         $this->assertEquals($updateSuccessfulKey, trim($this->progressBar->getMessage()));
     }
@@ -121,9 +121,13 @@ class FinalizeUpdateStepTest extends AbstractStepTest
             ->method('writeln')
             ->with("\n\n<info>This is an example message</info>");
 
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
+
         $this->step->execute($this->progressBar, $this->input, $this->output);
 
-        $this->assertFileNotExists(__DIR__.'/resources/upgrade.php');
-        $this->assertFileNotExists(__DIR__.'/resources/lastUpdateCheck.txt');
+        $this->assertFileDoesNotExist(__DIR__.'/resources/upgrade.php');
+        $this->assertFileDoesNotExist(__DIR__.'/resources/lastUpdateCheck.txt');
     }
 }
