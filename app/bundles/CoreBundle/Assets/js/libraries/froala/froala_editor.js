@@ -204,6 +204,7 @@
     var initOnA = $.proxy(function () {
       this.$el = this.$oel;
       this.el = this.$el.get(0);
+      this.$wp = $(this);
       this.$el.attr('contenteditable', true).css('outline', 'none').css('display', 'inline-block');
       this.opts.multiLine = false;
       this.opts.toolbarInline = false;
