@@ -109,6 +109,16 @@ final class WebhookEvents
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.webhook.campaign_on_trigger_action';
 
     /**
+     * The mautic.webhook.campaign_on_webhook_response event is dispatched when send a webhook campaign action is fired and we get response from webhook.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignTriggerEvent instance.
+     *
+     * @var string
+     */
+    const ON_WEBHOOK_RESPONSE = 'mautic.webhook.campaign_on_webhook_response';
+
+    /**
      * The mautic.webhook_on_request event is fired before request is processed.
      *
      * The event listener receives a Mautic\WebhookBundle\Event\WebhookRequestEvent instance.
