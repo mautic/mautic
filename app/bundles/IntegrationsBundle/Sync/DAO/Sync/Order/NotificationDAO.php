@@ -41,7 +41,7 @@ class NotificationDAO
 
     public function getMauticObjectId(): int
     {
-        return $this->objectChangeDAO->getMappedObjectId();
+        return (int) $this->objectChangeDAO->getMappedObjectId();
     }
 
     public function getIntegration(): string

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\Entity\MessageRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
@@ -36,15 +38,18 @@ use Mautic\EmailBundle\Model\SendEmailToContact;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\LeadBundle\Entity\CompanyRepository;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -53,6 +58,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 class EmailModelTest extends \PHPUnit\Framework\TestCase
 {
+    const SEGMENT_A = 'segment A';
+
+    const SEGMENT_B = 'segment B';
+
     /**
      * @var MockObject|IpLookupHelper
      */
@@ -687,5 +696,65 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailModel->setDispatcher($this->createMock(EventDispatcher::class));
 
         $this->emailModel->hitEmail($stat, $request);
+    }
+
+    public function testGetEmailListStatsOneSegment()
+    {
+        $list = $this->createMock(LeadList::class);
+        $list->method('getName')->willReturn(self::SEGMENT_A);
+
+        $lists = new ArrayCollection([$list]);
+
+        $result = $this->getEmailListStats($lists);
+
+        self::assertCount(1, $result['datasets']);
+        self::assertEquals(self::SEGMENT_A, $result['datasets'][0]['label']);
+    }
+
+    public function testGetEmailListStatsTwoSegments()
+    {
+        $list = $this->createMock(LeadList::class);
+        $list->method('getName')->willReturn(self::SEGMENT_A);
+
+        $list2 = $this->createMock(LeadList::class);
+        $list2->method('getName')->willReturn(self::SEGMENT_B);
+
+        $lists = new ArrayCollection([$list, $list2]);
+
+        $result = $this->getEmailListStats($lists);
+
+        self::assertCount(3, $result['datasets']);
+        self::assertEquals(self::SEGMENT_A, $result['datasets'][1]['label']);
+        self::assertEquals(self::SEGMENT_B, $result['datasets'][2]['label']);
+    }
+
+    private function getEmailListStats(ArrayCollection $lists)
+    {
+        $trackableRepo    = $this->createMock(TrackableRepository::class);
+        $doNotContactRepo = $this->createMock(DoNotContactRepository::class);
+
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['MauticEmailBundle:Stat', $this->statRepository],
+                        ['MauticLeadBundle:DoNotContact', $doNotContactRepo],
+                        ['MauticPageBundle:Trackable', $trackableRepo],
+                    ]
+                )
+            );
+
+        $this->emailEntity->method('getLists')->willReturn($lists);
+
+        $connection   = $this->createMock(Connection::class);
+        $this->entityManager->method('getConnection')->willReturn($connection);
+
+        $dateFromObject = new \DateTime('now');
+        $dateToObject   = new \DateTime('-1 month');
+
+        $this->emailEntity->method('getLists')->willReturn($lists);
+
+        return $this->emailModel->getEmailListStats($this->emailEntity, true, $dateFromObject, $dateToObject);
     }
 }
