@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Form\Type\CompanyMergeType;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -152,7 +153,7 @@ class CompanyController extends FormController
             'RETURN_ARRAY'
         );
 
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        /** @var CompanyModel $model */
         $model  = $this->getModel('lead.company');
 
         /** @var \Mautic\LeadBundle\Entity\Company $company */
@@ -519,7 +520,7 @@ class CompanyController extends FormController
      */
     public function viewAction($objectId)
     {
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        /** @var CompanyModel $model */
         $model  = $this->getModel('lead.company');
 
         // When we change company data these changes get cached
@@ -835,7 +836,7 @@ class CompanyController extends FormController
             ],
             'RETURN_ARRAY'
         );
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        /** @var CompanyModel $model */
         $model            = $this->getModel('lead.company');
         $secondaryCompany = $model->getEntity($objectId);
         $page             = $this->get('session')->get('mautic.lead.page', 1);
