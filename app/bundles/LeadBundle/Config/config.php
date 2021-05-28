@@ -1216,6 +1216,7 @@ return [
                     'mautic.lead.model.field',
                     'session',
                     'mautic.validator.email',
+                    'mautic.lead.model.list',
                     'mautic.company.deduper',
                 ],
             ],

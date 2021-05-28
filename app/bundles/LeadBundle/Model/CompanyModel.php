@@ -72,6 +72,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     private $repoSetup = false;
 
     /**
+     * @var ListModel
+     */
+    private $listModel;
+
+    /**
      * @var CompanyDeduper
      */
     private $companyDeduper;
@@ -79,11 +84,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * CompanyModel constructor.
      */
-    public function __construct(FieldModel $leadFieldModel, Session $session, EmailValidator $validator, CompanyDeduper $companyDeduper)
+    public function __construct(FieldModel $leadFieldModel, Session $session, EmailValidator $validator, ListModel $listModel, CompanyDeduper $companyDeduper)
     {
         $this->leadFieldModel = $leadFieldModel;
         $this->session        = $session;
         $this->emailValidator = $validator;
+        $this->listModel      = $listModel;
         $this->companyDeduper = $companyDeduper;
     }
 
@@ -770,7 +776,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
     {
-        $company = $this->importCompany($fields, $data, $owner, false);
+        $company = $this->importCompany($fields, $data, $owner, false, $list);
 
         if (null === $company) {
             throw new \Exception($this->translator->trans('mautic.company.error.notfound', [], 'flashes'));
@@ -792,7 +798,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws \Exception
      */
-    public function importCompany($fields, $data, $owner = null, $persist = true)
+    public function importCompany($fields, $data, $owner = null, $persist = true, $list = null)
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));
@@ -877,6 +883,14 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         if ($persist) {
             $this->saveEntity($company);
+        }
+
+        if (null !== $list && $company->getId()) {
+            $companyContactIds = $this->getCompanyLeadRepository()->getCompanyLeads($company->getId());
+            $contactIds        = array_column($companyContactIds, 'lead_id');
+            foreach ($contactIds as $contactId) {
+                $this->listModel->addLead($contactId, [$list], true);
+            }
         }
 
         return $company;

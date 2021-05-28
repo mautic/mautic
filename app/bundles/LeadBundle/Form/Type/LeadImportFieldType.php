@@ -100,8 +100,7 @@ class LeadImportFieldType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        if ('lead' === $options['object']) {
-            $builder->add(
+        $builder->add(
                 $builder->create(
                     'list',
                     LeadListType::class,
@@ -109,7 +108,8 @@ class LeadImportFieldType extends AbstractType
                         'label'      => 'mautic.lead.lead.field.list',
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
-                            'class' => 'form-control',
+                            'class'   => 'form-control',
+                            'tooltip' => sprintf('mautic.lead.lead.field.list.%s.tooltip', $options['object']),
                         ],
                         'required' => false,
                         'multiple' => false,
@@ -117,6 +117,7 @@ class LeadImportFieldType extends AbstractType
                 )
             );
 
+        if ('lead' === $options['object']) {
             $builder->add(
                 'tags',
                 TagType::class,

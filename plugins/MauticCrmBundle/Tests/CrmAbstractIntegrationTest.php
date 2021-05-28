@@ -14,6 +14,7 @@ namespace MauticPlugin\MauticCrmBundle\Tests;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
 
@@ -72,11 +73,15 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $listModel = $this->getMockBuilder(ListModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $companyDeduper = $this->createMock(CompanyDeduper::class);
 
         $companyModel = $this->getMockBuilder(CompanyModel::class)
             ->setMethodsExcept(['setFieldValues'])
-            ->setConstructorArgs([$this->fieldModel, $this->session, $emailValidator, $companyDeduper])
+            ->setConstructorArgs([$this->fieldModel, $this->session, $emailValidator, $listModel, $companyDeduper])
             ->getMock();
         $companyModel->expects($this->any())
             ->method('fetchCompanyFields')
