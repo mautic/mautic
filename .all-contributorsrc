@@ -30,7 +30,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/1235442?v=4",
       "profile": "http://johnlinhart.com",
       "contributions": [
-        "userTesting"
+        "userTesting",
+        "review"
       ]
     },
     {
@@ -89,7 +90,8 @@
       "profile": "https://www.ruthcheesley.co.uk",
       "contributions": [
         "userTesting",
-        "review"
+        "review",
+        "doc"
       ]
     },
     {
@@ -155,7 +157,9 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/2618452?v=4",
       "profile": "http://mohitaghera.in",
       "contributions": [
-        "code"
+        "code",
+        "userTesting",
+        "review"
       ]
     },
     {
@@ -183,6 +187,53 @@
       "profile": "https://github.com/shinde-rahul",
       "contributions": [
         "review"
+      ]
+    },
+    {
+      "login": "jos0405",
+      "name": "jos0405",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4246909?v=4",
+      "profile": "https://github.com/jos0405",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "nickveenhof",
+      "name": "Nick Veenhof",
+      "avatar_url": "https://avatars.githubusercontent.com/u/161341?v=4",
+      "profile": "http://veenhof.be",
+      "contributions": [
+        "review"
+      ]
+    },
+    {
+      "login": "patrykgruszka",
+      "name": "Patryk Gruszka",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8580942?v=4",
+      "profile": "https://github.com/patrykgruszka",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    },
+    {
+      "login": "alexhammerschmied",
+      "name": "Alex Hammerschmied",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20030306?v=4",
+      "profile": "https://hartmut.io",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "dsp76",
+      "name": "Dirk Spannaus",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1241376?v=4",
+      "profile": "https://www.twentyzen.com",
+      "contributions": [
+        "bug"
       ]
     }
   ],
