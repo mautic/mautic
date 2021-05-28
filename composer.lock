@@ -5145,8 +5145,7 @@
                 "symfony/yaml": "~4.4.0",
                 "theofidry/psysh-bundle": "~4.4.0",
                 "tightenco/collect": "^8.16.0",
-                "twilio/sdk": "^5.25",
-                "willdurand/oauth-server-bundle": "dev-release-0.0.4"
+                "twilio/sdk": "^5.25"
             },
             "type": "mautic-core",
             "extra": {
@@ -13581,47 +13580,6 @@
                 "source": "https://github.com/willdurand/Negotiation/tree/3.0.0"
             },
             "time": "2020-09-25T08:01:41+00:00"
-        },
-        {
-            "name": "willdurand/oauth-server-bundle",
-            "version": "dev-release-0.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mautic/BazingaOAuthServerBundle.git",
-                "reference": "33ec06bcdb86a9872c36000da3c874ef16e32dd0"
-            },
-            "require": {
-                "php": ">=7.1",
-                "symfony/console": "~4.4",
-                "symfony/framework-bundle": "~4.4",
-                "symfony/security-bundle": "~4.4"
-            },
-            "require-dev": {
-                "doctrine/doctrine-bundle": "~1.12",
-                "symfony/orm-pack": "^2.1"
-            },
-            "type": "symfony-bundle",
-            "autoload": {
-                "psr-4": {
-                    "Bazinga\\OAuthServerBundle\\": ""
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "William Durand",
-                    "email": "william.durand1@gmail.com"
-                }
-            ],
-            "description": "Server side implementation of the OAuth 1.0 protocol based on RFC 5849",
-            "keywords": [
-                "api",
-                "oauth",
-                "server"
-            ],
-            "time": "2021-03-28T11:29:04+00:00"
         }
     ],
     "packages-dev": [
