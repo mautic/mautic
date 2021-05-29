@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2021 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -60,6 +60,7 @@ class GrapesJsData extends AbstractFixture implements OrderedFixtureInterface, C
         $plugin->setVersion($parameters['version']);
         $plugin->setAuthor($parameters['author']);
         $plugin->setBundle('GrapesJsBuilderBundle');
+
         $manager->persist($plugin);
         $manager->flush();
 
