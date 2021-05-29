@@ -16,10 +16,10 @@ export default class DynamicContentCommands {
   }
 
   launchDynamicContentPopup(editor, sender, options) {
-    this.showDynamicContentEditor(editor, options);
-
     // Transform DC to token
     editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
+
+    this.showDynamicContentEditor(editor, options);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -49,13 +49,11 @@ export default class DynamicContentCommands {
   convertDynamicContentSlotsToTokens(editor) {
     // get all dynamic content elements loaded in the editor
     const dynamicContents = editor.DomComponents.getWrapper().find('[data-slot="dynamicContent"]');
-
     dynamicContents.forEach((dynamicContent) => {
       const attributes = dynamicContent.getAttributes();
       const decId = attributes['data-param-dec-id'];
-
       // If it's not a token -> convert to token
-      if (decId) {
+      if (decId >= 0) {
         const dynConId = DynamicContentCommands.getDcStoreId(attributes['data-param-dec-id']);
 
         const dynConTarget = mQuery(dynConId);
