@@ -50,7 +50,9 @@ export default class DynamicContentService {
     this.getDcComponents();
 
     let dcName = this.getTokenName(component);
+    
     if (!dcName) {
+      this.logger.debug('No dynamic content tokens name', { component, dcName });
       return false;
     }
 
@@ -192,14 +194,16 @@ export default class DynamicContentService {
       throw new Error('no Editor');
     }
 
-    const domComponents = this.editor.DomComponents;
-    const wrapperChildren = domComponents.getComponents();
     this.dcComponents = [];
 
-    wrapperChildren.forEach((comp) => {
-      if (comp.is('dynamic-content')) {
-        this.dcComponents.push(comp);
+    const wrapper = this.editor.getWrapper();
+    const dcCompoments = wrapper.find('[data-gjs-type="dynamic-content"]');
+
+    dcCompoments.forEach((comp) => {
+      if (!comp.is('dynamic-content')) {
+        throw new Error('no dynamic-content component');
       }
+      this.dcComponents.push(comp);
     });
 
     return this.dcComponents;

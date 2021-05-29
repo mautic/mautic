@@ -24,7 +24,7 @@ export default class DynamicContentCommands {
 
   // eslint-disable-next-line class-methods-use-this
   stopDynamicContentPopup(editor) {
-    editor.runCommand('preset-mautic:dynamic-content-tokens-to-slots');
+    // editor.runCommand('preset-mautic:dynamic-content-tokens-to-slots');
   }
 
   /**
@@ -33,7 +33,9 @@ export default class DynamicContentCommands {
    * {dynamiccontent} => Dynamic Content
    */
   convertDynamicContentTokensToSlots() {
-    this.dcService.getDcComponents().forEach((comp) => {
+    const components = this.dcService.getDcComponents();
+
+    components.forEach((comp) => {
       this.dcService.transformDcTokenToSlot(comp);
     });
   }
