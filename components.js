@@ -1,5 +1,5 @@
 /* eslint-disable no-else-return */
-import DynamicContentDomComponents from './dynymicContent/dynamicContent.domcomponents';
+import DynamicContentDomComponents from './dynamicContent/dynamicContent.domcomponents';
 import ContentService from './content.service';
 
 // https://grapesjs.com/docs/api/component.html

@@ -24,8 +24,10 @@ export default class DynamicContentService {
     const content = component.get('content');
     const regexEx = regex.exec(content);
     this.getDynamicContentTabs();
+    console.log('this.dynamicContentTabs');
+    console.log(this.dynamicContentTabs);
 
-    // abort if component is empty or does not appear to be valid
+    // abort if component is already converted to the default variant or not valid
     if (regexEx === null || !regexEx[1]) {
       return false;
     }
@@ -38,6 +40,7 @@ export default class DynamicContentService {
     const dynamicContentTab = this.dynamicContentTabs.find((tab) => tab.title === dynContenName);
 
     // If dynamic content item exists -> fill
+    // Hint: the first dynamic content item (tab) is created from php: #emailform_dynamicContent_0
     if (dynamicContentTab) {
       this.logger.debug('Using existing dynamic content item', { dynamicContentTab });
       const dynContentTarget = DynamicContentService.getDynContentTarget(dynamicContentTab.href);

@@ -1,4 +1,4 @@
-import DynamicContentCommands from './dynymicContent/dynamicContent.commands';
+import DynamicContentCommands from './dynamicContent/dynamicContent.commands';
 
 export default (editor) => {
   const dynamicContentCmd = new DynamicContentCommands(editor);
