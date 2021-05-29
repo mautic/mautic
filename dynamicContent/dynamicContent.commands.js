@@ -23,16 +23,18 @@ export default class DynamicContentCommands {
   }
 
   /**
-   * Convert dynamic content tokens to slot and load content
+   * Convert dynamic content tokens on the canvas to slots
+   * and load the associated data from the html store.
    * {dynamiccontent} => Dynamic Content
    */
   convertDynamicContentTokenToSlot(editor) {
-    const dynamicContents = editor.DomComponents.getWrapper().find('[data-slot="dynamicContent"]');
-    if (dynamicContents.length <= 0) {
-      this.logger.debug('no dynamic content tokens found');
-    }
-    dynamicContents.forEach((dynamicContent) => {
-      this.dcService.manageDynamicContentTokenToSlot(dynamicContent);
+    const domComponents = editor.DomComponents;
+    const wrapperChildren = domComponents.getComponents();
+
+    wrapperChildren.forEach((comp) => {
+      if (comp.is('dynamic-content')) {
+        this.dcService.manageDynamicContentTokenToSlot(comp);
+      }
     });
   }
 

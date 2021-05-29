@@ -70,7 +70,7 @@ export default class DynamicContentDomComponents {
       onActive() {
         const target = this.model;
         this.em.get('Commands').run('preset-mautic:dynamic-content-tokens-to-slots');
-        this.em.get('Commands').run('preset-mautic:dynamic-content-open', { target });
+        // this.em.get('Commands').run('preset-mautic:dynamic-content-open', { target });
       },
       // does not work: gets removed when Sorting (by grapesjs)
       // removed() {

@@ -6,38 +6,54 @@ export default class DynamicContentService {
    * Each "tab" corresponds to a dynamic content block on the canvas.
    * References by the tab.title (e.g. Dynamic Content)
    */
-  dynamicContentTabs = [];
+  dynamicContentItems = [];
 
   constructor(editor) {
     this.logger = new Logger(editor);
   }
 
   /**
+   * Get the name of the dynamic content element.
+   * Used as identifier
+   * E.g. Dynamic Content from: {dynamiccontent="Dynamic Content"}
+   * @param {GrapesJS Component} component
+   * @returns string | null
+   */
+  static getTokenName(component) {
+    const regex = RegExp(/\{dynamiccontent="(.*)"\}/, 'g');
+    const regexEx = regex.exec(component.get('content'));
+
+    return regexEx[1] || null;
+  }
+
+  /**
    * Convert a text token to the default variant
    * Wire up the ids
    *
-   * @param {JQuery Object} component
+   * @param {GrapesJS Component} component
    */
   manageDynamicContentTokenToSlot(component) {
-    const regex = RegExp(/\{dynamiccontent="(.*)"\}/, 'g');
+    this.getDynamicContentItems();
 
-    const content = component.get('content');
-    const regexEx = regex.exec(content);
-    this.getDynamicContentTabs();
-    console.log('this.dynamicContentTabs');
-    console.log(this.dynamicContentTabs);
-
-    // abort if component is already converted to the default variant or not valid
-    if (regexEx === null || !regexEx[1]) {
+    let dynContentName = DynamicContentService.getTokenName(component);
+    if (!dynContentName) {
       return false;
     }
 
-    // Get the name of the dynamic content element.
-    // E.g. Dynamic Content from: {dynamiccontent="Dynamic Content"}
-    const dynContenName = regexEx[1];
+    // if it is a new component (dropped to the canvas)
+    // add an id and create a corresponding item in the html store
+    if (dynContentName === 'Dynamic Content') {
+      console.log(this.dynamicContentItems.length);
+      dynContentName += ` ${this.dynamicContentItems.length}`;
+    }
+
+    // on the other hand, load the existing meta data from the html store
+
+    console.log('this.dynamicContentItems');
+    console.log(this.dynamicContentItems);
 
     // get the tab/item matching the dynamic content on the canvas
-    const dynamicContentTab = this.dynamicContentTabs.find((tab) => tab.title === dynContenName);
+    const dynamicContentTab = this.dynamicContentItems.find((tab) => tab.title === dynContenName);
 
     // If dynamic content item exists -> fill
     // Hint: the first dynamic content item (tab) is created from php: #emailform_dynamicContent_0
@@ -97,7 +113,7 @@ export default class DynamicContentService {
     const result = regex.exec(identifier);
 
     if (!result || result.length !== 3) {
-      throw new Error('no DynamicContent target found');
+      throw new Error(`No DynamicContent target found: ${identifier}`);
     }
     return {
       htmlId: `${result[1]}${result[2]}`, // #emailform_dynamicContent_1
@@ -106,24 +122,67 @@ export default class DynamicContentService {
     };
   }
 
-  /**
-   * Load all
-   */
-  getDynamicContentTabs() {
-    this.dynamicContentTabs = [];
+  // /**
+  //  * Extract the dynamic content id from an id string:
+  //  *
+  //  * @param {string} identifier e.g. emailform_dynamicContent_1
+  //  * @return integer
+  //  */
+  // static getDynContentId(identifier) {
+  //   const regex = RegExp(/(emailform_dynamicContent_)(\d*)/, 'g');
+  //   const result = regex.exec(identifier);
+  //   console.warn({ result });
+  //   if (!result || !result[2]) {
+  //     throw new Error(`No DynamicContent target found: ${identifier}`);
+  //   }
+  //   return parseInt(result[2], 10)
+  // }
 
-    mQuery('#dynamicContentTabs a').each((index, value) => {
-      if (value.href.indexOf('javascript') >= 0) {
-        return;
-      }
-      this.dynamicContentTabs.push({
-        title: value.innerHTML.trim(),
-        href: value.href,
+  /**
+   * Get the default dynamic content name (tokenName)
+   * @param {string} id id of the input field
+   * @returns string of the field
+   */
+  static getDynContentName(dynContentTarget) {
+    return `Dynamic Content ${dynContentTarget.decId + 1}`;
+  }
+
+  /**
+   * Get the default content
+   * @param {string} id id of the textarea
+   * @returns string with the html in the textarea
+   */
+  static getDynContentContent(id) {
+    return mQuery(id).val();
+  }
+
+  /**
+   * Get all Dynamic Content items from the HTML store
+   * @returns array of objects with title and href
+   */
+  getDynamicContentItems() {
+    this.dynamicContentItems = [];
+
+    //
+    mQuery('#dynamicContentContainer .dynamic-content').each((index, value) => {
+      console.warn({ index });
+      console.warn(value);
+      const dynContentTarget = DynamicContentService.getDynContentTarget(`#${value.id}`);
+      console.warn({ dynContenttarget: dynContentTarget });
+
+      // if (value.href.indexOf('javascript') >= 0) {
+      //   return;
+      // }
+      this.dynamicContentItems.push({
+        identifier: value.id, // emailform_dynamicContent_0
+        id: dynContentTarget.decId, // 0
+        name: DynamicContentService.getDynContentName(dynContentTarget), // Dynamic Content 1
+        content: DynamicContentService.getDynContentContent(dynContentTarget.content), // Default Dynamic Content
       });
     });
 
-    if (!this.dynamicContentTabs) {
-      throw Error('No dynamic content tabs found');
+    if (!this.dynamicContentItems) {
+      throw Error('No dynamic content store item found');
     }
   }
 }
