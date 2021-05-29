@@ -209,6 +209,16 @@ final class LeadEvents
     const LIST_POST_SAVE = 'mautic.lead_list_post_save';
 
     /**
+     * The mautic.lead_list_pre_unpublish event is dispatched before a lead_list is unpublished.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListEvent instance.
+     *
+     * @var string
+     */
+    const LIST_PRE_UNPUBLISH = 'mautic.lead_list_pre_unpublish';
+
+    /**
      * The mautic.lead_list_pre_delete event is dispatched before a lead_list is deleted.
      *
      * The event listener receives a
