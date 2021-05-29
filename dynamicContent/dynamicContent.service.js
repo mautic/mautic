@@ -86,18 +86,18 @@ export default class DynamicContentService {
     } else {
       // If dynamic content item in html store doesn't exist -> create
       // @todo replace mQuery('#dynamicContentTabs') with class property
-      const dynConTarget = Mautic.createNewDynamicContentItem(mQuery);
-      const dynConTab = mQuery('#dynamicContentTabs').find(`a[href="${dynConTarget}"]`);
+      const dcTarget = Mautic.createNewDynamicContentItem(mQuery);
+      const dcTab = mQuery('#dynamicContentTabs').find(`a[href="${dcTarget}"]`);
 
       // get ID: e.g. #emailform_dynamicContent_1
       component.addAttributes({
-        'data-param-dec-id': parseInt(dynConTarget.replace(/[^0-9]/g, ''), 10),
+        'data-param-dec-id': parseInt(dcTarget.replace(/[^0-9]/g, ''), 10),
       });
       // Replace token on canvas with user facing "label" from html store
-      component.set('content', dynConTab.text());
+      component.set('content', dcTab.text());
       this.logger.debug('Created a new dynamic content item', {
         dcName,
-        content: dynConTab.text(),
+        content: dcTab.text(),
       });
     }
     return true;
