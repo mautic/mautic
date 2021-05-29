@@ -16,8 +16,8 @@ export default class DynamicContentCommands {
   }
 
   launchDynamicContentPopup(editor, sender, options) {
-    // Transform DC to token
-    editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
+    // Transform DC slots to token
+    // editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
 
     this.showDynamicContentEditor(editor, options);
   }
