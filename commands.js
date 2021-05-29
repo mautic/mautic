@@ -14,7 +14,7 @@ export default (editor) => {
     run: (edtr) => dynamicContentCmd.convertDynamicContentSlotsToTokens(edtr),
   });
   editor.Commands.add('preset-mautic:dynamic-content-tokens-to-slots', {
-    run: (edtr) => dynamicContentCmd.convertDynamicContentTokenToSlot(edtr),
+    run: () => dynamicContentCmd.convertDynamicContentTokenToSlot(),
   });
   editor.Commands.add('preset-mautic:dynamic-content-delete-store-item', {
     run: (edtr, sender, options) =>

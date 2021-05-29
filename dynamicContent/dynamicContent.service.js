@@ -2,14 +2,22 @@ import Logger from '../logger';
 
 export default class DynamicContentService {
   /**
-   * Dynamic content tabs on the base html (hidden)
+   * Dynamic content tabs on the base html item store (hidden)
    * Each "tab" corresponds to a dynamic content block on the canvas.
    * References by the tab.title (e.g. Dynamic Content)
    */
-  dynamicContentItems = [];
+  dcStoreItems = [];
+
+  /**
+   * Components currently on the canvas/editor
+   */
+  dcComponents = [];
+
+  editor;
 
   constructor(editor) {
     this.logger = new Logger(editor);
+    this.editor = editor;
   }
 
   /**
@@ -19,11 +27,16 @@ export default class DynamicContentService {
    * @param {GrapesJS Component} component
    * @returns string | null
    */
-  static getTokenName(component) {
+  getTokenName(component) {
     const regex = RegExp(/\{dynamiccontent="(.*)"\}/, 'g');
-    const regexEx = regex.exec(component.get('content'));
+    const content = component.get('content');
+    const regexEx = regex.exec(content);
 
-    return regexEx[1] || null;
+    if (!regexEx || !regexEx[1]) {
+      this.logger.debug('No dynamic content tokens to get', { content });
+      return null;
+    }
+    return regexEx[1];
   }
 
   /**
@@ -33,55 +46,44 @@ export default class DynamicContentService {
    * @param {GrapesJS Component} component
    */
   manageDynamicContentTokenToSlot(component) {
-    this.getDynamicContentItems();
+    this.getDcStoreItems();
+    this.getDcComponents();
 
-    let dynContentName = DynamicContentService.getTokenName(component);
+    let dynContentName = this.getTokenName(component);
     if (!dynContentName) {
       return false;
     }
 
     // if it is a new component (dropped to the canvas)
-    // add an id and create a corresponding item in the html store
+    // give it a new id (and create a corresponding item in the html store)
     if (dynContentName === 'Dynamic Content') {
-      console.log(this.dynamicContentItems.length);
-      dynContentName += ` ${this.dynamicContentItems.length}`;
+      dynContentName += ` ${this.dcComponents.length}`;
     }
 
-    // on the other hand, load the existing meta data from the html store
-
-    console.log('this.dynamicContentItems');
-    console.log(this.dynamicContentItems);
-
-    // get the tab/item matching the dynamic content on the canvas
-    const dynamicContentTab = this.dynamicContentItems.find((tab) => tab.title === dynContenName);
+    // get the item/tab matching the dynamic content on the canvas
+    const dynamicContentItem = this.dcStoreItems.find((item) => item.name === dynContentName);
 
     // If dynamic content item exists -> fill
     // Hint: the first dynamic content item (tab) is created from php: #emailform_dynamicContent_0
-    if (dynamicContentTab) {
-      this.logger.debug('Using existing dynamic content item', { dynamicContentTab });
-      const dynContentTarget = DynamicContentService.getDynContentTarget(dynamicContentTab.href);
+    if (dynamicContentItem) {
+      this.logger.debug('Using existing dynamic content item', { dynamicContentItem });
 
-      let dynConContent = '';
-      if (dynContentTarget.decId) {
-        const dynConContainer = mQuery(dynContentTarget.htmlId).find(dynContentTarget.content);
+      // let dynConContent = '';
+      // if (dynamicContentItem.id) {
+      //   const dynConContainer = mQuery(dynContentTarget.htmlId).find(dynContentTarget.content);
 
-        // is there content in the current editor?
-        if (dynConContainer.hasClass('editor')) {
-          dynConContent = dynConContainer.froalaEditor('html.get');
-        } else {
-          dynConContent = dynConContainer.html();
-        }
-      }
-
-      if (dynConContent === '') {
-        // fallback to component label text on canvas
-        dynConContent = dynamicContentTab.title;
-      }
+      //   // is there content in the current editor?
+      //   if (dynConContainer.hasClass('editor')) {
+      //     dynConContent = dynConContainer.froalaEditor('html.get');
+      //   } else {
+      //     dynConContent = dynConContainer.html();
+      //   }
+      // }
 
       component.addAttributes({
-        'data-param-dec-id': dynContentTarget.decId,
+        'data-param-dec-id': dynamicContentItem.id,
       });
-      component.set('content', dynConContent);
+      component.set('content', dynamicContentItem.content);
     } else {
       // If dynamic content item in html store doesn't exist -> create
       // @todo replace mQuery('#dynamicContentTabs') with class property
@@ -95,7 +97,7 @@ export default class DynamicContentService {
       // Replace token on canvas with user facing "label" from html store
       component.set('content', dynConTab.text());
       this.logger.debug('Created a new dynamic content item', {
-        dynContenName,
+        dynContentName,
         content: dynConTab.text(),
       });
     }
@@ -143,8 +145,8 @@ export default class DynamicContentService {
    * @param {string} id id of the input field
    * @returns string of the field
    */
-  static getDynContentName(dynContentTarget) {
-    return `Dynamic Content ${dynContentTarget.decId + 1}`;
+  static getDynContentName(target) {
+    return `Dynamic Content ${target.decId + 1}`;
   }
 
   /**
@@ -152,37 +154,55 @@ export default class DynamicContentService {
    * @param {string} id id of the textarea
    * @returns string with the html in the textarea
    */
-  static getDynContentContent(id) {
-    return mQuery(id).val();
+  static getDynContentContent(target) {
+    return mQuery(target.id).val() || DynamicContentService.getDynContentName(target);
   }
 
   /**
    * Get all Dynamic Content items from the HTML store
    * @returns array of objects with title and href
    */
-  getDynamicContentItems() {
-    this.dynamicContentItems = [];
+  getDcStoreItems() {
+    this.dcStoreItems = [];
 
-    //
-    mQuery('#dynamicContentContainer .dynamic-content').each((index, value) => {
-      console.warn({ index });
-      console.warn(value);
+    // #dynamicContentContainer
+    mQuery('.dynamic-content').each((index, value) => {
       const dynContentTarget = DynamicContentService.getDynContentTarget(`#${value.id}`);
-      console.warn({ dynContenttarget: dynContentTarget });
 
-      // if (value.href.indexOf('javascript') >= 0) {
-      //   return;
-      // }
-      this.dynamicContentItems.push({
+      this.dcStoreItems.push({
         identifier: value.id, // emailform_dynamicContent_0
         id: dynContentTarget.decId, // 0
         name: DynamicContentService.getDynContentName(dynContentTarget), // Dynamic Content 1
-        content: DynamicContentService.getDynContentContent(dynContentTarget.content), // Default Dynamic Content
+        content: DynamicContentService.getDynContentContent(dynContentTarget), // Default Dynamic Content
       });
     });
 
-    if (!this.dynamicContentItems) {
-      throw Error('No dynamic content store item found');
+    // one is always set from php
+    if (!this.dcStoreItems[0]) {
+      throw Error('No dynamic content store item found!');
     }
+  }
+
+  /**
+   * Get all the dynamic content components currently
+   * on the canvas (in the editor).
+   * @return {GrapesJS Component} array
+   */
+  getDcComponents() {
+    if (!this.editor) {
+      throw new Error('no Editor');
+    }
+
+    const domComponents = this.editor.DomComponents;
+    const wrapperChildren = domComponents.getComponents();
+    this.dcComponents = [];
+
+    wrapperChildren.forEach((comp) => {
+      if (comp.is('dynamic-content')) {
+        this.dcComponents.push(comp);
+      }
+    });
+
+    return this.dcComponents;
   }
 }

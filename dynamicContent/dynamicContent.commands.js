@@ -27,14 +27,9 @@ export default class DynamicContentCommands {
    * and load the associated data from the html store.
    * {dynamiccontent} => Dynamic Content
    */
-  convertDynamicContentTokenToSlot(editor) {
-    const domComponents = editor.DomComponents;
-    const wrapperChildren = domComponents.getComponents();
-
-    wrapperChildren.forEach((comp) => {
-      if (comp.is('dynamic-content')) {
-        this.dcService.manageDynamicContentTokenToSlot(comp);
-      }
+  convertDynamicContentTokenToSlot() {
+    this.dcService.getDcComponents().forEach((comp) => {
+      this.dcService.manageDynamicContentTokenToSlot(comp);
     });
   }
 
@@ -175,7 +170,7 @@ export default class DynamicContentCommands {
    * @returns string
    */
   static getDcStoreId(id) {
-    if (id <= 0) {
+    if (id < 0) {
       throw new Error('no dynamic content ID');
     }
     return `#emailform_dynamicContent_${id}`;
