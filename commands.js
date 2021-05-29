@@ -8,13 +8,13 @@ export default (editor) => {
   editor.Commands.add('preset-mautic:dynamic-content-open', {
     run: (edtr, sender, options = {}) =>
       dynamicContentCmd.launchDynamicContentPopup(edtr, sender, options),
-    stop: (edtr) => edtr.runCommand('preset-mautic:dynamic-content-tokens-to-slots'),
+    stop: (edtr) => dynamicContentCmd.stopDynamicContentPopup(edtr),
   });
   editor.Commands.add('preset-mautic:dynamic-content-slots-to-tokens', {
     run: (edtr) => dynamicContentCmd.convertDynamicContentSlotsToTokens(edtr),
   });
   editor.Commands.add('preset-mautic:dynamic-content-tokens-to-slots', {
-    run: () => dynamicContentCmd.convertDynamicContentTokenToSlot(),
+    run: () => dynamicContentCmd.convertDynamicContentTokensToSlots(),
   });
   editor.Commands.add('preset-mautic:dynamic-content-delete-store-item', {
     run: (edtr, sender, options) =>

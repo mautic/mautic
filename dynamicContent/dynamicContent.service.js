@@ -45,32 +45,32 @@ export default class DynamicContentService {
    *
    * @param {GrapesJS Component} component
    */
-  manageDynamicContentTokenToSlot(component) {
+  transformDcTokenToSlot(component) {
     this.getDcStoreItems();
     this.getDcComponents();
 
-    let dynContentName = this.getTokenName(component);
-    if (!dynContentName) {
+    let dcName = this.getTokenName(component);
+    if (!dcName) {
       return false;
     }
 
     // if it is a new component (dropped to the canvas)
     // give it a new id (and create a corresponding item in the html store)
-    if (dynContentName === 'Dynamic Content') {
-      dynContentName += ` ${this.dcComponents.length}`;
+    if (dcName === 'Dynamic Content') {
+      dcName += ` ${this.dcComponents.length}`;
     }
 
     // get the item/tab matching the dynamic content on the canvas
-    const dynamicContentItem = this.dcStoreItems.find((item) => item.name === dynContentName);
+    const dcItem = this.dcStoreItems.find((item) => item.name === dcName);
 
     // If dynamic content item exists -> fill
     // Hint: the first dynamic content item (tab) is created from php: #emailform_dynamicContent_0
-    if (dynamicContentItem) {
-      this.logger.debug('Using existing dynamic content item', { dynamicContentItem });
+    if (dcItem) {
+      this.logger.debug('Using existing dynamic content item', { dcItem });
 
       // let dynConContent = '';
-      // if (dynamicContentItem.id) {
-      //   const dynConContainer = mQuery(dynContentTarget.htmlId).find(dynContentTarget.content);
+      // if (dcItem.id) {
+      //   const dynConContainer = mQuery(dcTarget.htmlId).find(dcTarget.content);
 
       //   // is there content in the current editor?
       //   if (dynConContainer.hasClass('editor')) {
@@ -80,10 +80,9 @@ export default class DynamicContentService {
       //   }
       // }
 
-      component.addAttributes({
-        'data-param-dec-id': dynamicContentItem.id,
-      });
-      component.set('content', dynamicContentItem.content);
+      // Update the component
+      component.addAttributes({ 'data-param-dec-id': dcItem.id });
+      component.set('content', dcItem.content);
     } else {
       // If dynamic content item in html store doesn't exist -> create
       // @todo replace mQuery('#dynamicContentTabs') with class property
@@ -97,7 +96,7 @@ export default class DynamicContentService {
       // Replace token on canvas with user facing "label" from html store
       component.set('content', dynConTab.text());
       this.logger.debug('Created a new dynamic content item', {
-        dynContentName,
+        dcName,
         content: dynConTab.text(),
       });
     }
@@ -106,11 +105,11 @@ export default class DynamicContentService {
 
   /**
    * Extract the dynamic content index and the html id from a string:
-   * e.g. href from dynContentTarget
+   * e.g. href from dcTarget
    *
    * @param {string} identifier e.g. http://localhost:1234/#emailform_dynamicContent_1
    */
-  static getDynContentTarget(identifier) {
+  static getDcTarget(identifier) {
     const regex = RegExp(/(#emailform_dynamicContent_)(\d*)/, 'g');
     const result = regex.exec(identifier);
 
@@ -145,7 +144,7 @@ export default class DynamicContentService {
    * @param {string} id id of the input field
    * @returns string of the field
    */
-  static getDynContentName(target) {
+  static getDcName(target) {
     return `Dynamic Content ${target.decId + 1}`;
   }
 
@@ -154,8 +153,8 @@ export default class DynamicContentService {
    * @param {string} id id of the textarea
    * @returns string with the html in the textarea
    */
-  static getDynContentContent(target) {
-    return mQuery(target.id).val() || DynamicContentService.getDynContentName(target);
+  static getDcContent(target) {
+    return mQuery(target.id).val() || DynamicContentService.getDcName(target);
   }
 
   /**
@@ -167,13 +166,13 @@ export default class DynamicContentService {
 
     // #dynamicContentContainer
     mQuery('.dynamic-content').each((index, value) => {
-      const dynContentTarget = DynamicContentService.getDynContentTarget(`#${value.id}`);
+      const dcTarget = DynamicContentService.getDcTarget(`#${value.id}`);
 
       this.dcStoreItems.push({
         identifier: value.id, // emailform_dynamicContent_0
-        id: dynContentTarget.decId, // 0
-        name: DynamicContentService.getDynContentName(dynContentTarget), // Dynamic Content 1
-        content: DynamicContentService.getDynContentContent(dynContentTarget), // Default Dynamic Content
+        id: dcTarget.decId, // 0
+        name: DynamicContentService.getDcName(dcTarget), // Dynamic Content 1
+        content: DynamicContentService.getDcContent(dcTarget), // Default Dynamic Content
       });
     });
 

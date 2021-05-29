@@ -22,14 +22,19 @@ export default class DynamicContentCommands {
     editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  stopDynamicContentPopup(editor) {
+    editor.runCommand('preset-mautic:dynamic-content-tokens-to-slots');
+  }
+
   /**
-   * Convert dynamic content tokens on the canvas to slots
-   * and load the associated data from the html store.
+   * Convert all dynamic content tokens on the canvas to
+   * human readable texts/slots/component.
    * {dynamiccontent} => Dynamic Content
    */
-  convertDynamicContentTokenToSlot() {
+  convertDynamicContentTokensToSlots() {
     this.dcService.getDcComponents().forEach((comp) => {
-      this.dcService.manageDynamicContentTokenToSlot(comp);
+      this.dcService.transformDcTokenToSlot(comp);
     });
   }
 
