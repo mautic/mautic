@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 return [
-    'name'        => 'Builder',
+    'name'        => 'GrapesJS Builder',
     'description' => 'GrapesJS Builder with MJML support for Mautic',
     'version'     => '1.0.0',
     'author'      => 'Webmecanik',
