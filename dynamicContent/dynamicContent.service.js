@@ -50,7 +50,7 @@ export default class DynamicContentService {
     this.getDcComponents();
 
     let dcName = this.getTokenName(component);
-    
+
     if (!dcName) {
       this.logger.debug('No dynamic content tokens name', { component, dcName });
       return false;
@@ -67,13 +67,26 @@ export default class DynamicContentService {
 
     // If dynamic content item exists -> fill
     // Hint: the first dynamic content item (tab) is created from php: #emailform_dynamicContent_0
+    console.warn({ dcItem });
     if (dcItem) {
-      this.logger.debug('Using existing dynamic content item', { dcItem });
+      this.updateComponent(component, dcItem);
+    } else {
+      this.initNewComponent(component, dcName);
+    }
+    return true;
+  }
 
-      // let dynConContent = '';
+  updateComponent(component, dcItem) {
+    this.logger.debug('Using existing dynamic content item', { dcItem });
+    // Update the component on the canvas with new values from the html store
+    component.addAttributes({ 'data-param-dec-id': dcItem.id });
+    component.set('content', dcItem.content);
+
+    return component;
+
+    // let dynConContent = '';
       // if (dcItem.id) {
       //   const dynConContainer = mQuery(dcTarget.htmlId).find(dcTarget.content);
-
       //   // is there content in the current editor?
       //   if (dynConContainer.hasClass('editor')) {
       //     dynConContent = dynConContainer.froalaEditor('html.get');
@@ -81,28 +94,31 @@ export default class DynamicContentService {
       //     dynConContent = dynConContainer.html();
       //   }
       // }
+  }
 
-      // Update the component
-      component.addAttributes({ 'data-param-dec-id': dcItem.id });
-      component.set('content', dcItem.content);
-    } else {
-      // If dynamic content item in html store doesn't exist -> create
-      // @todo replace mQuery('#dynamicContentTabs') with class property
-      const dcTarget = Mautic.createNewDynamicContentItem(mQuery);
-      const dcTab = mQuery('#dynamicContentTabs').find(`a[href="${dcTarget}"]`);
+  /**
+   * If dynamic content item in html store doesn't exist -> create
+   * @todo replace mQuery('#dynamicContentTabs') with class property
+   *
+   * @param {GrapesJS Component} component
+   * @param {string}
+   */
+  initNewComponent(component, dcName) {
+    const dcTarget = Mautic.createNewDynamicContentItem(mQuery);
 
-      // get ID: e.g. #emailform_dynamicContent_1
-      component.addAttributes({
-        'data-param-dec-id': parseInt(dcTarget.replace(/[^0-9]/g, ''), 10),
-      });
-      // Replace token on canvas with user facing "label" from html store
-      component.set('content', dcTab.text());
-      this.logger.debug('Created a new dynamic content item', {
-        dcName,
-        content: dcTab.text(),
-      });
-    }
-    return true;
+    // get ID from newly generated store item: e.g. #emailform_dynamicContent_1
+    component.addAttributes({
+      'data-param-dec-id': parseInt(dcTarget.replace(/[^0-9]/g, ''), 10),
+    });
+
+    // Replace token on canvas with user facing name: dcName
+    component.set('content', dcName);
+    this.logger.debug('Created a new dynamic content item', {
+      dcName,
+      component,
+    });
+
+    return component;
   }
 
   /**
