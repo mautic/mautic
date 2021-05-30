@@ -48,7 +48,6 @@ export default (editor, opts = {}) => {
     },
   });
 
-
   // Load other parts
   loadCommands(editor, config);
   loadListeners(editor, config);

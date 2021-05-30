@@ -84,15 +84,15 @@ export default class DynamicContentService {
     return component;
 
     // let dynConContent = '';
-      // if (dcItem.id) {
-      //   const dynConContainer = mQuery(dcTarget.htmlId).find(dcTarget.content);
-      //   // is there content in the current editor?
-      //   if (dynConContainer.hasClass('editor')) {
-      //     dynConContent = dynConContainer.froalaEditor('html.get');
-      //   } else {
-      //     dynConContent = dynConContainer.html();
-      //   }
-      // }
+    // if (dcItem.id) {
+    //   const dynConContainer = mQuery(dcTarget.htmlId).find(dcTarget.content);
+    //   // is there content in the current editor?
+    //   if (dynConContainer.hasClass('editor')) {
+    //     dynConContent = dynConContainer.froalaEditor('html.get');
+    //   } else {
+    //     dynConContent = dynConContainer.html();
+    //   }
+    // }
   }
 
   /**
