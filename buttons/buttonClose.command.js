@@ -70,13 +70,12 @@ export default class ButtonCloseCommands {
     ButtonCloseCommands.resetHtml(editor);
   }
 
-
   /**
    * Save the html and mjml
    * @param {string} html
    * @param {string} mjml
    */
-   static returnContentToTextarea(editor, html, mjml) {
+  static returnContentToTextarea(editor, html, mjml) {
     if (ContentService.isMjmlMode(editor)) {
       mQuery('textarea.builder-html').val(html);
       mQuery('textarea.builder-mjml').val(mjml);
