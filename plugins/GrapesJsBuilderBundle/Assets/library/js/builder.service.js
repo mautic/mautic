@@ -186,7 +186,6 @@ export default class BuilderService {
   }
 
   initEmailHtml() {
-    
     // Launch GrapesJS with body part
     this.editor = grapesjs.init({
       clearOnRender: true,
