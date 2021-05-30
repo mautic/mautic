@@ -67,7 +67,6 @@ export default class DynamicContentService {
 
     // If dynamic content item exists -> fill
     // Hint: the first dynamic content item (tab) is created from php: #emailform_dynamicContent_0
-    console.warn({ dcItem });
     if (dcItem) {
       this.updateComponent(component, dcItem);
     } else {
