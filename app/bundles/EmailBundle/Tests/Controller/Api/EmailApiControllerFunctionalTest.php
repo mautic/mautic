@@ -212,4 +212,65 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('1', $fetchedStatData['stats'][0]['is_read']);
         $this->assertMatchesRegularExpression('/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/', $fetchedStatData['stats'][0]['date_read']);
     }
+
+    public function testSendEmailToDNCLead()
+    {
+        // Create a couple of segments first:
+        $payload = [
+            [
+                'name'        => 'API segment A',
+                'description' => 'Segment created via API test',
+            ],
+        ];
+
+        $this->client->request('POST', '/api/segments/batch/new', $payload);
+        $clientResponse  = $this->client->getResponse();
+        $segmentResponse = json_decode($clientResponse->getContent(), true);
+        $segmentAId      = $segmentResponse['lists'][0]['id'];
+
+        $this->assertSame(201, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertGreaterThan(0, $segmentAId);
+
+        // Create email with the new segment:
+        $payload = [
+            'name'       => 'API email',
+            'subject'    => 'Email created via API test',
+            'emailType'  => 'list',
+            'lists'      => [$segmentAId],
+            'customHtml' => '<h1>Email content created by an API test</h1>',
+        ];
+
+        $this->client->request('POST', '/api/emails/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $emailId        = $response['email']['id'];
+
+        // Create new lead
+        $payload = [
+            'email' => 'apiemail1@email.com',
+        ];
+
+        $this->client->request('POST', '/api/contacts/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $contactId      = $response['contact']['id'];
+
+        // Add DNC to lead
+        $this->client->request('POST', "/api/contacts/{$contactId}/dnc/email/add");
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+
+        $this->client->request('POST',
+            "/api/emails/{$emailId}/contact/{$contactId}/send",
+            [
+                "ignoreDNC" => true,
+            ]
+        );
+        $response     = $this->client->getResponse();
+        $responseData = json_decode($response->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertTrue($responseData['success']);
+    }
 }
