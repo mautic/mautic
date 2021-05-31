@@ -58,6 +58,10 @@ class ConfigSubscriber implements EventSubscriberInterface
                 ->setOriginalNormData($originalNormData)
                 ->log($normData);
 
+            if (!isset($originalNormData['trackingconfig']) && !isset($normData['trackingconfig'])) {
+                return;
+            }
+
             $oldAnonymizeIp = $originalNormData['trackingconfig']['parameters']['anonymize_ip'];
             $newAnonymizeIp = $normData['trackingconfig']['anonymize_ip'];
 
