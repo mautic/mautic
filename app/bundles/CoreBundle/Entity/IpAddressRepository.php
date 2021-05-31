@@ -106,15 +106,6 @@ SQL;
         return $stmt->rowCount();
     }
 
-    public function deleteAllIpAddress(): void
-    {
-        $table_name = $this->getTableName();
-        $sql        = "DELETE FROM {$table_name} LIMIT ".self::DELETE_BATCH_SIZE;
-        $conn       = $this->getEntityManager()->getConnection();
-        while ($conn->executeQuery($sql)->rowCount()) {
-        }
-    }
-
     /**
      * @throws DBALException
      */

@@ -12,9 +12,10 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
@@ -28,7 +29,7 @@ use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\SmsBundle\Entity\Stat as SmsStat;
 use Mautic\StageBundle\Entity\LeadStageLog;
 
-final class Version20210426080311 extends PreUpAssertionMigration
+final class Version20210426080311 extends AbstractMauticMigration
 {
     const COLUMN_NAME            = 'ip_id';
     const PRIMARY_ID_COLUMN_NAME = 'id';
@@ -49,20 +50,24 @@ final class Version20210426080311 extends PreUpAssertionMigration
         Hit::TABLE_NAME              => false,
     ];
 
-    protected function preUpAssertions(): void
+    public function preUp(Schema $schema): void
     {
+        $skipError = [];
         foreach ($this->associatedTables as $tableName => $allowNull) {
-            $this->skipAssertion(function (Schema $schema) use ($tableName) {
-                return $this->isChangesExecuted($schema, $tableName);
-            }, sprintf('On delete %s already updated for foreign key %s in table %s', $this->getOnDeleteValue($tableName), $this->getForeignKeyName($tableName), $tableName));
+            if ($this->isChangesExecuted($schema, $tableName)) {
+                $skipError[] = sprintf('On delete %s already updated for foreign key %s in table %s', $this->getOnDeleteValue($tableName), $this->getForeignKeyName($tableName), $tableName);
+            }
 
             if (!$allowNull) {
-                $this->skipAssertion(function (Schema $schema) use ($tableName) {
-                    $table = $schema->getTable($this->getPrefixedTableName($tableName));
-
-                    return !$table->getColumn(self::COLUMN_NAME)->getNotnull();
-                }, sprintf('allow null already updated for column %s in table %s', self::COLUMN_NAME, $tableName));
+                $table = $schema->getTable($this->getPrefixedTableName($tableName));
+                if (!$table->getColumn(self::COLUMN_NAME)->getNotnull()) {
+                    $skipError[] = sprintf('allow null already updated for column %s in table %s', self::COLUMN_NAME, $tableName);
+                }
             }
+        }
+
+        if (!empty($skipError)) {
+            throw new SkipMigration(implode('\r\n', $skipError));
         }
     }
 
@@ -99,5 +104,10 @@ final class Version20210426080311 extends PreUpAssertionMigration
     private function getForeignKeyName(string $tableName): string
     {
         return $this->generatePropertyName($tableName, 'fk', [self::COLUMN_NAME]);
+    }
+
+    private function getPrefixedTableName(string $tableName): string
+    {
+        return $this->prefix.$tableName;
     }
 }

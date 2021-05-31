@@ -1627,6 +1627,7 @@ return [
         'rss_notification_url'             => '',
         'translations_list_url'            => 'https://language-packs.mautic.com/manifest.json',
         'translations_fetch_url'           => 'https://language-packs.mautic.com/',
+        'stats_update_url'                 => 'https://updates.mautic.org/stats/send', // set to empty in config file to disable
         'system_update_url'                => 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates',
         'install_source'                   => 'Mautic',
         'max_entity_lock_time'             => 0,
