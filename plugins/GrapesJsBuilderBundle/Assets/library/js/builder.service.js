@@ -3,7 +3,8 @@ import grapesjsmjml from 'grapesjs-mjml';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
-import grapesjsmautic from 'grapesjs-preset-mautic';
+import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
+// import grapesjsmautic from 'grapesjs-preset-mautic';
 import ContentService from './content.service';
 
 export default class BuilderService {
