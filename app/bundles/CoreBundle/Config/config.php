@@ -159,6 +159,12 @@ return [
                     'mautic.core.model.notification',
                 ],
             ],
+            'mautic.lead.exports.logger' => [
+                'class'     => \Mautic\CoreBundle\Service\ExportLogger::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
         ],
         'events' => [
             'mautic.core.subscriber' => [

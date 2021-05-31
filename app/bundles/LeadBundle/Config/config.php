@@ -389,15 +389,15 @@ return [
             'mautic.lead.campaignbundle.action_delete_contacts.subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\CampaignActionDeleteContactSubscriber::class,
                 'arguments' => [
-                   'mautic.lead.model.lead',
-                   'mautic.campaign.helper.removed_contact_tracker',
+                    'mautic.lead.model.lead',
+                    'mautic.campaign.helper.removed_contact_tracker',
                 ],
             ],
             'mautic.lead.campaignbundle.action_dnc.subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\CampaignActionDNCSubscriber::class,
                 'arguments' => [
-                   'mautic.lead.model.dnc',
-                   'mautic.lead.model.lead',
+                    'mautic.lead.model.dnc',
+                    'mautic.lead.model.lead',
                 ],
             ],
             'mautic.lead.reportbundle.subscriber' => [
@@ -427,12 +427,6 @@ return [
                     'translator',
                     'router',
                     'mautic.channel.helper.channel_list',
-                ],
-            ],
-            'mautic.lead.reportbundle.segment_log_subscriber' => [
-                'class'     => \Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber::class,
-                'arguments' => [
-                    'mautic.lead.reportbundle.fields_builder',
                 ],
             ],
             'mautic.lead.reportbundle.report_utm_tag_subscriber' => [
@@ -500,6 +494,7 @@ return [
                 'arguments' => [
                     'translator',
                     'router',
+                    'mautic.security',
                 ],
             ],
             'mautic.lead.import.subscriber' => [
