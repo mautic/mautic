@@ -638,6 +638,7 @@ return [
                 'class'     => \Mautic\CoreBundle\Command\AnonymizeIpCommand::class,
                 'arguments' => [
                     'mautic.core.repository.ip_address',
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],
