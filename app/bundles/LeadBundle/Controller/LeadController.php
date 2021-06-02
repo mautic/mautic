@@ -105,14 +105,17 @@ class LeadController extends FormController
             $filter['force'] .= " $mine";
         }
 
-        $results = $model->getEntities([
-            'start'          => $start,
-            'limit'          => $limit,
-            'filter'         => $filter,
-            'orderBy'        => $orderBy,
-            'orderByDir'     => $orderByDir,
-            'withTotalCount' => true,
-        ]);
+        $results = $model->getEntities(
+            [
+                'start'          => $start,
+                'limit'          => $limit,
+                'filter'         => $filter,
+                'orderBy'        => $orderBy,
+                'orderByDir'     => $orderByDir,
+                'groupBy'        => 'l.id',
+                'withTotalCount' => true,
+            ]
+        );
 
         $count = $results['count'];
         unset($results['count']);
