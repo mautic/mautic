@@ -425,11 +425,11 @@ class CoreSubscriber implements EventSubscriberInterface
         } elseif ('api' == $type) {
             $defaults['_format'] = 'json';
         }
-        $method = '';
+        $method = [];
         if (isset($details['method'])) {
-            $method = $details['method'];
+            $method = (array) $details['method'];
         } elseif ('api' === $type) {
-            $method = 'GET';
+            $method = ['GET'];
         }
         // Set requirements
         $requirements = (!empty($details['requirements'])) ? $details['requirements'] : [];

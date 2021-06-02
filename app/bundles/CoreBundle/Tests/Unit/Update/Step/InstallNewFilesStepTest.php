@@ -75,10 +75,14 @@ class InstallNewFilesStepTest extends AbstractStepTest
             ->method('getRootPath')
             ->willReturn($resourcePath);
 
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
+
         $this->step->execute($this->progressBar, $this->input, $this->output);
 
         $this->assertFileExists($resourcePath.'/update');
-        $this->assertFileNotExists($resourcePath.'/update-test.zip');
+        $this->assertFileDoesNotExist($resourcePath.'/update-test.zip');
 
         // Cleanup
         $filesystem = new Filesystem();
@@ -107,10 +111,14 @@ class InstallNewFilesStepTest extends AbstractStepTest
             ->with('update-package')
             ->willReturn($resourcePath.'/update-test.zip');
 
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
+
         $this->step->execute($this->progressBar, $this->input, $this->output);
 
         $this->assertFileExists($resourcePath.'/update');
-        $this->assertFileNotExists($resourcePath.'/update-test.zip');
+        $this->assertFileDoesNotExist($resourcePath.'/update-test.zip');
 
         // Cleanup
         $filesystem = new Filesystem();
@@ -147,6 +155,10 @@ class InstallNewFilesStepTest extends AbstractStepTest
                     'package' => $resourcePath.'/update-test.zip',
                 ]
             );
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
 
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }

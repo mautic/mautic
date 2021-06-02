@@ -31,19 +31,8 @@ if ($support['data']) {
             <h3 class="text-white dark-sm"><span class="fa fa-bar-chart"></span></h3>
         </div>
     </div>
-    <div class="row">
-        <div class="col-sm-12">
-            <canvas id="abtest-bar-chart" height="300"></canvas>
-        </div>
-    </div>
+    <?php echo $view->render(
+        'MauticCoreBundle:Helper:chart.html.php',
+        ['chartData' => $chart->render(), 'chartType' => 'bar', 'chartHeight' => 300]
+    ); ?>
 </div>
-
-<script>
-    mQuery(document).ready(function() {
-        mQuery('#abStatsModal').on('shown.bs.modal', function (event) {
-            var canvas = document.getElementById("abtest-bar-chart");
-            var barData = mQuery.parseJSON('<?php echo str_replace('\'', '\\\'', json_encode($chart->render())); ?>');
-            var barGraph = new Chart(canvas, {type: 'bar', data: barData});
-        });
-    });
-</script>
