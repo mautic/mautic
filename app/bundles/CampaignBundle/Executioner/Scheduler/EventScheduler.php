@@ -395,7 +395,7 @@ class EventScheduler
             //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
             $this->logger->debug(
                 'CAMPAIGN: '.ucfirst($event->getEventType()).' ID# '.$event->getId().' for contact ID# '.$contact->getId()
-                .' has timing that is not appropriate and thus scheduled for '.$executionDate->format('Y-m-d H:m:i T')
+                .' has timing that is not appropriate and thus scheduled for '.$executionDate->format('Y-m-d H:i:s T')
             );
 
             $this->dispatchScheduledEvent($config, $log);
