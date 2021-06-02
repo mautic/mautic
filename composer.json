@@ -43,7 +43,6 @@
     "mautic/theme-nature": "self.version",
     "mautic/theme-aurora": "self.version",
     "mautic/theme-blank": "self.version",
-    "mautic/theme-blank-grapejs": "self.version",
     "mautic/theme-brienz": "self.version",
     "mautic/theme-cards": "self.version",
     "mautic/theme-confirmme": "self.version",
