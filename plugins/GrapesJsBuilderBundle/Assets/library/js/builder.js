@@ -1,5 +1,10 @@
 import BuilderService from './builder.service';
 import ContentService from './content.service';
+// import 'grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css';
+import 'grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.css';
+import 'grapesjs/dist/css/grapes.min.css';
+import './grapesjs-custom.css';
+import './grapesjs-custom.css';
 
 /**
  * Launch builder

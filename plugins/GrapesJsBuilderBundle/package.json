@@ -4,8 +4,8 @@
   "description": "⚠️ This Plugin is still Beta! It works great already and we're developing it actively! Please use it and report everything inside the \"Issues\" here in Github. ⚠️",
   "main": "index.js",
   "scripts": {
-    "build": "parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist",
-    "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist --no-minify ",
+    "build": "parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist --public-url ./",
+    "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist --public-url ./ --no-minify ",
     "lint": "eslint Assets/library/js/",
     "prettier": "node_modules/.bin/prettier -w Assets/library/js/",
     "prettier-check": "node_modules/.bin/prettier -c Assets/library/js/",
