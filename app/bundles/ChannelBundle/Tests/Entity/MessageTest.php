@@ -17,7 +17,7 @@ class MessageTest extends MauticMysqlTestCase
      */
     protected $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
     }
