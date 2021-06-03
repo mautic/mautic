@@ -886,6 +886,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $innerJoinTables,
                     $this->generateFilterExpression($q, 'comp.companyname', $likeExpr, $unique, null)
                 );
+                $filter->strict  = true;
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.stage'):
