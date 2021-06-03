@@ -593,20 +593,22 @@ class CompanyController extends FormController
 
         $engagementData = is_array($contacts) ? $this->getCompanyEngagementsForGraph($contacts) : [];
 
-        $contacts = $this->getCompanyContacts($objectId, null, $leadsIds);
+        if (!empty($contacts)) {
+            $contacts = $this->getCompanyContacts($objectId, null, $leadsIds);
+        }
 
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'company'           => $company,
                     'fields'            => $fields,
-                    'items'             => $contacts['items'],
                     'permissions'       => $permissions,
                     'engagementData'    => $engagementData,
                     'security'          => $this->get('mautic.security'),
-                    'page'              => $contacts['page'],
-                    'totalItems'        => $contacts['count'],
-                    'limit'             => $contacts['limit'],
+                    'items'             => !empty($contacts) ? $contacts['items'] : [],
+                    'page'              => !empty($contacts) ? $contacts['page'] : 1,
+                    'totalItems'        => !empty($contacts) ? $contacts['count'] : 0,
+                    'limit'             => !empty($contacts) ? $contacts['limit'] : 1,
                 ],
                 'contentTemplate' => 'MauticLeadBundle:Company:company.html.php',
             ]

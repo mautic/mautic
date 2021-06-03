@@ -285,5 +285,9 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
         ]
     ); ?>
 <?php else : ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php',
+    [
+            'header' => '',
+            'message'=> 'mautic.company.contact.is.not.associated',
+    ]); ?>
 <?php endif; ?>
