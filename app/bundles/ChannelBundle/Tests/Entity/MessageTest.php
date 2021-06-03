@@ -2,33 +2,18 @@
 
 namespace Mautic\ChannelBundle\Tests\Entity;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\ChannelBundle\Entity\Message;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MessageTest extends MauticMysqlTestCase
+class MessageTest extends TestCase
 {
-    protected $useCleanupRollback = false;
-
-    /**
-     * @var MockObject|EntityManagerInterface
-     */
-    protected $em;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testMessageUpdatesReflectsInChanges()
     {
         $category = new Category();
         $category->setTitle('New Category');
         $category->setAlias('category');
         $category->setBundle('bundle');
-        $this->em->persist($category);
 
         $message = new Message();
         $message->setName('New Message');
@@ -37,9 +22,7 @@ class MessageTest extends MauticMysqlTestCase
         $message->setPublishDown(new \DateTime());
         $message->setPublishUp(new \DateTime());
 
-        $this->em->persist($message);
         $this->assertIsArray($message->getChanges());
         $this->assertNotEmpty($message->getChanges());
-        $this->em->flush();
     }
 }
