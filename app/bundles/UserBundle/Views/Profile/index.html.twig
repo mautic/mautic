@@ -1,0 +1,45 @@
+{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+
+{% block content %}
+<!-- TODO ADD SLOTS HERE -->
+
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- step container -->
+    <div class="col-md-3 bg-white height-auto">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            {% if me.getId() %}
+            <div class="media">
+                <div class="pull-left">
+                    <!--<img class="img-rounded img-bordered media-object" src="<?php echo $view['gravatar']->getImage($me->getEmail()); ?>" alt="" width="65px">-->
+                </div>
+                <div class="media-body">
+                    <h4>{{ me.getName() }}</h4>
+                    <h5>{{ me.getPosition() }}</h5>
+                </div>
+            </div>
+            <hr />
+            {% endif %}
+
+            <ul class="list-group list-group-tabs">
+                <li class="list-group-item active">
+                    <a href="#profile" class="steps" data-toggle="tab">
+                        {% trans %}mautic.user.account.header.details{% endtrans %}
+                    </a>
+                </li>
+
+                {% if permissions['apiAccess'] %}
+                <li class="list-group-item">
+                    <a href="#clients" class="steps" data-toggle="tab">
+                        {% trans %}mautic.user.account.header.authorizedclients{% endtrans %}
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    <!--/ step container -->
+
+    <!-- TODO add container here -->
+</div>
+{% endblock %}
