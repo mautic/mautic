@@ -62,7 +62,7 @@ class CalendarSubscriber implements EventSubscriberInterface
 
         // Lead Notes
         $query = $this->connection->createQueryBuilder();
-        $query->select('ln.lead_id, l.firstname, l.lastname, ln.date_time AS start, ln.text AS description, ln.type')
+        $query->select('count(ln.id) as total')
             ->from(MAUTIC_TABLE_PREFIX.'lead_notes', 'ln')
             ->leftJoin('ln', MAUTIC_TABLE_PREFIX.'leads', 'l', 'ln.lead_id = l.id')
             ->where($query->expr()->andX(
@@ -70,11 +70,35 @@ class CalendarSubscriber implements EventSubscriberInterface
                 $query->expr()->lte('ln.date_time', ':end')
             ))
             ->setParameter('start', $dates['start_date'])
-            ->setParameter('end', $dates['end_date'])
-            ->setFirstResult(0)
-            ->setMaxResults(100);
+            ->setParameter('end', $dates['end_date']);
 
-        $results = $query->execute()->fetchAll();
+        $resultCount = $query->execute()->fetchAll();
+
+        $totalRecords = (int) $resultCount[0]['total'];
+
+        $numberOfRecordsPerPage = 100;
+        $totalRecordsProcessed  = 0;
+        $results                = [];
+
+        while ($totalRecordsProcessed < $totalRecords) {
+            $query = $this->connection->createQueryBuilder();
+            $query->select('ln.id, ln.lead_id, l.firstname, l.lastname, ln.date_time AS start, ln.text AS description, ln.type')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_notes', 'ln')
+                ->leftJoin('ln', MAUTIC_TABLE_PREFIX.'leads', 'l', 'ln.lead_id = l.id')
+                ->where($query->expr()->andX(
+                    $query->expr()->gte('ln.date_time', ':start'),
+                    $query->expr()->lte('ln.date_time', ':end')
+                ))
+                ->setParameter('start', $dates['start_date'])
+                ->setParameter('end', $dates['end_date'])
+                ->setFirstResult($totalRecordsProcessed)
+                ->setMaxResults($numberOfRecordsPerPage);
+
+            $records = $query->execute()->fetchAll();
+            $results = array_merge($records, $results);
+
+            $totalRecordsProcessed = $totalRecordsProcessed + count($records);
+        }
 
         // We need to convert the date to a ISO8601 compliant string
         foreach ($results as &$object) {
