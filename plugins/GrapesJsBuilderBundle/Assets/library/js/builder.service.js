@@ -6,6 +6,7 @@ import grapesjspostcss from 'grapesjs-parser-postcss';
 import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
 // import grapesjsmautic from 'grapesjs-preset-mautic';
 import ContentService from './content.service';
+import CodeModeButton from './codeMode/codeMode.button';
 
 export default class BuilderService {
   editor;
@@ -113,6 +114,11 @@ export default class BuilderService {
     } else {
       throw Error(`not supported builder type: ${object}`);
     }
+
+    // add code mode button
+    const codeModeButton = new CodeModeButton(this.editor);
+    codeModeButton.addCommand();
+    codeModeButton.addButton();
 
     this.setListeners();
   }

@@ -75,6 +75,7 @@ class CodeEditor {
       this.editor.setComponents(code.trim());
       this.editor.Modal.close();
     } catch (e) {
+      // eslint-disable-next-line no-alert
       window.alert(`Template error, you should fix your code before save! \n${e.message}`);
       this.editor.DomComponents.getWrapper().set('content', '');
       this.editor.setComponents(codeSave.trim());
