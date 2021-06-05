@@ -48,11 +48,11 @@ class CodeEditor {
     const btnCancel = document.createElement('button');
     const textarea = document.createElement('textarea');
 
-    btnEdit.innerHTML = this.opts.sourceEditBtnLabel;
+    btnEdit.innerHTML = Mautic.translate('grapesjsbuilder.sourceEditBtnLabel');
     btnEdit.className = `${cfg.stylePrefix}btn-prim ${cfg.stylePrefix}btn-code-edit`;
     btnEdit.onclick = this.updateCode.bind(this);
 
-    btnCancel.innerHTML = this.opts.sourceCancelBtnLabel;
+    btnCancel.innerHTML = Mautic.translate('grapesjsbuilder.sourceCancelBtnLabel');
     btnCancel.className = `${cfg.stylePrefix}btn-prim ${cfg.stylePrefix}btn-code-cancel`;
     btnCancel.onclick = this.cancelCode.bind(this);
 
@@ -68,28 +68,30 @@ class CodeEditor {
   // Load content and show popup
   showCodePopup() {
     this.updateEditorContents();
-    this.codeEditor.editor.refresh();
-
-    this.editor.Modal.setContent('');
+    // this.codeEditor.editor.refresh();
+    // this.editor.Modal.setContent('');
     this.editor.Modal.setContent(this.codePopup);
-    this.editor.Modal.setTitle(this.opts.sourceEditModalTitle);
+    this.editor.Modal.setTitle(Mautic.translate('grapesjsbuilder.sourceEditModalTitle'));
     this.editor.Modal.open();
+    this.editor.Modal.onceClose(() => {
+      this.editor.stopCommand('preset-mautic:code-edit');
+    });
   }
 
   // Update GrapesJs content
   updateCode() {
     const code = this.codeEditor.editor.getValue();
-    const codeSave = this.getEditorContent();
+    // const codeToSave = ContentService.getCanvasAsHtmlDocument(this.editor);
 
-    // Catch error of code
     try {
+      // delete canvas and set new content
       this.editor.DomComponents.getWrapper().set('content', '');
       this.editor.setComponents(code.trim());
       this.editor.Modal.close();
     } catch (e) {
-      window.alert(`Template error, you should fix your code before save! \n${e.message}`);
-      this.editor.DomComponents.getWrapper().set('content', '');
-      this.editor.setComponents(codeSave.trim());
+      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')} \n${e.message}`);
+      // this.editor.DomComponents.getWrapper().set('content', '');
+      // this.editor.setComponents(codeToSave.trim());
     }
   }
 
@@ -98,37 +100,29 @@ class CodeEditor {
     this.editor.Modal.close();
   }
 
-  // Update CodeMirror content
+  /**
+   * Set the content to be shown in the code editor
+   */
   updateEditorContents() {
-    // CodeModeCommand.codeEditor.codeEditor.setContent(htmlcontent);
-    this.codeEditor.setContent(this.getEditorContent());
+    // Check if MJML plugin is on
+    // @todo use ContentService.getMode()
+    // if ('grapesjsmjml' in cfg.pluginsOpts) {
+    //   content = this.editor.getHtml();
+    // } else {
+    this.codeEditor.setContent(this.getEditorHtmlContent());
   }
 
   /**
    * Get complete current html. Including doctype and original header.
    * @returns string
    */
-  getEditorContent() {
-    const cfg = this.editor.getConfig();
-    let content;
+  getEditorHtmlContent() {
+    const contentDocument = ContentService.getCanvasAsHtmlDocument(this.editor);
 
-    // Check if MJML plugin is on
-    if ('grapesjsmjml' in cfg.pluginsOpts) {
-      content = this.editor.getHtml();
-    } else {
-      const contentDocument = ContentService.getHtmlDocument(this.editor);
-      console.warn(contentDocument.doctype);
-
-      if (!contentDocument || !contentDocument.body) {
-        throw new Error('No html content found');
-      }
-      content =
-        ContentService.serializeDoctype(contentDocument.doctype) +
-        contentDocument.head.outerHTML +
-        contentDocument.body.outerHTML;
+    if (!contentDocument || !contentDocument.body) {
+      throw new Error('No html content found');
     }
-
-    return content;
+    return ContentService.serializeDocument(contentDocument);
   }
 }
 

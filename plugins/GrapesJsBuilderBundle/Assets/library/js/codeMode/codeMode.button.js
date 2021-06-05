@@ -4,11 +4,6 @@ export default class CodeModeButton {
   editor;
 
   /**
-   * The command to run on button click
-   */
-  command = 'preset-mautic:code-edit';
-
-  /**
    * Add close button with save for Mautic
    */
   constructor(editor) {
@@ -24,16 +19,17 @@ export default class CodeModeButton {
         id: 'code-edit',
         className: 'fa fa-edit',
         attributes: {
-          title: 'Edit Code', // @todo opts.sourceEditModalTitle
+          title: Mautic.translate('grapesjsbuilder.sourceEditModalTitle'),
         },
-        command: this.command,
+        command: CodeModeCommand.name,
       },
     ]);
   }
 
   addCommand() {
-    this.editor.Commands.add(this.command, {
+    this.editor.Commands.add(CodeModeCommand.name, {
       run: CodeModeCommand.launchCodeEditorModal,
+      stop: CodeModeCommand.stopCodeEditorModal,
     });
   }
 }

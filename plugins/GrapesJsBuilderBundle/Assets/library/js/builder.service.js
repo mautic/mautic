@@ -66,14 +66,6 @@ export default class BuilderService {
     });
 
     this.editor.on('modal:close', () => {
-      const commands = this.editor.Commands;
-      const cmdCodeEdit = 'preset-mautic:code-edit';
-
-      // Launch preset-mautic:code-edit command stop
-      if (commands.isActive(cmdCodeEdit)) {
-        commands.stop(cmdCodeEdit, { editor: this.editor });
-      }
-
       // ReMap keyboard shortcuts on modal close
       Object.keys(allKeymaps).map((objectKey) => {
         const shortcut = allKeymaps[objectKey];
@@ -116,6 +108,7 @@ export default class BuilderService {
     }
 
     // add code mode button
+    // @todo: only show button if configured: sourceEdit: 1,
     const codeModeButton = new CodeModeButton(this.editor);
     codeModeButton.addCommand();
     codeModeButton.addButton();
@@ -125,15 +118,6 @@ export default class BuilderService {
 
   static getMauticConf(mode) {
     return {
-      sourceEditBtnLabel: Mautic.translate('grapesjsbuilder.sourceEditBtnLabel'),
-      sourceCancelBtnLabel: Mautic.translate('grapesjsbuilder.sourceCancelBtnLabel'),
-      sourceEditModalTitle: Mautic.translate('grapesjsbuilder.sourceEditModalTitle'),
-      deleteAssetConfirmText: Mautic.translate('grapesjsbuilder.deleteAssetConfirmText'),
-      categorySectionLabel: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
-      categoryBlockLabel: Mautic.translate('grapesjsbuilder.categoryBlockLabel'),
-      dynamicContentBlockLabel: Mautic.translate('grapesjsbuilder.dynamicContentBlockLabel'),
-      dynamicContentBtnLabel: Mautic.translate('grapesjsbuilder.dynamicContentBtnLabel'),
-      dynamicContentModalTitle: Mautic.translate('grapesjsbuilder.dynamicContentModalTitle'),
       mode,
     };
   }
