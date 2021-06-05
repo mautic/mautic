@@ -4,7 +4,6 @@ import ContentService from './content.service';
 import 'grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.css';
 import 'grapesjs/dist/css/grapes.min.css';
 import './grapesjs-custom.css';
-import './grapesjs-custom.css';
 
 /**
  * Launch builder
