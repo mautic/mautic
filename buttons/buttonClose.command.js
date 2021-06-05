@@ -2,7 +2,6 @@ import ContentService from '../content.service';
 
 export default class ButtonCloseCommands {
   static closeEditorPageHtml(editor) {
-    const parser = new DOMParser();
 
     if (!editor) {
       throw new Error('no page-html editor');
@@ -10,17 +9,7 @@ export default class ButtonCloseCommands {
 
     editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
 
-    // Combine editor styles and editor html
-    const htmlCss = `${editor.getHtml()}<style>${editor.getCss({
-      avoidProtected: true,
-    })}</style>`;
-    const htmlDocument = parser.parseFromString(htmlCss, 'text/html');
-
-    // get original header and add it to the html
-    const originalContent = ContentService.getOriginalContent();
-    if (originalContent.head) {
-      htmlDocument.head.innerHTML += originalContent.head.innerHTML;
-    }
+    const htmlDocument = this.ContentService.getHtmlDocument(editor);
 
     ButtonCloseCommands.returnContentToTextarea(editor, htmlDocument.documentElement.outerHTML);
 
