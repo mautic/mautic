@@ -1,4 +1,16 @@
+import ContentService from '../../../../../../../grapesjs-preset-mautic/src/content.service';
+
+// import grapesjsmautic from 'grapesjs-preset-mautic';
+
 class CodeEditor {
+  editor;
+
+  opts;
+
+  codeEditor;
+
+  codePopup;
+
   constructor(editor, opts = {}) {
     this.editor = editor;
     this.opts = opts;
@@ -75,7 +87,6 @@ class CodeEditor {
       this.editor.setComponents(code.trim());
       this.editor.Modal.close();
     } catch (e) {
-      // eslint-disable-next-line no-alert
       window.alert(`Template error, you should fix your code before save! \n${e.message}`);
       this.editor.DomComponents.getWrapper().set('content', '');
       this.editor.setComponents(codeSave.trim());
@@ -89,10 +100,14 @@ class CodeEditor {
 
   // Update CodeMirror content
   updateEditorContents() {
+    // CodeModeCommand.codeEditor.codeEditor.setContent(htmlcontent);
     this.codeEditor.setContent(this.getEditorContent());
   }
 
-  // Get formated GrapesJs code
+  /**
+   * Get complete current html. Including doctype and original header.
+   * @returns string
+   */
   getEditorContent() {
     const cfg = this.editor.getConfig();
     let content;
@@ -101,9 +116,16 @@ class CodeEditor {
     if ('grapesjsmjml' in cfg.pluginsOpts) {
       content = this.editor.getHtml();
     } else {
-      content = `${this.editor.getHtml()}<style>${this.editor.getCss({
-        avoidProtected: true,
-      })}</style>`;
+      const contentDocument = ContentService.getHtmlDocument(this.editor);
+      console.warn(contentDocument.doctype);
+
+      if (!contentDocument || !contentDocument.body) {
+        throw new Error('No html content found');
+      }
+      content =
+        ContentService.serializeDoctype(contentDocument.doctype) +
+        contentDocument.head.outerHTML +
+        contentDocument.body.outerHTML;
     }
 
     return content;

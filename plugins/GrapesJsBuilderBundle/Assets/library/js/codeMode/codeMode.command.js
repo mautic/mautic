@@ -16,8 +16,9 @@ export default class CodeModeCommand {
       sender.set('active', 0);
     }
 
+    CodeModeCommand.codeEditor.showCodePopup();
+
     // Transform DC to token
     editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
-    CodeModeCommand.codeEditor.showCodePopup();
   }
 }
