@@ -11,16 +11,8 @@ export default (editor, opts = {}) => {
   const am = editor.AssetManager;
 
   const config = {
-    sourceEdit: 1,
-    sourceEditBtnLabel: 'Edit',
-    sourceCancelBtnLabel: 'Cancel',
-    sourceEditModalTitle: 'Edit code',
-    deleteAssetConfirmText: 'Are you sure?',
     showLayersManager: 0,
     showImportButton: 0,
-    categorySectionLabel: 'Sections',
-    categoryBlockLabel: 'Blocks',
-    dynamicContentModalTitle: 'Edit Dynamic Content',
     logFilter: 'log:debug',
     ...opts,
   };
@@ -41,7 +33,7 @@ export default (editor, opts = {}) => {
         const { model } = this;
 
         // eslint-disable-next-line no-alert, no-restricted-globals
-        if (confirm(config.deleteAssetConfirmText)) {
+        if (confirm(Mautic.translate('grapesjsbuilder.deleteAssetConfirmText'))) {
           model.collection.remove(model);
         }
       },

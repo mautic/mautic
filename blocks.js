@@ -28,7 +28,7 @@ export default (editor, opts = {}) => {
   // All block inside Blocks category
   blocks.forEach((block) => {
     block.set({
-      category: opts.categoryBlockLabel,
+      category: Mautic.translate('grapesjsbuilder.categoryBlockLabel'),
     });
   });
 
@@ -39,69 +39,69 @@ export default (editor, opts = {}) => {
   // MJML columns
   if (typeof bm.get('mj-1-column') !== 'undefined') {
     bm.get('mj-1-column').set({
-      category: opts.categorySectionLabel,
+      category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 
   if (typeof bm.get('mj-2-columns') !== 'undefined') {
     bm.get('mj-2-columns').set({
-      category: opts.categorySectionLabel,
+      category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 
   if (typeof bm.get('mj-3-columns') !== 'undefined') {
     bm.get('mj-3-columns').set({
-      category: opts.categorySectionLabel,
+      category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 
   // Newsletter columns
   if (typeof bm.get('sect100') !== 'undefined') {
     bm.get('sect100').set({
-      category: opts.categorySectionLabel,
+      category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 
   if (typeof bm.get('sect50') !== 'undefined') {
     bm.get('sect50').set({
-      category: opts.categorySectionLabel,
+      category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 
   if (typeof bm.get('sect30') !== 'undefined') {
     bm.get('sect30').set({
-      category: opts.categorySectionLabel,
+      category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 
   if (typeof bm.get('sect37') !== 'undefined') {
     bm.get('sect37').set({
-      category: opts.categorySectionLabel,
+      category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 
   // Webpage columns
   if (typeof bm.get('column1') !== 'undefined') {
     bm.get('column1').set({
-      category: opts.categorySectionLabel,
+      category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 
   if (typeof bm.get('column2') !== 'undefined') {
     bm.get('column2').set({
-      category: opts.categorySectionLabel,
+      category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 
   if (typeof bm.get('column3') !== 'undefined') {
     bm.get('column3').set({
-      category: opts.categorySectionLabel,
+      category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 
   if (typeof bm.get('column3-7') !== 'undefined') {
     bm.get('column3-7').set({
-      category: opts.categorySectionLabel,
+      category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 };

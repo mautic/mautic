@@ -9,7 +9,7 @@ export default class ButtonCloseCommands {
 
     editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
 
-    const htmlDocument = this.ContentService.getHtmlDocument(editor);
+    const htmlDocument = ContentService.getCanvasAsHtmlDocument(editor);
 
     ButtonCloseCommands.returnContentToTextarea(editor, htmlDocument.documentElement.outerHTML);
 
