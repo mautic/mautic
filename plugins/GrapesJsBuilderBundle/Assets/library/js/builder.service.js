@@ -95,10 +95,9 @@ export default class BuilderService {
     if (object === 'page') {
       this.editor = this.initPage();
     } else if (object === 'emailform') {
-      if (
-        ContentService.getOriginalContent().body &&
-        ContentService.getOriginalContent().body.innerHTML.indexOf('<mjml>') !== -1
-      ) {
+      if (false) {
+        // ContentService.getOriginalContent().body &&
+        // ContentService.getOriginalContent().body.innerHTML.indexOf('<mjml>') !== -1
         this.editor = this.initEmailMjml();
       } else {
         this.editor = this.initEmailHtml();
@@ -130,7 +129,7 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: ContentService.getOriginalContent().body.innerHTML,
+      components: ContentService.getOriginalContentHtml().body.innerHTML,
       height: '100%',
       canvas: {
         styles: ContentService.getStyles(),
@@ -161,7 +160,6 @@ export default class BuilderService {
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-
       plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic],
       pluginsOpts: {
         grapesjsmjml: {},
@@ -181,7 +179,7 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: ContentService.getOriginalContent().outerHTML,
+      components: ContentService.getOriginalContentHtml().body.innerHTML,
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
