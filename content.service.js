@@ -27,21 +27,19 @@ export default class ContentService {
   }
 
   /**
-   * Combine original header with editor styles
-   * and editor html
+   * Get the current Canvas content as complete HTML document:
+   * Combine original doctype, header, editor styles and content
    *
    * @param {GrapesJs Editor} editor
    * @returns HTMLDocument
    */
-  static getHtmlDocument(editor) {
+  static getCanvasAsHtmlDocument(editor) {
     const parser = new DOMParser();
     // get original doctype, header and add it to the html
-    const originalContent = ContentService.getOriginalContent();
-    const doctype = originalContent.doctype || '<!DOCTYPE html>';
+    const originalContent = ContentService.getOriginalContentHtml();
+    const doctype = ContentService.serializeDoctype(originalContent.doctype);
 
-    const htmlCombined = `${ContentService.serializeDoctype(
-      doctype
-    )}${editor.getHtml()}<style>${editor.getCss({
+    const htmlCombined = `${doctype}${editor.getHtml()}<style>${editor.getCss({
       avoidProtected: true,
     })}</style>`;
 
@@ -55,6 +53,20 @@ export default class ContentService {
   }
 
   /**
+   * Serialize a HTML Document to a string
+   * @param {DocumentHTML} contentDocument
+   */
+  static serializeDocument(contentDocument) {
+    if (!contentDocument || !(contentDocument instanceof HTMLDocument)) {
+      throw new Error('No Html Document');
+    }
+
+    return `${ContentService.serializeDoctype(contentDocument.doctype)}
+    ${contentDocument.head.outerHTML}
+    ${contentDocument.body.outerHTML}`;
+  }
+
+  /**
    * Returns the correct string for valid (HTML5) doctypes, eg:
    * <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
    *
@@ -62,6 +74,9 @@ export default class ContentService {
    * @returns string
    */
   static serializeDoctype(doctype) {
+    if (!doctype) {
+      return null;
+    }
     return new XMLSerializer().serializeToString(doctype);
   }
 
@@ -71,12 +86,54 @@ export default class ContentService {
    * @todo: add header for mjml
    * @returns HTMLDocument
    */
-  static getOriginalContent() {
+  static getOriginalContent(editor) {
+    if (ContentService.isMjmlMode(editor)) {
+      // const textareaMjml = mQuery('textarea.builder-mjml');
+      // @todo textareaMjml.val(),
+      return ContentService.getOriginalContentMjml();
+    }
+
+    // Parse HTML theme/template
+    return ContentService.getOriginalContentHtml();
+  }
+
+  /**
+   * Get the selected themes original or the users last saved
+   * content from the db. Loaded via Mautic PHP into the textarea.
+   * @returns HTMLDocument
+   */
+  static getOriginalContentHtml() {
     // Parse HTML theme/template
     const parser = new DOMParser();
     const textareaHtml = mQuery('textarea.builder-html');
-    // const textareaMjml = mQuery('textarea.builder-mjml');
-    // @todo textareaMjml.val(),
-    return parser.parseFromString(textareaHtml.val(), 'text/html');
+    const doc = parser.parseFromString(textareaHtml.val(), 'text/html');
+    if (!doc.body.innerHTML || !doc.head.innerHTML) {
+      throw new Error('No valid HTML template found');
+    }
+    return doc;
+  }
+
+  /**
+   * Extract all stylesheets from the template <head>
+   * @todo use DocumentHTML Styles directly
+   */
+  static getStyles() {
+    const content = ContentService.getOriginalContent();
+
+    if (!content.head) {
+      return [];
+    }
+    const links = content.head.querySelectorAll('link');
+    const styles = [];
+
+    if (links) {
+      links.forEach((link) => {
+        if (link && link.rel === 'stylesheet') {
+          styles.push(link.href);
+        }
+      });
+    }
+
+    return styles;
   }
 }
