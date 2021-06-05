@@ -5,7 +5,8 @@ import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
 import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
 // import grapesjsmautic from 'grapesjs-preset-mautic';
-import ContentService from './content.service';
+import ContentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
+// import grapesjsmautic from 'grapesjs-preset-mautic/src/content.service';
 import CodeModeButton from './codeMode/codeMode.button';
 
 export default class BuilderService {
@@ -91,13 +92,12 @@ export default class BuilderService {
   initGrapesJS(object) {
     // disable mautic global shortcuts
     Mousetrap.reset();
-
     if (object === 'page') {
       this.editor = this.initPage();
     } else if (object === 'emailform') {
       if (
         ContentService.getOriginalContent().body &&
-        ContentService.getOriginalContent().body.indexOf('<mjml>') !== -1
+        ContentService.getOriginalContent().body.innerHTML.indexOf('<mjml>') !== -1
       ) {
         this.editor = this.initEmailMjml();
       } else {
@@ -130,7 +130,7 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: ContentService.getOriginalContent().body,
+      components: ContentService.getOriginalContent().body.innerHTML,
       height: '100%',
       canvas: {
         styles: ContentService.getStyles(),
@@ -181,7 +181,7 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: ContentService.getOriginalContent().body,
+      components: ContentService.getOriginalContent().outerHTML,
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),

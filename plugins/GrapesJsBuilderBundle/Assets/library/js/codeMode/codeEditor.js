@@ -1,6 +1,5 @@
 import ContentService from '../../../../../../../grapesjs-preset-mautic/src/content.service';
-
-// import grapesjsmautic from 'grapesjs-preset-mautic';
+// import grapesjsmautic from 'grapesjs-preset-mautic/src/content.service';
 
 class CodeEditor {
   editor;

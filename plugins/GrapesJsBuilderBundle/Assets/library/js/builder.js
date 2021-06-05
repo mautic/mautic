@@ -1,5 +1,6 @@
+import AssetService from './asset.service';
 import BuilderService from './builder.service';
-import ContentService from './content.service';
+// import grapesjsmautic from 'grapesjs-preset-mautic/src/content.service';
 // import 'grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css';
 import 'grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.css';
 import 'grapesjs/dist/css/grapes.min.css';
@@ -12,7 +13,7 @@ import './grapesjs-custom.css';
  * @param actionName
  */
 function launchBuilderGrapesjs(formName) {
-  const assets = ContentService.getAssets();
+  const assets = AssetService.getAssets();
 
   const builder = new BuilderService(assets);
 
