@@ -4,20 +4,6 @@ export default (editor, opts = {}) => {
   const { $ } = editor;
   const pm = editor.Panels;
 
-  // Add function within builder to edit source code
-  if (opts.sourceEdit) {
-    pm.addButton('options', [
-      {
-        id: 'code-edit',
-        className: 'fa fa-edit',
-        command: 'preset-mautic:code-edit',
-        attributes: {
-          title: opts.sourceEditModalTitle,
-        },
-      },
-    ]);
-  }
-
   // Disable Import code button
   if (!opts.showImportButton) {
     const mjmlImportBtn = pm.getButton('options', 'mjml-import');
