@@ -7,7 +7,6 @@ import loadBlocks from './blocks';
 import loadListeners from './listeners';
 
 export default (editor, opts = {}) => {
-  const $ = mQuery;
   const am = editor.AssetManager;
 
   const config = {

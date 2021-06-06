@@ -26,6 +26,10 @@ export default (editor, opts = {}) => {
     }
   }
 
+  // disable useless export button since not all of .then(function (response) {
+  // template is exportet (in favour of code editor)
+  pm.removeButton('options', 'export-template');
+
   // Move Undo & Redo inside Commands Panel
   const undo = pm.getButton('options', 'undo');
   const redo = pm.getButton('options', 'redo');
@@ -58,23 +62,20 @@ export default (editor, opts = {}) => {
     ]);
   }
 
-  // Remove preview button
+  // Remove preview button (because they are dublicated?)
   const preview = pm.getButton('options', 'preview');
-
   if (preview !== null) {
     pm.removeButton('options', 'preview');
   }
 
   // Remove clear button
   const clear = pm.getButton('options', 'canvas-clear');
-
   if (clear !== null) {
     pm.removeButton('options', 'canvas-clear');
   }
 
   // Remove toggle images button
   const toggleImages = pm.getButton('options', 'gjs-toggle-images');
-
   if (toggleImages !== null) {
     pm.removeButton('options', 'gjs-toggle-images');
   }
