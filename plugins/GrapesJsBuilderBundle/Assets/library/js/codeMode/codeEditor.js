@@ -77,10 +77,12 @@ class CodeEditor {
     });
   }
 
-  // Update GrapesJs content
+  /**
+   * Update the GrapesJs canvas content with the
+   * content from the code editor.
+   */
   updateCode() {
-    const code = this.codeEditor.editor.getValue();
-    // const codeToSave = ContentService.getCanvasAsHtmlDocument(this.editor);
+    const code = ContentService.getEditorHtmlContent(this.editor);
 
     try {
       // delete canvas and set new content
