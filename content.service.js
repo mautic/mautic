@@ -53,17 +53,32 @@ export default class ContentService {
   }
 
   /**
+   * Get complete current html. Including doctype and original header.
+   * @returns string
+   */
+  static getEditorHtmlContent(editor) {
+    if (!editor) {
+      throw new Error('Editor is required.');
+    }
+
+    const contentDocument = ContentService.getCanvasAsHtmlDocument(editor);
+
+    if (!contentDocument || !contentDocument.body) {
+      throw new Error('No html content found');
+    }
+    return ContentService.serializeHtmlDocument(contentDocument);
+  }
+
+  /**
    * Serialize a HTML Document to a string
    * @param {DocumentHTML} contentDocument
    */
-  static serializeDocument(contentDocument) {
+  static serializeHtmlDocument(contentDocument) {
     if (!contentDocument || !(contentDocument instanceof HTMLDocument)) {
       throw new Error('No Html Document');
     }
 
-    return `${ContentService.serializeDoctype(contentDocument.doctype)}
-    ${contentDocument.head.outerHTML}
-    ${contentDocument.body.outerHTML}`;
+    return `${ContentService.serializeDoctype(contentDocument.doctype)}${contentDocument.head.outerHTML}${contentDocument.body.outerHTML}`;
   }
 
   /**
@@ -118,7 +133,7 @@ export default class ContentService {
    * @todo use DocumentHTML Styles directly
    */
   static getStyles() {
-    const content = ContentService.getOriginalContent();
+    const content = ContentService.getOriginalContentHtml();
 
     if (!content.head) {
       return [];

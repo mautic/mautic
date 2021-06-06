@@ -2,7 +2,6 @@ import ContentService from '../content.service';
 
 export default class ButtonCloseCommands {
   static closeEditorPageHtml(editor) {
-
     if (!editor) {
       throw new Error('no page-html editor');
     }
@@ -11,7 +10,27 @@ export default class ButtonCloseCommands {
 
     const htmlDocument = ContentService.getCanvasAsHtmlDocument(editor);
 
-    ButtonCloseCommands.returnContentToTextarea(editor, htmlDocument.documentElement.outerHTML);
+    ButtonCloseCommands.returnContentToTextarea(
+      editor,
+      ContentService.serializeDocument(htmlDocument)
+    );
+
+    // Reset HTML
+    ButtonCloseCommands.resetHtml(editor);
+  }
+
+  static closeEditorEmailHtml(editor) {
+    if (!editor) {
+      throw new Error('no email-html editor');
+    }
+
+    editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
+
+    // Getting HTML with CSS inline (only available for "grapesjs-preset-newsletter"):
+    const html = ContentService.getEditorHtmlContent(editor);
+
+
+    ButtonCloseCommands.returnContentToTextarea(editor, html);
 
     // Reset HTML
     ButtonCloseCommands.resetHtml(editor);
@@ -38,22 +57,6 @@ export default class ButtonCloseCommands {
       throw new Error('Could not generate html from MJML');
     }
     ButtonCloseCommands.returnContentToTextarea(editor, editor.getHtml(), code.html);
-
-    // Reset HTML
-    ButtonCloseCommands.resetHtml(editor);
-  }
-
-  static closeEditorEmailHtml(editor) {
-    if (!editor) {
-      throw new Error('no email-html editor');
-    }
-
-    editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
-
-    // Getting HTML with CSS inline (only available for "grapesjs-preset-newsletter"):
-    const innerHTML = editor.runCommand('gjs-get-inlined-html');
-
-    ButtonCloseCommands.returnContentToTextarea(editor, innerHTML);
 
     // Reset HTML
     ButtonCloseCommands.resetHtml(editor);
