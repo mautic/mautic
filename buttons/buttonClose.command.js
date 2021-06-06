@@ -43,12 +43,13 @@ export default class ButtonCloseCommands {
     editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
 
     const htmlCode = MjmlService.getEditorHtmlContent(editor);
+    const mjmlCode = MjmlService.getEditorMjmlContent(editor);
 
     // Update textarea for save
-    if (!code || !code.html) {
+    if (!htmlCode || !mjmlCode) {
       throw new Error('Could not generate html from MJML');
     }
-    ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, editor.getHtml().trim());
+    ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, mjmlCode);
 
     // Reset HTML
     ButtonCloseCommands.resetHtml(editor);

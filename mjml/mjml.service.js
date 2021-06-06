@@ -28,6 +28,15 @@ export default class MjmlService {
   }
 
   /**
+   * Get the editors mjml
+   * @param {Grapesjs Editor} editor
+   * @returns string
+   */
+  static getEditorMjmlContent(editor) {
+    return editor.getHtml().trim();
+  }
+
+  /**
    * Transform MJML to HTML
    * @todo show validation erros in the UI
    * @returns string
