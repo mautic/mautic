@@ -79,16 +79,18 @@ class CodeEditor {
   }
 
   /**
-   * Update the GrapesJs canvas content with the
-   * content from the code editor.
+   * Update the main editors canvas content with the
+   * content from modals editor.
+   * @todo show validation results in UI
    */
   updateCode() {
-    // let code;
-    // if (ContentService.isMjmlMode(this.editor)) {
-    //   code = MjmlService.getEditorHtmlContent(this.editor);
-    // } else {
-    const code = ContentService.getEditorHtmlContent(this.editor);
-    // }
+    let code;
+    if (ContentService.isMjmlMode(this.editor)) {
+      code = this.codeEditor.editor.getValue();
+      MjmlService.mjmlToHtml(code); // validate
+    } else {
+      code = ContentService.getEditorHtmlContent(this.editor);
+    }
 
     try {
       // delete canvas and set new content
@@ -108,16 +110,17 @@ class CodeEditor {
   }
 
   /**
-   * Set the content to be shown in the code editor
+   * Set the content to be edited in the popup editor
    */
   updateEditorContents() {
     // Check if MJML plugin is on
-    // let content;
-    // if (ContentService.isMjmlMode(this.editor)) {
-    //   content = MjmlService.getEditorHtmlContent(this.editor);
-    // } else {
-    const content = ContentService.getEditorHtmlContent(this.editor);
-    // }
+    let content;
+    if (ContentService.isMjmlMode(this.editor)) {
+      content = MjmlService.getEditorMjmlContent(this.editor);
+      console.log('loading modal');
+    } else {
+      content = ContentService.getEditorHtmlContent(this.editor);
+    }
     this.codeEditor.setContent(content);
   }
 }
