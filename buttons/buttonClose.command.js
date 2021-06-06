@@ -1,4 +1,5 @@
 import ContentService from '../content.service';
+import MjmlService from '../mjml/mjml.service';
 
 export default class ButtonCloseCommands {
   static closeEditorPageHtml(editor) {
@@ -41,21 +42,13 @@ export default class ButtonCloseCommands {
     }
     editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
 
-    let code = '';
-
-    // Try catch for mjml parser error
-    try {
-      code = editor.runCommand('mjml-get-code');
-    } catch (error) {
-      console.log(error.message);
-      alert('Errors inside your template. Template will not be saved.');
-    }
+    const htmlCode = MjmlService.getEditorHtmlContent(editor);
 
     // Update textarea for save
     if (!code || !code.html) {
       throw new Error('Could not generate html from MJML');
     }
-    ButtonCloseCommands.returnContentToTextarea(editor, code.html.trim(), editor.getHtml().trim());
+    ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, editor.getHtml().trim());
 
     // Reset HTML
     ButtonCloseCommands.resetHtml(editor);

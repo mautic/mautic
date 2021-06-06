@@ -11,6 +11,23 @@ export default class MjmlService {
   }
 
   /**
+   * Get the editors mjml and transform it to html
+   * @param {Grapesjs Editor} editor
+   * @returns string
+   */
+  static getEditorHtmlContent(editor) {
+    // Try catch for mjml parser error
+    try {
+      const code = editor.runCommand('mjml-get-code');
+      return code.html ? code.html.trim() : null;
+    } catch (error) {
+      console.log(error.message);
+      alert('Errors inside your template. Template will not be saved.');
+    }
+    return null;
+  }
+
+  /**
    * Transform MJML to HTML
    * @todo show validation erros in the UI
    * @returns string
