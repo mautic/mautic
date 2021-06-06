@@ -45,8 +45,9 @@ export default class ContentService {
 
     const htmlDocument = parser.parseFromString(htmlCombined, 'text/html');
 
-    if (originalContent.head) {
-      htmlDocument.head.innerHTML += originalContent.head.innerHTML;
+    // if no header is set on the canvas, replace it with existing from theme
+    if (!htmlDocument.head.innerHTML && originalContent.head.innerHTML) {
+      htmlDocument.head.innerHTML = originalContent.head.innerHTML;
     }
 
     return htmlDocument;
@@ -78,7 +79,9 @@ export default class ContentService {
       throw new Error('No Html Document');
     }
 
-    return `${ContentService.serializeDoctype(contentDocument.doctype)}${contentDocument.head.outerHTML}${contentDocument.body.outerHTML}`;
+    return `${ContentService.serializeDoctype(contentDocument.doctype)}${
+      contentDocument.head.outerHTML
+    }${contentDocument.body.outerHTML}`;
   }
 
   /**
@@ -93,23 +96,6 @@ export default class ContentService {
       return null;
     }
     return new XMLSerializer().serializeToString(doctype);
-  }
-
-  /**
-   * Get the selected themes original or the users last saved
-   * content from the db. Loaded via Mautic PHP into the textarea.
-   * @todo: add header for mjml
-   * @returns HTMLDocument
-   */
-  static getOriginalContent(editor) {
-    if (ContentService.isMjmlMode(editor)) {
-      // const textareaMjml = mQuery('textarea.builder-mjml');
-      // @todo textareaMjml.val(),
-      return ContentService.getOriginalContentMjml();
-    }
-
-    // Parse HTML theme/template
-    return ContentService.getOriginalContentHtml();
   }
 
   /**

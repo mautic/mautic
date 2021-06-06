@@ -6,6 +6,9 @@ export default class Logger {
   static filters = ['log:debug', 'log:info', 'log:warning'];
 
   constructor(editor) {
+    if (!editor) {
+      throw new Error('Editor is required');
+    }
     this.editor = editor;
   }
 

@@ -12,7 +12,7 @@ export default class ButtonCloseCommands {
 
     ButtonCloseCommands.returnContentToTextarea(
       editor,
-      ContentService.serializeDocument(htmlDocument)
+      ContentService.serializeHtmlDocument(htmlDocument)
     );
 
     // Reset HTML
@@ -28,7 +28,6 @@ export default class ButtonCloseCommands {
 
     // Getting HTML with CSS inline (only available for "grapesjs-preset-newsletter"):
     const html = ContentService.getEditorHtmlContent(editor);
-
 
     ButtonCloseCommands.returnContentToTextarea(editor, html);
 
@@ -56,7 +55,7 @@ export default class ButtonCloseCommands {
     if (!code || !code.html) {
       throw new Error('Could not generate html from MJML');
     }
-    ButtonCloseCommands.returnContentToTextarea(editor, editor.getHtml(), code.html);
+    ButtonCloseCommands.returnContentToTextarea(editor, code.html.trim(), editor.getHtml().trim());
 
     // Reset HTML
     ButtonCloseCommands.resetHtml(editor);
