@@ -108,20 +108,7 @@ class CodeEditor {
     // if ('grapesjsmjml' in cfg.pluginsOpts) {
     //   content = this.editor.getHtml();
     // } else {
-    this.codeEditor.setContent(this.getEditorHtmlContent());
-  }
-
-  /**
-   * Get complete current html. Including doctype and original header.
-   * @returns string
-   */
-  getEditorHtmlContent() {
-    const contentDocument = ContentService.getCanvasAsHtmlDocument(this.editor);
-
-    if (!contentDocument || !contentDocument.body) {
-      throw new Error('No html content found');
-    }
-    return ContentService.serializeDocument(contentDocument);
+    this.codeEditor.setContent(ContentService.getEditorHtmlContent(this.editor));
   }
 }
 
