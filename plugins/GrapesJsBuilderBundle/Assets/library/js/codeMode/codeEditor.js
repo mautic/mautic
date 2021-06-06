@@ -83,12 +83,12 @@ class CodeEditor {
    * content from the code editor.
    */
   updateCode() {
-    let code;
-    if (ContentService.isMjmlMode(this.editor)) {
-      code = MjmlService.getEditorHtmlContent(this.editor);
-    } else {
-      code = ContentService.getEditorHtmlContent(this.editor);
-    }
+    // let code;
+    // if (ContentService.isMjmlMode(this.editor)) {
+    //   code = MjmlService.getEditorHtmlContent(this.editor);
+    // } else {
+    const code = ContentService.getEditorHtmlContent(this.editor);
+    // }
 
     try {
       // delete canvas and set new content
@@ -112,12 +112,12 @@ class CodeEditor {
    */
   updateEditorContents() {
     // Check if MJML plugin is on
-    let content;
-    if (ContentService.isMjmlMode(this.editor)) {
-      content = MjmlService.getEditorHtmlContent(this.editor);
-    } else {
-      content = ContentService.getEditorHtmlContent(this.editor);
-    }
+    // let content;
+    // if (ContentService.isMjmlMode(this.editor)) {
+    //   content = MjmlService.getEditorHtmlContent(this.editor);
+    // } else {
+    const content = ContentService.getEditorHtmlContent(this.editor);
+    // }
     this.codeEditor.setContent(content);
   }
 }
