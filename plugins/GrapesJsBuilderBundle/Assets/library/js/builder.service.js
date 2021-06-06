@@ -6,6 +6,7 @@ import grapesjspostcss from 'grapesjs-parser-postcss';
 import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
 // import grapesjsmautic from 'grapesjs-preset-mautic';
 import ContentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
+import MjmlService from '../../../../../../grapesjs-preset-mautic/src/mjml/mjml.service';
 // import grapesjsmautic from 'grapesjs-preset-mautic/src/content.service';
 import CodeModeButton from './codeMode/codeMode.button';
 
@@ -95,9 +96,7 @@ export default class BuilderService {
     if (object === 'page') {
       this.editor = this.initPage();
     } else if (object === 'emailform') {
-      if (false) {
-        // ContentService.getOriginalContent().body &&
-        // ContentService.getOriginalContent().body.innerHTML.indexOf('<mjml>') !== -1
+      if (MjmlService.getOriginalContentMjml()) {
         this.editor = this.initEmailMjml();
       } else {
         this.editor = this.initEmailHtml();
@@ -152,11 +151,14 @@ export default class BuilderService {
   }
 
   initEmailMjml() {
-    // EmailBuilder -> MJML
+    const components = MjmlService.getOriginalContentMjml();
+    // validate
+    MjmlService.mjmlToHtml(components);
+
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: ContentService.getOriginalContent().body,
+      components,
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
