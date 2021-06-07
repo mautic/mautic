@@ -11,6 +11,7 @@
 
 namespace Mautic\SmsBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
@@ -110,6 +111,7 @@ class SmsRepository extends CommonRepository
 
     /**
      * Get amounts of pending text messages.
+     * @return QueryBuilder|int|array
      */
     public function getSmsPendingQuery($smsId)
     {
@@ -138,7 +140,9 @@ class SmsRepository extends CommonRepository
         $lists = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('el.leadlist_id')
             ->from(MAUTIC_TABLE_PREFIX.'sms_message_list_xref', 'el')
-            ->where('el.sms_id = '.(int) $smsId)->execute()
+            ->where('el.sms_id = '.(int) $smsId)
+            ->execute()
+            ->fetchAll();
             ;
         $listIds = [];
         if ($lists) {
