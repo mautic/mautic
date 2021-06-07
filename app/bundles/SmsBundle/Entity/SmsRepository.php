@@ -111,6 +111,7 @@ class SmsRepository extends CommonRepository
 
     /**
      * Get amounts of pending text messages.
+     *
      * @return QueryBuilder|int|array
      */
     public function getSmsPendingQuery($smsId)
@@ -141,7 +142,8 @@ class SmsRepository extends CommonRepository
         $lists = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('el.leadlist_id')
             ->from(MAUTIC_TABLE_PREFIX.'sms_message_list_xref', 'el')
-            ->where('el.sms_id = '.(int) $smsId);
+            ->where('el.sms_id = '.(int) $smsId)
+            ->execute();
         $listIds = [];
         if ($lists) {
             foreach ($lists as $list) {
