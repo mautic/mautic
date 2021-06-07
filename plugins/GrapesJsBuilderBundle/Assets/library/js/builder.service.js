@@ -5,7 +5,10 @@ import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
 import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
 // import grapesjsmautic from 'grapesjs-preset-mautic';
-import ContentService from './content.service';
+import ContentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
+import MjmlService from '../../../../../../grapesjs-preset-mautic/src/mjml/mjml.service';
+// import grapesjsmautic from 'grapesjs-preset-mautic/src/content.service';
+import CodeModeButton from './codeMode/codeMode.button';
 
 export default class BuilderService {
   editor;
@@ -65,14 +68,6 @@ export default class BuilderService {
     });
 
     this.editor.on('modal:close', () => {
-      const commands = this.editor.Commands;
-      const cmdCodeEdit = 'preset-mautic:code-edit';
-
-      // Launch preset-mautic:code-edit command stop
-      if (commands.isActive(cmdCodeEdit)) {
-        commands.stop(cmdCodeEdit, { editor: this.editor });
-      }
-
       // ReMap keyboard shortcuts on modal close
       Object.keys(allKeymaps).map((objectKey) => {
         const shortcut = allKeymaps[objectKey];
@@ -98,14 +93,10 @@ export default class BuilderService {
   initGrapesJS(object) {
     // disable mautic global shortcuts
     Mousetrap.reset();
-
     if (object === 'page') {
       this.editor = this.initPage();
     } else if (object === 'emailform') {
-      if (
-        ContentService.getOriginalContent().body &&
-        ContentService.getOriginalContent().body.indexOf('<mjml>') !== -1
-      ) {
+      if (MjmlService.getOriginalContentMjml()) {
         this.editor = this.initEmailMjml();
       } else {
         this.editor = this.initEmailHtml();
@@ -114,20 +105,17 @@ export default class BuilderService {
       throw Error(`not supported builder type: ${object}`);
     }
 
+    // add code mode button
+    // @todo: only show button if configured: sourceEdit: 1,
+    const codeModeButton = new CodeModeButton(this.editor);
+    codeModeButton.addCommand();
+    codeModeButton.addButton();
+
     this.setListeners();
   }
 
   static getMauticConf(mode) {
     return {
-      sourceEditBtnLabel: Mautic.translate('grapesjsbuilder.sourceEditBtnLabel'),
-      sourceCancelBtnLabel: Mautic.translate('grapesjsbuilder.sourceCancelBtnLabel'),
-      sourceEditModalTitle: Mautic.translate('grapesjsbuilder.sourceEditModalTitle'),
-      deleteAssetConfirmText: Mautic.translate('grapesjsbuilder.deleteAssetConfirmText'),
-      categorySectionLabel: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
-      categoryBlockLabel: Mautic.translate('grapesjsbuilder.categoryBlockLabel'),
-      dynamicContentBlockLabel: Mautic.translate('grapesjsbuilder.dynamicContentBlockLabel'),
-      dynamicContentBtnLabel: Mautic.translate('grapesjsbuilder.dynamicContentBtnLabel'),
-      dynamicContentModalTitle: Mautic.translate('grapesjsbuilder.dynamicContentModalTitle'),
       mode,
     };
   }
@@ -140,7 +128,7 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: ContentService.getOriginalContent().body,
+      components: ContentService.getOriginalContentHtml().body.innerHTML,
       height: '100%',
       canvas: {
         styles: ContentService.getStyles(),
@@ -163,15 +151,17 @@ export default class BuilderService {
   }
 
   initEmailMjml() {
-    // EmailBuilder -> MJML
+    const components = MjmlService.getOriginalContentMjml();
+    // validate
+    MjmlService.mjmlToHtml(components);
+
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: ContentService.getOriginalContent().body,
+      components,
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-
       plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic],
       pluginsOpts: {
         grapesjsmjml: {},
@@ -191,7 +181,7 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: ContentService.getOriginalContent().body,
+      components: ContentService.getOriginalContentHtml().body.innerHTML,
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),

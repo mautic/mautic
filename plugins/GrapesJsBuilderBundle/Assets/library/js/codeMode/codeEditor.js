@@ -1,4 +1,16 @@
+import ContentService from '../../../../../../../grapesjs-preset-mautic/src/content.service';
+import MjmlService from '../../../../../../../grapesjs-preset-mautic/src/mjml/mjml.service';
+// import grapesjsmautic from 'grapesjs-preset-mautic/src/content.service';
+
 class CodeEditor {
+  editor;
+
+  opts;
+
+  codeEditor;
+
+  codePopup;
+
   constructor(editor, opts = {}) {
     this.editor = editor;
     this.opts = opts;
@@ -36,11 +48,11 @@ class CodeEditor {
     const btnCancel = document.createElement('button');
     const textarea = document.createElement('textarea');
 
-    btnEdit.innerHTML = this.opts.sourceEditBtnLabel;
+    btnEdit.innerHTML = Mautic.translate('grapesjsbuilder.sourceEditBtnLabel');
     btnEdit.className = `${cfg.stylePrefix}btn-prim ${cfg.stylePrefix}btn-code-edit`;
     btnEdit.onclick = this.updateCode.bind(this);
 
-    btnCancel.innerHTML = this.opts.sourceCancelBtnLabel;
+    btnCancel.innerHTML = Mautic.translate('grapesjsbuilder.sourceCancelBtnLabel');
     btnCancel.className = `${cfg.stylePrefix}btn-prim ${cfg.stylePrefix}btn-code-cancel`;
     btnCancel.onclick = this.cancelCode.bind(this);
 
@@ -56,28 +68,39 @@ class CodeEditor {
   // Load content and show popup
   showCodePopup() {
     this.updateEditorContents();
-    this.codeEditor.editor.refresh();
-
-    this.editor.Modal.setContent('');
+    // this.codeEditor.editor.refresh();
+    // this.editor.Modal.setContent('');
     this.editor.Modal.setContent(this.codePopup);
-    this.editor.Modal.setTitle(this.opts.sourceEditModalTitle);
+    this.editor.Modal.setTitle(Mautic.translate('grapesjsbuilder.sourceEditModalTitle'));
     this.editor.Modal.open();
+    this.editor.Modal.onceClose(() => {
+      this.editor.stopCommand('preset-mautic:code-edit');
+    });
   }
 
-  // Update GrapesJs content
+  /**
+   * Update the main editors canvas content with the
+   * content from modals editor.
+   * @todo show validation results in UI
+   */
   updateCode() {
-    const code = this.codeEditor.editor.getValue();
-    const codeSave = this.getEditorContent();
+    let code;
+    if (ContentService.isMjmlMode(this.editor)) {
+      code = this.codeEditor.editor.getValue();
+      MjmlService.mjmlToHtml(code); // validate
+    } else {
+      code = ContentService.getEditorHtmlContent(this.editor);
+    }
 
-    // Catch error of code
     try {
+      // delete canvas and set new content
       this.editor.DomComponents.getWrapper().set('content', '');
       this.editor.setComponents(code.trim());
       this.editor.Modal.close();
     } catch (e) {
-      window.alert(`Template error, you should fix your code before save! \n${e.message}`);
-      this.editor.DomComponents.getWrapper().set('content', '');
-      this.editor.setComponents(codeSave.trim());
+      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')} \n${e.message}`);
+      // this.editor.DomComponents.getWrapper().set('content', '');
+      // this.editor.setComponents(codeToSave.trim());
     }
   }
 
@@ -86,26 +109,19 @@ class CodeEditor {
     this.editor.Modal.close();
   }
 
-  // Update CodeMirror content
+  /**
+   * Set the content to be edited in the popup editor
+   */
   updateEditorContents() {
-    this.codeEditor.setContent(this.getEditorContent());
-  }
-
-  // Get formated GrapesJs code
-  getEditorContent() {
-    const cfg = this.editor.getConfig();
-    let content;
-
     // Check if MJML plugin is on
-    if ('grapesjsmjml' in cfg.pluginsOpts) {
-      content = this.editor.getHtml();
+    let content;
+    if (ContentService.isMjmlMode(this.editor)) {
+      content = MjmlService.getEditorMjmlContent(this.editor);
+      console.log('loading modal');
     } else {
-      content = `${this.editor.getHtml()}<style>${this.editor.getCss({
-        avoidProtected: true,
-      })}</style>`;
+      content = ContentService.getEditorHtmlContent(this.editor);
     }
-
-    return content;
+    this.codeEditor.setContent(content);
   }
 }
 
