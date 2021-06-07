@@ -134,7 +134,7 @@ export default class BuilderService {
         styles: ContentService.getStyles(),
       },
       storageManager: false, // https://grapesjs.com/docs/modules/Storage.html#basic-configuration
-      assetManager: BuilderService.getMauticConf('page-html'),
+      assetManager: BuilderService.getAssetManagerConf(),
       styleManager: {
         clearProperties: true, // Temp fix https://github.com/artf/grapesjs-preset-webpage/issues/27
       },
