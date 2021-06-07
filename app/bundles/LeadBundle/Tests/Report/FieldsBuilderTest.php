@@ -147,7 +147,10 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn($userSegments);
 
-        $users = ['John', 'Doe'];
+        $users = [
+            0 => ['id' => 1, 'firstName' => 'John', 'lastName' => 'Doe'],
+            1 => ['id' => 2, 'firstName' => 'Joe', 'lastName' => 'Smith'],
+        ];
 
         $userModel->expects($this->once())
             ->method('getUserList')
@@ -229,8 +232,8 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
                 'label' => 'mautic.lead.list.filter.owner',
                 'type'  => 'select',
                 'list'  => [
-                    0 => 'John',
-                    1 => 'Doe',
+                    1 => 'John Doe',
+                    2 => 'Joe Smith',
                 ],
             ],
         ];
