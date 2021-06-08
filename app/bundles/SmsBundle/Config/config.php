@@ -184,14 +184,6 @@ return [
                     'mautic.sms.model.sms',
                 ],
             ],
-            'mautic.sms.helper.reply' => [
-                'class'     => \Mautic\SmsBundle\Helper\CallbackHelper::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'monolog.logger.mautic',
-                    'mautic.tracker.contact',
-                ],
-            ],
             'mautic.sms.twilio.configuration' => [
                 'class'        => \Mautic\SmsBundle\Integration\Twilio\Configuration::class,
                 'arguments'    => [
