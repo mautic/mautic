@@ -179,7 +179,7 @@ class Sms extends FormEntity
             ->columnName('failed_count')
             ->build();
 
-        $builder->addField('properties', 'json_array');
+        $builder->addField('properties', Types::JSON);
 
         $builder->addCategory();
 
