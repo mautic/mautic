@@ -167,7 +167,7 @@ class Sms extends FormEntity
             ->columnName('sent_count')
             ->build();
 
-        $builder->createField('deliveredCount', 'integer')
+        $builder->createField('deliveredCount', Types::INTEGER)
             ->columnName('delivered_count')
             ->build();
 
