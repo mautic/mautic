@@ -32,7 +32,7 @@ class CallbackController extends AbstractController
     private $callbackHelper;
 
     /**
-     * ReplyController constructor.
+     * CallbackController constructor.
      */
     public function __construct(HandlerContainer $callbackHandler, CallbackHelper $callbackHelper)
     {
