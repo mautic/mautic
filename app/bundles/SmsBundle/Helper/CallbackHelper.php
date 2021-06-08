@@ -52,7 +52,7 @@ class CallbackHelper
     private $smsModel;
 
     /**
-     * ReplyHelper constructor.
+     * CallbackHelper constructor.
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
