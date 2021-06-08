@@ -132,7 +132,7 @@ class Stat
             ->columnName('is_delivered')
             ->build();
 
-        $builder->createField('isRead', 'boolean')
+        $builder->createField('isRead', Types::BOOLEAN)
             ->columnName('is_read')
             ->build();
 
