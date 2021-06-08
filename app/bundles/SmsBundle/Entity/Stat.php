@@ -128,7 +128,7 @@ class Stat
             ->nullable()
             ->build();
 
-        $builder->createField('isDelivered', 'boolean')
+        $builder->createField('isDelivered', Types::BOOLEAN)
             ->columnName('is_delivered')
             ->build();
 
