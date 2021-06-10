@@ -57,6 +57,10 @@ class FormUploader
                 $this->fixRotationJPG($uploadedFile);
                 $uploadedFiles[] =$uploadedFile;
             }
+            if (!empty($uploadedFiles)) {
+                $submission->setFilePaths($uploadedFiles);
+            }
+
             $submission->setResults($result);
         } catch (FileUploadException $e) {
             foreach ($uploadedFiles as $filePath) {

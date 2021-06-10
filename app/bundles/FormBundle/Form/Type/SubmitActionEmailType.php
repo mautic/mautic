@@ -152,6 +152,16 @@ class SubmitActionEmailType extends AbstractType
             ]
         );
 
+        $default = isset($options['data']['file_is_attached']) ? $options['data']['file_is_attached'] : false;
+        $builder->add(
+            'file_is_attached',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.form.action.sendemail.file.attached',
+                'data'  => $default,
+            ]
+        );
+
         $builder->add(
             'templates',
             EmailListType::class,
