@@ -138,10 +138,12 @@ class SmsRepository extends CommonRepository
                     $mqQb->expr()->eq('mq.channel', $mqQb->expr()->literal('sms'))
                 )
             );
-        $lists = $this->_em->createQueryBuilder()
+        $lists = $this->_em->getConnection()->createQueryBuilder()
             ->select('el.leadlist_id')
+            ->distinct()
             ->from(MAUTIC_TABLE_PREFIX.'sms_message_list_xref', 'el')
-            ->where('el.sms_id = '.(int) $smsId)->getQuery()->getResult();
+            ->where('el.sms_id = '.(int) $smsId)
+            ->execute()->fetchAll();
         $listIds = [];
         if ($lists) {
             foreach ($lists as $list) {
