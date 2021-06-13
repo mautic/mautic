@@ -1080,6 +1080,22 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             );
 
             $builder->add(
+                'overwriteWithBlank',
+                ChoiceType::class,
+                [
+                    'choices'     => [
+                        'mautic.integrations.form.overwrite_with_blank' => 'overwriteWithBlank',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.sugarcrm.form.overwrite_with_blank.label',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'placeholder' => false,
+                    'required'    => false,
+                ]
+            );
+
+            $builder->add(
                 'objects',
                 ChoiceType::class,
                 [

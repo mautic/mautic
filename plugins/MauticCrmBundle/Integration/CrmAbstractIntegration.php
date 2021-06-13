@@ -429,7 +429,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             }
         }
 
-        $leadModel->setFieldValues($lead, $matchedFields, false, false);
+        $overwriteWithBlank = false;
+        if ((isset($config['overwriteWithBlank']) && isset($config['overwriteWithBlank'][0]) && 'overwriteWithBlank' == $config['overwriteWithBlank'][0])) {
+            $overwriteWithBlank = true;
+        }
+
+        $leadModel->setFieldValues($lead, $matchedFields, $overwriteWithBlank, false);
         if (!empty($socialCache)) {
             // Update the social cache
             $leadSocialCache = $lead->getSocialCache();
