@@ -11,10 +11,11 @@
 
 namespace Mautic\InstallBundle\Command;
 
+use Doctrine\DBAL\Exception;
+use Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;
-use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -238,6 +239,8 @@ class InstallCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -343,6 +346,9 @@ class InstallCommand extends ContainerAwareCommand
                 // no break
             case InstallService::DOCTRINE_STEP:
                 $output->writeln($step.' - Creating database...');
+                /** @var ConnectionWrapper $connectionWrapper */
+                $connectionWrapper = $container->get('doctrine')->getConnection();
+                $connectionWrapper->initConnection($dbParams);
                 $messages = $this->stepAction($installer, $dbParams, $step);
                 if (!empty($messages)) {
                     $output->writeln('Errors in database configuration/installation:');
