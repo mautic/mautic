@@ -1283,12 +1283,14 @@ class LeadModel extends FormModel
      * @param null         $tags
      * @param bool         $persist
      * @param LeadEventLog $eventLog
+     * @param null         $importId
+     * @param bool         $skipIfExists
      *
      * @return bool|null
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null)
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false)
     {
         $fields    = array_flip($fields);
         $fieldData = [];
@@ -1488,6 +1490,12 @@ class LeadModel extends FormModel
         $fieldErrors = [];
 
         foreach ($this->leadFields as $leadField) {
+            // Skip If value already exists
+            if ($skipIfExists && !$lead->isNew() && !empty($lead->getFieldValue($leadField['alias']))) {
+                unset($fieldData[$leadField['alias']]);
+                continue;
+            }
+
             if (isset($fieldData[$leadField['alias']])) {
                 if ('NULL' === $fieldData[$leadField['alias']]) {
                     $fieldData[$leadField['alias']] = null;
