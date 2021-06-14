@@ -67,7 +67,12 @@
   "repositories": [
     {
       "type": "path",
-      "url": "app"
+      "url": "app",
+      "options": {
+        "versions": {
+            "mautic/core-lib": "3.2.x-dev"
+        }
+      }
     },
     {
       "type": "git",
