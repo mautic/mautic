@@ -13,7 +13,7 @@ use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\TemplateReference;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ThemeHelper
+class ThemeHelper implements ThemeHelperInterface
 {
     /**
      * @var PathsHelper
@@ -672,5 +672,14 @@ class ThemeHelper
         }
 
         return in_array($builderName, $builderRequested);
+    }
+
+    public function getCurrentTheme(string $template, string $specificFeature): string
+    {
+        if (!in_array($template, array_keys($this->getInstalledThemes($specificFeature)))) {
+            return $this->coreParametersHelper->get('theme_email_default');
+        }
+
+        return $template;
     }
 }
