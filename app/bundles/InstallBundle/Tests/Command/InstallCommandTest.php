@@ -56,7 +56,7 @@ class InstallCommandTest extends TestCase
         $this->installer->method('checkIfInstalled')->willReturnOnConsecutiveCalls(true);
         $this->container->method('get')->with('mautic.install.service')->willReturn($this->installer);
 
-        $input = new ArrayInput(['site_url' => 'localhost',]);
+        $input  = new ArrayInput(['site_url' => 'localhost']);
         $output = new BufferedOutput();
         $this->command->run($input, $output);
 
@@ -79,12 +79,12 @@ class InstallCommandTest extends TestCase
 
         $input = new ArrayInput(
             [
-                'site_url' => 'localhost',
+                'site_url'          => 'localhost',
                 '--admin_firstname' => 'Admin',
-                '--admin_lastname' => 'Mautic',
-                '--admin_username' => 'admin',
-                '--admin_email' => 'admin@example.com',
-                '--admin_password' => 'password',
+                '--admin_lastname'  => 'Mautic',
+                '--admin_username'  => 'admin',
+                '--admin_email'     => 'admin@example.com',
+                '--admin_password'  => 'password',
             ]
         );
         $output = new BufferedOutput();
