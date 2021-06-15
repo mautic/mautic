@@ -30,13 +30,15 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class InstallCommand extends ContainerAwareCommand
 {
+    public const COMMAND = 'mautic:install';
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('mautic:install')
+            ->setName(self::COMMAND)
             ->setDescription('Installs Mautic')
             ->setHelp('This command allows you to trigger the install process.')
             ->addArgument(
