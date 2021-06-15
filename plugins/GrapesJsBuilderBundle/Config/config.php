@@ -6,7 +6,7 @@ return [
     'name'        => 'GrapesJS Builder',
     'description' => 'GrapesJS Builder with MJML support for Mautic',
     'version'     => '1.0.0',
-    'author'      => 'Webmecanik',
+    'author'      => 'Mautic Community',
     'routes'      => [
         'main'   => [
             'grapesjsbuilder_upload' => [
