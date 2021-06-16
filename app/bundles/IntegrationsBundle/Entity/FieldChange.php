@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Entity;
 
+use DateTime;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -30,7 +31,7 @@ class FieldChange
     private $integration;
 
     /**
-     * @var int
+     * @var int|string
      */
     private $objectId;
 
@@ -40,7 +41,7 @@ class FieldChange
     private $objectType;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     private $modifiedAt;
 
@@ -141,7 +142,7 @@ class FieldChange
 
     public function getObjectId(): int
     {
-        return $this->objectId;
+        return (int) $this->objectId;
     }
 
     /**
@@ -162,14 +163,14 @@ class FieldChange
     /**
      * @return FieldChange
      */
-    public function setModifiedAt(\DateTime $time): self
+    public function setModifiedAt(DateTime $time): self
     {
         $this->modifiedAt = $time;
 
         return $this;
     }
 
-    public function getModifiedAt(): \DateTime
+    public function getModifiedAt(): DateTime
     {
         return $this->modifiedAt;
     }
