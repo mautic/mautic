@@ -62,7 +62,7 @@ trait CustomFieldRepositoryTrait
 
         //get a total count
         $result = $dq->execute()->fetchAll();
-        $total  = ($result) ? $result[0]['count'] : 0;
+        $total  = ($result) ? (int) $result[0]['count'] : 0;
 
         if (!$total) {
             $results = [];
