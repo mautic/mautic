@@ -123,8 +123,9 @@ class EventLogger
             $log->setRotation($this->contactRotations[$contact->getId()]['rotation']);
         } else {
             // Likely a single contact handle such as decision processing
-            $rotations = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
-            $log->setRotation($rotations[$contact->getId()]['rotation']);
+            $rotations   = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
+            $rotationVal = isset($rotations[$contact->getId()]) ? $rotations[$contact->getId()]['rotation'] : 1;
+            $log->setRotation($rotationVal);
         }
 
         return $log;
