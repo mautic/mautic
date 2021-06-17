@@ -141,15 +141,16 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         if ($dwc instanceof DynamicContent) {
             // Use translation if available
-            list($ignore, $dwc) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+            [, $dwc] = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
 
             if ($slot) {
                 $this->dynamicContentModel->setSlotContentForLead($dwc, $lead, $slot);
             }
 
-            $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
+            $stat = $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
             $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+            $tokenEvent->setStat($stat);
             $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
 
             $content = $tokenEvent->getContent();
