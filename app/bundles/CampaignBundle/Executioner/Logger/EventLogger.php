@@ -209,7 +209,7 @@ class EventLogger
 
         // Ensure each contact has a log entry to prevent them from being picked up again prematurely
         foreach ($contacts as $contact) {
-            if (!isset($this->contactRotations[$contact->getId()]) || $this->contactRotations[$contact->getId()]['manually_removed']) {
+            if ($this->contactRotations[$contact->getId()]['manually_removed']) {
                 continue;
             }
             $log = $this->buildLogEntry($event, $contact, $isInactiveEntry);

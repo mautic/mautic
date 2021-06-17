@@ -134,11 +134,11 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // Now we should have 50 email open decisions
         $byEvent = $this->getCampaignEventLogs([3, 4, 5, 14, 15]);
-        $this->assertCount(25, $byEvent[3]);
+        $this->assertCount(50, $byEvent[3]);
 
         // 25 should be marked as non_action_path_taken
         $nonActionCount = $this->getNonActionPathTakenCount($byEvent[3]);
-        $this->assertEquals(0, $nonActionCount);
+        $this->assertEquals(25, $nonActionCount);
 
         // A condition should be logged as evaluated for each of the 25 contacts
         $this->assertCount(25, $byEvent[4]);
