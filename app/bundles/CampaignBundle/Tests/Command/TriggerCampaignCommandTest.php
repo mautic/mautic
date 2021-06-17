@@ -522,21 +522,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertFalse(isset($tags['EmailNotOpen']));
     }
 
-    /**
-<<<<<<< HEAD
-=======
-     * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \Exception
-     */
-    public function testSegmentCacheCount(): void
-    {
-        // Execute the command again to trigger related events.
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1]);
-        // Segment cache count should be 50.
-        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertEquals(50, $count);
-    }
-
     public function testCampaignActionChangeMembership(): void
     {
         $campaign1 = $this->createCampaign('Campaign 1');
@@ -616,7 +601,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
->>>>>>> bea940a7da (functional test case)
      * @return array
      */
     private function getTagCounts()
