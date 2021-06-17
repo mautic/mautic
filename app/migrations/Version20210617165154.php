@@ -50,8 +50,8 @@ final class Version20210617165154 extends AbstractMauticMigration
                 is_admin = 0
 SQL;
 
-        $stmt = $this->connection->prepare($sql);
-        $result = $stmt->executeQuery();
+        $stmt                = $this->connection->prepare($sql);
+        $result              = $stmt->executeQuery();
         $this->rowsToMigrate = $result->fetchAllAssociative();
     }
 
@@ -62,16 +62,14 @@ SQL;
             $leadListPermissions = ($permissions['lead:lists'] ?? []);
 
             if (!in_array('full', $leadListPermissions) && !in_array('create', $leadListPermissions)) {
-
                 $permissions['lead:lists'][] = 'create';
-                $params = [
-                    'id'         => $rowToMigrate['id'],
+                $params                      = [
+                    'id'          => $rowToMigrate['id'],
                     'permissions' => serialize($permissions),
                 ];
 
                 $this->addSql($this->getUpdateSql(), $params);
-
-            };
+            }
         }
     }
 
