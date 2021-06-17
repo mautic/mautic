@@ -174,7 +174,9 @@ class ListApiController extends CommonApiController
      */
     protected function checkEntityAccess($entity, $action = 'view')
     {
-        if ('create' == $action || 'edit' == $action || 'view' == $action) {
+        if ('create' == $action) {
+            return $this->security->isGranted('lead:lists:create');
+        } elseif ('edit' == $action || 'view' == $action) {
             return $this->security->isGranted('lead:leads:viewown');
         } elseif ('delete' == $action) {
             return $this->factory->getSecurity()->hasEntityAccess(

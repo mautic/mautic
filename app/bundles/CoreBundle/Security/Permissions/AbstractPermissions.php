@@ -94,7 +94,7 @@ abstract class AbstractPermissions
      */
     public function getValue($name, $perm)
     {
-        return ($this->isSupported($name, $perm)) ? $this->permissions[$name][$perm] : 0;
+        return ($this->isSupported($name, $perm)) ? ($this->permissions[$name][$perm] ?? 0) : 0;
     }
 
     /**
