@@ -796,6 +796,8 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
                 'ignore_paginator' => true,
             ]
         );
+        // It must be associative because the order of entities has changed
+        $idHelper->setIsAssociative(true);
 
         [$entities, $total] = $prepareForSerialization
                 ?
@@ -1147,14 +1149,17 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
 
             $this->setSerializationContext($view);
         } else {
-            $formErrors = $this->getFormErrorMessages($form);
-            $msg        = $this->getFormErrorMessage($formErrors);
+            $formErrors     = $this->getFormErrorMessages($form);
+            $formErrorCodes = $this->getFormErrorCodes($form);
+            $msg            = $this->getFormErrorMessage($formErrors);
 
             if (!$msg) {
                 $msg = $this->translator->trans('mautic.core.error.badrequest', [], 'flashes');
             }
 
-            return $this->returnError($msg, Response::HTTP_BAD_REQUEST, $formErrors);
+            $responseCode = in_array(Response::HTTP_UNPROCESSABLE_ENTITY, $formErrorCodes) ? Response::HTTP_UNPROCESSABLE_ENTITY : Response::HTTP_BAD_REQUEST;
+
+            return $this->returnError($msg, $responseCode, $formErrors);
         }
 
         return $this->handleView($view);
