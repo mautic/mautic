@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2021 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -17,9 +19,6 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
-use Mautic\UserBundle\Entity\Role;
-use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
-use MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -30,25 +29,26 @@ class GrapesJsData extends AbstractFixture implements OrderedFixtureInterface, C
      */
     private $container;
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getGroups(): array
     {
         return ['group_install', 'group_mautic_install_data'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(ContainerInterface $container = null): void
     {
         $this->container = $container;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $parameters = include __DIR__.'/../../../../../plugins/GrapesJsBuilderBundle/Config/config.php';
+        $projectDir               = $this->container->get('kernel')->getProjectDir();
+        $grapeJsBuilderConfigPath = $projectDir.'/plugins/GrapesJsBuilderBundle/Config/config.php';
+
+        if (!file_exists($grapeJsBuilderConfigPath)) {
+            return;
+        }
+
+        $parameters = include $grapeJsBuilderConfigPath;
 
         if (!is_array($parameters)) {
             return;
@@ -60,23 +60,18 @@ class GrapesJsData extends AbstractFixture implements OrderedFixtureInterface, C
         $plugin->setVersion($parameters['version']);
         $plugin->setAuthor($parameters['author']);
         $plugin->setBundle('GrapesJsBuilderBundle');
-
         $manager->persist($plugin);
-        $manager->flush();
 
         $integration = new Integration();
         $integration->setIsPublished(true);
         $integration->setName('GrapesJsBuilder');
         $integration->setPlugin($plugin);
-
         $manager->persist($integration);
+
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 1;
     }
