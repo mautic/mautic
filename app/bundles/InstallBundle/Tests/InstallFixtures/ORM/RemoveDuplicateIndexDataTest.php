@@ -52,11 +52,6 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
         Assert::assertSame(6, $this->fixture->getOrder());
     }
 
-    /**
-     * @throws DoctrineSchemaException
-     * @throws Exception
-     * @throws SchemaException
-     */
     public function testLoad(): void
     {
         $this->createTables();
