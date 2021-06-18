@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -1083,6 +1084,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     public function removeEventLog(LeadEventLog $eventLog)
     {
         $this->eventLog->removeElement($eventLog);
+    }
+
+    public function getLastEventLogByAction(string $action): ?LeadEventLog
+    {
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq('action', $action))
+            ->orderBy(['id' => Criteria::DESC])
+            ->setFirstResult(0)
+            ->setMaxResults(1);
+
+        return $this->eventLog->matching($criteria)->first() ?: null;
     }
 
     /**
