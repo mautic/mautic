@@ -35,7 +35,7 @@ class GrapeJsDataTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->tempContainer = self::$container;
-        $this->fixture = new GrapesJsData();
+        $this->fixture       = new GrapesJsData();
         $this->fixture->setContainer($this->getContainerFake());
     }
 
@@ -52,11 +52,11 @@ class GrapeJsDataTest extends MauticMysqlTestCase
     public function testLoad(): void
     {
         $findOneByCriteria = [
-            'name' => 'GrapesJS Builder',
+            'name'        => 'GrapesJS Builder',
             'description' => 'GrapesJS Builder with MJML support for Mautic',
-            'version' => '1.0.0',
-            'author' => 'Mautic Community',
-            'bundle' => 'GrapesJsBuilderBundle',
+            'version'     => '1.0.0',
+            'author'      => 'Mautic Community',
+            'bundle'      => 'GrapesJsBuilderBundle',
         ];
         $plugin = $this->em->getRepository(Plugin::class)->findOneBy($findOneByCriteria);
         self::assertNull($plugin);
@@ -69,8 +69,8 @@ class GrapeJsDataTest extends MauticMysqlTestCase
         $integration = $this->em->getRepository(Integration::class)->findOneBy(
             [
                 'isPublished' => true,
-                'name' => 'GrapesJsBuilder',
-                'plugin' => $plugin,
+                'name'        => 'GrapesJsBuilder',
+                'plugin'      => $plugin,
             ]
         );
         self::assertInstanceOf(Integration::class, $integration);
