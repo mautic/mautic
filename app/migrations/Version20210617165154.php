@@ -64,24 +64,9 @@ SQL;
 
             if (!in_array('full', $leadListPermissions) && !in_array('create', $leadListPermissions)) {
                 $permissions['lead:lists'][] = 'create';
-                $params                      = [
-                    'id'          => $rowToMigrate['id'],
-                    'permissions' => serialize($permissions),
-                ];
-
-                $this->addSql($this->getUpdateSql(), $params);
                 $this->setPermission($rowToMigrate['id'], $permissions);
             }
         }
-    }
-
-    private function getUpdateSql(): string
-    {
-        return <<<SQL
-            UPDATE {$this->prefix}roles
-            SET readable_permissions = :permissions
-            WHERE id = :id
-SQL;
     }
 
     /**
