@@ -14,6 +14,8 @@ namespace Mautic\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\UserBundle\Model\RoleModel;
+use Mautic\UserBundle\Model\UserModel;
 
 final class Version20210617165154 extends AbstractMauticMigration
 {
@@ -69,6 +71,7 @@ SQL;
                 ];
 
                 $this->addSql($this->getUpdateSql(), $params);
+                $this->setPermission($rowToMigrate['id'], $permissions);
             }
         }
     }
@@ -80,5 +83,17 @@ SQL;
             SET readable_permissions = :permissions
             WHERE id = :id
 SQL;
+    }
+
+    /**
+     * @param $id
+     */
+    private function setPermission($id, array $permissions)
+    {
+        /** @var RoleModel $roleModel */
+        $roleModel = $this->container->get('mautic.user.model.role');
+        $role      = $roleModel->getEntity($id);
+        $roleModel->setRolePermissions($role, $permissions);
+        $roleModel->saveEntity($role);
     }
 }
