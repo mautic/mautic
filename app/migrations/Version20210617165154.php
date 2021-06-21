@@ -15,7 +15,6 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\UserBundle\Model\RoleModel;
-use Mautic\UserBundle\Model\UserModel;
 
 final class Version20210617165154 extends AbstractMauticMigration
 {
