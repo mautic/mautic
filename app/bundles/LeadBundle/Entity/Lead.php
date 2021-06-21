@@ -1090,7 +1090,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     {
         $criteria = Criteria::create()
             ->where(Criteria::expr()->eq('action', $action))
-            ->orderBy(['id' => Criteria::DESC])
+            ->orderBy(['dateAdded' => Criteria::DESC])
             ->setFirstResult(0)
             ->setMaxResults(1);
 
