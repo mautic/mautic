@@ -8,21 +8,21 @@
     "mautic/core-lib": "^3.0"
   },
   "require-dev": {
-    "symfony/web-profiler-bundle": "~4.4.0",
-    "symfony/var-dumper": "~4.4.0",
+    "friendsofphp/php-cs-fixer": "~2.16.1",
+    "http-interop/http-factory-guzzle": "^1.0",
+    "liip/functional-test-bundle": "^4.2",
+    "liip/test-fixtures-bundle": "^1.6",
+    "mautic/transifex": "^4.0",
+    "php-http/mock-client": "^1.4",
+    "phpstan/phpstan": "0.12.86",
+    "phpunit/phpunit": "^9.5",
+    "rector/rector": "0.11.0",
     "symfony/browser-kit": "~4.4.0",
     "symfony/dom-crawler": "~4.4.0",
-    "mautic/transifex": "^4.0",
-    "http-interop/http-factory-guzzle": "^1.0",
-    "webfactory/exceptions-bundle": "~4.3",
-    "friendsofphp/php-cs-fixer": "~2.16.1",
-    "liip/test-fixtures-bundle": "^1.6",
-    "phpstan/phpstan": "0.12.25",
-    "rector/rector-prefixed": "^0.6.13",
     "symfony/phpunit-bridge": "~5.1.0",
-    "phpunit/phpunit": "^9.5",
-    "liip/functional-test-bundle": "^4.2",
-    "php-http/mock-client": "^1.4"
+    "symfony/var-dumper": "~4.4.0",
+    "symfony/web-profiler-bundle": "~4.4.0",
+    "webfactory/exceptions-bundle": "~4.3"
   },
   "replace": {
     "mautic/grapes-js-builder-bundle": "self.version",
