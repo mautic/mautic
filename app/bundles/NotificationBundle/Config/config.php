@@ -70,6 +70,9 @@ return [
                     'mautic.notification.repository.stat',
                 ],
             ],
+            'mautic.notification.configbundle.subscriber' => [
+                'class' => Mautic\NotificationBundle\EventListener\ConfigSubscriber::class,
+            ],
         ],
         'forms' => [
             'mautic.form.type.notification' => [
@@ -86,6 +89,9 @@ return [
             ],
             'mautic.form.type.notificationconfig' => [
                 'class' => 'Mautic\NotificationBundle\Form\Type\ConfigType',
+            ],
+            'mautic.notification.config' => [
+                'class' => \Mautic\NotificationBundle\Form\Type\NotificationConfigType::class,
             ],
             'mautic.form.type.notificationsend_list' => [
                 'class'     => 'Mautic\NotificationBundle\Form\Type\NotificationSendType',
@@ -285,5 +291,7 @@ return [
         'gcm_sender_id'                      => '482941778795',
         'notification_subdomain_name'        => null,
         'welcomenotification_enabled'        => true,
+        'send_notification_to_author'        => true,
+        'notification_email_addresses'       => null,
     ],
 ];
