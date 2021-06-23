@@ -11,6 +11,8 @@
 
 namespace Mautic\UserBundle\Security\Firewall;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\ApiBundle\Entity\oAuth2\AccessToken;
 use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Authentication\AuthenticationHandler;
@@ -64,6 +66,11 @@ class AuthenticationListener implements ListenerInterface
     protected $permissionRepository;
 
     /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
      * @param $providerKey
      */
     public function __construct(
@@ -73,7 +80,8 @@ class AuthenticationListener implements ListenerInterface
         LoggerInterface $logger,
         EventDispatcherInterface $dispatcher,
         $providerKey,
-        PermissionRepository $permissionRepository
+        PermissionRepository $permissionRepository,
+        EntityManagerInterface $entityManager
     ) {
         $this->tokenStorage          = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
@@ -82,6 +90,7 @@ class AuthenticationListener implements ListenerInterface
         $this->logger                = $logger;
         $this->dispatcher            = $dispatcher;
         $this->permissionRepository  = $permissionRepository;
+        $this->entityManager         = $entityManager;
     }
 
     public function handle(GetResponseEvent $event)
@@ -178,6 +187,11 @@ class AuthenticationListener implements ListenerInterface
         $token = $this->tokenStorage->getToken();
         $user  = $token->getUser();
 
+        // If no user associated with a token, it's a client credentials grant type. Handle accordingly.
+        if (is_null($user)) {
+            $user = $this->assignRoleFromToken($token);
+        }
+
         if (!$user->isAdmin() && empty($user->getActivePermissions())) {
             $activePermissions = $this->permissionRepository->getPermissionsByRole($user->getRole());
 
@@ -187,5 +201,30 @@ class AuthenticationListener implements ListenerInterface
         $token->setUser($user);
 
         $this->tokenStorage->setToken($token);
+    }
+
+    /**
+     * Handle permission for Client Credential grant type.
+     */
+    private function assignRoleFromToken(TokenInterface $token): User
+    {
+        $token = $token->getToken();
+
+        /** @var AccessToken $accessToken */
+        $accessToken = $this->entityManager->getRepository(AccessToken::class)->findOneBy(['token' => $token]);
+
+        $role = $accessToken->getClient()->getRole();
+
+        // Create a pseudo user and assign the role
+        $user = new User();
+        $user->setRole($role);
+
+        // Set for the audit log and the entity's "created by user" metadata which takes the first and last name
+        $user->setFirstName($accessToken->getClient()->getName());
+        $user->setLastName(sprintf('[%s]', $accessToken->getClient()->getId()));
+        $user->setUsername($user->getName());
+        defined('MAUTIC_AUDITLOG_USER') || define('MAUTIC_AUDITLOG_USER', $user->getName());
+
+        return $user;
     }
 }

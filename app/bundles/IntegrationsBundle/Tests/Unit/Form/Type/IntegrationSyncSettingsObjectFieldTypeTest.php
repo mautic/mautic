@@ -68,47 +68,46 @@ final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framewor
         $field->method('isToIntegrationSyncEnabled')->willReturn(true);
         $field->method('isToMauticSyncEnabled')->willReturn(true);
 
-        $this->formBuilder->expects($this->at(0))
+        $this->formBuilder->expects($this->exactly(2))
             ->method('add')
-            ->with(
-                'mappedField',
-                ChoiceType::class,
+            ->withConsecutive(
                 [
-                    'label'          => false,
-                    'choices'        => [
-                        'Mautic Field A' => 'mautic_field_a',
-                        'Mautic Field B' => 'mautic_field_b',
+                    'mappedField',
+                    ChoiceType::class,
+                    [
+                        'label'          => false,
+                        'choices'        => [
+                            'Mautic Field A' => 'mautic_field_a',
+                            'Mautic Field B' => 'mautic_field_b',
+                        ],
+                        'required'       => true,
+                        'placeholder'    => '',
+                        'error_bubbling' => false,
+                        'attr'           => [
+                            'class'            => 'form-control integration-mapped-field',
+                            'data-placeholder' => $options['placeholder'],
+                            'data-object'      => $options['object'],
+                            'data-integration' => $options['integration'],
+                            'data-field'       => 'Integration Field A',
+                        ],
                     ],
-                    'required'       => true,
-                    'placeholder'    => '',
-                    'error_bubbling' => false,
-                    'attr'           => [
-                        'class'            => 'form-control integration-mapped-field',
-                        'data-placeholder' => $options['placeholder'],
-                        'data-object'      => $options['object'],
-                        'data-integration' => $options['integration'],
-                        'data-field'       => 'Integration Field A',
-                    ],
-                ]
-            );
-
-        $this->formBuilder->expects($this->at(1))
-            ->method('add')
-            ->with(
-                'syncDirection',
-                ChoiceType::class,
+                ],
                 [
-                    'choices' => [
-                        'mautic.integration.sync_direction_integration' => ObjectMappingDAO::SYNC_TO_INTEGRATION,
-                        'mautic.integration.sync_direction_mautic'      => ObjectMappingDAO::SYNC_TO_MAUTIC,
-                    ],
-                    'label'      => false,
-                    'empty_data' => ObjectMappingDAO::SYNC_TO_INTEGRATION,
-                    'attr'       => [
-                        'class'            => 'integration-sync-direction',
-                        'data-object'      => 'Object A',
-                        'data-integration' => 'Integration A',
-                        'data-field'       => 'Integration Field A',
+                    'syncDirection',
+                    ChoiceType::class,
+                    [
+                        'choices' => [
+                            'mautic.integration.sync_direction_integration' => ObjectMappingDAO::SYNC_TO_INTEGRATION,
+                            'mautic.integration.sync_direction_mautic'      => ObjectMappingDAO::SYNC_TO_MAUTIC,
+                        ],
+                        'label'      => false,
+                        'empty_data' => ObjectMappingDAO::SYNC_TO_INTEGRATION,
+                        'attr'       => [
+                            'class'            => 'integration-sync-direction',
+                            'data-object'      => 'Object A',
+                            'data-integration' => 'Integration A',
+                            'data-field'       => 'Integration Field A',
+                        ],
                     ],
                 ]
             );

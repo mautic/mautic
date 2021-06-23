@@ -16,9 +16,9 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-        matrix:
-          php-versions: ['7.4']
-          db-types: ['mysql', 'mariadb']
+      matrix:
+        php-versions: ['7.4']
+        db-types: ['mysql', 'mariadb']
   
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
@@ -53,6 +53,7 @@ jobs:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
         coverage: pcov
+        ini-values: pcov.directory=., pcov.exclude="~tests|themes|vendor~"
     
     - name: Set SYMFONY_ENV to test
       run: echo "SYMFONY_ENV=test" >> $GITHUB_ENV
@@ -80,7 +81,6 @@ jobs:
 
         if [[ "${{ matrix.php-versions }}" == "7.4" ]] && [[ "${{ matrix.db-types }}" == "mysql" ]]; then
           composer test -- --coverage-clover=coverage.xml
-          bash <(curl -s https://codecov.io/bash)
         else
           composer test
         fi
@@ -94,6 +94,13 @@ jobs:
         export DB_PORT=${!DB_PORT_STRING}
 
         composer test -- plugins/MauticCrmBundle/Tests/Pipedrive
+
+    - name: Upload coverage report
+      if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' }}
+      uses: codecov/codecov-action@v1
+      with:
+        files: ./coverage.xml
+        fail_ci_if_error: true
 
     - name: Slack Notification if tests fail
       uses: rtCamp/action-slack-notify@v2
@@ -115,12 +122,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'Rector', 'CS Fixer']
+        commands: ['PHPSTAN', 'CS Fixer']
 
     name: ${{ matrix.commands }}
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v6.2
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
@@ -140,8 +153,14 @@ jobs:
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           composer rector -- --dry-run --no-progress-bar
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
-          bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots \
-          --diff $(git diff -- '*.php' --name-only --diff-filter=ACMRTUXB "HEAD~..HEAD")
+          for file in ${{ steps.changed-files.outputs.all_modified_files }}; do
+            if [[ $file == *.php ]]; then
+              cs_fix_files="${cs_fix_files} $file"
+            fi
+          done
+          if [[ $cs_fix_files ]]; then
+            bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots --diff $cs_fix_files
+          fi
         else
           echo "Invalid command"
           exit 1
