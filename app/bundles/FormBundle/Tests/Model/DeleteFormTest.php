@@ -15,7 +15,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Helper\FormFieldHelper;
@@ -44,7 +44,7 @@ class DeleteFormTest extends FormTestAbstract
             ->getMock();
 
         $themeHelper = $this
-            ->getMockBuilder(ThemeHelper::class)
+            ->getMockBuilder(ThemeHelperInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 

@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Translation\Translator;
@@ -69,7 +69,7 @@ class FormTestAbstract extends TestCase
     {
         $requestStack         = $this->createMock(RequestStack::class);
         $templatingHelperMock = $this->createMock(TemplatingHelper::class);
-        $themeHelper          = $this->createMock(ThemeHelper::class);
+        $themeHelper          = $this->createMock(ThemeHelperInterface::class);
         $formActionModel      = $this->createMock(ActionModel::class);
         $formFieldModel       = $this->createMock(FieldModel::class);
         $fieldHelper          = $this->createMock(FormFieldHelper::class);

@@ -1178,6 +1178,7 @@ return [
         'image_path'                      => 'media/images',
         'tmp_path'                        => '%kernel.root_dir%/../var/tmp',
         'theme'                           => 'blank',
+        'blank_theme'                     => 'blank',
         'theme_import_allowed_extensions' => ['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'],
         'db_driver'                       => 'pdo_mysql',
         'db_host'                         => '127.0.0.1',

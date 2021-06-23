@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Form\Type\FormListType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
@@ -68,16 +69,23 @@ class EmailType extends AbstractType
      */
     private $coreParametersHelper;
 
+    /**
+     * @var ThemeHelperInterface
+     */
+    private $themeHelper;
+
     public function __construct(
         TranslatorInterface $translator,
         EntityManager $entityManager,
         StageModel $stageModel,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        ThemeHelperInterface $themeHelper
     ) {
         $this->translator           = $translator;
         $this->em                   = $entityManager;
         $this->stageModel           = $stageModel;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->themeHelper          = $themeHelper;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -212,6 +220,10 @@ class EmailType extends AbstractType
             ]
         );
 
+        $template = $options['data']->getTemplate() ?? 'blank';
+        // If theme does not exist, set empty
+        $template = $this->themeHelper->getCurrentTheme($template, 'email');
+
         $builder->add(
             'template',
             ThemeListType::class,
@@ -221,7 +233,7 @@ class EmailType extends AbstractType
                     'class'   => 'form-control not-chosen hidden',
                     'tooltip' => 'mautic.email.form.template.help',
                 ],
-                'data' => $options['data']->getTemplate() ? $options['data']->getTemplate() : 'blank',
+                'data' => $template,
             ]
         );
 
