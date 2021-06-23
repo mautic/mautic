@@ -38,7 +38,7 @@ class VisitPageWitIpAnonymizationOnFunctionalTest extends MauticMysqlTestCase
         // Logout and visit the landing page.
         $this->client->request(Request::METHOD_GET, '/s/logout');
         $pageContent = $this->client->request(Request::METHOD_GET, '/page-page-anonymizaiton-on');
-        
+
         Assert::assertTrue($this->client->getResponse()->isOk(), $pageContent->text());
         Assert::assertStringContainsString('Test Html', $pageContent->text());
 
