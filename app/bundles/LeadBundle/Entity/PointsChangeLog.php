@@ -13,10 +13,8 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 
-/**
- * Class PointsChangeLog.
- */
 class PointsChangeLog
 {
     public const TABLE_NAME = 'lead_points_change_log';
@@ -244,21 +242,17 @@ class PointsChangeLog
     }
 
     /**
-     * Set ipAddress.
-     *
      * @return PointsChangeLog
      */
-    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress)
     {
-        $this->ipAddress = !$ipAddress->isAnonymizationEnabled() ? $ipAddress : null;
+        $this->ipAddress = $ipAddress;
 
         return $this;
     }
 
     /**
-     * Get ipAddress.
-     *
-     * @return \Mautic\CoreBundle\Entity\IpAddress
+     * @return IpAddress
      */
     public function getIpAddress()
     {

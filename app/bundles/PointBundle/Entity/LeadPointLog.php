@@ -13,6 +13,7 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 
 class LeadPointLog
 {
@@ -76,7 +77,7 @@ class LeadPointLog
     }
 
     /**
-     * @return mixed
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -84,11 +85,11 @@ class LeadPointLog
     }
 
     /**
-     * @param mixed $ipAddress
+     * @param IpAddress $ipAddress
      */
     public function setIpAddress($ipAddress)
     {
-        $this->ipAddress = !$ipAddress->isAnonymizationEnabled() ? $ipAddress : null;
+        $this->ipAddress = $ipAddress;
     }
 
     /**

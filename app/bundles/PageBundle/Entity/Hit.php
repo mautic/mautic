@@ -14,13 +14,11 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
-/**
- * Class Hit.
- */
 class Hit
 {
     public const TABLE_NAME = 'page_hits';
@@ -647,21 +645,17 @@ class Hit
     }
 
     /**
-     * Set ipAddress.
-     *
      * @return Hit
      */
-    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress)
     {
-        $this->ipAddress = !$ipAddress->isAnonymizationEnabled() ? $ipAddress : null;
+        $this->ipAddress = $ipAddress;
 
         return $this;
     }
 
     /**
-     * Get ipAddress.
-     *
-     * @return \Mautic\CoreBundle\Entity\IpAddress
+     * @return IpAddress
      */
     public function getIpAddress()
     {

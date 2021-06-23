@@ -17,9 +17,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
-/**
- * Class StatDevice.
- */
 class StatDevice
 {
     public const TABLE_NAME = 'email_stats_devices';
@@ -108,12 +105,9 @@ class StatDevice
         return $this->ipAddress;
     }
 
-    /**
-     * @param mixed $ip
-     */
     public function setIpAddress(IpAddress $ip)
     {
-        $this->ipAddress = !$ip->isAnonymizationEnabled() ? $ip : null;
+        $this->ipAddress = $ip;
     }
 
     /**

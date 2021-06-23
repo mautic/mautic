@@ -13,10 +13,8 @@ namespace Mautic\StageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 
-/**
- * Class LeadStageLog.
- */
 class LeadStageLog
 {
     public const TABLE_NAME = 'stage_lead_action_log';
@@ -80,7 +78,7 @@ class LeadStageLog
     }
 
     /**
-     * @return mixed
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -88,11 +86,11 @@ class LeadStageLog
     }
 
     /**
-     * @param mixed $ipAddress
+     * @param IpAddress $ipAddress
      */
     public function setIpAddress($ipAddress)
     {
-        $this->ipAddress = !$ipAddress->isAnonymizationEnabled() ? $ipAddress : null;
+        $this->ipAddress = $ipAddress;
     }
 
     /**

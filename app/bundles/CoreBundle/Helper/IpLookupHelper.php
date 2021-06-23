@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -131,6 +132,7 @@ class IpLookupHelper
         static $ipAddresses       = [];
         $request                  = $this->requestStack->getCurrentRequest();
         $isIpAnonymizationEnabled = (bool) $this->coreParametersHelper->get('anonymize_ip');
+
         if (null === $ip) {
             $ip = $this->getIpAddressFromRequest();
         }
@@ -142,11 +144,16 @@ class IpLookupHelper
 
         $this->realIp = $ip;
 
+        if ($isIpAnonymizationEnabled) {
+            $ip = '*.*.*.*';
+        }
+
         if (empty($ipAddresses[$ip])) {
             $ipAddress = null;
             $saveIp    = false;
             if (!$isIpAnonymizationEnabled) {
-                $repo      = $this->em->getRepository('MauticCoreBundle:IpAddress');
+                /** @var IpAddressRepository $repo */
+                $repo      = $this->em->getRepository(IpAddress::class);
                 $ipAddress = $repo->findOneByIpAddress($ip);
                 $saveIp    = (null === $ipAddress);
             }

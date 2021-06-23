@@ -18,9 +18,6 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 
-/**
- * Class Submission.
- */
 class Submission
 {
     public const TABLE_NAME = 'form_submissions';
@@ -225,23 +222,17 @@ class Submission
     }
 
     /**
-     * Set ipAddress.
-     *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
-     *
      * @return Submission
      */
     public function setIpAddress(IpAddress $ipAddress = null)
     {
-        $this->ipAddress = !$ipAddress->isAnonymizationEnabled() ? $ipAddress : null;
+        $this->ipAddress = $ipAddress;
 
         return $this;
     }
 
     /**
-     * Get ipAddress.
-     *
-     * @return \Mautic\CoreBundle\Entity\IpAddress
+     * @return IpAddress
      */
     public function getIpAddress()
     {

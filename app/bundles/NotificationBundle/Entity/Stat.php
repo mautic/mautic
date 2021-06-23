@@ -17,9 +17,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class Stat.
- */
 class Stat
 {
     public const TABLE_NAME = 'push_notification_stats';
@@ -267,19 +264,16 @@ class Stat
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
         return $this->ipAddress;
     }
 
-    /**
-     * @param mixed $ip
-     */
     public function setIpAddress(IpAddress $ip)
     {
-        $this->ipAddress = !$ip->isAnonymizationEnabled() ? $ip : null;
+        $this->ipAddress = $ip;
     }
 
     /**

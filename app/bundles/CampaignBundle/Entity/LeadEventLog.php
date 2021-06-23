@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 class LeadEventLog implements ChannelInterface
 {
     public const TABLE_NAME = 'campaign_lead_event_log';
+
     /**
      * @var int|null
      */
@@ -259,7 +260,7 @@ class LeadEventLog implements ChannelInterface
      */
     public function setIpAddress(IpAddress $ipAddress)
     {
-        $this->ipAddress = !$ipAddress->isAnonymizationEnabled() ? $ipAddress : null;
+        $this->ipAddress = $ipAddress;
 
         return $this;
     }

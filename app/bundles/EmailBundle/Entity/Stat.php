@@ -321,12 +321,9 @@ class Stat
         return $this->ipAddress;
     }
 
-    /**
-     * @param IpAddress|null $ip
-     */
     public function setIpAddress(IpAddress $ip)
     {
-        $this->ipAddress = !$ip->isAnonymizationEnabled() ? $ip : null;
+        $this->ipAddress = $ip;
     }
 
     /**

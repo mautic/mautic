@@ -241,7 +241,7 @@ class Stat
      */
     public function setIpAddress(IpAddress $ipAddress)
     {
-        $this->ipAddress = !$ipAddress->isAnonymizationEnabled() ? $ipAddress : null;
+        $this->ipAddress = $ipAddress;
 
         return $this;
     }
