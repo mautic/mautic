@@ -313,7 +313,7 @@ class Report extends FormEntity implements SchedulerInterface
     /**
      * Set columns.
      *
-     * @param string $columns
+     * @param array $columns
      *
      * @return Report
      */
