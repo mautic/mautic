@@ -541,6 +541,8 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.lead.model.list',
+                    'translator',
                 ],
             ],
             'mautic.lead.serializer.subscriber' => [
@@ -804,6 +806,14 @@ return [
                 'arguments' => ['mautic.lead.repository.lead_list', 'mautic.helper.user'],
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'uniqueleadlist',
+            ],
+            'mautic.lead_list.constraint.in_use' => [
+                'class'     => Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUseValidator::class,
+                'arguments' => [
+                    'mautic.lead.model.list',
+                ],
+                'tag'       => 'validator.constraint_validator',
+                'alias'     => 'segment_in_use',
             ],
             'mautic.lead.event.dispatcher' => [
                 'class'     => \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::class,
