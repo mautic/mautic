@@ -576,6 +576,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->select(
                         'e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed'
                     )
+                        ->andWhere('es.is_failed = 1')
                         ->having('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0')
                         ->groupBy('e.id, e.subject')
                         ->orderBy('failed', 'DESC');
