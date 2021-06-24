@@ -151,19 +151,16 @@ class IpLookupHelper
         if (empty($ipAddresses[$ip])) {
             $ipAddress = null;
             $saveIp    = false;
-            if (!$isIpAnonymizationEnabled) {
-                /** @var IpAddressRepository $repo */
-                $repo      = $this->em->getRepository(IpAddress::class);
-                $ipAddress = $repo->findOneByIpAddress($ip);
-                $saveIp    = (null === $ipAddress);
-            }
+
+            /** @var IpAddressRepository $repo */
+            $repo      = $this->em->getRepository(IpAddress::class);
+            $ipAddress = $repo->findOneByIpAddress($ip);
+            $saveIp    = (null === $ipAddress);
 
             if (null === $ipAddress) {
                 $ipAddress = new IpAddress();
                 $ipAddress->setIpAddress($ip);
             }
-
-            $ipAddress->setIsAnonymize($isIpAnonymizationEnabled);
 
             // Ensure the do not track list is inserted
             if (!is_array($this->doNotTrackIps)) {

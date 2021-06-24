@@ -612,7 +612,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function addIpAddress(IpAddress $ipAddress)
     {
-        if (!$ipAddress->isTrackable() || $ipAddress->isAnonymizationEnabled()) {
+        if (!$ipAddress->isTrackable()) {
             return $this;
         }
 
