@@ -16,8 +16,6 @@ namespace Mautic\CoreBundle\Entity;
  */
 class IpAddressRepository extends CommonRepository
 {
-    const DELETE_BATCH_SIZE = 10000;
-
     /**
      * Count how many unique IP addresses is there.
      *
@@ -109,16 +107,13 @@ SQL;
     /**
      * @throws DBALException
      */
-    public function deleteAllIpAddress(): int
+    public function anonymizeAllIpAddress(): int
     {
-        $totalDeletedIps = 0;
-        $table_name      = $this->getTableName();
-        $sql             = "DELETE FROM {$table_name} LIMIT ".self::DELETE_BATCH_SIZE;
-        $conn            = $this->getEntityManager()->getConnection();
-        while ($deletedRecords = $conn->executeQuery($sql)->rowCount()) {
-            $totalDeletedIps += $deletedRecords;
-        }
+        $table_name        = $this->getTableName();
+        $sql               = "UPDATE {$table_name} SET ip_address = '*.*.*.*' WHERE ip_address != '*.*.*.*'";
+        $conn              = $this->getEntityManager()->getConnection();
+        $anonymizedRecords = $conn->executeQuery($sql)->rowCount();
 
-        return $totalDeletedIps;
+        return $anonymizedRecords;
     }
 }

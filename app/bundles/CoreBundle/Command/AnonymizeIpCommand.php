@@ -54,10 +54,10 @@ class AnonymizeIpCommand extends Command
             return $this->exitWithError('Anonymization could not be done because anonymize Ip feature is disabled for this instance.', $output);
         }
         try {
-            $deletedRows = $this->ipAddressRepository->deleteAllIpAddress();
-            $output->writeln(sprintf('<info>%s IP addresses have been deleted</info>', $deletedRows));
+            $deletedRows = $this->ipAddressRepository->anonymizeAllIpAddress();
+            $output->writeln(sprintf('<info>%s IP addresses have been anonymize</info>', $deletedRows));
         } catch (DBALException $e) {
-            return $this->exitWithError(sprintf('Deletion of IP addresses failed because of database error: %s', $e->getMessage()), $output);
+            return $this->exitWithError(sprintf('Anonymization of IP addresses failed because of database error: %s', $e->getMessage()), $output);
         }
 
         return 0;

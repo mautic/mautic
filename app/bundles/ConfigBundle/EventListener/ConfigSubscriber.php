@@ -65,8 +65,8 @@ class ConfigSubscriber implements EventSubscriberInterface
             $oldAnonymizeIp = $originalNormData['trackingconfig']['parameters']['anonymize_ip'];
             $newAnonymizeIp = $normData['trackingconfig']['anonymize_ip'];
 
-            if ($oldAnonymizeIp !== $newAnonymizeIp && $newAnonymizeIp && !$this->coreParametersHelper->get('delete_ip_address_in_background', false)) {
-                $this->ipAddressRepository->deleteAllIpAddress();
+            if ($oldAnonymizeIp !== $newAnonymizeIp && $newAnonymizeIp && !$this->coreParametersHelper->get('anonymize_ip_address_in_background', false)) {
+                $this->ipAddressRepository->anonymizeAllIpAddress();
             }
         }
     }
