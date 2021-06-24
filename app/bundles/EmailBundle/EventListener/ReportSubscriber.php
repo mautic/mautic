@@ -424,6 +424,10 @@ class ReportSubscriber implements EventSubscriberInterface
                     $event->addCompanyLeftJoin($qb);
                 }
 
+                if (!$event->hasGroupBy()) {
+                    $qb->groupBy('es.id');
+                }
+
                 break;
         }
 

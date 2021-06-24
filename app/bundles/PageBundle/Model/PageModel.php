@@ -739,15 +739,19 @@ class PageModel extends FormModel
      */
     public function getHitQuery(Request $request, $page = null)
     {
-        // get all post params
-        $query = $request->request->all();
+        $get  = $request->query->all();
+        $post = $request->request->all();
+
+        $query = \array_merge($get, $post);
 
         // Set generated page url
         $query['page_url'] = $this->getPageUrl($request, $page);
 
         // get all params from the url (actual url or passed in as page_url)
-        $queryUrl = $this->getQueryFromUrl($query['page_url']);
-        $query    = \array_merge($queryUrl, $query);
+        if (!empty($query['page_url'])) {
+            $queryUrl = $this->getQueryFromUrl($query['page_url']);
+            $query    = \array_merge($queryUrl, $query);
+        }
 
         // Process clickthrough if applicable
         if (!empty($query['ct'])) {
