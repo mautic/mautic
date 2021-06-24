@@ -55,7 +55,7 @@ class AnonymizeIpCommand extends Command
         }
         try {
             $deletedRows = $this->ipAddressRepository->anonymizeAllIpAddress();
-            $output->writeln(sprintf('<info>%s IP addresses have been anonymize</info>', $deletedRows));
+            $output->writeln(sprintf('<info>%s IP addresses have been anonymized</info>', $deletedRows));
         } catch (DBALException $e) {
             return $this->exitWithError(sprintf('Anonymization of IP addresses failed because of database error: %s', $e->getMessage()), $output);
         }
