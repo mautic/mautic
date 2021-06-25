@@ -40,15 +40,17 @@ class AnonymizeIpCommandTest extends MauticMysqlTestCase
         $this->createIpAddress();
 
         $this->runCommand(AnonymizeIpCommand::COMMAND_NAME);
-
+        $this->em->clear();
         $ipAddressList = $this->em->getRepository(IpAddress::class)->findBy(['ipAddress' => '*.*.*.*']);
         Assert::assertCount(1, $ipAddressList);
+        Assert::assertNull($ipAddressList[0]->getIpDetails());
     }
 
     private function createIpAddress(): IpAddress
     {
         $ipAddress = new IpAddress();
         $ipAddress->setIpAddress('192.168.8.9');
+        $ipAddress->setIpDetails(['city' => 'Boston', 'region' => 'MA', 'country' => 'United States', 'zipcode' => '02113']);
         $this->em->persist($ipAddress);
         $this->em->flush();
 
