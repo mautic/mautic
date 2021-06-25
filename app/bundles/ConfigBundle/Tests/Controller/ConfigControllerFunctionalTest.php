@@ -220,5 +220,38 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
         Assert::assertEquals($page3, $form['config[coreconfig][404_page]']->getValue());
+        // re-create the Symfony client to make config changes applied
+        $this->setUpSymfony();
+
+        // Request not found url page3 page content should be rendered
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/editnotfoundurlblablabla');
+        $this->assertStringContainsString('Page3 Test Html', $crawler->text());
+    }
+
+    public function testConfigNotificationConfiguration(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+
+        // Find save & close button
+        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+
+        $send_notification_to_author  = 0;
+        $notification_email_addresses = 'a@test.com, b@test.com';
+
+        $form['config[notification_config][send_notification_to_author]']->setValue($send_notification_to_author);
+        $form['config[notification_config][notification_email_addresses]']->setValue($notification_email_addresses);
+        $form['config[coreconfig][site_url]']->setValue('https://mautic-cloud.local');
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        Assert::assertEquals($send_notification_to_author, $form['config[notification_config][send_notification_to_author]']->getValue());
+        Assert::assertEquals($notification_email_addresses, $form['config[notification_config][notification_email_addresses]']->getValue());
+
+        // re-create the Symfony client to make config changes applied
+        $this->setUpSymfony();
     }
 }

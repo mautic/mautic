@@ -30,8 +30,9 @@ class NotificationConfigType extends AbstractType
             [
                 'label' => 'mautic.notification.form.config.send_notification_to_author',
                 'attr'  => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.notification.form.config.send_notification_to_author.tooltip',
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.notification.form.config.send_notification_to_author.tooltip',
+                    'onchange' => 'Mautic.resetEmailsToNotification(this.value)',
                 ],
             ]
         );
@@ -43,7 +44,6 @@ class NotificationConfigType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'placeholder'  => 'mautic.core.optional',
                     'tooltip'      => 'mautic.notification.form.config.notification_email_addresses.tooltip',
                     'data-show-on' => '{"config_notification_config_send_notification_to_author_0":"checked"}',
                 ],

@@ -66,4 +66,23 @@ Mautic.observeConfigTabs = function() {
         }
     });
 }
+
+Mautic.showAnonymizeWarningMessage = function(anonymize_ip) {
+    if (parseInt(anonymize_ip, 10) === 1)
+    {
+        mQuery('.anonymize_ip_address').removeClass('hide');
+    }
+    else
+    {
+        mQuery('.anonymize_ip_address').addClass('hide');
+    }
+};
+
+Mautic.resetEmailsToNotification = function(send_to_owner) {
+    if (parseInt(send_to_owner, 10) === 1)
+    {
+        mQuery('#config_notification_config_notification_email_addresses').val('');
+    }
+};
+
 mQuery(Mautic.observeConfigTabs);
