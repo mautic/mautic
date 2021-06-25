@@ -78,6 +78,68 @@ class NotificationHelper
         );
     }
 
+    public function notifyOfUnpublish(Event $event): void
+    {
+        /**
+         * Pass a fake lead so we can just get the campaign creator.
+         */
+        $user = $this->getUser(new Lead(), $event);
+
+        if (!$user || !$user->getId()) {
+            return;
+        }
+
+        $campaign = $event->getCampaign();
+
+        // Campaign is already unpublished, do not trigger further notification/email
+        if (!$campaign->isPublished()) {
+            return;
+        }
+
+        $this->notificationModel->addNotification(
+            $campaign->getName().' / '.$event->getName(),
+            'error',
+            false,
+            $this->translator->trans(
+                'mautic.campaign.event.failed.campaign.unpublished',
+                [
+                    '%campaign%' => '<a href="'.$this->router->generate(
+                            'mautic_campaign_action',
+                            ['objectAction' => 'view', 'objectId' => $campaign->getId()]
+                        ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
+                    '%event%' => $event->getName(),
+                ]
+            ),
+            null,
+            null,
+            $user
+        );
+
+        $this->userModel->emailUser(
+            $user,
+            $this->translator->trans(
+                'mautic.campaign.event.campaign_unpublished.title',
+                [
+                    '%title%' => $campaign->getName(),
+                ]
+            ),
+            $this->translator->trans(
+                'mautic.campaign.event.failed.campaign.unpublished',
+                [
+                    '%campaign%' => '<a href="'.$this->router->generate(
+                        'mautic_campaign_action',
+                        [
+                            'objectAction' => 'view',
+                            'objectId'     => $campaign->getId(),
+                        ],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
+                    '%event%' => $event->getName(),
+                ]
+            )
+        );
+    }
+
     /**
      * @return User
      */
