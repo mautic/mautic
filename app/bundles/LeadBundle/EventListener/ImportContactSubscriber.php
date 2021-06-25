@@ -102,7 +102,8 @@ final class ImportContactSubscriber implements EventSubscriberInterface
                 $event->import->getDefault('tags'),
                 true,
                 $event->eventLog,
-                (int) $event->import->getId()
+                (int) $event->import->getId(),
+                $event->import->getDefault('skip_if_exists')
             );
             $event->setWasMerged((bool) $merged);
             $event->stopPropagation();

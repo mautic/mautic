@@ -391,6 +391,9 @@ class ImportController extends FormController
                             unset($matchedFields['tags']);
                         }
 
+                        $skipIfExists = $matchedFields['skip_if_exists'];
+                        unset($matchedFields['skip_if_exists']);
+
                         foreach ($matchedFields as $k => $f) {
                             if (empty($f)) {
                                 unset($matchedFields[$k]);
@@ -420,6 +423,7 @@ class ImportController extends FormController
                                 ->setDefault('owner', $defaultOwner)
                                 ->setDefault('list', $list)
                                 ->setDefault('tags', $tags)
+                                ->setDefault('skip_if_exists', $skipIfExists)
                                 ->setHeaders($session->get('mautic.'.$object.'.import.headers'))
                                 ->setParserConfig($session->get('mautic.'.$object.'.import.config'));
 
