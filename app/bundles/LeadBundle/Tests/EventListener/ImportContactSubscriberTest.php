@@ -162,7 +162,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
-                public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, ?LeadEventLog $eventLog = null, $importId = null)
+                public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false)
                 {
                     return true;
                 }
