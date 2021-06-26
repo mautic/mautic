@@ -134,7 +134,6 @@ class WebhookType extends AbstractType
             ChoiceType::class,
             [
                 'choices' => [
-                    'mautic.core.form.default'                                  => '',
                     'mautic.webhook.config.event.orderby.chronological'         => Criteria::ASC,
                     'mautic.webhook.config.event.orderby.reverse.chronological' => Criteria::DESC,
                 ],
@@ -143,7 +142,7 @@ class WebhookType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.webhook.config.event.orderby.tooltip',
                 ],
-                'placeholder' => '',
+                'placeholder' => 'mautic.core.form.default',
                 'required'    => false,
             ]
         );

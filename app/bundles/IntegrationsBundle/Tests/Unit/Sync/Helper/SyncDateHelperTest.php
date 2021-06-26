@@ -27,7 +27,7 @@ class SyncDateHelperTest extends TestCase
     {
         $this->syncDateHelper = $this->getMockBuilder(SyncDateHelper::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getLastSyncDateForObject'])
+            ->onlyMethods(['getLastSyncDateForObject'])
             ->getMock();
     }
 

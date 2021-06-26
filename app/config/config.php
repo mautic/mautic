@@ -34,7 +34,9 @@ $container->setParameter('mautic.ip_lookup_services', $bundleMetadataBuilder->ge
 // Load parameters
 include __DIR__.'/parameters.php';
 $container->loadFromExtension('mautic_core');
-$configParameterBag = (new \Mautic\CoreBundle\Loader\ParameterLoader())->getParameterBag();
+$parameterLoader         = new \Mautic\CoreBundle\Loader\ParameterLoader();
+$configParameterBag      = $parameterLoader->getParameterBag();
+$localConfigParameterBag = $parameterLoader->getLocalParameterBag();
 
 // Set template engines
 $engines = ['php', 'twig'];
@@ -114,7 +116,7 @@ $dbalSettings = [
         'point' => 'string',
         'bit'   => 'string',
     ],
-    'server_version' => '%mautic.db_server_version%',
+    'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
 ];
 
 $container->loadFromExtension('doctrine', [
@@ -182,17 +184,12 @@ $container->loadFromExtension('oneup_uploader', [
 
 //FOS Rest for API
 $container->loadFromExtension('fos_rest', [
-    'routing_loader' => [
-        'default_format' => 'json',
-        'include_format' => false,
-    ],
-    'view' => [
+    'routing_loader' => false,
+    'body_listener'  => true,
+    'view'           => [
         'formats' => [
             'json' => true,
             'xml'  => false,
-            'html' => false,
-        ],
-        'templating_formats' => [
             'html' => false,
         ],
     ],
@@ -212,7 +209,7 @@ $container->loadFromExtension('jms_serializer', [
         'lower_case' => false,
     ],
     'metadata' => [
-        'cache'          => 'none',
+        'cache'          => 'file',
         'auto_detection' => false,
         'directories'    => $bundleMetadataBuilder->getSerializerConfig(),
     ],
@@ -306,6 +303,21 @@ $container->loadFromExtension('fm_elfinder', [
             'relative_path'   => false,
             'connector'       => [
                 'debug' => '%kernel.debug%',
+                'binds' => [
+                    'upload.pre mkdir.pre mkfile.pre rename.pre archive.pre ls.pre' => [
+                        'Plugin.Sanitizer.cmdPreprocess',
+                    ],
+                    'upload.presave paste.copyfrom'                                 => [
+                        'Plugin.Sanitizer.onUpLoadPreSave',
+                    ],
+                ],
+                'plugins' => [
+                    'Sanitizer' => [
+                        'enable'   => true,
+                        'targets'  => [' ', '\\', '/', ':', '*', '?', '"', '<', '>', '|'], // target chars
+                        'replace'  => '-', // replace to this
+                    ],
+                ],
                 'roots' => [
                     'local' => [
                         'driver'    => 'Flysystem',

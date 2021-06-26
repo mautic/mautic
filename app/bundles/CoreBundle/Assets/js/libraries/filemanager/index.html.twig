@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <link href="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/jquery-ui/themes/#{theme}/jquery-ui.min.css") }}" rel="stylesheet" type="text/css">
@@ -11,20 +11,36 @@
     <script src="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/elfinder/dist/js/elfinder.min.js") }}"></script>
     <script src="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/elfinder/dist/js/i18n/elfinder.#{locale}.js") }}"></script>
 <script type="text/javascript" charset="utf-8">
+    var editorType = '';
+    var editor = null;
+
     jQuery().ready(function() {
         var $f = jQuery('.elfinder').elfinder({
             url : '{{path('ef_connect', { 'instance': instance, 'homeFolder': homeFolder } )}}',
             lang : '{{locale}}',
             onlyMimes: {{ onlyMimes|raw }},
-            getFileCallback : function(file, elFinderInstance) {
+            getFileCallback : function(file, fm) {
                 let fileUrl = file.url;
                 if (file.baseUrl == '' && typeof window.opener.mauticImagesPath !== 'undefined') {
                     fileUrl = window.opener.mauticImagesPath+'/'+file.name;
                 }
-                window.opener.document.fileManagerInsertImageCallback('textarea.editor', elFinderInstance.convAbsUrl(fileUrl));
+
+                const editorParam = new RegExp('(?:[\?&]|&amp;)editor=([^&]+)', 'i');
+                const editorMatch = window.location.search.match(editorParam);
+                if (editorMatch && editorMatch.length > 1 && editorMatch[1] == 'ckeditor') {
+                    window.opener.CKEDITOR.tools.callFunction((function () {
+                        const reParam = new RegExp('(?:[\?&]|&amp;)CKEditorFuncNum=([^&]+)', 'i');
+                        const match = window.location.search.match(reParam);
+                        return (match && match.length > 1) ? match[1] : '';
+                    })(), fm.convAbsUrl(fileUrl));
+                    fm.destroy();
+                } else {
+                    window.opener.document.fileManagerInsertImageCallback('textarea.editor', fileUrl);
+                }
+
                 window.close();
             }
-    });
+        });
 
         {% if fullscreen %}
         var $window = jQuery(window);

@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
@@ -134,6 +135,18 @@ class LeadImportFieldType extends AbstractType
                 ]
             );
         }
+
+        $builder->add(
+            'skip_if_exists',
+            YesNoButtonGroupType::class,
+            [
+                'label'       => 'mautic.lead.import.skip_if_exists',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'required'    => false,
+                'data'        => false,
+            ]
+        );
 
         $buttons = ['cancel_icon' => 'fa fa-times'];
 

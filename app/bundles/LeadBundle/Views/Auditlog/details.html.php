@@ -32,16 +32,16 @@ switch ($type) {
             $text .= '<tr>';
             if (is_array($values)) {
                 if (count($values) >= 2) {
-                    $text .= "<td>$field</td><td>{$view->escape($values[1])}</td><td>{$view->escape($values[0])}</td>";
+                    $text .= "<td>{$view->escape($field)}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values[1]))}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values[0]))}</td>";
                 } else {
                     $v = '';
                     foreach ($values as $k => $value) {
                         $v = $k.': '.$view->escape(implode(', ', $value));
                     }
-                    $text .= "<td>$field</td><td>{$view->escape($v)}</td><td>&nbsp;</td>";
+                    $text .= "<td>{$view->escape($field)}</td><td>{$view->escape($v)}</td><td>&nbsp;</td>";
                 }
             } else {
-                $text .= "<td>$field</td><td>{$view->escape($values)}</td><td>&nbsp;</td>";
+                $text .= "<td>{$view->escape($field)}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values))}</td><td>&nbsp;</td>";
             }
             $text .= '</tr>';
         }
@@ -59,16 +59,16 @@ switch ($type) {
             $text .= '<tr>';
             if (is_array($values)) {
                 if (count($values) >= 2) {
-                    $text .= "<td>$field</td><td>{$view->escape($values[1])}</td><td>{$view->escape($values[0])}</td>";
+                    $text .= "<td>{$view->escape($field)}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values[1]))}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values[0]))}</td>";
                 } else {
                     $v = '';
                     foreach ($values as $k => $value) {
                         $v = $k.': '.$view->escape(implode(', ', $value));
                     }
-                    $text .= "<td>$field</td><td>$v</td><td>&nbsp;</td>";
+                    $text .= "<td>{$view->escape($field)}</td><td>$v</td><td>&nbsp;</td>";
                 }
             } else {
-                $text .= "<td>{$view->escape($field)}</td><td>{$view->escape($values)}</td><td>&nbsp;</td>";
+                $text .= "<td>{$view->escape($field)}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values))}</td><td>&nbsp;</td>";
             }
             $text .= '</tr>';
         }

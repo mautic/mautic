@@ -2,7 +2,7 @@
   "name": "Paprika",
   "author": "Friendly Automate",
   "authorUrl": "https://friendly.is",
-  "builder": "grapesjsbuilder",
+  "builder": ["grapesjsbuilder"],
   "features": [
     "email"
   ]

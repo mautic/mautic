@@ -11,7 +11,6 @@
 
 namespace Mautic\ApiBundle;
 
-use Mautic\ApiBundle\DependencyInjection\Compiler\OAuthPass;
 use Mautic\ApiBundle\DependencyInjection\Compiler\SerializerPass;
 use Mautic\ApiBundle\DependencyInjection\Factory\ApiFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -29,7 +28,6 @@ class MauticApiBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new OAuthPass());
         $container->addCompilerPass(new SerializerPass());
 
         $extension = $container->getExtension('security');

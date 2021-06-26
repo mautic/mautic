@@ -11,7 +11,7 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
@@ -22,7 +22,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var EntityManager
+     * @var EntityManagerInterface
      */
     private $em;
 
@@ -31,7 +31,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    public function __construct(EntityManager $em, TranslatorInterface $translator)
+    public function __construct(EntityManagerInterface $em, TranslatorInterface $translator)
     {
         $this->em         = $em;
         $this->translator = $translator;

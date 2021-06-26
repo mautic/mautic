@@ -72,6 +72,7 @@ return [
                     'mautic.helper.paths',
                     'mautic.helper.core_parameters',
                     'translator',
+                    'doctrine.dbal.default_connection',
                 ],
             ],
         ],

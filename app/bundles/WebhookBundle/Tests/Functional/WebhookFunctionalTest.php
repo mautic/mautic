@@ -50,6 +50,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
                 Assert::assertSame('://whatever.url', $request->getUri()->getPath());
                 $jsonPayload = json_decode($request->getBody()->getContents(), true);
                 Assert::assertCount(3, $jsonPayload['mautic.lead_post_save_new']);
+                Assert::assertNotEmpty($request->getHeader('Webhook-Signature'));
 
                 ++$this->sendRequestCounter;
 

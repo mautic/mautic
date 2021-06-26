@@ -3,6 +3,9 @@
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\PageBundle\Entity\Page;
+use Symfony\Component\HttpFoundation\Response;
 
 class PageControllerTest extends MauticMysqlTestCase
 {
@@ -38,6 +41,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
         $this->client->request('GET', '/page-page-landingPageTracking');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+
         $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
         if (!empty($leadIdsBeforeTest)) {
             $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
@@ -101,5 +105,53 @@ class PageControllerTest extends MauticMysqlTestCase
         );
         $this->assertCount(1, $eventLogsAfterSecondVisit);
         $this->assertSame(reset($eventLogsAfterFirstVisit)['id'], reset($eventLogsAfterSecondVisit)['id']);
+    }
+
+    /**
+     * Test tracking of a first visit with UTM Tags.
+     */
+    public function testLandingPageWithUtmTracking(): void
+    {
+        $timestamp  = \time();
+        $page       = $this->createTestPage();
+
+        $this->client->request('GET', "{$page->getAlias()}?utm_source=linkedin&utm_medium=social&utm_campaign=mautic&utm_content=".$timestamp);
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), 'page not found');
+
+        if (Response::HTTP_OK === $clientResponse->getStatusCode()) {
+            $allUtmTags    = $this->em->getRepository(UtmTag::class)->getEntities();
+            $this->assertNotCount(0, $allUtmTags);
+
+            foreach ($allUtmTags as $utmTag) {
+                $this->assertSame('linkedin', $utmTag->getUtmSource(), 'utm_source does not match');
+                $this->assertSame('social', $utmTag->getUtmMedium(), 'utm_medium does not match');
+                $this->assertSame('mautic', $utmTag->getUtmCampaign(), 'utm_campaign does not match');
+                $this->assertSame(strval($timestamp), $utmTag->getUtmContent(), 'utm_content does not match');
+            }
+        }
+    }
+
+    /**
+     * Create a page for testing.
+     */
+    protected function createTestPage($pageParams=[]): Page
+    {
+        $page = new Page();
+
+        $title       = $pageParams['title'] ?? 'Page:Page:LandingPageTracking';
+        $alias       = $pageParams['alias'] ?? 'page-page-landingPageTracking';
+        $isPublished = $pageParams['isPublished'] ?? true;
+        $template    = $pageParams['template'] ?? 'blank';
+
+        $page->setTitle($title);
+        $page->setAlias($alias);
+        $page->setIsPublished($isPublished);
+        $page->setTemplate($template);
+
+        $this->em->persist($page);
+        $this->em->flush();
+
+        return $page;
     }
 }

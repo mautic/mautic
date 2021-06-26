@@ -28,7 +28,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Report\FieldsBuilder;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -38,7 +37,6 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -349,16 +347,19 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testNotRelevantContextBuilder()
     {
-        $this->reportBuilderEventMock->expects($this->at(0))
-            ->method('checkContext')
-            ->with([
-                'leads',
-                'lead.pointlog',
-                'contact.attribution.multi',
-                'contact.attribution.first',
-                'contact.attribution.last',
-                'contact.frequencyrules',
-            ])->willReturn(false);
+        $this->reportBuilderEventMock->method('checkContext')
+            ->withConsecutive(
+                [
+                    [
+                        'leads',
+                        'lead.pointlog',
+                        'contact.attribution.multi',
+                        'contact.attribution.first',
+                        'contact.attribution.last',
+                        'contact.frequencyrules',
+                    ],
+                ]
+            )->willReturn(false);
 
         $this->reportBuilderEventMock->expects($this->never())
             ->method('addTable');
@@ -368,19 +369,22 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testNotRelevantContextGenerate()
     {
-        $this->reportGeneratorEventMock->expects($this->at(0))
-            ->method('checkContext')
-            ->with(['leads',
-            'lead.pointlog',
-            'contact.attribution.multi',
-            'contact.attribution.first',
-            'contact.attribution.last',
-            'contact.frequencyrules',
-            ])->willReturn(false);
-
-        $this->reportGeneratorEventMock->expects($this->at(1))
-            ->method('checkContext')
-            ->with(['companies'])->willReturn(false);
+        $this->reportGeneratorEventMock->method('checkContext')
+            ->withConsecutive(
+                [
+                    [
+                        'leads',
+                        'lead.pointlog',
+                        'contact.attribution.multi',
+                        'contact.attribution.first',
+                        'contact.attribution.last',
+                        'contact.frequencyrules',
+                    ],
+                ],
+                [
+                    ['companies'],
+                ]
+            )->willReturn(false);
 
         $this->reportGeneratorEventMock->expects($this->never())
             ->method('getQueryBuilder');
@@ -450,6 +454,23 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
         switch ($event) {
             case 'leads':
+                $expected['leads']['columns']['l.stage_id'] = [
+                    'label' => null,
+                    'type'  => 'int',
+                    'link'  => 'mautic_stage_action',
+                    'alias' => 'stage_id',
+                ];
+                $expected['leads']['columns']['s.name'] = [
+                    'alias' => 'stage_name',
+                    'label' => null,
+                    'type'  => 'string',
+                ];
+                $expected['leads']['columns']['s.date_added'] = [
+                    'alias'   => 'stage_date_added',
+                    'label'   => null,
+                    'type'    => 'string',
+                    'formula' => '(SELECT MAX(stage_log.date_added) FROM lead_stages_change_log stage_log WHERE stage_log.stage_id = l.stage_id AND stage_log.lead_id = l.id)',
+                ];
                 break;
             case 'contact.frequencyrules':
                 $expected['contact.frequencyrules'] = [
@@ -829,22 +850,25 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider eventDataProvider
      */
-    public function testReportGenerate($event)
+    public function testReportGenerate($context)
     {
-        $this->reportGeneratorEventMock->expects($this->at(0))
-        ->method('checkContext')
-        ->with(['leads',
-        'lead.pointlog',
-        'contact.attribution.multi',
-        'contact.attribution.first',
-        'contact.attribution.last',
-        'contact.frequencyrules',
-        ])
-        ->willReturn(true);
+        $this->reportGeneratorEventMock->method('checkContext')
+            ->withConsecutive(
+                [
+                    [
+                        'leads',
+                        'lead.pointlog',
+                        'contact.attribution.multi',
+                        'contact.attribution.first',
+                        'contact.attribution.last',
+                        'contact.frequencyrules',
+                    ],
+                ]
+            )->willReturn(true);
 
         $this->reportGeneratorEventMock->expects($this->once())
             ->method('getContext')
-            ->willReturn($event);
+            ->willReturn($context);
 
         $this->reportGeneratorEventMock->expects($this->once())
             ->method('getQueryBuilder')
@@ -884,7 +908,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $mockStmt = $this->getMockBuilder(PDOStatement::class)
             ->disableOriginalConstructor()
-            ->setMethods(['fetchAll'])
+            ->onlyMethods(['fetchAll'])
             ->getMock();
 
         $this->reportGraphEventMock->expects($this->once())
@@ -893,7 +917,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $mockChartQuery = $this->getMockBuilder(ChartQuery::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'modifyCountQuery',
                 'modifyTimeDataQuery',
                 'loadAndBuildTimeData',

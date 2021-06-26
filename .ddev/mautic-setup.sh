@@ -5,6 +5,7 @@ setup_mautic() {
     composer install
 
     cp ./.ddev/local.config.php.dist ./app/config/local.php
+    cp ./.env.dist ./.env
 
     printf "Installing Mautic...\n"
     php bin/console mautic:install https://${DDEV_HOSTNAME} \

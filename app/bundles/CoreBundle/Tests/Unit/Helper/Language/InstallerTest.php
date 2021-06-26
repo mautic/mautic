@@ -38,11 +38,11 @@ class InstallerTest extends \PHPUnit\Framework\TestCase
         $this->assertFileExists($languagePath.'/config.json');
 
         // did it ignore the php config?
-        $this->assertFileNotExists($languagePath.'/config.php');
+        $this->assertFileDoesNotExist($languagePath.'/config.php');
 
         // did it ignore the extra files?
-        $this->assertFileNotExists($languagePath.'/random.txt');
-        $this->assertFileNotExists($languagePath.'/RandomFolder');
+        $this->assertFileDoesNotExist($languagePath.'/random.txt');
+        $this->assertFileDoesNotExist($languagePath.'/RandomFolder');
 
         // did it create the bundles?
         $this->assertFileExists($languagePath.'/CoreBundle');
@@ -55,12 +55,12 @@ class InstallerTest extends \PHPUnit\Framework\TestCase
         $this->assertFileExists($languagePath.'/CampaignBundle/flashes.ini');
 
         // did it ignore the bundle's extra files?
-        $this->assertFileNotExists($languagePath.'/CoreBundle/random.txt');
+        $this->assertFileDoesNotExist($languagePath.'/CoreBundle/random.txt');
 
         // did the installer cleanup appropriately
         $this->assertFileExists($translationsDirectory.'/tmp/es');
         $installer->cleanup();
-        $this->assertFileNotExists($translationsDirectory.'/tmp/es');
+        $this->assertFileDoesNotExist($translationsDirectory.'/tmp/es');
 
         // cleanup the test
         (new Filesystem())->remove($languagePath);

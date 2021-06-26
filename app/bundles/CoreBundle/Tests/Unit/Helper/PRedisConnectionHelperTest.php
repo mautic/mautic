@@ -34,7 +34,7 @@ class PRedisConnectionHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertIsArray($connInfo);
         $this->assertGreaterThan(1, count($connInfo));
         foreach ($connInfo as $c) {
-            $this->assertRegExp('/^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:[.](?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/', $c['host']);
+            $this->assertMatchesRegularExpression('/^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:[.](?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/', $c['host']);
             $this->assertEquals('tcp', $c['scheme']);
             $this->assertEquals(8888, $c['port']);
             $this->assertEquals('test=car', $c['query']);

@@ -1,0 +1,74 @@
+{
+    "name": "Example - Email Overview",
+    "description": "Example layout with an overview of emails.",
+    "widgets": [
+        {
+            "name": "Emails sent \/ opened",
+            "width": 100,
+            "height": 330,
+            "ordering": 0,
+            "type": "emails.in.time",
+            "params": {
+                "flag": "sent_and_opened"
+            },
+            "template": null
+        },
+        {
+            "name": "Upcoming emails",
+            "width": 25,
+            "height": 330,
+            "ordering": 1,
+            "type": "upcoming.emails",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Ignored\/opened emails",
+            "width": 25,
+            "height": 330,
+            "ordering": 2,
+            "type": "ignored.vs.read.emails",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Most sent emails",
+            "width": 25,
+            "height": 330,
+            "ordering": 3,
+            "type": "most.sent.emails",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Most read emails",
+            "width": 25,
+            "height": 330,
+            "ordering": 4,
+            "type": "most.read.emails",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Contact map",
+            "width": 50,
+            "height": 330,
+            "ordering": 5,
+            "type": "map.of.leads",
+            "params": [],
+            "template": null
+        },
+        {
+            "name": "Contacts created",
+            "width": 50,
+            "height": 330,
+            "ordering": 6,
+            "type": "created.leads.in.time",
+            "params": {
+                "lists": "identifiedVsAnonymous",
+                "flag": null
+            },
+            "template": null
+        }
+    ]
+}
