@@ -210,6 +210,14 @@ class BuilderSubscriber implements EventSubscriberInterface
                 SlotSeparatorType::class,
                 400
             );
+            $event->addSlotType(
+                'signature',
+                $this->translator->trans('mautic.core.slot.label.signature'),
+                'pencil',
+                'MauticCoreBundle:Slots:signature.html.php',
+                'slot_signature',
+                360
+            );
 
             $event->addSlotType(
                 'dynamicContent',
