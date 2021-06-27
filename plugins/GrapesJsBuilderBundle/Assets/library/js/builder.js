@@ -1,9 +1,11 @@
 import AssetService from './asset.service';
 import BuilderService from './builder.service';
 // import grapesjsmautic from 'grapesjs-preset-mautic/src/content.service';
-// import 'grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css';
-import 'grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.css';
+
+// all css get combined into one builder.css and automatically loaded via js/parcel
 import 'grapesjs/dist/css/grapes.min.css';
+import 'grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css';
+import 'grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.css';
 import './grapesjs-custom.css';
 
 /**
