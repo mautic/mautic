@@ -691,7 +691,7 @@ class CommonController extends Controller implements MauticController
         }
 
         if (null == $icon) {
-            $icon = 'media/images/favicon.ico';
+            $icon = 'app/assets/images/favicon.ico';
         }
 
         if (0 !== strpos($icon, 'http')) {
