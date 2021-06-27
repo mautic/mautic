@@ -177,9 +177,6 @@ class PathsHelper
 
                 return $this->temporaryDir;
             case 'images':
-                if (!is_dir($this->imagePath) && !file_exists($this->imagePath) && is_writable($this->imagePath)) {
-                    mkdir($this->imagePath, 0777, true);
-                }
                 $path = $this->imagePath;
                 break;
 
