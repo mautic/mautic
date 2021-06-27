@@ -230,10 +230,26 @@ class PipedriveIntegration extends CrmAbstractIntegration
         ]);
     }
 
+    public function getAvailableLeadFields($object = null)
+    {
+        $integrationFields = [];
+
+        if (is_array($object)) {
+            $objects = $object['feature_settings']['objects'] ?? [];
+            if (in_array('company', $objects)) {
+                $integrationFields['company'] = $this->getAvailableFields(self::ORGANIZATION_ENTITY_TYPE);
+            }
+        } else {
+            $integrationFields = $this->getAvailableFields($object);
+        }
+
+        return $integrationFields;
+    }
+
     /**
      * @return array|mixed
      */
-    public function getAvailableLeadFields($object = null)
+    private function getAvailableFields($object = null)
     {
         $integrationFields = [];
 
