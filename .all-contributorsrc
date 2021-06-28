@@ -263,6 +263,17 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ts-navghane",
+      "name": "Tejas Navghane",
+      "avatar_url": "https://avatars.githubusercontent.com/u/54406786?v=4",
+      "profile": "https://github.com/ts-navghane",
+      "contributions": [
+        "test",
+        "code",
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
