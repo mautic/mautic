@@ -253,6 +253,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "dadarya0",
+      "name": "Saurabh Gupta",
+      "avatar_url": "https://avatars.githubusercontent.com/u/48244990?v=4",
+      "profile": "https://github.com/dadarya0",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
