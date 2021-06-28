@@ -200,7 +200,9 @@ class IpAddress
                     return false;
                 }
 
-                if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress)) {
+				// disable regex check for entry ::1
+				// https://github.com/mautic/mautic/issues/9896
+                if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress) && $ip != "::1") {
                     return false;
                 }
             }
