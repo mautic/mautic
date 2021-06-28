@@ -65,15 +65,11 @@
                     }
                     selected_values = [];
                     select.find('option').each(function () {
-                        if (!$(this).is(":selected")) {
-                            return $(this).remove();
-                        } else {
+                        if ($(this).is(":selected")) {
                             return selected_values.push($(this).val() + "-" + $(this).text());
                         }
                     });
-                    select.find('optgroup:empty').each(function () {
-                        return $(this).remove();
-                    });
+
                     items = callback != null ? callback(data, field) : data;
                     nbItems = 0;
 
@@ -95,7 +91,8 @@
                                     value = element.value;
                                     text = element.text;
                                 }
-                                if ($.inArray(value + "-" + text, selected_values) === -1) {
+                                var existElement = select.find('option[value="' + value + '"]');
+                                if ($.inArray(value + "-" + text, selected_values) === -1 && existElement.length === 0) {
                                     return $("<option />").attr('value', value).html(text).appendTo(group);
                                 }
                             });
@@ -107,7 +104,9 @@
                                 value = element.value;
                                 text = element.text;
                             }
-                            if ($.inArray(value + "-" + text, selected_values) === -1) {
+
+                            var existElement = select.find('option[value="' + value + '"]');
+                            if ($.inArray(value + "-" + text, selected_values) === -1 && existElement.length === 0) {
                                 return $("<option />").attr('value', value).html(text).appendTo(select);
                             }
                         }
@@ -117,6 +116,7 @@
                         if (hasNew) {
                             hasNew.prependTo(select);
                         }
+
                         select.trigger("chosen:updated");
 
                         setTimeout( function() {

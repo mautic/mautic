@@ -431,10 +431,13 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @param null   $labelColumn
      * @param string $valueColumn
+     * @param int    $limit
      *
      * @return array
+     *
+     * @throws \ReflectionException
      */
-    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id')
+    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id', $limit = 100, $include = [])
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -453,15 +456,15 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             if ($reflection->hasMethod('getTitle')) {
                 $labelColumn = 'title';
             } else {
-                $labelColumn = 'name';
+                $labelColumn = 'companyname';
             }
         }
 
         $q->select($prefix.$valueColumn.' as value,
         case
-        when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, " <small>", companycity,", ", companycountry, "</small>")
-        when (comp.companycountry is not null) then concat(comp.companyname, " <small>", comp.companycountry, "</small>")
-        when (comp.companycity is not null) then concat(comp.companyname, " <small>", comp.companycity, "</small>")
+        when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, "  - ", companycity,", ", companycountry)
+        when (comp.companycountry is not null) then concat(comp.companyname, " - ", comp.companycountry)
+        when (comp.companycity is not null) then concat(comp.companyname, " - ", comp.companycity)
         else comp.companyname
         end
         as label')
@@ -470,10 +473,13 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         if (null !== $expr && $expr->count()) {
             $q->where($expr);
+            if (!empty($parameters)) {
+                $q->setParameters($parameters);
+            }
         }
 
-        if (!empty($parameters)) {
-            $q->setParameters($parameters);
+        if (!empty($include)) {
+            $q->andWhere($q->expr()->in('comp.id', $include));
         }
 
         // Published only
@@ -482,6 +488,10 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 $q->expr()->eq($prefix.'is_published', ':true')
             )
                 ->setParameter('true', true, 'boolean');
+        }
+
+        if ($limit) {
+            $q->setMaxResults((int) $limit);
         }
 
         return $q->execute()->fetchAll();
