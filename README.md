@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-27-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-28-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -109,6 +109,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://www.linkedin.com/in/rehannischal"><img src="https://avatars.githubusercontent.com/u/43839944?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rehan Nischal</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3ARehanNischal" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/Christophe9880"><img src="https://avatars.githubusercontent.com/u/82932885?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Christophe9880</b></sub></a><br /><a href="#userTesting-Christophe9880" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/dadarya0"><img src="https://avatars.githubusercontent.com/u/48244990?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Saurabh Gupta</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=dadarya0" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/ts-navghane"><img src="https://avatars.githubusercontent.com/u/54406786?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tejas Navghane</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=ts-navghane" title="Tests">⚠️</a> <a href="https://github.com/mautic/mautic/commits?author=ts-navghane" title="Code">💻</a> <a href="#userTesting-ts-navghane" title="User Testing">📓</a></td>
   </tr>
 </table>
 
