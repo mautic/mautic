@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-29-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-30-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -113,6 +113,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://www.webmecanik.com"><img src="https://avatars.githubusercontent.com/u/49391402?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Florent Petitjean - Webmecanik</b></sub></a><br /><a href="#userTesting-florentpetitjean" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://github.com/tobsowo"><img src="https://avatars.githubusercontent.com/u/5642737?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Oluwatobi Owolabi</b></sub></a><br /><a href="#eventOrganizing-tobsowo" title="Event Organizing">📋</a></td>
   </tr>
 </table>
 
