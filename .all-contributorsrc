@@ -291,6 +291,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "tobsowo",
+      "name": "Oluwatobi Owolabi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5642737?v=4",
+      "profile": "https://github.com/tobsowo",
+      "contributions": [
+        "eventOrganizing"
+      ]
     }
   ],
   "contributorsPerLine": 7,
