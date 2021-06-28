@@ -14,7 +14,6 @@ namespace Mautic\InstallBundle\Controller;
 use Doctrine\DBAL\DBALException;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
@@ -106,10 +105,6 @@ class InstallController extends CommonController
                             $this->handleInstallerErrors($form, $messages);
                             break;
                         }
-
-                        // XXX Regression: we used to also get this if database created but configuration not saved
-                        $schemaHelper             = new SchemaHelper($dbParams);
-                        $formData->server_version = $schemaHelper->getServerVersion();
 
                         // Refresh to install schema with new connection information in the container
                         return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1.1]));
