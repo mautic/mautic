@@ -278,6 +278,15 @@
         "userTesting",
         "review"
       ]
+    },
+    {
+      "login": "florentpetitjean",
+      "name": "Florent Petitjean - Webmecanik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/49391402?v=4",
+      "profile": "https://www.webmecanik.com",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
