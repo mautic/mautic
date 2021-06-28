@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "02091e29426fb07e1c0bc92c558df9a5",
+    "content-hash": "f54d5161b7956ddf9cd0622732a7d738",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1017,7 +1017,7 @@
                 "doctrine/coding-standard": "9.0.0",
                 "jetbrains/phpstorm-stubs": "2020.2",
                 "phpstan/phpstan": "0.12.81",
-                "phpunit/phpunit": "^7.5.20|^8.5|9.5.0",
+                "phpunit/phpunit": "^7.5.20|^8.5|9.5.5",
                 "squizlabs/php_codesniffer": "3.6.0",
                 "symfony/cache": "^4.4",
                 "symfony/console": "^2.0.5|^3.0|^4.0|^5.0",
@@ -5053,7 +5053,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "01a8665f0e9e9dcadf2ff20deee249426502cf1c"
+                "reference": "38559a91620ab2cd24463218821b17301dbedd70"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5145,7 +5145,8 @@
                 "symfony/yaml": "~4.4.0",
                 "theofidry/psysh-bundle": "~4.4.0",
                 "tightenco/collect": "^8.16.0",
-                "twilio/sdk": "^5.25"
+                "twilio/sdk": "^5.25",
+                "willdurand/oauth-server-bundle": "dev-release-0.0.4"
             },
             "type": "mautic-core",
             "extra": {
@@ -13579,6 +13580,47 @@
                 "source": "https://github.com/willdurand/Negotiation/tree/3.0.0"
             },
             "time": "2020-09-25T08:01:41+00:00"
+        },
+        {
+            "name": "willdurand/oauth-server-bundle",
+            "version": "dev-release-0.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/BazingaOAuthServerBundle.git",
+                "reference": "33ec06bcdb86a9872c36000da3c874ef16e32dd0"
+            },
+            "require": {
+                "php": ">=7.1",
+                "symfony/console": "~4.4",
+                "symfony/framework-bundle": "~4.4",
+                "symfony/security-bundle": "~4.4"
+            },
+            "require-dev": {
+                "doctrine/doctrine-bundle": "~1.12",
+                "symfony/orm-pack": "^2.1"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Bazinga\\OAuthServerBundle\\": ""
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "William Durand",
+                    "email": "william.durand1@gmail.com"
+                }
+            ],
+            "description": "Server side implementation of the OAuth 1.0 protocol based on RFC 5849",
+            "keywords": [
+                "api",
+                "oauth",
+                "server"
+            ],
+            "time": "2021-03-28T11:29:04+00:00"
         }
     ],
     "packages-dev": [
@@ -16716,5 +16758,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.0.0"
 }
