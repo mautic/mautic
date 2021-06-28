@@ -11,17 +11,19 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\Stat;
+use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var EntityManager
+     * @var EntityManagerInterface
      */
     private $em;
 
@@ -30,7 +32,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    public function __construct(EntityManager $em, TranslatorInterface $translator)
+    public function __construct(EntityManagerInterface $em, TranslatorInterface $translator)
     {
         $this->em         = $em;
         $this->translator = $translator;
@@ -57,7 +59,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         $children   = $parameters['children'];
 
         /** @var \Mautic\EmailBundle\Entity\StatRepository $repo */
-        $repo = $this->em->getRepository('MauticEmailBundle:Stat');
+        $repo = $this->em->getRepository(Stat::class);
         /** @var Email $parent */
         $ids       = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
@@ -151,9 +153,9 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         $children   = $parameters['children'];
 
         /** @var \Mautic\PageBundle\Entity\HitRepository $pageRepo */
-        $pageRepo = $this->em->getRepository('MauticPageBundle:Hit');
+        $pageRepo = $this->em->getRepository(Hit::class);
         /** @var \Mautic\EmailBundle\Entity\StatRepository $emailRepo */
-        $emailRepo = $this->em->getRepository('MauticEmailBundle:Stat');
+        $emailRepo = $this->em->getRepository(Stat::class);
         /** @var Email $parent */
         $ids = $parent->getRelatedEntityIds();
 

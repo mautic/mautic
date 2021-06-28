@@ -236,7 +236,7 @@ class ImportController extends FormController
 
                 $inProgress = $session->get('mautic.'.$object.'.import.inprogress', false);
                 $checks     = $session->get('mautic.'.$object.'.import.progresschecks', 1);
-                if (true || !$inProgress || $checks > 5) {
+                if (!$inProgress || $checks > 5) {
                     $session->set('mautic.'.$object.'.import.inprogress', true);
                     $session->set('mautic.'.$object.'.import.progresschecks', 1);
 
@@ -378,6 +378,9 @@ class ImportController extends FormController
                             unset($matchedFields['tags']);
                         }
 
+                        $skipIfExists = $matchedFields['skip_if_exists'];
+                        unset($matchedFields['skip_if_exists']);
+
                         foreach ($matchedFields as $k => $f) {
                             if (empty($f)) {
                                 unset($matchedFields[$k]);
@@ -407,6 +410,7 @@ class ImportController extends FormController
                                 ->setDefault('owner', $defaultOwner)
                                 ->setDefault('list', $list)
                                 ->setDefault('tags', $tags)
+                                ->setDefault('skip_if_exists', $skipIfExists)
                                 ->setHeaders($session->get('mautic.'.$object.'.import.headers'))
                                 ->setParserConfig($session->get('mautic.'.$object.'.import.config'));
 

@@ -18,7 +18,8 @@ use Aws\Exception\AwsException;
 use Aws\MockHandler;
 use Aws\Result;
 use Aws\SesV2\SesV2Client;
-use Joomla\Http\Http;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
@@ -26,18 +27,24 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail
 use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\AmazonApiTransport;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|TranslatorInterface
+     */
     private $translator;
+
+    /**
+     * @var MockObject|AmazonCallback
+     */
     private $amazonCallback;
-    private $amazonClient;
     private $amazonMock;
     private $amazonTransport;
     private $logger;
@@ -45,16 +52,16 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
     private $request;
 
     /**
-     * @var Http
+     * @var MockObject|Client
      */
     private $mockHttp;
     /**
-     * @var TransportCallback
+     * @var MockObject|TransportCallback
      */
     private $transportCallback;
 
     /**
-     * @var MauticMessage
+     * @var MockObject|MauticMessage
      */
     private $message;
 
@@ -70,16 +77,11 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
         $this->request            =  $this->createMock(Request::class);
 
         // Mock http connector
-        $this->mockHttp = $this->getMockBuilder(Http::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->transportCallback = $this->getMockBuilder(TransportCallback::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mockHttp          = $this->createMock(Client::class);
+        $this->transportCallback = $this->createMock(TransportCallback::class);
+        $this->amazonMock        = new MockHandler();
 
-        $this->amazonMock         = new MockHandler();
-
-        $this->amazonTransport = new AmazonApiTransport(
+        $this->amazonTransport   = new AmazonApiTransport(
             $this->translator,
             $this->amazonCallback,
             $this->logger
@@ -234,18 +236,14 @@ PAYLOAD;
 PAYLOAD;
 
         $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
-
-        $request = $this->getMockBuilder(Request::class)
-        ->disableOriginalConstructor()
-        ->getMock();
+        $request        = $this->createMock(Request::class);
 
         $request->expects($this->any())
             ->method('getContent')
             ->will($this->returnValue($payload));
 
         // Mock a successful response
-        $mockResponse       = $this->getMockBuilder(Response::class)->getMock();
-        $mockResponse->code = 200;
+        $mockResponse = new Response(200);
 
         $this->mockHttp->expects($this->once())
             ->method('get')

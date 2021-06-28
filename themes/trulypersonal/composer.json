@@ -1,0 +1,14 @@
+{
+  "name": "mautic/theme-trulypersonal",
+  "description": "Mautic Truly Personal Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "trulypersonal"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.4.0 <8.1",
+    "mautic/core-lib": "^4.0"
+  }
+}

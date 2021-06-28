@@ -42,29 +42,28 @@ trait CitrixRegistrationTrait
             foreach ($productsToRegister as $productToRegister) {
                 $productId = $productToRegister['productId'];
 
-                $isRegistered = CitrixHelper::registerToProduct(
+                $joinURL = CitrixHelper::registerToProduct(
                     $product,
                     $productId,
                     $email,
                     $firstname,
                     $lastname
                 );
-                if ($isRegistered) {
-                    $eventName = CitrixHelper::getCleanString(
-                            $productToRegister['productTitle']
-                        ).'_#'.$productToRegister['productId'];
 
-                    $this->citrixModel->addEvent(
-                        $product,
-                        $email,
-                        $eventName,
-                        $productToRegister['productTitle'],
-                        CitrixEventTypes::REGISTERED,
-                        $currentLead
-                    );
-                } else {
-                    throw new BadRequestHttpException('Unable to register!');
-                }
+                $eventName = CitrixHelper::getCleanString(
+                        $productToRegister['productTitle']
+                    ).'_#'.$productToRegister['productId'];
+
+                $this->citrixModel->addEvent(
+                    $product,
+                    $email,
+                    $eventName,
+                    $productToRegister['productTitle'],
+                    CitrixEventTypes::REGISTERED,
+                    $currentLead,
+                    null,
+                    $joinURL
+                );
             }
         } else {
             throw new BadRequestHttpException('Mandatory lead fields not found!');

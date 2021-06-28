@@ -35,6 +35,11 @@ $view['slots']->set('headerTitle', $view['translator']->trans('System Info'));
                         <?php echo $view['translator']->trans('mautic.sysinfo.tab.log'); ?>
                     </a>
                 </li>
+                <li role="presentation" class="list-group-item">
+                    <a href="#dbinfo" aria-controls="dbinfo" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.sysinfo.tab.dbinfo'); ?>
+                    </a>
+                </li>
             </ul>
 
         </div>
@@ -79,6 +84,33 @@ $view['slots']->set('headerTitle', $view['translator']->trans('System Info'));
                             <?php echo $view['translator']->trans('mautic.sysinfo.log.missing'); ?>
                         </div>
                     <?php endif; ?>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="dbinfo">
+                <div class="pt-md pr-md pl-md pb-md">
+                    <h2 class="pb-md"><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.title'); ?></h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.property'); ?></th>
+                                <th><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.value'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.version'); ?></td>
+                                <td id="dbinfo-version"><?php echo $dbInfo['version']; ?></td>
+                            </tr>
+                            <tr>
+                                <td><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.driver'); ?></td>
+                                <td id="dbinfo-driver"><?php echo $dbInfo['driver']; ?></td>
+                            </tr>
+                            <tr>
+                                <td><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.platform'); ?></td>
+                                <td id="dbinfo-platform"><?php echo $dbInfo['platform']; ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

@@ -82,7 +82,7 @@ class StageRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $query = $this->getMockBuilder(AbstractQuery::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getOneOrNullResult'])
+            ->onlyMethods(['getOneOrNullResult'])
             ->getMockForAbstractClass();
 
         $queryBuilder->expects($this->once())
@@ -128,7 +128,7 @@ class StageRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $query = $this->getMockBuilder(AbstractQuery::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getOneOrNullResult'])
+            ->onlyMethods(['getOneOrNullResult'])
             ->getMockForAbstractClass();
 
         $queryBuilder->expects($this->once())

@@ -360,7 +360,8 @@ class ImportModel extends FormModel
                         $import->getDefault('tags'),
                         true,
                         $eventLog,
-                        $import->getId()
+                        $import->getId(),
+                        $import->getDefault('skip_if_exists')
                     );
 
                     if ($merged) {

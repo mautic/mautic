@@ -11,6 +11,8 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\IpLookup\IpstackLookup;
 
 class IpstackLookupTest extends \PHPUnit\Framework\TestCase
@@ -20,15 +22,10 @@ class IpstackLookupTest extends \PHPUnit\Framework\TestCase
     public function testIpLookupSuccessful()
     {
         // Mock http connector
-        $mockHttp = $this->getMockBuilder('Joomla\Http\Http')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockHttp = $this->createMock(Client::class);
 
         // Mock a successful response
-        $mockResponse = $this->getMockBuilder('Joomla\Http\Response')
-            ->getMock();
-        $mockResponse->code = 200;
-        $mockResponse->body = '{"ip":"192.30.252.131","country_code":"US","country_name":"United States","region_code":"CA","region_name":"California","city":"San Francisco","zip_code":"94107","time_zone":"America/Los_Angeles","latitude":37.7697,"longitude":-122.3933,"metro_code":807}';
+        $mockResponse = new Response(200, [], '{"ip":"192.30.252.131","country_code":"US","country_name":"United States","region_code":"CA","region_name":"California","city":"San Francisco","zip_code":"94107","time_zone":"America/Los_Angeles","latitude":37.7697,"longitude":-122.3933,"metro_code":807}');
 
         $mockHttp->expects($this->once())
             ->method('get')

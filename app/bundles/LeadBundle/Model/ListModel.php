@@ -248,6 +248,9 @@ class ListModel extends FormModel
             case 'post_delete':
                 $name = LeadEvents::LIST_POST_DELETE;
                 break;
+            case 'pre_unpublish':
+                $name = LeadEvents::LIST_PRE_UNPUBLISH;
+                break;
             default:
                 return null;
         }
@@ -1242,6 +1245,7 @@ class ListModel extends FormModel
                     } else {
                         $dependents[] = $entity;
                     }
+                    break;
                 }
             }
         }

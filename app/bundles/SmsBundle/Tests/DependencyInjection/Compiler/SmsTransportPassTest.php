@@ -41,7 +41,7 @@ class SmsTransportPassTest extends TestCase
 
         $transport = $this->getMockBuilder(TransportChain::class)
             ->disableOriginalConstructor()
-            ->setMethods(['addTransport'])
+            ->onlyMethods(['addTransport'])
             ->getMock();
 
         $container

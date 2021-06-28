@@ -69,7 +69,7 @@ class AccessToken extends BaseAccessToken
             ->build();
 
         $builder->createManyToOne('user', 'Mautic\UserBundle\Entity\User')
-            ->addJoinColumn('user_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('user_id', 'id', true, false, 'CASCADE')
             ->build();
 
         $builder->createField('token', 'string')

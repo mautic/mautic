@@ -120,7 +120,8 @@ class AssetsHelper
             $path        = $assetPrefix.$path;
         }
 
-        $url = $this->packages->getUrl($path, $packageName, $version);
+        $path = $this->appendVersion($path, $version);
+        $url  = $this->packages->getUrl($path, $packageName);
 
         if ($absolute) {
             $url = $this->getBaseUrl().'/'.$path;
@@ -446,7 +447,7 @@ class AssetsHelper
         $assets = $this->assetHelper->getAssets();
 
         if ($includeEditor) {
-            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts());
+            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts(), $this->getCKEditorScripts());
         }
 
         if (isset($assets['js'])) {
@@ -469,7 +470,7 @@ class AssetsHelper
         $assets = $this->assetHelper->getAssets();
 
         if ($includeEditor) {
-            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts());
+            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts(), $this->getCKEditorScripts());
         }
 
         if ($render) {
@@ -484,6 +485,16 @@ class AssetsHelper
         }
 
         return $assets['js'];
+    }
+
+    private function getCKEditorScripts(): array
+    {
+        $base    = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/';
+
+        return [
+            $base.'ckeditor.js?v'.$this->version,
+            $base.'adapters/jquery.js?v'.$this->version,
+        ];
     }
 
     /**
@@ -728,5 +739,31 @@ class AssetsHelper
     private function escape($string)
     {
         return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
+    }
+
+    /**
+     * Appends the version to the path if is not present.
+     */
+    private function appendVersion(string $path, string $version = null): string
+    {
+        $version = $version ?: $this->version;
+
+        if (!$version) {
+            // no version is set
+            return $path;
+        }
+
+        $versionArgument   = 'v'.$version;
+        $querySeparator    = '?';
+        $argumentSeparator = '&amp;';
+        $query             = explode($querySeparator, $path)[1] ?? '';
+        parse_str(str_replace($argumentSeparator, '&', $query), $arguments);
+
+        if (isset($arguments[$versionArgument])) {
+            // path already contains the version
+            return $path;
+        }
+
+        return rtrim($path, $querySeparator).($query ? $argumentSeparator : $querySeparator).$versionArgument;
     }
 }

@@ -109,7 +109,7 @@ trait RequestTrait
 
                     // Ensure the value is an array
                     if (!is_array($params[$name])) {
-                        $params[$name] = (false !== strpos($params[$name], '|')) ? explode('|', $params[$name]) : [$params[$name]];
+                        $params[$name] = (false !== strpos($params[$name], '|')) ? explode('|', $params[$name]) : ($params[$name] ? [$params[$name]] : []);
                     }
 
                     break;

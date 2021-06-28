@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -65,6 +67,7 @@ class ThemeHelperTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->pathsHelper         = $this->createMock(PathsHelper::class);
         $this->templatingHelper    = $this->createMock(TemplatingHelper::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
@@ -86,7 +89,7 @@ class ThemeHelperTest extends TestCase
         );
     }
 
-    public function testExceptionThrownWithMissingConfig()
+    public function testExceptionThrownWithMissingConfig(): void
     {
         $this->expectException(FileNotFoundException::class);
 
@@ -106,7 +109,7 @@ class ThemeHelperTest extends TestCase
         $this->themeHelper->install(__DIR__.'/resource/themes/missing-config.zip');
     }
 
-    public function testExceptionThrownWithMissingMessage()
+    public function testExceptionThrownWithMissingMessage(): void
     {
         $this->expectException(FileNotFoundException::class);
 
@@ -126,7 +129,7 @@ class ThemeHelperTest extends TestCase
         $this->themeHelper->install(__DIR__.'/resource/themes/missing-message.zip');
     }
 
-    public function testExceptionThrownWithMissingFeature()
+    public function testExceptionThrownWithMissingFeature(): void
     {
         $this->expectException(FileNotFoundException::class);
 
@@ -146,7 +149,7 @@ class ThemeHelperTest extends TestCase
         $this->themeHelper->install(__DIR__.'/resource/themes/missing-feature.zip');
     }
 
-    public function testThemeIsInstalled()
+    public function testThemeIsInstalled(): void
     {
         $fs = new Filesystem();
         $fs->copy(__DIR__.'/resource/themes/good.zip', __DIR__.'/resource/themes/good-tmp.zip');
@@ -162,7 +165,7 @@ class ThemeHelperTest extends TestCase
         $fs->remove(__DIR__.'/resource/themes/good-tmp');
     }
 
-    public function testThemeFallbackToDefaultIfTemplateIsMissing()
+    public function testThemeFallbackToDefaultIfTemplateIsMissing(): void
     {
         $templateNameParser = $this->createMock(TemplateNameParser::class);
         $this->templatingHelper->expects($this->once())
@@ -176,20 +179,13 @@ class ThemeHelperTest extends TestCase
 
         $templating = $this->createMock(DelegatingEngine::class);
 
-        // twig does not exist
-        $templating->expects($this->at(0))
+        $templating->expects($this->exactly(3))
             ->method('exists')
-            ->willReturn(false);
-
-        // php does not exist
-        $templating->expects($this->at(1))
-            ->method('exists')
-            ->willReturn(false);
-
-        // default themes twig exists
-        $templating->expects($this->at(2))
-            ->method('exists')
-            ->willReturn(true);
+            ->willReturnOnConsecutiveCalls(
+                false, // twig does not exist
+                false, // php does not exist
+                true // default themes twig exists
+            );
 
         $this->templatingHelper->expects($this->once())
             ->method('getTemplating')
@@ -213,7 +209,7 @@ class ThemeHelperTest extends TestCase
         $this->assertEquals(':nature:page.html.twig', $template);
     }
 
-    public function testThemeFallbackToNextBestIfTemplateIsMissingForBothRequestedAndDefaultThemes()
+    public function testThemeFallbackToNextBestIfTemplateIsMissingForBothRequestedAndDefaultThemes(): void
     {
         $templateNameParser = $this->createMock(TemplateNameParser::class);
         $this->templatingHelper->expects($this->once())

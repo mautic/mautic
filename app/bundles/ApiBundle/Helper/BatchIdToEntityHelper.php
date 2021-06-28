@@ -199,4 +199,9 @@ class BatchIdToEntityHelper
 
         return array_keys($array) !== range(0, count($array) - 1) && 0 !== $firstKey;
     }
+
+    public function setIsAssociative(bool $isAssociative): void
+    {
+        $this->isAssociative = $isAssociative;
+    }
 }

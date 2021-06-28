@@ -11,11 +11,15 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class SegmentSubscriber implements EventSubscriberInterface
 {
@@ -29,10 +33,26 @@ class SegmentSubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var ListModel
+     */
+    private $listModel;
+
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        ListModel $listModel,
+        TranslatorInterface $translator
+    ) {
+        $this->ipLookupHelper    = $ipLookupHelper;
+        $this->auditLogModel     = $auditLogModel;
+        $this->listModel         = $listModel;
+        $this->translator        = $translator;
     }
 
     /**
@@ -41,8 +61,9 @@ class SegmentSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            LeadEvents::LIST_POST_SAVE   => ['onSegmentPostSave', 0],
-            LeadEvents::LIST_POST_DELETE => ['onSegmentDelete', 0],
+            LeadEvents::LIST_PRE_UNPUBLISH => ['onSegmentPreUnpublish', 0],
+            LeadEvents::LIST_POST_SAVE     => ['onSegmentPostSave', 0],
+            LeadEvents::LIST_POST_DELETE   => ['onSegmentDelete', 0],
         ];
     }
 
@@ -63,6 +84,18 @@ class SegmentSubscriber implements EventSubscriberInterface
             ];
             $this->auditLogModel->writeToLog($log);
         }
+    }
+
+    public function onSegmentPreUnpublish(SegmentEvent $event): ?RecordCanNotUnpublishException
+    {
+        $leadList = $event->getList();
+        $lists    = $this->listModel->getSegmentsWithDependenciesOnSegment($leadList->getId(), 'name');
+        if (count($lists)) {
+            $message = $this->translator->trans('mautic.lead_list.is_in_use', ['%segments%' => implode(',', $lists)], 'validators');
+            throw new RecordCanNotUnpublishException($message);
+        }
+
+        return null;
     }
 
     /**

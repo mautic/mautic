@@ -83,7 +83,7 @@ class FieldFilterTransformer implements DataTransformerInterface
         $rawFilters = array_values($rawFilters);
 
         foreach ($rawFilters as $k => $f) {
-            if ('datetime' == $f['type']) {
+            if ('datetime' == $f['type'] && null !== $f['filter']) {
                 if (in_array($f['filter'], $this->relativeDateStrings) or stristr($f['filter'][0], '-') or stristr($f['filter'][0], '+')) {
                     continue;
                 }
