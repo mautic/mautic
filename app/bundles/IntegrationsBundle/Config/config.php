@@ -105,6 +105,12 @@ return [
                     'mautic.helper.integration',
                 ],
             ],
+            'mautic.integrations.subscriber.pseudo_fields' => [
+                'class'     => \Mautic\IntegrationsBundle\EventListener\ContactPseudoFieldsSubscriber::class,
+                'arguments' => [
+                    'mautic.integrations.helper.contact_object',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.integrations.form.config.integration' => [
@@ -276,7 +282,7 @@ return [
                     'doctrine.dbal.default_connection',
                     'mautic.lead.model.field',
                     'mautic.lead.model.dnc',
-                    'mautic.lead.model.company',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.integrations.helper.company_object' => [

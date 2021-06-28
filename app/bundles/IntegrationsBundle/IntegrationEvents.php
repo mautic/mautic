@@ -131,4 +131,13 @@ final class IntegrationEvents
      * @var string
      */
     public const INTEGRATION_OBJECT_TOKEN_EVENT = 'mautic.integration.INTEGRATION_OBJECT_TOKEN_EVENT';
+
+    /**
+     * The mautic.integration.INTEGRATION_CONTACT_PROCESS_PSEUDO_FIELDS event is dispatched when a process of pseudo (custom) fields are dispatched.
+     *
+     * The event listener receives a Mautic\IntegrationsBundle\Event\InternalContactProcessPseudFieldsEvent instance.
+     *
+     * @var string
+     */
+    const INTEGRATION_CONTACT_PROCESS_PSEUDO_FIELDS = 'mautic.integration.INTEGRATION_CONTACT_PROCESS_PSEUDO_FIELDS';
 }
