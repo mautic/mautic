@@ -272,7 +272,8 @@
       "contributions": [
         "test",
         "code",
-        "userTesting"
+        "userTesting",
+        "review"
       ]
     }
   ],
