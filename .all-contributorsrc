@@ -300,6 +300,17 @@
       "contributions": [
         "eventOrganizing"
       ]
+    },
+    {
+      "login": "fakela",
+      "name": "Favour Kelvin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/39309699?v=4",
+      "profile": "https://www.linkedin.com/in/favour-kelvin/",
+      "contributions": [
+        "doc",
+        "tutorial",
+        "talk"
+      ]
     }
   ],
   "contributorsPerLine": 7,
