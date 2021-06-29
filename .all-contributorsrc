@@ -22,7 +22,8 @@
       "profile": "https://steercampaign.com",
       "contributions": [
         "code",
-        "userTesting"
+        "userTesting",
+        "review"
       ]
     },
     {
@@ -32,7 +33,8 @@
       "profile": "http://johnlinhart.com",
       "contributions": [
         "userTesting",
-        "review"
+        "review",
+        "code"
       ]
     },
     {
@@ -189,7 +191,9 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/1046788?v=4",
       "profile": "https://github.com/shinde-rahul",
       "contributions": [
-        "review"
+        "review",
+        "userTesting",
+        "code"
       ]
     },
     {
@@ -218,7 +222,9 @@
       "contributions": [
         "code",
         "doc",
-        "test"
+        "test",
+        "review",
+        "userTesting"
       ]
     },
     {
@@ -277,6 +283,53 @@
         "code",
         "userTesting",
         "review"
+      ]
+    },
+    {
+      "login": "florentpetitjean",
+      "name": "Florent Petitjean - Webmecanik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/49391402?v=4",
+      "profile": "https://www.webmecanik.com",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "tobsowo",
+      "name": "Oluwatobi Owolabi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5642737?v=4",
+      "profile": "https://github.com/tobsowo",
+      "contributions": [
+        "eventOrganizing"
+      ]
+    },
+    {
+      "login": "fakela",
+      "name": "Favour Kelvin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/39309699?v=4",
+      "profile": "https://www.linkedin.com/in/favour-kelvin/",
+      "contributions": [
+        "doc",
+        "tutorial",
+        "talk"
+      ]
+    },
+    {
+      "login": "giomasce",
+      "name": "Giovanni Mascellani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/101675?v=4",
+      "profile": "http://poisson.phc.dm.unipi.it/~mascellani",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "RaphaelWoude",
+      "name": "Raphael van der Woude",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47354694?v=4",
+      "profile": "https://github.com/RaphaelWoude",
+      "contributions": [
+        "userTesting"
       ]
     }
   ],
