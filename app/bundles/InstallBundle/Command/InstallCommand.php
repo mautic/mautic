@@ -324,10 +324,10 @@ class InstallCommand extends ContainerAwareCommand
                         $output->writeln('Missing optional settings:');
                         $this->handleInstallerErrors($output, $messages['optional']);
 
-                        if (!isset($options['force'])) {
+                        if (empty($options['force'])) {
                             // Ask user to confirm install when optional settings missing
                             $helper   = $this->getHelper('question');
-                            $question = new ConfirmationQuestion('Continue with install anyway? ', false);
+                            $question = new ConfirmationQuestion('Continue with install anyway? [yes/no]', false);
 
                             if (!$helper->ask($input, $output, $question)) {
                                 return -$step;

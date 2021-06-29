@@ -271,11 +271,12 @@ Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
     event.preventDefault();
 
     var wasPublished = mQuery(el).hasClass('fa-toggle-on');
+    var element = mQuery(el);
 
-    mQuery(el).removeClass('fa-toggle-on fa-toggle-off').addClass('fa-spin fa-spinner');
+    element.removeClass('fa-toggle-on fa-toggle-off').addClass('fa-spin fa-spinner');
 
     //destroy tooltips so it can be regenerated
-    mQuery(el).tooltip('destroy');
+    element.tooltip('destroy');
     //clear the lookup cache
     MauticVars.liveCache = new Array();
 
@@ -286,7 +287,7 @@ Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
     if (extra) {
         extra = '&' + extra;
     }
-    mQuery(el).tooltip('destroy');
+    element.tooltip('destroy');
     mQuery.ajax({
         url: mauticAjaxUrl,
         type: "POST",
@@ -296,13 +297,13 @@ Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
             if (response.reload) {
                 Mautic.redirectWithBackdrop(window.location);
             } else if (response.statusHtml) {
-                mQuery(el).replaceWith(response.statusHtml);
-                mQuery(el).tooltip({html: true, container: 'body'});
+                element.replaceWith(response.statusHtml);
+                element.tooltip({html: true, container: 'body'});
             }
         },
         error: function (request, textStatus, errorThrown) {
             var addClass = (wasPublished) ? 'fa-toggle-on' : 'fa-toggle-off';
-            mQuery(el).removeClass('fa-spin fa-spinner').addClass(addClass);
+            element.removeClass('fa-spin fa-spinner').addClass(addClass);
 
             Mautic.processAjaxError(request, textStatus, errorThrown);
         }

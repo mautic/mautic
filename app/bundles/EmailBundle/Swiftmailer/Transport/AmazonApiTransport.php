@@ -338,7 +338,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             $fromEmail = current(array_keys($from));
             $fromName  = $from[$fromEmail];
 
-            $sesArray['FromEmailAddress'] =  (!empty($fromName)) ? $fromName.' <'.$fromEmail.'>' : $fromEmail;
+            $sesArray['FromEmailAddress'] =  (!empty($fromName)) ? mb_encode_mimeheader($fromName).' <'.$fromEmail.'>' : $fromEmail;
             $to                           = $message->getTo();
             if (!empty($to)) {
                 $sesArray['Destination']['ToAddresses'] = array_keys($to);
@@ -381,7 +381,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 $toSendMessage                                   = (new \Swift_Message());
                 $toSendMessage->setSubject($tokenizedMessage['subject']);
                 $toSendMessage->setFrom([$tokenizedMessage['from']['email'] => $tokenizedMessage['from']['name']]);
-                $sesArray['FromEmailAddress'] =  (!empty($tokenizedMessage['from']['name'])) ? $tokenizedMessage['from']['name'].' <'.$tokenizedMessage['from']['email'].'>' : $tokenizedMessage['from']['email'];
+                $sesArray['FromEmailAddress'] =  (!empty($tokenizedMessage['from']['name'])) ? mb_encode_mimeheader($tokenizedMessage['from']['name']).' <'.$tokenizedMessage['from']['email'].'>' : $tokenizedMessage['from']['email'];
                 $toSendMessage->setTo([$recipient]);
                 $sesArray['Destination']['ToAddresses'] = [$recipient];
                 if (isset($tokenizedMessage['text']) && strlen($tokenizedMessage['text']) > 0) {

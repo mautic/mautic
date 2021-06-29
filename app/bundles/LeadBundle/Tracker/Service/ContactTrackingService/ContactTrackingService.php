@@ -47,9 +47,9 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
     private $mergeRecordRepository;
 
     /**
-     * @var Request|null
+     * @var RequestStack
      */
-    private $request;
+    private $requestStack;
 
     /**
      * ContactTrackingService constructor.
@@ -65,7 +65,7 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
         $this->leadDeviceRepository  = $leadDeviceRepository;
         $this->leadRepository        = $leadRepository;
         $this->mergeRecordRepository = $mergeRecordRepository;
-        $this->request               = $requestStack->getCurrentRequest();
+        $this->requestStack          = $requestStack;
     }
 
     /**
@@ -73,7 +73,9 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
      */
     public function getTrackedLead()
     {
-        if (null === $this->request) {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (null === $request) {
             return null;
         }
 
@@ -84,7 +86,7 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
 
         $leadId = $this->cookieHelper->getCookie($trackingId, null);
         if (null === $leadId) {
-            $leadId = $this->request->get('mtc_id', null);
+            $leadId = $request->get('mtc_id', null);
             if (null === $leadId) {
                 return null;
             }

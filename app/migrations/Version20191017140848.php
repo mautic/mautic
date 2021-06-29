@@ -11,6 +11,7 @@
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
@@ -21,7 +22,7 @@ class Version20191017140848 extends AbstractMauticMigration
 {
     /**
      * @throws SkipMigration
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      */
     public function preUp(Schema $schema): void
     {
@@ -32,7 +33,7 @@ class Version20191017140848 extends AbstractMauticMigration
     }
 
     /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      */
     public function up(Schema $schema): void
     {

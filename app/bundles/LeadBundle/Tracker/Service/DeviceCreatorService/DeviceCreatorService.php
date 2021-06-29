@@ -28,7 +28,7 @@ final class DeviceCreatorService implements DeviceCreatorServiceInterface
         $device = new LeadDevice();
         $device->setClientInfo($deviceDetector->getClient());
         $device->setDevice($deviceDetector->getDeviceName());
-        $device->setDeviceBrand($deviceDetector->getBrand());
+        $device->setDeviceBrand($deviceDetector->getBrandName());
         $device->setDeviceModel($deviceDetector->getModel());
         $device->setDeviceOs($deviceDetector->getOs());
         $device->setDateAdded(new \DateTime());

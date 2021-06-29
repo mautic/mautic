@@ -80,6 +80,9 @@ class ContactSegmentQueryBuilder
          */
         $this->getResolutionPlan($segmentId);
 
+        $params     = $queryBuilder->getParameters();
+        $paramTypes = $queryBuilder->getParameterTypes();
+
         /** @var ContactSegmentFilter $filter */
         foreach ($segmentFilters as $filter) {
             try {
@@ -89,8 +92,13 @@ class ContactSegmentQueryBuilder
             }
 
             $queryBuilder = $filter->applyQuery($queryBuilder);
+            // We need to collect params between union queries in this iteration,
+            // because they are overwritten by new union query build
+            $params     = array_merge($params, $queryBuilder->getParameters());
+            $paramTypes = array_merge($paramTypes, $queryBuilder->getParameterTypes());
         }
 
+        $queryBuilder->setParameters($params, $paramTypes);
         $queryBuilder->applyStackLogic();
 
         return $queryBuilder;

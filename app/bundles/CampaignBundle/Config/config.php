@@ -132,7 +132,6 @@ return [
                     'translator',
                     'doctrine.orm.entity_manager',
                     'router',
-                    'mautic.security',
                 ],
             ],
             'mautic.campaign.calendarbundle.subscriber' => [

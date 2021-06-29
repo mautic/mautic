@@ -54,6 +54,16 @@ class Metadata
     private $maxSupportedPHPVersion;
 
     /**
+     * We use this property to show a warning message on the dashboard
+     * if the user has a PHP version that is lower than the given version.
+     * Users are warned that their PHP version won't be supported by future
+     * Mautic versions anymore.
+     *
+     * @var string
+     */
+    private $showPHPVersionWarningIfUnder;
+
+    /**
      * @var string
      */
     private $minSupportedMauticVersion;
@@ -65,12 +75,13 @@ class Metadata
 
     public function __construct(array $metadata)
     {
-        $this->version                   = $metadata['version'];
-        $this->stability                 = $metadata['stability'];
-        $this->minSupportedPHPVersion    = $metadata['minimum_php_version'];
-        $this->maxSupportedPHPVersion    = $metadata['maximum_php_version'];
-        $this->minSupportedMauticVersion = $metadata['minimum_mautic_version'];
-        $this->announcementUrl           = $metadata['announcement_url'];
+        $this->version                      = $metadata['version'];
+        $this->stability                    = $metadata['stability'];
+        $this->minSupportedPHPVersion       = $metadata['minimum_php_version'];
+        $this->maxSupportedPHPVersion       = $metadata['maximum_php_version'];
+        $this->showPHPVersionWarningIfUnder = empty($metadata['show_php_version_warning_if_under']) ? '' : $metadata['show_php_version_warning_if_under'];
+        $this->minSupportedMauticVersion    = $metadata['minimum_mautic_version'];
+        $this->announcementUrl              = $metadata['announcement_url'];
 
         preg_match('#^(\d+)\.(\d+)\.(\d+)[\. \-]?([a-z0-9\-\.]+)?$#', $this->version, $match);
         $this->majorVersion = $match[1];
@@ -117,6 +128,17 @@ class Metadata
     public function getMaxSupportedPHPVersion(): string
     {
         return $this->maxSupportedPHPVersion;
+    }
+
+    /**
+     * We use this property to show a warning message on the dashboard
+     * if the user has a PHP version that is lower than the given version.
+     * Users are warned that their PHP version won't be supported by future
+     * Mautic versions anymore.
+     */
+    public function getShowPHPVersionWarningIfUnder(): string
+    {
+        return $this->showPHPVersionWarningIfUnder;
     }
 
     public function getMinSupportedMauticVersion(): string
