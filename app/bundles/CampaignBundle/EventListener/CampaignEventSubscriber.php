@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignEventSubscriber implements EventSubscriberInterface
 {
-    private const LOOPS_TO_FAIL = 100;
+    public const LOOPS_TO_FAIL = 100;
 
     private const DISABLE_CAMPAIGN_THRESHOLD = 0.35;
 
