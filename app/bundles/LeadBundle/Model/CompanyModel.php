@@ -763,14 +763,16 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param null         $tags
      * @param bool         $persist
      * @param LeadEventLog $eventLog
+     * @param null         $importId
+     * @param bool         $skipIfExists
      *
      * @return bool|null
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false)
     {
-        $company = $this->importCompany($fields, $data, $owner, false);
+        $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists);
 
         if (null === $company) {
             throw new \Exception($this->translator->trans('mautic.company.error.notfound', [], 'flashes'));
@@ -792,7 +794,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws \Exception
      */
-    public function importCompany($fields, $data, $owner = null, $persist = true)
+    public function importCompany($fields, $data, $owner = null, $persist = true, $skipIfExists = false)
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));
@@ -841,6 +843,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $fieldErrors = [];
 
         foreach ($this->fetchCompanyFields() as $entityField) {
+            // Skip If value already exists
+            if ($skipIfExists && !$company->isNew() && !empty($company->getProfileFields()[$entityField['alias']])) {
+                unset($fieldData[$entityField['alias']]);
+                continue;
+            }
+
             if (isset($fieldData[$entityField['alias']])) {
                 $fieldData[$entityField['alias']] = InputHelper::_($fieldData[$entityField['alias']], 'string');
 
