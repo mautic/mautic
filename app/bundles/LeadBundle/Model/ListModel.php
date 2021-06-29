@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\DBALException;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -75,13 +76,19 @@ class ListModel extends FormModel
      */
     private $requestStack;
 
-    public function __construct(CategoryModel $categoryModel, CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment, SegmentChartQueryFactory $segmentChartQueryFactory, RequestStack $requestStack)
+    /**
+     * @var GeneratedColumnsProviderInterface
+     */
+    private $generatedColumnsProvider;
+
+    public function __construct(CategoryModel $categoryModel, CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment, SegmentChartQueryFactory $segmentChartQueryFactory, RequestStack $requestStack, GeneratedColumnsProviderInterface $generatedColumnsProvider)
     {
         $this->categoryModel            = $categoryModel;
         $this->coreParametersHelper     = $coreParametersHelper;
         $this->leadSegmentService       = $leadSegment;
         $this->segmentChartQueryFactory = $segmentChartQueryFactory;
         $this->requestStack             = $requestStack;
+        $this->generatedColumnsProvider = $generatedColumnsProvider;
     }
 
     /**
@@ -1177,6 +1184,7 @@ class ListModel extends FormModel
     {
         $chart    = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query    = new SegmentContactsLineChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $filter);
+        $query->setGeneratedColumnProvider($this->generatedColumnsProvider);
 
         // added line everytime
         $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.added'), $this->segmentChartQueryFactory->getContactsAdded($query));

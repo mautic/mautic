@@ -568,6 +568,9 @@ return [
                     'mautic.lead.model.list',
                 ],
             ],
+            'mautic.leadlist.generated_columns.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\LeadEventLogGeneratedColumnSubscriber::class,
+            ],
         ],
         'forms' => [
             'mautic.form.type.lead' => [
@@ -1103,6 +1106,7 @@ return [
                     'mautic.lead.model.lead_segment_service',
                     'mautic.lead.segment.stat.chart.query.factory',
                     'request_stack',
+                    'mautic.generated.columns.provider',
                 ],
             ],
             'mautic.lead.repository.lead_segment_filter_descriptor' => [
