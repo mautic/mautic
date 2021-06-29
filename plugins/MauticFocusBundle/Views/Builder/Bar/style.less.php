@@ -61,7 +61,7 @@
             margin: -3px 0 0 0;
         }
 
-        .mauticform-input, select, .mauticform-button {
+        .mauticform-input, select, .mauticform-button, .mauticform-pagebreak {
             padding: 3px 6px;
             font-size: 0.9em;
         }
@@ -82,7 +82,7 @@
             font-size: 1em;
         }
 
-        .mauticform-input, select, .mauticform-button {
+        .mauticform-input, select, .mauticform-button, .mauticform-pagebreak {
             font-size: 1em;
         }
     }

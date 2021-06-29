@@ -21,7 +21,9 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/12627658?v=4",
       "profile": "https://steercampaign.com",
       "contributions": [
-        "code"
+        "code",
+        "userTesting",
+        "review"
       ]
     },
     {
@@ -31,7 +33,8 @@
       "profile": "http://johnlinhart.com",
       "contributions": [
         "userTesting",
-        "review"
+        "review",
+        "code"
       ]
     },
     {
@@ -40,7 +43,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/14075239?v=4",
       "profile": "https://www.webmecanik.com",
       "contributions": [
-        "userTesting"
+        "userTesting",
+        "code"
       ]
     },
     {
@@ -139,7 +143,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/12815758?v=4",
       "profile": "http://drahy.net",
       "contributions": [
-        "code"
+        "code",
+        "review"
       ]
     },
     {
@@ -186,7 +191,9 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/1046788?v=4",
       "profile": "https://github.com/shinde-rahul",
       "contributions": [
-        "review"
+        "review",
+        "userTesting",
+        "code"
       ]
     },
     {
@@ -215,7 +222,9 @@
       "contributions": [
         "code",
         "doc",
-        "test"
+        "test",
+        "review",
+        "userTesting"
       ]
     },
     {
@@ -233,7 +242,94 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/1241376?v=4",
       "profile": "https://www.twentyzen.com",
       "contributions": [
+        "bug",
+        "userTesting"
+      ]
+    },
+    {
+      "login": "RehanNischal",
+      "name": "Rehan Nischal",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43839944?v=4",
+      "profile": "http://www.linkedin.com/in/rehannischal",
+      "contributions": [
         "bug"
+      ]
+    },
+    {
+      "login": "Christophe9880",
+      "name": "Christophe9880",
+      "avatar_url": "https://avatars.githubusercontent.com/u/82932885?v=4",
+      "profile": "https://github.com/Christophe9880",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "dadarya0",
+      "name": "Saurabh Gupta",
+      "avatar_url": "https://avatars.githubusercontent.com/u/48244990?v=4",
+      "profile": "https://github.com/dadarya0",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ts-navghane",
+      "name": "Tejas Navghane",
+      "avatar_url": "https://avatars.githubusercontent.com/u/54406786?v=4",
+      "profile": "https://github.com/ts-navghane",
+      "contributions": [
+        "test",
+        "code",
+        "userTesting",
+        "review"
+      ]
+    },
+    {
+      "login": "florentpetitjean",
+      "name": "Florent Petitjean - Webmecanik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/49391402?v=4",
+      "profile": "https://www.webmecanik.com",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "tobsowo",
+      "name": "Oluwatobi Owolabi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5642737?v=4",
+      "profile": "https://github.com/tobsowo",
+      "contributions": [
+        "eventOrganizing"
+      ]
+    },
+    {
+      "login": "fakela",
+      "name": "Favour Kelvin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/39309699?v=4",
+      "profile": "https://www.linkedin.com/in/favour-kelvin/",
+      "contributions": [
+        "doc",
+        "tutorial",
+        "talk"
+      ]
+    },
+    {
+      "login": "giomasce",
+      "name": "Giovanni Mascellani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/101675?v=4",
+      "profile": "http://poisson.phc.dm.unipi.it/~mascellani",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "RaphaelWoude",
+      "name": "Raphael van der Woude",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47354694?v=4",
+      "profile": "https://github.com/RaphaelWoude",
+      "contributions": [
+        "userTesting"
       ]
     }
   ],
