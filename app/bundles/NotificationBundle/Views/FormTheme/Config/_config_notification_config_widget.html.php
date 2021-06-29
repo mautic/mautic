@@ -14,15 +14,34 @@ declare(strict_types=1);
 
 <div class="panel panel-primary">
     <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.notification_config'); ?></h3>
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.campaign_notification_config'); ?></h3>
     </div>
     <div class="panel-body">
-        <?php foreach ($form->children as $f): ?>
-            <div class="row">
-                <div class="col-md-6">
-                    <?php echo $view['form']->row($f); ?>
-                </div>
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->row($form['campaign_send_notification_to_author']); ?>
             </div>
-        <?php endforeach; ?>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->row($form['campaign_notification_email_addresses']); ?>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-heading">
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.webhook_notification_config'); ?></h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->row($form['webhook_send_notification_to_author']); ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->row($form['webhook_notification_email_addresses']); ?>
+            </div>
+        </div>
     </div>
 </div>
