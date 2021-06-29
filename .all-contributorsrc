@@ -311,6 +311,15 @@
         "tutorial",
         "talk"
       ]
+    },
+    {
+      "login": "giomasce",
+      "name": "Giovanni Mascellani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/101675?v=4",
+      "profile": "http://poisson.phc.dm.unipi.it/~mascellani",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

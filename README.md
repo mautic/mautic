@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-31-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-32-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -115,6 +115,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.webmecanik.com"><img src="https://avatars.githubusercontent.com/u/49391402?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Florent Petitjean - Webmecanik</b></sub></a><br /><a href="#userTesting-florentpetitjean" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/tobsowo"><img src="https://avatars.githubusercontent.com/u/5642737?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Oluwatobi Owolabi</b></sub></a><br /><a href="#eventOrganizing-tobsowo" title="Event Organizing">📋</a></td>
     <td align="center"><a href="https://www.linkedin.com/in/favour-kelvin/"><img src="https://avatars.githubusercontent.com/u/39309699?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Favour Kelvin</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=fakela" title="Documentation">📖</a> <a href="#tutorial-fakela" title="Tutorials">✅</a> <a href="#talk-fakela" title="Talks">📢</a></td>
+    <td align="center"><a href="http://poisson.phc.dm.unipi.it/~mascellani"><img src="https://avatars.githubusercontent.com/u/101675?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Giovanni Mascellani</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=giomasce" title="Code">💻</a></td>
   </tr>
 </table>
 
