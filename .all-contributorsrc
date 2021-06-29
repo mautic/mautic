@@ -320,6 +320,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "RaphaelWoude",
+      "name": "Raphael van der Woude",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47354694?v=4",
+      "profile": "https://github.com/RaphaelWoude",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
