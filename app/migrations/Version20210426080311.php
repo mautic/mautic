@@ -52,6 +52,7 @@ final class Version20210426080311 extends AbstractMauticMigration
 
     public function preUp(Schema $schema): void
     {
+        throw new SkipMigration('Skip this migration temporarily, migration took several hours on bigger instances and brought the whole db server down because it run out of database connections due to the records waiting to be written to the locked tables');
         $skipError = [];
         foreach ($this->associatedTables as $tableName => $allowNull) {
             if ($this->isChangesExecuted($schema, $tableName)) {
