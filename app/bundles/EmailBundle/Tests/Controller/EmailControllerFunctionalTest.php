@@ -166,7 +166,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email->setName('Email B');
         $email->setSubject('Email B Subject');
         $email->setEmailType('list');
-        $email->setTemplate('beefree-empty');
+        $email->setTemplate('blank');
         $email->setCustomHtml('Test html');
 
         $email->addList($segment);
@@ -199,7 +199,6 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertEquals('Email B', $firstEmail->getName());
         Assert::assertEquals('Email B Subject clone', $secondEmail->getSubject());
         Assert::assertEquals('Email B clone', $secondEmail->getName());
-        Assert::assertEquals('beefree-empty', $secondEmail->getTemplate());
         Assert::assertEquals('Test html', $secondEmail->getCustomHtml());
     }
 }
