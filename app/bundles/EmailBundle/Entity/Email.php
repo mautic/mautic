@@ -677,7 +677,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function getCloneObjectId()
     {
-        return $this->cloneObjectId;
+        return (int) $this->cloneObjectId;
     }
 
     /**

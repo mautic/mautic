@@ -160,12 +160,15 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $segment = new LeadList();
         $segment->setName('Segment B');
         $segment->setAlias('segment-B');
+        $segment->setPublicName('seg');
+
         $email = new Email();
         $email->setName('Email B');
         $email->setSubject('Email B Subject');
         $email->setEmailType('list');
         $email->setTemplate('beefree-empty');
         $email->setCustomHtml('Test html');
+
         $email->addList($segment);
         $this->em->persist($segment);
         $this->em->persist($email);
