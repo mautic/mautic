@@ -14,7 +14,6 @@ namespace Mautic\CampaignBundle\Command;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\Helper\ExitCode;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -83,6 +82,6 @@ class CampaignDeleteEventLogsCommand extends Command
             $this->eventModel->deleteEventsByEventIds($eventIds);
         }
 
-        return ExitCode::SUCCESS;
+        return 0;
     }
 }

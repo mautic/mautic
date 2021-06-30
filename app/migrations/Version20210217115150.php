@@ -13,21 +13,20 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
-final class Version20210217115150 extends PreUpAssertionMigration
+final class Version20210217115150 extends AbstractMauticMigration
 {
-    protected function preUpAssertions(): void
+    public function preUp(Schema $schema): void
     {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getPrefixedTableName(Campaign::TABLE_NAME))->hasColumn('deleted');
-        }, 'Deleted column already added in '.Campaign::TABLE_NAME);
-
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getPrefixedTableName(Event::TABLE_NAME))->hasColumn('deleted');
-        }, 'Deleted column already added in '.Event::TABLE_NAME);
+        if ($schema->getTable($this->getPrefixedTableName(Campaign::TABLE_NAME))->hasColumn('deleted') &&
+            $schema->getTable($this->getPrefixedTableName(Event::TABLE_NAME))->hasColumn('deleted')
+        ) {
+            throw new SkipMigration('Deleted column already added in tables');
+        }
     }
 
     public function up(Schema $schema): void
