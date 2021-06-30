@@ -369,6 +369,36 @@ final class LeadEvents
     const IMPORT_POST_DELETE = 'mautic.lead_import_post_delete';
 
     /**
+     * The mautic.lead_import_on_initialize event is dispatched when the import is being initialized.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportInitEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_ON_INITIALIZE = 'mautic.lead_import_on_initialize';
+
+    /**
+     * The mautic.lead_import_on_field_mapping event is dispatched when the import needs the list of fields for mapping.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportMappingEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_ON_FIELD_MAPPING = 'mautic.lead_import_on_field_mapping';
+
+    /**
+     * The mautic.lead_import_on_process event is dispatched when the import batch is processing.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_ON_PROCESS = 'mautic.lead_import_on_process';
+
+    /**
      * The mautic.lead_import_batch_processed event is dispatched after an import batch is processed.
      *
      * The event listener receives a
