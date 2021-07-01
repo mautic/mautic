@@ -11,7 +11,6 @@
 
 namespace Mautic\SmsBundle\Entity;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
@@ -111,14 +110,12 @@ class SmsRepository extends CommonRepository
 
     /**
      * Get amounts of pending text messages.
-     *
-     * @return QueryBuilder|int|array
      */
     public function getSmsPendingQuery($smsId)
     {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $dncQb->select('null')
+        $dncQb->select('dnc.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->where(
                 $dncQb->expr()->andX(
@@ -138,12 +135,12 @@ class SmsRepository extends CommonRepository
                     $mqQb->expr()->eq('mq.channel', $mqQb->expr()->literal('sms'))
                 )
             );
-        $lists = $this->_em->getConnection()->createQueryBuilder()
+        $lists = $mqQb
             ->select('el.leadlist_id')
             ->distinct()
             ->from(MAUTIC_TABLE_PREFIX.'sms_message_list_xref', 'el')
             ->where('el.sms_id = '.(int) $smsId)
-            ->execute()->fetchAll();
+            ->execute();
         $listIds = [];
         if ($lists) {
             foreach ($lists as $list) {
@@ -165,7 +162,7 @@ class SmsRepository extends CommonRepository
 
         // Do not include leads that have already been sent the text message
         $statQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $statQb->select('null')
+        $statQb->select('stat.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'sms_message_stats', 'stat')
             ->where(
                 $statQb->expr()->eq('stat.lead_id', 'l.id')
@@ -181,8 +178,8 @@ class SmsRepository extends CommonRepository
 
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->andWhere(sprintf('EXISTS (%s)', $segmentQb->getSQL()))
-            ->andWhere(sprintf('NOT EXISTS (%s)', $dncQb->getSQL()))
-            ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
+            ->andWhere($q->expr()->notIn('l.id', $dncQb->getSQL()))
+            ->andWhere($q->expr()->notIn('l.id', $statQb->getSQL()))
             ->andWhere(sprintf('NOT EXISTS (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
 
