@@ -52,7 +52,7 @@ class FocusConfigTrackingPageTypeTest extends TestCase
                     'attr'  => [
                         'tooltip' => 'mautic.page.config.form.focus.pixel.enabled.tooltip',
                     ],
-                'data'  => ((bool) ($options['data'])) ?? true,
+                'data'  => ($options['data']) ?? true,
                 ]
             );
 
