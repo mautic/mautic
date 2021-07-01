@@ -140,7 +140,7 @@ class SmsRepository extends CommonRepository
             ->distinct()
             ->from(MAUTIC_TABLE_PREFIX.'sms_message_list_xref', 'el')
             ->where('el.sms_id = '.(int) $smsId)
-            ->execute();
+            ->execute()->fetchAll();
         $listIds = [];
         if ($lists) {
             foreach ($lists as $list) {
