@@ -72,6 +72,11 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
                 'label' => 'mautic.lead.report.owner_lastname',
                 'type'  => 'string',
             ],
+            'l.created_by' => [
+                'label'   => 'mautic.lead.report.created_by',
+                'type'    => 'string',
+                'formula' => 'CONCAT(ucb.first_name, " ", ucb.last_name)',
+            ],
             'x.title' => [
                 'label' => 'Title',
                 'type'  => 'string',
@@ -190,6 +195,11 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             'u.last_name' => [
                 'label' => 'mautic.lead.report.owner_lastname',
                 'type'  => 'string',
+            ],
+            'l.created_by' => [
+                'label'   => 'mautic.lead.report.created_by',
+                'type'    => 'string',
+                'formula' => 'CONCAT(ucb.first_name, " ", ucb.last_name)',
             ],
             'x.title' => [
                 'label' => 'Title',
