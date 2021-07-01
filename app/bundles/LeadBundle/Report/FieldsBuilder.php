@@ -18,6 +18,8 @@ use Mautic\UserBundle\Model\UserModel;
 
 class FieldsBuilder
 {
+    const PREFIX_CREATED_BY = 'ucb';
+
     /**
      * @var FieldModel
      */
@@ -86,14 +88,22 @@ class FieldsBuilder
             ],
         ];
 
-        $ownerPrefix           = $prefix.'owner_id';
         $ownersList            = [];
         $owners                = $this->userModel->getUserList('', 0);
         foreach ($owners as $owner) {
             $ownersList[$owner['id']] = sprintf('%s %s', $owner['firstName'], $owner['lastName']);
         }
+
+        $ownerPrefix           = $prefix.'owner_id';
         $filters[$ownerPrefix] = [
             'label' => 'mautic.lead.list.filter.owner',
+            'type'  => 'select',
+            'list'  => $ownersList,
+        ];
+
+        $createByPrefix           = $prefix.'created_by';
+        $filters[$createByPrefix] = [
+            'label' => 'mautic.lead.list.filter.created_by',
             'type'  => 'select',
             'list'  => $ownersList,
         ];
@@ -151,6 +161,11 @@ class FieldsBuilder
             'u.last_name' => [
                 'label' => 'mautic.lead.report.owner_lastname',
                 'type'  => 'string',
+            ],
+            'l.created_by' => [
+                'label'   => 'mautic.lead.report.created_by',
+                'type'    => 'string',
+                'formula' => 'CONCAT('.self::PREFIX_CREATED_BY.'.first_name, " ", '.self::PREFIX_CREATED_BY.'.last_name)',
             ],
         ];
     }

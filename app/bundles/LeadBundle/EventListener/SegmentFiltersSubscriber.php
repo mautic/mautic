@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -30,12 +31,18 @@ class SegmentFiltersSubscriber implements EventSubscriberInterface
     private $listModel;
 
     /**
+     * @var UserModel
+     */
+    private $userModel;
+
+    /**
      * SegmentFiltersSubscriber constructor.
      */
-    public function __construct(TranslatorInterface $translator, ListModel $listModel)
+    public function __construct(TranslatorInterface $translator, ListModel $listModel, UserModel $userModel)
     {
         $this->translator = $translator;
         $this->listModel  = $listModel;
+        $this->userModel  = $userModel;
     }
 
     public static function getSubscribedEvents()
@@ -89,6 +96,26 @@ class SegmentFiltersSubscriber implements EventSubscriberInterface
                     'callback' => 'activateSegmentFilterTypeahead',
                 ],
                 'operators' => $this->listModel->getOperatorsForFieldType('lookup_id'),
+                'object'    => 'lead',
+            ],
+            'created_by' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.created_by'),
+                'properties' => [
+                    'type' => 'select',
+                    'list' => array_flip($this->userModel->getOwnerListChoices()),
+                ],
+                'operators' => $this->listModel->getOperatorsForFieldType(
+                    [
+                        'include' => [
+                            '=',
+                            '!=',
+                            'empty',
+                            '!empty',
+                            'in',
+                            '!in',
+                        ],
+                    ]
+                ),
                 'object'    => 'lead',
             ],
             'points' => [

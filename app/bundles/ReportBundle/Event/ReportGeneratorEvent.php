@@ -332,6 +332,22 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
+     * Add company left join.
+     */
+    public function addUsersLeftJoin(string $prefix = 'u', string $column = 'owner_id')
+    {
+        $queryBuilder     = $this->getQueryBuilder();
+        $joinedLeadTables = $queryBuilder->getQueryParts()['join']['l'] ?? [];
+        foreach ($joinedLeadTables as $joinedLeadTable) {
+            if ($joinedLeadTable['joinTable']  === 'users' && $joinedLeadTable['joinAlias'] === $prefix) {
+                return;
+            }
+        }
+
+        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', $prefix, $prefix.'.id = l.'.$column);
+    }
+
+    /**
      * Apply date filters to the query.
      *
      * @param string $dateColumn

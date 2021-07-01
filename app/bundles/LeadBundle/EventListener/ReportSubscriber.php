@@ -129,7 +129,10 @@ class ReportSubscriber implements EventSubscriberInterface
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
-            ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', 0],
+            ReportEvents::REPORT_ON_GENERATE       => [
+                ['onReportGenerate', 0],
+                ['onEndReportGenerate', -999],
+            ],
             ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0],
             ReportEvents::REPORT_ON_DISPLAY        => ['onReportDisplay', 0],
         ];
@@ -932,5 +935,12 @@ class ReportSubscriber implements EventSubscriberInterface
 
         $event->setData($data);
         unset($data);
+    }
+
+    public function onEndReportGenerate(ReportGeneratorEvent $event)
+    {
+        if ($event->hasColumn('l.created_by') || $event->hasFilter('l.created_by')) {
+            $event->addUsersLeftJoin(FieldsBuilder::PREFIX_CREATED_BY, 'created_by');
+        }
     }
 }
