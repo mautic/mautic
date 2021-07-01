@@ -339,7 +339,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         $queryBuilder     = $this->getQueryBuilder();
         $joinedLeadTables = $queryBuilder->getQueryParts()['join']['l'] ?? [];
         foreach ($joinedLeadTables as $joinedLeadTable) {
-            if ($joinedLeadTable['joinTable']  === 'users' && $joinedLeadTable['joinAlias'] === $prefix) {
+            if ('users' === $joinedLeadTable['joinTable'] && $joinedLeadTable['joinAlias'] === $prefix) {
                 return;
             }
         }
