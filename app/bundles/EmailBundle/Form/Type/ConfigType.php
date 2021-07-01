@@ -692,6 +692,22 @@ class ConfigType extends AbstractType
                 'required'   => false,
             ]
         );
+
+        $builder->add(
+            'segment_email_once_to_email_address',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.config.just.once',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.just.once.tooltip',
+                ],
+                'data'       => empty($options['data']['segment_email_once_to_email_address']) ? false : true,
+                'required'   => false,
+            ]
+        );
+
         $builder->add(
             'email_frequency_number',
             NumberType::class,
