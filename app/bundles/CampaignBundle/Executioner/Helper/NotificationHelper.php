@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Executioner\Helper;
 
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
@@ -42,14 +43,25 @@ class NotificationHelper
     private $router;
 
     /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
      * NotificationHelper constructor.
      */
-    public function __construct(UserModel $userModel, NotificationModel $notificationModel, TranslatorInterface $translator, Router $router)
-    {
-        $this->userModel         = $userModel;
-        $this->notificationModel = $notificationModel;
-        $this->translator        = $translator;
-        $this->router            = $router;
+    public function __construct(
+        UserModel $userModel,
+        NotificationModel $notificationModel,
+        TranslatorInterface $translator,
+        Router $router,
+        CoreParametersHelper $coreParametersHelper
+    ) {
+        $this->userModel            = $userModel;
+        $this->notificationModel    = $notificationModel;
+        $this->translator           = $translator;
+        $this->router               = $router;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public function notifyOfFailure(Lead $contact, Event $event)
@@ -115,18 +127,17 @@ class NotificationHelper
             $user
         );
 
-        $this->userModel->emailUser(
-            $user,
-            $this->translator->trans(
-                'mautic.campaign.event.campaign_unpublished.title',
-                [
-                    '%title%' => $campaign->getName(),
-                ]
-            ),
-            $this->translator->trans(
-                'mautic.campaign.event.failed.campaign.unpublished',
-                [
-                    '%campaign%' => '<a href="'.$this->router->generate(
+        $subject = $this->translator->trans(
+            'mautic.campaign.event.campaign_unpublished.title',
+            [
+                '%title%' => $campaign->getName(),
+            ]
+        );
+
+        $content = $this->translator->trans(
+            'mautic.campaign.event.failed.campaign.unpublished',
+            [
+                '%campaign%' => '<a href="'.$this->router->generate(
                         'mautic_campaign_action',
                         [
                             'objectAction' => 'view',
@@ -134,10 +145,17 @@ class NotificationHelper
                         ],
                         UrlGeneratorInterface::ABSOLUTE_URL
                     ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
-                    '%event%' => $event->getName(),
-                ]
-            )
+                '%event%' => $event->getName(),
+            ]
         );
+
+        $sendToAuthor = $this->coreParametersHelper->get('campaign_send_notification_to_author', 1);
+        if ($sendToAuthor) {
+            $this->userModel->emailUser($user, $subject, $content);
+        } else {
+            $emailAddresses =  array_map('trim', explode(',', $this->coreParametersHelper->get('campaign_notification_email_addresses')));
+            $this->userModel->sendMailToEmailAddresses($emailAddresses, $subject, $content);
+        }
     }
 
     /**

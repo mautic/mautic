@@ -304,10 +304,37 @@ class UserModel extends FormModel
         $text = str_replace('\\n', "\n", $text);
         $html = nl2br($text);
 
-        $mailer->setBody($html);
-        $mailer->setPlainText(strip_tags($text));
+        $this->emailUser(
+            $user,
+            $this->translator->trans('mautic.user.user.passwordreset.subject'),
+            $html
+        );
+    }
 
+    public function emailUser(User $user, string $subject, string $content)
+    {
+        $mailer  = $this->prepareEMail($subject, $content);
+        $mailer->setTo([$user->getEmail() => $user->getName()]);
         $mailer->send();
+    }
+
+    public function sendMailToEmailAddresses(array $emailAddresses, string $subject, string $content)
+    {
+        $mailer  = $this->prepareEMail($subject, $content);
+        $mailer->setTo($emailAddresses);
+        $mailer->send();
+    }
+
+    private function prepareEMail(string $subject, string $content): MailHelper
+    {
+        $mailer  = $this->mailHelper->getMailer();
+        $content = str_replace('\\n', "\n", $content);
+        $html    = nl2br($content);
+        $mailer->setSubject($subject);
+        $mailer->setBody($html);
+        $mailer->setPlainText(strip_tags($content));
+
+        return $mailer;
     }
 
     /**
