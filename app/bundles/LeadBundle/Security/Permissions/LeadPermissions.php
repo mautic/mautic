@@ -25,6 +25,7 @@ class LeadPermissions extends AbstractPermissions
             'lists' => [
                 'viewother'   => 2,
                 'editother'   => 8,
+                'create'      => 32,
                 'deleteother' => 64,
                 'full'        => 1024,
             ],
@@ -56,6 +57,7 @@ class LeadPermissions extends AbstractPermissions
                 'choices' => [
                     'mautic.core.permissions.viewother'   => 'viewother',
                     'mautic.core.permissions.editother'   => 'editother',
+                    'mautic.core.permissions.create'      => 'create',
                     'mautic.core.permissions.deleteother' => 'deleteother',
                     'mautic.core.permissions.full'        => 'full',
                 ],

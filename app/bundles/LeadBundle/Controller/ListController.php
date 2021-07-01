@@ -53,6 +53,7 @@ class ListController extends FormController
             'lead:leads:viewother',
             'lead:lists:viewother',
             'lead:lists:editother',
+            'lead:lists:create',
             'lead:lists:deleteother',
         ], 'RETURN_ARRAY');
 
@@ -156,7 +157,7 @@ class ListController extends FormController
      */
     public function newAction()
     {
-        if (!$this->get('mautic.security')->isGranted('lead:leads:viewown')) {
+        if (!$this->get('mautic.security')->isGranted('lead:lists:create')) {
             return $this->accessDenied();
         }
 
