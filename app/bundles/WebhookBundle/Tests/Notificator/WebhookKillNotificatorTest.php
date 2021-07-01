@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Mautic\WebhookBundle\Tests\Notificator;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
@@ -56,7 +57,26 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
                 ]
             )
             ->willReturnOnConsecutiveCalls($subject, $reason, $details);
+        $coreParamHelperMock = $this->createMock(CoreParametersHelper::class);
+        $coreParamHelperMock
+            ->expects($this->at(0))
+            ->method('get')
+            ->with('webhook_send_notification_to_author')
+            ->willReturn(1);
 
+        $translatorMock = $this->createMock(TranslatorInterface::class);
+        $translatorMock
+            ->expects($this->at(0))
+            ->method('trans')
+            ->with('mautic.webhook.stopped')
+            ->willReturn($subject);
+        $translatorMock
+            ->expects($this->at(1))
+            ->method('trans')
+            ->with($reason)
+            ->willReturn($reason);
+
+        $webhook = $this->createMock(Webhook::class);
         $webhook->expects($this->once())
             ->method('getId')
             ->willReturn($webhookId);
@@ -118,7 +138,7 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             ->method('setBody')
             ->with($details);
 
-        $webhookKillNotificator = new WebhookKillNotificator($translatorMock, $routerMock, $notificationModelMock, $entityManagerMock, $mailHelperMock);
+        $webhookKillNotificator = new WebhookKillNotificator($translatorMock, $routerMock, $notificationModelMock, $entityManagerMock, $mailHelperMock, $coreParamHelperMock);
         $webhookKillNotificator->send($webhook, $reason);
     }
 
@@ -156,6 +176,25 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnOnConsecutiveCalls($subject, $reason, $details);
 
+        $coreParamHelperMock = $this->createMock(CoreParametersHelper::class);
+        $coreParamHelperMock
+            ->expects($this->at(0))
+            ->method('get')
+            ->with('webhook_send_notification_to_author')
+            ->willReturn(1);
+        $translatorMock = $this->createMock(TranslatorInterface::class);
+        $translatorMock
+            ->expects($this->at(0))
+            ->method('trans')
+            ->with('mautic.webhook.stopped')
+            ->willReturn($subject);
+        $translatorMock
+            ->expects($this->at(1))
+            ->method('trans')
+            ->with($reason)
+            ->willReturn($reason);
+
+        $webhook = $this->createMock(Webhook::class);
         $webhook->expects($this->once())
             ->method('getId')
             ->willReturn($webhookId);
@@ -225,7 +264,7 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             ->method('setBody')
             ->with($details);
 
-        $webhookKillNotificator = new WebhookKillNotificator($translatorMock, $routerMock, $notificationModelMock, $entityManagerMock, $mailHelperMock);
+        $webhookKillNotificator = new WebhookKillNotificator($translatorMock, $routerMock, $notificationModelMock, $entityManagerMock, $mailHelperMock, $coreParamHelperMock);
         $webhookKillNotificator->send($webhook, $reason);
     }
 }

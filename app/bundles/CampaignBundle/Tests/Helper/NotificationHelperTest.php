@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Tests\Helper;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -43,6 +44,11 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $translator;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
     protected function setUp(): void
     {
         $this->userModel = $this->getMockBuilder(UserModel::class)
@@ -58,6 +64,10 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $this->translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -214,7 +224,8 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
             $this->userModel,
             $this->notificationModel,
             $this->translator,
-            $this->router
+            $this->router,
+            $this->coreParametersHelper
         );
     }
 }

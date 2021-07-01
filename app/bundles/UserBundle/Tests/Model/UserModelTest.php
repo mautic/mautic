@@ -110,6 +110,11 @@ class UserModelTest extends TestCase
             ->method('generate')
             ->with('mautic_user_passwordresetconfirm', ['token' => null], UrlGeneratorInterface::ABSOLUTE_URL);
 
+        $this->translator
+            ->expects($this->any())
+            ->method('trans')
+            ->willReturn('test');
+
         $this->userModel->sendResetEmail($this->user);
     }
 
