@@ -135,7 +135,7 @@ class SmsRepository extends CommonRepository
                     $mqQb->expr()->eq('mq.channel', $mqQb->expr()->literal('sms'))
                 )
             );
-        $lists = $mqQb
+        $lists = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('el.leadlist_id')
             ->distinct()
             ->from(MAUTIC_TABLE_PREFIX.'sms_message_list_xref', 'el')
