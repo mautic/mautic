@@ -311,14 +311,14 @@ class UserModel extends FormModel
         );
     }
 
-    public function emailUser(User $user, string $subject, string $content)
+    public function emailUser(User $user, string $subject, string $content): void
     {
         $mailer  = $this->prepareEMail($subject, $content);
         $mailer->setTo([$user->getEmail() => $user->getName()]);
         $mailer->send();
     }
 
-    public function sendMailToEmailAddresses(array $emailAddresses, string $subject, string $content)
+    public function sendMailToEmailAddresses(array $emailAddresses, string $subject, string $content): void
     {
         $mailer  = $this->prepareEMail($subject, $content);
         $mailer->setTo($emailAddresses);

@@ -134,4 +134,62 @@ class UserModelTest extends TestCase
 
         $this->userModel->sendResetEmail($this->user);
     }
+
+    public function testEmailUser(): void
+    {
+        $email   = 'a@test.com';
+        $name    = 'name';
+        $toMail  = [$email => $name];
+        $subject = 'subject';
+        $content = 'content';
+
+        $this->user->expects($this->once())
+            ->method('getEmail')
+            ->willReturn($email);
+
+        $this->user->expects($this->once())
+            ->method('getName')
+            ->willReturn($name);
+
+        $this->mailHelper->expects($this->once())
+            ->method('getMailer')
+            ->willReturn($this->mailHelper);
+
+        $this->mailHelper->expects($this->once())
+            ->method('setTo')
+            ->with($toMail)
+            ->willReturn(true);
+
+        $this->mailHelper->expects($this->once())
+            ->method('send');
+
+        $this->assertSame(
+            null, // Means no erros.
+            $this->userModel->emailUser($this->user, $subject, $content)
+        );
+    }
+
+    public function testSendMailToEmailAddresses(): void
+    {
+        $toMails = ['a@test.com', 'b@test.com'];
+        $subject = 'subject';
+        $content = 'content';
+
+        $this->mailHelper->expects($this->once())
+            ->method('getMailer')
+            ->willReturn($this->mailHelper);
+
+        $this->mailHelper->expects($this->once())
+            ->method('setTo')
+            ->with($toMails)
+            ->willReturn(true);
+
+        $this->mailHelper->expects($this->once())
+            ->method('send');
+
+        $this->assertSame(
+            null, // Means no erros.
+            $this->userModel->sendMailToEmailAddresses($toMails, $subject, $content)
+        );
+    }
 }
