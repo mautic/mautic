@@ -13,8 +13,11 @@ namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\EventListener\SegmentFiltersSubscriber;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -24,6 +27,11 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class FieldAliasKeywordValidator extends ConstraintValidator
 {
+    const RESTRICTED_ALIASES = [
+        'contact_id',
+        'company_id',
+    ];
+
     /**
      * @var ListModel
      */
@@ -39,11 +47,23 @@ class FieldAliasKeywordValidator extends ConstraintValidator
      */
     private $em;
 
-    public function __construct(ListModel $listModel, FieldAliasHelper $aliasHelper, EntityManager $em)
+    /**
+     * @var DataCollectorTranslator
+     */
+    private $translator;
+
+    /**
+     * @var SegmentFiltersSubscriber
+     */
+    private $segmentFilter;
+
+    public function __construct(ListModel $listModel, FieldAliasHelper $aliasHelper, EntityManager $em, TranslatorInterface $translator, SegmentFiltersSubscriber $segmentFilter)
     {
-        $this->listModel   = $listModel;
-        $this->aliasHelper = $aliasHelper;
-        $this->em          = $em;
+        $this->listModel     = $listModel;
+        $this->aliasHelper   = $aliasHelper;
+        $this->em            = $em;
+        $this->translator    = $translator;
+        $this->segmentFilter = $segmentFilter;
     }
 
     /**
@@ -56,8 +76,19 @@ class FieldAliasKeywordValidator extends ConstraintValidator
 
         //If empty it's a new object else it's an edit
         if (empty($oldValue) || (!empty($oldValue) && is_array($oldValue) && $oldValue['alias'] != $field->getAlias())) {
-            $segmentChoices = $this->listModel->getChoiceFields();
-            if (isset($segmentChoices[$field->getObject()][$field->getAlias()])) {
+            if (in_array($field->getAlias(), self::RESTRICTED_ALIASES)) {
+                $this->context->addViolation(
+                    $this->translator->trans(
+                        'mautic.lead.field.keyword.restricted',
+                        ['%alias%' => $field->getAlias()],
+                        'validators'
+                    )
+                );
+
+                return;
+            }
+            $choices = array_merge($this->listModel->getChoiceFields()[$field->getObject()] ?? [], $this->segmentFilter->getSegmentFilters());
+            if (isset($choices[$field->getAlias()])) {
                 $this->context->addViolation($constraint->message, ['%keyword%' => $field->getAlias()]);
             }
         }
