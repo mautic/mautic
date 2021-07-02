@@ -3,11 +3,10 @@ import grapesjsmjml from 'grapesjs-mjml';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
-// import grapesjsmautic from 'grapesjs-preset-mautic';
-import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
-import ContentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
-import MjmlService from '../../../../../../grapesjs-preset-mautic/src/mjml/mjml.service';
-// import grapesjsmautic from 'grapesjs-preset-mautic/src/content.service';
+import grapesjsmautic from 'grapesjs-preset-mautic/src';
+import ContentService from 'grapesjs-preset-mautic/src/content.service';
+import MjmlService from 'grapesjs-preset-mautic/src/mjml/mjml.service';
+// import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
 import CodeModeButton from './codeMode/codeMode.button';
 
 export default class BuilderService {
