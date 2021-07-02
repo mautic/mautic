@@ -255,6 +255,7 @@ trait EntityFieldsBuildFormTrait
                     switch ($type) {
                         case LookupType::class:
                             $attr['data-target'] = $alias;
+                            $constraints[]       = new Length(['max' => 191]);
                             if (!empty($properties['list'])) {
                                 $attr['data-options'] = FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, array_keys(FormFieldHelper::parseList($properties['list'])));
                             }
