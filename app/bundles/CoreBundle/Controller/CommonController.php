@@ -19,6 +19,8 @@ use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
+use Sonata\Exporter\Source\ArraySourceIterator;
+use Sonata\Exporter\Source\IteratorSourceIterator;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -494,6 +496,17 @@ class CommonController extends Controller implements MauticController
      */
     public function notFound($msg = 'mautic.core.url.error.404')
     {
+        $page_404 = $this->coreParametersHelper->get('404_page');
+        if (!empty($page_404)) {
+            $pageModel = $this->getModel('page');
+            $page      = $pageModel->getEntity($page_404);
+            if (!empty($page) && $page->getIsPublished() && !empty($page->getCustomHtml())) {
+                $slug = $pageModel->generateSlug($page);
+
+                return $this->redirectToRoute('mautic_page_public', ['slug' => $slug]);
+            }
+        }
+
         return $this->renderException(
             new NotFoundHttpException(
                 $this->translator->trans($msg,
