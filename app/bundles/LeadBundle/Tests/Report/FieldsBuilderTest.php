@@ -246,6 +246,14 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
                     2 => 'Joe Smith',
                 ],
             ],
+            'x.created_by' => [
+                'label' => 'mautic.lead.list.filter.created_by',
+                'type'  => 'select',
+                'list'  => [
+                    1 => 'John Doe',
+                    2 => 'Joe Smith',
+                ],
+            ],
         ];
 
         $columns = $fieldsBuilder->getLeadFilter('x', 'segment');
