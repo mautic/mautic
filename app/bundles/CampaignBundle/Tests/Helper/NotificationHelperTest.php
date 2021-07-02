@@ -216,7 +216,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $this->getNotificationHelper()->notifyOfFailure($lead, $event);
     }
 
-    public function testNotificationOfUnpublishToAuther(): void
+    public function testNotificationOfUnpublishToAuthor(): void
     {
         $event    = new Event();
         $user     = $this->getMockBuilder(User::class)
