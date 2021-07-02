@@ -52,7 +52,6 @@ class WebhookQueue
             ->setCustomRepositoryClass(WebhookQueueRepository::class);
         $builder->addId();
         $builder->createManyToOne('webhook', 'Webhook')
-            ->inversedBy('queues')
             ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
         $builder->addNullableField('dateAdded', Type::DATETIME, 'date_added');

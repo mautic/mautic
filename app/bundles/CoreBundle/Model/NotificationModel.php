@@ -47,11 +47,6 @@ class NotificationModel extends FormModel
     protected $updateHelper;
 
     /**
-     * @var FeedReader
-     */
-    protected $rssReader;
-
-    /**
      * @var CoreParametersHelper
      */
     protected $coreParametersHelper;
@@ -59,12 +54,10 @@ class NotificationModel extends FormModel
     public function __construct(
         PathsHelper $pathsHelper,
         UpdateHelper $updateHelper,
-        FeedReader $rssReader,
         CoreParametersHelper $coreParametersHelper
     ) {
         $this->pathsHelper          = $pathsHelper;
         $this->updateHelper         = $updateHelper;
-        $this->rssReader            = $rssReader;
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
@@ -166,8 +159,6 @@ class NotificationModel extends FormModel
             return [[], false, ''];
         }
 
-        $this->updateUpstreamNotifications();
-
         $showNewIndicator = false;
         $userId           = ($this->userHelper->getUser()) ? $this->userHelper->getUser()->getId() : 0;
 
@@ -222,46 +213,5 @@ class NotificationModel extends FormModel
         }
 
         return [$notifications, $showNewIndicator, ['isNew' => $newUpdate, 'message' => $updateMessage]];
-    }
-
-    /**
-     * Fetch upstream notifications via RSS.
-     */
-    public function updateUpstreamNotifications()
-    {
-        $url = $this->coreParametersHelper->get('rss_notification_url');
-
-        if (empty($url)) {
-            return;
-        }
-
-        //check to see when we last checked for an update
-        $lastChecked = $this->session->get('mautic.upstream.checked', 0);
-
-        if (time() - $lastChecked > 3600) {
-            $this->session->set('mautic.upstream.checked', time());
-            $lastDate = $this->getRepository()->getUpstreamLastDate();
-
-            try {
-                /** @var FeedContent $feed */
-                $feed = $this->rssReader->getFeedContent($url, $lastDate);
-
-                /** @var Item $item */
-                foreach ($feed->getItems() as $item) {
-                    $description = $item->getDescription();
-                    if (mb_strlen(strip_tags($description)) > 300) {
-                        $description = mb_substr(strip_tags($description), 0, 300);
-                        $description .= '... <a href="'.$item->getLink().'" target="_blank">'.$this->translator->trans(
-                                'mautic.core.notification.read_more'
-                            ).'</a>';
-                    }
-                    $header = $item->getTitle();
-
-                    $this->addNotification($description, 'upstream', false, ($header) ? $header : null, 'fa-bullhorn');
-                }
-            } catch (\Exception $exception) {
-                $this->logger->addWarning($exception->getMessage());
-            }
-        }
     }
 }
