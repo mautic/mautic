@@ -25,6 +25,7 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Event\TrackingEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
+use Mautic\PageBundle\Model\Tracking404Model;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -291,7 +292,11 @@ class PublicController extends CommonFormController
             return new Response($content);
         }
 
-        $model->hitPage($entity, $this->request, 404);
+        /** @var Tracking404Model $tracking404Model */
+        $tracking404Model = $this->get('mautic.page.model.tracking.404');
+        if ($tracking404Model->isTrackable()) {
+            $tracking404Model->hitPage($entity, $this->request);
+        }
 
         return $this->notFound();
     }
