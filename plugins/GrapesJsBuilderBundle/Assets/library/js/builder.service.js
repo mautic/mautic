@@ -3,10 +3,9 @@ import grapesjsmjml from 'grapesjs-mjml';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
-import grapesjsmautic from 'grapesjs-preset-mautic/src';
-import ContentService from 'grapesjs-preset-mautic/src/content.service';
-import MjmlService from 'grapesjs-preset-mautic/src/mjml/mjml.service';
+import grapesjsmautic from 'grapesjs-preset-mautic';
 // import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
+
 import CodeModeButton from './codeMode/codeMode.button';
 
 export default class BuilderService {
@@ -95,13 +94,13 @@ export default class BuilderService {
     if (object === 'page') {
       this.editor = this.initPage();
     } else if (object === 'emailform') {
-      if (MjmlService.getOriginalContentMjml()) {
+      if (grapesjsmautic.MjmlService.getOriginalContentMjml()) {
         this.editor = this.initEmailMjml();
       } else {
         this.editor = this.initEmailHtml();
       }
     } else {
-      throw Error(`not supported builder type: ${object}`);
+      throw Error(`Not supported builder type: ${object}`);
     }
 
     // add code mode button
@@ -127,10 +126,10 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: ContentService.getOriginalContentHtml().body.innerHTML,
+      components: grapesjsmautic.ContentService.getOriginalContentHtml().body.innerHTML,
       height: '100%',
       canvas: {
-        styles: ContentService.getStyles(),
+        styles: grapesjsmautic.ContentService.getStyles(),
       },
       storageManager: false, // https://grapesjs.com/docs/modules/Storage.html#basic-configuration
       assetManager: this.getAssetManagerConf(),
@@ -150,9 +149,9 @@ export default class BuilderService {
   }
 
   initEmailMjml() {
-    const components = MjmlService.getOriginalContentMjml();
+    const components = grapesjsmautic.MjmlService.getOriginalContentMjml();
     // validate
-    MjmlService.mjmlToHtml(components);
+    grapesjsmautic.MjmlService.mjmlToHtml(components);
 
     this.editor = grapesjs.init({
       clearOnRender: true,
@@ -180,7 +179,7 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: ContentService.getOriginalContentHtml().body.innerHTML,
+      components: grapesjsmautic.ContentService.getOriginalContentHtml().body.innerHTML,
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
