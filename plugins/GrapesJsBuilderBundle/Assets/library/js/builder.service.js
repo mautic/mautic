@@ -5,6 +5,8 @@ import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
 import grapesjsmautic from 'grapesjs-preset-mautic';
 // import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
+import mjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
+import contentService from 'grapesjs-preset-mautic/dist/content.service';
 
 import CodeModeButton from './codeMode/codeMode.button';
 
@@ -94,7 +96,7 @@ export default class BuilderService {
     if (object === 'page') {
       this.editor = this.initPage();
     } else if (object === 'emailform') {
-      if (grapesjsmautic.MjmlService.getOriginalContentMjml()) {
+      if (mjmlService.getOriginalContentMjml()) {
         this.editor = this.initEmailMjml();
       } else {
         this.editor = this.initEmailHtml();
@@ -126,10 +128,10 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: grapesjsmautic.ContentService.getOriginalContentHtml().body.innerHTML,
+      components: contentService.getOriginalContentHtml().body.innerHTML,
       height: '100%',
       canvas: {
-        styles: grapesjsmautic.ContentService.getStyles(),
+        styles: contentService.getStyles(),
       },
       storageManager: false, // https://grapesjs.com/docs/modules/Storage.html#basic-configuration
       assetManager: this.getAssetManagerConf(),
@@ -149,9 +151,9 @@ export default class BuilderService {
   }
 
   initEmailMjml() {
-    const components = grapesjsmautic.MjmlService.getOriginalContentMjml();
+    const components = mjmlService.getOriginalContentMjml();
     // validate
-    grapesjsmautic.MjmlService.mjmlToHtml(components);
+    mjmlService.mjmlToHtml(components);
 
     this.editor = grapesjs.init({
       clearOnRender: true,
@@ -179,7 +181,7 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: grapesjsmautic.ContentService.getOriginalContentHtml().body.innerHTML,
+      components: contentService.getOriginalContentHtml().body.innerHTML,
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
