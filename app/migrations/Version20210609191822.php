@@ -30,8 +30,8 @@ final class Version20210609191822 extends AbstractMauticMigration
     public function up(Schema $schema): void
     {
         foreach ($this->tables as $table) {
-            if ($schema->hasTable($table)) {
-                $schema->dropTable($table);
+            if ($schema->hasTable($this->prefix . $table)) {
+                $schema->dropTable($this->prefix . $table);
             }
         }
     }
