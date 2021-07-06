@@ -212,10 +212,12 @@ class LeadField extends FormEntity
 
         $builder->createField('columnIsNotCreated', 'boolean')
             ->columnName('column_is_not_created')
+            ->option('default', false)
             ->build();
 
         $builder->createField('originalIsPublishedValue', 'boolean')
             ->columnName('original_is_published_value')
+            ->option('default', false)
             ->build();
     }
 
