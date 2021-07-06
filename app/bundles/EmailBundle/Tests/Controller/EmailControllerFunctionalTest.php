@@ -153,4 +153,52 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         return $email;
     }
+
+    public function testCloneAction()
+    {
+        // Create a segment and email
+        $segment = new LeadList();
+        $segment->setName('Segment B');
+        $segment->setAlias('segment-B');
+        $segment->setPublicName('seg');
+
+        $email = new Email();
+        $email->setName('Email B');
+        $email->setSubject('Email B Subject');
+        $email->setEmailType('list');
+        $email->setTemplate('blank');
+        $email->setCustomHtml('Test html');
+
+        $email->addList($segment);
+        $this->em->persist($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        // request for email clone
+        $crawler        = $this->client->request(Request::METHOD_GET, "/s/emails/clone/{$email->getId()}");
+        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $form['emailform[emailType]']->setValue('list');
+        $form['emailform[subject]']->setValue('Email B Subject clone');
+        $form['emailform[name]']->setValue('Email B clone');
+        $form['emailform[isPublished]']->setValue(1);
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $emails = $this->em->getRepository(Email::class)->findBy([], ['id' => 'ASC']);
+        Assert::assertCount(2, $emails);
+
+        $firstEmail  = $emails[0];
+        $secondEmail = $emails[1];
+
+        Assert::assertSame($email->getId(), $firstEmail->getId());
+        Assert::assertNotSame($email->getId(), $secondEmail->getId());
+        Assert::assertEquals('list', $secondEmail->getEmailType());
+        Assert::assertEquals('Email B Subject', $firstEmail->getSubject());
+        Assert::assertEquals('Email B', $firstEmail->getName());
+        Assert::assertEquals('Email B Subject clone', $secondEmail->getSubject());
+        Assert::assertEquals('Email B clone', $secondEmail->getName());
+        Assert::assertEquals('Test html', $secondEmail->getCustomHtml());
+    }
 }
