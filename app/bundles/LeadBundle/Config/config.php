@@ -607,6 +607,7 @@ return [
                     'mautic.helper.user',
                     'mautic.campaign.model.campaign',
                     'mautic.asset.model.asset',
+                    'mautic.form.model.form',
                 ],
             ],
             'mautic.form.type.leadlist_choices' => [
@@ -1006,6 +1007,14 @@ return [
             ],
             'mautic.lead.query.builder.foreign.value' => [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder::class,
+                'arguments' => ['mautic.lead.model.random_parameter_name'],
+            ],
+            'mautic.lead.query.builder.foreign.value.firstsubmission' => [
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\FirstSubmissionFilterQueryBuilder::class,
+                'arguments' => ['mautic.lead.model.random_parameter_name'],
+            ],
+            'mautic.lead.query.builder.foreign.value.lastsubmission' => [
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\LastSubmissionFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
             'mautic.lead.query.builder.foreign.func' => [
