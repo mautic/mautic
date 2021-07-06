@@ -1,6 +1,14 @@
 <?php
 
 declare(strict_types=1);
+/*
+ * @copyright   2021 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
 
 namespace Mautic\PageBundle\Tests\Entity;
 
@@ -51,5 +59,29 @@ class PageTest extends \PHPUnit\Framework\TestCase
         yield ['', false, ['noIndex' => [null, false]]];
         yield [0, false, ['noIndex' => [null, false]]];
         yield ['string', true, ['noIndex' => [null, true]]];
+    }
+
+    /**
+     * Test setHeadScript and getHeadScript.
+     */
+    public function testSetHeadScript()
+    {
+        $script = '<script>console.log("test")';
+        $page   = new Page();
+        $page->setHeadScript($script);
+
+        $this->assertEquals($script, $page->getHeadScript());
+    }
+
+    /**
+     * Test setFooterScript and getFooterScript.
+     */
+    public function testSetFooterScript()
+    {
+        $script = '<script>console.log("test")';
+        $page   = new Page();
+        $page->setFooterScript($script);
+
+        $this->assertEquals($script, $page->getFooterScript());
     }
 }
