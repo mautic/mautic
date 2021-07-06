@@ -59,6 +59,39 @@ if ('index' == $tmpl) {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'email',
+                        'orderBy'    => 'e.dateAdded',
+                        'text'       => 'mautic.lead.import.label.dateAdded',
+                        'class'      => 'visible-lg col-email-dateAdded',
+                    ]
+                );
+                ?>
+                <?php
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'email',
+                        'orderBy'    => 'e.dateModified',
+                        'text'       => 'mautic.lead.import.label.dateModified',
+                        'class'      => 'visible-lg col-email-dateModified',
+                    ]
+                );
+                ?>
+                <?php
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'email',
+                        'orderBy'    => 'e.createdByUser',
+                        'text'       => 'mautic.core.createdby',
+                        'class'      => 'visible-lg col-email-createdByUser',
+                    ]
+                );
+                ?>
+                <?php
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'email',
                         'orderBy'    => 'e.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-email-id',
@@ -217,6 +250,9 @@ if ('index' == $tmpl) {
                         <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
                         <?php echo $view['content']->getCustomContent('email.stats.below', $mauticTemplateVars); ?>
                     </td>
+                    <td class="visible-lg"><?php echo $item->getDateAdded() ? $view['date']->toFullConcat($item->getDateAdded()) : ''; ?></td>
+                    <td class="visible-lg"><?php echo $item->getDateModified() ? $view['date']->toFullConcat($item->getDateModified()) : ''; ?></td>
+                    <td class="visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
