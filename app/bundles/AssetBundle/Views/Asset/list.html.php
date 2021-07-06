@@ -38,7 +38,6 @@ if ('index' == $tmpl) {
                         'orderBy'    => 'a.title',
                         'text'       => 'mautic.core.title',
                         'class'      => 'col-asset-title',
-                        'default'    => true,
                     ]
                 );
 
@@ -59,6 +58,37 @@ if ('index' == $tmpl) {
                         'orderBy'    => 'a.downloadCount',
                         'text'       => 'mautic.asset.asset.thead.download.count',
                         'class'      => 'visible-md visible-lg col-asset-download-count',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'asset',
+                        'orderBy'    => 'a.dateAdded',
+                        'text'       => 'mautic.lead.import.label.dateAdded',
+                        'class'      => 'visible-md visible-lg col-asset-dateAdded',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'asset',
+                        'orderBy'    => 'a.dateModified',
+                        'text'       => 'mautic.lead.import.label.dateModified',
+                        'class'      => 'visible-md visible-lg col-asset-dateModified',
+                        'default'    => true,
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'asset',
+                        'orderBy'    => 'a.createdByUser',
+                        'text'       => 'mautic.core.createdby',
+                        'class'      => 'visible-md visible-lg col-asset-createdByUser',
                     ]
                 );
 
@@ -148,6 +178,9 @@ if ('index' == $tmpl) {
                         <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getDownloadCount(); ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateAdded() ? $view['date']->toFull($item->getDateAdded()) : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateModified() ? $view['date']->toFull($item->getDateModified()) : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>

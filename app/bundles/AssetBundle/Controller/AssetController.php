@@ -66,7 +66,7 @@ class AssetController extends FormController
                 ['column' => 'a.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
-        $orderBy    = $this->get('session')->get('mautic.asset.orderby', 'a.title');
+        $orderBy    = $this->get('session')->get('mautic.asset.orderby', 'a.dateModified');
         $orderByDir = $this->get('session')->get('mautic.asset.orderbydir', 'DESC');
 
         $assets = $model->getEntities(
@@ -333,7 +333,7 @@ class AssetController extends FormController
                     $entity->setUploadDir($this->get('mautic.helper.core_parameters')->get('upload_dir'));
                     $entity->preUpload();
                     $entity->upload();
-
+                    $entity->setDateModified(new \DateTime());
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
