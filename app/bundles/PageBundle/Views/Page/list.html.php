@@ -38,7 +38,6 @@ if ('index' == $tmpl) {
                         'orderBy'    => 'p.title',
                         'text'       => 'mautic.core.title',
                         'class'      => 'col-page-title',
-                        'default'    => true,
                     ]
                 );
 
@@ -59,6 +58,37 @@ if ('index' == $tmpl) {
                         'orderBy'    => 'p.hits',
                         'text'       => 'mautic.page.thead.hits',
                         'class'      => 'col-page-hits visible-md visible-lg',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'page',
+                        'orderBy'    => 'p.dateAdded',
+                        'text'       => 'mautic.lead.import.label.dateAdded',
+                        'class'      => 'col-page-dateAdded visible-md visible-lg',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'page',
+                        'orderBy'    => 'p.dateModified',
+                        'text'       => 'mautic.lead.import.label.dateModified',
+                        'class'      => 'col-page-dateModified visible-md visible-lg',
+                        'default'    => true,
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'page',
+                        'orderBy'    => 'p.createdByUser',
+                        'text'       => 'mautic.core.createdby',
+                        'class'      => 'col-page-createdByUser visible-md visible-lg',
                     ]
                 );
 
@@ -144,6 +174,9 @@ if ('index' == $tmpl) {
                         <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getHits(); ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateAdded() ? $view['date']->toFull($item->getDateAdded()) : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateModified() ? $view['date']->toFull($item->getDateModified()) : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>

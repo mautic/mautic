@@ -23,6 +23,16 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->prefix = self::$container->getParameter('mautic.db_table_prefix');
     }
 
+    /**
+     * Index should return status code 200.
+     */
+    public function testIndexAction(): void
+    {
+        $this->client->request('GET', '/s/pages');
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+    }
+
     public function testLandingPageTracking()
     {
         $this->connection->insert($this->prefix.'pages', [
