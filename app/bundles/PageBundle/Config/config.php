@@ -226,6 +226,7 @@ return [
                     'mautic.page.model.page',
                     'mautic.security',
                     'mautic.helper.user',
+                    'mautic.helper.theme',
                 ],
             ],
             'mautic.form.type.pagevariant' => [

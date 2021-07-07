@@ -22,7 +22,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
@@ -73,7 +73,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     protected $ipLookupHelper;
 
     /**
-     * @var ThemeHelper
+     * @var ThemeHelperInterface
      */
     protected $themeHelper;
 
@@ -164,7 +164,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
-        ThemeHelper $themeHelper,
+        ThemeHelperInterface $themeHelper,
         Mailbox $mailboxHelper,
         MailHelper $mailHelper,
         LeadModel $leadModel,
