@@ -254,4 +254,14 @@ final class EmailEvents
      * @var string
      */
     const ON_DETERMINE_CLICKTHROUGH_RATE_WINNER = 'mautic.email.on_clickthrough_rate_winner';
+
+    /**
+     * The mautic.email.on_point_change_action_action_executed event is dispatched when change point action is executed.
+     *
+     * The event listener receives a
+     * Mautic\PointBundle\Events\PointChangeActionExecutedEvent
+     *
+     * @var string
+     */
+    const ON_POINT_CHANGE_ACTION_EXECUTED = 'mautic.email.on_point_change_action_action_executed';
 }

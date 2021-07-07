@@ -24,12 +24,14 @@ use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Entity\PointRepository;
 use Mautic\PointBundle\Event\PointActionEvent;
 use Mautic\PointBundle\Event\PointBuilderEvent;
+use Mautic\PointBundle\Event\PointChangeActionExecutedEvent;
 use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\Form\Type\PointType;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class PointModel extends CommonFormModel
 {
@@ -60,6 +62,11 @@ class PointModel extends CommonFormModel
      */
     private $contactTracker;
 
+    /**
+     * @var PropertyAccessor
+     */
+    private $propertyAccessor;
+
     public function __construct(
         Session $session,
         IpLookupHelper $ipLookupHelper,
@@ -72,6 +79,7 @@ class PointModel extends CommonFormModel
         $this->leadModel          = $leadModel;
         $this->mauticFactory      = $mauticFactory;
         $this->contactTracker     = $contactTracker;
+        $this->propertyAccessor   = new PropertyAccessor();
     }
 
     /**
@@ -243,76 +251,46 @@ class PointModel extends CommonFormModel
         $persist = [];
         /** @var Point $action */
         foreach ($availablePoints as $action) {
-            //if it's already been done or not repeatable, then skip it
-            if (!$action->getRepeatable() && isset($completedActions[$action->getId()])) {
-                continue;
-            }
             //make sure the action still exists
             if (!isset($availableActions['actions'][$action->getType()])) {
                 continue;
             }
+
             $settings = $availableActions['actions'][$action->getType()];
 
-            $args = [
-                'action' => [
-                    'id'         => $action->getId(),
-                    'type'       => $action->getType(),
-                    'name'       => $action->getName(),
-                    'properties' => $action->getProperties(),
-                    'points'     => $action->getDelta(),
-                ],
-                'lead'         => $lead,
-                'factory'      => $this->mauticFactory, // WHAT?
-                'eventDetails' => $eventDetails,
-            ];
-
-            $callback = (isset($settings['callback'])) ? $settings['callback'] :
-                ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];
-
-            if (is_callable($callback)) {
-                if (is_array($callback)) {
-                    $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                } elseif (false !== strpos($callback, '::')) {
-                    $parts      = explode('::', $callback);
-                    $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+            if (!$action->getRepeatable()) {
+                if (isset($settings['eventName'])) {
+                    $pointChangeActionExecutedEvent = new PointChangeActionExecutedEvent($action, $lead, $eventDetails, $completedActions);
+                    $event                          = $this->dispatcher->dispatch($settings['eventName'], $pointChangeActionExecutedEvent);
+                    if (!$event->canChangePoints()) {
+                        continue;
+                    }
                 } else {
-                    $reflection = new \ReflectionMethod(null, $callback);
-                }
-
-                $pass = [];
-                foreach ($reflection->getParameters() as $param) {
-                    if (isset($args[$param->getName()])) {
-                        $pass[] = $args[$param->getName()];
-                    } else {
-                        $pass[] = null;
+                    // 1. step - can change points from callback
+                    if (!$this->invokeCallback($action, $lead, $eventDetails, $settings)) {
+                        continue;
+                    }
+                    // 2. step - can change points from log
+                    if (isset($completedActions[$action->getId()])) {
+                        continue;
                     }
                 }
-                $pointsChange = $reflection->invokeArgs($this, $pass);
+            }
 
-                if ($pointsChange) {
-                    $delta = $action->getDelta();
-                    $lead->adjustPoints($delta);
-                    $parsed = explode('.', $action->getType());
-                    $lead->addPointsChangeLogEntry(
-                        $parsed[0],
-                        $action->getId().': '.$action->getName(),
-                        $parsed[1],
-                        $delta,
-                        $ipAddress
-                    );
+            $this->adjustLeadPoints($action, $lead);
 
-                    $event = new PointActionEvent($action, $lead);
-                    $this->dispatcher->dispatch(PointEvents::POINT_ON_ACTION, $event);
+            $event = new PointActionEvent($action, $lead);
+            $this->dispatcher->dispatch(PointEvents::POINT_ON_ACTION, $event);
 
-                    if (!$action->getRepeatable()) {
-                        $log = new LeadPointLog();
-                        $log->setIpAddress($ipAddress);
-                        $log->setPoint($action);
-                        $log->setLead($lead);
-                        $log->setDateFired(new \DateTime());
-                        $persist[] = $log;
-                    }
-                }
+            // Add to log, repeatable is not logged, just executed
+            if (!$action->getRepeatable()) {
+                $log = new LeadPointLog();
+                $log->setIpAddress($ipAddress);
+                $log->setPoint($action);
+                $log->setLead($lead);
+                $log->setInternalId($this->propertyAccessor->getValue($eventDetails, 'id'));
+                $log->setDateFired(new \DateTime());
+                $persist[] = $log;
             }
         }
 
@@ -325,6 +303,64 @@ class PointModel extends CommonFormModel
         if (!empty($lead->getpointchanges())) {
             $this->leadModel->saveEntity($lead);
         }
+    }
+
+    private function adjustLeadPoints(Point $action, Lead $lead)
+    {
+        $delta = $action->getDelta();
+        $lead->adjustPoints($delta);
+        $parsed = explode('.', $action->getType());
+        $lead->addPointsChangeLogEntry(
+            $parsed[0],
+            $action->getId().': '.$action->getName(),
+            $parsed[1],
+            $delta,
+            $this->ipLookupHelper->getIpAddress()
+        );
+    }
+
+    /**
+     * @param $eventDetails
+     *
+     * @return bool
+     */
+    private function invokeCallback(Point $action, Lead $lead, $eventDetails, array $settings)
+    {
+        $callback = (isset($settings['callback'])) ? $settings['callback'] :
+            ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];
+
+        $args = [
+            'action' => [
+                'id'         => $action->getId(),
+                'type'       => $action->getType(),
+                'name'       => $action->getName(),
+                'properties' => $action->getProperties(),
+                'points'     => $action->getDelta(),
+            ],
+            'lead'         => $lead,
+            'factory'      => $this->mauticFactory, // WHAT?
+            'eventDetails' => $eventDetails,
+        ];
+
+        if (is_array($callback)) {
+            $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+        } elseif (false !== strpos($callback, '::')) {
+            $parts      = explode('::', $callback);
+            $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+        } else {
+            $reflection = new \ReflectionMethod(null, $callback);
+        }
+
+        $pass = [];
+        foreach ($reflection->getParameters() as $param) {
+            if (isset($args[$param->getName()])) {
+                $pass[] = $args[$param->getName()];
+            } else {
+                $pass[] = null;
+            }
+        }
+
+        return $reflection->invokeArgs($this, $pass);
     }
 
     /**
