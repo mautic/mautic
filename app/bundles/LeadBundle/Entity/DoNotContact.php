@@ -78,7 +78,8 @@ class DoNotContact
 
         $builder->setTable('lead_donotcontact')
             ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\DoNotContactRepository')
-            ->addIndex(['reason'], 'dnc_reason_search');
+            ->addIndex(['reason'], 'dnc_reason_search')
+            ->addIndex(['date_added'], 'dnc_date_added');
 
         $builder->addId();
 

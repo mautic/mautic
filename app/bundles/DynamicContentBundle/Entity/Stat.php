@@ -78,7 +78,8 @@ class Stat
         $builder->setTable('dynamic_content_stats')
             ->setCustomRepositoryClass('Mautic\DynamicContentBundle\Entity\StatRepository')
             ->addIndex(['dynamic_content_id', 'lead_id'], 'stat_dynamic_content_search')
-            ->addIndex(['source', 'source_id'], 'stat_dynamic_content_source_search');
+            ->addIndex(['source', 'source_id'], 'stat_dynamic_content_source_search')
+            ->addIndex(['date_sent'], 'stat_dynamic_content_date_sent');
 
         $builder->addBigIntIdField();
 

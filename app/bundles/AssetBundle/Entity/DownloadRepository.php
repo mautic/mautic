@@ -76,7 +76,7 @@ class DownloadRepository extends CommonRepository
             $query->andWhere($query->expr()->like('a.title', $query->expr()->literal('%'.$options['search'].'%')));
         }
 
-        return $this->getTimelineResults($query, $options, 'a.title', 'd.date_download', [], ['date_download']);
+        return $this->getTimelineResults($query, $options, 'a.title', 'd.date_download', [], ['date_download'], null, 'd.id');
     }
 
     /**

@@ -141,7 +141,7 @@ class StatRepository extends CommonRepository
             );
         }
 
-        return $this->getTimelineResults($query, $options, 'dc.name', 's.date_sent', ['sentDetails'], ['dateSent']);
+        return $this->getTimelineResults($query, $options, 'dc.name', 's.date_sent', ['sentDetails'], ['dateSent'], null, 's.id');
     }
 
     /**

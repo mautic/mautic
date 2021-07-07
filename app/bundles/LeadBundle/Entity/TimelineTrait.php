@@ -36,7 +36,8 @@ trait TimelineTrait
         $timestampColumn,
         $serializedColumns = [],
         $dateTimeColumns = [],
-        $resultsParserCallback = null
+        $resultsParserCallback = null,
+        string $secondaryOrdering = null
     ) {
         if (!empty($options['unitCounts'])) {
             list($tablePrefix, $column) = explode('.', $timestampColumn);
@@ -86,6 +87,9 @@ trait TimelineTrait
             }
 
             $query->orderBy($orderBy, $orderByDir);
+            if ($secondaryOrdering) {
+                $query->addOrderBy($secondaryOrdering, $orderByDir);
+            }
         }
 
         if (!empty($options['limit'])) {

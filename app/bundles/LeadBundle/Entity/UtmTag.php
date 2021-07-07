@@ -99,6 +99,7 @@ class UtmTag
         $builder->addNullableField('utmMedium', Type::STRING, 'utm_medium');
         $builder->addNullableField('utmSource', Type::STRING, 'utm_source');
         $builder->addNullableField('utmTerm', Type::STRING, 'utm_term');
+        $builder->addIndex(['date_added'], 'utm_date_added');
     }
 
     /**
