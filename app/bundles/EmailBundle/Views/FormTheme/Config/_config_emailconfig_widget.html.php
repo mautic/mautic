@@ -159,6 +159,7 @@ $template  = '<div class="col-md-6">{content}</div>';
     <div class="panel-body">
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_text', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'do_not_contact_text', $template); ?>
         </div>
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_message', $template); ?>
@@ -179,6 +180,9 @@ $template  = '<div class="col-md-6">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'show_contact_categories', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'show_contact_preferred_channels', $template); ?>
+        </div>
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'show_contact_dnc', $template); ?>
         </div>
     </div>
 </div>

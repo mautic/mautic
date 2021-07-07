@@ -36,34 +36,16 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
     private $coreParametersHelper;
 
-    /**
-     * @var EmailModel
-     */
     private $emailModel;
 
-    /**
-     * @var TrackableModel
-     */
     private $pageTrackableModel;
 
-    /**
-     * @var RedirectModel
-     */
     private $pageRedirectModel;
 
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
 
-    /**
-     * @var EntityManager
-     */
     private $entityManager;
 
     public function __construct(
@@ -122,10 +104,11 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
 
         $tokens = [
-            '{unsubscribe_text}' => $this->translator->trans('mautic.email.token.unsubscribe_text'),
-            '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text'),
-            '{signature}'        => $this->translator->trans('mautic.email.token.signature'),
-            '{subject}'          => $this->translator->trans('mautic.email.subject'),
+            '{unsubscribe_text}'    => $this->translator->trans('mautic.email.token.unsubscribe_text'),
+            '{webview_text}'        => $this->translator->trans('mautic.email.token.webview_text'),
+            '{signature}'           => $this->translator->trans('mautic.email.token.signature'),
+            '{subject}'             => $this->translator->trans('mautic.email.subject'),
+            '{dnc_text}'            => $this->translator->trans('mautic.email.token.do_not_contact_text'),
         ];
 
         if ($event->tokensRequested(array_keys($tokens))) {
@@ -136,8 +119,9 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         // these should not allow visual tokens
         $tokens = [
-            '{unsubscribe_url}' => $this->translator->trans('mautic.email.token.unsubscribe_url'),
-            '{webview_url}'     => $this->translator->trans('mautic.email.token.webview_url'),
+            '{unsubscribe_url}'     => $this->translator->trans('mautic.email.token.unsubscribe_url'),
+            '{webview_url}'         => $this->translator->trans('mautic.email.token.webview_url'),
+            '{dnc_url}'             => $this->translator->trans('mautic.email.token.do_not_contact_url'),
         ];
         if ($event->tokensRequested(array_keys($tokens))) {
             $event->addTokens(
@@ -264,10 +248,20 @@ class BuilderSubscriber implements EventSubscriberInterface
         if (!$unsubscribeText) {
             $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
         }
+
+        $doNotContactText = $this->coreParametersHelper->get('do_not_contact_text');
+        if (!$doNotContactText) {
+            $doNotContactText = $this->translator->trans('mautic.email.do_not_contact.text', ['%link%' => '|URL|']);
+        }
+
         $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]), $unsubscribeText);
         $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
 
+        $doNotContactText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_dnc', ['idHash' => $idHash]), $doNotContactText);
+        $event->addToken('{dnc_text}', EmojiHelper::toHtml($doNotContactText));
+
         $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]));
+        $event->addToken('{dnc_url}', $this->emailModel->buildUrl('mautic_email_dnc', ['idHash' => $idHash]));
 
         $webviewText = $this->coreParametersHelper->get('webview_text');
         if (!$webviewText) {
