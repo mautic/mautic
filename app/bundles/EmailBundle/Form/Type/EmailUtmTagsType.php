@@ -70,6 +70,19 @@ class EmailUtmTagsType extends AbstractType
                 'required' => false,
             ]
         );
+
+        $builder->add(
+            'utmTerm',
+            'text',
+            [
+                'label'      => 'mautic.email.campaign_term',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+                'required' => false,
+            ]
+        );
     }
 
     /**
