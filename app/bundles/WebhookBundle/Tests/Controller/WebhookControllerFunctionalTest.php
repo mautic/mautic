@@ -20,7 +20,7 @@ use Mautic\WebhookBundle\Entity\Webhook;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class WebhookControllerFunctionalTest extends MauticMysqlTestCase
+final class WebhookControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testViewWebhookDetail(): void
     {
