@@ -59,6 +59,7 @@ return [
                     'mautic.integrations.repository.object_mapping',
                     'mautic.integrations.helper.variable_expresser',
                     'mautic.integrations.helper.sync_integrations',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.integrations.subscriber.contact_object' => [

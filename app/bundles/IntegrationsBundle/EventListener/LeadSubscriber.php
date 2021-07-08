@@ -16,8 +16,11 @@ namespace Mautic\IntegrationsBundle\EventListener;
 use Mautic\IntegrationsBundle\Entity\FieldChange;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
+use Mautic\IntegrationsBundle\Event\InternalContactEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
+use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
@@ -26,6 +29,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
@@ -50,16 +54,23 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $syncIntegrationsHelper;
 
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
     public function __construct(
         FieldChangeRepository $fieldChangeRepo,
         ObjectMappingRepository $objectMappingRepository,
         VariableExpresserHelperInterface $variableExpressor,
-        SyncIntegrationsHelper $syncIntegrationsHelper
+        SyncIntegrationsHelper $syncIntegrationsHelper,
+        EventDispatcherInterface $dispatcher
     ) {
         $this->fieldChangeRepo         = $fieldChangeRepo;
         $this->objectMappingRepository = $objectMappingRepository;
         $this->variableExpressor       = $variableExpressor;
         $this->syncIntegrationsHelper  = $syncIntegrationsHelper;
+        $this->dispatcher              = $dispatcher;
     }
 
     public static function getSubscribedEvents(): array
@@ -108,7 +119,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
 
         if (isset($changes['fields'])) {
-            $this->recordFieldChanges($changes['fields'], $lead->getId(), Lead::class);
+            $this->recordFieldChanges($changes['fields'], $lead->getId(), $lead);
         }
 
         if (isset($changes['dnc_channel_status'])) {
@@ -120,7 +131,7 @@ class LeadSubscriber implements EventSubscriberInterface
                 $dncChanges['mautic_internal_dnc_'.$channel] = [$oldValue, $newValue];
             }
 
-            $this->recordFieldChanges($dncChanges, $lead->getId(), Lead::class);
+            $this->recordFieldChanges($dncChanges, $lead->getId(), $lead);
         }
     }
 
@@ -158,7 +169,7 @@ class LeadSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->recordFieldChanges($changes['fields'], $company->getId(), Company::class);
+        $this->recordFieldChanges($changes['fields'], $company->getId(), $company);
     }
 
     public function onCompanyPostDelete(Events\CompanyEvent $event): void
@@ -177,7 +188,7 @@ class LeadSubscriber implements EventSubscriberInterface
             1 => $lead->getCompany(),
         ];
 
-        $this->recordFieldChanges($changes, $lead->getId(), Lead::class);
+        $this->recordFieldChanges($changes, $lead->getId(), $lead);
     }
 
     /**
@@ -185,27 +196,35 @@ class LeadSubscriber implements EventSubscriberInterface
      *
      * @throws IntegrationNotFoundException
      */
-    private function recordFieldChanges(array $fieldChanges, $objectId, string $objectType): void
+    private function recordFieldChanges(array $fieldChanges, $objectId, object $object): void
     {
         $toPersist     = [];
         $changedFields = [];
         $objectId      = (int) $objectId;
-        foreach ($fieldChanges as $key => [$oldValue, $newValue]) {
-            $valueDAO          = $this->variableExpressor->encodeVariable($newValue);
-            $changedFields[]   = $key;
-            $fieldChangeEntity = (new FieldChange())
-                ->setObjectType($objectType)
-                ->setObjectId($objectId)
-                ->setModifiedAt(new \DateTime())
-                ->setColumnName($key)
-                ->setColumnType($valueDAO->getType())
-                ->setColumnValue($valueDAO->getValue());
+        $objectType    = get_class($object);
 
-            foreach ($this->syncIntegrationsHelper->getEnabledIntegrations() as $integrationName) {
-                $integrationFieldChangeEntity = clone $fieldChangeEntity;
-                $integrationFieldChangeEntity->setIntegration($integrationName);
+        foreach ($this->syncIntegrationsHelper->getEnabledIntegrations() as $integrationName) {
+            try {
+                if (Lead::class === $objectType) {
+                    $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES, new InternalContactEvent($integrationName, $object));
+                }
+            } catch (InvalidValueException $e) {
+                continue; // Do not record changes for object and integration that has an invalid value.
+            }
 
-                $toPersist[] = $integrationFieldChangeEntity;
+            foreach ($fieldChanges as $key => [$oldValue, $newValue]) {
+                $valueDAO          = $this->variableExpressor->encodeVariable($newValue);
+                $changedFields[]   = $key;
+                $fieldChangeEntity = (new FieldChange())
+                    ->setObjectType($objectType)
+                    ->setObjectId($objectId)
+                    ->setModifiedAt(new \DateTime())
+                    ->setColumnName($key)
+                    ->setColumnType($valueDAO->getType())
+                    ->setColumnValue($valueDAO->getValue())
+                    ->setIntegration($integrationName);
+
+                $toPersist[] = $fieldChangeEntity;
             }
         }
 

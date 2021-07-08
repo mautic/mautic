@@ -148,7 +148,7 @@ class ObjectChangeDAO
     /**
      * @param string $name
      *
-     * @return FieldDAO
+     * @return FieldDAO|null
      */
     public function getField($name)
     {
