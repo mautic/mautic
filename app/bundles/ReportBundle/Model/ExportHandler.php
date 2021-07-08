@@ -87,6 +87,6 @@ class ExportHandler
             throw new FileIOException('Could not create directory '.$this->dir, 0, $e);
         }
 
-        return $this->dir.'/'.$fileName.'.csv';
+        return $this->dir.'/'.$fileName;
     }
 }

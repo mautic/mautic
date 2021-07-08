@@ -105,6 +105,6 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 
         $exportHandler = new ExportHandler($coreParametersHelperMock, $filePathResolver);
 
-        $exportHandler->getHandler('myFile');
+        $exportHandler->getHandler('myFile.csv');
     }
 }

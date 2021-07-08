@@ -117,4 +117,135 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
 
         $reportExporter->processExport($exportOption);
     }
+
+    public function testDoesNotSendIfEmptyReport()
+    {
+        $batchSize = 2;
+
+      /** @var CoreParametersHelper|MockObject $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+      /** @var ScheduleModel|MockObject $schedulerModel */
+        $schedulerModel = $this->createMock(ScheduleModel::class);
+
+      /** @var ReportDataAdapter|MockObject $reportDataAdapter */
+        $reportDataAdapter = $this->createMock(ReportDataAdapter::class);
+
+        $coreParametersHelper->expects($this->once())
+        ->method('get')
+        ->with('report_export_batch_size')
+        ->willReturn($batchSize);
+
+        $reportExportOptions = new ReportExportOptions($coreParametersHelper);
+
+      /** @var ReportFileWriter|MockObject $reportFileWriter */
+        $reportFileWriter = $this->createMock(ReportFileWriter::class);
+
+      /** @var EventDispatcherInterface|MockObject $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $exportOption     = new ExportOption(null);
+        $reportResult     = Fixtures::getValidReportResult();
+        $reportResult['totalResults'] = 0;
+        $reportDataResult = new ReportDataResult($reportResult);
+        $report1          = new Report();
+        $scheduler1       = new Scheduler($report1, new \DateTime());
+
+        $schedulerModel->expects($this->once())
+        ->method('getScheduledReportsForExport')
+        ->with($exportOption)
+        ->willReturn([
+        $scheduler1,
+        ]);
+
+      /*
+       * $reportDataResult->getData() has 11 results
+       * Batch size is 2 -> report will be processed 6 times (last process takes only 1 result)
+       * We have 2 scheduler = 3 report => 6 * 3 = 18 calls of getReportData
+       * If test fails here, check content of $reportDataResult->getData() and follow the calculation
+       */
+        $reportDataAdapter->expects($this->exactly(1))
+        ->method('getReportData')
+        ->willReturn($reportDataResult);
+
+        $eventDispatcher->expects($this->exactly(0))
+        ->method('dispatch')
+        ->with(ReportEvents::REPORT_SCHEDULE_SEND);
+
+        $schedulerModel->expects($this->exactly(1))
+        ->method('reportWasScheduled');
+
+        $reportExporter = new ReportExporter(
+            $schedulerModel,
+            $reportDataAdapter,
+            $reportExportOptions,
+            $reportFileWriter,
+            $eventDispatcher
+        );
+
+        $reportExporter->processExport($exportOption);
+    }
+
+    public function testDoesSendIfEmptyReportAndFlagSendEmptyReportSet()
+    {
+        $batchSize = 2;
+
+      /** @var CoreParametersHelper|MockObject $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+      /** @var ScheduleModel|MockObject $schedulerModel */
+        $schedulerModel = $this->createMock(ScheduleModel::class);
+
+      /** @var ReportDataAdapter|MockObject $reportDataAdapter */
+        $reportDataAdapter = $this->createMock(ReportDataAdapter::class);
+
+        $coreParametersHelper->expects($this->once())
+        ->method('get')
+        ->with('report_export_batch_size')
+        ->willReturn($batchSize);
+
+        $reportExportOptions = new ReportExportOptions($coreParametersHelper);
+
+      /** @var ReportFileWriter|MockObject $reportFileWriter */
+        $reportFileWriter = $this->createMock(ReportFileWriter::class);
+
+      /** @var EventDispatcherInterface|MockObject $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $exportOption     = new ExportOption(null);
+        $reportResult     = Fixtures::getValidReportResult();
+        $reportResult['totalResults'] = 0;
+        $reportDataResult = new ReportDataResult($reportResult);
+        $report1          = new Report();
+        $report1->setSendEmpty(true);
+        $scheduler1       = new Scheduler($report1, new \DateTime());
+
+        $schedulerModel->expects($this->once())
+        ->method('getScheduledReportsForExport')
+        ->with($exportOption)
+        ->willReturn([
+        $scheduler1,
+        ]);
+
+        $reportDataAdapter->expects($this->exactly(1))
+        ->method('getReportData')
+        ->willReturn($reportDataResult);
+
+        $eventDispatcher->expects($this->exactly(1))
+        ->method('dispatch')
+        ->with(ReportEvents::REPORT_SCHEDULE_SEND);
+
+        $schedulerModel->expects($this->exactly(1))
+        ->method('reportWasScheduled');
+
+        $reportExporter = new ReportExporter(
+            $schedulerModel,
+            $reportDataAdapter,
+            $reportExportOptions,
+            $reportFileWriter,
+            $eventDispatcher
+        );
+
+        $reportExporter->processExport($exportOption);
+    }
 }

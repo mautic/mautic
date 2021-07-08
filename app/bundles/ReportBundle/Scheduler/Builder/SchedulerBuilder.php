@@ -55,11 +55,14 @@ class SchedulerBuilder
         }
 
         $builder   = $this->schedulerTemplateFactory->getBuilder($scheduler);
-        $startDate = new \DateTime();
+        $startDate = new \DateTime('now', new \DateTimeZone($scheduler->getScheduleTimezone()));
         $rule      = new Rule();
 
         if (!$scheduler->isScheduledNow()) {
-            $startDate->setTime(0, 0)->modify('+1 day');
+            list($hour, $minute) = array_map(function ($i) {
+                return intval($i);
+            }, explode(':', $scheduler->getScheduleTime()));
+            $startDate->setTime($hour, $minute)->modify('+1 day');
         }
 
         $rule->setStartDate($startDate)->setCount($count);

@@ -33,18 +33,12 @@ class ExcelExporter
     }
 
     /**
-     * @param string $name
-     *
      * @throws \Exception
      */
-    public function export(array $reportData, $name)
+    public function export(ReportDataResult $reportDataResult, string $name, $file = 'php://output')
     {
         if (!class_exists(Spreadsheet::class)) {
             throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
-        }
-
-        if (!array_key_exists('data', $reportData) || !array_key_exists('columns', $reportData)) {
-            throw new \InvalidArgumentException("Keys 'data' and 'columns' have to be provided");
         }
 
         try {
@@ -55,21 +49,20 @@ class ExcelExporter
 
             $header = [];
 
-            $reportDataResult = new ReportDataResult($reportData);
             //build the data rows
             foreach ($reportDataResult->getData() as $count=>$data) {
                 $row = [];
                 foreach ($data as $k => $v) {
                     if (0 === $count) {
                         //set the header
-                        foreach ($reportData['columns'] as $c) {
+                        foreach ($reportDataResult->getColumns() as $c) {
                             if ($c['alias'] == $k) {
                                 $header[] = $c['label'];
                                 break;
                             }
                         }
                     }
-                    $row[] = htmlspecialchars_decode($this->formatterHelper->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true), ENT_QUOTES);
+                    $row[] = htmlspecialchars_decode($this->formatterHelper->_($v, $reportDataResult->getType($k), true), ENT_QUOTES);
                 }
 
                 if (0 === $count) {
@@ -79,14 +72,11 @@ class ExcelExporter
                 //write the row
                 $rowCount = $count + 2;
                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
-                //free memory
-                unset($row, $reportData['data'][$count]);
             }
 
             $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
             $objWriter->setPreCalculateFormulas(false);
-
-            $objWriter->save('php://output');
+            $objWriter->save($file);
         } catch (Exception $e) {
             throw new \Exception('PHPSpreadsheet Error', 0, $e);
         }

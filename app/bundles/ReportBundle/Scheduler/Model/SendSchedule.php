@@ -59,7 +59,19 @@ class SendSchedule
         try {
             // Try to send the CSV file as an email attachement.
             $this->fileHandler->fileCanBeAttached($csvFilePath);
-            $this->mailer->attachFile($csvFilePath, basename($csvFilePath), 'text/csv');
+            $extension =  pathinfo($csvFilePath, PATHINFO_EXTENSION);
+            switch ($extension) {
+              case 'csv':
+                $content_type = 'text/csv';
+                break;
+              case 'xlsx':
+                $content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+                break;
+              case 'html':
+                $content_type = 'text/html';
+                break;
+            }
+            $this->mailer->attachFile($csvFilePath, basename($csvFilePath), $content_type);
         } catch (FileTooBigException $e) {
             $zipFilePath = $this->fileHandler->zipIt($csvFilePath);
             try {

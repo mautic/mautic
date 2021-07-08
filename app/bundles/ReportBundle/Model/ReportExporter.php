@@ -107,6 +107,7 @@ class ReportExporter
         // just published reports, but schedule continue
         if ($report->isPublished()) {
             $this->reportExportOptions->beginExport();
+            $this->reportExportOptions->setPaginate(!in_array($report->getScheduleFormat(), ['xlsx']));
             while (true) {
                 $data = $this->reportDataAdapter->getReportData($report, $this->reportExportOptions);
 
@@ -123,8 +124,10 @@ class ReportExporter
             }
 
             $file  = $this->reportFileWriter->getFilePath($scheduler);
-            $event = new ReportScheduleSendEvent($scheduler, $file);
-            $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
+            if ($totalResults > 0 || $report->sendEmpty()) {
+                $event = new ReportScheduleSendEvent($scheduler, $file);
+                $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
+            }
         }
 
         $this->schedulerModel->reportWasScheduled($report);

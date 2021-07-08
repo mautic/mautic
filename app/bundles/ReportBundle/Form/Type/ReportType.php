@@ -14,6 +14,8 @@ namespace Mautic\ReportBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\SelectType;
+use Mautic\CoreBundle\Form\Type\TimezoneType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
@@ -316,6 +318,67 @@ class ReportType extends AbstractType
                         'data-report-schedule' => 'isScheduled',
                     ],
                     'required' => false,
+                ]
+            );
+
+          //Scheduler
+            $builder->add(
+                'sendEmpty',
+                YesNoButtonGroupType::class,
+                [
+                'label'      => 'mautic.report.schedule.sendEmpty',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                'class'                => 'form-control',
+                'data-report-schedule' => 'sendEmpty',
+                ],
+                'required' => false,
+                ]
+            );
+
+            //Scheduler
+            $builder->add(
+                'scheduleFormat',
+                SelectType::class,
+                [
+                'label'      => 'mautic.report.schedule.scheduleFormat',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                'class'                => 'form-control',
+                'data-report-schedule' => 'scheduleFormat',
+                ],
+                'choices'  => ['csv' => 'csv', 'xlsx' => 'xlsx'],
+                'required' => false,
+                ]
+            );
+
+          //Scheduler
+            $builder->add(
+                'scheduleTimezone',
+                TimezoneType::class,
+                [
+                'label'      => 'mautic.report.schedule.scheduleTimezone',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                'class'                => 'form-control',
+                'data-report-schedule' => 'scheduleTimezone',
+                ],
+                'required' => false,
+                ]
+            );
+
+
+            $builder->add(
+                'scheduleTime',
+                TextType::class,
+                [
+                'label'      => 'mautic.report.schedule.scheduleTime',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                'class'                => 'form-control',
+                'data-report-schedule' => 'scheduleTime',
+                ],
+                'required' => false,
                 ]
             );
 

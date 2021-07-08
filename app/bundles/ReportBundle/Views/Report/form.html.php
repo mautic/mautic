@@ -154,6 +154,10 @@ $scheduleTabErrorClass = ($view['form']->containsErrors($form['toAddress'])) ? '
                                     <div class="schedule_form">
                                         <?php echo $view['form']->row($form['toAddress']); ?>
                                         <?php echo $view['form']->row($form['scheduleUnit']); ?>
+                                        <?php echo $view['form']->row($form['scheduleFormat']); ?>
+                                        <?php echo $view['form']->row($form['scheduleTimezone']); ?>
+                                        <?php echo $view['form']->row($form['scheduleTime']); ?>
+                                        <?php echo $view['form']->row($form['sendEmpty']); ?>
 
                                         <div id='scheduleMonthFrequency''>
                                             <?php echo $view['form']->row($form['scheduleMonthFrequency']); ?>

@@ -480,7 +480,8 @@ class ReportModel extends FormModel
 
                 $response = new StreamedResponse(
                     function () use ($reportData, $name) {
-                        $this->excelExporter->export($reportData, $name);
+                        $reportDataResult = new ReportDataResult($reportData);
+                        $this->excelExporter->export($reportDataResult, $name);
                     }
                 );
 

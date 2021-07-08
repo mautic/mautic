@@ -31,7 +31,7 @@ class ReportDataAdapter
     public function getReportData(Report $report, ReportExportOptions $reportExportOptions)
     {
         $options                    = [];
-        $options['paginate']        = true;
+        $options['paginate']        = $reportExportOptions->isPaginate();
         $options['limit']           = $reportExportOptions->getBatchSize();
         $options['ignoreGraphData'] = true;
         $options['page']            = $reportExportOptions->getPage();

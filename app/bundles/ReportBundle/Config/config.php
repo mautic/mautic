@@ -277,6 +277,7 @@ return [
                 'class'     => \Mautic\ReportBundle\Model\ReportFileWriter::class,
                 'arguments' => [
                     'mautic.report.model.csv_exporter',
+                    'mautic.report.model.excel_exporter',
                     'mautic.report.model.export_handler',
                 ],
             ],

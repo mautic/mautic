@@ -14,7 +14,8 @@
     <div class="col-md-12">
         <?php
             foreach ($dates as $date) {
-                echo $view['date']->toShort($date).'<br>';
+
+                echo $view['date']->toFullConcat($date).'<br>';
             }
         ?>
     </div>

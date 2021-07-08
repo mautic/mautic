@@ -19,6 +19,11 @@ use Mautic\ReportBundle\Exception\FileIOException;
 class ReportFileWriter
 {
     /**
+     * @var ExcelExporter
+     */
+    private $excelExporter;
+
+    /**
      * @var CsvExporter
      */
     private $csvExporter;
@@ -28,10 +33,11 @@ class ReportFileWriter
      */
     private $exportHandler;
 
-    public function __construct(CsvExporter $csvExporter, ExportHandler $exportHandler)
+    public function __construct(CsvExporter $csvExporter, ExcelExporter $excelExporter, ExportHandler $exportHandler)
     {
-        $this->csvExporter   = $csvExporter;
-        $this->exportHandler = $exportHandler;
+        $this->exportHandler     = $exportHandler;
+        $this->csvExporter       = $csvExporter;
+        $this->excelExporter     = $excelExporter;
     }
 
     /**
@@ -39,10 +45,18 @@ class ReportFileWriter
      */
     public function writeReportData(Scheduler $scheduler, ReportDataResult $reportDataResult, ReportExportOptions $reportExportOptions)
     {
-        $fileName = $this->getFileName($scheduler);
-        $handler  = $this->exportHandler->getHandler($fileName);
-        $this->csvExporter->export($reportDataResult, $handler, $reportExportOptions->getPage());
-        $this->exportHandler->closeHandler($handler);
+        $filePath = $this->getFilePath($scheduler);
+        switch ($scheduler->getReport()->getScheduleFormat()) {
+          case 'csv':
+            $this->exportCsv($scheduler, $reportDataResult);
+            break;
+          case 'xlsx':
+            $name = $this->getName($scheduler, $reportExportOptions);
+            $this->excelExporter->export($reportDataResult, $name, $filePath);
+            break;
+        }
+
+        return $filePath;
     }
 
     public function clear(Scheduler $scheduler)
@@ -72,6 +86,31 @@ class ReportFileWriter
         $dateString = $date->format('Y-m-d');
         $reportName = $scheduler->getReport()->getName();
 
-        return $dateString.'_'.InputHelper::alphanum($reportName, false, '-');
+        return $dateString.'_'.InputHelper::alphanum($reportName, false, '-').'.'.$this->getSuffix($scheduler);
+    }
+
+    private function exportCsv($scheduler, $reportDataResult)
+    {
+        $fileName = $this->getFileName($scheduler);
+        $handler  = $this->exportHandler->getHandler($fileName);
+        $this->csvExporter->export($reportDataResult, $handler);
+        $this->exportHandler->closeHandler($handler);
+    }
+
+    private function getSuffix($scheduler)
+    {
+        return $scheduler->getReport()->getScheduleFormat();
+    }
+
+    private function getName(Scheduler $scheduler, ReportExportOptions $reportExportOptions)
+    {
+        $parts      = [$scheduler->getReport()->getName()];
+        $date_parts = [($reportExportOptions->getDateFrom() ?: $scheduler->getScheduleDate())->format('Y-m-d')];
+        if ($reportExportOptions->getDateTo() && $reportExportOptions->getDateFrom() != $reportExportOptions->getDateTo()) {
+            $date_parts[] = $reportExportOptions->getDateTo()->format('Y-m-d');
+        }
+        $parts[] = implode(' - ', $date_parts);
+
+        return implode(' ', $parts);
     }
 }

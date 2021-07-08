@@ -44,6 +44,7 @@ class SchedulerRepository extends EntityRepository
             $qb->andWhere('report.id = :id')
                 ->setParameter('id', $exportOption->getReportId());
         }
+        echo $qb->getQuery()->getSQL();
 
         return $qb->getQuery()->getResult();
     }
