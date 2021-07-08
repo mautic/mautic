@@ -1,6 +1,6 @@
 import DynamicContentListeners from './dynamicContent/dynamicContent.listeners';
 
-export default (editor, options) => {
+export default (editor) => {
   const dynamicContentTabs = [];
 
   const dcListener = new DynamicContentListeners(editor, dynamicContentTabs);
