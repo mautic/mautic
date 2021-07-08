@@ -320,8 +320,11 @@ class DashboardController extends AbstractFormController
         }
 
         $name = $this->getNameFromRequest();
+
+        /** @var DashboardModel $dashboardModel */
+        $dashboardModel = $this->getModel('dashboard');
         try {
-            $this->getModel('dashboard')->saveSnapshot($name);
+            $dashboardModel->saveSnapshot($name);
             $type = 'notice';
             $msg  = $this->translator->trans('mautic.dashboard.notice.save', [
                 '%name%'    => $name,
