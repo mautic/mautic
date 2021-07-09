@@ -327,7 +327,7 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     filterHolder.append(newForm);
 
     var itemContainer = mQuery(tabId);
-    var textarea      = itemContainer.find('.editor');
+    var textarea      = itemContainer.find('.editor.builder-v2');
     var firstInput    = itemContainer.find('input[type="text"]').first();
 
     textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
@@ -378,7 +378,7 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
 
     var filterContainer  = mQuery(filterContainerId);
     var availableFilters = filterContainer.find('select[data-mautic="available_filters"]');
-    var altTextarea      = filterContainer.find('.editor');
+    var altTextarea      = filterContainer.find('.editor.builder-v2');
     var removeButton     = filterContainer.find('.remove-item');
 
     Mautic.activateChosenSelect(availableFilters, false, mQuery);

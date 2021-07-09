@@ -2126,7 +2126,7 @@ Mautic.getDynamicContentDataForToken = function(token) {
     if (dynConContainer.html()) {
         var dynConContent = dynConContainer.find(dynConTarget+'_content');
 
-        if (dynConContent.hasClass('editor')) {
+        if (dynConContent.hasClass('builder-v2')) {
             dynConContent = dynConContent.froalaEditor('html.get');
         } else {
             dynConContent = dynConContent.html();
