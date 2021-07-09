@@ -709,6 +709,13 @@ return [
                     'mailer',
                 ],
             ],
+            'mautic.helper.from_email_helper' => [
+                'class'     => \Mautic\EmailBundle\Helper\FromEmailHelper::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.lead.repository.lead',
+                ],
+            ],
             'mautic.helper.plain_text_message' => [
                 'class'     => \Mautic\EmailBundle\Helper\PlainTextMessageHelper::class,
             ],

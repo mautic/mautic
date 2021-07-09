@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
@@ -265,6 +266,14 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
         /** @var MauticFactory $mockFactory */
         $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
+        $fromEmaiHelper->expects($this->once())
+            ->method('setDefaultFromArray');
+        $mockFactory->expects($this->once())
+            ->method('get')
+            ->with('mautic.helper.from_email_helper')
+            ->willReturn($fromEmaiHelper);
 
         $transport   = new SmtpTransport();
         $swiftMailer = new \Swift_Mailer($transport);

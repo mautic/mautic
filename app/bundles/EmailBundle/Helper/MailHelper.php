@@ -20,6 +20,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\PartialEmailSendFailure;
+use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
@@ -60,6 +61,11 @@ class MailHelper
      * @var \Swift_Plugins_Loggers_ArrayLogger
      */
     protected $logger;
+
+    /**
+     * @var FromEmailHelper
+     */
+    private $fromEmailHelper;
 
     /**
      * @var bool|MauticMessage
@@ -241,10 +247,10 @@ class MailHelper
 
     public function __construct(MauticFactory $factory, \Swift_Mailer $mailer, $from = null)
     {
-        $this->factory   = $factory;
-        $this->mailer    = $mailer;
-        $this->transport = $mailer->getTransport();
-
+        $this->factory         = $factory;
+        $this->mailer          = $mailer;
+        $this->transport       = $mailer->getTransport();
+        $this->fromEmailHelper = $factory->get('mautic.helper.from_email_helper');
         try {
             $this->logger = new \Swift_Plugins_Loggers_ArrayLogger();
             $this->mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($this->logger));
@@ -252,8 +258,8 @@ class MailHelper
             $this->logError($e);
         }
 
-        $systemFromEmail  = $factory->getParameter('mailer_from_email');
-        $systemFromName   = $this->cleanName(
+        $systemFromEmail = $factory->getParameter('mailer_from_email');
+        $systemFromName  = $this->cleanName(
             $factory->getParameter('mailer_from_name')
         );
         $this->setDefaultFrom($from, [$systemFromEmail => $systemFromName]);
@@ -333,26 +339,8 @@ class MailHelper
         }
 
         // Set from email
-        $ownerSignature = false;
         if (!$isQueueFlush) {
-            $emailToSend    = $this->getEmail();
-            if (!empty($emailToSend)) {
-                if ($emailToSend->getUseOwnerAsMailer()) {
-                    $owner = $this->getContactOwner($this->lead);
-                    if (!empty($owner)) {
-                        $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
-                        $ownerSignature = $this->getContactOwnerSignature($owner);
-                    } else {
-                        $this->setFrom($this->systemFrom, null);
-                    }
-                } elseif (!empty($emailToSend->getFromAddress())) {
-                    $this->setFrom($emailToSend->getFromAddress(), $emailToSend->getFromName());
-                } else {
-                    $this->setFrom($this->systemFrom, null);
-                }
-            } else {
-                $this->setFrom($this->from, null);
-            }
+            $this->setFromForSingleMessage();
         } // from is set in flushQueue
 
         // Set system return path if applicable
@@ -387,10 +375,8 @@ class MailHelper
 
             if (!$isQueueFlush) {
                 // Replace token content
-                $tokens = $this->getTokens();
-                if ($ownerSignature) {
-                    $tokens['{signature}'] = $ownerSignature;
-                }
+                $tokens                = $this->getTokens();
+                $tokens['{signature}'] = $this->fromEmailHelper->getSignature();
 
                 // Set metadata if applicable
                 if (method_exists($this->message, 'addMetadata')) {
@@ -500,21 +486,15 @@ class MailHelper
 
             // Metadata has to be set for each recipient
             foreach ($this->queuedRecipients as $email => $name) {
-                $fromKey = 'default';
-                $tokens  = $this->getTokens();
+                $from    = $this->fromEmailHelper->getFromAddressArrayConsideringOwner($this->from, $this->lead, $this->email);
+                $fromKey = key($from);
 
-                if ($owner = $this->getContactOwner($this->lead)) {
-                    $fromKey = $owner['email'];
-
-                    // Override default signature with owner
-                    if ($ownerSignature = $this->getContactOwnerSignature($owner)) {
-                        $tokens['{signature}'] = $ownerSignature;
-                    }
-                }
+                $tokens                = $this->getTokens();
+                $tokens['{signature}'] = $this->fromEmailHelper->getSignature();
 
                 if (!isset($this->metadata[$fromKey])) {
                     $this->metadata[$fromKey] = [
-                        'from'     => $owner,
+                        'from'     => $from,
                         'contacts' => [],
                     ];
                 }
@@ -585,7 +565,7 @@ class MailHelper
             $errors['failures'] = [];
             $flushed            = false;
 
-            foreach ($this->metadata as $fromKey => $metadatum) {
+            foreach ($this->metadata as $metadatum) {
                 // Whatever is in the message "to" should be ignored as we will send to the contacts grouped by from addresses
                 // This prevents mailers such as sparkpost from sending duplicates to contacts
                 $this->message->setTo([]);
@@ -594,14 +574,8 @@ class MailHelper
 
                 $email = $this->getEmail();
 
-                if (!empty($email)) {
-                    if ($email->getUseOwnerAsMailer() && 'default' !== $fromKey) {
-                        $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name']);
-                    } elseif (!empty($email->getFromAddress())) {
-                        $this->setFrom($email->getFromAddress(), $email->getFromName());
-                    } else {
-                        $this->setFrom($this->systemFrom, null);
-                    }
+                if ($email && $email->getUseOwnerAsMailer()) {
+                    $this->setFrom($metadatum['from']);
                 } else {
                     $this->setFrom($this->from, null);
                 }
@@ -1367,7 +1341,6 @@ class MailHelper
                 $fromEmail = key($this->from);
             }
 
-            $this->setFrom($fromEmail, $fromName);
             $this->from = [$fromEmail => $fromName];
         } else {
             $this->from = $this->systemFrom;
@@ -2044,48 +2017,6 @@ class MailHelper
     }
 
     /**
-     * @param $contact
-     *
-     * @return bool|array
-     */
-    protected function getContactOwner(&$contact)
-    {
-        $owner = false;
-        $email = $this->getEmail();
-
-        if (!empty($email)) {
-            if ($email->getUseOwnerAsMailer() && is_array($contact) && isset($contact['id'])) {
-                if (!isset($contact['owner_id'])) {
-                    $contact['owner_id'] = 0;
-                } elseif (isset($contact['owner_id'])) {
-                    $leadModel = $this->factory->getModel('lead');
-                    if (isset(self::$leadOwners[$contact['owner_id']])) {
-                        $owner = self::$leadOwners[$contact['owner_id']];
-                    } elseif ($owner = $leadModel->getRepository()->getLeadOwner($contact['owner_id'])) {
-                        self::$leadOwners[$owner['id']] = $owner;
-                    }
-                }
-            }
-        }
-
-        return $owner;
-    }
-
-    /**
-     * @param $owner
-     *
-     * @return mixed
-     */
-    protected function getContactOwnerSignature($owner)
-    {
-        return empty($owner['signature'])
-            ? false
-            : EmojiHelper::toHtml(
-                str_replace('|FROM_NAME|', $owner['first_name'].' '.$owner['last_name'], nl2br($owner['signature']))
-            );
-    }
-
-    /**
      * @return array
      */
     private function getSystemHeaders()
@@ -2188,5 +2119,81 @@ class MailHelper
 
         $this->systemFrom = $overrideFrom ?: $systemFrom;
         $this->from       = $this->systemFrom;
+
+        $this->fromEmailHelper->setDefaultFromArray($this->systemFrom);
+    }
+
+    private function setFromForSingleMessage()
+    {
+        $email = $this->getEmail();
+
+        if ($this->lead && $email && $email->getUseOwnerAsMailer()) {
+            if (!isset($this->lead['owner_id'])) {
+                $this->lead['owner_id'] = 0;
+            }
+
+            $from = $this->fromEmailHelper->getFromAddressArrayConsideringOwner($this->from, $this->lead);
+            $this->setFrom($from);
+
+            return;
+        }
+
+        if (!$this->message->getFrom()) {
+            $from = $this->fromEmailHelper->getFromAddressArray($this->from, $this->lead);
+
+            $this->setFrom($from);
+        }
+    }
+
+    /**
+     * @param $contact
+     *
+     * @return bool|array
+     *
+     * @deprecated
+     */
+    protected function getContactOwner(&$contact)
+    {
+        if (!is_array($contact)) {
+            return false;
+        }
+
+        if (!isset($contact['id'])) {
+            return false;
+        }
+
+        if (!isset($contact['owner_id'])) {
+            $contact['owner_id'] = 0;
+
+            return false;
+        }
+
+        try {
+            return $this->fromEmailHelper->getContactOwner($contact['owner_id']);
+        } catch (OwnerNotFoundException $exception) {
+            return false;
+        }
+    }
+
+    /**
+     * @param $owner
+     *
+     * @return mixed
+     *
+     * @deprecated; use FromEmailHelper::getUserSignature
+     */
+    protected function getContactOwnerSignature($owner)
+    {
+        if (empty($owner['id'])) {
+            return '';
+        }
+
+        try {
+            $this->fromEmailHelper->getContactOwner($owner['id']);
+        } catch (OwnerNotFoundException $exception) {
+            return '';
+        }
+
+        return $this->fromEmailHelper->getSignature();
     }
 }
