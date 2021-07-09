@@ -66,6 +66,16 @@ if ('index' == $tmpl) {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'page',
+                        'orderBy'    => 'submission_count',
+                        'text'       => 'mautic.form.form.results',
+                        'class'      => 'visible-md visible-lg col-page-submissions',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'page',
                         'orderBy'    => 'p.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'col-page-id visible-md visible-lg',
@@ -75,7 +85,10 @@ if ('index' == $tmpl) {
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($items as $item): ?>
+            <?php
+            foreach ($items as $i):
+                $item = $i[0];
+            ?>
                 <tr>
                     <td>
                         <?php
@@ -144,6 +157,19 @@ if ('index' == $tmpl) {
                         <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getHits(); ?></td>
+                    <td class="visible-md visible-lg">
+                        <a href="<?php echo $view['router']->path(
+                            'mautic_page_results',
+                            ['objectId' => $item->getId()]
+                        ); ?>" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs" <?php echo (0
+                        == $i['submission_count']) ? 'disabled=disabled' : ''; ?>>
+                            <?php echo $view['translator']->transChoice(
+                                'mautic.form.form.viewresults',
+                                $i['submission_count'],
+                                ['%count%' => $i['submission_count']]
+                            ); ?>
+                        </a>
+                    </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
