@@ -177,11 +177,16 @@ export default class BuilderService {
   }
 
   initEmailHtml() {
+    const components = contentService.getOriginalContentHtml().body.innerHTML;
+    if (!components) {
+      throw new Error('no components');
+    }
+
     // Launch GrapesJS with body part
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: contentService.getOriginalContentHtml().body.innerHTML,
+      components,
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
