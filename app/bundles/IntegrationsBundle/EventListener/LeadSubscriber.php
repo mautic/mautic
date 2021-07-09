@@ -199,7 +199,7 @@ class LeadSubscriber implements EventSubscriberInterface
                 ->setModifiedAt(new \DateTime())
                 ->setColumnName($key)
                 ->setColumnType($valueDAO->getType())
-                ->setColumnValue($valueDAO->getValue());
+                ->setColumnValue(mb_strlen($valueDAO->getValue()) <= 191 ? $valueDAO->getValue() : substr($valueDAO->getValue(), 0, 191));
 
             foreach ($this->syncIntegrationsHelper->getEnabledIntegrations() as $integrationName) {
                 $integrationFieldChangeEntity = clone $fieldChangeEntity;
