@@ -331,6 +331,16 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "mannp",
+      "name": "mannp",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4335298?v=4",
+      "profile": "https://github.com/mannp",
+      "contributions": [
+        "bug",
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
