@@ -478,7 +478,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $stat = $this->getEmailStatus($stat);
         }
 
-        if (!$stat) {
+        if (!$stat || $this->isUseragentBlacklisted($request->server->get('HTTP_USER_AGENT'))) {
             return;
         }
 
@@ -2373,5 +2373,21 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         return $ids;
+    }
+
+    private function isUseragentBlacklisted(?string $useragent): bool
+    {
+        if (null === $useragent) {
+            return false;
+        }
+        $blacklist = [
+            'Chrome/42.0.2311.135', //https://www.gmass.co/blog/false-opens-in-gmail/
+        ];
+        foreach ($blacklist as $blackItem) {
+            if (false !== stripos($useragent, $blackItem)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
