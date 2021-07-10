@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -2297,24 +2296,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
 
                     $syncLead = !empty($leadEntity->getChanges(true));
-                }
-
-                // Validate if we have a company for this Mautic contact
-                if (!empty($sfEntityRecord['Company'])
-                    && $sfEntityRecord['Company'] !== $this->translator->trans(
-                        'mautic.integration.form.lead.unknown'
-                    )
-                ) {
-                    $company = IdentifyCompanyHelper::identifyLeadsCompany(
-                        ['company' => $sfEntityRecord['Company']],
-                        null,
-                        $this->companyModel
-                    );
-
-                    if (!empty($company[2])) {
-                        $syncLead = $this->companyModel->addLeadToCompany($company[2], $leadEntity);
-                        $this->em->detach($company[2]);
-                    }
                 }
 
                 if ($syncLead) {
