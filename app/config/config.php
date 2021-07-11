@@ -250,6 +250,12 @@ $container->setParameter(
     'JMS\Serializer\Naming\IdenticalPropertyNamingStrategy'
 );
 
+$container->register(\Mautic\EmailBundle\Messenger\EmailMessageHandler::class)
+    ->addTag('messenger.message_handler', [
+        // only needed if can't be guessed by type-hint
+        'handles' => \Mautic\EmailBundle\Messenger\EmailMessage::class,
+    ]);
+
 // Monolog formatter
 $container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\LineFormatter')
     ->addMethodCall('includeStacktraces', [true])
