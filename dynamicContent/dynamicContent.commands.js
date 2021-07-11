@@ -34,9 +34,10 @@ export default class DynamicContentCommands {
    */
   convertDynamicContentTokensToSlots() {
     const components = this.dcService.getDcComponents();
-
     components.forEach((comp) => {
-      this.dcService.transformDcTokenToSlot(comp);
+      if (!this.dcService.transformDcTokenToSlot(comp)) {
+        this.logger.warning('DynamicContent component not updated', { comp });
+      }
     });
   }
 
