@@ -223,8 +223,12 @@ $view['slots']->set(
                                                     <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
                                                     <span class="mt-1"><?php echo $view->escape($field['value']); ?>
                                                     <?php else: ?>
-                                                        <?php if (is_array($field['value']) && 'multiselect' === $field['type']): ?>
-                                                            <?php echo implode(', ', $field['value']); ?>
+                                                        <?php if ('multiselect' === $field['type']): ?>
+                                                            <?php if (is_array($field['value'])): ?>
+                                                                <?php echo implode(', ', $field['value']); ?>
+                                                            <?php else: ?>
+                                                                <?php echo str_replace('|', ', ', $view->escape($field['normalizedValue'])); ?>
+                                                            <?php endif; ?>
                                                         <?php elseif (is_string($field['value']) && 'url' === $field['type']): ?>
                                                             <a href="<?php echo $view->escape($field['value']); ?>" target="_blank">
                                                                 <?php echo $field['value']; ?>
