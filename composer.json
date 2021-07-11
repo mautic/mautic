@@ -5,7 +5,8 @@
   "description": "Mautic Open Source Distribution",
   "require": {
     "composer/installers": "^1.11",
-    "mautic/core-lib": "^3.0"
+    "mautic/core-lib": "^3.0",
+    "symfony/messenger": "^5.3"
   },
   "require-dev": {
     "symfony/web-profiler-bundle": "~4.4.0",
