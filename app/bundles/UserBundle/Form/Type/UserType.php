@@ -172,6 +172,20 @@ class UserType extends AbstractType
                 'error_bubbling'  => false,
             ]
         );
+        if (!$existing) {
+            $builder->add(
+                'automaticPassword',
+                YesNoButtonGroupType::class,
+                [
+                    'label' => 'mautic.user.user.form.automaticpassword',
+                    'attr'  => [
+                        'tooltip'  => 'mautic.user.user.form.automaticpassword.descr',
+                        'onchange' => 'Mautic.togglePasswordInput()',
+                    ],
+                    'data' => false,
+                ]
+            );
+        }
 
         $builder->add(
             'timezone',

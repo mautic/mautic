@@ -311,6 +311,20 @@ class UserModel extends FormModel
     }
 
     /**
+     * Send email with credential to the new user.
+     */
+    public function sendCredentialsEmail($email, $username, $password)
+    {
+        /** @var MailHelper $mailer */
+        $mailer = $this->mailHelper->getMailer();
+        $mailer->setTo($email);
+        $mailer->setSubject($this->translator->trans('mautic.email.user.new_user.subject'));
+        $text = $this->translator->trans('mautic.email.user.new_user.body', ['%username%' => $username, '%password%' => $password, '%link%' => $_SERVER['SERVER_NAME']]);
+        $mailer->setBody($text);
+        $mailer->send();
+    }
+
+    /**
      * Set user preference.
      *
      * @param      $key
