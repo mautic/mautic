@@ -1,0 +1,20 @@
+{% set request = app.request %}
+{% set content_only = true %}
+{% set modal_view = false %}
+
+{% if not request.isXmlHttpRequest() and not modal_view %}
+{% set template = 'slim' %}
+{% use 'MauticCoreBundle:Default:slim.html.twig' %}
+{% endif %}
+
+{% if not modal_view %}
+<div class="content-body">
+    {{ include('MauticCoreBundle:Default:pageheader.html.twig') }}
+	<!-- TODO <?php $view['slots']->output('_content'); ?> -->
+</div>
+
+<!-- TODO add modal here -->
+<!-- TODO add getAuthenticationContext() here -->
+{% else %}
+{% block content %}{% endblock %}
+{% endif %}

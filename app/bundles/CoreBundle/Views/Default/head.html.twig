@@ -1,0 +1,14 @@
+<head>
+    <meta charset="UTF-8" />
+    <title>TODO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="icon" type="image/x-icon" href="{{ asset('media/images/favicon.ico') }}" />
+    <link rel="icon" sizes="192x192" href="{{ asset('media/images/favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ asset('media/images/apple-touch-icon.png') }}" />
+
+    {{ outputSystemStylesheets() }}
+
+    {% include('MauticCoreBundle:Default:script.html.twig') %}
+
+    {{ outputHeadDeclarations() }}
+</head>

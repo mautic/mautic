@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    {% include('MauticCoreBundle:Default:head.html.twig') %}
+    <body>
+        {{ outputScripts('bodyOpen') }}
+        <section id="app-content" class="container content-only">
+            <!-- TODO add flashes -->
+            {% block content %}{% endblock %}
+        </section>
+        {{ outputScripts('bodyClose') }}
+        <script>
+            Mautic.onPageLoad('body');
+        </script>
+    </body>
+</html>
