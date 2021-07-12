@@ -16,8 +16,15 @@ use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use Mautic\Middleware\MiddlewareBuilder;
 use function Stack\run;
 
-if (extension_loaded('apcu') && in_array(@$_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1', '172.17.0.1'])) {
-    @apcu_clear_cache();
+if (in_array(@$_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1', '172.17.0.1'])) {
+    if (function_exists('apc_clear_cache')) {
+        @apc_clear_cache();
+        @apc_clear_cache('user');
+        @apc_clear_cache('opcode');
+    }
+    if (function_exists('apcu_clear_cache')) {
+        @apcu_clear_cache();
+    }
 }
 
 ErrorHandler::register('dev');
