@@ -92,6 +92,11 @@ class Field
     private $validation = [];
 
     /**
+     * @var array
+     */
+    private $conditions = [];
+
+    /**
      * @var Form
      */
     private $form;
@@ -147,6 +152,11 @@ class Field
      * @var bool
      */
     private $alwaysDisplay;
+
+    /**
+     * @var string
+     */
+    private $parent;
 
     /**
      * Reset properties on clone.
@@ -219,6 +229,9 @@ class Field
             ->nullable()
             ->build();
 
+        $builder->addNullableField('parent', 'string', 'parent_id');
+        $builder->addNullableField('conditions', 'json_array');
+
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('fields')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
@@ -265,6 +278,8 @@ class Field
                     'order',
                     'properties',
                     'validation',
+                    'parent',
+                    'conditions',
                     'labelAttributes',
                     'inputAttributes',
                     'containerAttributes',
@@ -901,6 +916,45 @@ class Field
     }
 
     /**
+     * Was field displayed.
+     *
+     * @return bool
+     */
+    public function showForConditionalField(array $data)
+    {
+        if (!$parentField = $this->findParentFieldInForm()) {
+            return true;
+        }
+
+        if (!isset($data[$parentField->getAlias()])) {
+            return false;
+        }
+
+        $sendValues = $data[$parentField->getAlias()];
+        if (!is_array($sendValues)) {
+            $sendValues = [$sendValues];
+        }
+
+        foreach ($sendValues as $value) {
+            // any value
+            if ('' !== $value && !empty($this->conditions['any'])) {
+                return true;
+            }
+
+            if ('notIn' === $this->conditions['expr']) {
+                // value not matched
+                if ('' !== $value && !in_array($value, $this->conditions['values'])) {
+                    return true;
+                }
+            } elseif (in_array($value, $this->conditions['values'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return bool
      */
     public function isCaptchaType()
@@ -930,5 +984,61 @@ class Field
     public function setAlwaysDisplay($alwaysDisplay)
     {
         $this->alwaysDisplay = $alwaysDisplay;
+    }
+
+    /**
+     * @return array
+     */
+    public function getConditions()
+    {
+        return $this->conditions;
+    }
+
+    /**
+     * @param array $conditions
+     *
+     * @return Field
+     */
+    public function setConditions($conditions)
+    {
+        $this->isChanged('conditions', $conditions);
+        $this->conditions = $conditions;
+
+        return $this;
+    }
+
+    /**
+     * @param string $parent
+     *
+     * @return string
+     */
+    public function setParent($parent)
+    {
+        $this->isChanged('parent', $parent);
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    private function findParentFieldInForm()
+    {
+        if (!$this->parent) {
+            return;
+        }
+
+        $fields = $this->getForm()->getFields();
+        foreach ($fields as $field) {
+            if (intval($field->getId()) === intval($this->parent)) {
+                return $field;
+            }
+        }
     }
 }

@@ -128,12 +128,15 @@
         };
 
         Form.prepareForms = function() {
+            if (Core.debug()) console.log('Preparing forms found on the page');
+
             var forms = document.getElementsByTagName('form');
             for (var i = 0, n = forms.length; i < n; i++) {
                 var formId = forms[i].getAttribute('data-mautic-form');
                 if (formId !== null) {
                     Form.prepareMessengerForm(formId);
                     Form.prepareValidation(formId);
+                    Form.prepareShowOn(formId);
                     Form.preparePagination(formId);
                 }
             }
@@ -195,6 +198,113 @@
                         multiple: container.getAttribute('data-validate-multiple'),
                     }
                 });
+            }
+        };
+
+        Form.prepareShowOn = function (formId) {
+            var theForm = document.getElementById('mauticform_' + formId);
+            var showOnDataAttribute = 'data-mautic-form-show-on';
+
+            var parents = {};
+            var showOn = theForm.querySelectorAll('['+showOnDataAttribute+']');
+            [].forEach.call(showOn, function (container) {
+                var condition = container.getAttribute(showOnDataAttribute);
+                var returnArray = condition.split(':');
+
+                var idOnChangeElem  = "mauticform_" + formId+"_"+returnArray[0];
+                var elemToShow = container.getAttribute('id');
+                var elemShowOnValues = (returnArray[1]).split('|');
+
+                if(!parents[idOnChangeElem]){
+                    parents[idOnChangeElem] = {};
+                }
+
+                parents[idOnChangeElem][elemToShow] = elemShowOnValues;
+
+            });
+
+            Object.keys(parents).forEach(function(key) {
+                var containerElement = document.getElementById(key);
+
+                Form.doShowOn(parents, key, Form.getSelectedValues(containerElement));
+
+                containerElement.onchange = function (evt) {
+                    var selectElement = evt.target;
+                    Form.doShowOn(parents, key, Form.getSelectedValues(evt.currentTarget));
+                }
+            });
+        };
+
+        Form.doShowOn = function (parents, key, selectedValues) {
+
+            Object.keys((parents[key])).forEach(function(key2) {
+                Form.hideField(document.getElementById(key2));
+            });
+
+            Object.keys((parents[key])).forEach(function(key2) {
+                [].forEach.call(selectedValues, function (selectedValue) {
+                    
+                    var el = document.getElementById(key2);
+                    if (selectedValue) {
+                        if (el.getAttribute('data-mautic-form-expr') == 'notIn') {
+                            if (!(parents[key][key2]).includes(selectedValue)) {
+                                Form.showField(el, selectedValue);
+                            }
+                        }
+                        else if ((parents[key][key2]).includes(selectedValue) || ((parents[key][key2]).includes('*'))) {
+                            Form.showField(el, selectedValue);
+                        }
+                    }
+                })
+            });
+        };
+
+        Form.hideField = function(element) {
+            element.style.display = 'none';
+            element.setAttribute('data-validate-disable', 1);
+        }
+
+        Form.showField = function(element, selectedValue) {
+            element.style.display = 'block';
+            element.removeAttribute('data-validate-disable');
+            Form.filterOptGroups(element, selectedValue);
+        }
+
+        Form.getSelectedValues = function(containerElement) {
+            if (containerElement.querySelectorAll('input[type=checkbox], input[type=radio]').length) {
+                return Array.from(containerElement.querySelectorAll('input:checked'))
+                    .map(option => option.value);
+
+            }else if(containerElement.querySelectorAll('select').length){
+                return Array.from(containerElement.querySelectorAll('option:checked'))
+                    .map(option => option.value);
+            }
+        }
+
+        Form.filterOptGroups = function(selectElement, optGroupValue) {
+            var optGroups = selectElement.querySelectorAll('optgroup');
+            var optGroupCount = optGroups.length;
+
+            if (!optGroupCount) {
+                return;
+            }
+
+            var optGroupFound = false;
+
+            for (var index = 0; index < optGroupCount; ++index) {
+                var optGroup = optGroups[index];
+                if (optGroup.getAttribute('label') !== optGroupValue) {
+                    optGroup.style.display = 'none';
+                } else {
+                    optGroup.style.display = 'block';
+                    optGroupFound = true;
+                }
+            }
+
+            // Hide select field itself if no opt group label match the selected value.
+            // Use case: Show states only for countries which have some states.
+            if (false === optGroupFound) {
+                Form.hideField(selectElement);
             }
         };
 
@@ -390,6 +500,14 @@
 
                 validateField: function(theForm, fieldKey) {
                     var field = MauticFormValidations[formId][fieldKey];
+
+                    var containerId = Form.getFieldContainerId(formId, fieldKey);
+
+                    // Skip conditonal hidden field
+                    if (document.getElementById(containerId).getAttribute('data-validate-disable')) {
+                        return true;
+                    }
+
                     var valid = Form.customCallbackHandler(formId, 'onValidateField', {fieldKey: fieldKey, field: field});
 
                     // If true, then a callback handled it
@@ -422,8 +540,6 @@
                                     break;
                             }
                         }
-
-                        var containerId = Form.getFieldContainerId(formId, fieldKey);
 
                         if (!valid) {
                             validator.markError(containerId, valid);
@@ -601,6 +717,8 @@
                     Form.switchPage(document.getElementById('mauticform_' + formId), 1);
 
                     document.getElementById('mauticform_' + formId).reset();
+
+                    Form.prepareShowOn(formId); // Hides conditional fields again.
                 },
 
                 disableSubmitButton: function() {
@@ -808,7 +926,7 @@
             if (Core.debug()) console.log('Automatic setup mautic_base_url as: ' + config.mautic_base_url);
             Modal.loadStyle();
             document.addEventListener("DOMContentLoaded", function(e){
-                if (Core.debug()) console.log('DOM is ready');
+                if (Core.debug()) console.log('DOMContentLoaded dispatched as DOM is ready');
                 Form.initialize();
             });
         };
@@ -818,6 +936,21 @@
         };
 
         Core.onLoad = function() {
+            if (Core.debug()) console.log('Object onLoad called');
+
+            Core.setupForms();
+        };
+
+        Core.setupForms = function() {
+            if (Core.debug()) console.log('DOM ready state is ' + document.readyState);
+
+            // Landing pages and form "previews" cannot process till the DOM is fully loaded
+            if ("complete" !== document.readyState) {
+                setTimeout(function () { Core.setupForms(); }, 1);
+
+                return;
+            }
+
             Form.prepareForms();
             Form.registerFormMessenger();
         };

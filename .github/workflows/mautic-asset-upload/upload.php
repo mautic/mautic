@@ -76,7 +76,7 @@ $data = [
     'storageLocation' => 'local',
     'file'            => $response['file']['name'],
     'category'        => $assetCategoryId,
-    'isPublished'     => true,
+    'isPublished'     => false,
 ];
 
 $response = $assetApi->create($data);
