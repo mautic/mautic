@@ -589,7 +589,7 @@ $view['slots']->set(
                         onclick="Mautic.setAsPrimaryCompany(<?php echo $company['id']; ?>, <?php echo $lead->getId(); ?>);"
                         title="<?php echo $view['translator']->trans('mautic.lead.company.set.primary'); ?>">
                     </i>
-                    <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'view', 'objectId' => $company['id']]); ?>" style="color: white;">
+                    <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'view', 'objectId' => $company['id']]); ?>" data-toggle="ajax" style="color: white;">
                         <?php echo $view->escape($company['companyname']); ?>
                     </a>
                 </span>
@@ -604,7 +604,7 @@ $view['slots']->set(
           <?php foreach ($lists[$lead->getId()] as $key => $list): ?>
             <h5 class="pull-left mt-xs mr-xs">
                   <span class="label label-success">
-                      <a href="<?php echo $view['router']->path('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list['id']]); ?>" style="color: white;">
+                      <a href="<?php echo $view['router']->path('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list['id']]); ?>" data-toggle="ajax" style="color: white;">
                           <?php echo $view->escape($list['name']); ?>
                       </a>
                   </span>
