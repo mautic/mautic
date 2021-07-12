@@ -63,10 +63,7 @@ class EmailType extends AbstractType
      */
     private $stageModel;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private CoreParametersHelper $coreParametersHelper;
 
     public function __construct(
         TranslatorInterface $translator,
@@ -221,7 +218,7 @@ class EmailType extends AbstractType
                     'class'   => 'form-control not-chosen hidden',
                     'tooltip' => 'mautic.email.form.template.help',
                 ],
-                'data' => $options['data']->getTemplate() ? $options['data']->getTemplate() : 'blank',
+                'data' => $options['data']->getTemplate() ? $options['data']->getTemplate() : $this->coreParametersHelper->get('theme_email_default'),
             ]
         );
 

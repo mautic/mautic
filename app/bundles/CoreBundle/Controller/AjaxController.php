@@ -15,6 +15,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\UpgradeEvent;
+use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
@@ -279,29 +280,34 @@ class AjaxController extends CommonController
             }
 
             if ($hasPermission) {
-                $dataArray['success'] = 1;
-                //toggle permission state
-                if ($customToggle) {
-                    $accessor = PropertyAccess::createPropertyAccessor();
-                    $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
-                    $model->getRepository()->saveEntity($entity);
-                } else {
-                    $refresh = $model->togglePublishStatus($entity);
-                }
-                if (!empty($refresh)) {
-                    $dataArray['reload'] = 1;
-                } else {
-                    //get updated icon HTML
-                    $html = $this->renderView(
-                        'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                        [
-                            'item'  => $entity,
-                            'model' => $name,
-                            'query' => $extra,
-                            'size'  => (isset($post['size'])) ? $post['size'] : '',
-                        ]
-                    );
-                    $dataArray['statusHtml'] = $html;
+                try {
+                    $dataArray['success'] = 1;
+                    //toggle permission state
+                    if ($customToggle) {
+                        $accessor = PropertyAccess::createPropertyAccessor();
+                        $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
+                        $model->getRepository()->saveEntity($entity);
+                    } else {
+                        $refresh = $model->togglePublishStatus($entity);
+                    }
+                    if (!empty($refresh)) {
+                        $dataArray['reload'] = 1;
+                    } else {
+                        //get updated icon HTML
+                        $html = $this->renderView(
+                            'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                            [
+                                'item'  => $entity,
+                                'model' => $name,
+                                'query' => $extra,
+                                'size'  => (isset($post['size'])) ? $post['size'] : '',
+                            ]
+                        );
+                        $dataArray['statusHtml'] = $html;
+                    }
+                } catch (RecordCanNotUnpublishException $e) {
+                    $this->addFlash($e->getMessage());
+                    $status = Response::HTTP_UNPROCESSABLE_ENTITY;
                 }
             } else {
                 $this->addFlash('mautic.core.error.access.denied');

@@ -154,7 +154,7 @@ class Log
      */
     public function setNote($note)
     {
-        $this->note = substr(strip_tags($note), 0, 190);
+        $this->note = substr(strip_tags(iconv('UTF-8', 'UTF-8//IGNORE', $note)), 0, 190);
 
         return $this;
     }

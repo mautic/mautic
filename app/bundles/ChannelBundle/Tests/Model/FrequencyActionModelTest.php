@@ -17,31 +17,32 @@ use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|Lead
      */
     private $contactMock5;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|LeadModel
      */
     private $contactModelMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|FrequencyRuleRepository
      */
     private $frequencyRepoMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|FrequencyRule
      */
     private $frequencyRuleEmailMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|FrequencyRule
      */
     private $frequencyRuleSmsMock;
 
@@ -52,18 +53,18 @@ class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->contactMock5      = $this->createMock(Lead::class);
-        $this->contactModelMock  = $this->createMock(LeadModel::class);
-        $this->frequencyRepoMock = $this->createMock(FrequencyRuleRepository::class);
-        $this->actionModel       = new FrequencyActionModel(
+        parent::setUp();
+
+        $this->contactMock5           = $this->createMock(Lead::class);
+        $this->contactModelMock       = $this->createMock(LeadModel::class);
+        $this->frequencyRepoMock      = $this->createMock(FrequencyRuleRepository::class);
+        $this->frequencyRuleEmailMock = $this->createMock(FrequencyRule::class);
+        $this->frequencyRuleSmsMock   = $this->createMock(FrequencyRule::class);
+        $collectionMock               = $this->createMock(AbstractLazyCollection::class);
+        $this->actionModel            = new FrequencyActionModel(
             $this->contactModelMock,
             $this->frequencyRepoMock
         );
-
-        $collectionMock = $this->createMock(AbstractLazyCollection::class);
-
-        $this->frequencyRuleEmailMock = $this->createMock(FrequencyRule::class);
-        $this->frequencyRuleSmsMock   = $this->createMock(FrequencyRule::class);
 
         $collectionMock->method('toArray')
             ->willReturn([
@@ -74,16 +75,16 @@ class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
         $this->contactMock5->method('getFrequencyRules')->willReturn($collectionMock);
     }
 
-    public function testUpdateWhenEntityAccess()
+    public function testUpdateWhenEntityAccess(): void
     {
         $contacts = [5];
 
-        $this->contactModelMock->expects($this->at(0))
+        $this->contactModelMock->expects($this->once())
             ->method('getLeadsByIds')
             ->with($contacts)
             ->willReturn([$this->contactMock5]);
 
-        $this->contactModelMock->expects($this->at(1))
+        $this->contactModelMock->expects($this->once())
             ->method('canEditContact')
             ->with($this->contactMock5)
             ->willReturn(false);
@@ -94,7 +95,7 @@ class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
         $this->actionModel->update($contacts, [], '');
     }
 
-    public function testUpdate()
+    public function testUpdate(): void
     {
         $contacts = [5];
         $params   = [
@@ -110,12 +111,12 @@ class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
             'contact_pause_end_date_sms'     => '',
         ];
 
-        $this->contactModelMock->expects($this->at(0))
+        $this->contactModelMock->expects($this->once())
             ->method('getLeadsByIds')
             ->with($contacts)
             ->willReturn([$this->contactMock5]);
 
-        $this->contactModelMock->expects($this->at(1))
+        $this->contactModelMock->expects($this->once())
             ->method('canEditContact')
             ->with($this->contactMock5)
             ->willReturn(true);
@@ -158,13 +159,19 @@ class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
             ->method('setPreferredChannel')
             ->with(true);
 
-        $this->contactMock5->expects($this->at(1))
+        $this->contactMock5->expects($this->exactly(2))
             ->method('addFrequencyRule')
-            ->with($this->frequencyRuleEmailMock);
+            ->withConsecutive(
+                [$this->frequencyRuleEmailMock],
+                [$this->frequencyRuleEmailMock]
+            );
 
-        $this->frequencyRepoMock->expects($this->at(0))
+        $this->frequencyRepoMock->expects($this->exactly(2))
             ->method('saveEntity')
-            ->with($this->frequencyRuleEmailMock);
+            ->withConsecutive(
+                [$this->frequencyRuleEmailMock],
+                [$this->frequencyRuleSmsMock]
+            );
 
         $this->frequencyRuleSmsMock->expects($this->once())
             ->method('setChannel')
@@ -194,14 +201,6 @@ class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
         $this->frequencyRuleSmsMock->expects($this->once())
             ->method('setPreferredChannel')
             ->with(false);
-
-        $this->contactMock5->expects($this->at(1))
-            ->method('addFrequencyRule')
-            ->with($this->frequencyRuleEmailMock);
-
-        $this->frequencyRepoMock->expects($this->at(1))
-            ->method('saveEntity')
-            ->with($this->frequencyRuleSmsMock);
 
         $this->actionModel->update($contacts, $params, 'email');
     }

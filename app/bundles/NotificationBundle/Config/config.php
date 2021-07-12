@@ -119,9 +119,9 @@ return [
         ],
         'other' => [
             'mautic.notification.api' => [
-                'class'     => 'Mautic\NotificationBundle\Api\OneSignalApi',
+                'class'     => \Mautic\NotificationBundle\Api\OneSignalApi::class,
                 'arguments' => [
-                    'mautic.http.connector',
+                    'mautic.http.client',
                     'mautic.page.model.trackable',
                     'mautic.helper.integration',
                 ],

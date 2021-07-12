@@ -11,7 +11,8 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
-use Joomla\Http\Http;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -37,9 +38,9 @@ class LanguageHelperTest extends TestCase
     private $coreParametersHelper;
 
     /**
-     * @var Http|\PHPUnit\Framework\MockObject\MockObject
+     * @var Client|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $connector;
+    private $client;
 
     /**
      * @var string
@@ -55,7 +56,7 @@ class LanguageHelperTest extends TestCase
     {
         $this->logger               = $this->createMock(Logger::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->connector            = $this->createMock(Http::class);
+        $this->client               = $this->createMock(Client::class);
 
         $this->translationsPath = __DIR__.'/resource/language';
         $this->tmpPath          = $this->translationsPath.'/tmp';
@@ -103,13 +104,13 @@ class LanguageHelperTest extends TestCase
             );
 
         $languages      = ['languages' => [['name'=>'Spanish', 'locale'=>'es']]];
-        $response       = new \stdClass();
-        $response->code = 200;
-        $response->body = json_encode($languages);
+        $response       = new Response(200, [], json_encode($languages));
 
-        $this->connector->expects($this->once())
+        $this->client->expects($this->once())
             ->method('get')
-            ->with('https://languages.test', [], 10)
+            ->with('https://languages.test', [
+                \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+            ])
             ->willReturn($response);
 
         $this->getHelper()->fetchLanguages();
@@ -132,11 +133,9 @@ class LanguageHelperTest extends TestCase
             ->with('translations_fetch_url')
             ->willReturn('https://languages.test/');
 
-        $response       = new \stdClass();
-        $response->code = 200;
-        $response->body = file_get_contents($this->translationsPath.'/es.zip');
+        $response = new Response(200, [], file_get_contents($this->translationsPath.'/es.zip'));
 
-        $this->connector->expects($this->once())
+        $this->client->expects($this->once())
             ->method('get')
             ->with('https://languages.test/es.zip')
             ->willReturn($response);
@@ -160,6 +159,6 @@ class LanguageHelperTest extends TestCase
      */
     private function getHelper()
     {
-        return new LanguageHelper($this->pathsHelper, $this->logger, $this->coreParametersHelper, $this->connector);
+        return new LanguageHelper($this->pathsHelper, $this->logger, $this->coreParametersHelper, $this->client);
     }
 }

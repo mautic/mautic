@@ -27,6 +27,8 @@ class EmailGraphStatsController extends Controller
      * @param string $dateTo
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Exception
      */
     public function viewAction(Request $request, $objectId, $isVariant, $dateFrom = null, $dateTo = null)
     {

@@ -63,11 +63,6 @@ class Webhook extends FormEntity
     /**
      * @var ArrayCollection
      */
-    private $queues;
-
-    /**
-     * @var ArrayCollection
-     */
     private $logs;
 
     /**
@@ -99,7 +94,6 @@ class Webhook extends FormEntity
     public function __construct()
     {
         $this->events = new ArrayCollection();
-        $this->queues = new ArrayCollection();
         $this->logs   = new ArrayCollection();
     }
 
@@ -117,14 +111,6 @@ class Webhook extends FormEntity
             ->orphanRemoval()
             ->setIndexBy('event_type')
             ->mappedBy('webhook')
-            ->cascadePersist()
-            ->cascadeMerge()
-            ->cascadeDetach()
-            ->build();
-
-        $builder->createOneToMany('queues', 'WebhookQueue')
-            ->mappedBy('webhook')
-            ->fetchExtraLazy()
             ->cascadePersist()
             ->cascadeMerge()
             ->cascadeDetach()
@@ -446,49 +432,6 @@ class Webhook extends FormEntity
     public function getEventsOrderbyDir()
     {
         return $this->eventsOrderbyDir;
-    }
-
-    /**
-     * @return ArrayCollection
-     */
-    public function getQueues()
-    {
-        return $this->queues;
-    }
-
-    /**
-     * @return $this
-     */
-    public function addQueues($queues)
-    {
-        $this->queues = $queues;
-
-        /** @var \Mautic\WebhookBundle\Entity\WebhookQueue $queue */
-        foreach ($queues as $queue) {
-            $queue->setWebhook($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function addQueue(WebhookQueue $queue)
-    {
-        $this->queues[] = $queue;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function removeQueue(WebhookQueue $queue)
-    {
-        $this->queues->removeElement($queue);
-
-        return $this;
     }
 
     /**

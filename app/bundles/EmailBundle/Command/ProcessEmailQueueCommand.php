@@ -123,7 +123,7 @@ EOT
                         try {
                             $transport->send($message);
                         } catch (\Swift_TransportException $e) {
-                            if ($dispatcher->hasListeners(EmailEvents::EMAIL_FAILED)) {
+                            if (!$tryAgain && $dispatcher->hasListeners(EmailEvents::EMAIL_FAILED)) {
                                 $event = new QueueEmailEvent($message);
                                 $dispatcher->dispatch(EmailEvents::EMAIL_FAILED, $event);
                             }

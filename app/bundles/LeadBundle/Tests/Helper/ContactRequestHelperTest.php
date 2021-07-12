@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -23,53 +25,56 @@ use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
+     * @var MockObject|LeadModel
      */
     private $leadModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ContactTracker
+     * @var MockObject|ContactTracker
      */
     private $contactTracker;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CoreParametersHelper
+     * @var MockObject|CoreParametersHelper
      */
     private $coreParametersHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|IpLookupHelper
+     * @var MockObject|IpLookupHelper
      */
     private $ipLookupHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher
+     * @var MockObject|EventDispatcher
      */
     private $dispatcher;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
+     * @var MockObject|RequestStack
      */
     private $requestStack;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Logger
+     * @var MockObject|Logger
      */
     private $logger;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Lead
+     * @var MockObject|Lead
      */
     private $trackedContact;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->leadModel            = $this->createMock(LeadModel::class);
         $this->contactTracker       = $this->createMock(ContactTracker::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -77,8 +82,8 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->requestStack         = $this->createMock(RequestStack::class);
         $this->logger               = $this->createMock(Logger::class);
         $this->dispatcher           = $this->createMock(EventDispatcher::class);
+        $this->trackedContact       = $this->createMock(Lead::class);
 
-        $this->trackedContact = $this->createMock(Lead::class);
         $this->trackedContact->method('getId')
             ->willReturn(1);
 
@@ -92,7 +97,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new IpAddress());
     }
 
-    public function testEventDoesNotIdentifyContact()
+    public function testEventDoesNotIdentifyContact(): void
     {
         $query = [
             'ct' => [
@@ -100,7 +105,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
                 'channel' => [
                     'email' => 1,
                 ],
-                'stat'    => 'abc123',
+                'stat' => 'abc123',
             ],
         ];
 
@@ -122,7 +127,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->trackedContact->getId(), $helper->getContactFromQuery($query)->getId());
     }
 
-    public function testEventIdentifiesContact()
+    public function testEventIdentifiesContact(): void
     {
         $query = [
             'ct' => [
@@ -152,7 +157,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($contact === $foundContact);
     }
 
-    public function testLandingPageClickthroughIdentifiesLeadIfEnabled()
+    public function testLandingPageClickthroughIdentifiesLeadIfEnabled(): void
     {
         $this->coreParametersHelper->expects($this->once())
             ->method('get')
@@ -195,9 +200,9 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($lead->getId(), $helper->getContactFromQuery($query)->getId());
     }
 
-    public function testLandingPageClickthroughDoesNotIdentifyLeadIfDisabled()
+    public function testLandingPageClickthroughDoesNotIdentifyLeadIfDisabled(): void
     {
-        $this->coreParametersHelper->expects($this->at(0))
+        $this->coreParametersHelper->expects($this->once())
             ->method('get')
             ->with('track_by_tracking_url')
             ->willReturn(false);
@@ -227,10 +232,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->trackedContact->getId(), $helper->getContactFromQuery($query)->getId());
     }
 
-    /**
-     * @return ContactRequestHelper
-     */
-    private function getContactRequestHelper()
+    private function getContactRequestHelper(): ContactRequestHelper
     {
         return new ContactRequestHelper(
             $this->leadModel,

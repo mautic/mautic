@@ -2,9 +2,9 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Api;
 
-use Joomla\Http\Response;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCitrixBundle\Integration\CitrixAbstractIntegration;
+use Psr\Http\Message\ResponseInterface;
 
 class CitrixApi
 {
@@ -35,7 +35,6 @@ class CitrixApi
         $requestSettings = [
             'encode_parameters'   => 'json',
             'return_raw'          => 'true', // needed to get the HTTP status code in the response
-            'override_auth_token' => 'oauth_token='.$this->integration->getApiKey(),
         ];
 
         if (array_key_exists('requestSettings', $settings) && is_array($settings['requestSettings'])) {
@@ -49,14 +48,14 @@ class CitrixApi
             $route,
             $operation
         );
-        /** @var Response $request */
+        /** @var ResponseInterface $request */
         $request = $this->integration->makeRequest(
             $url,
             $settings['parameters'],
             $settings['method'],
             $requestSettings
         );
-        $status  = $request->code;
+        $status  = $request->getStatusCode();
         $message = '';
 
         // Try refresh access_token with refresh_token (https://goto-developer.logmeininc.com/how-use-refresh-tokens)
@@ -91,7 +90,7 @@ class CitrixApi
                 $message = 'The user is already registered';
                 break;
             default:
-                $message = $request->body;
+                $message = $request->getBody();
                 break;
         }
 
@@ -99,15 +98,15 @@ class CitrixApi
             throw new ApiErrorException($message);
         }
 
-        return $this->integration->parseCallbackResponse($request->body);
+        return $this->integration->parseCallbackResponse($request->getBody());
     }
 
     /**
      * @return bool
      */
-    private function isInvalidTokenFromReponse(Response $request)
+    private function isInvalidTokenFromReponse(ResponseInterface $request)
     {
-        $responseData = $this->integration->parseCallbackResponse($request->body);
+        $responseData = $this->integration->parseCallbackResponse($request->getBody());
         if (isset($responseData['int_err_code']) && 'InvalidToken' == $responseData['int_err_code']) {
             return true;
         }

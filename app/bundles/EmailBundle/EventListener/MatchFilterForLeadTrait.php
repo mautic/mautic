@@ -24,7 +24,6 @@ trait MatchFilterForLeadTrait
             // Lead in generated for preview with faked data
             return false;
         }
-
         $groups   = [];
         $groupNum = 0;
 
@@ -74,15 +73,6 @@ trait MatchFilterForLeadTrait
 
                     if (null !== $filterVal) {
                         $filterVal = (bool) $filterVal;
-                    }
-                    break;
-                case 'date':
-                    if (!$leadVal instanceof \DateTime) {
-                        $leadVal = new \DateTime($leadVal);
-                    }
-
-                    if (!$filterVal instanceof \DateTime) {
-                        $filterVal = new \DateTime($filterVal);
                     }
                     break;
                 case 'datetime':
@@ -188,6 +178,16 @@ trait MatchFilterForLeadTrait
                     break;
                 case '!regexp':
                     $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/i', $leadVal);
+                    break;
+                case 'startsWith':
+                    $groups[$groupNum] = 0 === strncmp($leadVal, $filterVal, strlen($filterVal));
+                    break;
+                case 'endsWith':
+                    $endOfString       = substr($leadVal, strlen($leadVal) - strlen($filterVal));
+                    $groups[$groupNum] = 0 === strcmp($endOfString, $filterVal);
+                    break;
+                case 'contains':
+                    $groups[$groupNum] = false !== strpos((string) $leadVal, (string) $filterVal);
                     break;
             }
         }

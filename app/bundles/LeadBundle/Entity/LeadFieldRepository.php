@@ -233,6 +233,10 @@ class LeadFieldRepository extends CommonRepository
                     ('in' === $operatorExpr ? $q->expr()->in($property, ':values') : $q->expr()->notIn($property, ':values'))
                 );
 
+                $expr->add(
+                    $property." $operator '\\\\|?$value\\\\|?'"
+                );
+
                 $q->where($expr)
                     ->setParameter('lead', (int) $lead)
                     ->setParameter('values', $values, Connection::PARAM_STR_ARRAY);

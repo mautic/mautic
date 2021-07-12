@@ -82,7 +82,7 @@ class ParameterLoader
         $dotenv->populate($envVariables->all());
     }
 
-    public static function getLocalConfigFile(string $root): string
+    public static function getLocalConfigFile(string $root, $updateDefaultParameters = true): string
     {
         $root = realpath($root);
 
@@ -90,21 +90,27 @@ class ParameterLoader
         include $root.'/config/paths.php';
 
         if (!isset($paths['local_config'])) {
-            self::$defaultParameters['local_config_path'] = $root.'/config/local.php';
+            if ($updateDefaultParameters) {
+                self::$defaultParameters['local_config_path'] = $root.'/config/local.php';
+            }
 
-            return self::$defaultParameters['local_config_path'];
+            return $root.'/config/local.php';
         }
 
         $paths['local_config'] = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
 
-        self::$defaultParameters['local_config_path'] = $paths['local_config'];
+        if ($updateDefaultParameters) {
+            self::$defaultParameters['local_config_path'] = $paths['local_config'];
+        }
 
         // We need this for the file manager
         if (isset($paths['local_root'])) {
-            self::$defaultParameters['local_root'] = $paths['local_root'];
+            if ($updateDefaultParameters) {
+                self::$defaultParameters['local_root'] = $paths['local_root'];
+            }
         }
 
-        return self::$defaultParameters['local_config_path'];
+        return $paths['local_config'];
     }
 
     private function loadDefaultParameters(): void

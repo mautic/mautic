@@ -149,7 +149,7 @@ class ApiSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            // Catch useless oauth1a errors
+            // Catch useless oauth errors
             $error = $error['message'];
         }
 

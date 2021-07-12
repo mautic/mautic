@@ -252,7 +252,7 @@ return [
                     'mautic.permission.repository',
                     'session',
                     'event_dispatcher',
-                    'security.encoder_factory',
+                    'security.password_encoder',
                 ],
             ],
             'mautic.security.authentication_listener' => [
@@ -265,6 +265,7 @@ return [
                     'event_dispatcher',
                     '', // providerKey
                     'mautic.permission.repository',
+                    'doctrine.orm.default_entity_manager',
                 ],
                 'public' => false,
             ],
@@ -336,7 +337,7 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.security.saml.username_mapper',
                     'mautic.user.model.user',
-                    'security.encoder_factory',
+                    'security.password_encoder',
                     '%mautic.saml_idp_default_role%',
                 ],
             ],
@@ -378,7 +379,7 @@ return [
             'mautic.user.fixture.user' => [
                 'class'     => \Mautic\UserBundle\DataFixtures\ORM\LoadUserData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['security.encoder_factory'],
+                'arguments' => ['security.password_encoder'],
             ],
         ],
     ],

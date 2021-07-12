@@ -5,5 +5,5 @@
   "features": [
     "page"
   ],
-  "builder": "custom"
+  "builder": ["custom"]
 }

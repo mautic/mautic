@@ -20,20 +20,19 @@ class ConfigType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('csv_always_enclose', YesNoButtonGroupType::class, [
-            'label'      => 'mautic.config.tab.form.csv_always_enclose',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.config.tab.form.csv_always_enclose.tooltip',
+        $builder->add(
+            'csv_always_enclose',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.config.tab.form.csv_always_enclose',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.config.tab.form.csv_always_enclose.tooltip',
                 ],
-            'data'        => isset($options['data']['csv_always_enclose']) ? (bool) $options['data']['csv_always_enclose'] : false,
-            'constraints' => [
-                new NotBlank([
-                    'message' => 'mautic.core.value.required',
-                ]),
-            ],
-        ]);
+                'data'       => isset($options['data']['csv_always_enclose']) ? (bool) $options['data']['csv_always_enclose'] : false,
+            ]
+        );
     }
 
     /**

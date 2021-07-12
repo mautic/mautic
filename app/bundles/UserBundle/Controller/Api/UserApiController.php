@@ -65,7 +65,7 @@ class UserApiController extends CommonApiController
 
         if (isset($parameters['plainPassword']['password'])) {
             $submittedPassword = $parameters['plainPassword']['password'];
-            $encoder           = $this->get('security.encoder_factory')->getEncoder($entity);
+            $encoder           = $this->get('security.password_encoder');
             $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
         }
 
@@ -101,7 +101,7 @@ class UserApiController extends CommonApiController
                 $entity = $this->model->getEntity();
                 if (isset($parameters['plainPassword']['password'])) {
                     $submittedPassword = $parameters['plainPassword']['password'];
-                    $encoder           = $this->get('security.encoder_factory')->getEncoder($entity);
+                    $encoder           = $this->get('security.password_encoder');
                     $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
                 }
             }
@@ -145,7 +145,7 @@ class UserApiController extends CommonApiController
                     }
                 }
 
-                $encoder = $this->get('security.encoder_factory')->getEncoder($entity);
+                $encoder = $this->get('security.password_encoder');
                 $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword, true));
                 break;
         }

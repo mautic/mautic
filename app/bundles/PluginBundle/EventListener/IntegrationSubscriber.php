@@ -12,7 +12,6 @@
 namespace Mautic\PluginBundle\EventListener;
 
 use DOMDocument;
-use Joomla\Http\Response;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\PluginEvents;
 use Monolog\Logger;
@@ -85,26 +84,25 @@ class IntegrationSubscriber implements EventSubscriberInterface
      */
     public function onResponse(PluginIntegrationRequestEvent $event)
     {
-        /** @var Response $response */
         $response = $event->getResponse();
-        $headers  = var_export($response->headers, true);
+        $headers  = var_export($response->getHeaders(), true);
         $name     = strtoupper($event->getIntegrationName());
-        $isJson   = isset($response->headers['Content-Type']) && preg_match('/application\/json/', $response->headers['Content-Type']);
-        $json     = $isJson ? str_replace('    ', '  ', json_encode(json_decode($response->body), JSON_PRETTY_PRINT)) : '';
+        $isJson   = isset($response->getHeaders()['Content-Type']) && preg_match('/application\/json/', $response->getHeaders()['Content-Type']);
+        $json     = $isJson ? str_replace('    ', '  ', json_encode(json_decode($response->getBody()), JSON_PRETTY_PRINT)) : '';
         $xml      = '';
-        $isXml    = isset($response->headers['Content-Type']) && preg_match('/text\/xml/', $response->headers['Content-Type']);
+        $isXml    = isset($response->getHeaders()['Content-Type']) && preg_match('/text\/xml/', $response->getHeaders()['Content-Type']);
         if ($isXml) {
             $doc                     = new DomDocument('1.0');
             $doc->preserveWhiteSpace = false;
             $doc->formatOutput       = true;
-            $doc->loadXML($response->body);
+            $doc->loadXML($response->getBody());
             $xml = $doc->saveXML();
         }
 
         if (defined('IN_MAUTIC_CONSOLE') && defined('MAUTIC_CONSOLE_VERBOSITY')
             && MAUTIC_CONSOLE_VERBOSITY >= ConsoleOutput::VERBOSITY_VERY_VERBOSE) {
             $output = new ConsoleOutput();
-            $output->writeln(sprintf('<fg=magenta>RESPONSE: %d</>', $response->code));
+            $output->writeln(sprintf('<fg=magenta>RESPONSE: %d</>', $response->getStatusCode()));
             $output->writeln('<fg=cyan>'.$headers.'</>');
             $output->writeln('');
 
@@ -113,21 +111,21 @@ class IntegrationSubscriber implements EventSubscriberInterface
             } elseif ($isXml) {
                 $output->writeln('<fg=cyan>'.$xml.'</>');
             } else {
-                $output->writeln('<fg=cyan>'.$response->body.'</>');
+                $output->writeln('<fg=cyan>'.$response->getBody().'</>');
             }
         } else {
-            $this->logger->debug("$name RESPONSE CODE: {$response->code}");
+            $this->logger->debug("$name RESPONSE CODE: {$response->getStatusCode()}");
             if ('' !== $headers) {
                 $this->logger->debug("$name RESPONSE HEADERS: \n".$headers.PHP_EOL);
             }
-            if ('' !== $json || '' !== $xml || '' !== $response->body) {
+            if ('' !== $json || '' !== $xml || '' !== $response->getBody()) {
                 $body = "$name RESPONSE BODY: ";
                 if ($isJson) {
                     $body .= $json;
                 } elseif ($isXml) {
                     $body .= $xml;
                 } else {
-                    $body = $response->body;
+                    $body = $response->getBody();
                 }
 
                 $this->logger->debug($body);
