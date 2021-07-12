@@ -140,4 +140,13 @@ final class IntegrationEvents
      * @var string
      */
     public const INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES = 'mautic.integration.INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES';
+
+    /**
+     * This event is dispatched when a Mautic company field changes are about to be stored to the sync_object_field_change_report table.
+     *
+     * The event listener receives a Mautic\IntegrationsBundle\Event\InternalCompanyEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES = 'mautic.integration.INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES';
 }
