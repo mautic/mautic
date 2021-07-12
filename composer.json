@@ -5,6 +5,7 @@
   "description": "Mautic Open Source Distribution",
   "require": {
     "composer/installers": "^1.11",
+    "matomo/device-detector": "^4.2",
     "mautic/core-lib": "^3.0"
   },
   "require-dev": {
