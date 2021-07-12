@@ -1,4 +1,5 @@
 import DynamicContentBlocks from './dynamicContent/dynamicContent.blocks';
+import ContentService from './content.service';
 
 export default (editor, opts = {}) => {
   const bm = editor.BlockManager;
