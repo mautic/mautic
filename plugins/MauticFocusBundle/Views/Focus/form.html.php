@@ -402,7 +402,6 @@ echo $view['form']->start($form);
                                     </div>
                                 </div>
                                 <?php echo $view['form']->row($form['form']); ?>
-                                <div style="margin-bottom: 50px;"></div>
                             </div>
 
                             <!-- link type properties -->
@@ -411,6 +410,8 @@ echo $view['form']->start($form);
                                 <?php echo $view['form']->row($form['properties']['content']['link_url']); ?>
                                 <?php echo $view['form']->row($form['properties']['content']['link_new_window']); ?>
                             </div>
+
+                            <?php echo $view['form']->row($form['properties']['content']['css']); ?>
                         </div>
                     </div>
                 </div>
