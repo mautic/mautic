@@ -20,11 +20,13 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\PartialEmailSendFailure;
+use Mautic\EmailBundle\Messenger\EmailMessage;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -239,11 +241,17 @@ class MailHelper
      */
     private $embedImagesReplaces = [];
 
+    /**
+     * @var MessageBusInterface
+     */
+    private $bus;
+
     public function __construct(MauticFactory $factory, \Swift_Mailer $mailer, $from = null)
     {
         $this->factory   = $factory;
         $this->mailer    = $mailer;
         $this->transport = $mailer->getTransport();
+        $this->bus       = $this->factory->get('messenger.default_bus');
 
         try {
             $this->logger = new \Swift_Plugins_Loggers_ArrayLogger();
@@ -262,7 +270,7 @@ class MailHelper
 
         // Check if batching is supported by the transport
         if (
-            ('memory' == $this->factory->getParameter('mailer_spool_type') && $this->transport instanceof TokenTransportInterface)
+            (in_array($this->factory->getParameter('mailer_spool_type'), ['memory', 'messenger']) && $this->transport instanceof TokenTransportInterface)
             || ($this->transport instanceof SpoolTransport && $this->transport->supportsTokenization())
         ) {
             $this->tokenizationEnabled = true;
@@ -428,7 +436,11 @@ class MailHelper
 
                 $failures = null;
 
-                $this->mailer->send($this->message, $failures);
+                if ('messenger' == $this->factory->getParameter('mailer_spool_type')) {
+                    $this->bus->dispatch(new EmailMessage($this->message));
+                } else {
+                    $this->mailer->send($this->message, $failures);
+                }
 
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;

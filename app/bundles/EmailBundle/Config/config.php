@@ -375,6 +375,12 @@ return [
             ],
         ],
         'other' => [
+            'mautic.email.message.handler' => [
+                'class'     => \Mautic\EmailBundle\Messenger\EmailMessageHandler::class,
+                'arguments' => [
+                    'mailer',
+                ],
+            ],
             'mautic.spool.delegator' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\Spool\DelegatingSpool::class,
                 'arguments' => [
@@ -992,5 +998,6 @@ return [
         'mailer_mailjet_sandbox_default_mail' => null,
         'disable_trackable_urls'              => false,
         'theme_email_default'                 => 'blank',
+        'messenger_transport_dsn'             => null,
     ],
 ];

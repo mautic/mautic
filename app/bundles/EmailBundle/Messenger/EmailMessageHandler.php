@@ -15,7 +15,18 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class EmailMessageHandler implements MessageHandlerInterface
 {
-    public function __invoke()
+    /**
+     * @var \Swift_Mailer
+     */
+    private $mailer;
+
+    public function __construct(\Swift_Mailer $mailer)
     {
+        $this->mailer = $mailer;
+    }
+
+    public function __invoke(EmailMessage $emailMessage)
+    {
+        $this->mailer->send($emailMessage->getMauticMessage());
     }
 }

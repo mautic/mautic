@@ -11,17 +11,25 @@
 
 namespace Mautic\EmailBundle\Messenger;
 
+use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+
 class EmailMessage
 {
-    private $content;
+    /**
+     * @var \Swift_Message
+     */
+    private $mauticMessage;
 
-    public function __construct(string $content)
+    public function __construct(\Swift_Message $mauticMessage)
     {
-        $this->content = $content;
+        $this->mauticMessage = $mauticMessage;
     }
 
-    public function getContent(): string
+    /**
+     * @return MauticMessage
+     */
+    public function getMauticMessage()
     {
-        return $this->content;
+        return $this->mauticMessage;
     }
 }

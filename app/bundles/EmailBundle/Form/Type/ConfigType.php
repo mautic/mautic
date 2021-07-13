@@ -556,15 +556,16 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $spoolConditions = '{"config_emailconfig_mailer_spool_type":["memory"]}';
+        $spoolConditions = '{"config_emailconfig_mailer_spool_type":["memory", "messenger"]}';
 
         $builder->add(
             'mailer_spool_type',
             ChoiceType::class,
             [
-                'choices'           => [
-                    'mautic.email.config.mailer_spool_type.memory' => 'memory',
-                    'mautic.email.config.mailer_spool_type.file'   => 'file',
+                'choices'     => [
+                    'mautic.email.config.mailer_spool_type.memory'    => 'memory',
+                    'mautic.email.config.mailer_spool_type.file'      => 'file',
+                    'mautic.email.config.mailer_spool_type.messenger' => 'messenger',
                 ],
                 'label'       => 'mautic.email.config.mailer.spool.type',
                 'label_attr'  => ['class' => 'control-label'],
@@ -574,6 +575,21 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.email.config.mailer.spool.type.tooltip',
                 ],
                 'placeholder' => false,
+            ]
+        );
+
+        $builder->add(
+            'messenger_transport_dsn',
+            TextType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.messenger.transport.dsn',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_emailconfig_mailer_spool_type":["messenger"]}',
+                    'tooltip'      => 'mautic.email.config.mailer.messenger.transport.dsn.tooltip',
+                ],
+                'required'   => false,
             ]
         );
 
