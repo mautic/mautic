@@ -16,9 +16,12 @@ namespace Mautic\IntegrationsBundle\EventListener;
 use Mautic\IntegrationsBundle\Entity\FieldChange;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
+use Mautic\IntegrationsBundle\Event\InternalCompanyEvent;
+use Mautic\IntegrationsBundle\Event\InternalContactEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
+use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
@@ -203,8 +206,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
         foreach ($this->syncIntegrationsHelper->getEnabledIntegrations() as $integrationName) {
             try {
-                $internalTypeEventFactory = InternalTypeEventFactory::create($objectType, $integrationName, $object);
-                $this->dispatcher->dispatch($internalTypeEventFactory->getEventName(), $internalTypeEventFactory->getEvent());
+                $this->dispatch($integrationName, $object);
             } catch (InvalidValueException $e) {
                 continue; // Do not record changes for object and integration that has an invalid value.
             }
@@ -229,5 +231,31 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->fieldChangeRepo->saveEntities($toPersist);
 
         $this->fieldChangeRepo->clear();
+    }
+
+    /**
+     * @throws InvalidValueException
+     */
+    public function dispatch(string $integrationName, object $object): void
+    {
+        if ($object instanceof Lead) {
+            $this->dispatcher->dispatch(
+                IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES,
+                new InternalContactEvent($integrationName, $object)
+            );
+
+            return;
+        }
+
+        if ($object instanceof Company) {
+            $this->dispatcher->dispatch(
+                IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES,
+                new InternalCompanyEvent($integrationName, $object)
+            );
+
+            return;
+        }
+
+        throw new InvalidValueException('An object type should be specified. None matches.');
     }
 }
