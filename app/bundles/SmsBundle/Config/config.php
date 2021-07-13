@@ -257,6 +257,13 @@ return [
             ],
         ],
         'repositories' => [
+            'mautic.sms.repository.sms' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\SmsBundle\Entity\Sms::class,
+                ],
+            ],
             'mautic.sms.repository.stat' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
