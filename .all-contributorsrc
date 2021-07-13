@@ -360,6 +360,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "bryanitamazonva",
+      "name": "bryanitamazonva",
+      "avatar_url": "https://avatars.githubusercontent.com/u/79956709?v=4",
+      "profile": "https://github.com/bryanitamazonva",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
