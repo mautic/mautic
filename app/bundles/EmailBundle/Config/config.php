@@ -375,12 +375,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.email.message.handler' => [
-                'class'     => \Mautic\EmailBundle\Messenger\EmailMessageHandler::class,
-                'arguments' => [
-                    'mailer',
-                ],
-            ],
             'mautic.spool.delegator' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\Spool\DelegatingSpool::class,
                 'arguments' => [

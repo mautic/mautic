@@ -252,9 +252,32 @@ $container->setParameter(
 
 $container->register(\Mautic\EmailBundle\Messenger\EmailMessageHandler::class)
     ->addTag('messenger.message_handler', [
-        // only needed if can't be guessed by type-hint
         'handles' => \Mautic\EmailBundle\Messenger\EmailMessage::class,
-    ]);
+    ])
+    ->addArgument(new Reference('mailer'));
+
+$container->loadFromExtension(
+    'framework',
+    [
+        'messenger' => [
+            'transports' => [
+                'emails' => [
+                    'dsn'     => $configParameterBag->get('messenger_transport_dsn'),
+                ],
+            ],
+        ],
+    ]
+);
+
+// config/packages/messenger.php
+$container->loadFromExtension('framework', [
+    'messenger' => [
+        'routing' => [
+            // async is whatever name you gave your transport above
+            \Mautic\EmailBundle\Messenger\EmailMessage::class => 'amqp',
+        ],
+    ],
+]);
 
 // Monolog formatter
 $container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\LineFormatter')
