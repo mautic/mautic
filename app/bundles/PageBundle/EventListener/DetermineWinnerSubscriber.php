@@ -108,11 +108,10 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     $support['labels'][]             = $pid.':'.$stats['title'];
                 }
 
-                // investigate the rate calculation, seems that lowest value should be the winner
-                $max                   = max($rates);
-                $support['step_width'] = (ceil($max / 10) * 10);
+                $min                   = min($rates);
+                $support['step_width'] = (ceil($min / 10) * 10);
 
-                $winners = ($max > 0) ? array_keys($rates, $max) : [];
+                $winners = ($min >= 0) ? array_keys($rates, $min) : [];
 
                 $event->setAbTestResults([
                     'winners'         => $winners,
