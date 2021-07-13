@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 class EventRepository extends CommonRepository
@@ -83,7 +84,9 @@ class EventRepository extends CommonRepository
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('c.isPublished', 1),
+                    $q->expr()->isNull('c.deleted'),
                     $q->expr()->eq('e.type', ':type'),
+                    $q->expr()->isNull('e.deleted'),
                     $q->expr()->eq('IDENTITY(l.lead)', ':contactId'),
                     $q->expr()->eq('l.manuallyRemoved', 0),
                     $q->expr()->notIn('e.id', $eventQb->getDQL()),
@@ -137,18 +140,21 @@ class EventRepository extends CommonRepository
 
     /**
      * @param $campaignId
+     * @param bool $includeDeleted
      *
      * @return array
      */
-    public function getCampaignEvents($campaignId)
+    public function getCampaignEvents($campaignId, $ignoreDeleted = true)
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('e, IDENTITY(e.parent)')
             ->from('MauticCampaignBundle:Event', 'e', 'e.id')
-            ->where(
-                $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
-            )
+            ->where($q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId))
             ->orderBy('e.order', 'ASC');
+
+        if ($ignoreDeleted) {
+            $q->andWhere($q->expr()->isNull('e.deleted'));
+        }
 
         $results = $q->getQuery()->getArrayResult();
 
@@ -226,6 +232,29 @@ class EventRepository extends CommonRepository
             ->setParameter('null', null)
             ->where(
                 $qb->expr()->in('parent_id', $events)
+            )
+            ->execute();
+    }
+
+    public function deleteEvents(array $eventIds): void
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->delete(Event::class, 'e')
+            ->where($qb->expr()->in('e.id', ':event_ids'))
+            ->setParameter('event_ids', $eventIds, Connection::PARAM_INT_ARRAY)
+            ->getQuery()
+            ->execute();
+    }
+
+    public function setEventsAsDeleted(array $eventIds): void
+    {
+        $dateTime = (new \DateTime())->format('Y-m-d H:i:s');
+        $qb       = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX.Event::TABLE_NAME)
+            ->set('deleted', ':deleted')
+            ->setParameter('deleted', $dateTime)
+            ->where(
+                $qb->expr()->in('id', $eventIds)
             )
             ->execute();
     }

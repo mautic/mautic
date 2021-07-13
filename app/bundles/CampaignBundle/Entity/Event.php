@@ -23,6 +23,8 @@ use Mautic\LeadBundle\Entity\Lead as Contact;
  */
 class Event implements ChannelInterface
 {
+    public const TABLE_NAME = 'campaign_events';
+
     const TYPE_DECISION  = 'decision';
     const TYPE_ACTION    = 'action';
     const TYPE_CONDITION = 'condition';
@@ -163,6 +165,12 @@ class Event implements ChannelInterface
      */
     private $changes = [];
 
+    /**
+     * @var \DateTime|null
+     * @Groups({"event:read", "event:write", "campaign:read"})
+     */
+    private $deleted;
+
     public function __construct()
     {
         $this->log      = new ArrayCollection();
@@ -184,7 +192,7 @@ class Event implements ChannelInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('campaign_events')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\EventRepository')
             ->addIndex(['type', 'event_type'], 'campaign_event_search')
             ->addIndex(['event_type'], 'campaign_event_type')
@@ -206,6 +214,8 @@ class Event implements ChannelInterface
             ->build();
 
         $builder->addField('properties', 'array');
+
+        $builder->addNullableField('deleted', 'datetime');
 
         $builder->createField('triggerDate', 'datetime')
             ->columnName('trigger_date')
@@ -279,7 +289,6 @@ class Event implements ChannelInterface
         $builder->createOneToMany('log', 'LeadEventLog')
             ->mappedBy('event')
             ->cascadePersist()
-            ->cascadeRemove()
             ->fetchExtraLazy()
             ->build();
 
@@ -680,7 +689,9 @@ class Event implements ChannelInterface
      */
     public function getChildren()
     {
-        return $this->children;
+        $criteria = Criteria::create()->where(Criteria::expr()->isNull('deleted'));
+
+        return $this->children->matching($criteria);
     }
 
     /**
@@ -1075,5 +1086,23 @@ class Event implements ChannelInterface
         $this->isChanged('triggerRestrictedDaysOfWeek', $triggerRestrictedDaysOfWeek);
 
         return $this;
+    }
+
+    public function setDeleted(?\DateTimeInterface $deleted): Event
+    {
+        $this->isChanged('deleted', $deleted);
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getDeleted(): ?\DateTimeInterface
+    {
+        return $this->deleted;
+    }
+
+    public function isDeleted(): bool
+    {
+        return !is_null($this->deleted);
     }
 }

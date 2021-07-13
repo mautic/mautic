@@ -12,6 +12,8 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Types\Type;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -20,6 +22,7 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 
 class LeadEventLogRepository extends CommonRepository
 {
+    const LOG_DELETE_BATCH_SIZE = 5000;
     use TimelineTrait;
     use ContactLimiterTrait;
     use SlaveConnectionTrait;
@@ -441,7 +444,9 @@ class LeadEventLogRepository extends CommonRepository
                 $q->expr()->andX(
                     $q->expr()->in('o.id', $ids),
                     $q->expr()->eq('o.isScheduled', 1),
-                    $q->expr()->eq('c.isPublished', 1)
+                    $q->expr()->eq('c.isPublished', 1),
+                    $q->expr()->isNull('c.deleted'),
+                    $q->expr()->isNull('e.deleted')
                 )
             );
 
@@ -596,18 +601,21 @@ SQL;
             ->execute();
     }
 
-    /**
-     * Removes logs by event_id.
-     * It uses batch processing for removing
-     * large quantities of records.
-     *
-     * @param int $eventId
-     */
-    public function removeEventLogs($eventId)
+    public function removeEventLogsByCampaignId(int $campaignId): void
     {
-        $conn = $this->_em->getConnection();
-        $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', [
-            'event_id' => (int) $eventId,
-        ]);
+        $table_name    = $this->getTableName();
+        $sql           = "DELETE FROM {$table_name} WHERE campaign_id = (?) LIMIT ".self::LOG_DELETE_BATCH_SIZE;
+        $conn          = $this->getEntityManager()->getConnection();
+        while ($conn->executeQuery($sql, [$campaignId], [ParameterType::INTEGER])->rowCount()) {
+        }
+    }
+
+    public function removeEventLogs(array $eventIds): void
+    {
+        $table_name    = $this->getTableName();
+        $sql           = "DELETE FROM {$table_name} WHERE event_id IN (?) ORDER BY event_id ASC LIMIT ".self::LOG_DELETE_BATCH_SIZE;
+        $conn          = $this->getEntityManager()->getConnection();
+        while ($conn->executeQuery($sql, [$eventIds], [Connection::PARAM_INT_ARRAY])->rowCount()) {
+        }
     }
 }
