@@ -367,6 +367,8 @@ class LeadController extends FormController
 
         $integrationRepo = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPluginBundle:IntegrationEntity');
 
+        $lists = $this->getModel('lead.list')->getRepository()->getLeadLists([$lead], true, true);
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -374,6 +376,7 @@ class LeadController extends FormController
                     'avatarPanelState'  => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
                     'fields'            => $fields,
                     'companies'         => $companies,
+                    'lists'             => $lists,
                     'socialProfiles'    => $socialProfiles,
                     'socialProfileUrls' => $socialProfileUrls,
                     'places'            => $this->getPlaces($lead),
