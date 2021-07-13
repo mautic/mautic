@@ -11,6 +11,9 @@
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
+use Mautic\CampaignBundle\Entity\Lead;
+use PHPUnit\Framework\Assert;
+
 class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
     protected function setUp(): void
@@ -515,6 +518,30 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // No one should be tagged as EmailNotOpen because the actions are still scheduled
         $this->assertFalse(isset($tags['EmailNotOpen']));
+    }
+
+    public function testCampaignActionChangeMembership(): void
+    {
+        $campaign1 = $this->createCampaign('Campaign 1');
+        $campaign2 = $this->createCampaign('Campaign 2');
+        $lead      = $this->createLead('Lead');
+        $this->createCampaignLead($campaign1, $lead);
+        $this->createCampaignLead($campaign2, $lead);
+        $this->em->flush();
+        $property = ['addTo' => [$campaign2->getId()], 'removeFrom' => ['this']];
+        $this->createEvent('Event', $campaign1, 'campaign.addremovelead', 'action', $property);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign1->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
+
+        $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
+
+        Assert::assertCount(2, $campaignLeads);
+        Assert::assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
+        Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
+        Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
+        Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
     }
 
     /**
