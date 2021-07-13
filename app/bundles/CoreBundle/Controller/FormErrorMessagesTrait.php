@@ -65,6 +65,18 @@ trait FormErrorMessagesTrait
         return $errors;
     }
 
+    public function getFormErrorCodes(Form $form): array
+    {
+        $codes = [];
+
+        foreach ($form->getErrors(true) as $error) {
+            $code         = $error->getCause()->getCode();
+            $codes[$code] = $code;
+        }
+
+        return $codes;
+    }
+
     public function getFormErrorForBuilder(Form $form)
     {
         if (!$form->isSubmitted()) {

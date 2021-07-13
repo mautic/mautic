@@ -1283,12 +1283,14 @@ class LeadModel extends FormModel
      * @param null         $tags
      * @param bool         $persist
      * @param LeadEventLog $eventLog
+     * @param null         $importId
+     * @param bool         $skipIfExists
      *
      * @return bool|null
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null)
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false)
     {
         $fields    = array_flip($fields);
         $fieldData = [];
@@ -1299,16 +1301,7 @@ class LeadModel extends FormModel
         [$companyFields, $companyData]     = $this->companyModel->extractCompanyDataFromImport($fields, $data);
 
         if (!empty($companyData)) {
-            $companyFields = array_flip($companyFields);
-            $this->companyModel->import($companyFields, $companyData, $owner, $list, $tags, $persist, $eventLog);
-            $companyFields = array_flip($companyFields);
-
-            $companyName    = isset($companyFields['companyname']) ? $companyData[$companyFields['companyname']] : null;
-            $companyCity    = isset($companyFields['companycity']) ? $companyData[$companyFields['companycity']] : null;
-            $companyCountry = isset($companyFields['companycountry']) ? $companyData[$companyFields['companycountry']] : null;
-            $companyState   = isset($companyFields['companystate']) ? $companyData[$companyFields['companystate']] : null;
-
-            $company = $this->companyModel->getRepository()->identifyCompany($companyName, $companyCity, $companyCountry, $companyState);
+            $company       = $this->companyModel->importCompany(array_flip($companyFields), $companyData);
         }
 
         foreach ($fields as $leadField => $importField) {
@@ -1501,6 +1494,12 @@ class LeadModel extends FormModel
         $fieldErrors = [];
 
         foreach ($this->leadFields as $leadField) {
+            // Skip If value already exists
+            if ($skipIfExists && !$lead->isNew() && !empty($lead->getFieldValue($leadField['alias']))) {
+                unset($fieldData[$leadField['alias']]);
+                continue;
+            }
+
             if (isset($fieldData[$leadField['alias']])) {
                 if ('NULL' === $fieldData[$leadField['alias']]) {
                     $fieldData[$leadField['alias']] = null;
@@ -1563,6 +1562,7 @@ class LeadModel extends FormModel
 
             if (null !== $company) {
                 $this->companyModel->addLeadToCompany($company, $lead);
+                $this->setPrimaryCompany($company->getId(), $lead->getId());
             }
 
             if ($eventLog) {
