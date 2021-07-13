@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-33-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-34-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -117,6 +117,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.linkedin.com/in/favour-kelvin/"><img src="https://avatars.githubusercontent.com/u/39309699?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Favour Kelvin</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=fakela" title="Documentation">📖</a> <a href="#tutorial-fakela" title="Tutorials">✅</a> <a href="#talk-fakela" title="Talks">📢</a></td>
     <td align="center"><a href="http://poisson.phc.dm.unipi.it/~mascellani"><img src="https://avatars.githubusercontent.com/u/101675?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Giovanni Mascellani</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=giomasce" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/RaphaelWoude"><img src="https://avatars.githubusercontent.com/u/47354694?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Raphael van der Woude</b></sub></a><br /><a href="#userTesting-RaphaelWoude" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://github.com/mannp"><img src="https://avatars.githubusercontent.com/u/4335298?v=4?s=100" width="100px;" alt=""/><br /><sub><b>mannp</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Amannp" title="Bug reports">🐛</a> <a href="#userTesting-mannp" title="User Testing">📓</a></td>
   </tr>
 </table>
 
