@@ -356,6 +356,7 @@ Mautic.reorderSegmentFilters = function() {
     }
 
     mQuery('#' + prefix + '_filters .panel').each(function() {
+        mQuery(this).attr('id',prefix + '_filters_'+counter);
         Mautic.updateFilterPositioning(mQuery(this).find('select.glue-select').first());
         mQuery(this).find('[id^="' + prefix + '_filters_"]').each(function() {
             var id     = mQuery(this).attr('id');
@@ -369,6 +370,9 @@ Mautic.reorderSegmentFilters = function() {
             var newName = prefix+'[filters]['+counter+']['+suffix+']';
             if (typeof name !== 'undefined' && name.slice(-2) === '[]') {
                 newName += '[]';
+            }
+            else if (id.startsWith(prefix+'_filters_') && id.endsWith('_properties')) {
+                mQuery(this).attr('id', prefix+'_filters_'+counter+'_properties');
             }
 
             mQuery(this).attr('name', newName);
