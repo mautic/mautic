@@ -341,6 +341,15 @@
         "bug",
         "userTesting"
       ]
+    },
+    {
+      "login": "MarketSmart",
+      "name": "MarketSmart",
+      "avatar_url": "https://avatars.githubusercontent.com/u/85239715?v=4",
+      "profile": "https://github.com/MarketSmart",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
