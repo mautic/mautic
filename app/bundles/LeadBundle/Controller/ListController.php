@@ -74,8 +74,8 @@ class ListController extends FormController
         $session->set('mautic.segment.filter', $search);
 
         //do some default filtering
-        $orderBy    = $session->get('mautic.segment.orderby', 'l.name');
-        $orderByDir = $session->get('mautic.segment.orderbydir', 'ASC');
+        $orderBy    = $session->get('mautic.segment.orderby', 'l.dateModified');
+        $orderByDir = $session->get('mautic.segment.orderbydir', 'DESC');
 
         $filter = [
             'string' => $search,
@@ -179,6 +179,7 @@ class ListController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
+                    $list->setDateModified(new \DateTime());
                     $model->saveEntity($list);
 
                     $this->addFlash('mautic.core.notice.created', [
