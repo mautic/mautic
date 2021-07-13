@@ -1,0 +1,14 @@
+{
+  "name": "mautic/theme-paprika",
+  "description": "Mautic Paprika Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "paprika"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.4.0 <8.1",
+    "mautic/core-lib": "^4.0"
+  }
+}
