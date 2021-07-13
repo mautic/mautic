@@ -500,6 +500,7 @@ return [
                 'arguments' => [
                     'translator',
                     'router',
+                    'mautic.security',
                 ],
             ],
             'mautic.lead.import.contact.subscriber' => [

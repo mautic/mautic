@@ -55,6 +55,11 @@ if (class_exists(Spreadsheet::class)) {
     ];
 }
 
+// Remove buttons if disable export permission exists
+if (!empty($disableExportPermission)) {
+    $buttons = [];
+}
+
 $buttons[] =
     [
         'attr' => [

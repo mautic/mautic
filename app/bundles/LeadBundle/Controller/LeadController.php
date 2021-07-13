@@ -1943,7 +1943,9 @@ class LeadController extends FormController
             'RETURN_ARRAY'
         );
 
-        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+        if ((!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother'])) {
+            return $this->accessDenied();
+        } elseif (!$this->get('mautic.security')->isAdmin() && $this->get('mautic.security')->isGranted('lead:export:disable', 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 
