@@ -582,6 +582,7 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.lead.model.list',
+                    'mautic.user.model.user',
                 ],
             ],
         ],
