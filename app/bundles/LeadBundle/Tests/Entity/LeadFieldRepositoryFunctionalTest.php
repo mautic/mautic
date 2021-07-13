@@ -30,7 +30,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $repository = $this->container->get('mautic.lead.model.field')->getRepository();
+        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue(1, 'firstname', 'John', 'eq'));
         $this->assertFalse($repository->compareValue(1, 'firstname', 'Jack', 'eq'));
@@ -43,7 +43,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $repository = $this->container->get('mautic.lead.model.field')->getRepository();
+        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue(1, 'firstname', 'Annie', 'neq'));
         $this->assertFalse($repository->compareValue(1, 'firstname', 'Ada', 'neq'));
@@ -56,7 +56,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $lead->setFirstname('Ada');
         $this->em->flush();
 
-        $repository = $this->container->get('mautic.lead.model.field')->getRepository();
+        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue(1, 'lastname', null, 'empty'));
         $this->assertFalse($repository->compareValue(1, 'firstname', null, 'empty'));
@@ -69,7 +69,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $lead->setFirstname('Ada');
         $this->em->flush();
 
-        $repository = $this->container->get('mautic.lead.model.field')->getRepository();
+        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue(1, 'firstname', null, 'notEmpty'));
         $this->assertFalse($repository->compareValue(1, 'lastname', null, 'notEmpty'));
@@ -82,7 +82,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $lead->setEmail('MaryWNevarez@armyspy.com');
         $this->em->flush();
 
-        $repository = $this->container->get('mautic.lead.model.field')->getRepository();
+        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue(1, 'email', 'Mary', 'startsWith'));
         $this->assertFalse($repository->compareValue(1, 'email', 'Unicorn', 'startsWith'));
@@ -95,7 +95,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $lead->setEmail('MaryWNevarez@armyspy.com');
         $this->em->flush();
 
-        $repository = $this->container->get('mautic.lead.model.field')->getRepository();
+        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue(1, 'email', 'armyspy.com', 'endsWith'));
         $this->assertFalse($repository->compareValue(1, 'email', 'Unicorn', 'endsWith'));
@@ -108,7 +108,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $lead->setEmail('MaryWNevarez@armyspy.com');
         $this->em->flush();
 
-        $repository = $this->container->get('mautic.lead.model.field')->getRepository();
+        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue(1, 'email', 'Nevarez', 'contains'));
         $this->assertFalse($repository->compareValue(1, 'email', 'Unicorn', 'contains'));
@@ -121,7 +121,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $repository = $this->container->get('mautic.lead.model.field')->getRepository();
+        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue(1, 'country', ['United Kingdom', 'South Africa'], 'in'));
         $this->assertFalse($repository->compareValue(1, 'country', ['Poland', 'Canada'], 'in'));
@@ -134,7 +134,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $repository = $this->container->get('mautic.lead.model.field')->getRepository();
+        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue(1, 'country', ['Australia', 'Poland'], 'notIn'));
         $this->assertFalse($repository->compareValue(1, 'country', ['United Kingdom'], 'notIn'));
