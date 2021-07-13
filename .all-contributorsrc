@@ -84,7 +84,8 @@
       "profile": "https://github.com/luguenth",
       "contributions": [
         "code",
-        "doc"
+        "doc",
+        "userTesting"
       ]
     },
     {
@@ -340,6 +341,33 @@
       "contributions": [
         "bug",
         "userTesting"
+      ]
+    },
+    {
+      "login": "MarketSmart",
+      "name": "MarketSmart",
+      "avatar_url": "https://avatars.githubusercontent.com/u/85239715?v=4",
+      "profile": "https://github.com/MarketSmart",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "oltmanns-leuchtfeuer",
+      "name": "Leon",
+      "avatar_url": "https://avatars.githubusercontent.com/u/55587275?v=4",
+      "profile": "http://www.leuchtfeuer.com",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "bryanitamazonva",
+      "name": "bryanitamazonva",
+      "avatar_url": "https://avatars.githubusercontent.com/u/79956709?v=4",
+      "profile": "https://github.com/bryanitamazonva",
+      "contributions": [
+        "bug"
       ]
     }
   ],
