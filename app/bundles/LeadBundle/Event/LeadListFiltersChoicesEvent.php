@@ -95,4 +95,9 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
             $this->choices[$object][$choiceKey] = $choiceConfig;
         }
     }
+
+    public function setChoices(array $choices): void
+    {
+        $this->choices = $choices;
+    }
 }
