@@ -11,6 +11,8 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use DateTime;
+use DateTimeZone;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -28,7 +30,6 @@ class HitRepository extends CommonRepository
      *
      * @param Page|Redirect $page
      * @param string        $trackingId
-     * @param Lead          $lead
      *
      * @return bool
      */
@@ -133,19 +134,19 @@ class HitRepository extends CommonRepository
 
         $query->andWhere($query->expr()->eq('h.code', (int) $code));
 
-        return $hits = $query->getQuery()->getArrayResult();
+        return $query->getQuery()->getArrayResult();
     }
 
     /**
      * Get an array of hits via an email clickthrough.
      *
-     * @param           $emailIds
-     * @param \DateTime $fromDate
-     * @param int       $code
+     * @param          $emailIds
+     * @param DateTime $fromDate
+     * @param int      $code
      *
      * @return array
      */
-    public function getEmailClickthroughHitCount($emailIds, \DateTime $fromDate = null, $code = 200)
+    public function getEmailClickthroughHitCount($emailIds, DateTime $fromDate = null, $code = 200)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -216,7 +217,7 @@ class HitRepository extends CommonRepository
      */
     public function countVisitors($seconds = 60, $notLeft = false)
     {
-        $now         = new \DateTime();
+        $now         = new DateTime();
         $viewingTime = new \DateInterval('PT'.$seconds.'S');
         $now->sub($viewingTime);
         $query = $this->createQueryBuilder('h');
@@ -246,7 +247,7 @@ class HitRepository extends CommonRepository
      *
      * @param array $options
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getLatestHit($options)
     {
@@ -273,19 +274,19 @@ class HitRepository extends CommonRepository
         }
         $result = $sq->execute()->fetch();
 
-        return new \DateTime($result['latest_hit'], new \DateTimeZone('UTC'));
+        return new DateTime($result['latest_hit'], new DateTimeZone('UTC'));
     }
 
     /**
      * Get the number of bounces.
      *
      * @param array|string $pageIds
-     * @param \DateTime    $fromDate
+     * @param DateTime     $fromDate
      * @param bool         $isVariantCheck
      *
      * @return array
      */
-    public function getBounces($pageIds, \DateTime $fromDate = null, $isVariantCheck = false)
+    public function getBounces($pageIds, DateTime $fromDate = null, $isVariantCheck = false)
     {
         $inOrEq = (!is_array($pageIds)) ? 'eq' : 'in';
 
@@ -407,8 +408,8 @@ class HitRepository extends CommonRepository
         $titles = [];
 
         foreach ($results as $r) {
-            $dateHit  = $r['date_hit'] ? new \DateTime($r['date_hit']) : 0;
-            $dateLeft = $r['date_left'] ? new \DateTime($r['date_left']) : 0;
+            $dateHit  = $r['date_hit'] ? new DateTime($r['date_hit']) : 0;
+            $dateLeft = $r['date_left'] ? new DateTime($r['date_left']) : 0;
 
             $titles[$r['page_id']]  = $r['title'];
             $times[$r['page_id']][] = $dateLeft ? ($dateLeft->getTimestamp() - $dateHit->getTimestamp()) : 0;
@@ -453,8 +454,8 @@ class HitRepository extends CommonRepository
         $times = [];
 
         foreach ($results as $r) {
-            $dateHit  = $r['date_hit'] ? new \DateTime($r['date_hit']) : 0;
-            $dateLeft = $r['date_left'] ? new \DateTime($r['date_left']) : 0;
+            $dateHit  = $r['date_hit'] ? new DateTime($r['date_hit']) : 0;
+            $dateLeft = $r['date_left'] ? new DateTime($r['date_left']) : 0;
             $times[]  = $dateLeft ? ($dateLeft->getTimestamp() - $dateHit->getTimestamp()) : 0;
         }
 
@@ -581,5 +582,20 @@ class HitRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
             ->execute();
+    }
+
+    public function getLatestHitDateByLeadAndTrackingId(int $leadId, string $trackingId): ?DateTime
+    {
+        $result = $this->_em->getConnection()->createQueryBuilder()
+            ->select('MAX(date_hit)')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits')
+            ->where('lead_id = :leadId')
+            ->andWhere('tracking_id = :trackingId')
+            ->setParameter('leadId', $leadId)
+            ->setParameter('trackingId', $trackingId)
+            ->execute()
+            ->fetchColumn();
+
+        return $result ? new DateTime($result, new DateTimeZone('UTC')) : null;
     }
 }
