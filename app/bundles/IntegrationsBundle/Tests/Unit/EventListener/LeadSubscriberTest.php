@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class LeadSubscriberTest extends TestCase
 {
@@ -76,11 +77,13 @@ class LeadSubscriberTest extends TestCase
         $this->syncIntegrationsHelper  = $this->createMock(SyncIntegrationsHelper::class);
         $this->leadEvent               = $this->createMock(LeadEvent::class);
         $this->companyEvent            = $this->createMock(CompanyEvent::class);
+        $eventDispatcherInterfaceMock  = $this->createMock(EventDispatcherInterface::class);
         $this->subscriber              = new LeadSubscriber(
             $this->fieldChangeRepository,
             $this->objectMappingRepository,
             $this->variableExpresserHelper,
-            $this->syncIntegrationsHelper
+            $this->syncIntegrationsHelper,
+            $eventDispatcherInterfaceMock
         );
     }
 
@@ -176,18 +179,8 @@ class LeadSubscriberTest extends TestCase
             ],
         ];
         $objectId   = 1;
-        $objectType = Lead::class;
 
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('isAnonymous')
-            ->willReturn(false);
-        $lead->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
-        $lead->expects($this->once())
-            ->method('getId')
-            ->willReturn($objectId);
+        $lead = $this->createLeadMock($fieldChanges, $objectId);
 
         $this->leadEvent->expects($this->once())
             ->method('getLead')
@@ -198,7 +191,7 @@ class LeadSubscriberTest extends TestCase
             ->with(Contact::NAME)
             ->willReturn(true);
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $lead);
 
         $this->subscriber->onLeadPostSave($this->leadEvent);
     }
@@ -213,18 +206,8 @@ class LeadSubscriberTest extends TestCase
             ],
         ];
         $objectId   = 1;
-        $objectType = Lead::class;
 
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('isAnonymous')
-            ->willReturn(false);
-        $lead->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
-        $lead->expects($this->once())
-            ->method('getId')
-            ->willReturn($objectId);
+        $lead = $this->createLeadMock($fieldChanges, $objectId);
 
         $this->leadEvent->expects($this->once())
             ->method('getLead')
@@ -237,7 +220,7 @@ class LeadSubscriberTest extends TestCase
 
         $fieldChanges['fields']['owner_id'] = $fieldChanges['owner'];
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $lead);
 
         $this->subscriber->onLeadPostSave($this->leadEvent);
     }
@@ -252,18 +235,8 @@ class LeadSubscriberTest extends TestCase
             ],
         ];
         $objectId   = 1;
-        $objectType = Lead::class;
 
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('isAnonymous')
-            ->willReturn(false);
-        $lead->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
-        $lead->expects($this->once())
-            ->method('getId')
-            ->willReturn($objectId);
+        $lead = $this->createLeadMock($fieldChanges, $objectId);
 
         $this->leadEvent->expects($this->once())
             ->method('getLead')
@@ -276,7 +249,7 @@ class LeadSubscriberTest extends TestCase
 
         $fieldChanges['fields']['points'] = $fieldChanges['points'];
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $lead);
 
         $this->subscriber->onLeadPostSave($this->leadEvent);
     }
@@ -319,10 +292,7 @@ class LeadSubscriberTest extends TestCase
     {
         $fieldChanges = [];
 
-        $company = $this->createMock(Company::class);
-        $company->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
+        $company = $this->createCompanyMock($fieldChanges, 1);
 
         $this->companyEvent->expects($this->once())
             ->method('getCompany')
@@ -349,19 +319,9 @@ class LeadSubscriberTest extends TestCase
                 ],
             ],
         ];
-        $objectId   = 1;
-        $objectType = Company::class;
+        $objectId     = 1;
 
-        $company = $this->createMock(Company::class);
-        $company->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
-        $company->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
-        $company->expects($this->once())
-            ->method('getId')
-            ->willReturn($objectId);
+        $company = $this->createCompanyMock($fieldChanges, $objectId);
 
         $this->companyEvent->expects($this->once())
             ->method('getCompany')
@@ -372,7 +332,7 @@ class LeadSubscriberTest extends TestCase
             ->with(MauticSyncDataExchange::OBJECT_COMPANY)
             ->willReturn(true);
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $company);
 
         $this->subscriber->onCompanyPostSave($this->companyEvent);
     }
@@ -386,16 +346,9 @@ class LeadSubscriberTest extends TestCase
                 $newOwnerId,
             ],
         ];
-        $objectId   = 1;
-        $objectType = Company::class;
+        $objectId     = 1;
 
-        $company = $this->createMock(Company::class);
-        $company->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
-        $company->expects($this->once())
-            ->method('getId')
-            ->willReturn($objectId);
+        $company = $this->createCompanyMock($fieldChanges, $objectId);
 
         $this->companyEvent->expects($this->once())
             ->method('getCompany')
@@ -408,7 +361,7 @@ class LeadSubscriberTest extends TestCase
 
         $fieldChanges['fields']['owner_id'] = $fieldChanges['owner'];
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $company);
 
         $this->subscriber->onCompanyPostSave($this->companyEvent);
     }
@@ -434,7 +387,7 @@ class LeadSubscriberTest extends TestCase
         $this->subscriber->onCompanyPostDelete($this->companyEvent);
     }
 
-    private function handleRecordFieldChanges(array $fieldChanges, int $objectId, string $objectType): void
+    private function handleRecordFieldChanges(array $fieldChanges, int $objectId, object $object): void
     {
         $integrationName     = 'testIntegration';
         $enabledIntegrations = [$integrationName];
@@ -447,6 +400,8 @@ class LeadSubscriberTest extends TestCase
         $values     = [];
         $valueDAOs  = [];
         $i          = 0;
+        $objectType = get_class($object);
+
         foreach ($fieldChanges as $fieldName => [$oldValue, $newValue]) {
             $values[]     = [$newValue];
             $valueDAOs[]  = new EncodedValueDAO($objectType, (string) $newValue);
@@ -466,5 +421,59 @@ class LeadSubscriberTest extends TestCase
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('clear');
+    }
+
+    private function createLeadMock(array $fieldChanges, int $objectId): Lead
+    {
+        return new class($fieldChanges, $objectId) extends Lead {
+            private $fieldChanges;
+            private $objectId;
+
+            public function __construct(array $fieldChanges, int $objectId)
+            {
+                parent::__construct();
+                $this->fieldChanges = $fieldChanges;
+                $this->objectId     = $objectId;
+            }
+
+            public function isAnonymous(): bool
+            {
+                return false;
+            }
+
+            public function getChanges($includePast = false): array
+            {
+                return $this->fieldChanges;
+            }
+
+            public function getId(): int
+            {
+                return $this->objectId;
+            }
+        };
+    }
+
+    private function createCompanyMock(array $fieldChanges, int $objectId): Company
+    {
+        return new class($fieldChanges, $objectId) extends Company {
+            private $fieldChanges;
+            private $objectId;
+
+            public function __construct(array $fieldChanges, int $objectId)
+            {
+                $this->fieldChanges = $fieldChanges;
+                $this->objectId     = $objectId;
+            }
+
+            public function getChanges($includePast = false): array
+            {
+                return $this->fieldChanges;
+            }
+
+            public function getId(): int
+            {
+                return $this->objectId;
+            }
+        };
     }
 }
