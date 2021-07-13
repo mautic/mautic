@@ -351,6 +351,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "oltmanns-leuchtfeuer",
+      "name": "Leon",
+      "avatar_url": "https://avatars.githubusercontent.com/u/55587275?v=4",
+      "profile": "http://www.leuchtfeuer.com",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
