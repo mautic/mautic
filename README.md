@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-36-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-37-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -122,6 +122,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="http://www.leuchtfeuer.com"><img src="https://avatars.githubusercontent.com/u/55587275?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Leon</b></sub></a><br /><a href="#userTesting-oltmanns-leuchtfeuer" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://github.com/bryanitamazonva"><img src="https://avatars.githubusercontent.com/u/79956709?v=4?s=100" width="100px;" alt=""/><br /><sub><b>bryanitamazonva</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Abryanitamazonva" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
