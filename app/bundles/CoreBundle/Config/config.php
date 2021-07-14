@@ -419,6 +419,13 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.helper.template.gtm' => [
+                'class'     => \Mautic\CoreBundle\Templating\Helper\GTMHelper::class,
+                'alias'     => 'google_tag_manager',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
             'mautic.helper.template.mautibot' => [
                 'class' => 'Mautic\CoreBundle\Templating\Helper\MautibotHelper',
                 'alias' => 'mautibot',

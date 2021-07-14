@@ -56,10 +56,29 @@
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.tracking.google.analytics'); ?></h3>
     </div>
     <div class="panel-body">
+        <?php if (($form['google_analytics_trackingpage_enabled']->vars['value'] && $form['google_tag_manager_trackingpage_enabled']->vars['value']) || ($form['google_analytics_landingpage_enabled']->vars['value'] && $form['google_tag_manager_landingpage_enabled']->vars['value'])) : ?>
+            <div class="alert alert-warning"><?php echo $view['translator']->trans('mautic.config.tab.googleanalytics.info'); ?></div>
+        <?php endif; ?>
         <?php echo $view['form']->row($form['google_analytics_id']); ?>
         <div class="row">
             <?php foreach ($form->children as $name => $f): ?>
                 <?php if (in_array($name, ['google_analytics_trackingpage_enabled', 'google_analytics_landingpage_enabled', 'google_analytics_anonymize_ip'])) : ?>
+                    <div class="col-md-6">
+                        <?php echo $view['form']->row($f); ?>
+                    </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <div class="panel-heading">
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.tracking.google.tagmanager'); ?></h3>
+    </div>
+    <div class="panel-body">
+        <?php echo $view['form']->row($form['google_tag_manager_id']); ?>
+        <div class="row">
+            <?php foreach ($form->children as $name => $f): ?>
+                <?php if (in_array($name, ['google_tag_manager_trackingpage_enabled', 'google_tag_manager_landingpage_enabled'])) : ?>
                     <div class="col-md-6">
                         <?php echo $view['form']->row($f); ?>
                     </div>

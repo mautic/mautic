@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Templating\Helper\GTMHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
@@ -235,6 +236,9 @@ class PublicControllerTest extends AbstractMauticTestCase
         $analyticsHelper = $this->getMockBuilder(AnalyticsHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $gtmHelper = $this->getMockBuilder(GTMHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $pageModel = $this->getMockBuilder(PageModel::class)
             ->disableOriginalConstructor()
@@ -285,6 +289,7 @@ class PublicControllerTest extends AbstractMauticTestCase
                         ['mautic.helper.ip_lookup', Container::EXCEPTION_ON_INVALID_REFERENCE, $ipHelper],
                         ['mautic.security', Container::EXCEPTION_ON_INVALID_REFERENCE, $mauticSecurity],
                         ['mautic.helper.template.analytics', Container::EXCEPTION_ON_INVALID_REFERENCE, $analyticsHelper],
+                        ['mautic.helper.template.gtm', Container::EXCEPTION_ON_INVALID_REFERENCE, $gtmHelper],
                         ['mautic.page.model.page', Container::EXCEPTION_ON_INVALID_REFERENCE, $pageModel],
                         ['mautic.lead.model.lead', Container::EXCEPTION_ON_INVALID_REFERENCE, $leadModel],
                         ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $router],
