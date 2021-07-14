@@ -691,4 +691,37 @@ class StatRepository extends CommonRepository
 
         return $contacts;
     }
+
+    /**
+     * @param $emailId
+     * @param $time
+     *
+     * @return mixed
+     */
+    public function getChannelDetails($emailId, $time)
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+        $query->select('s.email_id')
+            ->where('s.email_address = :email')
+            ->andWhere('s.date_sent  = :time')
+            ->setParameter(':email', $emailId)
+            ->setParameter(':time', $time);
+
+        $results = $query->execute()->fetch();
+        if (!$results) {
+            $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+            $query->select('s.email_id')
+                ->where('s.email_address = :email')
+                ->andWhere('s.date_sent  < :time')
+                ->setParameter(':email', $emailId)
+                ->setParameter(':time', $time)
+                ->orderBy('s.id', 'Desc');
+
+            $results = $query->execute()->fetch();
+        }
+
+        return $results;
+    }
 }
