@@ -256,25 +256,17 @@ $container->register(\Mautic\EmailBundle\Messenger\EmailMessageHandler::class)
     ])
     ->addArgument(new Reference('mailer'));
 
-$container->loadFromExtension(
-    'framework',
-    [
-        'messenger' => [
-            'transports' => [
-                'emails' => [
-                    'dsn'     => $configParameterBag->get('messenger_transport_dsn'),
-                ],
-            ],
-        ],
-    ]
-);
-
 // config/packages/messenger.php
 $container->loadFromExtension('framework', [
     'messenger' => [
         'routing' => [
             // async is whatever name you gave your transport above
-            \Mautic\EmailBundle\Messenger\EmailMessage::class => 'amqp',
+                \Mautic\EmailBundle\Messenger\EmailMessage::class => $configParameterBag->get('messenger_transport_email'),
+        ],
+        'transports' => [
+            $configParameterBag->get('messenger_transport_email') => [
+                'dsn'     => $configParameterBag->get('messenger_transport_dsn'),
+            ],
         ],
     ],
 ]);

@@ -992,6 +992,7 @@ return [
         'mailer_mailjet_sandbox_default_mail' => null,
         'disable_trackable_urls'              => false,
         'theme_email_default'                 => 'blank',
+        'messenger_transport_email'           => 'email',
         'messenger_transport_dsn'             => null,
     ],
 ];
