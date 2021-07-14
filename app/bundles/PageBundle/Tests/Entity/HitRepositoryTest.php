@@ -40,15 +40,16 @@ class HitRepositoryTest extends MauticMysqlTestCase
         $this->hitRepository = $this->em->getRepository(Hit::class);
     }
 
-    public function testGetLatestHitDateByLeadAndTrackingId(): void
+    public function testGetLatestHitDateByLead(): void
     {
-        Assert::assertNull($this->hitRepository->getLatestHitDateByLeadAndTrackingId(1, 'someId'));
+        Assert::assertNull($this->hitRepository->getLatestHitDateByLead(1, 'someId'));
+        Assert::assertNull($this->hitRepository->getLatestHitDateByLead(1));
 
         $leadOne  = $this->createLead();
         $leadTwo  = $this->createLead();
         $this->createHit($leadOne, $dateOne = new DateTime('-10 second'), 'one-first');
         $this->createHit($leadOne, new DateTime('-20 second'), 'one-first');
-        $this->createHit($leadOne, $dateThree = new DateTime('-30 second'), 'one-second');
+        $this->createHit($leadOne, $dateThree = new DateTime('-5 second'), 'one-second');
         $this->createHit($leadTwo, new DateTime('-50 second'), 'two-first');
         $this->createHit($leadTwo, $dateFive = new DateTime('-40 second'), 'two-first');
         $this->em->flush();
@@ -56,9 +57,11 @@ class HitRepositoryTest extends MauticMysqlTestCase
         $this->assertHitDate($dateOne, $leadOne, 'one-first');
         $this->assertHitDate($dateThree, $leadOne, 'one-second');
         $this->assertHitDate($dateFive, $leadTwo, 'two-first');
+        $this->assertHitDate($dateThree, $leadOne, null);
+        $this->assertHitDate($dateFive, $leadTwo, null);
 
-        Assert::assertNull($this->hitRepository->getLatestHitDateByLeadAndTrackingId((int) $leadOne->getId(), 'two-first'));
-        Assert::assertNull($this->hitRepository->getLatestHitDateByLeadAndTrackingId((int) $leadTwo->getId(), 'one-second'));
+        Assert::assertNull($this->hitRepository->getLatestHitDateByLead((int) $leadOne->getId(), 'two-first'));
+        Assert::assertNull($this->hitRepository->getLatestHitDateByLead((int) $leadTwo->getId(), 'one-second'));
     }
 
     private function createHit(Lead $lead, DateTime $dateHit, string $trackingId): void
@@ -89,9 +92,9 @@ class HitRepositoryTest extends MauticMysqlTestCase
         return $this->ipAddress;
     }
 
-    private function assertHitDate(DateTime $expectedHitDate, Lead $leadOne, string $trackingId): void
+    private function assertHitDate(DateTime $expectedHitDate, Lead $leadOne, ?string $trackingId): void
     {
-        $hitDate = $this->hitRepository->getLatestHitDateByLeadAndTrackingId((int) $leadOne->getId(), $trackingId);
+        $hitDate = $this->hitRepository->getLatestHitDateByLead((int) $leadOne->getId(), $trackingId);
 
         Assert::assertInstanceOf(DateTime::class, $hitDate);
         Assert::assertSame($expectedHitDate->getTimestamp(), $hitDate->getTimestamp());

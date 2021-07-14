@@ -584,16 +584,20 @@ class HitRepository extends CommonRepository
             ->execute();
     }
 
-    public function getLatestHitDateByLeadAndTrackingId(int $leadId, string $trackingId): ?DateTime
+    public function getLatestHitDateByLead(int $leadId, string $trackingId = null): ?DateTime
     {
-        $result = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('MAX(date_hit)')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits')
             ->where('lead_id = :leadId')
-            ->andWhere('tracking_id = :trackingId')
-            ->setParameter('leadId', $leadId)
-            ->setParameter('trackingId', $trackingId)
-            ->execute()
+            ->setParameter('leadId', $leadId);
+
+        if (null != $trackingId) {
+            $q->andWhere('tracking_id = :trackingId')
+                ->setParameter('trackingId', $trackingId);
+        }
+
+        $result = $q->execute()
             ->fetchColumn();
 
         return $result ? new DateTime($result, new DateTimeZone('UTC')) : null;
