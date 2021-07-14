@@ -120,6 +120,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
                     'some fields',
                 ],
                 'mautic.lead.special_fields' => [
+                    'id'             => 'mautic.lead.import.label.id',
                     'dateAdded'      => 'mautic.lead.import.label.dateAdded',
                     'createdByUser'  => 'mautic.lead.import.label.createdByUser',
                     'dateModified'   => 'mautic.lead.import.label.dateModified',

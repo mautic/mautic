@@ -70,6 +70,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
     {
         if ($event->importIsForRouteObject('contacts')) {
             $specialFields = [
+                'id'             => 'mautic.lead.import.label.id',
                 'dateAdded'      => 'mautic.lead.import.label.dateAdded',
                 'createdByUser'  => 'mautic.lead.import.label.createdByUser',
                 'dateModified'   => 'mautic.lead.import.label.dateModified',

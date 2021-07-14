@@ -220,9 +220,6 @@ class ImportController extends FormController
                     new ImportMappingEvent($this->request->get('object'))
                 );
 
-                // Add ID to lead fields to allow matching import contacts by identifier
-                $leadFields['id'] = 'ID';
-
                 try {
                     $form = $this->get('form.factory')->create(
                         LeadImportFieldType::class,
