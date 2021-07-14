@@ -65,6 +65,11 @@ return [
                  'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                  'arguments' => [],
              ],
+            'mautic.install.fixture.grape_js' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\GrapesJsData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
         ],
         'forms' => [
             \Mautic\InstallBundle\Configurator\Form\CheckStepType::class => [

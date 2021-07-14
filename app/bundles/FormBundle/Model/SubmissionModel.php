@@ -44,6 +44,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
@@ -343,12 +344,12 @@ class SubmissionModel extends CommonFormModel
                 $leadFieldMatches[$leadField] = $leadValue;
             }
 
+            $tokens["{formfield={$alias}}"] = $this->normalizeValue($value, $f);
+
             //convert array from checkbox groups and multiple selects
             if (is_array($value)) {
                 $value = implode(', ', $value);
             }
-
-            $tokens["{formfield={$alias}}"] = $value;
 
             //save the result
             if (false !== $f->getSaveResult()) {
@@ -867,7 +868,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Get data for the form submission
-        list($data, $uniqueFieldsWithData) = $getData($leadFieldMatches);
+        [$data, $uniqueFieldsWithData] = $getData($leadFieldMatches);
         $this->logger->debug('FORM: Unique fields submitted include '.implode(', ', $uniqueFieldsWithData));
 
         // Check for duplicate lead
@@ -891,7 +892,7 @@ class SubmissionModel extends CommonFormModel
 
             // Get unique identifier fields for the found lead then compare with the lead currently tracked
             $uniqueFieldsFound             = $getData($foundLeadFields, true);
-            list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
+            [$hasConflict, $conflicts]     = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
 
             if ($inKioskMode || $hasConflict || !$lead->getId()) {
                 // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
@@ -916,7 +917,7 @@ class SubmissionModel extends CommonFormModel
 
         if (!$inKioskMode) {
             // Check for conflicts with the submitted data and the currently tracked lead
-            list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
+            [$hasConflict, $conflicts] = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
 
             $this->logger->debug(
                 'FORM: Current unique contact fields '.implode(', ', array_keys($uniqueFieldsCurrent)).' = '.implode(', ', $uniqueFieldsCurrent)
@@ -980,7 +981,7 @@ class SubmissionModel extends CommonFormModel
 
         $companyFieldMatches = $getCompanyData($leadFieldMatches);
         if (!empty($companyFieldMatches)) {
-            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
+            [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
             if ($leadAdded) {
                 $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             } elseif ($companyEntity instanceof Company) {
@@ -1032,5 +1033,19 @@ class SubmissionModel extends CommonFormModel
         }
 
         return true;
+    }
+
+    private function normalizeValue($value, Field $f): string
+    {
+        $value = !is_array($value) ? [$value] : $value;
+
+        // select and multiselect normalization
+        if ($properties = $f->getProperties()['list'] ?? null) {
+            foreach ($value as $key => $item) {
+                $value[$key] = CustomFieldValueHelper::setValueFromPropertiesList($properties, $item);
+            }
+        }
+
+        return implode(', ', $value);
     }
 }

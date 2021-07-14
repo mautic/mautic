@@ -1,0 +1,9 @@
+{
+  "name": "Truly Personal",
+  "author": "Alex Hammerschmied",
+  "authorUrl": "https://hartmut.io",
+  "builder": ["grapesjsbuilder"],
+  "features": [
+    "email"
+  ]
+}

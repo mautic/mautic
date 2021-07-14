@@ -348,7 +348,7 @@ class MailHelper
                 } elseif (!empty($emailToSend->getFromAddress())) {
                     $this->setFrom($emailToSend->getFromAddress(), $emailToSend->getFromName());
                 } else {
-                    $this->setFrom($this->systemFrom, null);
+                    $this->setFrom($this->from, null);
                 }
             } else {
                 $this->setFrom($this->from, null);

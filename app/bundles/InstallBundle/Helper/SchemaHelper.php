@@ -95,14 +95,6 @@ class SchemaHelper
     }
 
     /**
-     * @return mixed
-     */
-    public function getServerVersion()
-    {
-        return $this->db->getWrappedConnection()->getServerVersion();
-    }
-
-    /**
      * @return bool
      *
      * @throws DBALException

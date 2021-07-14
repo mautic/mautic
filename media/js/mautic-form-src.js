@@ -831,7 +831,7 @@
         for (var i = 0; i < sjs.length; i++) {
             if (!sjs[i].hasAttribute('src') || sjs[i].getAttribute("src").indexOf('mautic-form-src.js') == -1) continue;
             var sParts = sjs[i].getAttribute("src").split("?");
-            if (sParts[1]) MauticSDK.setConfig(MauticSDK.parseToObject(sParts[1]));
+            if (sParts[1] && sParts[1].indexOf("=") !== -1) MauticSDK.setConfig(MauticSDK.parseToObject(sParts[1]));
             MauticSDK.initialize(sParts[0]);
             break;
         }

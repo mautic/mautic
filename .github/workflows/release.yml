@@ -279,5 +279,5 @@ jobs:
         "${{ secrets.MAUTIC_INSTANCE_USER }}" \
         "${{ secrets.MAUTIC_INSTANCE_PASSWORD }}" \
         "${{ env.MAUTIC_VERSION }}" \
-        2 \
+        4 \
         "${{ github.workspace }}/${{ env.MAUTIC_VERSION }}.zip"

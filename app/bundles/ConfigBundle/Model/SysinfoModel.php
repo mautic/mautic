@@ -11,6 +11,7 @@
 
 namespace Mautic\ConfigBundle\Model;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -38,14 +39,21 @@ class SysinfoModel
      */
     private $translator;
 
+    protected Connection $connection;
+
     /**
      * SysinfoModel constructor.
      */
-    public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
-    {
+    public function __construct(
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper,
+        TranslatorInterface $translator,
+        Connection $connection
+    ) {
         $this->pathsHelper          = $pathsHelper;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;
+        $this->connection           = $connection;
     }
 
     /**
@@ -59,7 +67,7 @@ class SysinfoModel
             return $this->phpInfo;
         }
 
-        if (function_exists('phpinfo')) {
+        if (function_exists('phpinfo') && 'cli' !== php_sapi_name()) {
             ob_start();
             $currentTz = date_default_timezone_get();
             date_default_timezone_set('UTC');
@@ -138,6 +146,15 @@ class SysinfoModel
         }
 
         return $this->tail($log, $lines);
+    }
+
+    public function getDbInfo(): array
+    {
+        return [
+            'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchColumn(),
+            'driver'   => $this->connection->getDriver()->getName(),
+            'platform' => get_class($this->connection->getDatabasePlatform()),
+        ];
     }
 
     /**
