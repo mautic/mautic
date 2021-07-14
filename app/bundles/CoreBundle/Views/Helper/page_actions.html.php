@@ -27,10 +27,6 @@ foreach ($templateButtons as $action => $enabled) {
         continue;
     }
 
-    if (!$enabled) {
-        continue;
-    }
-
     $path     = false;
     $primary  = false;
     $priority = 0;
@@ -53,7 +49,7 @@ foreach ($templateButtons as $action => $enabled) {
             $priority        = 200;
             break;
         case 'new':
-        case'edit':
+        case 'edit':
             $actionQuery = ('edit' == $action) ? ['objectId' => $item->getId()] : [];
             $icon        = ('edit' == $action) ? 'pencil-square-o' : 'plus';
             $path        = $view['router']->path($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));

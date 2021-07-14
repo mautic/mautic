@@ -502,6 +502,22 @@ return [
                     'router',
                 ],
             ],
+            'mautic.lead.import.contact.subscriber' => [
+                'class'     => Mautic\LeadBundle\EventListener\ImportContactSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.field.field_list',
+                    'mautic.security',
+                    'mautic.lead.model.lead',
+                ],
+            ],
+            'mautic.lead.import.company.subscriber' => [
+                'class'     => Mautic\LeadBundle\EventListener\ImportCompanySubscriber::class,
+                'arguments' => [
+                    'mautic.lead.field.field_list',
+                    'mautic.security',
+                    'mautic.lead.model.company',
+                ],
+            ],
             'mautic.lead.import.subscriber' => [
                 'class'     => Mautic\LeadBundle\EventListener\ImportSubscriber::class,
                 'arguments' => [

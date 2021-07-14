@@ -124,21 +124,21 @@ class InstallCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Admin first name.',
-                'Admin'
+                null
             )
             ->addOption(
                 '--admin_lastname',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Admin last name.',
-                'Mautic'
+                null
             )
             ->addOption(
                 '--admin_username',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Admin username.',
-                'admin'
+                null
             )
             ->addOption(
                 '--admin_email',
@@ -262,7 +262,11 @@ class InstallCommand extends ContainerAwareCommand
         $options = $input->getOptions();
 
         $dbParams   = [];
-        $adminParam = [];
+        $adminParam = [
+          'firstname' => 'Admin',
+          'lastname'  => 'Mautic',
+          'username'  => 'admin',
+        ];
         $allParams  = $installer->localConfigParameters();
 
         // Initialize DB and admin params from local.php
