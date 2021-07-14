@@ -502,7 +502,8 @@ class StatRepository extends CommonRepository
             's.date_'.$state,
             ['openDetails'],
             ['dateRead', 'dateSent'],
-            $timeToReadParser
+            $timeToReadParser,
+            's.id'
         );
     }
 

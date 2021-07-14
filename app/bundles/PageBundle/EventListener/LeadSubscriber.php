@@ -80,9 +80,9 @@ class LeadSubscriber implements EventSubscriberInterface
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKey  = 'page.hit';
-        $eventTypeName = $this->translator->trans('mautic.page.event.hit');
-        $event->addEventType($eventTypeKey, $eventTypeName);
+        $eventTypeKey         = 'page.hit';
+        $eventTypeNameDefault = $this->translator->trans('mautic.page.event.hit');
+        $event->addEventType($eventTypeKey, $eventTypeNameDefault);
         $event->addSerializerGroup('pageList', 'hitDetails');
 
         if (!$event->isApplicable($eventTypeKey)) {
@@ -100,8 +100,9 @@ class LeadSubscriber implements EventSubscriberInterface
         if (!$event->isEngagementCount()) {
             // Add the hits to the event array
             foreach ($hits['results'] as $hit) {
-                $template = 'MauticPageBundle:SubscribedEvents\Timeline:index.html.php';
-                $icon     = 'fa-link';
+                $eventTypeName = $eventTypeNameDefault;
+                $template      = 'MauticPageBundle:SubscribedEvents\Timeline:index.html.php';
+                $icon          = 'fa-link';
 
                 if (!empty($hit['source'])) {
                     if ($channelModel = $this->getChannelModel($hit['source'])) {
