@@ -260,7 +260,6 @@ $container->register(\Mautic\EmailBundle\Messenger\EmailMessageHandler::class)
 $container->loadFromExtension('framework', [
     'messenger' => [
         'routing' => [
-            // async is whatever name you gave your transport above
                 \Mautic\EmailBundle\Messenger\EmailMessage::class => $configParameterBag->get('messenger_transport_email'),
         ],
         'transports' => [

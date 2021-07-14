@@ -24,6 +24,7 @@
     "symfony/debug": "~4.4.0",
     "symfony/form": "~4.4.0",
     "symfony/intl": "~4.4.0",
+    "symfony/messenger": "^5.3",
     "symfony/options-resolver": "~4.4.0",
     "symfony/process": "~4.4.0",
     "symfony/security": "~4.4.0",
