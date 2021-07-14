@@ -257,6 +257,9 @@ class InstallService
      */
     public function createDatabaseStep(StepInterface $step, array $dbParams): array
     {
+        // Clear Cache to get the prefixes working
+        $this->cacheHelper->nukeCache();
+
         $messages = $this->validateDatabaseParams($dbParams);
 
         if (!empty($messages)) {
