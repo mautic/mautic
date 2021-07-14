@@ -19,34 +19,34 @@ body:
 #      placeholder: ex. email@example.com
 #    validations:
 #      required: false
-- type: dropdown
-id: Mautic Version
-attributes:
-label: Mautic Version
-description: What version of Mautic you are using? Please test to reproduce your bug with latest stable version of Mautic which might contain new fixes.
-options:
-  - 4.0.x series
-  - 3.3.3
-  - 3.3.x series
-  - 3.2.x series (not supported)
-  - 3.1.x series (not supported)
-  - 2.x series (not supported)
-validations:
-required: true
-- type: input
-   id: PhP version
-   attributes:
-     label: PhP version
-     description: What PHP version are you using in your environment?
-     placeholder: ex. 7.3.27
-   validations:
-     required: true
-- type: dropdown
-  id: browsers
-  attributes:
-    label: What browsers are you seeing the problem on?
-    multiple: true
-    options:
+  - type: dropdown
+    id: Mautic Version
+    attributes:
+      label: Mautic Version
+      description: What version of Mautic you are using? Please test to reproduce your bug with latest stable version of Mautic which might contain new fixes.
+      options:
+        - 4.0.x series
+        - 3.3.3
+        - 3.3.x series
+        - 3.2.x series (not supported)
+        - 3.1.x series (not supported)
+        - 2.x series (not supported)
+    validations:
+      required: true
+  - type: input
+    id: PhP version
+    attributes:
+      label: PhP version
+      description: What PHP version are you using in your environment?
+      placeholder: ex. 7.3.27
+    validations:
+      required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browsers are you seeing the problem on?
+      multiple: true
+      options:
       - Firefox
       - Chrome
       - Safari
