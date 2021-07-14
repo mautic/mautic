@@ -260,11 +260,11 @@ $container->register(\Mautic\EmailBundle\Messenger\EmailMessageHandler::class)
 $container->loadFromExtension('framework', [
     'messenger' => [
         'routing' => [
-                \Mautic\EmailBundle\Messenger\EmailMessage::class => $configParameterBag->get('messenger_transport_email'),
+                \Mautic\EmailBundle\Messenger\EmailMessage::class => '%mautic.messenger_transport_email%',
         ],
         'transports' => [
-            $configParameterBag->get('messenger_transport_email') => [
-                'dsn'     => $configParameterBag->get('messenger_transport_dsn'),
+            '%mautic.messenger_transport_email%' => [
+                'dsn'     => '%mautic.messenger_transport_dsn%',
             ],
         ],
     ],
