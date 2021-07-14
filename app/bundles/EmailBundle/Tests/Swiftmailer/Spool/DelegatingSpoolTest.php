@@ -35,7 +35,7 @@ class DelegatingSpoolTest extends TestCase
      */
     private $message;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->realTransport        = $this->createMock(\Swift_Transport::class);

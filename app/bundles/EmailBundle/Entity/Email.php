@@ -65,6 +65,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $subject;
 
     /**
+     * @var bool
+     */
+    private $useOwnerAsMailer;
+
+    /**
      * @var string
      */
     private $fromAddress;
@@ -265,6 +270,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addNullableField('fromName', Type::STRING, 'from_name');
         $builder->addNullableField('replyToAddress', Type::STRING, 'reply_to_address');
         $builder->addNullableField('bccAddress', Type::STRING, 'bcc_address');
+        $builder->addNullableField('useOwnerAsMailer', Type::BOOLEAN, 'use_owner_as_mailer');
         $builder->addNullableField('template', Type::STRING);
         $builder->addNullableField('content', Type::TARRAY);
         $builder->addNullableField('utmTags', Type::TARRAY, 'utm_tags');
@@ -436,6 +442,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'fromName',
                     'replyToAddress',
                     'bccAddress',
+                    'useOwnerAsMailer',
                     'utmTags',
                     'customHtml',
                     'plainText',
@@ -679,6 +686,26 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
+     * @return bool
+     */
+    public function getUseOwnerAsMailer()
+    {
+        return $this->useOwnerAsMailer;
+    }
+
+    /**
+     * @param bool $useOwnerAsMailer
+     *
+     * @return $this
+     */
+    public function setUseOwnerAsMailer($useOwnerAsMailer)
+    {
+        $this->useOwnerAsMailer = $useOwnerAsMailer;
+
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     public function getFromAddress()
@@ -693,6 +720,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setFromAddress($fromAddress)
     {
+        $this->isChanged('fromAddress', $fromAddress);
         $this->fromAddress = $fromAddress;
 
         return $this;
@@ -713,6 +741,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setFromName($fromName)
     {
+        $this->isChanged('fromName', $fromName);
         $this->fromName = $fromName;
 
         return $this;
@@ -733,6 +762,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setReplyToAddress($replyToAddress)
     {
+        $this->isChanged('replyToAddress', $replyToAddress);
         $this->replyToAddress = $replyToAddress;
 
         return $this;
@@ -753,6 +783,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setBccAddress($bccAddress)
     {
+        $this->isChanged('bccAddress', $bccAddress);
         $this->bccAddress = $bccAddress;
 
         return $this;

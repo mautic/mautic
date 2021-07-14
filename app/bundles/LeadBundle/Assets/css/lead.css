@@ -72,6 +72,7 @@
 .col-leadpoints-date {
     width: 175px;
 }
+
 .col-leadpoints-delta {
     width: 75px;
 }
@@ -95,6 +96,7 @@
     background: #00aced;
     color: #FFFFFF;
 }
+
 .panel-instagram .panel-heading {
     background: #517fa4;
     color: #FFFFFF;
@@ -151,13 +153,16 @@ ul.tag-cloud li {
 .contact-cards .img {
     max-height: 115px;
 }
+
 #lead_merge_lead_to_merge_chosen .chosen-search {
     display:none;
 }
+
 .history-search{
     overflow: visible!important;
     min-height: 53px;
 }
+
 .timeline-icon {
     width: 50px;
     text-align: center;
@@ -196,19 +201,15 @@ ul.tag-cloud li {
 #contact-timeline tr.timeline-details img {
     max-height: 200px;
 }
+
 .frequency{
     width: 45px!important;
+}
 
-}
-.fa-user:before, .fa-building:before{
-    margin-right: 6px;
-}
-.inline-spacer {
-    text-transform: capitalize;
-}
 .contact{
     display: inline !important;
 }
+
 .frequency-table, .frequency-table td{
     border-bottom: none!important;
     border-top: none!important;
@@ -219,26 +220,32 @@ ul.tag-cloud li {
     padding-top: 27px;
     padding-bottom: 15px;
 }
+
 .frequency-select {
     width:145px !important;
     float: right;
     padding-right: 5px;
 }
+
 .frequency-label {
     padding: 8px;
  }
+
 .frequency-date {
     width: 100px;
     float:left;
 }
+
 .panel-companies .primary {
     color: #fdb933;
 }
+
 .building::before {
     content: "\f1ad";
     font-family: "FontAwesome";
     padding-right: 3px;
 }
+
 .user::before {
     content: "\f007";
     font-family: "FontAwesome";

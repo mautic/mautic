@@ -42,7 +42,7 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
      */
     private $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

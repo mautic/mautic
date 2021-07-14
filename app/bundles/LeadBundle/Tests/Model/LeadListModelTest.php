@@ -10,11 +10,11 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
 {
     protected $fixture;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $mockListModel = $this->getMockBuilder(ListModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getEntities', 'getEntity'])
+            ->onlyMethods(['getEntities', 'getEntity'])
             ->getMock();
 
         $mockListModel->expects($this->any())
@@ -22,7 +22,7 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function ($id) {
                 $mockEntity = $this->getMockBuilder(LeadList::class)
                     ->disableOriginalConstructor()
-                    ->setMethods(['getName'])
+                    ->onlyMethods(['getName'])
                     ->getMock();
 
                 $mockEntity->expects($this->once())

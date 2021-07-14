@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class StandardImportTestHelper extends CommonMocks
@@ -37,7 +38,7 @@ abstract class StandardImportTestHelper extends CommonMocks
         ['ella@doe.email', 'Ella', 'Doe'],
     ];
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
 
@@ -45,7 +46,7 @@ abstract class StandardImportTestHelper extends CommonMocks
         static::generateLargeCSV();
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         if (file_exists(self::$csvPath)) {
             unlink(self::$csvPath);
@@ -87,13 +88,16 @@ abstract class StandardImportTestHelper extends CommonMocks
         self::$largeCsvPath = $tmpFile;
     }
 
-    public function setup()
+    public function setUp(): void
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
 
         $this->eventEntities = [];
     }
 
+    /**
+     * @return Import|MockObject
+     */
     protected function initImportEntity(array $methods = null)
     {
         $entity = $this->getMockBuilder(Import::class)

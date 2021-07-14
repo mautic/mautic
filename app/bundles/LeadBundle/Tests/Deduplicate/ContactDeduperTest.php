@@ -34,7 +34,7 @@ class ContactDeduperTest extends \PHPUnit\Framework\TestCase
      */
     private $leadRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()

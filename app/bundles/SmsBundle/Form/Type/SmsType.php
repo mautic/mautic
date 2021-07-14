@@ -11,11 +11,15 @@
 
 namespace Mautic\SmsBundle\Form\Type;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\LeadBundle\Form\Type\LeadListType;
 use Mautic\SmsBundle\Entity\Sms;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -31,6 +35,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class SmsType extends AbstractType
 {
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
+    public function __construct(EntityManager $em)
+    {
+        $this->em = $em;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));
@@ -71,6 +85,26 @@ class SmsType extends AbstractType
         );
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
+
+        //add lead lists
+        $transformer = new IdToEntityModelTransformer($this->em, 'MauticLeadBundle:LeadList', 'id', true);
+        $builder->add(
+            $builder->create(
+                'lists',
+                LeadListType::class,
+                [
+                    'label'      => 'mautic.email.form.list',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'        => 'form-control',
+                    ],
+                    'multiple' => true,
+                    'expanded' => false,
+                    'required' => true,
+                ]
+            )
+                ->addModelTransformer($transformer)
+        );
 
         $builder->add(
             'publishUp',
@@ -125,7 +159,7 @@ class SmsType extends AbstractType
                 'required' => false,
             ]
         );
-
+        $builder->add('smsType', HiddenType::class);
         $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['update_select'])) {

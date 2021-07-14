@@ -238,7 +238,10 @@ class FieldController extends CommonFormController
                                     $aliases[] = $f['alias'];
                                 }
                             }
-                            $formField['alias'] = $this->getModel('form.field')->generateAlias($formField['label'], $aliases);
+                            $formField['alias'] = $this->getModel('form.field')->generateAlias(
+                                $formField['alias'] ?? $formField['label'],
+                                $aliases
+                            );
                         }
 
                         // Force required for captcha if not a honeypot

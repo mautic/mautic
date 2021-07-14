@@ -20,6 +20,8 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
 use Mautic\ReportBundle\Model\ExportResponse;
 use Symfony\Component\HttpFoundation;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class ReportController extends FormController
 {
@@ -150,6 +152,7 @@ class ReportController extends FormController
             }
 
             $entity = clone $entity;
+            $entity->setId(null);
             $entity->setIsPublished(false);
         }
 
@@ -750,7 +753,7 @@ class ReportController extends FormController
      */
     public function exportAction($objectId, $format = 'csv')
     {
-        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
+        /** @var \Mautic\ReportBundle\Model\ReportModel $model */
         $model    = $this->getModel('report');
         $entity   = $model->getEntity($objectId);
         $security = $this->container->get('mautic.security');
@@ -821,6 +824,59 @@ class ReportController extends FormController
             $reportData = $model->getReportData($entity, null, $options);
             $response   = $model->exportResults($format, $entity, $reportData);
         }
+
+        return $response;
+    }
+
+    /**
+     * @param int    $reportId
+     * @param string $format
+     *
+     * @return BinaryFileResponse
+     *
+     * @throws \Exception
+     */
+    public function downloadAction($reportId, $format = 'csv')
+    {
+        if ('csv' !== $format) {
+            throw new \Exception($this->translator->trans('mautic.format.invalid', ['%format%' => $format, '%validFormats%' => 'csv']));
+        }
+
+        /** @var \Mautic\ReportBundle\Model\ReportModel $model */
+        $model = $this->getModel('report');
+
+        /** @var \Mautic\ReportBundle\Entity\Report $report */
+        $report = $model->getEntity($reportId);
+
+        /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */
+        $security = $this->container->get('mautic.security');
+
+        /** @var \Mautic\ReportBundle\Scheduler\Model\FileHandler $fileHandler */
+        $fileHandler = $this->container->get('mautic.report.model.file_handler');
+
+        if (empty($report)) {
+            return $this->notFound($this->translator->trans('mautic.report.notfound', ['%id%' => $reportId]));
+        }
+
+        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
+            return $this->accessDenied();
+        }
+
+        if (!$fileHandler->compressedCsvFileForReportExists($report)) {
+            if ($report->isScheduled()) {
+                $message = 'mautic.report.download.missing';
+            } else {
+                $message = 'mautic.report.download.missing.but.scheduled';
+                $report->setAsScheduledNow($this->user->getEmail());
+                $model->saveEntity($report);
+            }
+
+            return $this->notFound($this->translator->trans($message, ['%id%' => $reportId]));
+        }
+
+        $response = new BinaryFileResponse($fileHandler->getPathToCompressedCsvFileForReport($report));
+
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, "report-{$report->getId()}.zip");
 
         return $response;
     }

@@ -38,7 +38,7 @@ class PathsHelperTest extends TestCase
      */
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->userHelper           = $this->createMock(UserHelper::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);

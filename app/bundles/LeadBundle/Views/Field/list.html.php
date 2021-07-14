@@ -8,6 +8,8 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+/** @var \Mautic\LeadBundle\Entity\LeadField $item */
 if ('index' == $tmpl) {
     $view->extend('MauticLeadBundle:Field:index.html.php');
 }
@@ -34,6 +36,7 @@ if ('index' == $tmpl) {
                 ?>
                 <th class="col-leadfield-label"><?php echo $view['translator']->trans('mautic.lead.field.label'); ?></th>
                 <th class="visible-md visible-lg col-leadfield-alias"><?php echo $view['translator']->trans('mautic.core.alias'); ?></th>
+                <th class="visible-md visible-lg col-leadfield-group"><?php echo $view['translator']->trans('mautic.lead.field.object'); ?></th>
                 <th class="visible-md visible-lg col-leadfield-group"><?php echo $view['translator']->trans('mautic.lead.field.group'); ?></th>
                 <th class="col-leadfield-type"><?php echo $view['translator']->trans('mautic.lead.field.type'); ?></th>
                 <th class="visible-md visible-lg col-leadfield-id"><?php echo $view['translator']->trans('mautic.core.id'); ?></th>
@@ -64,9 +67,16 @@ if ('index' == $tmpl) {
                     </td>
                     <td>
                     <span class="ellipsis">
-                        <?php echo $view->render(
+                        <?php
+                        $aditionalText = $item->getColumnIsNotCreated() ? ' ('.$view['translator']->trans('mautic.lead.field.being_created_in_background').')' : null;
+                        echo $view->render(
                             'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                            ['item' => $item, 'model' => 'lead.field', 'disableToggle' => ('email' == $item->getAlias())]
+                            [
+                                    'item'           => $item,
+                                    'model'          => 'lead.field',
+                                    'disableToggle'  => $item->disablePublishChange(),
+                                    'aditionalLabel' => $aditionalText,
+                            ]
                         ); ?>
                         <a href="<?php echo $view['router']->path(
                             'mautic_contactfield_action',
@@ -75,6 +85,7 @@ if ('index' == $tmpl) {
                     </span>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getAlias(); ?></td>
+                    <td class="visible-md visible-lg"><?php echo $view['translator']->trans('mautic.'.$item->getObject().'.'.$item->getObject()); ?></td>
                     <td class="visible-md visible-lg"><?php echo $view['translator']->trans('mautic.lead.field.group.'.$item->getGroup()); ?></td>
                     <td><?php echo $view['translator']->transConditional(
                             'mautic.core.type.'.$item->getType(),

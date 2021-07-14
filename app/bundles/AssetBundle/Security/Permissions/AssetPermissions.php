@@ -11,35 +11,28 @@
 
 namespace Mautic\AssetBundle\Security\Permissions;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class AssetPermissions.
- */
 class AssetPermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct($params)
+    public function __construct(CoreParametersHelper $coreParametersHelper)
     {
-        parent::__construct($params);
+        parent::__construct($coreParametersHelper->all());
+    }
+
+    public function definePermissions()
+    {
         $this->addExtendedPermissions('assets');
         $this->addStandardPermissions('categories');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'asset';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
         $this->addStandardFormFields('asset', 'categories', $builder, $data);

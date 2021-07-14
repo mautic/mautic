@@ -19,6 +19,7 @@ use Mautic\CampaignBundle\Event\ScheduledBatchEvent;
 use Mautic\CampaignBundle\Event\ScheduledEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CampaignBundle\Executioner\Exception\IntervalNotConfiguredException;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime;
@@ -152,43 +153,30 @@ class EventScheduler
         $this->dispatchBatchScheduledEvent($config, $event, $logs, true);
     }
 
+    /**
+     * @deprecated since Mautic 3. To be removed in Mautic 4. Use rescheduleFailures instead.
+     */
     public function rescheduleFailure(LeadEventLog $log)
     {
-        if (!$interval = $this->coreParametersHelper->get('campaign_time_wait_on_event_false')) {
-            return;
-        }
-
         try {
-            $date = new \DateTime();
-            $date->add(new \DateInterval($interval));
-        } catch (\Exception $exception) {
-            // Bad interval
-            return;
+            $this->reschedule($log, $this->getRescheduleDate($log));
+        } catch (IntervalNotConfiguredException $e) {
+            // Do not reschedule if an interval was not configured.
         }
-
-        $this->reschedule($log, $date);
     }
 
     public function rescheduleFailures(ArrayCollection $logs)
     {
-        if (!$interval = $this->coreParametersHelper->get('campaign_time_wait_on_event_false')) {
-            return;
-        }
-
         if (!$logs->count()) {
             return;
         }
 
-        try {
-            $date = new \DateTime();
-            $date->add(new \DateInterval($interval));
-        } catch (\Exception $exception) {
-            // Bad interval
-            return;
-        }
-
         foreach ($logs as $log) {
-            $this->reschedule($log, $date);
+            try {
+                $this->reschedule($log, $this->getRescheduleDate($log));
+            } catch (IntervalNotConfiguredException $e) {
+                // Do not reschedule if an interval was not configured.
+            }
         }
 
         // Send out a batch event
@@ -422,5 +410,31 @@ class EventScheduler
         // Update log entries and clear from memory
         $this->eventLogger->persistCollection($logs)
             ->clearCollection($logs);
+    }
+
+    /**
+     * @throws IntervalNotConfiguredException
+     */
+    private function getRescheduleDate(LeadEventLog $leadEventLog): \DateTimeInterface
+    {
+        $rescheduleDate = new \DateTime();
+        $logInterval    = $leadEventLog->getRescheduleInterval();
+
+        if ($logInterval) {
+            return $rescheduleDate->add($logInterval);
+        }
+
+        $defaultIntervalString = $this->coreParametersHelper->get('campaign_time_wait_on_event_false');
+
+        if (!$defaultIntervalString) {
+            throw new IntervalNotConfiguredException('No Interval has been set on the lead event log nor as campaign_time_wait_on_event_false config value.');
+        }
+
+        try {
+            return $rescheduleDate->add(new \DateInterval($defaultIntervalString));
+        } catch (\Exception $exception) {
+            // Bad interval
+            throw new IntervalNotConfiguredException("'{$defaultIntervalString}' is not valid interval string for campaign_time_wait_on_event_false config key.");
+        }
     }
 }

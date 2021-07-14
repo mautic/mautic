@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Form\Type\FormFieldEmailType;
+use Mautic\FormBundle\Form\Type\FormFieldTelType;
 use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -60,8 +61,8 @@ class FormValidationSubscriber implements EventSubscriberInterface
             'phone.validation',
             [
                 'eventName' => FormEvents::ON_FORM_VALIDATE,
-                'fieldType' => TelType::class,
-                'formType'  => \Mautic\FormBundle\Form\Type\FormFieldTelType::class,
+                'fieldType' => 'tel',
+                'formType'  => FormFieldTelType::class,
             ]
         );
 

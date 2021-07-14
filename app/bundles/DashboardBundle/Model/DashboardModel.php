@@ -57,7 +57,7 @@ class DashboardModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         PathsHelper $pathsHelper,
         Filesystem $filesystem
-        ) {
+    ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->pathsHelper          = $pathsHelper;
         $this->filesystem           = $filesystem;
@@ -313,17 +313,16 @@ class DashboardModel extends FormModel
 
     /**
      * Generate default date range filter and time unit.
-     *
-     * @return array
      */
-    public function getDefaultFilter()
+    public function getDefaultFilter(): array
     {
         $dateRangeDefault = $this->coreParametersHelper->get('default_daterange_filter', '-1 month');
         $dateRangeStart   = new \DateTime();
         $dateRangeStart->modify($dateRangeDefault);
 
         $today    = new \DateTime();
-        $dateFrom = new \DateTime($this->session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00')));
+        $dateFrom = $this->session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00'));
+        $dateFrom = new \DateTime($dateFrom);
         $dateTo   = new \DateTime($this->session->get('mautic.daterange.form.to', $today->format('Y-m-d 23:59:59')));
 
         return [

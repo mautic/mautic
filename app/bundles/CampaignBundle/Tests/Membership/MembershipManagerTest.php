@@ -49,7 +49,7 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
      */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->adder           = $this->createMock(Adder::class);
         $this->remover         = $this->createMock(Remover::class);

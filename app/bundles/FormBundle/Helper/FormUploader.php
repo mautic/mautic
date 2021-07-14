@@ -155,6 +155,9 @@ class FormUploader
             return;
         }
         $exif = exif_read_data($filename);
+        if (empty($exif['Orientation'])) {
+            return;
+        }
         $ort  = $exif['Orientation']; /*STORES ORIENTATION FROM IMAGE */
         $ort1 = $ort;
         $exif = exif_read_data($filename, 0, true);

@@ -432,6 +432,6 @@ class SendEmailToContact
         $this->createContactStatEntry($this->contact['email']);
 
         // Now send but don't redispatch the event
-        return $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
+        return $this->mailer->queue(false, MailHelper::QUEUE_RETURN_ERRORS);
     }
 }

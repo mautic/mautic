@@ -53,7 +53,7 @@ class FlashBagTest extends TestCase
      */
     private $flashBag;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->symfonyFlashBag  = $this->createMock(SymfonyFlashBag::class);
 

@@ -13,12 +13,15 @@ namespace Mautic\SmsBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
  * Class StatRepository.
  */
 class StatRepository extends CommonRepository
 {
+    use TimelineTrait;
+
     /**
      * @param $trackingHash
      *
@@ -121,53 +124,58 @@ class StatRepository extends CommonRepository
      */
     public function getLeadStats($leadId, array $options = [])
     {
-        $query = $this->createQueryBuilder('s');
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'sms_message_stats', 's')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'sms_messages', 'e', 's.sms_id = e.id');
 
-        $query->select('IDENTITY(s.sms) AS sms_id, s.id, s.dateSent, e.title, IDENTITY(s.list) AS list_id, l.name as list_name, s.trackingHash as idHash')
-            ->leftJoin('MauticSmsBundle:Sms', 'e', 'WITH', 'e.id = s.sms')
-            ->leftJoin('MauticLeadBundle:LeadList', 'l', 'WITH', 'l.id = s.list')
-            ->where(
-                $query->expr()->eq('IDENTITY(s.lead)', $leadId)
+        if ($leadId) {
+            $query->andWhere(
+                $query->expr()->eq('s.lead_id', (int) $leadId)
             );
+        }
+
+        if (!empty($options['basic_select'])) {
+            $query->select(
+                's.sms_id, s.id, s.date_sent as dateSent, e.name, e.name as sms_name,  s.is_failed as isFailed'
+            );
+        } else {
+            $query->select(
+                's.sms_id, s.id, s.date_sent as dateSent, e.name, e.name as sms_name, e.message, e.sms_type as type, s.is_failed as isFailed, s.list_id, l.name as list_name, s.tracking_hash as idHash, s.lead_id, s.details'
+            )
+                ->leftJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 's.list_id = l.id');
+        }
+
+        if (isset($options['state'])) {
+            $state = $options['state'];
+            if ('failed' == $state) {
+                $query->andWhere(
+                    $query->expr()->eq('s.is_failed', 1)
+                );
+            }
+        }
+        $state = 'sent';
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('e.title', $query->expr()->literal('%'.$options['search'].'%'))
+                $query->expr()->orX(
+                    $query->expr()->like('e.name', $query->expr()->literal('%'.$options['search'].'%'))
+                )
             );
-        }
-
-        if (isset($options['order'])) {
-            list($orderBy, $orderByDir) = $options['order'];
-
-            switch ($orderBy) {
-                case 'eventLabel':
-                    $orderBy = 'e.title';
-                    break;
-                case 'timestamp':
-                default:
-                    $orderBy = 's.dateSent';
-                    break;
-            }
-
-            $query->orderBy($orderBy, $orderByDir);
-        }
-
-        if (!empty($options['limit'])) {
-            $query->setMaxResults($options['limit']);
-
-            if (!empty($options['start'])) {
-                $query->setFirstResult($options['start']);
-            }
         }
 
         if (isset($options['fromDate']) && $options['fromDate']) {
             $dt = new DateTimeHelper($options['fromDate']);
             $query->andWhere(
-                $query->expr()->gte('s.dateSent', $query->expr()->literal($dt->toUtcString()))
+                $query->expr()->gte('s.date_sent', $query->expr()->literal($dt->toUtcString()))
             );
         }
 
-        return $query->getQuery()->getArrayResult();
+        return $this->getTimelineResults(
+            $query,
+            $options,
+            'e.name',
+            's.date_'.$state
+        );
     }
 
     /**

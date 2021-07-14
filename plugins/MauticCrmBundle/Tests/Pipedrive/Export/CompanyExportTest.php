@@ -20,6 +20,13 @@ class CompanyExportTest extends PipedriveTest
         ],
     ];
 
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement([
+            'companies',
+        ]);
+    }
+
     public function testCreateCompanyWhenFeatureIsDisabled()
     {
         $this->installPipedriveIntegration(
