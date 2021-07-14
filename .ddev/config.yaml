@@ -13,7 +13,7 @@ mysql_version: ""
 provider: default
 use_dns_when_possible: true
 composer_version: "2"
-webimage_extra_packages: [php7.4-imap]
+webimage_extra_packages: [php7.4-imap, php7.4-amqp]
 hooks:
   post-start:
     # Fix line endings on Windows
