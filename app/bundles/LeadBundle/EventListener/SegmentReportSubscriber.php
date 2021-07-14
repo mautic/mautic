@@ -98,6 +98,7 @@ class SegmentReportSubscriber implements EventSubscriberInterface
         if ($event->usesColumn('i.ip_address')) {
             $event->addLeadIpAddressLeftJoin($qb);
         }
+        $event->applyDateFilters($qb, 'date_added', 'l');
 
         $event->setQueryBuilder($qb);
     }
