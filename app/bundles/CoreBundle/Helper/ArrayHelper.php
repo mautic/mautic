@@ -78,6 +78,23 @@ class ArrayHelper
     }
 
     /**
+     * Flip array or sub arrays.
+     */
+    public static function flipArray(array $masterArrays): array
+    {
+        if (!is_array(end($masterArrays))) {
+            return array_flip($masterArrays);
+        }
+
+        return array_map(
+            function (array $subArray) {
+                return array_flip($subArray);
+            },
+            $masterArrays
+        );
+    }
+
+    /**
      *  SUM/SUBSTRACT between two arrays.
      *
      * @param bool $subtracted

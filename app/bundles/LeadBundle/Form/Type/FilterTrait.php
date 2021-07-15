@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -267,13 +268,14 @@ trait FilterTrait
                 $choices = [];
                 if (!empty($field['properties']['list'])) {
                     $list    = $field['properties']['list'];
-                    $choices = array_flip(
-                        ('boolean' === $fieldType)
-                            ?
-                            FormFieldHelper::parseBooleanList($list)
-                            :
-                            FormFieldHelper::parseList($list)
-                    );
+                    $choices =
+                        ArrayHelper::flipArray(
+                            ('boolean' === $fieldType)
+                                ?
+                                FormFieldHelper::parseBooleanList($list)
+                                :
+                                FormFieldHelper::parseList($list)
+                        );
                 }
 
                 if ('select' === $fieldType) {

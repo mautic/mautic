@@ -47,4 +47,28 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['two' => 'three', 'four' => 'five'], ArrayHelper::select(['two', 'four'], $origin));
         $this->assertSame(['one', 'two' => 'three'], ArrayHelper::select(['two', 0], $origin));
     }
+
+    public function testflipArray()
+    {
+        $array = [
+            'first' => 'Custom first',
+            'second'=> 'Custom second',
+        ];
+
+        $this->assertSame(array_flip($array), ArrayHelper::flipArray($array));
+
+        $array = [
+            'group1' => [
+                'first' => 'Custom first',
+            ],
+            'group2' => [
+                'second' => 'Custom second',
+            ],
+        ];
+
+        $flippedArray = ArrayHelper::flipArray($array);
+
+        $this->assertEquals('Custom first', key($flippedArray['group1']));
+        $this->assertEquals('first', end($flippedArray['group1']));
+    }
 }
