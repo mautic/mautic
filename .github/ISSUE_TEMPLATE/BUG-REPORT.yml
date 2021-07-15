@@ -2,7 +2,6 @@ name: Bug Report
 description: File a bug report
 title: ""
 labels: [bug, triage]
-assignees:
 body:
   - type: markdown
     attributes:
@@ -23,7 +22,7 @@ body:
     id: Mautic Version
     attributes:
       label: Mautic Version
-      description: What version of Mautic you are using? Please test to reproduce your bug with latest stable version of Mautic which might contain new fixes.
+      description: What version of Mautic you are using? Please test to reproduce your bug with the [latest stable version of Mautic](https://www.mautic.org/mautic-releases) which might contain new fixes.  If you are able, please also check the latest development release.
       options:
         - 4.0.x series
         - 3.3.3
@@ -34,9 +33,9 @@ body:
     validations:
       required: true
   - type: input
-    id: PhP version
+    id: PHP version
     attributes:
-      label: PhP version
+      label: PHP version
       description: What PHP version are you using in your environment?
       placeholder: ex. 7.3.27
     validations:
@@ -73,13 +72,13 @@ body:
     id: logs
     attributes:
       label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.  Please check to ensure that you are not sharing any sensitive information in your logs (replace with REDACTED as required)
       render: shell
-  # - type: checkboxes
-  #   id: terms
-  #   attributes:
-  #     label: Code of Conduct
-  #     description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com)
-  #     options:
-  #       - label: I agree to follow this project's Code of Conduct
-  #         required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree that you have read and agree to follow our [Code of Conduct](https://contribute.mautic.org/policies/code-of-conduct)
+      options:
+        - label: I confirm that I have read and agree to follow this project's Code of Conduct
+          required: true
