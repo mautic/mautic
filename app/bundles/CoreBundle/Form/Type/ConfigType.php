@@ -122,6 +122,22 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            '404_page',
+            PageListType::class,
+            [
+                'label'         => 'mautic.core.config.form.404_page',
+                'label_attr'    => ['class' => 'control-label'],
+                'attr'          => [
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.core.config.form.404_page.tooltip',
+                ],
+                'multiple'       => false,
+                'placeholder'    => '',
+                'published_only' => true,
+            ]
+        );
+
+        $builder->add(
             'cache_path',
             TextType::class,
             [

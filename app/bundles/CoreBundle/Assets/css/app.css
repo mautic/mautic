@@ -427,6 +427,10 @@ body > #app-wrapper {
   -o-transition: padding-left 0.3s ease;
   transition: padding-left 0.3s ease;
 }
+.app-sidebar.sidebar-left .sidebar-header.minimized {
+  padding-left: 3px;
+  padding-right: 3px;
+}
 .app-sidebar.sidebar-left .sidebar-content {
   padding-right: 1px;
 }
@@ -1894,6 +1898,9 @@ ul.dropdown-menu-form {
 }
 .mautic-brand.pull-left {
   width: 75%;
+}
+.mautic-brand.minimized {
+  background-size: contain;
 }
 .mautic-brand > svg.mautic-logo-figure {
   width: 32px;
