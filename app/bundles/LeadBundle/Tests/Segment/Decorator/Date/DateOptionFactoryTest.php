@@ -235,6 +235,50 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
+    public function testRelativeFirstDayOf()
+    {
+        $filterName = 'first day of previous month';
+
+        $filterDecorator = $this->getFilterDecorator($filterName);
+
+        $this->assertInstanceOf(DateRelativeInterval::class, $filterDecorator);
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
+     */
+    public function testRelativeLastDayOf()
+    {
+        $filterName = 'last day of previous month';
+
+        $filterDecorator = $this->getFilterDecorator($filterName);
+
+        $this->assertInstanceOf(DateRelativeInterval::class, $filterDecorator);
+    }
+
+    public function getRelativeDateNotations(): array
+    {
+        return [
+            [DateRelativeInterval::class, 'first day of January 2021'],
+            [DateRelativeInterval::class, 'last day of January 2021'],
+            [DateRelativeInterval::class, '5 days ago'],
+            [DateDefault::class, 'day of January 2021'],
+        ];
+    }
+
+    /**
+     * @dataProvider getRelativeDateNotations
+     */
+    public function testRelativeDateNotations(string $expectedResult, string $filterName)
+    {
+        $filterDecorator = $this->getFilterDecorator($filterName);
+
+        $this->assertInstanceOf($expectedResult, $filterDecorator);
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
+     */
     public function testDateDefault()
     {
         $filterName = '2018-01-01';
