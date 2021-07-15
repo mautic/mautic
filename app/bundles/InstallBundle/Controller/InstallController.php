@@ -99,8 +99,7 @@ class InstallController extends CommonController
                             $formData->password = $params['db_password'];
                         }
                         $dbParams = (array) $formData;
-
-                        $messages = $this->installer->createDatabaseStep($step, $dbParams);
+                        $messages = $this->installer->createDatabaseStep($step, $dbParams, true);
                         if (!empty($messages)) {
                             $this->handleInstallerErrors($form, $messages);
                             break;

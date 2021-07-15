@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Install;
 
+use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Cache\MiddlewareCacheWarmer;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
@@ -14,10 +16,12 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
+use Mautic\Middleware\MiddlewareBuilder;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -255,10 +259,11 @@ class InstallService
     /**
      * Create the database.
      */
-    public function createDatabaseStep(StepInterface $step, array $dbParams): array
+    public function createDatabaseStep(StepInterface $step, array $dbParams, bool $nukeCache = false): array
     {
-        // Clear Cache to get the prefixes working
-        $this->cacheHelper->nukeCache();
+        if ($nukeCache) {
+            $this->cacheHelper->nukeCache();
+        }
 
         $messages = $this->validateDatabaseParams($dbParams);
 
