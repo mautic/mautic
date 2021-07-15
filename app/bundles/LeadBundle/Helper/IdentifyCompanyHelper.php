@@ -36,7 +36,12 @@ class IdentifyCompanyHelper
             return [null, false, null];
         }
 
-        $companies = $companyModel->checkForDuplicateCompanies($parameters);
+        try {
+            $companies = $companyModel->checkForDuplicateCompanies($parameters);
+        } catch (UniqueFieldNotFoundException $uniqueFieldNotFoundException) {
+            return [null, false, null];
+        }
+
         if (!empty($companies)) {
             $companyEntity = end($companies);
             $companyData   = $companyEntity->getProfileFields();

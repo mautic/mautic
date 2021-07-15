@@ -1311,8 +1311,12 @@ class LeadModel extends FormModel
             }
         }
 
-        $lead   = $this->checkForDuplicateContact($fieldData);
-        $merged = ($lead->getId());
+        if (array_key_exists('id', $fieldData)) {
+            $lead = $this->getEntity($fieldData['id']);
+        }
+
+        $lead   = $lead ?? $this->checkForDuplicateContact($fieldData);
+        $merged = (bool) $lead->getId();
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
             $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);
