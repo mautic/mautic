@@ -16,6 +16,7 @@ use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class CategoryController extends AbstractFormController
 {
@@ -191,7 +192,7 @@ class CategoryController extends AbstractFormController
         $success    = $closeModal    = 0;
         $cancelled  = $valid  = false;
         $method     = $this->request->getMethod();
-        $inForm     = ('POST' == $method) ? $this->request->request->get('category_form')['inForm'] : $this->request->get('inForm', 0);
+        $inForm     = $this->getInFormValue($method);
         $showSelect = $this->request->get('show_bundle_select', false);
 
         //not found
@@ -286,8 +287,7 @@ class CategoryController extends AbstractFormController
         $success   = $closeModal   = 0;
         $cancelled = $valid = false;
         $method    = $this->request->getMethod();
-        $inForm    = ('POST' == $method) ? $this->request->request->get('category_form')['inForm'] : $this->request->get('inForm', 0);
-
+        $inForm    = $this->getInFormValue($method);
         //not found
         if (null === $entity) {
             $closeModal = true;
@@ -535,5 +535,16 @@ class CategoryController extends AbstractFormController
                 'flashes' => $flashes,
             ])
         );
+    }
+
+    private function getInFormValue(string $method): int
+    {
+        $inForm = $this->request->get('inForm', 0);
+        if (Request::METHOD_POST == $method) {
+            $category_form = $this->request->request->get('category_form');
+            $inForm        = $category_form['inForm'] ?? 0;
+        }
+
+        return (int) $inForm;
     }
 }
