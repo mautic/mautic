@@ -114,13 +114,13 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame(
             [
                 'mautic.lead.contact' => [
+                    'id' => 'mautic.lead.import.label.id',
                     'some fields',
                 ],
                 'mautic.lead.company' => [
                     'some fields',
                 ],
                 'mautic.lead.special_fields' => [
-                    'id'             => 'mautic.lead.import.label.id',
                     'dateAdded'      => 'mautic.lead.import.label.dateAdded',
                     'createdByUser'  => 'mautic.lead.import.label.createdByUser',
                     'dateModified'   => 'mautic.lead.import.label.dateModified',

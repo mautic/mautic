@@ -70,7 +70,6 @@ final class ImportContactSubscriber implements EventSubscriberInterface
     {
         if ($event->importIsForRouteObject('contacts')) {
             $specialFields = [
-                'id'             => 'mautic.lead.import.label.id',
                 'dateAdded'      => 'mautic.lead.import.label.dateAdded',
                 'createdByUser'  => 'mautic.lead.import.label.createdByUser',
                 'dateModified'   => 'mautic.lead.import.label.dateModified',
@@ -84,8 +83,11 @@ final class ImportContactSubscriber implements EventSubscriberInterface
                 'ownerusername'  => 'mautic.lead.import.label.ownerusername',
             ];
 
+            // Add ID to lead fields to allow matching import contacts by identifier
+            $contactFields = array_merge(['id' => 'mautic.lead.import.label.id'], $this->fieldList->getFieldList(false, false));
+
             $event->fields = [
-                'mautic.lead.contact'        => $this->fieldList->getFieldList(false, false),
+                'mautic.lead.contact'        => $contactFields,
                 'mautic.lead.company'        => $this->fieldList->getFieldList(false, false, ['isPublished' => true, 'object' => 'company']),
                 'mautic.lead.special_fields' => $specialFields,
             ];
