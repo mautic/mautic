@@ -429,6 +429,11 @@ class MailHelper
                 }
             }
 
+            if ('messenger' == $this->factory->getParameter('mailer_spool_type')) {
+                $this->bus->dispatch(new EmailMessage($this->message));
+                return true;
+            }
+
             try {
                 if (!$this->transport->isStarted()) {
                     $this->transportStartTime = time();
@@ -436,11 +441,7 @@ class MailHelper
 
                 $failures = null;
 
-                if ('messenger' == $this->factory->getParameter('mailer_spool_type')) {
-                    $this->bus->dispatch(new EmailMessage($this->message));
-                } else {
-                    $this->mailer->send($this->message, $failures);
-                }
+                $this->mailer->send($this->message, $failures);
 
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
