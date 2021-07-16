@@ -13,12 +13,20 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\Tests\Controller;
 
+use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
+    /**
+     * @var string
+     */
+    private $prefix;
+
+    protected $useCleanupRollback = false;
+
     protected function setUp(): void
     {
         $this->configParams['config_allowed_parameters'] = [
@@ -27,6 +35,10 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         parent::setUp();
+
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
+
+        $this->prefix = MAUTIC_TABLE_PREFIX;
 
         $configPath = $this->getConfigPath();
         if (file_exists($configPath)) {
@@ -129,5 +141,84 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     private function escape(string $value): string
     {
         return str_replace('%', '%%', $value);
+    }
+
+    public function testConfigNotFoundPageConfiguration()
+    {
+        // insert published record
+        $this->connection->insert($this->prefix.'pages', [
+            'is_published' => 1,
+            'date_added'   => (new DateTime())->format('Y-m-d H:i:s'),
+            'title'        => 'page1',
+            'alias'        => 'page1',
+            'template'     => 'blank',
+            'custom_html'  => 'Page1 Test Html',
+            'hits'         => 0,
+            'unique_hits'  => 0,
+            'variant_hits' => 0,
+            'revision'     => 0,
+            'lang'         => 'en',
+        ]);
+        $page1 = $this->connection->lastInsertId();
+
+        // insert unpublished record
+        $this->connection->insert($this->prefix.'pages', [
+            'is_published' => 0,
+            'date_added'   => (new DateTime())->format('Y-m-d H:i:s'),
+            'title'        => 'page2',
+            'alias'        => 'page2',
+            'template'     => 'blank',
+            'custom_html'  => 'Page2 Test Html',
+            'hits'         => 0,
+            'unique_hits'  => 0,
+            'variant_hits' => 0,
+            'revision'     => 0,
+            'lang'         => 'en',
+        ]);
+        $this->connection->lastInsertId();
+
+        // insert published record
+        $this->connection->insert($this->prefix.'pages', [
+            'is_published' => 1,
+            'date_added'   => (new DateTime())->format('Y-m-d H:i:s'),
+            'title'        => 'page3',
+            'alias'        => 'page3',
+            'template'     => 'blank',
+            'custom_html'  => 'Page3 Test Html',
+            'hits'         => 0,
+            'unique_hits'  => 0,
+            'variant_hits' => 0,
+            'revision'     => 0,
+            'lang'         => 'en',
+        ]);
+        $page3 = $this->connection->lastInsertId();
+
+        // request config edit page
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+
+        // Find save & close button
+        $buttonCrawler  = $crawler->selectButton('config[buttons][save]');
+        $form           = $buttonCrawler->form();
+
+        // Fetch available option for 404_page field
+        $availableOptions = $form['config[coreconfig][404_page]']->availableOptionValues();
+
+        // page 2 should not be available in option list because it is unpublished
+        $this->assertEquals(['', $page1, $page3], $availableOptions);
+
+        // page 3 for 404_page
+        $form->setValues(
+            [
+                'config[coreconfig][site_url]' => 'https://mautic-community.local', // required
+                'config[coreconfig][404_page]' => $page3,
+            ]
+        );
+
+        $crawler = $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+        Assert::assertEquals($page3, $form['config[coreconfig][404_page]']->getValue());
     }
 }
