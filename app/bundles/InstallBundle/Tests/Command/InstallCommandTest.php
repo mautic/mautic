@@ -18,6 +18,7 @@ use Mautic\InstallBundle\Command\InstallCommand;
 use Mautic\InstallBundle\Install\InstallService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -37,11 +38,13 @@ class InstallCommandTest extends TestCase
         $this->installer = $this->createMock(InstallService::class);
         $application     = $this->createMock(Application::class);
         $inputDefinition = $this->createMock(InputDefinition::class);
+        $command         = $this->createMock(Command::class);
 
         $inputDefinition->method('getOptions')->willReturn([]);
 
         $application->method('getHelperSet')->willReturn($this->createMock(HelperSet::class));
         $application->method('getDefinition')->willReturn($inputDefinition);
+        $application->method('find')->willReturn($command);
 
         $this->command = new InstallCommand();
         $this->command->setContainer($this->container);
