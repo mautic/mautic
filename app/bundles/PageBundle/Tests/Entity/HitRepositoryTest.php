@@ -92,9 +92,9 @@ class HitRepositoryTest extends MauticMysqlTestCase
         return $this->ipAddress;
     }
 
-    private function assertHitDate(DateTime $expectedHitDate, Lead $leadOne, ?string $trackingId): void
+    private function assertHitDate(DateTime $expectedHitDate, Lead $lead, ?string $trackingId): void
     {
-        $hitDate = $this->hitRepository->getLatestHitDateByLead((int) $leadOne->getId(), $trackingId);
+        $hitDate = $this->hitRepository->getLatestHitDateByLead((int) $lead->getId(), $trackingId);
 
         Assert::assertInstanceOf(DateTime::class, $hitDate);
         Assert::assertSame($expectedHitDate->getTimestamp(), $hitDate->getTimestamp());
