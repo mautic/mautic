@@ -69,10 +69,10 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         foreach ($fieldGroups as $object => $fields) {
             if ('company' === $object) {
                 /** @var ColumnSchemaHelper $schema */
-                $schema = $this->container->get('mautic.schema.helper.column')->setName('companies');
+                $schema = $this->container->get('mautic.schema.helper.column')->setName('companies', true);
             } else {
                 /** @var ColumnSchemaHelper $schema */
-                $schema = $this->container->get('mautic.schema.helper.column')->setName('leads');
+                $schema = $this->container->get('mautic.schema.helper.column')->setName('leads', true);
             }
 
             $order = 1;
