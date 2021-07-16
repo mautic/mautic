@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 
+use Mautic\CoreBundle\Helper\DateRelativeParser;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
 use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayToday;
@@ -266,6 +267,10 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $relativeDate     = $this->createMock(RelativeDate::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
+
+        $dateDecorator->method('dateRelativeParser')->willReturn(
+            (new DateRelativeParser(['anniversary'=>'anniversary'], ''))
+        );
 
         $relativeDate->method('getRelativeDateStrings')
             ->willReturn(

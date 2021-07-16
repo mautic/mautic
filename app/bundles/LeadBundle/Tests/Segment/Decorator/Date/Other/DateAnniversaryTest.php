@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Other;
 
+use Mautic\CoreBundle\Helper\DateRelativeParser;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
@@ -71,6 +72,10 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
 
+        $dateDecorator->method('dateRelativeParser')->willReturn(
+            (new DateRelativeParser(['anniversary'=>'anniversary'], ''))
+        );
+
         $filterDecorator = new DateAnniversary($dateDecorator, $dateOptionParameters);
 
         $this->assertEquals($expectedResult, $filterDecorator->getParameterValue($contactSegmentFilterCrate));
@@ -84,11 +89,15 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
+        $date = new DateTimeHelper('2018-03-02', null);
 
         $timezoneResolver->method('getDefaultDate')
             ->with()
             ->willReturn($date);
+
+        $dateDecorator->method('dateRelativeParser')->willReturn(
+            (new DateRelativeParser(['anniversary' => 'anniversary', 'birthday' => 'birthday'], 'birthday +2 days'))
+        );
 
         $filter        = [
             'operator' => '=',
@@ -97,12 +106,11 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
         $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
         $filter        = [
-            'filter'   => 'birthday +2days',
+            'filter'   => 'birthday +2 days',
         ];
+
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
-
-        $filterDecorator = new DateAnniversary($dateDecorator, $dateOptionParameters);
-
+        $filterDecorator           = new DateAnniversary($dateDecorator, $dateOptionParameters);
         $this->assertEquals('%-03-04', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 }
