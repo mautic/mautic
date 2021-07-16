@@ -64,7 +64,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/866855?v=4",
       "profile": "https://github.com/stevedrobinson",
       "contributions": [
-        "userTesting"
+        "userTesting",
+        "bug"
       ]
     },
     {
@@ -368,6 +369,34 @@
       "profile": "https://github.com/bryanitamazonva",
       "contributions": [
         "bug"
+      ]
+    },
+    {
+      "login": "n-azimy",
+      "name": "n-azimy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/86242419?v=4",
+      "profile": "https://github.com/n-azimy",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "eltociear",
+      "name": "Ikko Ashimine",
+      "avatar_url": "https://avatars.githubusercontent.com/u/22633385?v=4",
+      "profile": "https://bandism.net/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "maxlawton",
+      "name": "Max Lawton",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1194823?v=4",
+      "profile": "https://github.com/maxlawton",
+      "contributions": [
+        "code",
+        "doc"
       ]
     }
   ],
