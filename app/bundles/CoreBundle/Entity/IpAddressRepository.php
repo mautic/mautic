@@ -103,4 +103,17 @@ SQL;
 
         return $stmt->rowCount();
     }
+
+    /**
+     * @throws DBALException
+     */
+    public function anonymizeAllIpAddress(): int
+    {
+        $table_name        = $this->getTableName();
+        $sql               = "UPDATE {$table_name} SET ip_address = '*.*.*.*', ip_details = 'N;' WHERE ip_address != '*.*.*.*'";
+        $conn              = $this->getEntityManager()->getConnection();
+        $anonymizedRecords = $conn->executeQuery($sql)->rowCount();
+
+        return $anonymizedRecords;
+    }
 }

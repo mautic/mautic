@@ -17,11 +17,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class Stat.
- */
 class Stat
 {
+    public const TABLE_NAME = 'push_notification_stats';
     /**
      * @var int
      */
@@ -111,7 +109,7 @@ class Stat
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('push_notification_stats')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\NotificationBundle\Entity\StatRepository')
             ->addIndex(['notification_id', 'lead_id'], 'stat_notification_search')
             ->addIndex(['is_clicked'], 'stat_notification_clicked_search')
@@ -266,16 +264,13 @@ class Stat
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
         return $this->ipAddress;
     }
 
-    /**
-     * @param mixed $ip
-     */
     public function setIpAddress(IpAddress $ip)
     {
         $this->ipAddress = $ip;

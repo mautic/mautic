@@ -13,9 +13,11 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 
 class LeadPointLog
 {
+    public const TABLE_NAME = 'point_lead_action_log';
     /**
      * @var Point
      **/
@@ -40,7 +42,7 @@ class LeadPointLog
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('point_lead_action_log')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\PointBundle\Entity\LeadPointLogRepository');
 
         $builder->createManyToOne('point', 'Point')
@@ -75,7 +77,7 @@ class LeadPointLog
     }
 
     /**
-     * @return mixed
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -83,7 +85,7 @@ class LeadPointLog
     }
 
     /**
-     * @param mixed $ipAddress
+     * @param IpAddress $ipAddress
      */
     public function setIpAddress($ipAddress)
     {

@@ -13,13 +13,13 @@ namespace Mautic\AssetBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 
-/**
- * Class Download.
- */
 class Download
 {
+    public const TABLE_NAME = 'asset_downloads';
+
     /**
      * @var int
      */
@@ -79,7 +79,7 @@ class Download
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('asset_downloads')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\AssetBundle\Entity\DownloadRepository')
             ->addIndex(['tracking_id'], 'download_tracking_search')
             ->addIndex(['source', 'source_id'], 'download_source_search')
@@ -95,7 +95,7 @@ class Download
             ->addJoinColumn('asset_id', 'id', true, false, 'CASCADE')
             ->build();
 
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
 
         $builder->addLead(true, 'SET NULL');
 
@@ -230,11 +230,9 @@ class Download
     }
 
     /**
-     * Set ipAddress.
-     *
      * @return Download
      */
-    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress)
     {
         $this->ipAddress = $ipAddress;
 
@@ -242,9 +240,7 @@ class Download
     }
 
     /**
-     * Get ipAddress.
-     *
-     * @return \Mautic\CoreBundle\Entity\IpAddress
+     * @return IpAddress
      */
     public function getIpAddress()
     {

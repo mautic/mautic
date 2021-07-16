@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -128,8 +129,9 @@ class IpLookupHelper
      */
     public function getIpAddress($ip = null)
     {
-        static $ipAddresses = [];
-        $request            = $this->requestStack->getCurrentRequest();
+        static $ipAddresses       = [];
+        $request                  = $this->requestStack->getCurrentRequest();
+        $isIpAnonymizationEnabled = (bool) $this->coreParametersHelper->get('anonymize_ip');
 
         if (null === $ip) {
             $ip = $this->getIpAddressFromRequest();
@@ -142,12 +144,16 @@ class IpLookupHelper
 
         $this->realIp = $ip;
 
-        if ($this->coreParametersHelper->get('anonymize_ip')) {
-            $ip = preg_replace(['/\.\d*$/', '/[\da-f]*:[\da-f]*$/'], ['.***', '****:****'], $ip);
+        if ($isIpAnonymizationEnabled) {
+            $ip = '*.*.*.*';
         }
 
         if (empty($ipAddresses[$ip])) {
-            $repo      = $this->em->getRepository('MauticCoreBundle:IpAddress');
+            $ipAddress = null;
+            $saveIp    = false;
+
+            /** @var IpAddressRepository $repo */
+            $repo      = $this->em->getRepository(IpAddress::class);
             $ipAddress = $repo->findOneByIpAddress($ip);
             $saveIp    = (null === $ipAddress);
 
@@ -189,7 +195,7 @@ class IpLookupHelper
             }
 
             $details = $ipAddress->getIpDetails();
-            if ($ipAddress->isTrackable() && empty($details['city']) && !$this->coreParametersHelper->get('anonymize_ip')) {
+            if ($ipAddress->isTrackable() && !$isIpAnonymizationEnabled && empty($details['city'])) {
                 // Get the IP lookup service
 
                 // Fetch the data

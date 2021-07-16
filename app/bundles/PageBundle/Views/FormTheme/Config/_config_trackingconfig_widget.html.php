@@ -31,6 +31,9 @@
                 <?php if (in_array($name, ['anonymize_ip', 'track_contact_by_ip', 'track_by_tracking_url'])) : ?>
                         <div class="col-md-6">
                             <?php echo $view['form']->row($f); ?>
+                            <?php if ('anonymize_ip' === $name) { ?>
+                                <div class="anonymize_ip_address hide text-danger"><?php echo $view['translator']->trans('mautic.page.config.form.anonymize_ip.warning'); ?></div>
+                            <?php } ?>
                         </div>
                 <?php endif; ?>
             <?php endforeach; ?>

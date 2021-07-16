@@ -633,6 +633,14 @@ return [
                     'mautic.maxmind.doNotSellList',
                 ],
             ],
+            'mautic.core.command.anonymize_ip' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\AnonymizeIpCommand::class,
+                'arguments' => [
+                    'mautic.core.repository.ip_address',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [
@@ -1100,6 +1108,15 @@ return [
             ],
             'mautic.core.model.form' => [
                 'class' => 'Mautic\CoreBundle\Model\FormModel',
+            ],
+        ],
+        'repositories' => [
+            'mautic.core.repository.ip_address' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\CoreBundle\Entity\IpAddress::class,
+                ],
             ],
         ],
         'validator' => [
@@ -1600,25 +1617,26 @@ return [
             'yoozBot',
             'zgrab',
         ],
-        'do_not_track_internal_ips' => [],
-        'track_private_ip_ranges'   => false,
-        'link_shortener_url'        => null,
-        'cached_data_timeout'       => 10,
-        'batch_sleep_time'          => 1,
-        'batch_campaign_sleep_time' => false,
-        'transliterate_page_title'  => false,
-        'cors_restrict_domains'     => true,
-        'cors_valid_domains'        => [],
-        'max_entity_lock_time'      => 0,
-        'default_daterange_filter'  => '-1 month',
-        'debug'                     => false,
-        'rss_notification_url'      => '',
-        'translations_list_url'     => 'https://language-packs.mautic.com/manifest.json',
-        'translations_fetch_url'    => 'https://language-packs.mautic.com/',
-        'stats_update_url'          => 'https://updates.mautic.org/stats/send', // set to empty in config file to disable
-        'install_source'            => 'Mautic',
-        'system_update_url'         => 'https://api.github.com/repos/mautic/mautic/releases',
-        'editor_fonts'              => [
+        'do_not_track_internal_ips'           => [],
+        'track_private_ip_ranges'             => false,
+        'link_shortener_url'                  => null,
+        'cached_data_timeout'                 => 10,
+        'batch_sleep_time'                    => 1,
+        'batch_campaign_sleep_time'           => false,
+        'transliterate_page_title'            => false,
+        'cors_restrict_domains'               => true,
+        'cors_valid_domains'                  => [],
+        'rss_notification_url'                => '',
+        'translations_list_url'               => 'https://language-packs.mautic.com/manifest.json',
+        'translations_fetch_url'              => 'https://language-packs.mautic.com/',
+        'stats_update_url'                    => 'https://updates.mautic.org/stats/send', // set to empty in config file to disable
+        'system_update_url'                   => 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates',
+        'install_source'                      => 'Mautic',
+        'max_entity_lock_time'                => 0,
+        'default_daterange_filter'            => '-1 month',
+        'debug'                               => false,
+        'anonymize_ip_address_in_background'  => false,
+        'editor_fonts'                        => [
             [
                 'name' => 'Arial',
                 'font' => 'Arial, Helvetica Neue, Helvetica, sans-serif',

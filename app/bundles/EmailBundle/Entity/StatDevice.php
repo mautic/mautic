@@ -17,11 +17,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
-/**
- * Class StatDevice.
- */
 class StatDevice
 {
+    public const TABLE_NAME = 'email_stats_devices';
     /**
      * @var int
      */
@@ -51,7 +49,7 @@ class StatDevice
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('email_stats_devices')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatDeviceRepository')
             ->addIndex(['date_opened'], 'date_opened_search');
 
@@ -107,9 +105,6 @@ class StatDevice
         return $this->ipAddress;
     }
 
-    /**
-     * @param mixed $ip
-     */
     public function setIpAddress(IpAddress $ip)
     {
         $this->ipAddress = $ip;
