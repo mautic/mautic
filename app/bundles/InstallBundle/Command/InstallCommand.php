@@ -250,7 +250,7 @@ class InstallCommand extends ContainerAwareCommand
         $command = $this->getApplication()->find('cache:clear');
 
         $arguments = [
-            '--env'    => $input->getOption('env') ?? 'prod',
+            '--env'    => $input->getOptions()['env'] ?? 'prod',
         ];
 
         $commandInput = new ArrayInput($arguments);
