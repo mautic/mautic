@@ -136,7 +136,7 @@ class ScheduledExecutioner implements ExecutionerInterface
 
         try {
             $this->prepareForExecution();
-            $this->executeOrRecheduleEvent();
+            $this->executeOrRescheduleEvent();
         } catch (NoEventsFoundException $exception) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
@@ -265,7 +265,7 @@ class ScheduledExecutioner implements ExecutionerInterface
      * @throws Scheduler\Exception\NotSchedulableException
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    private function executeOrRecheduleEvent()
+    private function executeOrRescheduleEvent()
     {
         // Use the same timestamp across all contacts processed
         $now = new \DateTime();
