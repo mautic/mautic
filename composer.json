@@ -5,7 +5,7 @@
   "description": "Mautic Open Source Distribution",
   "require": {
     "composer/installers": "^1.11",
-    "mautic/core-lib": "self.version"
+    "mautic/core-lib": "^3.0"
   },
   "require-dev": {
     "symfony/web-profiler-bundle": "~4.4.0",
@@ -67,11 +67,12 @@
   "repositories": [
     {
       "type": "path",
-      "url": "app"
-    },
-    {
-      "type": "git",
-      "url": "https://github.com/mautic/BazingaOAuthServerBundle.git"
+      "url": "app",
+      "options": {
+        "versions": {
+            "mautic/core-lib": "3.2.x-dev"
+        }
+      }
     },
     {
       "type": "git",
