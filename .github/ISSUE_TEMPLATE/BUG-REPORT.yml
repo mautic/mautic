@@ -1,14 +1,14 @@
 name: Bug Report
 description: File a bug report
 title: ""
-labels: [bug, triage]
+labels: [bug, needs-triage]
 body:
   - type: markdown
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
         Before you create the issue:
-        * Search for similar report among other reported issues.
+        * Search for similar reports among other reported issues.
         * Learn how to troubleshoot at https://www.mautic.org/docs/en/tips/troubleshooting.html
 #  - type: input
 #    id: contact
@@ -64,7 +64,8 @@ body:
      attributes:
        label: How can we reproduce this issue?
        description: Explain us carefuly how we can reproduce the bug you faced.
-       value: "1.
+       value: |
+       "1.
        2."
      validations:
        required: true
