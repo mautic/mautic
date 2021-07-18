@@ -64,6 +64,10 @@ class SegmentReportSubscriber implements EventSubscriberInterface
                 'label' => 'mautic.lead.report.segment.manually_added',
                 'type'  => 'bool',
             ],
+            'lll.date_added' => [
+              'label' => 'mautic.lead.report.segment.date_added',
+              'type'  => 'date',
+            ],
         ];
 
         $data = [
@@ -98,6 +102,8 @@ class SegmentReportSubscriber implements EventSubscriberInterface
         if ($event->usesColumn('i.ip_address')) {
             $event->addLeadIpAddressLeftJoin($qb);
         }
+
+        $event->applyDateFilters($qb, 'date_added', 'lll');
 
         $event->setQueryBuilder($qb);
     }
