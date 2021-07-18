@@ -91,14 +91,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
                 throw new SegmentNotFoundException(sprintf('Segment %d used in the filter does not exist anymore.', $segmentId));
             }
 
-            $filters = $this->leadSegmentFilterFactory->getSegmentFilters($contactSegment);
-
-            $segmentQueryBuilder = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($contactSegment->getId(), $filters);
-
-            //  If the segment contains no filters; it means its for manually subscribed only
-            if (count($filters)) {
-                $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
-            }
+            $segmentQueryBuilder = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($contactSegment->getId(), []);
 
             $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
 
