@@ -18,10 +18,11 @@ use Symfony\Component\Validator\Constraint;
  */
 class EmailAddress extends Constraint
 {
-    public $message = 'mautic.email.address.invalid_format';
-
+    /**
+     * {@inheritdoc}
+     */
     public function validatedBy()
     {
-        return 'email_address';
+        return \get_class($this).'Validator';
     }
 }

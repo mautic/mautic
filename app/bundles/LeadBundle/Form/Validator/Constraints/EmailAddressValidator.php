@@ -24,15 +24,9 @@ class EmailAddressValidator extends ConstraintValidator
      */
     private $emailValidator;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(EmailValidator $emailValidator, TranslatorInterface $translator)
+    public function __construct(EmailValidator $emailValidator)
     {
         $this->emailValidator = $emailValidator;
-        $this->translator = $translator;
     }
 
     /**
@@ -45,10 +39,7 @@ class EmailAddressValidator extends ConstraintValidator
                 $this->emailValidator->validate($value);
             } catch (InvalidEmailException $invalidEmailException) {
                 $this->context->addViolation(
-                    $this->translator->trans(
-                        $constraint->message,
-                        ['%email%' => $value]
-                    )
+                    $invalidEmailException->getMessage()
                 );
             }
         }

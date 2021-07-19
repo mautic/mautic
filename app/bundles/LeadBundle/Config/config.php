@@ -804,10 +804,8 @@ return [
                 'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\EmailAddressValidator::class,
                 'arguments' => [
                     'mautic.validator.email',
-                    'translator',
                 ],
                 'tag'       => 'validator.constraint_validator',
-                'alias'     => 'email_address',
             ],
             \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class => [
                 'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class,
