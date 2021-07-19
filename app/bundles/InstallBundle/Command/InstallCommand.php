@@ -108,7 +108,7 @@ class InstallCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Database tables prefix.',
-                null
+                ''
             )
             ->addOption(
                 '--db_backup_tables',
@@ -277,7 +277,8 @@ class InstallCommand extends ContainerAwareCommand
         $output->writeln('Parsing options and arguments...');
         $options = $input->getOptions();
 
-        $dbParams   = [];
+        // $dbParams must be populated with the "table_prefix" key to avoid having an undefined Index later
+        $dbParams   = ['table_prefix' => null];
         $adminParam = [];
         $allParams  = $installer->localConfigParameters();
 
