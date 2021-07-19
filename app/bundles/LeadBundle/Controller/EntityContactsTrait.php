@@ -84,6 +84,7 @@ trait EntityContactsTrait
                 'filter'         => $filter,
                 'orderBy'        => $orderBy,
                 'orderByDir'     => $orderByDir,
+                'distinct'       => true,
             ],
             $entityJoinTable,
             $entityId,

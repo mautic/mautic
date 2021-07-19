@@ -20,6 +20,10 @@ return [
                 'path'       => '/pages/{objectAction}/{objectId}',
                 'controller' => 'MauticPageBundle:Page:execute',
             ],
+            'mautic_page_contacts' => [
+                'path'       => '/pages/view/{objectId}/contact/{page}',
+                'controller' => 'MauticPageBundle:Page:contacts',
+            ],
         ],
         'public' => [
             'mautic_page_tracker' => [

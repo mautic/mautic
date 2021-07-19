@@ -14,11 +14,14 @@ namespace Mautic\AssetBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\FileHelper;
+use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class AssetController extends FormController
 {
+    use EntityContactsTrait;
+
     /**
      * @param int $page
      *
@@ -213,6 +216,14 @@ class AssetController extends FormController
                 'assetDownloadUrl' => $model->generateUrl($activeAsset, true),
                 'logs'             => $logs,
                 'dateRangeForm'    => $dateRangeForm->createView(),
+                'assetLeads'       => $this->forward(
+                    'MauticAssetBundle:Asset:contacts',
+                    [
+                        'objectId'   => $activeAsset->getId(),
+                        'page'       => $this->get('session')->get('mautic.asset.contact.page', 1),
+                        'ignoreAjax' => true,
+                    ]
+                )->getContent(),
             ],
             'contentTemplate' => 'MauticAssetBundle:Asset:'.$tmpl.'.html.php',
             'passthroughVars' => [
@@ -220,6 +231,25 @@ class AssetController extends FormController
                 'mauticContent' => 'asset',
             ],
         ]);
+    }
+
+    /**
+     * @param int $objectId
+     * @param int $page
+     *
+     * @return mixed
+     */
+    public function contactsAction($objectId, $page = 1)
+    {
+        return $this->generateContactsGrid(
+            $objectId,
+            $page,
+            'asset:assets:view',
+            'asset',
+            'asset_downloads',
+            null,
+            'asset_id'
+        );
     }
 
     /**

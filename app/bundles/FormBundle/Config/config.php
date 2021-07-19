@@ -79,6 +79,10 @@ return [
                 'path'       => '/forms/{objectAction}/{objectId}',
                 'controller' => 'MauticFormBundle:Form:execute',
             ],
+            'mautic_form_contacts' => [
+                'path'       => '/forms/view/{objectId}/contact/{page}',
+                'controller' => 'MauticFormBundle:Form:contacts',
+            ],
         ],
         'api' => [
             'mautic_api_formstandard' => [

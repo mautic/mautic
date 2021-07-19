@@ -175,27 +175,40 @@ $view['slots']->set(
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
-                <?php if ($showVariants): ?>
+                <?php if ($showVariants || $showTranslations): ?>
+                    <?php if ($showVariants): ?>
                     <li class="active">
                         <a href="#variants-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.core.variants'); ?>
                         </a>
                     </li>
-                <?php endif; ?>
-                <?php if ($showTranslations): ?>
+                    <?php endif; ?>
+                    <?php if ($showTranslations): ?>
                     <li class="<?php echo ($showVariants) ? '' : 'active'; ?>">
                         <a href="#translation-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.core.translations'); ?>
                         </a>
                     </li>
+                    <?php endif; ?>
+                <?php elseif ($allowAbTest): ?>
+                    <li class="active">
+                        <a href="#abtest-container" role="tab" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.core.ab_test'); ?>
+                        </a>
+                    </li>
                 <?php endif; ?>
+                <li>
+                    <a href="#leads-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.page.leads'); ?>
+                    </a>
+                </li>
             </ul>
             <!--/ tabs controls -->
         </div>
 
-        <?php if ($showVariants || $showTranslations): ?>
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
+        <?php if ($showVariants || $showTranslations): ?>
             <?php if ($showVariants): ?>
             <!-- #variants-container -->
             <div class="tab-pane active bdr-w-0" id="variants-container">
@@ -203,26 +216,38 @@ $view['slots']->set(
             </div>
             <!--/ #variants-container -->
             <?php endif; ?>
-            <!-- #translation-container -->
+
             <?php if ($showTranslations): ?>
+            <!-- #translation-container -->
             <div class="tab-pane <?php echo ($showVariants) ? '' : 'active '; ?> bdr-w-0" id="translation-container">
                 <?php echo $translationContent; ?>
             </div>
-            <?php endif; ?>
             <!--/ #translation-container -->
+            <?php endif; ?>
+
+        <?php elseif ($allowAbTest): ?>
+            <!-- #abtest-container -->
+            <div class="tab-pane active bdr-w-0" id="abtest-container">
+                <div class="text-center" style="height: 100%; width: 100%; ">
+                    <h3 style="padding: 30px;">
+                        <a class="create-abtest-link" href="<?php echo $view['router']->path('mautic_page_action', ['objectAction' => 'abtest', 'objectId' => $activePage->getId()]); ?>" data-toggle="ajax">
+                            <?php echo $view['translator']->trans('mautic.core.ab_test.create'); ?> <i class="fa fa-angle-right"></i>
+                        </a>
+                    </h3>
+                </div>
+            </div>
+            <!--/ #abtest-container -->
+        <?php endif; ?>
+
+            <!-- #leads-container -->
+            <div class="tab-pane page-list bdr-w-0" id="leads-container">
+                <?php echo $pageLeads; ?>
+                <div class="clearfix"></div>
+            </div>
+            <!--/ #leads-container  -->
+
         </div>
         <!--/ end: tab-content -->
-        <?php elseif ($allowAbTest): ?>
-        <div class="pa-md">
-            <div class="text-center" style="height: 100%; width: 100%; ">
-                <h3 style="padding: 30px;">
-                    <a class="create-abtest-link" href="<?php echo $view['router']->path('mautic_page_action', ['objectAction' => 'abtest', 'objectId' => $activePage->getId()]); ?>" data-toggle="ajax">
-                        <?php echo $view['translator']->trans('mautic.core.ab_test.create'); ?> <i class="fa fa-angle-right"></i>
-                    </a>
-                </h3>
-            </div>
-        </div>
-        <?php endif; ?>
     </div>
     <!--/ left section -->
 
