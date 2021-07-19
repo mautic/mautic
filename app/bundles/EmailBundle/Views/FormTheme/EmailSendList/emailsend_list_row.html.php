@@ -19,6 +19,11 @@
             <?php echo $view['form']->row($form['email_type']); ?>
         </div>
     <?php endif; ?>
+    <?php if (isset($form['send_to_dnc'])): ?>
+        <div class="col-xs-5">
+            <?php echo $view['form']->row($form['send_to_dnc']); ?>
+        </div>
+    <?php endif; ?>
     <?php if (isset($form['priority'])): ?>
         <div id="priority" class="col-xs-5 queue_hide">
             <?php echo $view['form']->row($form['priority']); ?>
