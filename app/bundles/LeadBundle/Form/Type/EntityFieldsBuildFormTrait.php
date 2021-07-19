@@ -263,12 +263,7 @@ trait EntityFieldsBuildFormTrait
                         case EmailType::class:
                             // Enforce a valid email
                             $attr['data-encoding'] = 'email';
-                            $constraints[]         = new Email(
-                                [
-                                    'message' => 'mautic.core.email.required',
-                                ]
-                            );
-                            $constraints[] = new EmailAddress();
+                            $constraints[]         = new EmailAddress();
                             break;
                         case TextType::class:
                             $constraints[] = new Length(['max' => 191]);
