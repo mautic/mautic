@@ -30,6 +30,7 @@ use Mautic\SmsBundle\Event\SmsEvent;
 use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Form\Type\SmsType;
 use Mautic\SmsBundle\Sms\TransportChain;
+use Mautic\SmsBundle\Sms\TransportSettingsInterface;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -491,15 +492,45 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $chart->setDataset($this->translator->trans('mautic.sms.show.total.sent'), $data);
         }
 
-        if (!$flag || 'failed' === $flag) {
-            $filter['is_failed'] = 1;
-            $q                   = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+        if ($this->transport->getSettings()->hasSetting(TransportSettingsInterface::STAT_DELIVERED) && (!$flag || 'delivered' === $flag)) {
+            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+            $q->andWhere($q->expr()->eq('t.is_delivered', ':true'))
+                ->setParameter('true', true, 'boolean');
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.sms.stat.delivered'), $data);
+        }
+
+        if ($this->transport->getSettings()->hasSetting(TransportSettingsInterface::STAT_READ) && (!$flag || 'read' === $flag)) {
+            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
             }
 
+            $q->andWhere($q->expr()->eq('t.is_read', ':true'))
+                ->setParameter('true', true, 'boolean');
+
             $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset($this->translator->trans('mautic.sms.show.failed'), $data);
+            $chart->setDataset($this->translator->trans('mautic.email.stat.read'), $data);
+        }
+
+        if ($this->transport->getSettings()->hasSetting(TransportSettingsInterface::STAT_FAILED) && (!$flag || 'failed' === $flag)) {
+            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $q->andWhere($q->expr()->eq('t.is_failed', ':true'))
+                ->setParameter('true', true, 'boolean');
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.email.stat.failed'), $data);
         }
 
         return $chart->render();

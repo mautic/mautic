@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\Sms\TransportChain;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -113,6 +114,9 @@ class SmsController extends FormController
         }
         $session->set('mautic.sms.page', $page);
 
+        /** @var TransportChain $transportChain */
+        $transportChain = $this->get('mautic.sms.transport_chain');
+
         return $this->delegateView([
             'viewParameters' => [
                 'searchValue' => $search,
@@ -124,7 +128,8 @@ class SmsController extends FormController
                 'permissions' => $permissions,
                 'model'       => $model,
                 'security'    => $this->get('mautic.security'),
-                'configured'  => count($this->get('mautic.sms.transport_chain')->getEnabledTransports()) > 0,
+                'transport'   => $transportChain,
+                'configured'  => count($transportChain->getEnabledTransports()) > 0,
             ],
             'contentTemplate' => 'MauticSmsBundle:Sms:list.html.php',
             'passthroughVars' => [

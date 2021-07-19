@@ -31,7 +31,7 @@ class AjaxController extends CommonAjaxController
         $cacheStorageHelper = $this->get('mautic.helper.cache_storage');
 
         $id  = $request->get('id');
-        $ids = $request->get('ids');
+        $ids = (array) $request->get('ids');
 
         // Support for legacy calls
         if (!$ids && $id) {

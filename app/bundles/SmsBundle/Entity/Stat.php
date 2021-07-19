@@ -11,6 +11,7 @@
 
 namespace Mautic\SmsBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -83,6 +84,16 @@ class Stat
      */
     private $isFailed = false;
 
+    /**
+     * @var bool
+     */
+    private $isDelivered = false;
+
+    /**
+     * @var bool
+     */
+    private $isRead = false;
+
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -116,6 +127,14 @@ class Stat
         $builder->createField('isFailed', 'boolean')
             ->columnName('is_failed')
             ->nullable()
+            ->build();
+
+        $builder->createField('isDelivered', Types::BOOLEAN)
+            ->columnName('is_delivered')
+            ->build();
+
+        $builder->createField('isRead', Types::BOOLEAN)
+            ->columnName('is_read')
             ->build();
 
         $builder->createField('trackingHash', 'string')
@@ -391,6 +410,46 @@ class Stat
     public function addDetail($type, $detail)
     {
         $this->details[$type][] = $detail;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDelivered()
+    {
+        return $this->isDelivered;
+    }
+
+    /**
+     * @param bool $isDelivered
+     *
+     * @return Stat
+     */
+    public function setIsDelivered($isDelivered)
+    {
+        $this->isDelivered = $isDelivered;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRead()
+    {
+        return $this->isRead;
+    }
+
+    /**
+     * @param bool $isRead
+     *
+     * @return Stat
+     */
+    public function setIsRead($isRead)
+    {
+        $this->isRead = $isRead;
 
         return $this;
     }

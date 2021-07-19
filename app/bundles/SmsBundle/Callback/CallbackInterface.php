@@ -12,6 +12,9 @@
 namespace Mautic\SmsBundle\Callback;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\SmsBundle\Callback\Event\CallbackEventInterface;
+use Mautic\SmsBundle\Event\DeliveryEvent;
+use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -38,12 +41,12 @@ interface CallbackInterface
     public function getContacts(Request $request);
 
     /**
-     * Extract the message in the reply from the request.
+     * Get callback event.
      *
      * @return string
      *
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      */
-    public function getMessage(Request $request);
+    public function getEvent(Request $request);
 }
