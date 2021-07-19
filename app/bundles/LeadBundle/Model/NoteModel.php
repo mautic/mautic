@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Event\LeadNoteEvent;
 use Mautic\LeadBundle\Form\Type\NoteType;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Uploader\LeadNoteUploader;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -27,9 +28,13 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class NoteModel extends FormModel
 {
-    /**
-     * @var Session
-     */
+    private $leadNoteUploader;
+
+    public function __construct(LeadNoteUploader $leadNoteUploader)
+    {
+        $this->leadNoteUploader = $leadNoteUploader;
+    }
+
     protected $session;
 
     public function setSession(Session $session)
@@ -99,11 +104,67 @@ class NoteModel extends FormModel
     }
 
     /**
+     * @param LeadNote $entity
+     * @param bool     $unlock
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        parent::saveEntity($entity, $unlock);
+        // attachment upload
+        if ($this->leadNoteUploader->uploadFiles($entity)) {
+            $this->getRepository()->saveEntity($entity);
+        }
+    }
+
+    public function deleteEntity($entity)
+    {
+        $this->leadNoteUploader->removeFiles($entity);
+        parent::deleteEntity($entity);
+    }
+
+    /**
+     * @param LeadNote $entity
+     * @param bool     $unlock
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        parent::saveEntity($entity, $unlock);
+        // attachment upload
+        if ($this->leadNoteUploader->uploadFiles($entity)) {
+            $this->getRepository()->saveEntity($entity);
+        }
+    }
+
+    public function deleteEntity($entity)
+    {
+        $this->leadNoteUploader->removeFiles($entity);
+        parent::deleteEntity($entity);
+    }
+
+    /**
+     * @param LeadNote $entity
+     * @param bool     $unlock
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        parent::saveEntity($entity, $unlock);
+        // attachment upload
+        if ($this->leadNoteUploader->uploadFiles($entity)) {
+            $this->getRepository()->saveEntity($entity);
+        }
+    }
+
+    public function deleteEntity($entity)
+    {
+        $this->leadNoteUploader->removeFiles($entity);
+        parent::deleteEntity($entity);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param $action
      * @param $event
-     * @param $entity
      * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException

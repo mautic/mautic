@@ -23,30 +23,18 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class LeadNote extends FormEntity
 {
-    /**
-     * @var int
-     */
     private $id;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead
-     */
     private $lead;
 
-    /**
-     * @var string
-     */
     private $text;
 
-    /**
-     * @var string
-     */
     private $type = 'general';
 
-    /**
-     * @var \DateTime
-     */
     private $dateTime;
+
+    /** @var string */
+    private $attachment;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
@@ -68,6 +56,10 @@ class LeadNote extends FormEntity
 
         $builder->createField('dateTime', 'datetime')
             ->columnName('date_time')
+            ->nullable()
+            ->build();
+
+        $builder->createField('attachment', 'string')
             ->nullable()
             ->build();
     }
@@ -197,5 +189,25 @@ class LeadNote extends FormEntity
     public function setDateTime($dateTime)
     {
         $this->dateTime = $dateTime;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAttachment()
+    {
+        return $this->attachment;
+    }
+
+    /**
+     * @param string $attachment
+     *
+     * @return LeadNote
+     */
+    public function setAttachment($attachment)
+    {
+        $this->attachment = $attachment;
+
+        return $this;
     }
 }

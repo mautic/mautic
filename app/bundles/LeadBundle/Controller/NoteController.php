@@ -294,6 +294,7 @@ class NoteController extends FormController
             return $this->delegateView(
                 [
                     'viewParameters' => [
+                        'note'        => $note,
                         'form'        => $form->createView(),
                         'lead'        => $lead,
                         'permissions' => $permissions,

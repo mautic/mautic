@@ -17,17 +17,16 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class NoteType extends AbstractType
 {
-    /**
-     * @var DateTimeHelper
-     */
     private $dateHelper;
 
     public function __construct()
@@ -83,6 +82,31 @@ class NoteType extends AbstractType
                 ],
                 'format' => 'yyyy-MM-dd HH:mm',
                 'data'   => $data,
+            ]
+        );
+
+        $builder->add(
+            'attachment',
+            'file',
+            [
+                'label'      => 'mautic.lead.note.type.attachment',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class'        => 'form-control',
+                ],
+                'mapped'      => false,
+            ]
+        );
+
+        $builder->add(
+            'attachment_remove',
+            CheckboxType::class,
+            [
+                'label'       => 'mautic.lead.note.type.attachment.remove',
+                'label_attr'  => ['class' => 'control-label'],
+                'required'    => false,
+                'mapped'      => false,
             ]
         );
 
