@@ -108,7 +108,7 @@ class InstallCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Database tables prefix.',
-                ''
+                null
             )
             ->addOption(
                 '--db_backup_tables',
