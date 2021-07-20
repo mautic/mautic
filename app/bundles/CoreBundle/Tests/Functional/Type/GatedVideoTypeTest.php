@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Tests\Functional\EventListener;
+namespace Mautic\CoreBundle\Tests\Functional\Type;
 
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
