@@ -174,30 +174,28 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             $this->throwException($this->translator->trans('mautic.email.api_key_required', [], 'validators'));
         }
 
-        if (!$this->started) {
-            $this->amazonClient  = $this->createAmazonClient();
+        $this->amazonClient  = $this->createAmazonClient();
 
-            $account             = $this->amazonClient->getAccount();
-            $emailQuotaRemaining = $account->get('SendQuota')['Max24HourSend'] - $account->get('SendQuota')['SentLast24Hours'];
+        $account             = $this->amazonClient->getAccount();
 
-            if (!$account->get('SendingEnabled')) {
-                $this->logger->error('Your AWS SES is not enabled for sending');
-                throw new \Exception('Your AWS SES is not enabled for sending');
-            }
-
-            if (!$account->get('ProductionAccessEnabled')) {
-                $this->logger->info('Your AWS SES is in sandbox mode, consider moving it to production state');
-            }
-
-            if ($emailQuotaRemaining <= 0) {
-                $this->logger->error('Your AWS SES quota is currently exceeded, used '.$account->get('SentLast24Hours').' of '.$account->get('Max24HourSend'));
-                throw new \Exception('Your AWS SES quota is currently exceeded');
-            }
-
-            $this->concurrency   = floor($account->get('SendQuota')['MaxSendRate']);
-
-            $this->started = true;
+        if (!$account->get('SendingEnabled')) {
+            $this->throwException($this->translator->trans('mautic.email.ses.enabled'));
         }
+
+        if (!$account->get('ProductionAccessEnabled')) {
+            $this->throwException($this->translator->trans('mautic.email.ses.sandbox'));
+        }
+
+        $emailQuotaRemaining = $account->get('SendQuota')['Max24HourSend'] - $account->get('SendQuota')['SentLast24Hours'];
+
+        if ($emailQuotaRemaining <= 0) {
+            $this->logger->error('Your AWS SES quota is currently exceeded, used '.$account->get('SentLast24Hours').' of '.$account->get('Max24HourSend'));
+            throw new \Exception('Your AWS SES quota is currently exceeded');
+        }
+
+        $this->concurrency   = floor($account->get('SendQuota')['MaxSendRate']);
+
+        $this->started = true;
     }
 
     public function createAmazonClient()
