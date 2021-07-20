@@ -54,10 +54,10 @@ class SegmentFiltersSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function getSegmentFilters()
+    public function getSegmentFilters()
     {
         //field choices
-        $choices =  [
+        return [
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
                 'properties' => ['type' => 'date'],
@@ -558,7 +558,5 @@ class SegmentFiltersSubscriber implements EventSubscriberInterface
                 'object'    => 'lead',
             ],
         ];
-
-        return $choices;
     }
 }

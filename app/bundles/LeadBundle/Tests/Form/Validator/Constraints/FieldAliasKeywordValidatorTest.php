@@ -13,11 +13,15 @@ namespace Mautic\LeadBundle\Tests\Form\Validator\Constraints;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\EventListener\SegmentFiltersSubscriber;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeyword;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
@@ -28,6 +32,7 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
     private $entityManagerMock;
     private $unitOfWorkMock;
     private $validator;
+    private $translatorMock;
 
     protected function setUp(): void
     {
@@ -38,6 +43,7 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
         $this->executionContextMock  = $this->createMock(ExecutionContextInterface::class);
         $this->entityManagerMock     = $this->createMock(EntityManager::class);
         $this->unitOfWorkMock        = $this->createMock(UnitOfWork::class);
+        $this->translatorMock        = $this->createMock(TranslatorInterface::class);
 
         $this->entityManagerMock
             ->method('getUnitOfWork')
@@ -63,7 +69,13 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->validator = new FieldAliasKeywordValidator($this->listModelMock, $this->fieldAliasHelperlMock, $this->entityManagerMock);
+        $this->validator = new FieldAliasKeywordValidator(
+            $this->listModelMock,
+            $this->fieldAliasHelperlMock,
+            $this->entityManagerMock,
+            $this->translatorMock,
+            new SegmentFiltersSubscriber($this->translatorMock, $this->listModelMock)
+        );
         $this->validator->initialize($this->executionContextMock);
     }
 
@@ -154,6 +166,25 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
         $field->setAlias('date_added');
 
         $this->executionContextMock->expects($this->never())->method('addViolation');
+
+        $this->validator->validate($field, new FieldAliasKeyword());
+    }
+
+    public function testFailureReservedKeyWords()
+    {
+        $originalFields = [
+            'alias' => 'old_alias',
+        ];
+
+        $this->unitOfWorkMock
+            ->method('getOriginalEntityData')
+            ->willReturn($originalFields);
+
+        $this->executionContextMock->expects($this->once())->method('addViolation');
+
+        $field = new LeadField();
+        $field->setObject('lead');
+        $field->setAlias('contact_id');
 
         $this->validator->validate($field, new FieldAliasKeyword());
     }
