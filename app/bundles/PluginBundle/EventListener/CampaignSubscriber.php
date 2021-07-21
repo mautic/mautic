@@ -47,13 +47,9 @@ class CampaignSubscriber implements EventSubscriberInterface
         $success                 = $this->pushToIntegration($config, $lead, $errors);
 
         if (count($errors)) {
-            $log = $event->getLogEntry();
-            $log->appendToMetadata(
-                [
-                    'failed' => 1,
-                    'reason' => implode('<br />', $errors),
-                ]
-            );
+            $event->setFailed(implode('<br />', $errors));
+
+            return;
         }
 
         $event->setResult($success);
