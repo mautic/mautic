@@ -120,6 +120,11 @@ class MenuBuilder
             $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
 
             $menuItems    = $event->getMenuItems();
+
+            // KNP Menu explicitly requires a menu name since v3
+            if (empty($menuItems['name'])) {
+                $menuItems['name'] = $name;
+            }
             $menus[$name] = $loader->load($menuItems);
         }
 
