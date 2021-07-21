@@ -689,7 +689,7 @@ class FormModel extends CommonFormModel
         ];
         $ignoreTypes = $this->getCustomComponents()['viewOnlyFields'];
         foreach ($fields as $f) {
-            if (!in_array($f->getType(), $ignoreTypes) && false !== $f->getSaveResult()) {
+            if (!in_array($f->getType(), $ignoreTypes)) {
                 $columns[] = [
                     'name'    => $f->getAlias(),
                     'type'    => 'text',
