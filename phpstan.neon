@@ -26,3 +26,4 @@ parameters:
 		- '#Constant MAUTIC_VERSION not found.#'
 		- '/Variable \$\w+ might not be defined\./'
 		- '/Variable \$paths in isset\(\) is never defined\./'
+		- '#Call to an undefined static method static\(Mautic\\IntegrationsBundle\\Bundle\\AbstractPluginBundle\)::installAllTablesIfMissing\(\).#'
