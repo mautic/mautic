@@ -122,6 +122,7 @@ EOT
 
                         try {
                             $transport->send($message);
+                            $tryAgain = false;
                         } catch (\Swift_TransportException $e) {
                             if ($dispatcher->hasListeners(EmailEvents::EMAIL_FAILED)) {
                                 $event = new QueueEmailEvent($message);
