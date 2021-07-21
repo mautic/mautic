@@ -61,7 +61,7 @@ $props = $focus['properties'];
     );
 
     // Add view tracking image
-    if (!$preview): ?>
+    if (!$preview && $tracking_enabled): ?>
 
         <img src="<?php echo $view['router']->url(
             'mautic_focus_pixel',
