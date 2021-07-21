@@ -46,7 +46,8 @@ class ListLead
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_lists_leads')
-            ->setCustomRepositoryClass(ListLeadRepository::class);
+            ->setCustomRepositoryClass(ListLeadRepository::class)
+            ->addIndex(['manually_removed', 'lead_id', 'leadlist_id'], 'lead_list_removed_lead_search');
 
         $builder->createManyToOne('list', 'LeadList')
             ->isPrimaryKey()
