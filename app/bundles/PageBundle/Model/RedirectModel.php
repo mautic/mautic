@@ -78,7 +78,7 @@ class RedirectModel extends FormModel
             ['redirectId' => $redirect->getRedirectId()],
             true,
             $clickthrough,
-            $shortenUrl
+            $utmTags
         );
 
         if (!empty($utmTags)) {
