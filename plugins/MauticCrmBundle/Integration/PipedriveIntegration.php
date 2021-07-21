@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Doctrine\ORM\EntityManager;
+use GuzzleHttp\Exception\ClientException;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -333,7 +334,13 @@ class PipedriveIntegration extends CrmAbstractIntegration
     {
         $this->leadExport->setIntegration($this);
 
-        return $this->leadExport->create($lead);
+        try {
+            return $this->leadExport->create($lead);
+        } catch (ClientException $clientException) {
+            $this->lastIntegrationError = $clientException->getMessage();
+        }
+
+        return false;
     }
 
     /**
