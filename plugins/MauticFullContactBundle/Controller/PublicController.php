@@ -211,7 +211,7 @@ class PublicController extends FormController
             }
         } catch (\Exception $ex) {
             try {
-                if ($notify && isset($lead) && (!isset($lead->imported) || !$lead->imported)) {
+                if ($notify && $lead && (!isset($lead->imported) || !$lead->imported)) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
                     if ($user = $userModel->getEntity($notify)) {
