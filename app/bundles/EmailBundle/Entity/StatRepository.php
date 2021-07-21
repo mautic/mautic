@@ -455,9 +455,12 @@ class StatRepository extends CommonRepository
                 ->leftJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 's.list_id = l.id');
         }
 
+        $timestampColumn = 's.date_sent';
+
         if (isset($options['state'])) {
             $state = $options['state'];
             if ('read' == $state) {
+                $timestampColumn = 's.date_read';
                 $query->andWhere(
                     $query->expr()->eq('s.is_read', 1)
                 );
@@ -467,7 +470,6 @@ class StatRepository extends CommonRepository
                 );
             }
         }
-        $state = 'sent';
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
@@ -482,7 +484,7 @@ class StatRepository extends CommonRepository
         if (isset($options['fromDate']) && $options['fromDate']) {
             $dt = new DateTimeHelper($options['fromDate']);
             $query->andWhere(
-                $query->expr()->gte('s.date_sent', $query->expr()->literal($dt->toUtcString()))
+                $query->expr()->gte($timestampColumn, $query->expr()->literal($dt->toUtcString()))
             );
         }
 
@@ -499,7 +501,7 @@ class StatRepository extends CommonRepository
             $query,
             $options,
             'storedSubject, e.subject',
-            's.date_'.$state,
+            $timestampColumn,
             ['openDetails'],
             ['dateRead', 'dateSent'],
             $timeToReadParser

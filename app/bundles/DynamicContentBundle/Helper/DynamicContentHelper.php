@@ -181,15 +181,16 @@ class DynamicContentHelper
         $content = $dwc->getContent();
         // Determine a translation based on contact's preferred locale
         /** @var DynamicContent $translation */
-        list($ignore, $translation) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+        [, $translation] = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
         if ($translation !== $dwc) {
             // Use translated version of content
             $dwc     = $translation;
             $content = $dwc->getContent();
         }
-        $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
+        $stat = $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
         $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+        $tokenEvent->setStat($stat);
         $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
 
         return $tokenEvent->getContent();

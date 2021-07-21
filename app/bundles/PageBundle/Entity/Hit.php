@@ -670,9 +670,9 @@ class Hit
     /**
      * Set trackingId.
      *
-     * @param int $trackingId
+     * @param string $trackingId
      *
-     * @return Page
+     * @return Hit
      */
     public function setTrackingId($trackingId)
     {
@@ -684,7 +684,7 @@ class Hit
     /**
      * Get trackingId.
      *
-     * @return int
+     * @return string|null
      */
     public function getTrackingId()
     {
