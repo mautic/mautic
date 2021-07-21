@@ -34,7 +34,8 @@
       "contributions": [
         "userTesting",
         "review",
-        "code"
+        "code",
+        "test"
       ]
     },
     {
