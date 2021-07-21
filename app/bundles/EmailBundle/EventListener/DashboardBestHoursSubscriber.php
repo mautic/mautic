@@ -14,7 +14,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
-use Mautic\EmailBundle\Form\Type\DashboardBestHourdsWidgetType;
+use Mautic\EmailBundle\Form\Type\DashboardBestHoursWidgetType;
 use Mautic\EmailBundle\Model\EmailModel;
 
 class DashboardBestHoursSubscriber extends MainDashboardSubscriber
@@ -33,7 +33,7 @@ class DashboardBestHoursSubscriber extends MainDashboardSubscriber
      */
     protected $types = [
         'emails.best.hours' => [
-            'formAlias' => DashboardBestHourdsWidgetType::class,
+            'formAlias' => DashboardBestHoursWidgetType::class,
         ],
     ];
 

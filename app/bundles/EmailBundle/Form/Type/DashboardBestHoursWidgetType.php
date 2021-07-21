@@ -9,10 +9,7 @@ use Mautic\LeadBundle\Form\Type\LeadListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class DashboardBestHourdsWidgetType.
- */
-class DashboardBestHourdsWidgetType extends AbstractType
+class DashboardBestHoursWidgetType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
