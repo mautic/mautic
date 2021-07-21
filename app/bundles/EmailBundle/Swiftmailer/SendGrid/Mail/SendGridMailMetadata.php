@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Mail;
 
+use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use SendGrid\BccSettings;
 use SendGrid\Mail;
 use SendGrid\MailSettings;
@@ -34,5 +35,54 @@ class SendGridMailMetadata
         }
 
         $mail->setMailSettings($mail_settings);
+
+        if ($message instanceof MauticMessage) {
+            $this->addMauticMessageMetadataToMail($mail, $message);
+        }
+    }
+
+    /**
+     * Add mautic-specific metadata to mail as SendGrid "CustomArgs".
+     * This includes the following values as set by the MailHelper on the
+     * message object:
+     *    - hashId
+     *    - emailId
+     *    - source information: sourceChannel, sourceId.
+     */
+    private function addMauticMessageMetadataToMail(Mail $mail, MauticMessage $message)
+    {
+        $metadata = $message->getMetadata();
+
+        // Short-circuit if there's no metadata to be added because the entire
+        // metadata array is empty.
+        if (empty($metadata)) {
+            return;
+        }
+
+        $meta = reset($metadata);
+
+        // Nothing to do when the primary metadata entry is empty.
+        if (false === $meta || empty($meta)) {
+            return;
+        }
+
+        if (null != ($hashId = $meta['hashId'] ?? null)) {
+            $mail->addCustomArg('hashId', $hashId);
+        }
+
+        if (null != ($emailId = $meta['emailId'] ?? null)) {
+            $mail->addCustomArg('emailId', $emailId);
+        }
+
+        // The MailHelper populates the 'source' as a tuple like
+        // ['channelName', 'channelId'] as passed from
+        // SendEmailToContact::setEmail(). Since SendGrid expects custom_args
+        // values to be strings, the array is split into two args, 'channel'
+        // and 'sourceId'.
+        if (!empty($meta['source']) && is_array($meta['source'])) {
+            list($channel, $sourceId) = $meta['source'];
+            $mail->addCustomArg('channel', $channel);
+            $mail->addCustomArg('sourceId', $sourceId);
+        }
     }
 }
