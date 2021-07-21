@@ -94,7 +94,7 @@ EOT
                     $file = $failedFile->getRealPath();
 
                     $lockedtime = filectime($file);
-                    if (!(time() - $lockedtime) > $timeout) {
+                    if (!((time() - $lockedtime) > $timeout)) {
                         //the file is not old enough to be resent yet
                         continue;
                     }
