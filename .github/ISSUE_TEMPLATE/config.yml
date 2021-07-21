@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Mautic Community Support
+    url: https://www.mautic.org/support
+    about: Please ask and answer questions here.
+  - name: Mautic Security Bug Report
+    url: https://www.mautic.org/mautic-security-team/how-to-report-a-security-issue
+    about: Please learn how to report security vulnerabilities here.
