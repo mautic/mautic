@@ -302,3 +302,11 @@ if ((empty($updateSelect) && !$isExisting && !$view['form']->containsErrors($for
             'typeTwoOnClick'     => "Mautic.selectEmailType('list');",
         ]);
 endif;
+
+?>
+<script>
+    <?php // TODO might need to find a better place for this function definition ?>
+    Mautic.getActiveBuilderName = function() {
+        return '<?php echo $builderName ?>';
+    }
+</script>
