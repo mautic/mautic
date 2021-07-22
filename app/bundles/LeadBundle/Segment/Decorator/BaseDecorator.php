@@ -114,6 +114,9 @@ class BaseDecorator implements FilterDecoratorInterface
         }
 
         switch ($contactSegmentFilterCrate->getOperator()) {
+            case 'in':
+            case '!in':
+                return !is_array($filter) ? explode('|', $filter) : $filter;
             case 'like':
             case '!like':
                 return false === strpos($filter, '%') ? '%'.$filter.'%' : $filter;
