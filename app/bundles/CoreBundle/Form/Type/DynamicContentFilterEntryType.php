@@ -46,11 +46,11 @@ class DynamicContentFilterEntryType extends AbstractType
 
         $this->filterFieldChoices();
 
-        $this->countryChoices  = FormFieldHelper::getCountryChoices();
-        $this->regionChoices   = FormFieldHelper::getRegionChoices();
-        $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
-        $this->localeChoices   = FormFieldHelper::getLocaleChoices();
-        $this->stageModel      = $stageModel;
+        $this->countryChoices            = FormFieldHelper::getCountryChoices();
+        $this->regionChoices             = FormFieldHelper::getRegionChoices();
+        $this->timezoneChoices           = FormFieldHelper::getTimezonesChoices();
+        $this->localeChoices             = FormFieldHelper::getLocaleChoices();
+        $this->stageModel                = $stageModel;
         $this->builderIntegrationsHelper = $builderIntegrationsHelper;
     }
 
@@ -72,7 +72,7 @@ class DynamicContentFilterEntryType extends AbstractType
             [
                 'label' => 'mautic.core.dynamicContent.alt_content',
                 'attr'  => [
-                    'class' => 'form-control editor editor-dynamic-content' . $extraClasses,
+                    'class' => 'form-control editor editor-dynamic-content'.$extraClasses,
                 ],
             ]
         );

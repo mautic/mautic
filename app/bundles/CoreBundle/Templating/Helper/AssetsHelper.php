@@ -472,7 +472,7 @@ class AssetsHelper
             $builderName = 'legacy';
         }
 
-        echo '<script>Mautic.getActiveBuilderName = function() { return \'' . $builderName . '\'; }</script>'."\n";
+        echo '<script>Mautic.getActiveBuilderName = function() { return \''.$builderName.'\'; }</script>'."\n";
     }
 
     /**
@@ -749,7 +749,8 @@ class AssetsHelper
         $this->version = substr(hash('sha1', $secretKey.$version), 0, 8);
     }
 
-    public function setBuilderIntegrationsHelper(BuilderIntegrationsHelper $builderIntegrationsHelper) {
+    public function setBuilderIntegrationsHelper(BuilderIntegrationsHelper $builderIntegrationsHelper)
+    {
         $this->builderIntegrationsHelper = $builderIntegrationsHelper;
     }
 

@@ -58,7 +58,7 @@ class DynamicContentFilterType extends AbstractType
             [
                 'label' => 'mautic.core.dynamicContent.default_content',
                 'attr'  => [
-                    'class' => 'form-control editor editor-dynamic-content' . $extraClasses,
+                    'class' => 'form-control editor editor-dynamic-content'.$extraClasses,
                 ],
             ]
         );
