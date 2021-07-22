@@ -250,6 +250,26 @@ $container->setParameter(
     'JMS\Serializer\Naming\IdenticalPropertyNamingStrategy'
 );
 
+$container->register(\Mautic\EmailBundle\Messenger\EmailMessageHandler::class)
+    ->addTag('messenger.message_handler', [
+        'handles' => \Mautic\EmailBundle\Messenger\EmailMessage::class,
+    ])
+    ->addArgument(new Reference('mailer'));
+
+// config/packages/messenger.php
+$container->loadFromExtension('framework', [
+    'messenger' => [
+        'routing' => [
+                \Mautic\EmailBundle\Messenger\EmailMessage::class => '%mautic.messenger_transport_email%',
+        ],
+        'transports' => [
+            '%mautic.messenger_transport_email%' => [
+                'dsn'     => '%mautic.messenger_transport_dsn%',
+            ],
+        ],
+    ],
+]);
+
 // Monolog formatter
 $container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\LineFormatter')
     ->addMethodCall('includeStacktraces', [true])
