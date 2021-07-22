@@ -271,7 +271,7 @@ Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
         toolbar: ckEditorToolbar,
         skin: 'moono-lisa',
         extraPlugins: 'sourcedialog,mentions',
-        removePlugins: 'flash,forms,iframe',
+        removePlugins: 'flash,forms,iframe,exportpdf',
         allowedContent: true,
         entities:  false,
         enterMode: CKEDITOR.ENTER_P,

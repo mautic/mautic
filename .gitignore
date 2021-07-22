@@ -80,6 +80,7 @@
 
 /plugins/*
 !/plugins/GrapesJsBuilderBundle
+!plugins/GrapesJsBuilderBundle/Assets/library/js/dist
 !/plugins/MauticCitrixBundle
 !/plugins/MauticClearbitBundle
 !/plugins/MauticCloudStorageBundle

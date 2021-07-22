@@ -585,8 +585,8 @@ Mautic.onPageLoad = function (container, response, inModal) {
         }
     });
     Mautic.activateGlobalFroalaOptions();
-    if (mQuery(container + ' textarea.editor').length) {
-        mQuery(container + ' textarea.editor').each(function () {
+    if (mQuery(container + ' textarea.editor:not(".builder-v2")').length) {
+        mQuery(container + ' textarea.editor:not(".builder-v2")').each(function () {
             const textarea = mQuery(this);
             const maxButtons = [[ 'Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'InsertToken', 'Sourcedialog', 'Maximize']]
             let minButtons = [['Undo', 'Redo', '|', 'Bold', 'Italic', 'Underline']];
@@ -603,6 +603,11 @@ Mautic.onPageLoad = function (container, response, inModal) {
             Mautic.ConvertFieldToCkeditor(textarea, ckEditorToolbar);
 
         });
+    }
+    else if (mQuery(container + ' textarea.builder-v2').length) {
+        mQuery(container + ' textarea.builder-v2').each(function () {
+            mQuery(this).froalaEditor();
+        })
     }
 
 
@@ -784,6 +789,9 @@ Mautic.onPageUnload = function (container, response) {
             MauticVars.modalsReset = {};
         }
 
+        mQuery(container + ' textarea.builder-v2').each(function () {
+            mQuery('textarea.builder-v2').froalaEditor('destroy');
+        })
         for(name in CKEDITOR.instances)
         {
             CKEDITOR.instances[name].destroy(true);
