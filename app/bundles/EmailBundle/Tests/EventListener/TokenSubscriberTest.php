@@ -8,6 +8,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
@@ -37,6 +38,9 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject&LoggerInterface $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
+        /** @var MockObject&MailHashHelper $logger */
+        $mailHashHelper = $this->createMock(MailHashHelper::class);
+
         $coreParametersHelper->method('get')
             ->willReturnMap(
                 [
@@ -47,7 +51,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $tokens = ['{test}' => 'value'];
 
-        $mailHelper = new MailHelper($mockFactory, new Mailer(new SmtpTransport()), $fromEmailHelper, $coreParametersHelper, $mailbox, $logger);
+        $mailHelper = new MailHelper($mockFactory, new Mailer(new SmtpTransport()), $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $mailHashHelper);
         $mailHelper->setTokens($tokens);
 
         $email = new Email();

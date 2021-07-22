@@ -14,6 +14,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\DTO\AddressDTO;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToContact;
@@ -253,6 +254,15 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')
             ->willReturn(new AddressDTO('someone@somewhere.com'));
+        
+        /**
+         * @var CoreParametersHelper&MockObject $mockParameterHelper
+         */
+        $mockParameterHelper = $this->createMock(CoreParametersHelper::class);
+        $mockParameterHelper->expects($this->any())
+            ->method('get')
+            ->with('secret_key')
+            ->willReturn('secret');
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock])
@@ -405,6 +415,12 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
+        $mockParameterHelper = $this->createMock(CoreParametersHelper::class);
+        $mockParameterHelper->expects($this->any())
+            ->method('get')
+            ->with('secret_key')
+            ->willReturn('secret');
+
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock])
             ->onlyMethods([])
@@ -499,6 +515,12 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')
             ->willReturn(new AddressDTO('someone@somewhere.com'));
+
+        $mockParameterHelper = $this->createMock(CoreParametersHelper::class);
+        $mockParameterHelper->expects($this->any())
+            ->method('get')
+            ->with('secret_key')
+            ->willReturn('secret');
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock])
@@ -610,6 +632,13 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     default => '',
                 }
             );
+
+        $mockParameterHelper = $this->createMock(CoreParametersHelper::class);
+        $mockParameterHelper->expects($this->any())
+            ->method('get')
+            ->with('secret_key')
+            ->willReturn('secret');
+
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')->willReturn(new AddressDTO('someone@somewhere.com'));
         $factoryMock->method('getLogger')->willReturn(new NullLogger());

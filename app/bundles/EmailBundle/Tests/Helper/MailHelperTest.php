@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
@@ -755,13 +756,20 @@ class MailHelperTest extends TestCase
 
     public function testUnsubscribeHeader(): void
     {
+        $this->coreParametersHelper->expects($this->at(0))
+            ->method('get')
+            ->with('secret_key')
+            ->willReturn('secret');
+
         $mockRouter  = $this->createMock(Router::class);
+        $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
         $mockRouter->expects($this->once())
             ->method('generate')
             ->with('mautic_email_unsubscribe',
-                ['idHash' => 'hash'],
+                ['idHash' => 'hash', 'urlEmail' => 'someemail@email.test', 'secretHash' => $emailSecret],
                 UrlGeneratorInterface::ABSOLUTE_URL)
-            ->willReturn('https://example.com/email/unsubscribe/65842d012b5b5772172137');
+            ->willReturn('http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
+            // ->willReturn('https://example.com/email/unsubscribe/65842d012b5b5772172137');
 
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
@@ -776,6 +784,7 @@ class MailHelperTest extends TestCase
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
         $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger);
+        $mailer->setIdHash('hash');
 
         $email = new Email();
         $email->setSubject('Test');
@@ -788,7 +797,8 @@ class MailHelperTest extends TestCase
 
         $mailer->setEmailType(MailHelper::EMAIL_TYPE_MARKETING);
         $headers = $mailer->getCustomHeaders();
-        $this->assertSame('<https://example.com/email/unsubscribe/65842d012b5b5772172137>', $headers['List-Unsubscribe']);
+        $this->assertSame('<http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret.'>', $headers['List-Unsubscribe']);
+        // $this->assertSame('<https://example.com/email/unsubscribe/65842d012b5b5772172137>', $headers['List-Unsubscribe']);
         $this->assertSame('List-Unsubscribe=One-Click', $headers['List-Unsubscribe-Post']);
 
         // There are no unsubscribe headers in transactional emails.
