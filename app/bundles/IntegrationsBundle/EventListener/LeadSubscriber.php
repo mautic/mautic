@@ -206,7 +206,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
         foreach ($this->syncIntegrationsHelper->getEnabledIntegrations() as $integrationName) {
             try {
-                $this->dispatch($integrationName, $object);
+                $this->dispatchBeforeFieldChangesEvent($integrationName, $object);
             } catch (InvalidValueException $e) {
                 continue; // Do not record changes for object and integration that has an invalid value.
             }
@@ -236,9 +236,10 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @throws InvalidValueException
      */
-    public function dispatch(string $integrationName, object $object): void
+    public function dispatchBeforeFieldChangesEvent(string $integrationName, object $object): void
     {
-        if ($object instanceof Lead) {
+        if ($object instanceof Lead &&
+            $this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)) {
             $this->dispatcher->dispatch(
                 IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES,
                 new InternalContactEvent($integrationName, $object)
@@ -247,7 +248,8 @@ class LeadSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($object instanceof Company) {
+        if ($object instanceof Company &&
+            $this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES)) {
             $this->dispatcher->dispatch(
                 IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES,
                 new InternalCompanyEvent($integrationName, $object)
