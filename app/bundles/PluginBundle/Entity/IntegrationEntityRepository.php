@@ -23,11 +23,13 @@ class IntegrationEntityRepository extends CommonRepository
      * @param      $integration
      * @param      $integrationEntity
      * @param      $internalEntity
+     * @param null $internalEntityIds
      * @param null $startDate
      * @param null $endDate
      * @param bool $push
      * @param int  $start
      * @param int  $limit
+     * @param null $integrationEntityIds
      *
      * @return array
      */
@@ -57,9 +59,19 @@ class IntegrationEntityRepository extends CommonRepository
                 ->setParameter('integrationEntity', $integrationEntity);
         }
 
-        if ($push) {
-            $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id and l.last_active >= :startDate')
-                ->setParameter('startDate', $startDate);
+        if ('lead' === $internalEntity) {
+            $joinCondition = $q->expr()->andX(
+                $q->expr()->eq('l.id', 'i.internal_entity_id')
+            );
+
+            if ($push) {
+                $joinCondition->add(
+                    $q->expr()->gte('l.last_active', ':startDate')
+                );
+                $q->setParameter('startDate', $startDate);
+            }
+
+            $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', $joinCondition);
         }
 
         if ($internalEntityIds) {
@@ -144,6 +156,7 @@ class IntegrationEntityRepository extends CommonRepository
      * @param $integration
      * @param $integrationEntity
      * @param $internalEntity
+     * @param $internalEntityIds
      *
      * @return IntegrationEntity[]
      */
