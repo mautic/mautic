@@ -399,6 +399,15 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "rohitpavaskar",
+      "name": "Rohit Pavaskar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15215575?v=4",
+      "profile": "https://github.com/rohitpavaskar",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

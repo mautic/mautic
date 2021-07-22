@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-40-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-41-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -126,6 +126,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/n-azimy"><img src="https://avatars.githubusercontent.com/u/86242419?v=4?s=100" width="100px;" alt=""/><br /><sub><b>n-azimy</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=n-azimy" title="Code">💻</a></td>
     <td align="center"><a href="https://bandism.net/"><img src="https://avatars.githubusercontent.com/u/22633385?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ikko Ashimine</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=eltociear" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/maxlawton"><img src="https://avatars.githubusercontent.com/u/1194823?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Max Lawton</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=maxlawton" title="Code">💻</a> <a href="https://github.com/mautic/mautic/commits?author=maxlawton" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/rohitpavaskar"><img src="https://avatars.githubusercontent.com/u/15215575?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rohit Pavaskar</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=rohitpavaskar" title="Code">💻</a></td>
   </tr>
 </table>
 
