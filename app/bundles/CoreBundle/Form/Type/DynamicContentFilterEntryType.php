@@ -11,6 +11,8 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\StageBundle\Model\StageModel;
@@ -36,7 +38,9 @@ class DynamicContentFilterEntryType extends AbstractType
      */
     private $stageModel;
 
-    public function __construct(ListModel $listModel, StageModel $stageModel)
+    private BuilderIntegrationsHelper $builderIntegrationsHelper;
+
+    public function __construct(ListModel $listModel, StageModel $stageModel, BuilderIntegrationsHelper $builderIntegrationsHelper)
     {
         $this->fieldChoices = $listModel->getChoiceFields();
 
@@ -47,17 +51,28 @@ class DynamicContentFilterEntryType extends AbstractType
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->localeChoices   = FormFieldHelper::getLocaleChoices();
         $this->stageModel      = $stageModel;
+        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $extraClasses = '';
+
+        try {
+            $mauticBuilder = $this->builderIntegrationsHelper->getBuilder('email');
+            $mauticBuilder->getName();
+        } catch (IntegrationNotFoundException $exception) {
+            // Assume legacy builder
+            $extraClasses = ' legacy-builder';
+        }
+
         $builder->add(
             'content',
             TextareaType::class,
             [
                 'label' => 'mautic.core.dynamicContent.alt_content',
                 'attr'  => [
-                    'class' => 'form-control editor editor-dynamic-content builder-v2',
+                    'class' => 'form-control editor editor-dynamic-content' . $extraClasses,
                 ],
             ]
         );
