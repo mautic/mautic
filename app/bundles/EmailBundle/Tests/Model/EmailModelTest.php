@@ -761,8 +761,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetBestHours()
     {
-        define('MAUTIC_TABLE_PREFIX', '');
-
         $dbalMock = new DBALMocker($this);
         $dbalMock->setQueryResponse(
             [
