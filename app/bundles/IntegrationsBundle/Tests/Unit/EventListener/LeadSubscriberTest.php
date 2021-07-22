@@ -16,8 +16,11 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\EventListener\LeadSubscriber;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
+use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
@@ -67,23 +70,28 @@ class LeadSubscriberTest extends TestCase
      */
     private $subscriber;
 
+    /**
+     * @var MockObject|EventDispatcherInterface
+     */
+    private $eventDispatcherInterfaceMock;
+
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->fieldChangeRepository   = $this->createMock(FieldChangeRepository::class);
-        $this->objectMappingRepository = $this->createMock(ObjectMappingRepository::class);
-        $this->variableExpresserHelper = $this->createMock(VariableExpresserHelperInterface::class);
-        $this->syncIntegrationsHelper  = $this->createMock(SyncIntegrationsHelper::class);
-        $this->leadEvent               = $this->createMock(LeadEvent::class);
-        $this->companyEvent            = $this->createMock(CompanyEvent::class);
-        $eventDispatcherInterfaceMock  = $this->createMock(EventDispatcherInterface::class);
-        $this->subscriber              = new LeadSubscriber(
+        $this->fieldChangeRepository        = $this->createMock(FieldChangeRepository::class);
+        $this->objectMappingRepository      = $this->createMock(ObjectMappingRepository::class);
+        $this->variableExpresserHelper      = $this->createMock(VariableExpresserHelperInterface::class);
+        $this->syncIntegrationsHelper       = $this->createMock(SyncIntegrationsHelper::class);
+        $this->leadEvent                    = $this->createMock(LeadEvent::class);
+        $this->companyEvent                 = $this->createMock(CompanyEvent::class);
+        $this->eventDispatcherInterfaceMock = $this->createMock(EventDispatcherInterface::class);
+        $this->subscriber                   = new LeadSubscriber(
             $this->fieldChangeRepository,
             $this->objectMappingRepository,
             $this->variableExpresserHelper,
             $this->syncIntegrationsHelper,
-            $eventDispatcherInterfaceMock
+            $this->eventDispatcherInterfaceMock
         );
     }
 
@@ -165,6 +173,10 @@ class LeadSubscriberTest extends TestCase
         $this->subscriber->onLeadPostSave($this->leadEvent);
     }
 
+    /**
+     * @throws IntegrationNotFoundException
+     * @throws ObjectNotFoundException
+     */
     public function testOnLeadPostSaveRecordChanges(): void
     {
         $fieldName    = 'fieldName';
@@ -193,9 +205,18 @@ class LeadSubscriberTest extends TestCase
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $lead);
 
+        $this->eventDispatcherInterfaceMock
+            ->method('hasListener')
+            ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
+            ->willReturn(true);
+
         $this->subscriber->onLeadPostSave($this->leadEvent);
     }
 
+    /**
+     * @throws IntegrationNotFoundException
+     * @throws ObjectNotFoundException
+     */
     public function testOnLeadPostSaveRecordChangesWithOwnerChange(): void
     {
         $newOwnerId   = 5;
@@ -222,9 +243,18 @@ class LeadSubscriberTest extends TestCase
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $lead);
 
+        $this->eventDispatcherInterfaceMock
+            ->method('hasListener')
+            ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
+            ->willReturn(true);
+
         $this->subscriber->onLeadPostSave($this->leadEvent);
     }
 
+    /**
+     * @throws IntegrationNotFoundException
+     * @throws ObjectNotFoundException
+     */
     public function testOnLeadPostSaveRecordChangesWithPointChange(): void
     {
         $newPointCount   = 5;
@@ -250,6 +280,11 @@ class LeadSubscriberTest extends TestCase
         $fieldChanges['fields']['points'] = $fieldChanges['points'];
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $lead);
+
+        $this->eventDispatcherInterfaceMock
+            ->method('hasListener')
+            ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
+            ->willReturn(true);
 
         $this->subscriber->onLeadPostSave($this->leadEvent);
     }
@@ -306,6 +341,10 @@ class LeadSubscriberTest extends TestCase
         $this->subscriber->onCompanyPostSave($this->companyEvent);
     }
 
+    /**
+     * @throws IntegrationNotFoundException
+     * @throws ObjectNotFoundException
+     */
     public function testOnCompanyPostSaveSyncRecordChanges(): void
     {
         $fieldName    = 'fieldName';
@@ -334,9 +373,18 @@ class LeadSubscriberTest extends TestCase
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $company);
 
+        $this->eventDispatcherInterfaceMock
+            ->method('hasListener')
+            ->with(IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES)
+            ->willReturn(true);
+
         $this->subscriber->onCompanyPostSave($this->companyEvent);
     }
 
+    /**
+     * @throws IntegrationNotFoundException
+     * @throws ObjectNotFoundException
+     */
     public function testOnCompanyPostSaveRecordChangesWithOwnerChange(): void
     {
         $newOwnerId   = 5;
@@ -362,6 +410,11 @@ class LeadSubscriberTest extends TestCase
         $fieldChanges['fields']['owner_id'] = $fieldChanges['owner'];
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $company);
+
+        $this->eventDispatcherInterfaceMock
+            ->method('hasListener')
+            ->with(IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES)
+            ->willReturn(true);
 
         $this->subscriber->onCompanyPostSave($this->companyEvent);
     }
