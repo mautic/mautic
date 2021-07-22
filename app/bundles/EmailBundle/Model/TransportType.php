@@ -23,6 +23,7 @@ class TransportType
         'mautic.transport.mandrill'     => 'mautic.email.config.mailer_transport.mandrill',
         'mautic.transport.mailjet'      => 'mautic.email.config.mailer_transport.mailjet',
         'smtp'                          => 'mautic.email.config.mailer_transport.smtp',
+        'mautic.transport.postal'       => 'mautic.email.config.mailer_transport.postal',
         'mautic.transport.postmark'     => 'mautic.email.config.mailer_transport.postmark',
         'mautic.transport.sendgrid'     => 'mautic.email.config.mailer_transport.sendgrid',
         'mautic.transport.pepipost'     => 'mautic.email.config.mailer_transport.pepipost',
@@ -36,6 +37,7 @@ class TransportType
      */
     private $showHost = [
         'smtp',
+        'mautic.transport.postal',
     ];
 
     /**
@@ -44,6 +46,7 @@ class TransportType
     private $showPort = [
         'smtp',
         'mautic.transport.amazon',
+        'mautic.transport.postal',
     ];
 
     /**
@@ -56,6 +59,7 @@ class TransportType
         'mautic.transport.elasticemail',
         'mautic.transport.amazon',
         'mautic.transport.amazon_api',
+        'mautic.transport.postal',
         'mautic.transport.postmark',
         'gmail',
         // smtp is left out on purpose as the auth_mode will manage displaying this field
@@ -71,6 +75,7 @@ class TransportType
         'mautic.transport.elasticemail',
         'mautic.transport.amazon',
         'mautic.transport.amazon_api',
+        'mautic.transport.postal',
         'mautic.transport.postmark',
         'gmail',
         // smtp is left out on purpose as the auth_mode will manage displaying this field

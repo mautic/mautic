@@ -27,6 +27,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
             'mautic.transport.mandrill'     => 'mautic.email.config.mailer_transport.mandrill',
             'mautic.transport.mailjet'      => 'mautic.email.config.mailer_transport.mailjet',
             'smtp'                          => 'mautic.email.config.mailer_transport.smtp',
+            'mautic.transport.postal'       => 'mautic.email.config.mailer_transport.postal',
             'mautic.transport.postmark'     => 'mautic.email.config.mailer_transport.postmark',
             'mautic.transport.sendgrid'     => 'mautic.email.config.mailer_transport.sendgrid',
             'mautic.transport.pepipost'     => 'mautic.email.config.mailer_transport.pepipost',
@@ -60,7 +61,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.elasticemail","gmail","mautic.transport.mandrill","mautic.transport.mailjet","smtp","mautic.transport.postmark","mautic.transport.sendgrid","mautic.transport.pepipost","mautic.transport.sendgrid_api","sendmail","mautic.transport.sparkpost"';
+        $expected = '"mautic.transport.elasticemail","gmail","mautic.transport.mandrill","mautic.transport.mailjet","smtp","mautic.transport.postal","mautic.transport.postmark","mautic.transport.sendgrid","mautic.transport.pepipost","mautic.transport.sendgrid_api","sendmail","mautic.transport.sparkpost"';
 
         $this->assertSame($expected, $transportType->getServiceDoNotNeedAmazonRegion());
     }
@@ -78,7 +79,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.pepipost","mautic.transport.elasticemail","mautic.transport.amazon","mautic.transport.amazon_api","mautic.transport.postmark","gmail"';
+        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.pepipost","mautic.transport.elasticemail","mautic.transport.amazon","mautic.transport.amazon_api","mautic.transport.postal","mautic.transport.postmark","gmail"';
 
         $this->assertSame($expected, $transportType->getServiceRequiresUser());
     }
@@ -96,7 +97,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.pepipost","mautic.transport.elasticemail","mautic.transport.amazon","mautic.transport.amazon_api","mautic.transport.postmark","gmail"';
+        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.pepipost","mautic.transport.elasticemail","mautic.transport.amazon","mautic.transport.amazon_api","mautic.transport.postal","mautic.transport.postmark","gmail"';
 
         $this->assertSame($expected, $transportType->getServiceRequiresPassword());
     }
