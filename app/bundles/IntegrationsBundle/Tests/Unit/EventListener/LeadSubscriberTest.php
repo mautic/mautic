@@ -206,7 +206,7 @@ class LeadSubscriberTest extends TestCase
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $lead);
 
         $this->eventDispatcherInterfaceMock
-            ->method('hasListener')
+            ->method('hasListeners')
             ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
             ->willReturn(true);
 
@@ -244,7 +244,7 @@ class LeadSubscriberTest extends TestCase
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $lead);
 
         $this->eventDispatcherInterfaceMock
-            ->method('hasListener')
+            ->method('hasListeners')
             ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
             ->willReturn(true);
 
@@ -282,7 +282,7 @@ class LeadSubscriberTest extends TestCase
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $lead);
 
         $this->eventDispatcherInterfaceMock
-            ->method('hasListener')
+            ->method('hasListeners')
             ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
             ->willReturn(true);
 
@@ -374,7 +374,7 @@ class LeadSubscriberTest extends TestCase
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $company);
 
         $this->eventDispatcherInterfaceMock
-            ->method('hasListener')
+            ->method('hasListeners')
             ->with(IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES)
             ->willReturn(true);
 
@@ -412,7 +412,7 @@ class LeadSubscriberTest extends TestCase
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $company);
 
         $this->eventDispatcherInterfaceMock
-            ->method('hasListener')
+            ->method('hasListeners')
             ->with(IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES)
             ->willReturn(true);
 
