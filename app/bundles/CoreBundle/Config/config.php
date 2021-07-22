@@ -1166,6 +1166,7 @@ return [
     'parameters' => [
         'site_url'                        => '',
         'webroot'                         => '',
+        '404_page'                        => '',
         'cache_path'                      => '%kernel.root_dir%/../var/cache',
         'log_path'                        => '%kernel.root_dir%/../var/logs',
         'max_log_files'                   => 7,
