@@ -15,8 +15,6 @@ namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\Entity\MessageRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
@@ -27,6 +25,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -762,38 +761,30 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetBestHours()
     {
-        $mockConnection   = $this->createMock(Connection::class);
+        define('MAUTIC_TABLE_PREFIX', '');
 
-        $queryBuilder      = new QueryBuilder($mockConnection);
-        $mockConnection->method('createQueryBuilder')->willReturn($queryBuilder);
-
-        $platform = $this->createMock(AbstractPlatform::class);
-        $mockConnection->method('getDatabasePlatform')
-            ->willReturn($platform);
-
-        $mockConnection->method('executeQuery')->willReturn(new class() {
-            public function fetchAll()
-            {
-                return [
-                    [
-                        'hour'  => 0,
-                        'count' => 0,
-                    ],
-                    [
-                        'hour'  => 1,
-                        'count' => 4,
-                    ],
-                    [
-                        'hour'  => 2,
-                        'count' => 10,
-                    ],
-                    [
-                        'hour'  => 3,
-                        'count' => 6,
-                    ],
-                ];
-            }
-        });
+        $dbalMock = new DBALMocker($this);
+        $dbalMock->setQueryResponse(
+            [
+                [
+                    'hour'  => 0,
+                    'count' => 0,
+                ],
+                [
+                    'hour'  => 1,
+                    'count' => 4,
+                ],
+                [
+                    'hour'  => 2,
+                    'count' => 10,
+                ],
+                [
+                    'hour'  => 3,
+                    'count' => 6,
+                ],
+            ]
+        );
+        $mockConnection = $dbalMock->getMockConnection();
 
         $this->entityManager->method('getConnection')->willReturn($mockConnection);
         $this->emailModel->setEntityManager($this->entityManager);
