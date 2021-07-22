@@ -306,7 +306,8 @@ class PublicController extends CommonFormController
             if (in_array('form', $config['features'])) {
                 $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':form.html.php');
             } else {
-                $contentTemplate = 'MauticFormBundle::form.html.php';
+                $viewParams['content'] = '';
+                $viewParams['message'] = $message.$formContent;
             }
         }
 
