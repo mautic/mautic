@@ -46,7 +46,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <div class="pa-md">
             <div class="row">
                 <div class="col-md-12">
-                    <?php $hookLog = $item->getLogs(); ?>
+                    <?php $hookLog = $item->getLimitedLogs(); ?>
                     <?php if (!count($hookLog)): ?>
                         <div class="alert alert-warning col-md-6 col-md-offset-3 mt-md" style="white-space: normal;">
                             <h4>

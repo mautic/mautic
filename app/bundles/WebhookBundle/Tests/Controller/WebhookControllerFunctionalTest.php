@@ -1,0 +1,71 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * @copyright   2021 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\WebhookBundle\Tests\Controller;
+
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\WebhookBundle\Entity\Event;
+use Mautic\WebhookBundle\Entity\Log;
+use Mautic\WebhookBundle\Entity\Webhook;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
+
+final class WebhookControllerFunctionalTest extends MauticMysqlTestCase
+{
+    public function testViewWebhookDetail(): void
+    {
+        $webhook = $this->createWebhook('test', 'http://domain.tld', 'secret');
+        $this->createWebhookEvent($webhook, 'Type');
+        for ($log = 1; $log <= 105; ++$log) {
+            $this->createWebhookLog($webhook, 'test', 200);
+        }
+        $this->em->flush();
+        $this->em->clear();
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/webhooks/view/'.$webhook->getId());
+
+        $logList = $crawler->filter('.table.table-responsive > tbody > tr')->count();
+        Assert::assertSame(Webhook::LOGS_DISPLAY_LIMIT, $logList);
+    }
+
+    private function createWebhook(string $name, string $url, string $secret): Webhook
+    {
+        $webhook = new Webhook();
+        $webhook->setName($name);
+        $webhook->setWebhookUrl($url);
+        $webhook->setSecret($secret);
+        $this->em->persist($webhook);
+
+        return $webhook;
+    }
+
+    private function createWebhookEvent(Webhook $webhook, string $type): Event
+    {
+        $event = new Event();
+        $event->setWebhook($webhook);
+        $event->setEventType($type);
+        $this->em->persist($event);
+
+        return $event;
+    }
+
+    private function createWebhookLog(Webhook $webhook, string $note, int $statusCode): Log
+    {
+        $log = new Log();
+        $log->setWebhook($webhook);
+        $log->setNote($note);
+        $log->setStatusCode($statusCode);
+        $this->em->persist($log);
+
+        return $log;
+    }
+}
