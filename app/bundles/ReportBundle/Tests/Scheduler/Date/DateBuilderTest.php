@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Tests\Scheduler\Date;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\Entity\SchedulerEntity;

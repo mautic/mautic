@@ -11,6 +11,7 @@
 
 namespace Mautic\ReportBundle\Scheduler\Builder;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
@@ -24,9 +25,15 @@ class SchedulerBuilder
     /** @var SchedulerTemplateFactory */
     private $schedulerTemplateFactory;
 
-    public function __construct(SchedulerTemplateFactory $schedulerTemplateFactory)
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    public function __construct(SchedulerTemplateFactory $schedulerTemplateFactory, CoreParametersHelper $coreParametersHelper)
     {
         $this->schedulerTemplateFactory = $schedulerTemplateFactory;
+        $this->coreParametersHelper     = $coreParametersHelper;
     }
 
     /**
@@ -54,8 +61,10 @@ class SchedulerBuilder
             throw new InvalidSchedulerException();
         }
 
+        $defaultTimezone = $this->coreParametersHelper->get('default_timezone', 'UTC');
+
+        $startDate = (new \DateTime('now', new \DateTimeZone($defaultTimezone)))->setTime(0, 0)->modify('+1 day');
         $builder   = $this->schedulerTemplateFactory->getBuilder($scheduler);
-        $startDate = new \DateTime();
         $rule      = new Rule();
 
         if (!$scheduler->isScheduledNow()) {

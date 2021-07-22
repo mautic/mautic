@@ -40,6 +40,11 @@ class MessageSchedule
      */
     private $router;
 
+    /**
+     * @var array|false|mixed|string
+     */
+    private $defaultTimezone;
+
     public function __construct(
         TranslatorInterface $translator,
         FileProperties $fileProperties,
@@ -50,6 +55,8 @@ class MessageSchedule
         $this->fileProperties       = $fileProperties;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->router               = $router;
+
+        $this->defaultTimezone = $this->coreParametersHelper->get('default_timezone', 'UTC');
     }
 
     /**
@@ -64,7 +71,7 @@ class MessageSchedule
         $link = $this->router->generate('mautic_report_view', ['objectId' => $report->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         if ($this->fileCouldBeSend($filePath)) {
-            $date = new \DateTime();
+            $date = new \DateTime('now', new \DateTimeZone($this->defaultTimezone));
 
             return $this->translator->trans(
                 'mautic.report.schedule.email.message',
@@ -104,7 +111,7 @@ class MessageSchedule
      */
     public function getSubject(Report $report)
     {
-        $date = new \DateTime();
+        $date = new \DateTime('now', new \DateTimeZone($this->defaultTimezone));
 
         return $this->translator->trans(
             'mautic.report.schedule.email.subject',

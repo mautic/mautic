@@ -128,8 +128,16 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper->expects($this->once())
             ->method('get')
-            ->with('report_export_max_filesize_in_bytes')
-            ->willReturn($limit);
+            ->willReturnCallback(
+                function ($key) use ($limit) {
+                    switch ($key) {
+                        case 'default_timezone':
+                            return date_default_timezone_get();
+                        case 'report_export_max_filesize_in_bytes':
+                            return $limit;
+                    }
+                }
+            );
 
         $this->router->expects($this->once())
             ->method('generate')
@@ -161,8 +169,16 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper->expects($this->once())
             ->method('get')
-            ->with('report_export_max_filesize_in_bytes')
-            ->willReturn($limit);
+            ->willReturnCallback(
+                function ($key) use ($limit) {
+                    switch ($key) {
+                        case 'default_timezone':
+                            return date_default_timezone_get();
+                        case 'report_export_max_filesize_in_bytes':
+                            return $limit;
+                    }
+                }
+            );
 
         $this->assertTrue($this->messageSchedule->fileCouldBeSend('path-to-a-file'));
     }
@@ -182,8 +198,16 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper->expects($this->once())
             ->method('get')
-            ->with('report_export_max_filesize_in_bytes')
-            ->willReturn($limit);
+            ->willReturnCallback(
+                function ($key) use ($limit) {
+                    switch ($key) {
+                        case 'default_timezone':
+                            return date_default_timezone_get();
+                        case 'report_export_max_filesize_in_bytes':
+                            return $limit;
+                    }
+                }
+            );
 
         $this->assertFalse($this->messageSchedule->fileCouldBeSend('path-to-a-file'));
     }

@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Tests\Scheduler\Builder;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Mautic\ReportBundle\Scheduler\Entity\SchedulerEntity;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
@@ -12,10 +13,24 @@ use Recurr\RecurrenceCollection;
 
 class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $coreParametersHelper;
+
+    protected function setUp(): void
+    {
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->coreParametersHelper->expects($this->once())
+            ->method('get')
+            ->with('default_timezone')
+            ->willReturn(date_default_timezone_get());
+    }
+
     public function testGetNextEvent()
     {
         $schedulerTemplateFactory = new SchedulerTemplateFactory();
-        $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory);
+        $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory, $this->coreParametersHelper);
 
         $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
 
@@ -33,7 +48,7 @@ class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
     public function testGetNextEvents()
     {
         $schedulerTemplateFactory = new SchedulerTemplateFactory();
-        $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory);
+        $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory, $this->coreParametersHelper);
 
         $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
 
@@ -59,7 +74,7 @@ class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
     public function testNoScheduler()
     {
         $schedulerTemplateFactory = new SchedulerTemplateFactory();
-        $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory);
+        $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory, $this->coreParametersHelper);
 
         $SchedulerEntity = new SchedulerEntity(false, SchedulerEnum::UNIT_DAILY, null, null);
 
