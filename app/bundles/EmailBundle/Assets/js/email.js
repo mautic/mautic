@@ -421,6 +421,7 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
         $el = mQuery(tabId);
     }
 
+    // add a click event listener for adding a new dynamic content variant
     $el.find('.addNewDynamicContentFilter').on('click', function (e) {
         e.preventDefault();
 
