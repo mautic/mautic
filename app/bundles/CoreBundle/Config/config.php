@@ -306,6 +306,10 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.form.type.timeformat' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\TimeFormatType::class,
+                'arguments' => ['translator'],
+            ],
             'mautic.form.type.slot.saveprefsbutton' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
                 'arguments' => [
