@@ -431,6 +431,7 @@ class MailHelper
 
             if ('messenger' == $this->factory->getParameter('mailer_spool_type')) {
                 $this->bus->dispatch(new EmailMessage($this->message));
+
                 return true;
             }
 
