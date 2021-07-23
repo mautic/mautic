@@ -12,6 +12,7 @@ export default class DynamicContentEvents {
     this.dccmd = new DynamicContentCommands(this.editor);
   }
 
+  // @todo merge events and listeners
   onComponentRemove() {
     this.editor.on('component:remove', (component) => {
       // Delete dynamic-content on Mautic side
@@ -20,14 +21,4 @@ export default class DynamicContentEvents {
       }
     });
   }
-
-  // @todo remove? not used
-  //   const modalContent = mQuery('#dynamic-content-popup');
-  //   // On modal close -> move editor within Mautic
-  //   if (modalContent) {
-  //     const dynamicContentContainer = mQuery('#dynamicContentContainer');
-  //     const content = mQuery(modalContent).contents().first();
-  //     dynamicContentContainer.append(content.detach());
-  //   }
-  // }
 }

@@ -7,7 +7,7 @@ export default class ButtonCloseCommands {
       throw new Error('no page-html editor');
     }
 
-    editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
+    editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
 
     const htmlDocument = ContentService.getCanvasAsHtmlDocument(editor);
 
@@ -25,7 +25,7 @@ export default class ButtonCloseCommands {
       throw new Error('no email-html editor');
     }
 
-    editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
+    editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
 
     // Getting HTML with CSS inline (only available for "grapesjs-preset-newsletter"):
     const html = ContentService.getEditorHtmlContent(editor);
@@ -40,7 +40,7 @@ export default class ButtonCloseCommands {
     if (!editor) {
       throw new Error('no email-mjml editor');
     }
-    editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
+    editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
 
     const htmlCode = MjmlService.getEditorHtmlContent(editor);
     const mjmlCode = MjmlService.getEditorMjmlContent(editor);

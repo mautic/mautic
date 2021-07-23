@@ -6,11 +6,11 @@ export default class DynamicContentListeners {
   }
 
   /**
-   * On editor load: convert tokens to slots
+   * On editor load: convert existing tokens to slots
    */
   onLoad() {
     this.editor.on('load', () => {
-      this.editor.runCommand('preset-mautic:dynamic-content-tokens-to-slots');
+      this.editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
     });
   }
 }

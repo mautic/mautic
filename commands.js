@@ -7,20 +7,20 @@ export default (editor) => {
   // Once the command is active, it has to be stopped before it can be run again.
   editor.Commands.add('preset-mautic:dynamic-content-open', {
     run: (edtr, sender, options = {}) => {
-      // dynamicContentCmd.convertDynamicContentTokensToSlots();
-      dynamicContentCmd.launchDynamicContentPopup(edtr, sender, options);
+      // dynamicContentCmd.updateComponentsFromDcStore();
+      dynamicContentCmd.showDynamicContentPopup(edtr, sender, options);
     },
     stop: (edtr) => dynamicContentCmd.stopDynamicContentPopup(edtr),
   });
-  // Slot to {token}
-  editor.Commands.add('preset-mautic:dynamic-content-slots-to-tokens', {
-    run: (edtr) => dynamicContentCmd.convertDynamicContentSlotsToTokens(edtr),
+  // Component to {token}
+  editor.Commands.add('preset-mautic:dynamic-content-components-to-tokens', {
+    run: (edtr) => dynamicContentCmd.convertDynamicContentComponentsToTokens(edtr),
   });
-  // {token} to slot
-  editor.Commands.add('preset-mautic:dynamic-content-tokens-to-slots', {
-    run: () => dynamicContentCmd.convertDynamicContentTokensToSlots(),
+  // Fill the component with values.
+  editor.Commands.add('preset-mautic:update-dc-components-from-dc-store', {
+    run: () => dynamicContentCmd.updateComponentsFromDcStore(),
   });
-  // delte store item
+  // delete store item
   editor.Commands.add('preset-mautic:dynamic-content-delete-store-item', {
     run: (edtr, sender, options) =>
       dynamicContentCmd.deleteDynamicContentStoreItem(edtr, sender, options),

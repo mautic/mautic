@@ -41,39 +41,80 @@ export default class DynamicContentService {
   }
 
   /**
-   * Convert a text token to the default variant
-   * Wire up the ids
+   * Get the content from the Html store and put the default content on the canvas.
+   * Creates a store item (filter) in Mautic Form if new.
+   * Wires up the ids.
+   * E.g. if they are initialized from a {token}
    *
    * @param {GrapesJS Component} component
    */
-  transformDcTokenToSlot(component) {
-    this.getDcStoreItems();
-    this.getDcComponents();
-
+  updateComponentFromDcStore(component) {
     // get the item/tab matching the dynamic content on the canvas
-    const dataParamDecId = component.getAttributes()['data-param-dec-id'] || false;
+    let dataParamDecId = component.getAttributes()['data-param-dec-id'] || false;
+    let dcItem = this.getStoreItem(dataParamDecId);
 
-    const dcItem = this.dcStoreItems.find((item) => item.id === dataParamDecId);
-
-    // If dynamic content item exists -> fill
+    // Add a new DC HTML store item, if it doesnt exist.
     // Hint: the first dynamic content item (tab) is created from php: #emailform_dynamicContent_0
-    if (dcItem) {
-      this.updateComponent(component, dcItem);
-    } else {
-      this.initNewComponent(component);
+    if (!dcItem) {
+      this.initNewStoreItem(component);
     }
+
+    // Load the html store item
+    dataParamDecId = component.getAttributes()['data-param-dec-id'] || false;
+    dcItem = this.getStoreItem(dataParamDecId);
+
+    // Update the Grapesjs component with the content from the HTML store item
+    this.updateComponent(component, dcItem);
     return true;
   }
 
+  /**
+   * if the editors modal is closed/stopped the Components content visible
+   * on the canvas and the html store item has to be updated
+   */
+  updateDcStoreItem() {
+    // For the editing inside grapesjs the dynamcicontent popup is moved to the "grapesjs dom"
+    // so it has to be moved back to the Mautic email form for saving.
+    const modalContent = mQuery('#dynamic-content-popup');
+    // On modal close -> move editor within Mautic
+    if (!modalContent) {
+      throw new Error('DC: No dynamic content popup found');
+    }
+
+    const dynamicContentContainer = mQuery('#dynamicContentContainer');
+    const content = mQuery(modalContent).contents().first();
+    dynamicContentContainer.append(content.detach());
+    this.logger.debug('DC: store item updated', { content });
+  }
+
+  /**
+   * Get a dynamic content item from its html store
+   */
+  getStoreItem(decId) {
+    // get all items
+    this.getDcStoreItems();
+    const item = this.dcStoreItems.find((itm) => itm.id === decId);
+    return item;
+  }
+
+  /**
+   * Set the html/content of the visible component on the canvas
+   */
   updateComponent(component, dcItem) {
-    this.logger.debug('Updating existing dynamic content item', { dcItem });
+    if (!component || !dcItem) {
+      throw new Error('No compoennt or dynamic content item');
+    }
+
+    this.logger.debug('Updating DC component with values from store', { dcItem });
     // Update the component on the canvas with new values from the html store
     // and link it  with the id to the html store
+    // needed for new components
     component.addAttributes({ 'data-param-dec-id': dcItem.id });
     component.set('content', dcItem.content);
 
     return component;
 
+    // gets the default content to be displayed on the canvas. Should have been replaced by the `dcItem.content`
     // let dynConContent = '';
     // if (dcItem.id) {
     //   const dynConContainer = mQuery(dcTarget.htmlId).find(dcTarget.content);
@@ -93,7 +134,7 @@ export default class DynamicContentService {
    * @param {GrapesJS Component} component
    * @param {string}
    */
-  initNewComponent(component) {
+  initNewStoreItem(component) {
     const dcTarget = Mautic.createNewDynamicContentItem(mQuery);
 
     // get ID from newly generated store item: e.g. #emailform_dynamicContent_1

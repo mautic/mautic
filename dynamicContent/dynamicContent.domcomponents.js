@@ -42,6 +42,13 @@ export default class DynamicContentDomComponents {
             });
           }
         },
+        // updated(property, value, prevValue) {
+        //   console.log('Local hook: model.updated', {
+        //     property,
+        //     value,
+        //     prevValue,
+        //   });
+        // },
       },
       {
         // Dynamic Content component detection
@@ -63,11 +70,13 @@ export default class DynamicContentDomComponents {
       events: {
         dblclick: 'onActive',
       },
-      // maybe use onRender for token to slot conversion
+      // maybe use onRender for token to component conversion
       // open the dynamic content modal if the editor is added or double clicked
       onActive() {
         const target = this.model;
-        this.em.get('Commands').run('preset-mautic:dynamic-content-tokens-to-slots');
+        // wire the new block up with Mautic
+        this.em.get('Commands').run('preset-mautic:update-dc-components-from-dc-store');
+        // open the editor in the popup
         this.em.get('Commands').run('preset-mautic:dynamic-content-open', { target });
       },
       // does not work: gets removed when Sorting (by grapesjs)
