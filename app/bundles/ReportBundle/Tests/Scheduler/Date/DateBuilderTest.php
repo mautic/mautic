@@ -36,7 +36,8 @@ class DateBuilderTest extends \PHPUnit\Framework\TestCase
     public function testGetNextEvent(): void
     {
         $schedulerTemplateFactory = new SchedulerTemplateFactory();
-        $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory);
+        $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
+        $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory, $coreParametersHelper);
         $dateBuilder              = new DateBuilder($schedulerBuilder);
         $schedulerEntity          = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
         $date                     = $dateBuilder->getNextEvent($schedulerEntity);
