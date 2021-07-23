@@ -137,21 +137,21 @@ export default class DynamicContentService {
    */
   updateComponent(component, dcItem) {
     if (!component || !dcItem) {
-      throw new Error('No compoennt or dynamic content item');
+      throw new Error('No component or dynamic content item');
     }
 
     this.logger.debug('Updating DC component with values from store', { dcItem });
     // Update the component on the canvas with new values from the html store
     // and link it  with the id to the html store
     // needed for new components
-    component.addAttributes({ 'data-param-dec-id': dcItem.id });
+    component.addAttributes({ 'data-param-dec-id': dcItem.decId });
     component.set('content', dcItem.content);
 
     return component;
 
     // gets the default content to be displayed on the canvas. Should have been replaced by the `dcItem.content`
     // let dynConContent = '';
-    // if (dcItem.id) {
+    // if (dcItem.decId) {
     //   const dynConContainer = mQuery(dcTarget.htmlId).find(dcTarget.content);
     //   // is there content in the current editor?
     //   if (dynConContainer.hasClass('editor')) {
