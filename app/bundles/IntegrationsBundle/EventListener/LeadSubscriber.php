@@ -236,7 +236,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @throws InvalidValueException
      */
-    public function dispatchBeforeFieldChangesEvent(string $integrationName, object $object): void
+    private function dispatchBeforeFieldChangesEvent(string $integrationName, object $object): void
     {
         if ($object instanceof Lead &&
             $this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)) {
