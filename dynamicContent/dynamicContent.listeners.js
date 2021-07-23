@@ -8,9 +8,9 @@ export default class DynamicContentListeners {
   /**
    * On editor load: convert existing tokens to slots
    */
-  onLoad() {
-    this.editor.on('load', () => {
-      this.editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
-    });
-  }
+  // onLoad() {
+  //   this.editor.on('load', () => {
+  //     // this.editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
+  //   });
+  // }
 }

@@ -30,6 +30,11 @@ export default class DynamicContentDomComponents {
          * Initilize the component
          */
         init() {
+          // link component to the corresponding html store item
+          this.em
+            .get('Commands')
+            .run('preset-mautic:link-component-to-store-item', { component: this });
+
           // Add toolbar edit button if it's not already in
           const toolbar = this.get('toolbar');
           const id = 'toolbar-dynamic-content';
@@ -74,8 +79,6 @@ export default class DynamicContentDomComponents {
       // open the dynamic content modal if the editor is added or double clicked
       onActive() {
         const target = this.model;
-        // wire the new block up with Mautic
-        this.em.get('Commands').run('preset-mautic:update-dc-components-from-dc-store');
         // open the editor in the popup
         this.em.get('Commands').run('preset-mautic:dynamic-content-open', { target });
       },

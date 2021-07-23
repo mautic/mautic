@@ -126,7 +126,9 @@ export default class DynamicContentCommands {
     // get the dynamic content editor
     const dcEditor = mQuery(DynamicContentCommands.getDcStoreId(attributes['data-param-dec-id']));
     if (dcEditor.length <= 0) {
-      throw new Error(`No Dynamic Content editor found for '${attributes['data-param-dec-id']}'`);
+      throw new Error(
+        `No Dynamic Content editor found for decId: '${attributes['data-param-dec-id']}'`
+      );
     }
 
     // Show if hidden
@@ -138,6 +140,12 @@ export default class DynamicContentCommands {
     mQuery(this.dcPopup).empty();
     // Insert inside popup
     mQuery(this.dcPopup).append(dcEditor.detach());
+  }
+
+  linkComponentToStoreItem(edtr, sender, options) {
+    // Add a new DC HTML store item, if it doesnt exist.
+    // Hint: the first dynamic content item (tab) is created from php: #emailform_dynamicContent_0
+    this.dcService.linkComponentToStoreItem(options.component);
   }
 
   /**
@@ -172,11 +180,13 @@ export default class DynamicContentCommands {
 
   /**
    * Get the DynamicContent identifier of the html store item
+   * based on the token nr (decId)
    * e.g. emailform_dynamicContent_0
-   * @param {integer} id
+   * @param {integer} decId
    * @returns string
    */
-  static getDcStoreId(id) {
+  static getDcStoreId(decId) {
+    const id = decId - 1;
     if (id < 0) {
       throw new Error('no dynamic content ID');
     }

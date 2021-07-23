@@ -12,7 +12,8 @@ export default class DynamicContentEvents {
     this.dccmd = new DynamicContentCommands(this.editor);
   }
 
-  // @todo merge events and listeners
+  // @todo merge events and listeners. or move this to the component itself as a
+  // local listener. see create-new-dynamic-content-store-item
   onComponentRemove() {
     this.editor.on('component:remove', (component) => {
       // Delete dynamic-content on Mautic side
