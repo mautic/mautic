@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\Command;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
+use Monolog\Logger;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,6 +26,18 @@ use Symfony\Component\Finder\Finder;
  */
 class ProcessEmailQueueCommand extends ModeratedCommand
 {
+    const LIMIT_TO_RESTART = 100;
+
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    public function __construct(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -178,13 +191,24 @@ EOT
         } elseif ($timeout = $container->getParameter('mautic.mailer_spool_recover_timeout')) {
             $commandArgs['--recover-timeout'] = $timeout;
         }
-        $input      = new ArrayInput($commandArgs);
-        $returnCode = $command->run($input, $output);
 
-        $this->completeRun();
+        $numberOfRestarts = 0;
+        while ($numberOfRestarts < self::LIMIT_TO_RESTART) {
+            try {
+                $input      = new ArrayInput($commandArgs);
+                $returnCode = $command->run($input, $output);
 
-        if (0 !== $returnCode) {
-            return $returnCode;
+                $this->completeRun();
+
+                if (0 !== $returnCode) {
+                    return $returnCode;
+                }
+
+                $numberOfRestarts = self::LIMIT_TO_RESTART;
+            } catch (\Swift_TransportException $e) {
+                $this->logger->error($e->getMessage());
+                ++$numberOfRestarts;
+            }
         }
 
         return 0;

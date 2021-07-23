@@ -861,6 +861,13 @@ return [
             ],
         ],
         'commands' => [
+            'mautic.email.command.process.emai.queue' => [
+                'class'     => \Mautic\EmailBundle\Command\ProcessEmailQueueCommand::class,
+                'arguments' => [
+                    'monolog.logger.mautic',
+                ],
+                'tag' => 'console.command',
+            ],
             'mautic.email.command.fetch' => [
                 'class'     => \Mautic\EmailBundle\Command\ProcessFetchEmailCommand::class,
                 'arguments' => [
