@@ -36,8 +36,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        composer validate
-        composer install --prefer-dist --no-progress --no-suggest
+        COMPOSER_ROOT_VERSION=4.0 composer validate
+        COMPOSER_ROOT_VERSION=4.0 composer install --prefer-dist --no-progress --no-suggest
 
     - name: Build release files
       run: |
@@ -264,7 +264,7 @@ jobs:
 
     - name: Install dependencies
       working-directory: ./.github/workflows/mautic-asset-upload
-      run: composer install --prefer-dist --no-progress
+      run: COMPOSER_ROOT_VERSION=4.0 composer install --prefer-dist --no-progress
 
     - name: Download full installation package from previous step
       uses: actions/download-artifact@v2
