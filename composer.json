@@ -4,8 +4,9 @@
   "type": "project",
   "description": "Mautic Open Source Distribution",
   "require": {
+    "php": ">=7.4.0 <8.1",
     "composer/installers": "^1.11",
-    "mautic/core-lib": "^3.0"
+    "mautic/core-lib": "self.version"
   },
   "require-dev": {
     "symfony/web-profiler-bundle": "~4.4.0",
@@ -67,12 +68,7 @@
   "repositories": [
     {
       "type": "path",
-      "url": "app",
-      "options": {
-        "versions": {
-            "mautic/core-lib": "3.2.x-dev"
-        }
-      }
+      "url": "app"
     },
     {
       "type": "git",

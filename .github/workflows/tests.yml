@@ -60,8 +60,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        composer validate
-        composer install --prefer-dist --no-progress --no-suggest
+        COMPOSER_ROOT_VERSION=4.0 composer validate
+        COMPOSER_ROOT_VERSION=4.0 composer install --prefer-dist --no-progress --no-suggest
 
     - name: Temp install Mautic first due to failing tests
       env:
@@ -80,9 +80,9 @@ jobs:
         export DB_PORT=${!DB_PORT_STRING}
 
         if [[ "${{ matrix.php-versions }}" == "7.4" ]] && [[ "${{ matrix.db-types }}" == "mysql" ]]; then
-          composer test -- --coverage-clover=coverage.xml
+          COMPOSER_ROOT_VERSION=4.0 composer test -- --coverage-clover=coverage.xml
         else
-          composer test
+          COMPOSER_ROOT_VERSION=4.0 composer test
         fi
       env:
         mysql_port: ${{ job.services.mysql.ports[3306] }}
@@ -93,7 +93,7 @@ jobs:
         export DB_PORT_STRING="${{ matrix.db-types }}_port"
         export DB_PORT=${!DB_PORT_STRING}
 
-        composer test -- plugins/MauticCrmBundle/Tests/Pipedrive
+        COMPOSER_ROOT_VERSION=4.0 composer test -- plugins/MauticCrmBundle/Tests/Pipedrive
 
     - name: Upload coverage report
       if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' }}
@@ -143,15 +143,15 @@ jobs:
 
     - name: Install dependencies
       run: |
-        composer validate
-        composer install --prefer-dist --no-progress --no-suggest
+        COMPOSER_ROOT_VERSION=4.0 composer validate
+        COMPOSER_ROOT_VERSION=4.0 composer install --prefer-dist --no-progress --no-suggest
     
     - name: Run ${{ matrix.commands }}
       run: |
         if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
-          composer phpstan
+          COMPOSER_ROOT_VERSION=4.0 composer phpstan
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
-          composer rector -- --dry-run --no-progress-bar
+          COMPOSER_ROOT_VERSION=4.0 composer rector -- --dry-run --no-progress-bar
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
           for file in ${{ steps.changed-files.outputs.all_modified_files }}; do
             if [[ $file == *.php ]]; then
