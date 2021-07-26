@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use DeviceDetector\Parser\Device\DeviceParserAbstract;
+use DeviceDetector\Parser\Device\AbstractDeviceParser;
 use Mautic\CoreBundle\Helper\Serializer;
 
 ?>
@@ -41,7 +41,13 @@ use Mautic\CoreBundle\Helper\Serializer;
                 echo (is_array($clientInfo) && isset($clientInfo['name'])) ? $clientInfo['name'] : '';
                 ?>
             </td>
-            <td><?php echo DeviceParserAbstract::getFullName($device['device_brand']); ?></td>
+            <td>
+                <?php
+                // Short codes are being removed from DeviceParser but there are values stored in the DB that may still depend on it
+                $brandName = AbstractDeviceParser::getFullName($device['device_brand']);
+                echo $brandName ?: $device['device_brand'];
+                ?>
+            </td>
             <td><?php echo $view['date']->toText($device['date_added'], 'utc'); ?></td>
         </tr>
     <?php endforeach; ?>

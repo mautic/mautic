@@ -27,7 +27,7 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -69,7 +69,7 @@ class InstallService
                                 TranslatorInterface $translator,
                                 KernelInterface $kernel,
                                 ValidatorInterface $validator,
-                                EncoderFactory $encoder)
+                                UserPasswordEncoder $encoder)
     {
         $this->configurator             = $configurator;
         $this->cacheHelper              = $cacheHelper;
@@ -509,13 +509,13 @@ class InstallService
             return $messages;
         }
 
-        $encoder = $this->encoder->getEncoder($user);
+        $encoder = $this->encoder;
 
         $user->setFirstName($data['firstname']);
         $user->setLastName($data['lastname']);
         $user->setUsername($data['username']);
         $user->setEmail($data['email']);
-        $user->setPassword($encoder->encodePassword($data['password'], $user->getSalt()));
+        $user->setPassword($encoder->encodePassword($user, $data['password']));
 
         $adminRole = null;
         try {

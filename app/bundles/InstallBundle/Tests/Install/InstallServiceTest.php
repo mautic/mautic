@@ -25,7 +25,7 @@ use Mautic\InstallBundle\Configurator\Step\EmailStep;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -54,7 +54,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->kernel               = $this->createMock(KernelInterface::class);
         $this->validator            = $this->createMock(ValidatorInterface::class);
-        $this->encoder              = $this->createMock(EncoderFactory::class);
+        $this->encoder              = $this->createMock(UserPasswordEncoder::class);
 
         $this->installer = new InstallService(
             $this->configurator,

@@ -11,8 +11,8 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Amazon;
 
-use Joomla\Http\Exception\UnexpectedResponseException;
-use Joomla\Http\Http;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\TransferException;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
@@ -34,27 +34,12 @@ class AmazonCallback
      */
     const SNS_ADDRESS = 'no-reply@sns.amazonaws.com';
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
+    private LoggerInterface $logger;
+    private Client $httpClient;
+    private TransportCallback $transportCallback;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var Http
-     */
-    private $httpClient;
-
-    /**
-     * @var TransportCallback
-     */
-    private $transportCallback;
-
-    public function __construct(TranslatorInterface $translator, LoggerInterface $logger, Http $httpClient, TransportCallback $transportCallback)
+    public function __construct(TranslatorInterface $translator, LoggerInterface $logger, Client $httpClient, TransportCallback $transportCallback)
     {
         $this->translator        = $translator;
         $this->logger            = $logger;
@@ -98,17 +83,16 @@ class AmazonCallback
     {
         switch ($type) {
             case 'SubscriptionConfirmation':
-
                     // Confirm Amazon SNS subscription by calling back the SubscribeURL from the playload
                     try {
                         $response = $this->httpClient->get($payload['SubscribeURL']);
-                        if (200 == $response->code) {
+                        if (200 == $response->getStatusCode()) {
                             $this->logger->info('Callback to SubscribeURL from Amazon SNS successfully');
                             break;
                         }
 
-                        $reason = 'HTTP Code '.$response->code.', '.$response->body;
-                    } catch (UnexpectedResponseException $e) {
+                        $reason = 'HTTP Code '.$response->getStatusCode().', '.$response->getBody();
+                    } catch (TransferException $e) {
                         $reason = $e->getMessage();
                     }
 
@@ -148,7 +132,6 @@ class AmazonCallback
 
             break;
             case 'Bounce':
-
                 if ('Permanent' == $payload['bounce']['bounceType']) {
                     $emailId = null;
 
@@ -170,7 +153,7 @@ class AmazonCallback
                 }
             break;
             default:
-                $this->logger->warn("Received SES webhook of type '$payload[Type]' but couldn't understand payload");
+                $this->logger->warning("Received SES webhook of type '$payload[Type]' but couldn't understand payload");
                 $this->logger->debug('SES webhook payload: '.json_encode($payload));
             break;
         }

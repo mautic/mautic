@@ -12,10 +12,10 @@
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Twig_Extension;
-use Twig_SimpleFunction;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class AssetExtension extends Twig_Extension
+class AssetExtension extends AbstractExtension
 {
     /**
      * @var AssetsHelper
@@ -36,12 +36,12 @@ class AssetExtension extends Twig_Extension
     public function getFunctions()
     {
         return [
-            'outputScripts'           => new Twig_SimpleFunction('outputScripts', [$this, 'outputScripts'], ['is_safe' => ['all']]),
-            'outputHeadDeclarations'  => new Twig_SimpleFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
-            'getAssetUrl'             => new Twig_SimpleFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
-            'outputStyles'            => new Twig_SimpleFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
-            'outputSystemScripts'     => new Twig_SimpleFunction('outputSystemScripts', [$this, 'outputSystemScripts'], ['is_safe' => ['html']]),
-            'outputSystemStylesheets' => new Twig_SimpleFunction('outputSystemStylesheets', [$this, 'outputSystemStylesheets'], ['is_safe' => ['html']]),
+            'outputScripts'           => new TwigFunction('outputScripts', [$this, 'outputScripts'], ['is_safe' => ['all']]),
+            'outputHeadDeclarations'  => new TwigFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
+            'getAssetUrl'             => new TwigFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
+            'outputStyles'            => new TwigFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
+            'outputSystemScripts'     => new TwigFunction('outputSystemScripts', [$this, 'outputSystemScripts'], ['is_safe' => ['html']]),
+            'outputSystemStylesheets' => new TwigFunction('outputSystemStylesheets', [$this, 'outputSystemStylesheets'], ['is_safe' => ['html']]),
         ];
     }
 
