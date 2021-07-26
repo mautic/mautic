@@ -44,6 +44,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -356,12 +357,12 @@ class SubmissionModel extends CommonFormModel
                 }
             }
 
+            $tokens["{formfield={$alias}}"] = $this->normalizeValue($value, $f);
+
             //convert array from checkbox groups and multiple selects
             if (is_array($value)) {
                 $value = implode(', ', $value);
             }
-
-            $tokens["{formfield={$alias}}"] = $value;
 
             //save the result
             if (false !== $f->getSaveResult()) {
@@ -1072,5 +1073,19 @@ class SubmissionModel extends CommonFormModel
         }
 
         return $data;
+    }
+
+    private function normalizeValue($value, Field $f): string
+    {
+        $value = !is_array($value) ? [$value] : $value;
+
+        // select and multiselect normalization
+        if ($properties = $f->getProperties()['list'] ?? null) {
+            foreach ($value as $key => $item) {
+                $value[$key] = CustomFieldValueHelper::setValueFromPropertiesList($properties, $item);
+            }
+        }
+
+        return implode(', ', $value);
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Mautic\FormBundle\Tests\Model;
 
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Model\SubmissionModel;
@@ -84,5 +85,40 @@ class SubmissionModelTest extends FormTestAbstract
 
         $result = $method->invokeArgs($submissionModel, [$profileFields, $data, $notOverwriteFields]);
         $this->assertSame(['email' => 'test@test.com'], $result);
+    }
+
+    public function testNormalizeValues()
+    {
+        $submissionModel     = $this->getSubmissionModel();
+        $reflection          = new \ReflectionClass(SubmissionModel::class);
+        $method              = $reflection->getMethod('normalizeValue');
+        $method->setAccessible(true);
+
+        $field = new Field();
+        $this->assertEquals('', $method->invokeArgs($submissionModel, ['', $field]));
+        $this->assertEquals(1, $method->invokeArgs($submissionModel, [1, $field]));
+        $this->assertEquals('1, 2', $method->invokeArgs($submissionModel, [[1, 2], $field]));
+
+        // field wiht list
+        $field = new Field();
+        $field->setProperties(
+            [
+                'list' => [
+                        'list' => [
+                                [
+                                    'label' => 'First',
+                                    'value' => 1,
+                                ],
+                                [
+                                    'label' => 'Second',
+                                    'value' => 2,
+                                ],
+                            ],
+                    ],
+            ]
+        );
+        $this->assertEquals('', $method->invokeArgs($submissionModel, ['', $field]));
+        $this->assertEquals('First', $method->invokeArgs($submissionModel, [1, $field]));
+        $this->assertEquals('First, Second', $method->invokeArgs($submissionModel, [[1, 2], $field]));
     }
 }
