@@ -144,8 +144,7 @@
         "[web-root]/media/files/.htaccess": "assets/scaffold/media/files/.htaccess",
         "[web-root]/media/images/.htaccess": "assets/scaffold/media/images/.htaccess",
         "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
-        "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png",
-        "[project-root]/app/.htaccess": "assets/scaffold/files/deny.htaccess"
+        "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png"
       }
     }
   },
