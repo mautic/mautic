@@ -40,7 +40,7 @@
             </li>
             <?php endforeach; ?>
         </ul>
-        <?php echo '<!-- '.PHP_EOL.json_encode($logs, JSON_PRETTY_PRINT).PHP_EOL.' -->'; ?>
+        <?php echo '<!-- recent activity logs '.PHP_EOL.json_encode($logs, JSON_PRETTY_PRINT).PHP_EOL.' -->'; ?>
         <?php endif; ?>
     </div>
 </div>
