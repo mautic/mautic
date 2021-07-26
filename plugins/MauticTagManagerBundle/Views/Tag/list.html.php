@@ -125,7 +125,7 @@ $listCommand = $view['translator']->trans('mautic.tagmanager.tag.searchcommand.l
                     <td class="visible-md visible-lg">
                         <a class="label label-primary" href="<?php echo $view['router']->path(
                             'mautic_contact_index',
-                            ['search' => $view['translator']->trans('mautic.tagmanager.lead.searchcommand.list').':'.$item->getTag()]
+                            ['search' => $view['translator']->trans('mautic.tagmanager.lead.searchcommand.list').':"'.$item->getTag().'"']
                         ); ?>" data-toggle="ajax"<?php echo (0 == $tagsCount[$item->getId()]) ? 'disabled=disabled' : ''; ?>>
                             <?php echo $view['translator']->transChoice(
                                 'mautic.lead.list.viewleads_count',
