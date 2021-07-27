@@ -1,5 +1,8 @@
 /** EmailBundle **/
 Mautic.emailOnLoad = function (container, response) {
+    Mautic.internalDynamicContentItemCreateListeners = [];
+    Mautic.internalDynamicContentFilterCreateListeners = [];
+
     if (mQuery('#emailform_plainText').length) {
         // @todo initiate the token dropdown
         var plaintext = mQuery('#emailform_plainText');
@@ -327,15 +330,23 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     filterHolder.append(newForm);
 
     var itemContainer = mQuery(tabId);
-    var textarea      = itemContainer.find('.editor.builder-v2');
+    var textarea      = itemContainer.find('.editor');
     var firstInput    = itemContainer.find('input[type="text"]').first();
 
-    textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
-        // Set custom buttons with separator between them.
-        toolbarSticky: false,
-        toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'],
-        heightMin: 100
-    }));
+    if (textarea.hasClass('legacy-builder')) {
+        textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
+            // Set custom buttons with separator between them.
+            toolbarSticky: false,
+            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'],
+            heightMin: 100
+        }));
+    }
+
+    if (Mautic.internalDynamicContentItemCreateListeners) {
+        Mautic.internalDynamicContentItemCreateListeners.forEach(function(callback) {
+            callback(textarea);
+        });
+    }
 
     tabHolder.find('i').first().removeClass('fa-spinner fa-spin').addClass('fa-plus text-success');
     newTab.find('a').tab('show');
@@ -348,6 +359,10 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
 
     return tabId;
 };
+
+Mautic.dynamicContentAddNewItemListener = function(callback) {
+    Mautic.internalDynamicContentItemCreateListeners.push(callback);
+}
 
 Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
     // To support the parent.mQuery from the builder
@@ -378,7 +393,7 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
 
     var filterContainer  = mQuery(filterContainerId);
     var availableFilters = filterContainer.find('select[data-mautic="available_filters"]');
-    var altTextarea      = filterContainer.find('.editor.builder-v2');
+    var altTextarea      = filterContainer.find('.editor');
     var removeButton     = filterContainer.find('.remove-item');
 
     Mautic.activateChosenSelect(availableFilters, false, mQuery);
@@ -393,12 +408,20 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
         }
     });
 
-    altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
-        // Set custom buttons with separator between them.
-        toolbarSticky: false,
-        toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'],
-        heightMin: 100
-    }));
+    if (altTextarea.hasClass('legacy-builder')) {
+        altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
+            // Set custom buttons with separator between them.
+            toolbarSticky: false,
+            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'],
+            heightMin: 100
+        }));
+    }
+
+    if (Mautic.internalDynamicContentFilterCreateListeners) {
+        Mautic.internalDynamicContentFilterCreateListeners.forEach(function(callback) {
+            callback(altTextarea);
+        });
+    }
 
     Mautic.initRemoveEvents(removeButton, mQuery);
 
@@ -406,6 +429,10 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
 
     return filterContainerId;
 };
+
+Mautic.dynamicContentAddNewFilterListener = function(callback) {
+    Mautic.internalDynamicContentFilterCreateListeners.push(callback);
+}
 
 Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
     // To support the parent.mQuery from the builder
