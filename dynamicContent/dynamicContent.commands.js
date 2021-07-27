@@ -16,8 +16,7 @@ export default class DynamicContentCommands {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  stopDynamicContentPopup(editor) {
-    // editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
+  stopDynamicContentPopup() {
     this.dcService.updateDcStoreItem();
   }
 

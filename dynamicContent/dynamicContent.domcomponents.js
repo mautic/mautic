@@ -1,12 +1,10 @@
+import DynamicContentService from './dynamicContent.service';
+
 export default class DynamicContentDomComponents {
-  editor;
+  dcService;
 
-  constructor(editor) {
-    this.editor = editor;
-  }
-
-  addDynamicContentType() {
-    const dc = this.editor.DomComponents;
+  static addDynamicContentType(editor) {
+    const dc = editor.DomComponents;
     const defaultType = dc.getType('default');
     const defaultModel = defaultType.model;
 
@@ -47,6 +45,7 @@ export default class DynamicContentDomComponents {
             });
           }
         },
+        // @todo: show the store items default content on the canvas
         // updated(property, value, prevValue) {
         //   console.log('Local hook: model.updated', {
         //     property,
@@ -75,7 +74,14 @@ export default class DynamicContentDomComponents {
       events: {
         dblclick: 'onActive',
       },
-      // maybe use onRender for token to component conversion
+      // replace token with human readable view
+      onRender(el) {
+        const dcService = new DynamicContentService(editor);
+        const decId = DynamicContentService.getDataParamDecid(el.model);
+        const dcItem = dcService.getStoreItem(decId);
+        this.el.innerHTML = dcItem.content;
+        dcService.logger.debug('DC: Updated view', dcItem);
+      },
       // open the dynamic content modal if the editor is added or double clicked
       onActive() {
         const target = this.model;

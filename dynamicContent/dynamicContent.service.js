@@ -53,12 +53,20 @@ export default class DynamicContentService {
   }
 
   /**
+   * Returns the decId from the component
+   * @returns integer
+   */
+  static getDataParamDecid(component) {
+    return parseInt(component.getAttributes()['data-param-dec-id'], 10) || 0;
+  }
+
+  /**
    * Link the component on the canvas with the item in the HTML store
    * If it does not exist, create a new store item
    */
   linkComponentToStoreItem(component) {
     // get components data-param-dec-id (can come from token from db)
-    let decId = component.getAttributes()['data-param-dec-id'] || 0;
+    let decId = DynamicContentService.getDataParamDecid(component);
     if (decId > 0) {
       this.logger.debug('DC: Already wired up', { decId });
       return decId;
@@ -78,7 +86,7 @@ export default class DynamicContentService {
     }
 
     // return components dec-id (also from the new one)
-    return component.getAttributes()['data-param-dec-id'] || 0;
+    return DynamicContentService.getDataParamDecid(component);
   }
 
   /**
@@ -91,11 +99,11 @@ export default class DynamicContentService {
    */
   updateComponentFromDcStore(component) {
     // get the item/tab matching the dynamic content on the canvas
-    let dataParamDecId = component.getAttributes()['data-param-dec-id'] || 0;
+    let dataParamDecId = DynamicContentService.getDataParamDecid(component);
     let dcItem = this.getStoreItem(dataParamDecId);
 
     // Load the html store item
-    dataParamDecId = component.getAttributes()['data-param-dec-id'] || 0;
+    dataParamDecId = DynamicContentService.getDataParamDecid(component);
     dcItem = this.getStoreItem(dataParamDecId);
 
     // Update the Grapesjs component with the content from the HTML store item
@@ -119,7 +127,10 @@ export default class DynamicContentService {
     const dynamicContentContainer = mQuery('#dynamicContentContainer');
     const content = mQuery(modalContent).contents().first();
     dynamicContentContainer.append(content.detach());
-    this.logger.debug('DC: store item updated', { id: content.attr('id') });
+
+    this.logger.debug('DC: store item updated', {
+      id: content.attr('id'),
+    });
   }
 
   /**
