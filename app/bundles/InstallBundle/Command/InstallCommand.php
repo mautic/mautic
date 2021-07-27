@@ -282,7 +282,11 @@ class InstallCommand extends ContainerAwareCommand
 
         // $dbParams must be populated with the "table_prefix" key to avoid having an undefined Index later
         $dbParams   = ['table_prefix' => null];
-        $adminParam = [];
+        $adminParam = [
+            'firstname' => 'Admin',
+            'lastname'  => 'Mautic',
+            'username'  => 'admin',
+        ];
         $allParams  = $installer->localConfigParameters();
 
         // Initialize DB and admin params from local.php
