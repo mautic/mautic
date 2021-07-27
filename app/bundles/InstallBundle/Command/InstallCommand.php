@@ -254,7 +254,7 @@ class InstallCommand extends ContainerAwareCommand
         ];
 
         $commandInput = new ArrayInput($arguments);
-        $returnCode   = $command->run($commandInput, $output);
+        //$returnCode   = $command->run($commandInput, $output);
 
         $container = $this->getContainer();
         /** @var \Mautic\InstallBundle\Install\InstallService $installer */
@@ -272,6 +272,9 @@ class InstallCommand extends ContainerAwareCommand
             '==============',
             '',
         ]);
+
+        //Prevents querying of DB-Tables which not exist while the installation process
+        define('MAUTIC_INSTALLER', 1);
 
         // Build objects to pass to the install service from local.php or command line options
         $output->writeln('Parsing options and arguments...');
