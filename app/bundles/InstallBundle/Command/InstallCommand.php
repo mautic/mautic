@@ -254,7 +254,7 @@ class InstallCommand extends ContainerAwareCommand
         ];
 
         $commandInput = new ArrayInput($arguments);
-        //$returnCode   = $command->run($commandInput, $output);
+        $returnCode   = $command->run($commandInput, $output);
 
         $container = $this->getContainer();
         /** @var \Mautic\InstallBundle\Install\InstallService $installer */
