@@ -129,21 +129,21 @@ class InstallCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Admin first name.',
-                'Admin'
+                null
             )
             ->addOption(
                 '--admin_lastname',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Admin last name.',
-                'Mautic'
+                null
             )
             ->addOption(
                 '--admin_username',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Admin username.',
-                'admin'
+                null
             )
             ->addOption(
                 '--admin_email',
