@@ -152,10 +152,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         $this->cookieHelper->deleteCookie('mtc_sid');
     }
 
-    /**
-     * @return string|null
-     */
-    private function getTrackedIdentifier()
+    private function getTrackedIdentifier(): ?string
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -176,10 +173,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         return $deviceTrackingId;
     }
 
-    /**
-     * @return string
-     */
-    private function getUniqueTrackingIdentifier()
+    private function getUniqueTrackingIdentifier(): string
     {
         do {
             $generatedIdentifier = $this->randomHelper->generate(23);

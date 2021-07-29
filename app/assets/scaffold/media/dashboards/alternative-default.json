@@ -1,0 +1,140 @@
+{
+    "name": "Default - Alternative",
+    "description": "An alternate layout to Mautic's default.",
+    "widgets": [
+        {
+            "name": "Contacts created",
+            "width": 100,
+            "height": 330,
+            "ordering": 0,
+            "type": "created.leads.in.time",
+            "params": {
+                "lists": "identifiedVsAnonymous",
+                "flag": null
+            },
+            "template": null
+        },
+        {
+            "name": "Visits",
+            "width": 50,
+            "height": 330,
+            "ordering": 1,
+            "type": "page.hits.in.time",
+            "params": {
+                "flag": null
+            },
+            "template": null
+        },
+        {
+            "name": "Contact map",
+            "width": 50,
+            "height": 330,
+            "ordering": 3,
+            "type": "map.of.leads",
+            "params": [
+            ],
+            "template": null
+        },
+        {
+            "name": "Emails sent \/ opened",
+            "width": 50,
+            "height": 330,
+            "ordering": 5,
+            "type": "emails.in.time",
+            "params": {
+                "flag": null
+            },
+            "template": null
+        },
+        {
+            "name": "Points",
+            "width": 50,
+            "height": 330,
+            "ordering": 6,
+            "type": "points.in.time",
+            "params": [
+            ],
+            "template": null
+        },
+        {
+            "name": "Unique\/returning visitors",
+            "width": 25,
+            "height": 330,
+            "ordering": 7,
+            "type": "unique.vs.returning.leads",
+            "params": [
+            ],
+            "template": null
+        },
+        {
+            "name": "Identified vs anonymous leads",
+            "width": 25,
+            "height": 330,
+            "ordering": 8,
+            "type": "anonymous.vs.identified.leads",
+            "params": [
+            ],
+            "template": null
+        },
+        {
+            "name": "Ignored\/opened emails",
+            "width": 25,
+            "height": 330,
+            "ordering": 9,
+            "type": "ignored.vs.read.emails",
+            "params": [
+            ],
+            "template": null
+        },
+        {
+            "name": "Upcoming Emails",
+            "width": 25,
+            "height": 330,
+            "ordering": 10,
+            "type": "upcoming.emails",
+            "params": [
+            ],
+            "template": null
+        },
+        {
+            "name": "Top Contact Creators",
+            "width": 100,
+            "height": 330,
+            "ordering": 11,
+            "type": "top.creators",
+            "params": [
+            ],
+            "template": null
+        },
+        {
+            "name": "Dwell times",
+            "width": 25,
+            "height": 330,
+            "ordering": 12,
+            "type": "dwell.times",
+            "params": [
+            ],
+            "template": null
+        },
+        {
+            "name": "Recent activity",
+            "width": 50,
+            "height": 330,
+            "ordering": 13,
+            "type": "recent.activity",
+            "params": [
+            ],
+            "template": null
+        },
+        {
+            "name": "Top lists",
+            "width": 25,
+            "height": 330,
+            "ordering": 14,
+            "type": "top.lists",
+            "params": [
+            ],
+            "template": null
+        }
+    ]
+}
