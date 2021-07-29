@@ -472,6 +472,45 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    /**
+     * Test lead matching by ID.
+     */
+    public function testImportMatchLeadById(): void
+    {
+        $leadEventLog  = new LeadEventLog();
+        $lead          = new Lead();
+        $lead->setId(21);
+
+        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['saveEntity', 'getEntity'])
+            ->getMock();
+
+        $mockUserModel = $this->getMockBuilder(UserHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockUserModel->method('getUser')
+            ->willReturn(new User());
+
+        $mockLeadModel->setUserHelper($mockUserModel);
+
+        $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['extractCompanyDataFromImport'])
+            ->getMock();
+
+        $mockCompanyModel->expects($this->once())->method('extractCompanyDataFromImport')->willReturn([[], []]);
+
+        $this->setProperty($mockLeadModel, LeadModel::class, 'companyModel', $mockCompanyModel);
+        $this->setProperty($mockLeadModel, LeadModel::class, 'leadFields', [['alias' => 'email', 'type' => 'email', 'defaultValue' => '']]);
+
+        $mockLeadModel->expects($this->once())->method('getEntity')->willReturn($lead);
+
+        $merged = $mockLeadModel->import(['identifier' => 'id'], ['identifier' => '21'], null, null, null, true, $leadEventLog);
+        $this->assertTrue($merged);
+    }
+
     public function testSetFieldValuesWithStage(): void
     {
         $lead = new Lead();
