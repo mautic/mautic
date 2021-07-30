@@ -42,7 +42,7 @@ class ClientController extends FormController
         $orderBy           = $this->get('session')->get('mautic.client.orderby', 'c.name');
         $orderByDir        = $this->get('session')->get('mautic.client.orderbydir', 'ASC');
         $filter            = $this->request->get('search', $this->get('session')->get('mautic.client.filter', ''));
-        $apiMode           = $this->factory->getRequest()->get('api_mode', $this->get('session')->get('mautic.client.filter.api_mode', 'oauth1a'));
+        $apiMode           = $this->factory->getRequest()->get('api_mode', $this->get('session')->get('mautic.client.filter.api_mode', 'oauth2'));
         $this->get('session')->set('mautic.client.filter.api_mode', $apiMode);
         $this->get('session')->set('mautic.client.filter', $filter);
 
@@ -82,7 +82,6 @@ class ClientController extends FormController
 
         // api options
         $apiOptions           = [];
-        $apiOptions['oauth1'] = 'OAuth 1';
         $apiOptions['oauth2'] = 'OAuth 2';
         $filters['api_mode']  = [
             'values'  => [$apiMode],
@@ -184,7 +183,7 @@ class ClientController extends FormController
             return $this->accessDenied();
         }
 
-        $apiMode = (0 === $objectId) ? $this->get('session')->get('mautic.client.filter.api_mode', 'oauth1a') : $objectId;
+        $apiMode = (0 === $objectId) ? $this->get('session')->get('mautic.client.filter.api_mode', 'oauth2') : $objectId;
         $this->get('session')->set('mautic.client.filter.api_mode', $apiMode);
 
         /** @var \Mautic\ApiBundle\Model\ClientModel $model */
