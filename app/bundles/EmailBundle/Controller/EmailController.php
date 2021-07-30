@@ -1536,10 +1536,7 @@ class EmailController extends FormController
 
                 if ($previewForContactId) {
                     // We have one from request parameter
-                    $contact = $leadModel->getEntity($previewForContactId);
-                    if ($contact && $contact->getId()) {
-                        $fields = $contact->convertToArray();
-                    }
+                    $fields = $leadModel->getRepository()->getLead($previewForContactId);
                 }
 
                 if (!isset($fields)) {

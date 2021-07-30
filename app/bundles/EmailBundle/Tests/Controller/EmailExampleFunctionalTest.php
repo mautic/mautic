@@ -67,6 +67,291 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Contact emails is [Email]', $message->getBody()->toString());
     }
 
+    /**
+     * @throws MappingException
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithNoContact(): void
+    {
+        // Create custom field
+        $this->client->request(
+            'POST',
+            '/api/fields/contact/new',
+            [
+                'label'      => 'bool',
+                'type'       => 'boolean',
+                'properties' => [
+                    'no'  => 'No',
+                    'yes' => 'Yes',
+                ],
+            ]
+        );
+        $response = $this->client->getResponse()->getContent();
+        self::assertSame(201, $this->client->getResponse()->getStatusCode(), $response);
+        self::assertJson($response);
+
+        // Create email with dynamic content variant
+        $email          = $this->createEmail();
+        $dynamicContent = [
+            [
+                'tokenName' => 'Dynamic Content 1',
+                'content'   => '<p>Default Dynamic Content</p>',
+                'filters'   => [
+                    [
+                        'content' => null,
+                        'filters' => [],
+                    ],
+                ],
+            ],
+            [
+                'tokenName' => 'Dynamic Content 2',
+                'content'   => '<p>Default Dynamic Content</p>',
+                'filters'   => [
+                    [
+                        'content' => '<p>Variant 1 Dynamic Content</p>',
+                        'filters' => [
+                            [
+                                'glue'     => 'and',
+                                'field'    => 'bool',
+                                'object'   => 'lead',
+                                'type'     => 'boolean',
+                                'filter'   => '1',
+                                'display'  => null,
+                                'operator' => '=',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $email->setCustomHtml('<div>{dynamiccontent="Dynamic Content 2"}</div>');
+        $email->setDynamicContent($dynamicContent);
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
+        $formCrawler = $crawler->filter('form[name=example_send]');
+        self::assertSame(1, $formCrawler->count());
+        $form = $formCrawler->form();
+        $form->setValues(['example_send[emails][list][0]' => 'admin@yoursite.com']);
+        $this->client->submit($form);
+        self::assertCount(1, $this->transport->messages);
+        $message = $this->transport->messages[0];
+
+        // Asserting email data
+        self::assertInstanceOf('Swift_Message', $message);
+        self::assertSame('admin@yoursite.com', key($message->getTo()));
+        self::assertStringContainsString('Email subject', $message->getSubject());
+        self::assertStringContainsString('Default Dynamic Content', $message->getBody());
+    }
+
+    /**
+     * @throws MappingException
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithMatchFilterContact(): void
+    {
+        // Create custom field
+        $this->client->request(
+            'POST',
+            '/api/fields/contact/new',
+            [
+                'label'      => 'bool',
+                'type'       => 'boolean',
+                'properties' => [
+                    'no'  => 'No',
+                    'yes' => 'Yes',
+                ],
+            ]
+        );
+        $response = $this->client->getResponse()->getContent();
+        self::assertSame(201, $this->client->getResponse()->getStatusCode(), $response);
+        self::assertJson($response);
+
+        // Create email with dynamic content variant
+        $email          = $this->createEmail();
+        $dynamicContent = [
+            [
+                'tokenName' => 'Dynamic Content 1',
+                'content'   => '<p>Default Dynamic Content</p>',
+                'filters'   => [
+                    [
+                        'content' => null,
+                        'filters' => [],
+                    ],
+                ],
+            ],
+            [
+                'tokenName' => 'Dynamic Content 2',
+                'content'   => '<p>Default Dynamic Content</p>',
+                'filters'   => [
+                    [
+                        'content' => '<p>Variant 1 Dynamic Content</p>',
+                        'filters' => [
+                            [
+                                'glue'     => 'and',
+                                'field'    => 'bool',
+                                'object'   => 'lead',
+                                'type'     => 'boolean',
+                                'filter'   => '1',
+                                'display'  => null,
+                                'operator' => '=',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $email->setCustomHtml('<div>{dynamiccontent="Dynamic Content 2"}</div>');
+        $email->setDynamicContent($dynamicContent);
+        $this->em->flush();
+        $this->em->clear();
+
+        // Create some contacts
+        $this->client->request(
+            'POST',
+            '/api/contacts/batch/new',
+            [
+                [
+                    'firstname' => 'John',
+                    'lastname'  => 'A',
+                    'email'     => 'john.a@email.com',
+                    'bool'      => true,
+                ],
+            ]
+        );
+        self::assertSame(
+            201,
+            $this->client->getResponse()->getStatusCode(),
+            $this->client->getResponse()->getContent()
+        );
+        $contacts = json_decode($this->client->getResponse()->getContent(), true);
+
+        $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
+        $formCrawler = $crawler->filter('form[name=example_send]');
+        self::assertSame(1, $formCrawler->count());
+        $form = $formCrawler->form();
+        $form->setValues([
+            'example_send[emails][list][0]' => 'admin@yoursite.com',
+            'example_send[contact]'         => $contacts['contacts'][0]['firstname'],
+            'example_send[contact_id]'      => $contacts['contacts'][0]['id'],
+        ]);
+        $this->client->submit($form);
+        self::assertCount(1, $this->transport->messages);
+        $message = $this->transport->messages[0];
+
+        // Asserting email data
+        self::assertInstanceOf('Swift_Message', $message);
+        self::assertSame('admin@yoursite.com', key($message->getTo()));
+        self::assertStringContainsString('Email subject', $message->getSubject());
+        self::assertStringContainsString('Variant 1 Dynamic Content', $message->getBody());
+    }
+
+    /**
+     * @throws MappingException
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithNoMatchFilterContact(): void
+    {
+        // Create custom field
+        $this->client->request(
+            'POST',
+            '/api/fields/contact/new',
+            [
+                'label'      => 'bool',
+                'type'       => 'boolean',
+                'properties' => [
+                    'no'  => 'No',
+                    'yes' => 'Yes',
+                ],
+            ]
+        );
+        $response = $this->client->getResponse()->getContent();
+        self::assertSame(201, $this->client->getResponse()->getStatusCode(), $response);
+        self::assertJson($response);
+
+        // Create email with dynamic content variant
+        $email          = $this->createEmail();
+        $dynamicContent = [
+            [
+                'tokenName' => 'Dynamic Content 1',
+                'content'   => '<p>Default Dynamic Content</p>',
+                'filters'   => [
+                    [
+                        'content' => null,
+                        'filters' => [],
+                    ],
+                ],
+            ],
+            [
+                'tokenName' => 'Dynamic Content 2',
+                'content'   => '<p>Default Dynamic Content</p>',
+                'filters'   => [
+                    [
+                        'content' => '<p>Variant 1 Dynamic Content</p>',
+                        'filters' => [
+                            [
+                                'glue'     => 'and',
+                                'field'    => 'bool',
+                                'object'   => 'lead',
+                                'type'     => 'boolean',
+                                'filter'   => '1',
+                                'display'  => null,
+                                'operator' => '=',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $email->setCustomHtml('<div>{dynamiccontent="Dynamic Content 2"}</div>');
+        $email->setDynamicContent($dynamicContent);
+        $this->em->flush();
+        $this->em->clear();
+
+        // Create some contacts
+        $this->client->request(
+            'POST',
+            '/api/contacts/batch/new',
+            [
+                [
+                    'firstname' => 'John',
+                    'lastname'  => 'A',
+                    'email'     => 'john.a@email.com',
+                    'bool'      => false,
+                ],
+            ]
+        );
+        self::assertSame(
+            201,
+            $this->client->getResponse()->getStatusCode(),
+            $this->client->getResponse()->getContent()
+        );
+        $contacts = json_decode($this->client->getResponse()->getContent(), true);
+
+        $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
+        $formCrawler = $crawler->filter('form[name=example_send]');
+        self::assertSame(1, $formCrawler->count());
+        $form = $formCrawler->form();
+        $form->setValues([
+            'example_send[emails][list][0]' => 'admin@yoursite.com',
+            'example_send[contact]'         => $contacts['contacts'][0]['firstname'],
+            'example_send[contact_id]'      => $contacts['contacts'][0]['id'],
+        ]);
+        $this->client->submit($form);
+        self::assertCount(1, $this->transport->messages);
+        $message = $this->transport->messages[0];
+
+        // Asserting email data
+        self::assertInstanceOf('Swift_Message', $message);
+        self::assertSame('admin@yoursite.com', key($message->getTo()));
+        self::assertStringContainsString('Email subject', $message->getSubject());
+        self::assertStringContainsString('Default Dynamic Content', $message->getBody());
+    }
+
     private function createEmail(): Email
     {
         $email = new Email();
