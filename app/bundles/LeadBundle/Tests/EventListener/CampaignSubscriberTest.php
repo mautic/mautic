@@ -217,6 +217,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->configTo['id']);
         $companyEntityTo->method('getName')
             ->willReturn($this->configTo['companyname']);
+        $companyEntityTo->method('getProfileFields')
+            ->willReturn($this->configTo);
 
         $this->mockCompanyModel->expects($this->once())->method('getEntity')->willReturn($this->companyEntityFrom);
 
@@ -230,6 +232,14 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->mockCompanyModel->expects($this->once())
             ->method('getCompanyLeadRepository')
             ->willReturn($mockCompanyLeadRepo);
+
+        $this->mockCompanyModel->expects($this->once())
+            ->method('checkForDuplicateCompanies')
+            ->willReturn([$companyEntityTo]);
+
+        $this->mockCompanyModel->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([['alias' => 'companyname']]);
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -273,7 +283,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($event->getResult());
 
         $primaryCompany = $lead->getPrimaryCompany();
-
         $this->assertSame($this->configTo['companyname'], $primaryCompany['companyname']);
     }
 }

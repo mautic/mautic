@@ -24,7 +24,7 @@ use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
 class UserModel extends FormModel
 {
@@ -99,7 +99,7 @@ class UserModel extends FormModel
      *
      * @return string
      */
-    public function checkNewPassword(User $entity, PasswordEncoderInterface $encoder, $submittedPassword, $validate = false)
+    public function checkNewPassword(User $entity, UserPasswordEncoder $encoder, $submittedPassword, $validate = false)
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
@@ -109,7 +109,7 @@ class UserModel extends FormModel
 
         if (!empty($submittedPassword)) {
             //hash the clear password submitted via the form
-            return $encoder->encodePassword($submittedPassword, $entity->getSalt());
+            return $encoder->encodePassword($entity, $submittedPassword);
         }
 
         return $entity->getPassword();
@@ -241,7 +241,7 @@ class UserModel extends FormModel
      *
      * @param string $newPassword
      */
-    public function resetPassword(User $user, PasswordEncoderInterface $encoder, $newPassword)
+    public function resetPassword(User $user, UserPasswordEncoder $encoder, $newPassword)
     {
         $encodedPassword = $this->checkNewPassword($user, $encoder, $newPassword);
 

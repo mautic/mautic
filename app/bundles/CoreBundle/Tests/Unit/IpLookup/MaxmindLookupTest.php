@@ -11,9 +11,12 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\IpLookup\MaxmindCountryLookup;
 use Mautic\CoreBundle\IpLookup\MaxmindOmniLookup;
 use Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Maxmind requires API key and thus cannot test actual lookup so just make API endpoint works and
@@ -23,20 +26,18 @@ class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
 {
     private $cacheDir = __DIR__.'/../../../../../../var/cache/test';
 
+    /**
+     * @var MockObject|Client
+     */
     protected $mockHttp;
 
     protected function setUp(): void
     {
         // Mock http connector
-        $this->mockHttp = $this->getMockBuilder('Joomla\Http\Http')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mockHttp = $this->createMock(Client::class);
 
         // Mock a successful response
-        $mockResponse = $this->getMockBuilder('Joomla\Http\Response')
-            ->getMock();
-        $mockResponse->code = 200;
-        $mockResponse->body = <<<'RESPONSE'
+        $mockResponse = new Response(200, [], <<<'RESPONSE'
 {
   "city":  {
       "confidence":  25,
@@ -155,7 +156,7 @@ class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
       "queries_remaining":            54321
   }
 }
-RESPONSE;
+RESPONSE);
 
         $this->mockHttp->expects($this->once())
             ->method('get')
