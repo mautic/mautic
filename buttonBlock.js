@@ -1,14 +1,9 @@
-export default class ButtonBlock {
-  editor;
-
-  opts;
+export default class ButtonBlock { 
 
   blockManager;
 
-  constructor(editor, opts = {}) {
-    this.editor = editor;
-    this.opts = opts;
-    this.blockManager = this.editor.BlockManager;
+  constructor(editor, opts = {}) {  
+    this.blockManager = editor.BlockManager;
   }
 
   addButtonBlock() {
