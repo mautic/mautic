@@ -59,7 +59,7 @@ if (!isset($lead)) {
             <?php
             $displayManager = new \Mautic\FormBundle\ProgressiveProfiling\DisplayManager(
                 $form,
-                !empty($viewOnlyFields) ? $viewOnlyFields : []
+                !empty($doNotProgressiveFields) ? $doNotProgressiveFields : []
             );
             /** @var \Mautic\FormBundle\Entity\Field $f */
             foreach ($fields as $fieldId => $f):

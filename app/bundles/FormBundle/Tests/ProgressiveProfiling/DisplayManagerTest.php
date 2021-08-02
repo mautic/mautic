@@ -26,7 +26,7 @@ class DisplayManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array
      */
-    private $viewOnlyFields;
+    private $doNotProgressiveFields;
 
     /**
      * @var DisplayCounter
@@ -35,17 +35,17 @@ class DisplayManagerTest extends \PHPUnit\Framework\TestCase
 
     public function setUp(): void
     {
-        $this->viewOnlyFields = [];
-        $this->form           = new Form();
-        $this->displayCounter = new DisplayCounter($this->form);
+        $this->doNotProgressiveFields = [];
+        $this->form                   = new Form();
+        $this->displayCounter         = new DisplayCounter($this->form);
     }
 
     public function testShowForField()
     {
-        $form           = new Form();
-        $viewOnlyFields = ['button'];
-        $displayManager = new DisplayManager($form, $viewOnlyFields);
-        $displayCounter = $displayManager->getDisplayCounter();
+        $form                   = new Form();
+        $doNotProgressiveFields = ['button'];
+        $displayManager         = new DisplayManager($form, $doNotProgressiveFields);
+        $displayCounter         = $displayManager->getDisplayCounter();
 
         $field = new Field();
         $this->assertTrue($displayManager->showForField($field));

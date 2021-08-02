@@ -372,7 +372,7 @@ class SubmissionModel extends CommonFormModel
         if ($lead && $form->usesProgressiveProfiling()) {
             $leadSubmissions = $this->formModel->getLeadSubmissions($form, $lead->getId());
 
-            $displayManager = new DisplayManager($form, $this->formModel->getCustomComponents()['viewOnlyFields']);
+            $displayManager = new DisplayManager($form, $this->formModel->getDoNotProgressiveFields());
             foreach ($fields as $field) {
                 if ($field->showForContact($leadSubmissions, $lead, $form, $displayManager)) {
                     $displayManager->increaseDisplayedFields($field);
