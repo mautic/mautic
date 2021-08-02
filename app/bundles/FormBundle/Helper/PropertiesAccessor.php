@@ -49,7 +49,7 @@ class PropertiesAccessor
         $choices = [];
 
         if (is_array($options) && !isset($options[0]['value'])) {
-            return $options;
+            return array_flip($options);
         }
 
         if (!is_array($options)) {
