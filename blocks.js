@@ -18,7 +18,7 @@ export default (editor, opts = {}) => {
   //add button block for landing page 
   const mode = ContentService.getMode(editor);   
   if (mode === ContentService.modePageHtml) {   
-    const buttonBlock = new ButtonBlock(editor, opts);
+    const buttonBlock = new ButtonBlock(editor);
     buttonBlock.addButtonBlock();
   }
   
