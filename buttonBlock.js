@@ -2,7 +2,7 @@ export default class ButtonBlock {
 
   blockManager;
 
-  constructor(editor, opts = {}) {  
+  constructor(editor) {  
     this.blockManager = editor.BlockManager;
   }
 
