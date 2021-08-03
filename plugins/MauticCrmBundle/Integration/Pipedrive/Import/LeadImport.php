@@ -222,6 +222,7 @@ class LeadImport extends AbstractImport
 
         try {
             $lead = $this->contactMerger->merge($lead, $otherLead);
+            $this->update($data);
             $this->em->remove($otherIntegrationEntity);
         } catch (SameContactException $exception) {
             // Ignore
