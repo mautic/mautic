@@ -10,6 +10,7 @@
 
 namespace Mautic\EmailBundle\Model\AbTest;
 
+use Mautic\CoreBundle\Exception\RecordNotFoundException;
 use Mautic\CoreBundle\Model\AbTest\AbTestResultService;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\EmailBundle\Entity\Email;
@@ -70,7 +71,7 @@ class SendWinnerService
             $emailEntity = $this->emailModel->getEntity($emailId);
 
             if (empty($emailEntity)) {
-                throw new \Exception('Email id '.$emailId.' not found');
+                throw new RecordNotFoundException('Email id '.$emailId.' not found');
             }
 
             $emails = [$emailEntity];

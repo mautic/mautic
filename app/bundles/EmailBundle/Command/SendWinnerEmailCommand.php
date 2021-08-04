@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Command;
 
+use Mautic\CoreBundle\Exception\RecordNotFoundException;
 use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\EmailBundle\Model\AbTest\SendWinnerService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -58,9 +59,14 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->sendWinnerService->processWinnerEmails($input->getOption('id'));
+        try {
+            $this->sendWinnerService->processWinnerEmails($input->getOption('id'));
+            $output->writeln($this->sendWinnerService->getOutputMessages());
+        } catch (RecordNotFoundException $e) {
+            $output->writeln($e->getMessage());
 
-        $output->writeln($this->sendWinnerService->getOutputMessages());
+            return ExitCode::TEMPORARY_FAILURE;
+        }
 
         if (true === $this->sendWinnerService->shouldTryAgain()) {
             return ExitCode::TEMPORARY_FAILURE;
