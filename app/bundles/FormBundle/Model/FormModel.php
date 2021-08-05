@@ -736,7 +736,7 @@ class FormModel extends CommonFormModel
 
     public function getDoNotProgressiveFields(): array
     {
-        return array_merge($this->getCustomComponents()['viewOnlyFields'], ['hidden']);
+        return ['button', 'captcha', 'freetext', 'freehtml', 'pagebreak', 'hidden'];
     }
 
     /**
