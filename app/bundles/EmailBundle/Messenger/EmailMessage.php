@@ -15,20 +15,14 @@ use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 
 class EmailMessage
 {
-    /**
-     * @var \Swift_Message
-     */
-    private $mauticMessage;
+    private \Swift_Message $mauticMessage;
 
     public function __construct(\Swift_Message $mauticMessage)
     {
         $this->mauticMessage = $mauticMessage;
     }
 
-    /**
-     * @return MauticMessage
-     */
-    public function getMauticMessage()
+    public function getMauticMessage(): \Swift_Message
     {
         return $this->mauticMessage;
     }

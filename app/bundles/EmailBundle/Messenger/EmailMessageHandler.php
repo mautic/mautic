@@ -15,10 +15,7 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class EmailMessageHandler implements MessageHandlerInterface
 {
-    /**
-     * @var \Swift_Mailer
-     */
-    private $mailer;
+    private \Swift_Mailer $mailer;
 
     public function __construct(\Swift_Mailer $mailer)
     {
