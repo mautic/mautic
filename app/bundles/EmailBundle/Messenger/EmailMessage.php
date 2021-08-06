@@ -11,8 +11,6 @@
 
 namespace Mautic\EmailBundle\Messenger;
 
-use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
-
 class EmailMessage
 {
     private \Swift_Message $mauticMessage;
