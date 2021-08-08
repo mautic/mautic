@@ -38,6 +38,10 @@
                     <dd><?php echo $view['date']->toText($details['date_added'], 'UTC', 'Y-m-d H:i:s', true); ?></dd>
                     <dt><?php echo $view['translator']->trans('mautic.integration.last_sync_date'); ?></dt>
                     <dd><?php echo $view['date']->toText($details['last_sync_date'], 'UTC', 'Y-m-d H:i:s', true); ?></dd>
+
+                    <?php foreach (($details['extra-data'] ?? []) as $extraData): ?>
+                        <dd><?php echo $extraData; ?></dd>
+                    <?php endforeach; ?>
                 </dl>
             </div>
         </div>
