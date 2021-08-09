@@ -34,7 +34,7 @@ class InternalObjectFindByIdEvent extends Event
         return $this->object;
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -44,7 +44,7 @@ class InternalObjectFindByIdEvent extends Event
         $this->id = $id;
     }
 
-    public function getEntity(): object
+    public function getEntity(): ?object
     {
         return $this->entity;
     }

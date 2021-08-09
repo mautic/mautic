@@ -168,7 +168,7 @@ class CompanyObjectSubscriber implements EventSubscriberInterface
 
     public function findCompanyById(InternalObjectFindByIdEvent $event): void
     {
-        if (empty($event->getId()) || Company::NAME !== $event->getObject()->getName()) {
+        if (null === $event->getId() || Company::NAME !== $event->getObject()->getName()) {
             return;
         }
 
