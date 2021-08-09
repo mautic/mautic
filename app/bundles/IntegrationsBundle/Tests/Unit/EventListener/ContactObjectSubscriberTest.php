@@ -15,6 +15,7 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
+use Mautic\IntegrationsBundle\Event\InternalObjectFindByIdEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
@@ -25,6 +26,8 @@ use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
 
@@ -71,6 +74,7 @@ class ContactObjectSubscriberTest extends TestCase
                 ],
                 IntegrationEvents::INTEGRATION_FIND_OWNER_IDS              => ['findOwnerIdsForContacts', 0],
                 IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE => ['buildContactRoute', 0],
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD        => ['findContactById', 0],
             ],
             ContactObjectSubscriber::getSubscribedEvents()
         );
@@ -329,5 +333,48 @@ class ContactObjectSubscriberTest extends TestCase
         $this->subscriber->buildContactRoute($event);
 
         $this->assertSame('some/route', $event->getRoute());
+    }
+
+    /**
+     * @throws ImportFailedException
+     */
+    public function testFindContactById(): void
+    {
+        $event = new InternalObjectFindByIdEvent(new Contact());
+        $event->setId(1);
+        $contactObj = $this->createMock(Lead::class);
+        $this->contactObjectHelper->expects($this->once())
+            ->method('findObjectById')
+            ->with(1)
+            ->willReturn($contactObj);
+        $this->subscriber->findContactById($event);
+        self::assertSame($contactObj, $event->getEntity());
+    }
+
+    /**
+     * @throws ImportFailedException
+     */
+    public function testFindCompanyByIdWithNoIdSet(): void
+    {
+        $event = new InternalObjectFindByIdEvent(new Contact());
+        $this->contactObjectHelper->expects($this->never())
+            ->method('findObjectById');
+        $this->subscriber->findContactById($event);
+        self::assertNull($event->getEntity());
+    }
+
+    /**
+     * @throws ImportFailedException
+     */
+    public function testFindCompanyByIdWithNoCompany(): void
+    {
+        $event = new InternalObjectFindByIdEvent(new Contact());
+        $event->setId(1);
+        $this->contactObjectHelper->expects($this->once())
+            ->method('findObjectById')
+            ->with(1)
+            ->willReturn(null);
+        $this->subscriber->findContactById($event);
+        self::assertNull($event->getEntity());
     }
 }

@@ -172,7 +172,7 @@ class ContactObjectSubscriber implements EventSubscriberInterface
      */
     public function findContactById(InternalObjectFindByIdEvent $event): void
     {
-        if (empty($event->getId()) || Contact::NAME !== $event->getObject()->getName()) {
+        if (null === $event->getId() || Contact::NAME !== $event->getObject()->getName()) {
             return;
         }
 
