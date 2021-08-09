@@ -218,4 +218,14 @@ class CompanyObjectHelper implements ObjectHelperInterface
 
         return $qb->execute()->fetchAll();
     }
+
+    public function findObjectById(int $id): ?Company
+    {
+        return $this->repository->getEntity($id);
+    }
+
+    public function setFieldValues(Company $company): void
+    {
+        $this->model->setFieldValues($company, []);
+    }
 }

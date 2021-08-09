@@ -26,6 +26,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -404,5 +405,18 @@ class ContactObjectHelper implements ObjectHelperInterface
 
         // Assume manually removed
         return DoNotContact::MANUAL;
+    }
+
+    public function findObjectById(int $id): ?Lead
+    {
+        return $this->repository->getEntity($id);
+    }
+
+    /**
+     * @throws ImportFailedException
+     */
+    public function setFieldValues(Lead $lead): void
+    {
+        $this->model->setFieldValues($lead, []);
     }
 }
