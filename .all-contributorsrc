@@ -34,7 +34,8 @@
       "contributions": [
         "userTesting",
         "review",
-        "code"
+        "code",
+        "test"
       ]
     },
     {
@@ -64,7 +65,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/866855?v=4",
       "profile": "https://github.com/stevedrobinson",
       "contributions": [
-        "userTesting"
+        "userTesting",
+        "bug"
       ]
     },
     {
@@ -396,6 +398,15 @@
       "contributions": [
         "code",
         "doc"
+      ]
+    },
+    {
+      "login": "rohitpavaskar",
+      "name": "Rohit Pavaskar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15215575?v=4",
+      "profile": "https://github.com/rohitpavaskar",
+      "contributions": [
+        "code"
       ]
     }
   ],
