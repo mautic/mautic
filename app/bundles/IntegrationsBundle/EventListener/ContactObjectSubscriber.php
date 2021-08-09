@@ -15,6 +15,7 @@ namespace Mautic\IntegrationsBundle\EventListener;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
+use Mautic\IntegrationsBundle\Event\InternalObjectFindByIdEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
@@ -22,6 +23,7 @@ use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Router;
 
@@ -45,22 +47,20 @@ class ContactObjectSubscriber implements EventSubscriberInterface
         $this->router              = $router;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS => ['collectInternalObjects', 0],
-            IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS  => ['updateContacts', 0],
-            IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS  => ['createContacts', 0],
-            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS    => [
+            IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS    => ['collectInternalObjects', 0],
+            IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS     => ['updateContacts', 0],
+            IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS     => ['createContacts', 0],
+            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS       => [
                 ['findContactsByIds', 0],
                 ['findContactsByDateRange', 0],
                 ['findContactsByFieldValues', 0],
             ],
             IntegrationEvents::INTEGRATION_FIND_OWNER_IDS              => ['findOwnerIdsForContacts', 0],
             IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE => ['buildContactRoute', 0],
+            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD        => ['findContactById', 0],
         ];
     }
 
@@ -165,5 +165,24 @@ class ContactObjectSubscriber implements EventSubscriberInterface
             )
         );
         $event->stopPropagation();
+    }
+
+    /**
+     * @throws ImportFailedException
+     */
+    public function findContactById(InternalObjectFindByIdEvent $event): void
+    {
+        if (empty($event->getId()) || Contact::NAME !== $event->getObject()->getName()) {
+            return;
+        }
+
+        $contact = $this->contactObjectHelper->findObjectById($event->getId());
+
+        if (null === $contact) {
+            return;
+        }
+
+        $this->contactObjectHelper->setFieldValues($contact);
+        $event->setEntity($contact);
     }
 }

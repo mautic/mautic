@@ -15,6 +15,7 @@ namespace Mautic\IntegrationsBundle\EventListener;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
+use Mautic\IntegrationsBundle\Event\InternalObjectFindByIdEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
@@ -45,22 +46,20 @@ class CompanyObjectSubscriber implements EventSubscriberInterface
         $this->router              = $router;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS => ['collectInternalObjects', 0],
-            IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS  => ['updateCompanies', 0],
-            IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS  => ['createCompanies', 0],
-            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS    => [
+            IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS    => ['collectInternalObjects', 0],
+            IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS     => ['updateCompanies', 0],
+            IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS     => ['createCompanies', 0],
+            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS       => [
                 ['findCompaniesByIds', 0],
                 ['findCompaniesByDateRange', 0],
                 ['findCompaniesByFieldValues', 0],
             ],
             IntegrationEvents::INTEGRATION_FIND_OWNER_IDS              => ['findOwnerIdsForCompanies', 0],
             IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE => ['buildCompanyRoute', 0],
+            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD        => ['findCompanyById', 0],
         ];
     }
 
@@ -165,5 +164,21 @@ class CompanyObjectSubscriber implements EventSubscriberInterface
             )
         );
         $event->stopPropagation();
+    }
+
+    public function findCompanyById(InternalObjectFindByIdEvent $event): void
+    {
+        if (empty($event->getId()) || Company::NAME !== $event->getObject()->getName()) {
+            return;
+        }
+
+        $company = $this->companyObjectHelper->findObjectById($event->getId());
+
+        if (null === $company) {
+            return;
+        }
+
+        $this->companyObjectHelper->setFieldValues($company);
+        $event->setEntity($company);
     }
 }
