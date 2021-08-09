@@ -114,17 +114,17 @@ class Report extends FormEntity implements SchedulerInterface
     /**
      * @var string|null
      */
-    private $scheduleFormat;
+    private $scheduleFormat = 'csv';
 
     /**
      * @var string|null
      */
-    private $scheduleTimezone;
+    private $scheduleTimezone = 'UTC';
 
     /**
      * @var string|null
      */
-    private $scheduleTime;
+    private $scheduleTime = '00:00';
 
     /**
      * @var bool
