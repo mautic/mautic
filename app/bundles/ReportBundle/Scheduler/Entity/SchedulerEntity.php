@@ -37,13 +37,13 @@ class SchedulerEntity implements SchedulerInterface
     private $scheduleMonthFrequency;
 
     /**
-   * @var string|null
-   */
+     * @var string|null
+     */
     private $scheduleTimezone;
 
-   /**
-   * @var string|null
-   */
+    /**
+     * @var string|null
+     */
     private $scheduleTime;
 
     public function __construct($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency, $scheduleTimezone = 'UTC', $scheduleTime = '00:00')
@@ -53,7 +53,7 @@ class SchedulerEntity implements SchedulerInterface
         $this->scheduleDay            = $scheduleDay;
         $this->scheduleMonthFrequency = $scheduleMonthFrequency;
         $this->scheduleTimezone       = $scheduleTimezone;
-        $this->scheduleTime       = $scheduleTime;
+        $this->scheduleTime           = $scheduleTime;
     }
 
     /**

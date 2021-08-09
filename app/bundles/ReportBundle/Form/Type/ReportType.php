@@ -321,7 +321,6 @@ class ReportType extends AbstractType
                 ]
             );
 
-          //Scheduler
             $builder->add(
                 'sendEmpty',
                 YesNoButtonGroupType::class,
@@ -336,7 +335,6 @@ class ReportType extends AbstractType
                 ]
             );
 
-            //Scheduler
             $builder->add(
                 'scheduleFormat',
                 SelectType::class,
@@ -352,7 +350,6 @@ class ReportType extends AbstractType
                 ]
             );
 
-          //Scheduler
             $builder->add(
                 'scheduleTimezone',
                 TimezoneType::class,
@@ -366,7 +363,6 @@ class ReportType extends AbstractType
                 'required' => false,
                 ]
             );
-
 
             $builder->add(
                 'scheduleTime',

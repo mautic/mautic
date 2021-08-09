@@ -33,10 +33,19 @@ class ReportDataResult
      */
     private $types = [];
 
+    /**
+     * @var array
+     */
+    private $columns = [];
+
+    /**
+     * @var array
+     */
+    private $dataColumns = [];
+
     public function __construct(array $data)
     {
-        if (
-            !array_key_exists('data', $data) ||
+        if (!array_key_exists('data', $data) ||
             !array_key_exists('dataColumns', $data) ||
             !array_key_exists('columns', $data)
         ) {

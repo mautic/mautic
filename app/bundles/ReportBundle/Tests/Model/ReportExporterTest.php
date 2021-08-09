@@ -122,13 +122,13 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
     {
         $batchSize = 2;
 
-      /** @var CoreParametersHelper|MockObject $coreParametersHelper */
+        /** @var CoreParametersHelper|MockObject $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
-      /** @var ScheduleModel|MockObject $schedulerModel */
+        /** @var ScheduleModel|MockObject $schedulerModel */
         $schedulerModel = $this->createMock(ScheduleModel::class);
 
-      /** @var ReportDataAdapter|MockObject $reportDataAdapter */
+        /** @var ReportDataAdapter|MockObject $reportDataAdapter */
         $reportDataAdapter = $this->createMock(ReportDataAdapter::class);
 
         $coreParametersHelper->expects($this->once())
@@ -138,18 +138,18 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
 
         $reportExportOptions = new ReportExportOptions($coreParametersHelper);
 
-      /** @var ReportFileWriter|MockObject $reportFileWriter */
+        /** @var ReportFileWriter|MockObject $reportFileWriter */
         $reportFileWriter = $this->createMock(ReportFileWriter::class);
 
-      /** @var EventDispatcherInterface|MockObject $eventDispatcher */
+        /** @var EventDispatcherInterface|MockObject $eventDispatcher */
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $exportOption     = new ExportOption(null);
-        $reportResult     = Fixtures::getValidReportResult();
+        $exportOption                 = new ExportOption(null);
+        $reportResult                 = Fixtures::getValidReportResult();
         $reportResult['totalResults'] = 0;
-        $reportDataResult = new ReportDataResult($reportResult);
-        $report1          = new Report();
-        $scheduler1       = new Scheduler($report1, new \DateTime());
+        $reportDataResult             = new ReportDataResult($reportResult);
+        $report1                      = new Report();
+        $scheduler1                   = new Scheduler($report1, new \DateTime());
 
         $schedulerModel->expects($this->once())
         ->method('getScheduledReportsForExport')
@@ -158,12 +158,12 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
         $scheduler1,
         ]);
 
-      /*
-       * $reportDataResult->getData() has 11 results
-       * Batch size is 2 -> report will be processed 6 times (last process takes only 1 result)
-       * We have 2 scheduler = 3 report => 6 * 3 = 18 calls of getReportData
-       * If test fails here, check content of $reportDataResult->getData() and follow the calculation
-       */
+        /*
+         * $reportDataResult->getData() has 11 results
+         * Batch size is 2 -> report will be processed 6 times (last process takes only 1 result)
+         * We have 2 scheduler = 3 report => 6 * 3 = 18 calls of getReportData
+         * If test fails here, check content of $reportDataResult->getData() and follow the calculation
+         */
         $reportDataAdapter->expects($this->exactly(1))
         ->method('getReportData')
         ->willReturn($reportDataResult);
@@ -190,13 +190,13 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
     {
         $batchSize = 2;
 
-      /** @var CoreParametersHelper|MockObject $coreParametersHelper */
+        /** @var CoreParametersHelper|MockObject $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
-      /** @var ScheduleModel|MockObject $schedulerModel */
+        /** @var ScheduleModel|MockObject $schedulerModel */
         $schedulerModel = $this->createMock(ScheduleModel::class);
 
-      /** @var ReportDataAdapter|MockObject $reportDataAdapter */
+        /** @var ReportDataAdapter|MockObject $reportDataAdapter */
         $reportDataAdapter = $this->createMock(ReportDataAdapter::class);
 
         $coreParametersHelper->expects($this->once())
@@ -206,17 +206,17 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
 
         $reportExportOptions = new ReportExportOptions($coreParametersHelper);
 
-      /** @var ReportFileWriter|MockObject $reportFileWriter */
+        /** @var ReportFileWriter|MockObject $reportFileWriter */
         $reportFileWriter = $this->createMock(ReportFileWriter::class);
 
-      /** @var EventDispatcherInterface|MockObject $eventDispatcher */
+        /** @var EventDispatcherInterface|MockObject $eventDispatcher */
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $exportOption     = new ExportOption(null);
-        $reportResult     = Fixtures::getValidReportResult();
+        $exportOption                 = new ExportOption(null);
+        $reportResult                 = Fixtures::getValidReportResult();
         $reportResult['totalResults'] = 0;
-        $reportDataResult = new ReportDataResult($reportResult);
-        $report1          = new Report();
+        $reportDataResult             = new ReportDataResult($reportResult);
+        $report1                      = new Report();
         $report1->setSendEmpty(true);
         $scheduler1       = new Scheduler($report1, new \DateTime());
 
