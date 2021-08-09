@@ -106,6 +106,11 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
                         'type'  => 'bool',
                         'alias' => 'manually_added',
                     ],
+                    'lll.date_added' => [
+                        'label' => null,
+                        'type'  => 'date',
+                        'alias' => 'date_added',
+                    ],
                     's.id' => [
                         'label' => null,
                         'type'  => 'int',
@@ -157,7 +162,6 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'group' => 'contacts',
             ],
         ];
-
         $this->assertSame($expected, $reportBuilderEvent->getTables());
     }
 
