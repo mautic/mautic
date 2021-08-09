@@ -104,6 +104,35 @@ class CompanyObjectHelperTest extends TestCase
         }
     }
 
+    public function testFindObjectById(): void
+    {
+        $company = new Company();
+        $this->repository->expects(self::once())
+            ->method('getEntity')
+            ->with(1)
+            ->willReturn($company);
+
+        self::assertSame($company, $this->getObjectHelper()->findObjectById(1));
+    }
+
+    public function testFindObjectByIdReturnsNull(): void
+    {
+        $this->repository->expects(self::once())
+            ->method('getEntity')
+            ->with(1);
+
+        self::assertNull($this->getObjectHelper()->findObjectById(1));
+    }
+
+    public function testSetFieldValues(): void
+    {
+        $company = new Company();
+        $this->model->expects(self::once())
+            ->method('setFieldValues')
+            ->with($company, []);
+        $this->getObjectHelper()->setFieldValues($company);
+    }
+
     /**
      * @return CompanyObjectHelper
      */

@@ -25,6 +25,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\Contac
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -240,6 +241,38 @@ class ContactObjectHelperTest extends TestCase
             ->method('getEntities')
             ->willReturn([$contact1]);
         $this->getObjectHelper()->update([1], $objects);
+    }
+
+    public function testFindObjectById(): void
+    {
+        $contact = new Lead();
+        $this->repository->expects(self::once())
+            ->method('getEntity')
+            ->with(1)
+            ->willReturn($contact);
+
+        self::assertSame($contact, $this->getObjectHelper()->findObjectById(1));
+    }
+
+    public function testFindObjectByIdReturnsNull(): void
+    {
+        $this->repository->expects(self::once())
+            ->method('getEntity')
+            ->with(1);
+
+        self::assertNull($this->getObjectHelper()->findObjectById(1));
+    }
+
+    /**
+     * @throws ImportFailedException
+     */
+    public function testSetFieldValues(): void
+    {
+        $contact = new Lead();
+        $this->model->expects(self::once())
+            ->method('setFieldValues')
+            ->with($contact, []);
+        $this->getObjectHelper()->setFieldValues($contact);
     }
 
     /**
