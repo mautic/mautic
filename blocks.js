@@ -5,8 +5,8 @@ import ButtonBlock from './buttonBlock';
 export default (editor, opts = {}) => {
   const bm = editor.BlockManager;
   const cfg = editor.getConfig();
-
   const blocks = bm.getAll();
+
   // Add Dynamic Content block only for newsletter
   if ('grapesjsmjml' in cfg.pluginsOpts) {
     // Dynamic Content MJML block
@@ -15,13 +15,13 @@ export default (editor, opts = {}) => {
     dcb.addDynamciContentBlock();
   }
 
-  //add button block for landing page 
-  const mode = ContentService.getMode(editor);   
-  if (mode === ContentService.modePageHtml) {   
+  //add button block for landing page
+  const mode = ContentService.getMode(editor);
+  if (mode === ContentService.modePageHtml) {
     const buttonBlock = new ButtonBlock(editor);
     buttonBlock.addButtonBlock();
   }
-  
+
   // Add icon to mj-hero
   if (typeof bm.get('mj-hero') !== 'undefined') {
     bm.get('mj-hero').set({

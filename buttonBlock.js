@@ -1,8 +1,7 @@
-export default class ButtonBlock { 
-
+export default class ButtonBlock {
   blockManager;
 
-  constructor(editor) {  
+  constructor(editor) {
     this.blockManager = editor.BlockManager;
   }
 
@@ -24,12 +23,11 @@ export default class ButtonBlock {
                     </style>`;
     this.blockManager.add('button', {
       label: Mautic.translate('grapesjsbuilder.buttonBlockLabel'),
-      category : Mautic.translate('grapesjsbuilder.categoryBlockLabel'),
+      category: Mautic.translate('grapesjsbuilder.categoryBlockLabel'),
       attributes: {
-        class: 'gjs-fonts gjs-f-button'
+        class: 'gjs-fonts gjs-f-button',
       },
-      content: 
-        `${style}
+      content: `${style}
          <a href="#" target="_blank" class="button">Button</a>`,
     });
   }
