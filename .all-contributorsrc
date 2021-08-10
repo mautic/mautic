@@ -408,6 +408,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "disha-pishavadia24",
+      "name": "Disha P",
+      "avatar_url": "https://avatars.githubusercontent.com/u/22201881?v=4",
+      "profile": "https://www.udemy.com/certificate/UC-5CZA2NJ8/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "adiux",
+      "name": "Adrian",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13075514?v=4",
+      "profile": "http://www.idea2.ch",
+      "contributions": [
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
