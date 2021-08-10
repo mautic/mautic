@@ -126,7 +126,8 @@ export default class DynamicContentService {
 
     const dynamicContentContainer = mQuery('#dynamicContentContainer');
     const content = mQuery(modalContent).contents().first();
-    dynamicContentContainer.append(content.detach());
+    dynamicContentContainer.append(content);
+    modalContent.detach(); // remove the modal
 
     this.logger.debug('DC: store item updated', {
       id: content.attr('id'),
