@@ -417,6 +417,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "adiux",
+      "name": "Adrian",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13075514?v=4",
+      "profile": "http://www.idea2.ch",
+      "contributions": [
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
