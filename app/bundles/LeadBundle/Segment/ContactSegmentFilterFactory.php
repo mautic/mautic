@@ -37,10 +37,11 @@ class ContactSegmentFilterFactory
     {
         $contactSegmentFilters = new ContactSegmentFilters();
 
-        $filters = $leadList->getFilters();
+        $filters = $this->mergeFilters($leadList->getFilters());
         $event   = new LeadListMergeFiltersEvent($filters);
         $this->eventDispatcher->dispatch($event, LeadEvents::LIST_FILTERS_MERGE);
         $filters = $event->getFilters();
+
         foreach ($filters as $filter) {
             if (self::CUSTOM_OPERATOR === $filter['operator']) {
                 $mergedProperty      = $filter['merged_property'];
@@ -92,5 +93,82 @@ class ContactSegmentFilterFactory
         $qbServiceId = $decorator->getQueryType($contactSegmentFilterCrate);
 
         return $this->container->get($qbServiceId);
+    }
+
+    /**
+     * Merge multiple filters of same field with OR
+     *
+     * @param array<string, mixed> $filters
+     *
+     * @return array<string, mixed>
+     */
+    private function mergeFilters(array $filters): array
+    {
+        $shrinkedFilters = [];
+        $arrStacks       = []; // Put the same filters from array into Stacks
+
+        $previousKey = ''; // preserve the key from previous iteration
+        // replace filters with glue OR and operator = , with IN operator
+        foreach ($filters as $filter) {
+            // easy to compare
+            $key = implode('_', [
+                $filter['object'],
+                $filter['field'],
+                $filter['glue'],
+                $filter['operator'],
+            ]);
+
+            if ('or' === strtolower($filter['glue']) && '=' === $filter['operator']) {
+                if (!isset($arrStacks[$key])) {
+                    $arrStacks[$key] = [];
+                }
+
+                array_push($arrStacks[$key], $filter);
+            } else { // glue = and
+                // if 'or' followed by 'and', it becomes - or (cond1 and cond2)
+                if (isset($arrStacks[$previousKey]) && count($arrStacks[$previousKey]) > 0) {
+                    $previousFilter = array_pop($arrStacks[$previousKey]);
+                    array_push($shrinkedFilters, $previousFilter);
+                }
+
+                array_push($shrinkedFilters, $filter);
+            }
+
+            $previousKey = $key;
+        }
+
+        // add all grouped conditions back
+        foreach ($arrStacks as $stack) {
+            $groupedFilter = $this->groupFilters($stack);
+            if (!empty($groupedFilter)) {
+                $shrinkedFilters[] = $groupedFilter;
+            }
+        }
+
+        return array_values($shrinkedFilters);
+    }
+
+    /**
+     * @param array<string, mixed> $stack
+     *
+     * @return array<string, mixed>
+     */
+    private function groupFilters(array $stack): array
+    {
+        if (empty($stack)) {
+            return [];
+        }
+
+        if (count($stack) <= 1) {
+            return $stack[0];
+        }
+
+        $filter                         = $stack[0];
+        $filter['operator']             = 'in';
+        $filter['properties']['filter'] = $filter['filter'] = array_map(function ($ele) {
+            return $ele['filter'];
+        }, $stack);
+
+        return $filter;
     }
 }
