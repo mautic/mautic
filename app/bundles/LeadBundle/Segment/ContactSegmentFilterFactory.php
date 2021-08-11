@@ -57,6 +57,10 @@ class ContactSegmentFilterFactory
         $contactSegmentFilters = new ContactSegmentFilters();
 
         $filters = $leadList->getFilters();
+
+        // Merge multiple filters of same field with OR
+        $filters = $this->mergeFilters($filters);
+
         foreach ($filters as $filter) {
             $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 
@@ -82,5 +86,40 @@ class ContactSegmentFilterFactory
         $qbServiceId = $decorator->getQueryType($contactSegmentFilterCrate);
 
         return $this->container->get($qbServiceId);
+    }
+
+    /**
+     * @param $filters
+     *
+     * @return array
+     */
+    private function mergeFilters($filters)
+    {
+        $shrinkedFilters = [];
+        // replace condition OR on the same field with '=' filter, with IN operator
+        foreach ($filters as $filter) {
+            $key = implode('_', [
+                $filter['object'],
+                $filter['field'],
+                $filter['glue'],
+                ('=' === $filter['operator']) ? 'eq' : $filter['operator'],
+            ]);
+
+            if (isset($shrinkedFilters[$key])) {
+                $shrinkedFilters[$key]['operator']             = 'in'; // changes = to in
+                $shrinkedFilters[$key]['properties']['filter'] = array_merge(
+                    (array) $shrinkedFilters[$key]['properties']['filter'],
+                    (array) $filter['filter']
+                );
+                $shrinkedFilters[$key]['filter'] = array_merge(
+                    (array) $shrinkedFilters[$key]['filter'],
+                    (array) $filter['filter']
+                );
+            } else {
+                $shrinkedFilters[$key] = $filter;
+            }
+        }
+
+        return array_values($shrinkedFilters);
     }
 }
