@@ -64,8 +64,6 @@ EOT
             $output->writeln($this->sendWinnerService->getOutputMessages());
         } catch (RecordNotFoundException $e) {
             $output->writeln($e->getMessage());
-
-            return ExitCode::TEMPORARY_FAILURE;
         }
 
         if (true === $this->sendWinnerService->shouldTryAgain()) {

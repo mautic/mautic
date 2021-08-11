@@ -23,7 +23,7 @@ class SendWinnerEmailCommandFunctionalTest extends MauticMysqlTestCase
     public function testInvalidEmailId(): void
     {
         $emailId         = 1;
-        $commandResponse = $this->runCommand('mautic:email:sendwinner', ['--id' => $emailId], null, ExitCode::TEMPORARY_FAILURE);
+        $commandResponse = $this->runCommand('mautic:email:sendwinner', ['--id' => $emailId], null, ExitCode::SUCCESS);
         Assert::assertStringContainsString(sprintf('Email id %s not found', $emailId), $commandResponse);
     }
 
