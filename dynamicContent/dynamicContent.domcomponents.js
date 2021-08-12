@@ -1,60 +1,71 @@
+import DynamicContentService from './dynamicContent.service';
+
 export default class DynamicContentDomComponents {
-  editor;
+  dcService;
 
-  constructor(editor) {
-    this.editor = editor;
-  }
-
-  addDynamicContentType() {
-    // Not sure this is still used. https://grapesjs.com/docs/modules/Components.html#define-custom-component-type
-    function isComponent(el) {
-      console.trace('we use it: isComponent has been called');
-      if (el.getAttribute && el.getAttribute('data-slot') === 'dynamicContent') {
-        console.warn('itistrue', el.getAttribute);
-        return {
-          type: 'dynamic-content',
-        };
-      }
-      console.warn('itisfalse', el.getAttribute);
-      return false;
-    }
-    const dc = this.editor.DomComponents;
+  static addDynamicContentType(editor) {
+    const dc = editor.DomComponents;
     const defaultType = dc.getType('default');
     const defaultModel = defaultType.model;
 
-    const model = defaultModel.extend({
-      defaults: {
-        ...defaultModel.prototype.defaults,
-        name: 'Dynamic Content',
-        // draggable: '[data-gjs-type=cell]',
-        // droppable: false,
-        editable: false,
-        stylable: false,
-        propagate: ['droppable', 'editable'],
-        attributes: {
-          // Default attributes
-          'data-gjs-type': 'dynamic-content', // Type for GrapesJS
-          'data-slot': 'dynamicContent', // Retro compatibility with old template
+    const model = defaultModel.extend(
+      {
+        defaults: {
+          ...defaultModel.prototype.defaults,
+          name: 'Dynamic Content',
+          draggable: '[data-gjs-type=cell]',
+          droppable: false,
+          editable: false,
+          stylable: false,
+          propagate: ['droppable', 'editable'],
+          attributes: {
+            // Default attributes
+            'data-gjs-type': 'dynamic-content', // Type for GrapesJS
+            'data-slot': 'dynamicContent', // Retro compatibility with old template
+          },
         },
-      },
+        /**
+         * Initilize the component
+         */
+        init() {
+          // link component to the corresponding html store item
+          this.em
+            .get('Commands')
+            .run('preset-mautic:link-component-to-store-item', { component: this });
 
-      /**
-       * Initilize the component
-       */
-      init() {
-        // Add toolbar edit button if it's not already in
-        const toolbar = this.get('toolbar');
-        const id = 'toolbar-dynamic-content';
+          // Add toolbar edit button if it's not already in
+          const toolbar = this.get('toolbar');
+          const id = 'toolbar-dynamic-content';
 
-        if (!toolbar.filter((tlb) => tlb.id === id).length) {
-          toolbar.unshift({
-            id,
-            command: 'preset-mautic:dynamic-content-open',
-            attributes: { class: 'fa fa-pencil-square-o' },
-          });
-        }
+          if (!toolbar.filter((tlb) => tlb.id === id).length) {
+            toolbar.unshift({
+              id,
+              command: 'preset-mautic:dynamic-content-open',
+              attributes: { class: 'fa fa-pencil-square-o' },
+            });
+          }
+        },
+        // @todo: show the store items default content on the canvas
+        // updated(property, value, prevValue) {
+        //   console.log('Local hook: model.updated', {
+        //     property,
+        //     value,
+        //     prevValue,
+        //   });
+        // },
       },
-    });
+      {
+        // Dynamic Content component detection
+        isComponent(el) {
+          if (el.getAttribute && el.getAttribute('data-slot') === 'dynamicContent') {
+            return {
+              type: 'dynamic-content',
+            };
+          }
+          return false;
+        },
+      }
+    );
 
     const view = defaultType.view.extend({
       attributes: {
@@ -63,11 +74,18 @@ export default class DynamicContentDomComponents {
       events: {
         dblclick: 'onActive',
       },
-      // maybe use onRender for token to slot conversion
+      // replace token with human readable view
+      onRender(el) {
+        const dcService = new DynamicContentService(editor);
+        const decId = DynamicContentService.getDataParamDecid(el.model);
+        const dcItem = dcService.getStoreItem(decId);
+        this.el.innerHTML = dcItem.content;
+        dcService.logger.debug('DC: Updated view', dcItem);
+      },
       // open the dynamic content modal if the editor is added or double clicked
       onActive() {
         const target = this.model;
-        this.em.get('Commands').run('preset-mautic:dynamic-content-tokens-to-slots');
+        // open the editor in the popup
         this.em.get('Commands').run('preset-mautic:dynamic-content-open', { target });
       },
       // does not work: gets removed when Sorting (by grapesjs)
@@ -82,7 +100,6 @@ export default class DynamicContentDomComponents {
 
     // add the Dynamic Content component
     dc.addType('dynamic-content', {
-      isComponent,
       model,
       view,
     });

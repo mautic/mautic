@@ -4,7 +4,6 @@ import loadCommands from './commands';
 import loadButtons from './buttons';
 import loadEvents from './events';
 import loadBlocks from './blocks';
-import loadListeners from './listeners';
 
 export default (editor, opts = {}) => {
   const am = editor.AssetManager;
@@ -41,7 +40,6 @@ export default (editor, opts = {}) => {
 
   // Load other parts
   loadCommands(editor, config);
-  loadListeners(editor, config);
   loadComponents(editor, config);
   loadEvents(editor, config);
   loadButtons(editor, config);

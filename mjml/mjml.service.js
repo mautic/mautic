@@ -21,7 +21,7 @@ export default class MjmlService {
       const code = editor.runCommand('mjml-get-code');
       return code.html ? code.html.trim() : null;
     } catch (error) {
-      console.log(error.message);
+      console.warn(error.message);
       alert('Errors inside your template. Template will not be saved.');
     }
     return null;
@@ -48,7 +48,7 @@ export default class MjmlService {
       }
       return mjml2html(mjml, { validationLevel: 'strict' });
     } catch (error) {
-      console.log(error);
+      console.warn(error);
       return null;
     }
   }

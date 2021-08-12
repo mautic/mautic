@@ -6,7 +6,6 @@ import ContentService from './content.service';
 export default (editor) => {
   const mode = ContentService.getMode(editor);
   if (mode === ContentService.modeEmailHtml) {
-    const dcdc = new DynamicContentDomComponents(editor);
-    dcdc.addDynamicContentType();
+    DynamicContentDomComponents.addDynamicContentType(editor);
   }
 };
