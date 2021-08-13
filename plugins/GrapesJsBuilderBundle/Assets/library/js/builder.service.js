@@ -68,19 +68,6 @@ export default class BuilderService {
 
       // Remove keyboard shortcuts to prevent launch behind popup
       keymaps.removeAll();
-
-      // Set up dynamic content editors if present
-      Mautic.setDynamicContentEditors(Mautic.getBuilderContainer());
-
-      // When a new Dynamic Content filter (tab) is added, we want to turn the editor into CKEditor.
-      Mautic.dynamicContentAddNewFilterListener((textarea) => {
-        Mautic.ConvertFieldToCkeditor(textarea, {});
-      });
-
-      // When a new Dynamic Content item (slot) is added, we want to turn the editor into CKEditor.
-      Mautic.dynamicContentAddNewItemListener((textarea) => {
-        Mautic.ConvertFieldToCkeditor(textarea, {});
-      });
     });
 
     this.editor.on('modal:close', () => {
@@ -91,17 +78,6 @@ export default class BuilderService {
         keymaps.add(shortcut.id, shortcut.keys, shortcut.handler);
         return keymaps;
       });
-
-      // Destroy Dynamic Content editors
-      // eslint-disable-next-line no-undef
-      for (const name of Object.keys(CKEDITOR.instances)) {
-        if (name.includes('dynamicContent')) {
-          // eslint-disable-next-line no-console
-          console.log(`Destroying Dynamic Content editor: ${name}`);
-          // eslint-disable-next-line no-undef
-          CKEDITOR.instances[name].destroy(false);
-        }
-      }
     });
 
     this.editor.on('asset:remove', (response) => {
