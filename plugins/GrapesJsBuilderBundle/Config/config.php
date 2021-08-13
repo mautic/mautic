@@ -86,6 +86,7 @@ return [
                 'arguments' => [
                     'grapesjsbuilder.config',
                     'mautic.install.service',
+                    'request_stack',
                 ],
             ],
             'grapesjsbuilder.event.email.subscriber' => [
