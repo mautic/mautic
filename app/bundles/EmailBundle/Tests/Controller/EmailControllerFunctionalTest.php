@@ -43,12 +43,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testProfileEmailDetailPageForUnsentEmail(): void
     {
-        $segment = $this->createSegment();
-        $email   = $this->createEmail();
-        $email->addList($segment);
-
-        $this->em->persist($segment);
-        $this->em->persist($email);
+        $segment = $this->createSegment('Segment A', 'segment-a');
+        $email   = $this->createEmail('Email A', 'Email A Subject', 'list', 'blank', 'Test html', $segment);
         $this->em->flush();
 
         $this->client->enableProfiler();
@@ -79,9 +75,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testProfileEmailDetailPageForSentEmail(): void
     {
-        $segment = $this->createSegment();
-        $email   = $this->createEmail();
-        $email->addList($segment);
+        $segment = $this->createSegment('Segment A', 'segment-a');
+        $email   = $this->createEmail('Email A', 'Email A Subject', 'list', 'blank', 'Test html', $segment);
+
         $contact = new Lead();
         $contact->setEmail('john@doe.email');
         $emailStat = new Stat();
@@ -89,8 +85,6 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $emailStat->setLead($contact);
         $emailStat->setEmailAddress($contact->getEmail());
         $emailStat->setDateSent(new \DateTime());
-        $this->em->persist($segment);
-        $this->em->persist($email);
         $this->em->persist($contact);
         $this->em->persist($emailStat);
         $this->em->flush();
@@ -121,12 +115,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testSegmentEmailTranslationLookUp(): void
     {
-        $segment = $this->createSegment();
-        $email   = $this->createEmail();
-        $email->addList($segment);
-
-        $this->em->persist($segment);
-        $this->em->persist($email);
+        $segment = $this->createSegment('Segment A', 'segment-a');
+        $email   = $this->createEmail('Email A', 'Email A Subject', 'list', 'blank', 'Test html', $segment);
         $this->em->flush();
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
@@ -134,44 +124,10 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         self::assertSame('<option value="'.$email->getId().'">'.$email->getName().'</option>', trim($html));
     }
 
-    private function createSegment(string $suffix = 'A'): LeadList
+    public function testCloneAction(): void
     {
-        $segment = new LeadList();
-        $segment->setName("Segment $suffix");
-        $segment->setPublicName("Segment $suffix");
-        $segment->setAlias("segment-$suffix");
-
-        return $segment;
-    }
-
-    private function createEmail(string $suffix = 'A', string $emailType = 'list')
-    {
-        $email = new Email();
-        $email->setName("Email $suffix");
-        $email->setSubject("Email $suffix Subject");
-        $email->setEmailType($emailType);
-
-        return $email;
-    }
-
-    public function testCloneAction()
-    {
-        // Create a segment and email
-        $segment = new LeadList();
-        $segment->setName('Segment B');
-        $segment->setAlias('segment-B');
-        $segment->setPublicName('seg');
-
-        $email = new Email();
-        $email->setName('Email B');
-        $email->setSubject('Email B Subject');
-        $email->setEmailType('list');
-        $email->setTemplate('blank');
-        $email->setCustomHtml('Test html');
-
-        $email->addList($segment);
-        $this->em->persist($segment);
-        $this->em->persist($email);
+        $segment = $this->createSegment('Segment B', 'segment-B');
+        $email   = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segment);
         $this->em->flush();
 
         // request for email clone
@@ -200,5 +156,69 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertEquals('Email B Subject clone', $secondEmail->getSubject());
         Assert::assertEquals('Email B clone', $secondEmail->getName());
         Assert::assertEquals('Test html', $secondEmail->getCustomHtml());
+    }
+
+    public function testAbTestAction(): void
+    {
+        $segment        = $this->createSegment('Segment B', 'segment-B');
+        $varientSetting = ['totalWeight' => 100, 'winnerCriteria' => 'email.openrate'];
+        $email          = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segment, $varientSetting);
+        $this->em->flush();
+
+        // request for email clone
+        $crawler        = $this->client->request(Request::METHOD_GET, "/s/emails/abtest/{$email->getId()}");
+        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $form['emailform[subject]']->setValue('Email B Subject var 2');
+        $form['emailform[name]']->setValue('Email B var 2');
+        $form['emailform[variantSettings][weight]']->setValue($varientSetting['totalWeight']);
+        $form['emailform[variantSettings][winnerCriteria]']->setValue($varientSetting['winnerCriteria']);
+        $form['emailform[isPublished]']->setValue(1);
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $emails = $this->em->getRepository(Email::class)->findBy([], ['id' => 'ASC']);
+        Assert::assertCount(2, $emails);
+
+        $firstEmail  = $emails[0];
+        $secondEmail = $emails[1];
+
+        Assert::assertSame($email->getId(), $firstEmail->getId());
+        Assert::assertNotSame($email->getId(), $secondEmail->getId());
+        Assert::assertEquals('list', $secondEmail->getEmailType());
+        Assert::assertEquals('Email B Subject', $firstEmail->getSubject());
+        Assert::assertEquals('Email B', $firstEmail->getName());
+        Assert::assertEquals('Email B Subject var 2', $secondEmail->getSubject());
+        Assert::assertEquals('Email B var 2', $secondEmail->getName());
+        Assert::assertEquals('blank', $secondEmail->getTemplate());
+        Assert::assertEquals('Test html', $secondEmail->getCustomHtml());
+        Assert::assertEquals($firstEmail->getId(), $secondEmail->getVariantParent()->getId());
+    }
+
+    private function createSegment(string $name, string $alias): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName($name);
+        $segment->setAlias($alias);
+        $segment->setPublicName($name);
+        $this->em->persist($segment);
+
+        return $segment;
+    }
+
+    private function createEmail(string $name, string $subject, string $emailType, string $template, string $customHtml, ?LeadList $segment = null, ?array $varientSetting = []): Email
+    {
+        $email = new Email();
+        $email->setName($name);
+        $email->setSubject($subject);
+        $email->setEmailType($emailType);
+        $email->setTemplate($template);
+        $email->setCustomHtml($customHtml);
+        $email->setVariantSettings($varientSetting);
+        $email->addList($segment);
+        $this->em->persist($email);
+
+        return $email;
     }
 }

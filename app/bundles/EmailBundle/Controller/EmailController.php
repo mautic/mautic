@@ -834,8 +834,6 @@ class EmailController extends FormController
         $entity       = null;
         if ($emailEntity) {
             $entity       = clone $emailEntity;
-            $entity->setIsClone(true);
-            $entity->setCloneObjectId($objectId);
         }
         $method  = $this->request->getMethod();
         $session = $this->container->get('session');

@@ -223,6 +223,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function __clone()
     {
+        $this->isCloned         = true;
+        $this->cloneObjectId    = $this->id;
         $this->id               = null;
         $this->sentCount        = 0;
         $this->readCount        = 0;
@@ -641,35 +643,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $isClone bool
-     *
-     * @return $this
-     */
-    public function setIsClone($isClone)
-    {
-        $this->isCloned = $isClone;
-
-        return $this;
-    }
-
-    /**
      * @return mixed
      */
     public function getIsClone()
     {
         return $this->isCloned;
-    }
-
-    /**
-     * @param $cloneObjectId int
-     *
-     * @return $this
-     */
-    public function setCloneObjectId($cloneObjectId)
-    {
-        $this->cloneObjectId = $cloneObjectId;
-
-        return $this;
     }
 
     /**
