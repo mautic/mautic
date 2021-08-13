@@ -7,6 +7,13 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\RoleRepository;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxControllerFunctionalTest extends MauticMysqlTestCase
@@ -72,6 +79,82 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
         $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
+    }
+
+    /**
+     * @throws MappingException
+     */
+    public function testSegmentDependencyTree(): void
+    {
+        $segmentA = new LeadList();
+        $segmentA->setName('Segment A');
+        $segmentA->setAlias('segment-a');
+
+        $segmentB = new LeadList();
+        $segmentB->setName('Segment B');
+        $segmentB->setAlias('segment-b');
+
+        $segmentC = new LeadList();
+        $segmentC->setName('Segment C');
+        $segmentC->setAlias('segment-c');
+
+        $segmentD = new LeadList();
+        $segmentD->setName('Segment D');
+        $segmentD->setAlias('segment-d');
+
+        $segmentE = new LeadList();
+        $segmentE->setName('Segment E');
+        $segmentE->setAlias('segment-e');
+
+        $this->em->persist($segmentA);
+        $this->em->persist($segmentB);
+        $this->em->persist($segmentC);
+        $this->em->persist($segmentD);
+        $this->em->persist($segmentE);
+        $this->em->flush();
+
+        $segmentA->setFilters(
+            [
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'leadlist',
+                    'type'       => 'leadlist',
+                    'operator'   => 'in',
+                    'properties' => ['filter' => [$segmentB->getId()]],
+                ], [
+                    'object'     => 'lead',
+                    'glue'       => 'or',
+                    'field'      => 'leadlist',
+                    'type'       => 'leadlist',
+                    'operator'   => '!in',
+                    'properties' => ['filter' => [$segmentC->getId(), $segmentD->getId()]],
+                ],
+            ]
+        );
+
+        $segmentC->setFilters(
+            [
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'leadlist',
+                    'type'       => 'leadlist',
+                    'operator'   => 'in',
+                    'properties' => ['filter' => [$segmentE->getId()]],
+                ],
+            ]
+        );
+
+        $this->em->persist($segmentA);
+        $this->em->persist($segmentC);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, "/s/ajax?action=lead:getSegmentDependencyTree&id={$segmentA->getId()}");
+        $response = $this->client->getResponse();
+        self::assertTrue($response->isOk(), $response->getContent());
+
+        $data = json_decode($response->getContent(), true);
     }
 
     private function getMembersForCampaign(int $campaignId): array
