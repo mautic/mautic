@@ -96,8 +96,13 @@ class ContactSegmentFilterFactory
     private function mergeFilters($filters)
     {
         $shrinkedFilters = [];
-        // replace condition OR on the same field with '=' filter, with IN operator
+        $filterQueue     = []; // Put the filters from array into the Queue
+        $lastFilter      = []; // pop the latest
+
+        $preservedKey = ''; // preserve the key from previous iteration
+        // replace filters with glue OR and operator = , with IN operator
         foreach ($filters as $filter) {
+            // easy to compare
             $key = implode('_', [
                 $filter['object'],
                 $filter['field'],
@@ -105,21 +110,63 @@ class ContactSegmentFilterFactory
                 ('=' === $filter['operator']) ? 'eq' : $filter['operator'],
             ]);
 
-            if (isset($shrinkedFilters[$key])) {
-                $shrinkedFilters[$key]['operator']             = 'in'; // changes = to in
-                $shrinkedFilters[$key]['properties']['filter'] = array_merge(
-                    (array) $shrinkedFilters[$key]['properties']['filter'],
-                    (array) $filter['filter']
-                );
-                $shrinkedFilters[$key]['filter'] = array_merge(
-                    (array) $shrinkedFilters[$key]['filter'],
-                    (array) $filter['filter']
-                );
+            if ('or' === strtolower($filter['glue'])) {
+                if (empty($filterQueue) || $preservedKey === $key) {
+                    $filterQueue[] = $filter;
+                } else {
+                    $groupedFilter = $this->groupFilters($filterQueue);
+                    if (!empty($groupedFilter)) {
+                        $shrinkedFilters[] = $groupedFilter;
+                    }
+                    $filterQueue  = [$filter]; // reset filter queue
+                }
             } else {
-                $shrinkedFilters[$key] = $filter;
+                if (count($filterQueue) > 0) {
+                    $lastFilter = array_pop($filterQueue);
+                }
+
+                $groupedFilter = $this->groupFilters($filterQueue);
+                if (!empty($groupedFilter)) {
+                    $shrinkedFilters[] = $groupedFilter;
+                }
+                $filterQueue  = []; // reset filter queue
+
+                if (!empty($lastFilter)) {
+                    $shrinkedFilters[] = $lastFilter;
+                    $lastFilter        = [];
+                }
+
+                $shrinkedFilters[] = $filter;
             }
+
+            // preserve the key for next iteration comparison
+            $preservedKey =  $key;
+        }
+
+        // add filterqueue back if not empty
+        if (count($filterQueue) > 0) {
+            $shrinkedFilters[] = $filterQueue[0];
         }
 
         return array_values($shrinkedFilters);
+    }
+
+    private function groupFilters($filterQueue)
+    {
+        if (empty($filterQueue)) {
+            return [];
+        }
+
+        if (count($filterQueue) <= 1) {
+            return $filterQueue;
+        }
+
+        $filter                         = $filterQueue[0];
+        $filter['operator']             = 'in';
+        $filter['properties']['filter'] = $filter['filter'] = array_map(function ($ele) {
+            return $ele['filter'];
+        }, $filterQueue);
+
+        return $filter;
     }
 }
