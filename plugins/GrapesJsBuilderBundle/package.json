@@ -6,6 +6,7 @@
   "scripts": {
     "build": "parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist --public-url ./",
     "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist --public-url ./ --no-minify ",
+    "dev": "NODE_ENV=development parcel watch Assets/library/js/* --out-dir Assets/library/js/dist --public-url /plugins/GrapesJsBuilderBundle/Assets/library/js/dist --hmr-hostname localhost",
     "lint": "eslint Assets/library/js/",
     "prettier": "node_modules/.bin/prettier -w Assets/library/js/",
     "prettier-check": "node_modules/.bin/prettier -c Assets/library/js/",
