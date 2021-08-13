@@ -24,7 +24,7 @@ export default class CodeModeCommand {
     CodeModeCommand.codeEditor.showCodePopup();
 
     // Transform DC to token
-    editor.runCommand('preset-mautic:dynamic-content-slots-to-tokens');
+    editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
   }
 
   static stopCodeEditorModal(editor) {
