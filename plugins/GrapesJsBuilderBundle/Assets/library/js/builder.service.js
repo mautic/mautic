@@ -99,7 +99,7 @@ export default class BuilderService {
           // eslint-disable-next-line no-console
           console.log(`Destroying Dynamic Content editor: ${name}`);
           // eslint-disable-next-line no-undef
-          CKEDITOR.instances[name].destroy(true);
+          CKEDITOR.instances[name].destroy(false);
         }
       }
     });
