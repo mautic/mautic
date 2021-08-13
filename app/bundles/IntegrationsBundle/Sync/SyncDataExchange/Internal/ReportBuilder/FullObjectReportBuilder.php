@@ -140,16 +140,22 @@ class FullObjectReportBuilder
             $reportObjectDAO  = new ReportObjectDAO($requestedObjectDAO->getObject(), $object['id'], $modifiedDateTime);
             $syncReport->addObject($reportObjectDAO);
 
-            try {
-                if (isset($event)) {
-                    // Update object id rather than creating the event again.
-                    $event->setId((int) $object['id']);
-                    $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD, $event);
-                    $this->dispatchBeforeFieldChangesEvent($syncReport->getIntegration(), $event->getEntity());
+            if (isset($event)) {
+                // Update object id rather than creating the event again.
+                $event->setId((int) $object['id']);
+                $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD, $event);
+
+                if (!$event->getEntity()) {
+                    // Object not found, continue.
+                    continue;
                 }
-            } catch (InvalidValueException $e) {
-                // Object is not eligible, continue.
-                continue;
+
+                try {
+                    $this->dispatchBeforeFieldChangesEvent($syncReport->getIntegration(), $event->getEntity());
+                } catch (InvalidValueException $e) {
+                    // Object is not eligible, continue.
+                    continue;
+                }
             }
 
             foreach ($fields as $field) {
