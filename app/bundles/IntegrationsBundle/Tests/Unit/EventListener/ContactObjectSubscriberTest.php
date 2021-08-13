@@ -366,7 +366,7 @@ class ContactObjectSubscriberTest extends TestCase
     /**
      * @throws ImportFailedException
      */
-    public function testFindCompanyByIdWithNoCompany(): void
+    public function testFindContactByIdWithNoContact(): void
     {
         $event = new InternalObjectFindByIdEvent(new Contact());
         $event->setId(1);
