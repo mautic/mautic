@@ -354,7 +354,7 @@ class ContactObjectSubscriberTest extends TestCase
     /**
      * @throws ImportFailedException
      */
-    public function testFindCompanyByIdWithNoIdSet(): void
+    public function testFindContactByIdWithNoIdSet(): void
     {
         $event = new InternalObjectFindByIdEvent(new Contact());
         $this->contactObjectHelper->expects($this->never())
