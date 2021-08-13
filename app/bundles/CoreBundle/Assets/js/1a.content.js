@@ -591,12 +591,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
 
     // This turns all textarea elements with class "editor" into CKEditor ones, except for Dynamic Content elements, which can be initialized with Mautic.setDynamicContentEditors().
     if (mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length && Mautic.getActiveBuilderName() === 'legacy') {
-        console.log('Using Froala');
         mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').each(function () {
             mQuery(this).froalaEditor();
         });
     } else if (mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length) {
-        console.log('Using CKEditor');
         mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').each(function () {
             const textarea = mQuery(this);
             const maxButtons = [[ 'Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'InsertToken', 'Sourcedialog', 'Maximize']]
@@ -610,10 +608,8 @@ Mautic.onPageLoad = function (container, response, inModal) {
             if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
                 ckEditorToolbar = maxButtons;
             }
-
-            mQuery(document).ready(function () {
-                Mautic.ConvertFieldToCkeditor(textarea, ckEditorToolbar);
-            });
+            
+            Mautic.ConvertFieldToCkeditor(textarea, ckEditorToolbar);
         });
     }
 
@@ -750,9 +746,7 @@ Mautic.setDynamicContentEditors = function(container) {
                 ckEditorToolbar = maxButtons;
             }
 
-            mQuery(document).ready(function () {
-                Mautic.ConvertFieldToCkeditor(textarea, ckEditorToolbar);
-            });
+            Mautic.ConvertFieldToCkeditor(textarea, ckEditorToolbar);
         });
     }
 }
@@ -830,7 +824,7 @@ Mautic.onPageUnload = function (container, response) {
         } else {
             for(name in CKEDITOR.instances)
             {
-                CKEDITOR.instances[name].destroy(true);
+                CKEDITOR.instances[name].destroy(false);
             }
         }
 
