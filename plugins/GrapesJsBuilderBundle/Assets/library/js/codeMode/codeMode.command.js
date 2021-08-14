@@ -23,7 +23,7 @@ export default class CodeModeCommand {
 
     CodeModeCommand.codeEditor.showCodePopup();
 
-    // Transform DC to token
+    // Transform DC Component to token
     editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
   }
 
@@ -31,7 +31,7 @@ export default class CodeModeCommand {
     if (!editor) {
       throw new Error('no editor');
     }
-    // Transform Token to Slots
-    editor.runCommand('preset-mautic:dynamic-content-tokens-to-slots');
+    // Transform Token to Components
+    editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
   }
 }

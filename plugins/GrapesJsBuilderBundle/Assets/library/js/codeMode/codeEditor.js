@@ -84,12 +84,10 @@ class CodeEditor {
    * @todo show validation results in UI
    */
   updateCode() {
-    let code;
+    const code = this.codeEditor.editor.getValue();
+    // validate MJML code
     if (ContentService.isMjmlMode(this.editor)) {
-      code = this.codeEditor.editor.getValue();
-      MjmlService.mjmlToHtml(code); // validate
-    } else {
-      code = ContentService.getEditorHtmlContent(this.editor);
+      MjmlService.mjmlToHtml(code);
     }
 
     try {
@@ -99,8 +97,6 @@ class CodeEditor {
       this.editor.Modal.close();
     } catch (e) {
       window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')} \n${e.message}`);
-      // this.editor.DomComponents.getWrapper().set('content', '');
-      // this.editor.setComponents(codeToSave.trim());
     }
   }
 
