@@ -17,6 +17,14 @@ export default class DynamicContentCommands {
 
   // eslint-disable-next-line class-methods-use-this
   stopDynamicContentPopup() {
+    // Destroy Dynamic Content editors and write the contents to the textarea
+    for (const name of Object.keys(CKEDITOR.instances)) {
+      if (name.includes('dynamicContent')) {
+        this.logger.debug(`Destroying Dynamic Content editor: ${name}`);
+        CKEDITOR.instances[name].destroy(false);
+      }
+    }
+
     this.dcService.updateDcStoreItem();
   }
 
@@ -90,6 +98,20 @@ export default class DynamicContentCommands {
 
     editor.Modal.setContent(this.dcPopup);
     modal.open();
+
+    // Set up dynamic content editors if present
+    Mautic.setDynamicContentEditors(Mautic.getBuilderContainer());
+
+    // When a new Dynamic Content filter (tab) is added, we want to turn the editor into CKEditor.
+    Mautic.dynamicContentAddNewFilterListener((textarea) => {
+      Mautic.ConvertFieldToCkeditor(textarea, {});
+    });
+
+    // When a new Dynamic Content item (slot) is added, we want to turn the editor into CKEditor.
+    Mautic.dynamicContentAddNewItemListener((textarea) => {
+      Mautic.ConvertFieldToCkeditor(textarea, {});
+    });
+
     modal.onceClose(() => editor.stopCommand('preset-mautic:dynamic-content-open'));
   }
 
