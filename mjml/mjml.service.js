@@ -18,7 +18,11 @@ export default class MjmlService {
   static getEditorHtmlContent(editor) {
     // Try catch for mjml parser error
     try {
-      const code = editor.runCommand('mjml-get-code');
+      // html needs to be beautified for the click tracking to work. Therefore, we can
+      // not use the built in command: mjml-get-code
+      const mjml = this.getEditorMjmlContent(editor);
+      const code = this.mjmlToHtml(mjml);
+
       return code.html ? code.html.trim() : null;
     } catch (error) {
       console.warn(error.message);
@@ -43,10 +47,11 @@ export default class MjmlService {
    */
   static mjmlToHtml(mjml) {
     try {
-      if (typeof mjml !== 'string') {
-        throw new Error('no valid mjml string');
+      if (typeof mjml !== 'string' || !mjml.includes('<mjml>')) {
+        throw new Error('No valid MJML string');
       }
-      return mjml2html(mjml, { validationLevel: 'strict' });
+      // html needs to be beautified for the click tracking to work.
+      return mjml2html(mjml, { validationLevel: 'strict', beautify: true });
     } catch (error) {
       console.warn(error);
       return null;

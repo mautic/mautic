@@ -15,12 +15,12 @@ export default (editor) => {
   editor.Commands.add('preset-mautic:dynamic-content-components-to-tokens', {
     run: (edtr) => dynamicContentCmd.convertDynamicContentComponentsToTokens(edtr),
   });
-  // Link store to compoennt
+  // Link store to Compoennt
   editor.Commands.add('preset-mautic:link-component-to-store-item', {
     run: (edtr, sender, options) =>
       dynamicContentCmd.linkComponentToStoreItem(edtr, sender, options),
   });
-  // Fill the component with values.
+  // Fill the Component with values.
   editor.Commands.add('preset-mautic:update-dc-components-from-dc-store', {
     run: () => dynamicContentCmd.updateComponentsFromDcStore(),
   });

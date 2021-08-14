@@ -1,3 +1,5 @@
+import Logger from './logger';
+
 export default class ContentService {
   static modeEmailHtml = 'email-html';
 
@@ -35,6 +37,8 @@ export default class ContentService {
    */
   static getCanvasAsHtmlDocument(editor) {
     const parser = new DOMParser();
+    const logger = new Logger(editor);
+
     // get original doctype, header and add it to the html
     const originalContent = ContentService.getOriginalContentHtml();
     const doctype = ContentService.serializeDoctype(originalContent.doctype);
@@ -47,6 +51,9 @@ export default class ContentService {
 
     // if no header is set on the canvas, replace it with existing from theme
     if (!htmlDocument.head.innerHTML && originalContent.head.innerHTML) {
+      logger.debug('Set head based on the original content', {
+        head: originalContent.head.innerHTML,
+      });
       htmlDocument.head.innerHTML = originalContent.head.innerHTML;
     }
 
