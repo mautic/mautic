@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Tests\Form\Type;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Copy;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailTypeFunctionalTest extends MauticMysqlTestCase
@@ -22,27 +23,29 @@ final class EmailTypeFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
+        // Fetch the form
+        $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$lead->getId());
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $content     = $this->client->getResponse()->getContent();
+        $content     = json_decode($content)->newContent;
+        $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
+        $formCrawler = $crawler->filter('form');
+        $this->assertSame(1, $formCrawler->count());
+        $form = $formCrawler->form();
+
         // Send email to contact
-        $headers = $this->createAjaxHeaders();
-        $payload = [
-            'lead_quickemail' => [
-                'fromname' => 'Admin',
-                'from'     => 'admin@mautic.com',
-                'subject'  => 'Test Jap Mautic',
-                'body'     => '<p style="font-family: メイリオ">Test</p>',
-                'list'     => 0,
-            ],
-        ];
-        $this->client->request(
-            Request::METHOD_POST,
-            '/s/contacts/email/'.(string) $lead->getId(),
-            $payload,
-            [],
-            $headers);
+        $form->setValues([
+            'lead_quickemail[fromname]' => 'Admin',
+            'lead_quickemail[from]'     => 'admin@mautic.com',
+            'lead_quickemail[subject]'  => 'Test Jap Mautic',
+            'lead_quickemail[body]'     => '<p style="font-family: メイリオ">Test</p>',
+            'lead_quickemail[list]'     => 0,
+        ]);
+        $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
 
         // Check the email has correct text
         $copy = $this->em->getRepository(Copy::class)->findOneBy(['subject' => 'Test Jap Mautic']);
-        $this->assertContains('<p style="font-family: メイリオ">Test</p>', $copy->getBody());
+        $this->assertStringContainsString('<p style="font-family: メイリオ">Test</p>', $copy->getBody());
     }
 }

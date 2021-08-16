@@ -22,39 +22,37 @@ final class ActionControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($form);
         $this->em->flush();
 
-        // Save new Send Form Results action
-        $headers = $this->createAjaxHeaders();
-        $payload = [
-            'formaction' => [
-                'properties' => [
-                    'subject'        => 'Test Japanese',
-                    'set_replyto'    => 1,
-                    'message'        => '<p style="font-family: メイリオ">Test</p>',
-                    'email_to_owner' => 0,
-                    'copy_lead'      => 0,
-                ],
-                'type'   => 'form.email',
+        // Fetch the form
+        $this->client->request(Request::METHOD_GET, '/s/forms/action/new',
+            [
                 'formId' => $form->getId(),
+                'type'   => 'form.email',
             ],
-        ];
-        $this->client->request(
-            Request::METHOD_POST,
-            '/s/forms/action/new',
-            $payload,
             [],
-            $headers);
+            $this->createAjaxHeaders(),
+        );
         $this->assertTrue($this->client->getResponse()->isOk());
-        $content  = json_decode($this->client->getResponse()->getContent())->actionHtml;
+        $content     = $this->client->getResponse()->getContent();
+        $content     = json_decode($content)->newContent;
+        $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
+        $formCrawler = $crawler->filter('form');
+        $this->assertSame(1, $formCrawler->count());
+        $form = $formCrawler->form();
+
+        // Save new Send Form Results action
+        $form->setValues([
+            'formaction[properties][subject]' => 'Test Japanese',
+            'formaction[properties][message]' => '<p style="font-family: メイリオ">Test</p>',
+        ]);
+        $this->client->submit($form, [], $this->createAjaxHeaders());
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $content  = $this->client->getResponse()->getContent();
+        $content  = json_decode($content)->actionHtml;
         $crawler  = new Crawler($content);
         $editPage = $crawler->filter('.btn-edit')->attr('href');
 
         // Check the content was not changed
-        $this->client->request(
-            Request::METHOD_GET,
-            $editPage,
-            [],
-            [],
-            $headers);
-        $this->assertContains('&lt;p style=&quot;font-family: メイリオ&quot;&gt;Test&lt;/p&gt;', json_decode($this->client->getResponse()->getContent())->newContent);
+        $this->client->request(Request::METHOD_GET, $editPage, [], [], $this->createAjaxHeaders());
+        $this->assertStringContainsString('&lt;p style=&quot;font-family: メイリオ&quot;&gt;Test&lt;/p&gt;', json_decode($this->client->getResponse()->getContent())->newContent);
     }
 }
