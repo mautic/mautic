@@ -259,13 +259,23 @@ $container->register(\Mautic\EmailBundle\Messenger\EmailMessageHandler::class)
 // config/packages/messenger.php
 $container->loadFromExtension('framework', [
     'messenger' => [
-        'routing' => [
+        'failure_transport' => \Mautic\EmailBundle\Messenger\EmailMessage::FAILED,
+        'routing'           => [
                 \Mautic\EmailBundle\Messenger\EmailMessage::class => \Mautic\EmailBundle\Messenger\EmailMessage::RECEIVER,
         ],
         'transports' => [
             \Mautic\EmailBundle\Messenger\EmailMessage::RECEIVER => [
+                'dsn'            => '%mautic.messenger_transport_dsn%',
+                'options'        => $configParameterBag->get('messenger_transport_email_options'),
+                'retry_strategy' => $configParameterBag->get('messenger_transport_email_retry_strategy'),
+            ],
+            \Mautic\EmailBundle\Messenger\EmailMessage::FAILED => [
                 'dsn'     => '%mautic.messenger_transport_dsn%',
-                'options' => $configParameterBag->get('messenger_transport_email_options'),
+                'options' => [
+                    'queues' => [
+                        'failed_emails' => [],
+                    ],
+                ],
             ],
         ],
     ],
