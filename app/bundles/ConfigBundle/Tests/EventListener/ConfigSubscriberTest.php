@@ -8,8 +8,10 @@ use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\EventListener\ConfigSubscriber;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Container;
 
 class ConfigSubscriberTest extends TestCase
 {
@@ -23,16 +25,30 @@ class ConfigSubscriberTest extends TestCase
      */
     private $subscriber;
 
+    /**
+     * @var CoreParametersHelper|MockObject
+     */
+    private $coreParameterHelper;
+
+    /**
+     * @var MockObject|Container
+     */
+    private $container;
+
     protected function setUp(): void
     {
-        $this->logger     = $this->createMock(ConfigChangeLogger::class);
-        $this->subscriber = new ConfigSubscriber($this->logger);
+        $this->logger              = $this->createMock(ConfigChangeLogger::class);
+        $this->coreParameterHelper = $this->createMock(CoreParametersHelper::class);
+        $this->container           = $this->createMock(Container::class);
+
+        $this->subscriber = new ConfigSubscriber($this->coreParameterHelper, $this->container, $this->logger);
     }
 
     public function testGetSubscribedEvents()
     {
         $this->assertEquals(
             [
+                ConfigEvents::CONFIG_PRE_SAVE  => ['escapePercentCharacters', 1000],
                 ConfigEvents::CONFIG_POST_SAVE => ['onConfigPostSave', 0],
             ],
             $this->subscriber->getSubscribedEvents()
