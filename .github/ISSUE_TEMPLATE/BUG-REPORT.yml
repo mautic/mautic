@@ -64,7 +64,7 @@ body:
     attributes:
        label: How can we reproduce this issue?
        description: Explain us carefuly how we can reproduce the bug you faced.
-      value: "Step 1: "
+       value: "Step 1: "
     validations:
       required: true
   - type: textarea
