@@ -8,8 +8,8 @@ body:
       value: |
         Thanks for taking the time to fill out this bug report!
         Before you create the issue:
-        * Search for similar reports among other reported issues.
-        * Learn how to troubleshoot at https://www.mautic.org/docs/en/tips/troubleshooting.html
+        - Search for similar reports among other reported issues.
+        - Learn how to troubleshoot at https://www.mautic.org/docs/en/tips/troubleshooting.html
 #  - type: input
 #    id: contact
 #    attributes:
