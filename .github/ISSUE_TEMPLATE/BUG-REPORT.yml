@@ -64,7 +64,10 @@ body:
     attributes:
        label: How can we reproduce this issue?
        description: Explain us carefuly how we can reproduce the bug you faced.
-       value: "1"
+      value: | 
+        1.
+        2.
+        3.
     validations:
       required: true
   - type: textarea
