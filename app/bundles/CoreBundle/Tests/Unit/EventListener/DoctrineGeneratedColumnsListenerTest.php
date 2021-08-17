@@ -35,7 +35,7 @@ class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
      */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

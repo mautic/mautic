@@ -14,10 +14,22 @@ namespace Mautic\EmailBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Symfony\Component\HttpFoundation\Response;
 
 class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->loadFixtures([LoadCategoryData::class]);
+    }
+
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement(['categories']);
+    }
+
     public function testSingleEmailWorkflow()
     {
         // Create a couple of segments first:
@@ -135,11 +147,12 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(404, $response['errors'][0]['code']);
 
         // Delete also testing segments:
-        $this->client->request('DELETE', '/api/segments/batch/delete', [['id' => $segmentAId], ['id' => $segmentBId]]);
+        $this->client->request('DELETE', "/api/segments/batch/delete?ids={$segmentAId},{$segmentBId}", []);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(['lists' => []], $response);
+        // Response should include the two entities that we just deleted
+        $this->assertSame(2, count($response['lists']));
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
@@ -156,12 +169,12 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('Email Stat with tracking hash tracking_hash_123 was not found', $responseData['errors'][0]['message']);
     }
 
-    public function testReplyAction()
+    public function testReplyAction(): void
     {
         $trackingHash = 'tracking_hash_123';
 
         /** @var StatRepository $statRepository */
-        $statRepository = $this->container->get('mautic.email.repository.stat');
+        $statRepository = self::$container->get('mautic.email.repository.stat');
 
         // Create a test email stat.
         $stat = new Stat();
@@ -186,7 +199,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         // Check that the email reply was created correctly.
         $this->assertSame('1', $fetchedReplyData['total']);
         $this->assertSame($stat->getId(), $fetchedReplyData['stats'][0]['stat_id']);
-        $this->assertRegExp('/api-[a-z0-9]*/', $fetchedReplyData['stats'][0]['message_id']);
+        $this->assertMatchesRegularExpression('/api-[a-z0-9]*/', $fetchedReplyData['stats'][0]['message_id']);
 
         // Get the email stat that was just updated from the stat API.
         $statQuery = ['where' => [['col' => 'id', 'expr' => 'eq', 'val' => $stat->getId()]]];
@@ -197,6 +210,6 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('1', $fetchedStatData['total']);
         $this->assertSame($stat->getId(), $fetchedStatData['stats'][0]['id']);
         $this->assertSame('1', $fetchedStatData['stats'][0]['is_read']);
-        $this->assertRegExp('/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/', $fetchedStatData['stats'][0]['date_read']);
+        $this->assertMatchesRegularExpression('/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/', $fetchedStatData['stats'][0]['date_read']);
     }
 }

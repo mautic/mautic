@@ -44,7 +44,13 @@
                                         </a>
                                     </td>
                                 <?php elseif ('id' != $cellName) : ?>
-                                    <td><?php echo $view['assets']->makeLinks($cell); ?></td>
+                                    <td>
+                                        <?php if (is_numeric($cell)): ?>
+                                            <?php echo $cell; ?>
+                                        <?php else: ?>
+                                            <?php echo $view['assets']->makeLinks($cell); ?>
+                                        <?php endif; ?>
+                                    </td>
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </tr>

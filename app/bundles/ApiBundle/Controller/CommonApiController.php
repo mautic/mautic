@@ -13,11 +13,12 @@ namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
+use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CategoryBundle\Entity\Category;
@@ -42,7 +43,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * Class CommonApiController.
  */
-class CommonApiController extends FOSRestController implements MauticController
+class CommonApiController extends AbstractFOSRestController implements MauticController
 {
     use RequestTrait;
     use FormErrorMessagesTrait;
@@ -774,54 +775,56 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function getBatchEntities($parameters, &$errors, $prepareForSerialization = false, $requestIdColumn = 'id', $model = null, $returnWithOriginalKeys = true)
     {
-        $ids = [];
-        if (isset($parameters['ids'])) {
-            foreach ($parameters['ids'] as $key => $id) {
-                $ids[(int) $id] = $key;
-            }
-        } else {
-            foreach ($parameters as $key => $params) {
-                if (is_array($params) && !isset($params[$requestIdColumn])) {
-                    $this->setBatchError($key, 'mautic.api.call.id_missing', Response::HTTP_BAD_REQUEST, $errors);
-                    continue;
-                }
+        $idHelper = new BatchIdToEntityHelper($parameters, $requestIdColumn);
 
-                $id       = (is_array($params)) ? (int) $params[$requestIdColumn] : (int) $params;
-                $ids[$id] = $key;
-            }
+        if (!$idHelper->hasIds()) {
+            return [];
         }
-        $return = [];
-        if (!empty($ids)) {
-            $model    = ($model) ? $model : $this->model;
-            $entities = $model->getEntities(
-                [
-                    'filter' => [
-                        'force' => [
-                            [
-                                'column' => $model->getRepository()->getTableAlias().'.id',
-                                'expr'   => 'in',
-                                'value'  => array_keys($ids),
-                            ],
+
+        $model    = ($model) ? $model : $this->model;
+        $entities = $model->getEntities(
+            [
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => $model->getRepository()->getTableAlias().'.id',
+                            'expr'   => 'in',
+                            'value'  => $idHelper->getIds(),
                         ],
                     ],
-                    'ignore_paginator' => true,
-                ]
-            );
+                ],
+                'ignore_paginator' => true,
+            ]
+        );
+        // It must be associative because the order of entities has changed
+        $idHelper->setIsAssociative(true);
 
-            [$entities, $total] = $prepareForSerialization
+        [$entities, $total] = $prepareForSerialization
                 ?
                 $this->prepareEntitiesForView($entities)
                 :
                 $this->prepareEntityResultsToArray($entities);
 
-            foreach ($entities as $entity) {
-                if ($returnWithOriginalKeys) {
-                    // Ensure same keys as params
-                    $return[$ids[$entity->getId()]] = $entity;
-                } else {
-                    $return[$entity->getId()] = $entity;
-                }
+        // Set errors
+        if ($idHelper->hasErrors()) {
+            foreach ($idHelper->getErrors() as $key => $error) {
+                $this->setBatchError($key, $error, Response::HTTP_BAD_REQUEST, $errors);
             }
+        }
+
+        // Return the response with matching keys from the request
+        if ($returnWithOriginalKeys) {
+            if ($entities instanceof Paginator) {
+                $entities = $entities->getIterator()->getArrayCopy();
+            }
+
+            return $idHelper->orderByOriginalKey($entities);
+        }
+
+        // Return the response with IDs as keys (default behavior)
+        $return = [];
+        foreach ($entities as $entity) {
+            $return[$entity->getId()] = $entity;
         }
 
         return $return;
@@ -958,45 +961,16 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function prepareEntityResultsToArray($results, $callback = null)
     {
-        if ($results instanceof Paginator) {
-            $totalCount = count($results);
-        } elseif (isset($results['count'])) {
+        if (is_array($results) && isset($results['count'])) {
             $totalCount = $results['count'];
             $results    = $results['results'];
         } else {
             $totalCount = count($results);
         }
 
-        //we have to convert them from paginated proxy functions to entities in order for them to be
-        //returned by the serializer/rest bundle
-        $entities = [];
-        foreach ($results as $key => $r) {
-            if (is_array($r) && isset($r[0])) {
-                //entity has some extra something something tacked onto the entities
-                if (is_object($r[0])) {
-                    foreach ($r as $k => $v) {
-                        if (0 === $k) {
-                            continue;
-                        }
+        $entityResultHelper = $this->get('mautic.api.helper.entity_result');
 
-                        $r[0]->$k = $v;
-                    }
-                    $entities[$key] = $r[0];
-                } elseif (is_array($r[0])) {
-                    foreach ($r[0] as $k => $v) {
-                        $r[$k] = $v;
-                    }
-                    unset($r[0]);
-                    $entities[$key] = $r;
-                }
-            } else {
-                $entities[$key] = $r;
-            }
-
-            if (is_callable($callback)) {
-                $callback($entities[$key]);
-            }
-        }
+        $entities = $entityResultHelper->getArray($results, $callback);
 
         return [$entities, $totalCount];
     }
@@ -1175,14 +1149,17 @@ class CommonApiController extends FOSRestController implements MauticController
 
             $this->setSerializationContext($view);
         } else {
-            $formErrors = $this->getFormErrorMessages($form);
-            $msg        = $this->getFormErrorMessage($formErrors);
+            $formErrors     = $this->getFormErrorMessages($form);
+            $formErrorCodes = $this->getFormErrorCodes($form);
+            $msg            = $this->getFormErrorMessage($formErrors);
 
             if (!$msg) {
                 $msg = $this->translator->trans('mautic.core.error.badrequest', [], 'flashes');
             }
 
-            return $this->returnError($msg, Response::HTTP_BAD_REQUEST, $formErrors);
+            $responseCode = in_array(Response::HTTP_UNPROCESSABLE_ENTITY, $formErrorCodes) ? Response::HTTP_UNPROCESSABLE_ENTITY : Response::HTTP_BAD_REQUEST;
+
+            return $this->returnError($msg, $responseCode, $formErrors);
         }
 
         return $this->handleView($view);

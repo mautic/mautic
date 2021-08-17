@@ -23,7 +23,7 @@ class RequestHelperTest extends TestCase
      */
     private $request;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->request = $this->createMock(Request::class);
     }

@@ -28,9 +28,9 @@ class MenuHelper
     protected $security;
 
     /**
-     * @var Request|null
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * Stores items that are assigned to another parent outside it's bundle.
@@ -56,7 +56,7 @@ class MenuHelper
     {
         $this->security              = $security;
         $this->coreParametersHelper  = $coreParametersHelper;
-        $this->request               = $requestStack->getCurrentRequest();
+        $this->requestStack          = $requestStack;
         $this->integrationHelper     = $integrationHelper;
     }
 
@@ -307,7 +307,7 @@ class MenuHelper
      */
     protected function handleRequestChecks($name, $value)
     {
-        return $this->request->get($name) == $value;
+        return $this->requestStack->getCurrentRequest()->get($name) == $value;
     }
 
     /**

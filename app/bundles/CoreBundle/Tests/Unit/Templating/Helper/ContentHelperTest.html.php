@@ -22,7 +22,7 @@ class ContentHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $contentHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $dispatcherMock = $this->getMockBuilder(EventDispatcherInterface::class)
             ->disableOriginalConstructor()

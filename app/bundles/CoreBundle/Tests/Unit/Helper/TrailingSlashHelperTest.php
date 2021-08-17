@@ -22,7 +22,7 @@ class TrailingSlashHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $coreParametersHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')

@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
@@ -24,6 +25,11 @@ trait CustomFieldRepositoryTrait
     protected $customFieldList = [];
 
     /**
+     * @var string
+     */
+    protected $uniqueIdentifiersOperator;
+
+    /**
      * @param      $object
      * @param      $args
      * @param null $resultsCallback
@@ -32,7 +38,7 @@ trait CustomFieldRepositoryTrait
      */
     public function getEntitiesWithCustomFields($object, $args, $resultsCallback = null)
     {
-        list($fields, $fixedFields) = $this->getCustomFieldList($object);
+        [$fields, $fixedFields] = $this->getCustomFieldList($object);
 
         //Fix arguments if necessary
         $args = $this->convertOrmProperties($this->getClassName(), $args);
@@ -56,7 +62,7 @@ trait CustomFieldRepositoryTrait
 
         //get a total count
         $result = $dq->execute()->fetchAll();
-        $total  = ($result) ? $result[0]['count'] : 0;
+        $total  = ($result) ? (int) $result[0]['count'] : 0;
 
         if (!$total) {
             $results = [];
@@ -299,7 +305,7 @@ trait CustomFieldRepositoryTrait
      */
     protected function formatFieldValues($values, $byGroup = true, $object = 'lead')
     {
-        list($fields, $fixedFields) = $this->getCustomFieldList($object);
+        [$fields, $fixedFields] = $this->getCustomFieldList($object);
 
         $this->removeNonFieldColumns($values, $fixedFields);
 
@@ -367,7 +373,8 @@ trait CustomFieldRepositoryTrait
                 ->where('f.is_published = :published')
                 ->andWhere($fq->expr()->eq('object', ':object'))
                 ->setParameter('published', true, 'boolean')
-                ->setParameter('object', $object);
+                ->setParameter('object', $object)
+                ->addOrderBy('f.field_order', 'asc');
             $results = $fq->execute()->fetchAll();
 
             $fields      = [];
@@ -418,5 +425,19 @@ trait CustomFieldRepositoryTrait
     protected function postSaveEntity($entity)
     {
         // Inherit and use if required
+    }
+
+    public function setUniqueIdentifiersOperator(string $uniqueIdentifiersOperator): void
+    {
+        $this->uniqueIdentifiersOperator = $uniqueIdentifiersOperator;
+    }
+
+    public function getUniqueIdentifiersWherePart(): string
+    {
+        if (CompositeExpression::TYPE_AND == $this->uniqueIdentifiersOperator) {
+            return 'andWhere';
+        }
+
+        return 'orWhere';
     }
 }

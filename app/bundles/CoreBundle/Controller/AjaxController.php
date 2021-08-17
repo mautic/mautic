@@ -15,6 +15,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\UpgradeEvent;
+use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
@@ -23,11 +24,13 @@ use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
@@ -239,9 +242,10 @@ class AjaxController extends CommonController
     {
         $dataArray      = ['success' => 0];
         $name           = InputHelper::clean($request->request->get('model'));
-        $id             = (int) $request->request->get('id');
+        $id             = InputHelper::clean($request->request->get('id'));
         $customToggle   = InputHelper::clean($request->request->get('customToggle'));
         $model          = $this->getModel($name);
+        $status         = Response::HTTP_OK;
 
         $post = $request->request->all();
         unset($post['model'], $post['id'], $post['action']);
@@ -254,8 +258,10 @@ class AjaxController extends CommonController
         $entity = $model->getEntity($id);
         if (null !== $entity) {
             $permissionBase = $model->getPermissionBase();
-            $security       = $this->get('mautic.security');
-            $createdBy      = (method_exists($entity, 'getCreatedBy')) ? $entity->getCreatedBy() : null;
+
+            /** @var CorePermissions $security */
+            $security  = $this->get('mautic.security');
+            $createdBy = (method_exists($entity, 'getCreatedBy')) ? $entity->getCreatedBy() : null;
 
             if ($security->checkPermissionExists($permissionBase.':publishown')) {
                 $hasPermission = $security->hasEntityAccess($permissionBase.':publishown', $permissionBase.':publishother', $createdBy);
@@ -274,36 +280,44 @@ class AjaxController extends CommonController
             }
 
             if ($hasPermission) {
-                $dataArray['success'] = 1;
-                //toggle permission state
-                if ($customToggle) {
-                    $accessor = PropertyAccess::createPropertyAccessor();
-                    $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
-                    $model->getRepository()->saveEntity($entity);
-                } else {
-                    $refresh = $model->togglePublishStatus($entity);
+                try {
+                    $dataArray['success'] = 1;
+                    //toggle permission state
+                    if ($customToggle) {
+                        $accessor = PropertyAccess::createPropertyAccessor();
+                        $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
+                        $model->getRepository()->saveEntity($entity);
+                    } else {
+                        $refresh = $model->togglePublishStatus($entity);
+                    }
+                    if (!empty($refresh)) {
+                        $dataArray['reload'] = 1;
+                    } else {
+                        //get updated icon HTML
+                        $html = $this->renderView(
+                            'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                            [
+                                'item'  => $entity,
+                                'model' => $name,
+                                'query' => $extra,
+                                'size'  => (isset($post['size'])) ? $post['size'] : '',
+                            ]
+                        );
+                        $dataArray['statusHtml'] = $html;
+                    }
+                } catch (RecordCanNotUnpublishException $e) {
+                    $this->addFlash($e->getMessage());
+                    $status = Response::HTTP_UNPROCESSABLE_ENTITY;
                 }
-                if (!empty($refresh)) {
-                    $dataArray['reload'] = 1;
-                } else {
-                    //get updated icon HTML
-                    $html = $this->renderView(
-                        'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                        [
-                            'item'  => $entity,
-                            'model' => $name,
-                            'query' => $extra,
-                            'size'  => (isset($post['size'])) ? $post['size'] : '',
-                        ]
-                    );
-                    $dataArray['statusHtml'] = $html;
-                }
+            } else {
+                $this->addFlash('mautic.core.error.access.denied');
+                $status = Response::HTTP_FORBIDDEN;
             }
         }
 
         $dataArray['flashes'] = $this->getFlashContent();
 
-        return $this->sendJsonResponse($dataArray);
+        return $this->sendJsonResponse($dataArray, $status);
     }
 
     /**

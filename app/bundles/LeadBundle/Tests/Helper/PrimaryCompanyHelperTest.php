@@ -23,7 +23,7 @@ class PrimaryCompanyHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $leadRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->leadRepository = $this->createMock(CompanyLeadRepository::class);
 

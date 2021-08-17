@@ -30,12 +30,21 @@ class ScheduleModel
      */
     private $schedulerPlanner;
 
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
     public function __construct(EntityManager $entityManager, SchedulerPlanner $schedulerPlanner)
     {
+        $this->entityManager       = $entityManager;
         $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
         $this->schedulerPlanner    = $schedulerPlanner;
     }
 
+    /**
+     * @return Scheduler[]
+     */
     public function getScheduledReportsForExport(ExportOption $exportOption)
     {
         return $this->schedulerRepository->getScheduledReportsForExport($exportOption);
@@ -44,5 +53,12 @@ class ScheduleModel
     public function reportWasScheduled(Report $report)
     {
         $this->schedulerPlanner->computeScheduler($report);
+    }
+
+    public function turnOffScheduler(Report $report): void
+    {
+        $report->setIsScheduled(false);
+        $this->entityManager->persist($report);
+        $this->entityManager->flush();
     }
 }

@@ -41,7 +41,7 @@ class EventLoggerTest extends \PHPUnit\Framework\TestCase
      */
     private $leadRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
         $this->contactTracker         = $this->createMock(ContactTracker::class);

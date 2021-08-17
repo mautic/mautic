@@ -60,6 +60,12 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
             'durable'     => true,
         ]);
         $consumer->setRoutingKey($event->getQueueName());
+
+        // Check event for positive execution time and set on Consumer
+        if (0 < ($timeout = $event->getTimeout())) {
+            $consumer->setGracefulMaxExecutionDateTimeFromSecondsInTheFuture($timeout);
+        }
+
         $consumer->consume($event->getMessages());
     }
 }

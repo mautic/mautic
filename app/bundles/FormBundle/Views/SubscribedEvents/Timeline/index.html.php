@@ -36,7 +36,7 @@ $results    = $submission->getResults();
 	<?php foreach ($form->getFields() as $field) : ?>
 		<?php if (array_key_exists($field->getAlias(), $results) && '' != $results[$field->getAlias()]
 && null != $results[$field->getAlias()]
-&& $results[$field->getAlias()] != []
+&& [] != $results[$field->getAlias()]
 ) : ?>
 			<dt><?php echo $field->getLabel(); ?></dt>
 			<dd>

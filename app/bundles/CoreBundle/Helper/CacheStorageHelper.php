@@ -15,6 +15,11 @@ use Doctrine\DBAL\Connection;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 
+/**
+ * Class CacheStorageHelper.
+ *
+ * @deprecated This helper is deprecated in favor of CacheBundle
+ */
 class CacheStorageHelper
 {
     const ADAPTOR_DATABASE = 'db';
@@ -57,6 +62,15 @@ class CacheStorageHelper
     protected $defaultExpiration;
 
     /**
+     * Semi BC support for pre 2.6.0.
+     *
+     * @deprecated 2.6.0 to be removed in 3.0
+     *
+     * @var array
+     */
+    protected $expirations = [];
+
+    /**
      * @param      $adaptor
      * @param null $namespace
      * @param null $cacheDir
@@ -70,6 +84,17 @@ class CacheStorageHelper
         $this->connection        = $connection;
         $this->defaultExpiration = $defaultExpiration;
 
+        // @deprecated BC support for pre 2.6.0 to be removed in 3.0
+        if (!in_array($adaptor, [self::ADAPTOR_DATABASE, self::ADAPTOR_FILESYSTEM])) {
+            if (file_exists($adaptor)) {
+                $this->cacheDir = $adaptor.'/data';
+            } else {
+                throw new \InvalidArgumentException('cache directory either not set or does not exist; use the container\'s mautic.helper.cache_storage service.');
+            }
+
+            $this->adaptor = self::ADAPTOR_FILESYSTEM;
+        }
+
         $this->setCacheAdaptor();
     }
 
@@ -82,10 +107,13 @@ class CacheStorageHelper
     }
 
     /**
-     * @param $name
-     * @param $data
+     * @param      $name
+     * @param      $data
+     * @param null $expiration
      *
      * @return bool
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function set($name, $data, $expiration = null)
     {
@@ -101,7 +129,7 @@ class CacheStorageHelper
 
         $cacheItem->set($data);
 
-        $this->cacheAdaptor->save($cacheItem);
+        return $this->cacheAdaptor->save($cacheItem);
     }
 
     /**
@@ -109,6 +137,8 @@ class CacheStorageHelper
      * @param int $maxAge @deprecated 2.6.0 to be removed in 3.0; set expiration when using set()
      *
      * @return bool|mixed
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function get($name, $maxAge = null)
     {
@@ -174,6 +204,9 @@ class CacheStorageHelper
         return $this->cache[$namespace];
     }
 
+    /**
+     * Creates adapter.
+     */
     protected function setCacheAdaptor()
     {
         switch ($this->adaptor) {

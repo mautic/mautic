@@ -257,7 +257,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
-            ->setMethods(['createEmailStat'])
+            ->onlyMethods(['createEmailStat'])
             ->getMock();
 
         $mailHelper->method('createEmailStat')
@@ -416,7 +416,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
-            ->setMethods(null)
+            ->onlyMethods([])
             ->getMock();
 
         // Enable queueing
@@ -519,7 +519,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
-            ->setMethods(['createEmailStat'])
+            ->onlyMethods(['createEmailStat'])
             ->getMock();
 
         $mailHelper->expects($this->exactly(21))
@@ -656,7 +656,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
-            ->setMethods(['createEmailStat'])
+            ->onlyMethods(['createEmailStat'])
             ->getMock();
 
         $mailHelper->method('createEmailStat')

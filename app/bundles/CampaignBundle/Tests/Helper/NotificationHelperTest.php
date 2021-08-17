@@ -43,7 +43,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->userModel = $this->getMockBuilder(UserModel::class)
             ->disableOriginalConstructor()

@@ -37,17 +37,17 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $coreParametersHelper;
 
-    public static function setupBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$oldTimezone = date_default_timezone_get();
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         date_default_timezone_set(self::$oldTimezone);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -109,5 +109,13 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
 
         $this->assertSame('00:00:00', $this->helper->toText($dateTime));
+    }
+
+    public function testFullConcat()
+    {
+        date_default_timezone_set('Europe/Paris');
+        $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2021-02-21 18:00:00', new \DateTimeZone('UTC'));
+        $result   = $this->helper->toFullConcat($dateTime, 'UTC');
+        $this->assertEquals($result, 'February 21, 2021 7:00 pm');
     }
 }

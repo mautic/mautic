@@ -16,9 +16,9 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
 
-class TrackableModelTest extends WebTestCase
+class TrackableModelTest extends TestCase
 {
     /**
      * @testdox Test that content is detected as HTML
@@ -36,7 +36,7 @@ class TrackableModelTest extends WebTestCase
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
-            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
+            ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
             ->getMock();
 
         $mockModel->expects($this->once())
@@ -84,7 +84,7 @@ class TrackableModelTest extends WebTestCase
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
-            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
+            ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
             ->getMock();
 
         $mockModel->expects($this->once())
@@ -464,7 +464,7 @@ class TrackableModelTest extends WebTestCase
         reset($trackables);
         $token = key($trackables);
         $this->assertNotEmpty($trackables, $content);
-        $this->assertContains($token, $content);
+        $this->assertStringContainsString($token, $content);
     }
 
     /**
@@ -616,7 +616,7 @@ TEXT;
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
-            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
+            ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
             ->getMock();
 
         $mockModel->expects($this->once())

@@ -11,7 +11,7 @@
 
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use LightSaml\Provider\TimeProvider\TimeProviderInterface;
 use Mautic\UserBundle\Entity\IdEntry;
 use Mautic\UserBundle\Security\SAML\Store\IdStore;
@@ -35,7 +35,7 @@ class IdStoreTest extends TestCase
      */
     private $store;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager      = $this->createMock(ObjectManager::class);
         $this->timeProvider = $this->createMock(TimeProviderInterface::class);

@@ -124,21 +124,21 @@ class InstallCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Admin first name.',
-                'Admin'
+                null
             )
             ->addOption(
                 '--admin_lastname',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Admin last name.',
-                'Mautic'
+                null
             )
             ->addOption(
                 '--admin_username',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Admin username.',
-                'admin'
+                null
             )
             ->addOption(
                 '--admin_email',
@@ -262,7 +262,11 @@ class InstallCommand extends ContainerAwareCommand
         $options = $input->getOptions();
 
         $dbParams   = [];
-        $adminParam = [];
+        $adminParam = [
+          'firstname' => 'Admin',
+          'lastname'  => 'Mautic',
+          'username'  => 'admin',
+        ];
         $allParams  = $installer->localConfigParameters();
 
         // Initialize DB and admin params from local.php
@@ -324,10 +328,10 @@ class InstallCommand extends ContainerAwareCommand
                         $output->writeln('Missing optional settings:');
                         $this->handleInstallerErrors($output, $messages['optional']);
 
-                        if (!isset($options['force'])) {
+                        if (empty($options['force'])) {
                             // Ask user to confirm install when optional settings missing
                             $helper   = $this->getHelper('question');
-                            $question = new ConfirmationQuestion('Continue with install anyway? ', false);
+                            $question = new ConfirmationQuestion('Continue with install anyway? [yes/no]', false);
 
                             if (!$helper->ask($input, $output, $question)) {
                                 return -$step;

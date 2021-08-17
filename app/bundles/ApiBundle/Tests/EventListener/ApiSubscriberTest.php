@@ -48,7 +48,7 @@ class ApiSubscriberTest extends CommonMocks
      */
     private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

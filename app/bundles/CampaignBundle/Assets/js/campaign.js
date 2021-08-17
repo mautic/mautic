@@ -179,7 +179,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
 
     if (!response.success && Mautic.campaignBuilderConnectionRequiresUpdate) {
         // Modal exited - check to see if a connection needs to be removed
-        Mautic.campaignBuilderInstance.detach(Mautic.campaignBuilderLastConnection);
+        Mautic.campaignBuilderInstance.deleteConnection(Mautic.campaignBuilderLastConnection);
     }
     Mautic.campaignBuilderConnectionRequiresUpdate = false;
     Mautic.campaignBuilderUpdateLabel(domEventId);
@@ -918,7 +918,7 @@ Mautic.campaignBeforeDropCallback = function(params) {
 
             // Replace the connection
             mQuery.each(params.dropEndpoint.connections, function(key, conn) {
-                Mautic.campaignBuilderInstance.detach(conn);
+                Mautic.campaignBuilderInstance.deleteConnection(conn);
             });
         }
     }

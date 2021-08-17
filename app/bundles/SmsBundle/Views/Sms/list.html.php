@@ -123,21 +123,17 @@ if (count($items)):
                     </td>
                     <td>
                         <div>
-                            <?php if ('template' == $type): ?>
-                                <?php echo $view->render(
-                                    'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                    ['item' => $item, 'model' => 'sms']
-                                ); ?>
-                            <?php else: ?>
-                                <i class="fa fa-fw fa-lg fa-toggle-on text-muted disabled"></i>
-                            <?php endif; ?>
+                            <?php echo $view->render(
+                                'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                                ['item' => $item, 'model' => 'sms']
+                            ); ?>
                             <a href="<?php echo $view['router']->path(
                                 'mautic_sms_action',
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]
                             ); ?>">
                                 <?php echo $item->getName(); ?>
                                 <?php if ('list' == $type): ?>
-                                    <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.sms.icon_tooltip.list_sms'); ?>"><i class="fa fa-fw fa-list"></i></span>
+                                    <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.sms.icon_tooltip.list_sms'); ?>"><i class="fa fa-fw fa-pie-chart"></i></span>
                                 <?php endif; ?>
                             </a>
                         </div>
@@ -148,19 +144,14 @@ if (count($items)):
                         <?php $color    = ($category) ? '#'.$category->getColor() : 'inherit'; ?>
                         <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                     </td>
-                    <td class="visible-sm visible-md visible-lg col-stats">
-                        <span class="mt-xs label label-warning has-click-event clickable-stat"
-                              data-toggle="tooltip"
-                              title="<?php echo $view['translator']->trans('mautic.channel.stat.leadcount.tooltip'); ?>">
-                            <a href="<?php echo $view['router']->path(
-                                'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.sms_sent').':'.$item->getId()]
-                            ); ?>"><?php echo $view['translator']->trans(
-                                    'mautic.sms.stat.sentcount',
-                                    ['%count%' => $item->getSentCount(true)]
-                                ); ?></a>
-                        </span>
-                    </td>
+                       <?php
+                       echo $view->render(
+                           'MauticSmsBundle:Sms:list_stats.html.php',
+                           [
+                               'item' => $item,
+                           ]
+                       );
+                       ?>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
