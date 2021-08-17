@@ -1,5 +1,4 @@
 User-agent: *
-Disallow: /addons/
 Disallow: /plugins/
 Disallow: /app/
 Disallow: /media/dashboards/
