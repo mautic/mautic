@@ -4,8 +4,8 @@ contact_links:
     url: https://www.mautic.org/c/support
     about: Please ask and answer support questions here.
   - name: Mautic Feature Requests
-  - url: https://forum.mautic.org/c/ideas
-  - about: We use GitHub issues as a bug tracker only. Please go to https://forum.mautic.org/c/ideas to find support and discuss features/ideas.
+    url: https://forum.mautic.org/c/ideas
+    about: We use GitHub issues as a bug tracker only. Please go to https://forum.mautic.org/c/ideas to find support and discuss features/ideas.
   - name: Mautic Security Issues
     url: https://www.mautic.org/mautic-security-team/how-to-report-a-security-issue
     about: Please learn how to report security vulnerabilities here.
