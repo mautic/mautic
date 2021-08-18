@@ -266,8 +266,8 @@ $container->loadFromExtension('framework', [
         'transports' => [
             \Mautic\EmailBundle\Messenger\EmailMessage::RECEIVER => [
                 'dsn'            => '%mautic.messenger_transport_dsn%',
-                'options'        => $configParameterBag->get('messenger_transport_email_options'),
-                'retry_strategy' => $configParameterBag->get('messenger_transport_email_retry_strategy'),
+                'options'        => json_decode('%messenger_transport_email_options%', true),
+                'retry_strategy' => json_decode('%messenger_transport_email_retry_strategy%', true),
             ],
             \Mautic\EmailBundle\Messenger\EmailMessage::FAILED => [
                 'dsn'     => '%mautic.messenger_transport_dsn%',
