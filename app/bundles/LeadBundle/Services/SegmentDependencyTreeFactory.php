@@ -34,8 +34,9 @@ class SegmentDependencyTreeFactory
         $childSegments = $this->findChildSegments($segment);
 
         foreach ($childSegments as $childSegment) {
-            $rootNode->addChild(new IntNode($childSegment->getId()));
-            $this->buildTree($childSegment, $rootNode);
+            $childNode = new IntNode($childSegment->getId());
+            $rootNode->addChild($childNode);
+            $this->buildTree($childSegment, $childNode);
         }
 
         return $rootNode;

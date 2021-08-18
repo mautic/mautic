@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper\Tree;
 
+use RecursiveIterator;
+
 class IntNode implements NodeInterface
 {
     /**
@@ -24,7 +26,7 @@ class IntNode implements NodeInterface
     /**
      * @var int
      */
-    private $iteratorKey = 0;
+    private $position = 0;
 
     public function __construct(int $value, NodeInterface $parent = null)
     {
@@ -54,38 +56,45 @@ class IntNode implements NodeInterface
         $this->children[] = $child;
     }
 
-    public function getChildren(): array
+    public function getChildrenArray(): array
     {
         return $this->children;
     }
 
+    public function getChildren(): RecursiveIterator
+    {
+        // return $this->children;
+        // return $this->current()->getChildren();
+        return $this->current();
+    }
+
     public function hasChildren(): bool
     {
-        return !empty($this->children);
+        return !empty($this->current()->getChildrenArray());
     }
 
     public function current(): NodeInterface
     {
-        return $this->children[$this->iteratorKey];
+        return $this->children[$this->position];
     }
 
     public function key(): int
     {
-        return $this->iteratorKey;
+        return $this->position;
     }
 
     public function next(): void
     {
-        ++$this->iteratorKey;
+        ++$this->position;
     }
 
     public function rewind(): void
     {
-        --$this->iteratorKey;
+        $this->position = 0;
     }
 
     public function valid(): bool
     {
-        return isset($this->children[$this->iteratorKey]);
+        return isset($this->children[$this->position]);
     }
 }
