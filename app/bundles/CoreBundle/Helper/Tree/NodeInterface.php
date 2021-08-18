@@ -11,4 +11,6 @@ interface NodeInterface extends \RecursiveIterator
     public function setParent(NodeInterface $parent): void;
 
     public function addChild(NodeInterface $child): void;
+
+    public function getChildrenArray(): array;
 }

@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -982,11 +983,11 @@ class AjaxController extends CommonAjaxController
 
         /** @var SegmentDependencyTreeFactory $segmentDependencyTreeFactory */
         $segmentDependencyTreeFactory = $this->get('mautic.lead.service.segment_dependency_tree_factory');
-        $tree                         = $segmentDependencyTreeFactory->buildTree($segment);
-        var_dump($tree);
-        die;
 
-        return new JsonResponse([]);
+        $parentNode = $segmentDependencyTreeFactory->buildTree($segment);
+        $formatter  = new JsPlumbFormatter();
+
+        return new JsonResponse($formatter->format($parentNode));
     }
 
     /**

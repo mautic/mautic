@@ -84,6 +84,17 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @throws MappingException
      */
+    public function testSegmentDependencyTreeWithNotExistingSegment(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getSegmentDependencyTree&id=9999');
+        $response = $this->client->getResponse();
+        Assert::assertSame(404, $response->getStatusCode());
+        Assert::assertSame('{"message":"Segment 9999 could not be found."}', $response->getContent());
+    }
+
+    /**
+     * @throws MappingException
+     */
     public function testSegmentDependencyTree(): void
     {
         $segmentA = new LeadList();
@@ -154,7 +165,24 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertTrue($response->isOk(), $response->getContent());
 
-        $data = json_decode($response->getContent(), true);
+        Assert::assertSame(
+            [
+                'nodes' => [
+                    ['id' => $segmentA->getId(), 'name' => $segmentA->getId()],
+                    ['id' => $segmentB->getId(), 'name' => $segmentB->getId()],
+                    ['id' => $segmentC->getId(), 'name' => $segmentC->getId()],
+                    ['id' => $segmentE->getId(), 'name' => $segmentE->getId()],
+                    ['id' => $segmentD->getId(), 'name' => $segmentD->getId()],
+                ],
+                'edges' => [
+                    ['source' => $segmentA->getId(), 'target' => $segmentB->getId()],
+                    ['source' => $segmentA->getId(), 'target' => $segmentC->getId()],
+                    ['source' => $segmentA->getId(), 'target' => $segmentD->getId()],
+                    ['source' => $segmentC->getId(), 'target' => $segmentE->getId()],
+                ],
+            ],
+            json_decode($response->getContent(), true)
+        );
     }
 
     private function getMembersForCampaign(int $campaignId): array
