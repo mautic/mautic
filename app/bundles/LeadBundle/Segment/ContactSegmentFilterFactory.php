@@ -96,10 +96,9 @@ class ContactSegmentFilterFactory
     private function mergeFilters($filters)
     {
         $shrinkedFilters = [];
-        $filterQueue     = []; // Put the filters from array into the Queue
-        $lastFilter      = []; // pop the latest
+        $arrStacks       = []; // Put the same filters from array into Stacks
 
-        $preservedKey = ''; // preserve the key from previous iteration
+        $previousKey = ''; // preserve the key from previous iteration
         // replace filters with glue OR and operator = , with IN operator
         foreach ($filters as $filter) {
             // easy to compare
@@ -107,65 +106,54 @@ class ContactSegmentFilterFactory
                 $filter['object'],
                 $filter['field'],
                 $filter['glue'],
-                ('=' === $filter['operator']) ? 'eq' : $filter['operator'],
+                $filter['operator'],
             ]);
 
             if ('or' === strtolower($filter['glue'])) {
-                if (empty($filterQueue) || $preservedKey === $key) {
-                    $filterQueue[] = $filter;
-                } else {
-                    $groupedFilter = $this->groupFilters($filterQueue);
-                    if (!empty($groupedFilter)) {
-                        $shrinkedFilters[] = $groupedFilter;
-                    }
-                    $filterQueue  = [$filter]; // reset filter queue
-                }
-            } else {
-                if (count($filterQueue) > 0) {
-                    $lastFilter = array_pop($filterQueue);
+                if (!isset($arrStacks[$key])) {
+                    $arrStacks[$key] = [];
                 }
 
-                $groupedFilter = $this->groupFilters($filterQueue);
-                if (!empty($groupedFilter)) {
-                    $shrinkedFilters[] = $groupedFilter;
-                }
-                $filterQueue  = []; // reset filter queue
-
-                if (!empty($lastFilter)) {
-                    $shrinkedFilters[] = $lastFilter;
-                    $lastFilter        = [];
+                array_push($arrStacks[$key], $filter);
+            } else { // glue = and
+                // if 'or' followed by 'and', it becomes - or (cond1 and cond2)
+                if (isset($arrStacks[$previousKey]) && count($arrStacks[$previousKey]) > 0) {
+                    $previousFilter = array_pop($arrStacks[$previousKey]);
+                    array_push($shrinkedFilters, $previousFilter);
                 }
 
-                $shrinkedFilters[] = $filter;
+                array_push($shrinkedFilters, $filter);
             }
 
-            // preserve the key for next iteration comparison
-            $preservedKey =  $key;
+            $previousKey = $key;
         }
 
-        // add filterqueue back if not empty
-        if (count($filterQueue) > 0) {
-            $shrinkedFilters[] = $filterQueue[0];
+        // add all grouped conditions back
+        foreach ($arrStacks as $stack) {
+            $groupedFilter = $this->groupFilters($stack);
+            if (!empty($groupedFilter)) {
+                $shrinkedFilters[] = $groupedFilter;
+            }
         }
 
         return array_values($shrinkedFilters);
     }
 
-    private function groupFilters($filterQueue)
+    private function groupFilters($stack)
     {
-        if (empty($filterQueue)) {
+        if (empty($stack)) {
             return [];
         }
 
-        if (count($filterQueue) <= 1) {
-            return $filterQueue;
+        if (count($stack) <= 1) {
+            return $stack[0];
         }
 
-        $filter                         = $filterQueue[0];
+        $filter                         = $stack[0];
         $filter['operator']             = 'in';
         $filter['properties']['filter'] = $filter['filter'] = array_map(function ($ele) {
             return $ele['filter'];
-        }, $filterQueue);
+        }, $stack);
 
         return $filter;
     }
