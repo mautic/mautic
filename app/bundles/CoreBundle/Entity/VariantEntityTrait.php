@@ -196,7 +196,7 @@ trait VariantEntityTrait
      */
     public function getTotalWeight(): int
     {
-        return (int) $this->getVariantSettings()['totalWeight'] ?? AbTestSettingsService::DEFAULT_TOTAL_WEIGHT;
+        return (int) ($this->getVariantSettings()['totalWeight'] ?? AbTestSettingsService::DEFAULT_TOTAL_WEIGHT);
     }
 
     public function clearVariants(): void
