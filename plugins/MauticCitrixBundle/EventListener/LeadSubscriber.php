@@ -149,6 +149,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
         foreach ($activeProducts as $product) {
             $eventNames           = $this->model->getDistinctEventNamesDesc($product);
+            $eventNames           = CitrixHelper::mergeWithFutureEvents($eventNames, $product);
             $eventNames           = CitrixHelper::appendStartDateTimeToEventName($product, $eventNames);
             $eventNamesWithoutAny = array_merge(
                 [
@@ -254,8 +255,8 @@ class LeadSubscriber implements EventSubscriberInterface
                 $eventTypes = [CitrixEventTypes::REGISTERED, CitrixEventTypes::ATTENDED];
                 foreach ($eventTypes as $k => $eventType) {
                     $query = $em->getConnection()->createQueryBuilder()
-                                ->select('null')
-                                ->from($citrixEventsTable, $alias.$k);
+                        ->select('null')
+                        ->from($citrixEventsTable, $alias.$k);
 
                     if (!$isAnyEvent) {
                         $query->where(

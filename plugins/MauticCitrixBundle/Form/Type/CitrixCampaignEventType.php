@@ -61,6 +61,7 @@ class CitrixCampaignEventType extends AbstractType
 
         $product        = $options['attr']['data-product'];
         $eventNamesDesc = $this->model->getDistinctEventNamesDesc($product);
+        $eventNamesDesc = CitrixHelper::mergeWithFutureEvents($eventNamesDesc, $product);
         $eventNamesDesc = CitrixHelper::appendStartDateTimeToEventName($product, $eventNamesDesc);
 
         $choices = [

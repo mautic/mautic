@@ -617,4 +617,17 @@ class CitrixHelper
 
         return $contacts;
     }
+
+    public static function mergeWithFutureEvents($choices, $products)
+    {
+        $events = self::getCitrixChoices($products);
+
+        foreach ($events as $key => $event) {
+            if (!in_array($event, $choices)) {
+                $choices['_#'.$key] = $event;
+            }
+        }
+
+        return $choices;
+    }
 }
