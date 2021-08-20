@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\ListLead;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,7 +36,7 @@ class SegmentFilterCommandFunctionalTest extends MauticMysqlTestCase
         $exitCode = $applicationTester->run(['command' => 'mautic:segments:update', '-i' => $segmentId]);
         self::assertSame(0, $exitCode, $applicationTester->getDisplay());
 
-        self::assertSame(5, $this->em->getRepository(LeadList::class)->find(['leadlist_id' => $segmentId]));
+        self::assertCount(5, $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentId]));
     }
 
     private function saveContacts(): array
@@ -45,7 +46,7 @@ class SegmentFilterCommandFunctionalTest extends MauticMysqlTestCase
         $contactRepo = $this->em->getRepository(Lead::class);
         $contacts    = [];
 
-        for ($i = 'a'; $i <= 10; ++$i) {
+        for ($i = 0; $i <= 10; ++$i) {
             $contact = new Lead();
             $contact->setFirstname('fn'.$i);
             $contact->setLastname('ln'.$i);
