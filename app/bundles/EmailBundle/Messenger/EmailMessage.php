@@ -13,9 +13,6 @@ namespace Mautic\EmailBundle\Messenger;
 
 class EmailMessage
 {
-    const RECEIVER = 'email';
-    const FAILED   = 'email_failed';
-
     private \Swift_Message $mauticMessage;
 
     public function __construct(\Swift_Message $mauticMessage)

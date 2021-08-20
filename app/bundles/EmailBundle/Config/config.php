@@ -304,6 +304,13 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.email.subscriber.messenger.failed' => [
+                'class'     => \Mautic\EmailBundle\EventListener\MessengerFailedEmailSubscriber::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.email' => [
@@ -993,6 +1000,7 @@ return [
         'disable_trackable_urls'                     => false,
         'theme_email_default'                        => 'blank',
         'messenger_transport_dsn'                    => null,
+        'messenger_transport_email_receiver'         => 'email',
         'messenger_transport_email_options'          => [],
         'messenger_transport_email_retry_strategy'   => [],
     ],
