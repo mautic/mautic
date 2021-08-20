@@ -101,11 +101,6 @@ class ContactSegmentFilterFactory
         $previousKey = ''; // preserve the key from previous iteration
         // replace filters with glue OR and operator = , with IN operator
         foreach ($filters as $filter) {
-            // treat the first filter glue as 'or'
-            if (empty($previousKey)) {
-                $filter['glue'] = 'or';
-            }
-
             // easy to compare
             $key = implode('_', [
                 $filter['object'],
