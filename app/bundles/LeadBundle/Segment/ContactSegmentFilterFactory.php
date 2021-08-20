@@ -109,7 +109,7 @@ class ContactSegmentFilterFactory
                 $filter['operator'],
             ]);
 
-            if ('or' === strtolower($filter['glue'])) {
+            if ('or' === strtolower($filter['glue']) && '=' === $filter['operator']) {
                 if (!isset($arrStacks[$key])) {
                     $arrStacks[$key] = [];
                 }
