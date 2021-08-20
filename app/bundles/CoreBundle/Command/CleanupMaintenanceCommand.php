@@ -27,15 +27,18 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class CleanupMaintenanceCommand extends ContainerAwareCommand
 {
+    /**
+     * @var AuditLogModel
+     */
     private $auditLogModel;
 
+    /**
+     * @var IpLookupHelper
+     */
     private $ipLookupHelper;
 
-    public function __construct(AuditLogModel $auditLogModel,
-                                 IpLookupHelper $ipLookupHelper,
-                                 $name = null)
+    public function __construct(AuditLogModel $auditLogModel, IpLookupHelper $ipLookupHelper)
     {
-        parent::__construct($name);
         $this->auditLogModel  = $auditLogModel;
         $this->ipLookupHelper = $ipLookupHelper;
     }
@@ -96,7 +99,7 @@ EOT
         }
 
         if (!empty($gdpr)) {
-            // to fullfil GDPR, you must delete inactive user data older than 3years
+            // to fullfil GDPR, you must delete inactive user data older than 3 years
             $daysOld = 365 * 3;
         }
 
@@ -137,9 +140,20 @@ EOT
                 $output->writeln($query);
             }
         }
-        $stats = array_filter($event->getStats());
-        if (!$dryRun && count($stats)) {
-            $log   = [
+        // store to audit log
+        $this->storeToAuditLog($stats, $dryRun, $input);
+
+        return 0;
+    }
+
+    /**
+     * @param $dryRun
+     */
+    protected function storeToAuditLog(array $stats, $dryRun, InputInterface $input): void
+    {
+        $notEmptyStats = array_filter($stats);
+        if (!$dryRun && count($notEmptyStats)) {
+            $log = [
                 'userName'  => 'system',
                 'userId'    => 0,
                 'bundle'    => 'core',
@@ -148,13 +162,11 @@ EOT
                 'action'    => 'maintenance',
                 'details'   => [
                     'options' => array_filter($input->getOptions()),
-                    'stats'   => $stats,
+                    'stats'   => $notEmptyStats,
                 ],
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
             $this->auditLogModel->writeToLog($log);
         }
-
-        return 0;
     }
 }
