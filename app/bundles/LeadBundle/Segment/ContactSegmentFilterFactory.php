@@ -90,10 +90,8 @@ class ContactSegmentFilterFactory
 
     /**
      * @param $filters
-     *
-     * @return array
      */
-    private function mergeFilters($filters)
+    private function mergeFilters(array $filters): array
     {
         $shrinkedFilters = [];
         $arrStacks       = []; // Put the same filters from array into Stacks
@@ -139,7 +137,10 @@ class ContactSegmentFilterFactory
         return array_values($shrinkedFilters);
     }
 
-    private function groupFilters($stack)
+    /**
+     * @param $filters
+     */
+    private function groupFilters(array $stack): array
     {
         if (empty($stack)) {
             return [];
