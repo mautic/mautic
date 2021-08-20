@@ -16,8 +16,8 @@ class LeadRepository extends CommonRepository
     /**
      * Get the details of leads added to a campaign.
      *
-     * @param      $campaignId
-     * @param null $leads
+     * @param int        $campaignId
+     * @param int[]|null $leads
      *
      * @return array
      */
@@ -51,8 +51,8 @@ class LeadRepository extends CommonRepository
     /**
      * Get leads for a specific campaign.
      *
-     * @param      $campaignId
-     * @param null $eventId
+     * @param int      $campaignId
+     * @param int|null $eventId
      *
      * @return array
      */
@@ -92,8 +92,8 @@ class LeadRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      *
-     * @param $fromLeadId
-     * @param $toLeadId
+     * @param int $fromLeadId
+     * @param int $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -320,7 +320,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param $campaignId
+     * @param int $campaignId
      *
      * @return array
      */
@@ -349,7 +349,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param      $campaignId
+     * @param int  $campaignId
      * @param bool $campaignCanBeRestarted
      *
      * @return CountResult
@@ -373,17 +373,13 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter, true);
         $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb, $campaignCanBeRestarted);
 
-        if (!$campaignCanBeRestarted) {
-            $this->updateQueryWithHistoryExclusion($campaignId, $qb);
-        }
-
         $result = $qb->execute()->fetch();
 
         return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
     }
 
     /**
-     * @param      $campaignId
+     * @param int  $campaignId
      * @param bool $campaignCanBeRestarted
      *
      * @return array
@@ -406,10 +402,6 @@ class LeadRepository extends CommonRepository
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter);
         $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb, $campaignCanBeRestarted);
-
-        if (!$campaignCanBeRestarted) {
-            $this->updateQueryWithHistoryExclusion($campaignId, $qb);
-        }
 
         $results = $qb->execute()->fetchAll();
 
@@ -450,7 +442,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param $campaignId
+     * @param int $campaignId
      *
      * @return array
      */
@@ -509,7 +501,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param $campaignId
+     * @param int $campaignId
      *
      * @return array
      */
@@ -538,7 +530,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param $campaignId
+     * @param int $campaignId
      */
     private function updateQueryWithExistingMembershipExclusion($campaignId, QueryBuilder $qb, $campaignCanBeRestarted = false)
     {
@@ -578,28 +570,6 @@ class LeadRepository extends CommonRepository
                     $qb->expr()->eq('ll.lead_id', 'cl.lead_id'),
                     $qb->expr()->eq('ll.manually_removed', 0),
                     $qb->expr()->in('ll.leadlist_id', $segments)
-                )
-            );
-
-        $qb->andWhere(
-            sprintf('NOT EXISTS (%s)', $subq->getSQL())
-        );
-    }
-
-    /**
-     * Exclude contacts with any previous campaign history; this is mainly BC for pre 2.14.0 where the membership entry was deleted.
-     *
-     * @param $campaignId
-     */
-    private function updateQueryWithHistoryExclusion($campaignId, QueryBuilder $qb)
-    {
-        $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'el')
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('el.lead_id', 'll.lead_id'),
-                    $qb->expr()->eq('el.campaign_id', (int) $campaignId)
                 )
             );
 
