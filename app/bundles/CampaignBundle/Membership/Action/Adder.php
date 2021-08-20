@@ -42,7 +42,7 @@ class Adder
         $rotation = 1;
         if ($this->leadEventLogRepository->hasBeenInCampaignRotation($contact->getId(), $campaign->getId(), 1)) {
             if (!$campaign->allowRestart()) {
-                throw new ContactCannotBeAddedToCampaignException("Contact {$contact->getId()} could not be added to the campaign {$campaign->getId()} because it should start new campaign rotation but is not configured to be repetable.");
+                throw new ContactCannotBeAddedToCampaignException("Contact {$contact->getId()} could not be added to the campaign {$campaign->getId()} because it should start new campaign rotation but is not configured to be repeatable.");
             }
 
             $rotation = 2;
