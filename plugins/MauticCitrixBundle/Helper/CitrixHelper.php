@@ -335,7 +335,7 @@ class CitrixHelper
      * @param $firstname
      * @param $lastname
      *
-     * @return bool
+     * @return string
      *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      */
@@ -371,7 +371,11 @@ class CitrixHelper
                 }
             }
 
-            return is_array($response) && array_key_exists('joinUrl', $response);
+            if (!is_array($response) || !array_key_exists('joinUrl', $response)) {          //response has key and registration url
+                throw new BadRequestHttpException('Unable to register!');
+            }
+
+            return $response['joinUrl'];
         } catch (\Exception $ex) {
             self::log('registerToProduct: '.$ex->getMessage());
             throw new BadRequestHttpException($ex->getMessage());
