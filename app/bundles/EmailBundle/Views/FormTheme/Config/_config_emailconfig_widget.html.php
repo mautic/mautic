@@ -92,6 +92,10 @@ $template  = '<div class="col-md-6">{content}</div>';
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_path', $template); ?>
             </div>
 
+            <div class="alert alert-info" data-show-on='{"config_emailconfig_mailer_spool_type": "messenger"}'>
+                <?php echo $view['translator']->trans('mautic.email.config.mailer_spool_type.messenger.tootlip'); ?>
+            </div>
+
             <div class="row">
                 <div class="col-md-12">
                     <?php echo $view['form']->rowIfExists($fields, 'messenger_transport_dsn'); ?>
