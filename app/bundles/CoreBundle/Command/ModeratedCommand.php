@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
+use Symfony\Component\Lock\Store\RedisStore;
 
 abstract class ModeratedCommand extends Command
 {
@@ -66,7 +67,7 @@ abstract class ModeratedCommand extends Command
                 '--lock_mode',
                 '-x',
                 InputOption::VALUE_REQUIRED,
-                'Allowed value are "pid" or "flock". By default, lock will try with pid, if not available will use file system',
+                'Allowed value are "pid", "flock" or redis. By default, lock will try with pid, if not available will use file system',
                 self::MODE_PID
             )
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Deprecated; use --bypass-locking instead.');
@@ -91,7 +92,7 @@ abstract class ModeratedCommand extends Command
             // File lock is deprecated in favor of Symfony's Lock component's lock
             $this->moderationMode = 'flock';
         }
-        if (!in_array($this->moderationMode, ['pid', 'flock'])) {
+        if (!in_array($this->moderationMode, ['pid', 'flock', 'redis'])) {
             $output->writeln('<error>Unknown locking method specified.</error>');
 
             return false;
@@ -100,11 +101,13 @@ abstract class ModeratedCommand extends Command
         // Allow multiple runs of the same command if executing different IDs, etc
         $this->moderationKey = $this->getName().$moderationKey;
 
-        // Setup the run directory for lock/pid files
-        $this->runDirectory = $this->pathsHelper->getSystemPath('cache').'/../run';
-        if (!file_exists($this->runDirectory) && !@mkdir($this->runDirectory)) {
-            // This needs to throw an exception in order to not silently fail when there is an issue
-            throw new \RuntimeException($this->runDirectory.' could not be created.');
+        if (in_array($this->moderationMode, ['pid', 'flock'])) {
+            // Setup the run directory for lock/pid files
+            $this->runDirectory = $this->pathsHelper->getSystemPath('cache').'/../run';
+            if (!file_exists($this->runDirectory) && !@mkdir($this->runDirectory)) {
+                // This needs to throw an exception in order to not silently fail when there is an issue
+                throw new \RuntimeException($this->runDirectory.' could not be created.');
+            }
         }
 
         // Check if the command is currently running
@@ -181,7 +184,18 @@ abstract class ModeratedCommand extends Command
 
     private function checkFlock(): bool
     {
-        $store      = new FlockStore($this->runDirectory);
+        switch ($this->moderationMode) {
+            case 'redis':
+                $dsn   = $this->getContainer()->get('mautic.helper.core_parameters')->get('cache_adapter_redis')['dsn'] ?? null;
+                $redis = new \Redis();
+                $redis->connect(parse_url($dsn, PHP_URL_HOST));
+                $store = new RedisStore($redis);
+
+                break;
+            default:
+                $store = new FlockStore($this->runDirectory);
+        }
+
         $factory    = new LockFactory($store);
         $this->lock = $factory->createLock($this->moderationKey, $this->lockExpiration);
 
