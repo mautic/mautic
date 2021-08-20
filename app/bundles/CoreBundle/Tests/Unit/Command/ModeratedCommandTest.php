@@ -244,7 +244,7 @@ class ModeratedCommandTest extends TestCase
                 return new class() {
                     public function get()
                     {
-                        return ['dns' => 'redis://localhost'];
+                        return ['dsn' => 'redis://localhost'];
                     }
                 };
             });
