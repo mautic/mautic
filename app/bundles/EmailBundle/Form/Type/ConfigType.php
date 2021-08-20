@@ -579,6 +579,21 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'messenger_transport_dsn',
+            TextType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.messenger.transport.dsn',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_emailconfig_mailer_spool_type":["messenger"]}',
+                    'tooltip'      => 'mautic.email.config.mailer.messenger.transport.dsn.tooltip',
+                ],
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
             'mailer_custom_headers',
             SortableListType::class,
             [
