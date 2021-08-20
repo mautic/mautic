@@ -13,7 +13,9 @@ $fieldKeys = array_keys($fields);
 $template  = '<div class="col-md-6">{content}</div>';
 ?>
 
-<?php if (count(array_intersect($fieldKeys, ['mailer_from_name', 'mailer_from_email', 'mailer_transport', 'mailer_spool_type']))): ?>
+<?php if (count(
+    array_intersect($fieldKeys, ['mailer_from_name', 'mailer_from_email', 'mailer_transport', 'mailer_spool_type'])
+)): ?>
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.mail'); ?></h3>
@@ -29,7 +31,7 @@ $template  = '<div class="col-md-6">{content}</div>';
             </div>
 
             <?php if (isset($fields['mailer_from_name']) || isset($fields['mailer_from_email'])): ?>
-                <hr class="text-muted" />
+                <hr class="text-muted"/>
             <?php endif; ?>
 
             <?php if (isset($fields['mailer_transport'])): ?>
@@ -37,7 +39,8 @@ $template  = '<div class="col-md-6">{content}</div>';
                     <div class="col-sm-6">
                         <?php echo $view['form']->row($fields['mailer_transport']); ?>
                     </div>
-                    <div class="col-sm-6 pt-lg mt-3" id="mailerTestButtonContainer" data-hide-on='{"config_emailconfig_mailer_transport":["sendmail","mail"]}'>
+                    <div class="col-sm-6 pt-lg mt-3" id="mailerTestButtonContainer"
+                         data-hide-on='{"config_emailconfig_mailer_transport":["sendmail","mail"]}'>
                         <div class="button_container">
                             <?php echo $view['form']->widget($fields['mailer_test_connection_button']); ?>
                             <?php echo $view['form']->widget($fields['mailer_test_send_button']); ?>
@@ -45,7 +48,9 @@ $template  = '<div class="col-md-6">{content}</div>';
                         </div>
                         <div class="col-md-9 help-block">
                             <div class="status-msg"></div>
-                            <div class="save-config-msg hide text-danger"><?php echo $view['translator']->trans('mautic.email.config.save_to_test'); ?></div>
+                            <div class="save-config-msg hide text-danger"><?php echo $view['translator']->trans(
+                                    'mautic.email.config.save_to_test'
+                                ); ?></div>
                         </div>
                     </div>
                 </div>
@@ -84,18 +89,21 @@ $template  = '<div class="col-md-6">{content}</div>';
             </div>
 
             <?php if (isset($fields['mailer_transport'])): ?>
-                <hr class="text-muted" />
+                <hr class="text-muted"/>
             <?php endif; ?>
 
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_type', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_path', $template); ?>
             </div>
-
-            <div class="alert alert-info" data-show-on='{"config_emailconfig_mailer_spool_type": "messenger"}'>
-                <?php echo $view['translator']->trans('mautic.email.config.mailer_spool_type.messenger.tootlip'); ?>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-info" id="config_emailconfig_mailer_spool_type_messenger_tooltip"
+                         data-show-on='{"config_emailconfig_mailer_spool_type":["messenger"]}'>
+                        <?php echo $view['translator']->trans('mautic.email.config.mailer_spool_type.messenger.tootlip'); ?>
+                    </div>
+                </div>
             </div>
-
             <div class="row">
                 <div class="col-md-12">
                     <?php echo $view['form']->rowIfExists($fields, 'messenger_transport_dsn'); ?>
@@ -132,13 +140,17 @@ $template  = '<div class="col-md-6">{content}</div>';
 <?php if (isset($fields['monitored_email'])): ?>
     <div class="panel panel-primary">
         <div class="panel-heading">
-            <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.monitored_email'); ?></h3>
+            <h3 class="panel-title"><?php echo $view['translator']->trans(
+                    'mautic.email.config.header.monitored_email'
+                ); ?></h3>
         </div>
         <div class="panel-body">
             <?php if (function_exists('imap_open')): ?>
                 <?php echo $view['form']->widget($form['monitored_email']); ?>
             <?php else: ?>
-                <div class="alert alert-info"><?php echo $view['translator']->trans('mautic.email.imap_extension_missing'); ?></div>
+                <div class="alert alert-info"><?php echo $view['translator']->trans(
+                        'mautic.email.imap_extension_missing'
+                    ); ?></div>
             <?php endif; ?>
         </div>
     </div>
