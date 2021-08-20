@@ -16,6 +16,7 @@ abstract class ModeratedCommand extends Command
 {
     public const MODE_PID   = 'pid';
     public const MODE_FLOCK = 'flock';
+    public const MODE_REDIS = 'redis';
 
     /**
      * @deprecated Symfony 4 Removed LockHandler and the replacement is the lock from the Lock component so there is no need for something custom
@@ -92,7 +93,7 @@ abstract class ModeratedCommand extends Command
             // File lock is deprecated in favor of Symfony's Lock component's lock
             $this->moderationMode = 'flock';
         }
-        if (!in_array($this->moderationMode, ['pid', 'flock', 'redis'])) {
+        if (!in_array($this->moderationMode, [self::MODE_PID, self::MODE_FLOCK, self::MODE_REDIS])) {
             $output->writeln('<error>Unknown locking method specified.</error>');
 
             return false;
@@ -100,8 +101,7 @@ abstract class ModeratedCommand extends Command
 
         // Allow multiple runs of the same command if executing different IDs, etc
         $this->moderationKey = $this->getName().$moderationKey;
-
-        if (in_array($this->moderationMode, ['pid', 'flock'])) {
+        if (in_array($this->moderationMode, [self::MODE_PID, self::MODE_FLOCK])) {
             // Setup the run directory for lock/pid files
             $this->runDirectory = $this->pathsHelper->getSystemPath('cache').'/../run';
             if (!file_exists($this->runDirectory) && !@mkdir($this->runDirectory)) {
@@ -185,7 +185,7 @@ abstract class ModeratedCommand extends Command
     private function checkFlock(): bool
     {
         switch ($this->moderationMode) {
-            case 'redis':
+            case self::MODE_REDIS:
                 $dsn   = $this->getContainer()->get('mautic.helper.core_parameters')->get('cache_adapter_redis')['dsn'] ?? null;
                 $redis = new \Redis();
                 $redis->connect(parse_url($dsn, PHP_URL_HOST));

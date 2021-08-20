@@ -226,6 +226,53 @@ class ModeratedCommandTest extends TestCase
         rmdir($runDir);
     }
 
+    public function testRedisLock()
+    {
+        if (!class_exists('\Redis')) {
+            $this->markTestSkipped('Php Redis client not installed');
+        }
+
+        $command = new FakeModeratedCommand();
+        $command->setContainer($this->container);
+
+        $cacheDir = __DIR__.'/resource/cache/tmp';
+
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with('mautic.helper.core_parameters')
+            ->willReturnCallback(function (string $key) {
+                return new class() {
+                    public function get()
+                    {
+                        return ['dns' => 'redis://localhost'];
+                    }
+                };
+            });
+
+        $this->container->expects($this->once())
+            ->method('getParameter')
+            ->with('cach');
+
+        $this->input->method('getOption')
+            ->willReturnCallback(
+                function (string $name) {
+                    switch ($name) {
+                        case 'lock_mode':
+                            return ModeratedCommand::MODE_REDIS;
+                        case 'bypass-locking':
+                            return false;
+                        default:
+                            return null;
+                    }
+                }
+            );
+
+        $command->run($this->input, $this->output);
+
+        // Finish the command
+        $command->forceCompleteRun();
+    }
+
     private function getFirstFile(Finder $finder): SplFileInfo
     {
         $iterator = $finder->getIterator();
