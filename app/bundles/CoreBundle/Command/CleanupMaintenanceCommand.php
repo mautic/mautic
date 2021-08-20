@@ -13,6 +13,8 @@ namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,6 +27,19 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class CleanupMaintenanceCommand extends ContainerAwareCommand
 {
+    private $auditLogModel;
+
+    private $ipLookupHelper;
+
+    public function __construct(AuditLogModel $auditLogModel,
+                                 IpLookupHelper $ipLookupHelper,
+                                 $name = null)
+    {
+        parent::__construct($name);
+        $this->auditLogModel  = $auditLogModel;
+        $this->ipLookupHelper = $ipLookupHelper;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -121,6 +136,23 @@ EOT
                 $output->writeln("<info>$key</info>");
                 $output->writeln($query);
             }
+        }
+        $stats = array_filter($event->getStats());
+        if (!$dryRun && count($stats)) {
+            $log   = [
+                'userName'  => 'system',
+                'userId'    => 0,
+                'bundle'    => 'core',
+                'object'    => 'core',
+                'objectId'  => 0,
+                'action'    => 'maintenance',
+                'details'   => [
+                    'options' => array_filter($input->getOptions()),
+                    'stats'   => $stats,
+                ],
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
         }
 
         return 0;

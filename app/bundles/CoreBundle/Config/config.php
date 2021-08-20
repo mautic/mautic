@@ -600,6 +600,14 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.core.command.maintenance.cleanup' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\CleanupMaintenanceCommand::class,
+                'arguments' => [
+                    'mautic.core.model.auditlog',
+                    'mautic.helper.ip_lookup',
+                ],
+            ],
             'mautic.core.command.transifex_push' => [
                 'tag'       => 'console.command',
                 'class'     => \Mautic\CoreBundle\Command\PushTransifexCommand::class,
