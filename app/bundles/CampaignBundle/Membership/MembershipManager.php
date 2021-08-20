@@ -146,8 +146,14 @@ class MembershipManager
                 continue;
             }
 
-            // Existing membership does not exist so create a new one
-            $this->adder->createNewMembership($contact, $campaign, $isManualAction);
+            try {
+                // Existing membership does not exist so create a new one
+                $this->adder->createNewMembership($contact, $campaign, $isManualAction);
+            } catch (ContactCannotBeAddedToCampaignException $exception) {
+                $this->logger->debug("CAMPAIGN: {$exception->getMessage()}}");
+
+                continue;
+            }
 
             $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was added to campaign ID {$campaign->getId()} as a new member.");
         }

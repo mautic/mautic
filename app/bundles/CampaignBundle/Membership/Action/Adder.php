@@ -23,9 +23,6 @@ class Adder
      */
     private $leadEventLogRepository;
 
-    /**
-     * Adder constructor.
-     */
     public function __construct(LeadRepository $leadRepository, LeadEventLogRepository $leadEventLogRepository)
     {
         $this->leadRepository         = $leadRepository;
@@ -33,7 +30,7 @@ class Adder
     }
 
     /**
-     * @param $isManualAction
+     * @param bool $isManualAction
      *
      * @return CampaignMember
      */
@@ -44,6 +41,10 @@ class Adder
         // Start the new rotation at 2
         $rotation = 1;
         if ($this->leadEventLogRepository->hasBeenInCampaignRotation($contact->getId(), $campaign->getId(), 1)) {
+            if (!$campaign->allowRestart()) {
+                throw new ContactCannotBeAddedToCampaignException("Contact {$contact->getId()} could not be added to the campaign {$campaign->getId()} because it should start new campaign rotation but is not configured to be repetable.");
+            }
+
             $rotation = 2;
         }
 
