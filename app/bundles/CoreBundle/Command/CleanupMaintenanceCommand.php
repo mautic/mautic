@@ -39,6 +39,7 @@ class CleanupMaintenanceCommand extends ContainerAwareCommand
 
     public function __construct(AuditLogModel $auditLogModel, IpLookupHelper $ipLookupHelper)
     {
+        parent::__construct();
         $this->auditLogModel  = $auditLogModel;
         $this->ipLookupHelper = $ipLookupHelper;
     }
@@ -141,7 +142,7 @@ EOT
             }
         }
         // store to audit log
-        $this->storeToAuditLog($stats, $dryRun, $input);
+        $this->storeToAuditLog($stats, $dryRun, $input->getOptions());
 
         return 0;
     }
@@ -149,7 +150,7 @@ EOT
     /**
      * @param $dryRun
      */
-    protected function storeToAuditLog(array $stats, $dryRun, InputInterface $input): void
+    protected function storeToAuditLog(array $stats, $dryRun, array $options): void
     {
         $notEmptyStats = array_filter($stats);
         if (!$dryRun && count($notEmptyStats)) {
@@ -161,7 +162,7 @@ EOT
                 'objectId'  => 0,
                 'action'    => 'maintenance',
                 'details'   => [
-                    'options' => array_filter($input->getOptions()),
+                    'options' => array_filter($options),
                     'stats'   => $notEmptyStats,
                 ],
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
