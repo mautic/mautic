@@ -12,5 +12,8 @@
     "grunt-remove": "^0.1.0",
     "load-grunt-tasks": "^0.6.0",
     "time-grunt": "^1.0.0"
+  },
+  "dependencies": {
+    "ckeditor4": "^4.16.2"
   }
 }
