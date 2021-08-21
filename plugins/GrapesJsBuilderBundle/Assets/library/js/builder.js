@@ -4,7 +4,8 @@ import BuilderService from './builder.service';
 
 // all css get combined into one builder.css and automatically loaded via js/parcel
 import 'grapesjs/dist/css/grapes.min.css';
-import 'grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css';
+// not compatible with the newsletter preset css, brings the redish color
+// import 'grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css';
 import 'grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.css';
 import './grapesjs-custom.css';
 
