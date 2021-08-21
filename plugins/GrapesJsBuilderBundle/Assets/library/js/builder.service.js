@@ -125,6 +125,23 @@ export default class BuilderService {
     };
   }
 
+  static getCkeConf() {
+    return {
+      options: {
+        language: 'en',
+        toolbar: [
+          { name: 'links', items: ['Link', 'Unlink'] },
+          { name: 'basicstyles', items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat'] },
+          { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-'] },
+          { name: 'colors', items: ['TextColor', 'BGColor'] },
+          { name: 'document', items: ['Source'] },
+          { name: 'insert', items: ['SpecialChar'] },
+        ],
+        extraPlugins: ['sharedspace', 'colorbutton'],
+      },
+    };
+  }
+
   /**
    * Initialize the builder in the landingapge mode
    */
@@ -143,12 +160,13 @@ export default class BuilderService {
       styleManager: {
         clearProperties: true, // Temp fix https://github.com/artf/grapesjs-preset-webpage/issues/27
       },
-      plugins: [grapesjswebpage, grapesjspostcss, grapesjsmautic],
+      plugins: [grapesjswebpage, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor'],
       pluginsOpts: {
         [grapesjswebpage]: {
           formsOpts: false,
         },
         grapesjsmautic: BuilderService.getMauticConf('page-html'),
+        'gjs-plugin-ckeditor': BuilderService.getCkeConf(),
       },
     });
 
@@ -171,22 +189,7 @@ export default class BuilderService {
       pluginsOpts: {
         grapesjsmjml: {},
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
-        'gjs-plugin-ckeditor': {
-          options: {
-            language: 'en',
-            toolbar: [
-              { name: 'editing', items: ['Scayt'] },
-              { name: 'links', items: ['Link', 'Unlink'] },
-              { name: 'insert', items: ['SpecialChar'] },
-              { name: 'tools', items: ['Maximize'] },
-              { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
-              { name: 'document', items: ['Source'] },
-              { name: 'basicstyles', items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat'] },
-              { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-'] },
-            ],
-            extraPlugins: ['sharedspace','colorbutton'],
-          },
-        },
+        'gjs-plugin-ckeditor': BuilderService.getCkeConf(),
       },
     });
 
@@ -211,10 +214,11 @@ export default class BuilderService {
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic],
+      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor'],
       pluginsOpts: {
         grapesjsnewsletter: {},
         grapesjsmautic: BuilderService.getMauticConf('email-html'),
+        'gjs-plugin-ckeditor': BuilderService.getCkeConf(),
       },
     });
 
