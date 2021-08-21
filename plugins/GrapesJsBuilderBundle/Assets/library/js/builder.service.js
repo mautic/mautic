@@ -110,7 +110,7 @@ export default class BuilderService {
       throw Error(`Not supported builder type: ${object}`);
     }
 
-    this.setRte();
+    // this.setRte();
 
     // add code mode button
     // @todo: only show button if configured: sourceEdit: 1,
@@ -268,6 +268,9 @@ export default class BuilderService {
     };
   }
 
+  getEditor() {
+    return this.editor;
+  }
   /**
    * Generate assets list from GrapesJs
    */
