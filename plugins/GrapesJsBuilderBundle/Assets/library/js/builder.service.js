@@ -167,11 +167,24 @@ export default class BuilderService {
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic,'gjs-plugin-ckeditor'],
+      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor'],
       pluginsOpts: {
         grapesjsmjml: {},
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
-        'gjs-plugin-ckeditor':{},
+        'gjs-plugin-ckeditor': {
+          options: {
+            language: 'en',
+            toolbar: [
+              { name: 'editing', items: ['Scayt'] },
+              { name: 'links', items: ['Link', 'Unlink'] },
+              { name: 'insert', items: ['SpecialChar'] },
+              { name: 'tools', items: ['Maximize'] },
+              { name: 'document', items: ['Source'] },
+              { name: 'basicstyles', items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat'] },
+              { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-'] },
+            ],
+          },
+        },
       },
     });
 
