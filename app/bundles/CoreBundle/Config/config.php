@@ -674,6 +674,18 @@ return [
                 ],
             ],
 
+            'mautic.parameters.storage' => [
+                'class'     => \Mautic\CoreBundle\ParametersStorage\ParametersStorage::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            // Local storage
+            'mautic.parameters.storage.local' => [
+                'class'     => \Mautic\CoreBundle\ParametersStorage\Local\LocalParametersStorage::class,
+                'tag'       => 'mautic.parameters.storage.service',
+            ],
+
             // System uses
             'mautic.di.env_processor.nullable' => [
                 'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class,
@@ -1704,5 +1716,6 @@ return [
                 'font' => 'メイリオ, Meiryo, ＭＳ Ｐゴシック, MS PGothic, ヒラギノ角ゴ Pro W3, Hiragino Kaku Gothic Pro,Osaka, sans-serif',
             ],
         ],
+        \Mautic\CoreBundle\ParametersStorage\ParametersStorage::STORAGE_DEFAULT => 'mautic.parameters.storage.local',
     ],
 ];
