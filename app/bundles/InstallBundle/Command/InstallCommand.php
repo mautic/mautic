@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -41,7 +43,7 @@ class InstallCommand extends ContainerAwareCommand
         $this
             ->setName(self::COMMAND)
             ->setDescription('Installs Mautic')
-            ->setHelp('This command allows you to trigger the install process.')
+            ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from app/config/local.php and command line options/arguments, where the latter takes precedence.')
             ->addArgument(
                 'site_url',
                 InputArgument::REQUIRED,
@@ -277,7 +279,21 @@ class InstallCommand extends ContainerAwareCommand
         $output->writeln('Parsing options and arguments...');
         $options = $input->getOptions();
 
-        $dbParams   = [];
+        /**
+         * We need to have some default database parameters, as it could be the case that the
+         * user didn't set them both in local.php and the command line options.
+         */
+        $dbParams   = [
+            'driver'        => null,
+            'host'          => null,
+            'port'          => null,
+            'name'          => null,
+            'user'          => null,
+            'password'      => null,
+            'table_prefix'  => null,
+            'backup_tables' => null,
+            'backup_prefix' => null,
+        ];
         $adminParam = [
           'firstname' => 'Admin',
           'lastname'  => 'Mautic',
@@ -308,24 +324,24 @@ class InstallCommand extends ContainerAwareCommand
             }
         }
 
-        if (isset($allParams['site_url']) && !empty($allParams['site_url'])) {
+        if (!empty($allParams['site_url'])) {
             $siteUrl = $allParams['site_url'];
         } else {
             $siteUrl               = $input->getArgument('site_url');
             $allParams['site_url'] = $siteUrl;
         }
 
-        if ((!isset($allParams['mailer_from_name']) || empty($allParams['mailer_from_name']))
-            && isset($adminParam['firstname']) && isset($adminParam['lastname'])) {
+        if (empty($allParams['mailer_from_name'])
+            && isset($adminParam['firstname'])
+            && isset($adminParam['lastname'])) {
             $allParams['mailer_from_name'] = $adminParam['firstname'].' '.$adminParam['lastname'];
         }
 
-        if ((!isset($allParams['mailer_from_email']) || empty($allParams['mailer_from_email']))
-            && isset($adminParam['email'])) {
+        if (empty($allParams['mailer_from_email']) && isset($adminParam['email'])) {
             $allParams['mailer_from_email'] = $adminParam['email'];
         }
 
-        $step = $input->getArgument('step');
+        $step = (float) $input->getArgument('step');
 
         switch ($step) {
             default:
