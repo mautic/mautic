@@ -6,7 +6,7 @@ import grapesjspostcss from 'grapesjs-parser-postcss';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
 import mjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
-import RteCke from './rte-cke';
+import 'grapesjs-plugin-ckeditor';
 
 // for local dev
 // import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
@@ -110,8 +110,6 @@ export default class BuilderService {
       throw Error(`Not supported builder type: ${object}`);
     }
 
-    // this.setRte();
-
     // add code mode button
     // @todo: only show button if configured: sourceEdit: 1,
     const codeModeButton = new CodeModeButton(this.editor);
@@ -119,20 +117,6 @@ export default class BuilderService {
     codeModeButton.addButton();
 
     this.setListeners();
-  }
-
-  setRte() {
-    const Rte = new RteCke(this.editor, CKEDITOR);
-
-    this.editor.setCustomRte(Rte);
-
-    // The default top-left position of the toolbar is not always what you need.
-    // For example, when you scroll the canvas and the toolbar reaches the top, you'd like to move it down.
-    this.editor.on('rteToolbarPosUpdate', (pos) => {
-      if (pos.top <= pos.canvasTop) {
-        pos.top = pos.elementTop + pos.elementHeight;
-      }
-    });
   }
 
   static getMauticConf(mode) {
@@ -183,10 +167,11 @@ export default class BuilderService {
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic],
+      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic,'gjs-plugin-ckeditor'],
       pluginsOpts: {
         grapesjsmjml: {},
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
+        'gjs-plugin-ckeditor':{},
       },
     });
 
