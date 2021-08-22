@@ -81,7 +81,7 @@ EOT
         if (!$skipClear) {
             //Swift mailer's send command does not handle failed messages well rather it will retry sending forever
             //so let's first handle emails stuck in the queue and remove them if necessary
-            $transport = $this->getContainer()->get('swiftmailer.transport.real');
+            $transport = $this->getContainer()->get('swiftmailer.mailer.default.transport.real');
             if (!$transport->isStarted()) {
                 $transport->start();
             }

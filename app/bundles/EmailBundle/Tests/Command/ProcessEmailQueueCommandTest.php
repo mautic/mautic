@@ -64,7 +64,7 @@ class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive(
                 ['event_dispatcher'],
                 ['mautic.helper.core_parameters'],
-                ['swiftmailer.transport.real']
+                ['swiftmailer.mailer.default.transport.real']
             )->willReturnOnConsecutiveCalls(
                 $this->dispatcher,
                 $this->coreParametersHelper,
