@@ -99,17 +99,8 @@ class MembershipManager
             return;
         }
 
-        try {
-            // Contact is not already in the campaign so create a new entry
-            $this->adder->createNewMembership($contact, $campaign, $isManualAction);
-        } catch (ContactCannotBeAddedToCampaignException $exception) {
-            // Do nothing
-            $this->logger->debug(
-                "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}."
-            );
-
-            return;
-        }
+        // Contact is not already in the campaign so create a new entry
+        $this->adder->createNewMembership($contact, $campaign, $isManualAction);
 
         $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was added to campaign ID {$campaign->getId()} as a new member.");
 
@@ -146,14 +137,7 @@ class MembershipManager
                 continue;
             }
 
-            try {
-                // Existing membership does not exist so create a new one
-                $this->adder->createNewMembership($contact, $campaign, $isManualAction);
-            } catch (ContactCannotBeAddedToCampaignException $exception) {
-                $this->logger->debug("CAMPAIGN: {$exception->getMessage()}}");
-
-                continue;
-            }
+            $this->adder->createNewMembership($contact, $campaign, $isManualAction);
 
             $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was added to campaign ID {$campaign->getId()} as a new member.");
         }
