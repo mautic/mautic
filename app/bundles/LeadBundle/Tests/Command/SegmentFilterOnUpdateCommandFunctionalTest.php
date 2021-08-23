@@ -17,7 +17,7 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class SegmentFilterCommandFunctionalTest extends MauticMysqlTestCase
+class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @throws Exception
