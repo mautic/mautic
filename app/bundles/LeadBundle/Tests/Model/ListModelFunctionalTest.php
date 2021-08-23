@@ -78,9 +78,13 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
             ['leadlist_id' => ['value' => $segment->getId(), 'list_column_name' => 't.lead_id']]
         );
 
-        Assert::assertSame(4, end($data['datasets'][0]['data'])); // Added for today.
-        Assert::assertSame(0, end($data['datasets'][1]['data'])); // Removed for today.
-        Assert::assertSame(4, end($data['datasets'][2]['data'])); // Total for today.
+        Assert::assertSame('added', strtolower($data['datasets'][0]['label']));
+        Assert::assertSame('removed', strtolower($data['datasets'][1]['label']));
+        Assert::assertSame('total', strtolower($data['datasets'][2]['label']));
+
+        Assert::assertSame(4, (int)end($data['datasets'][0]['data'])); // Added for today.
+        Assert::assertSame(0, (int)end($data['datasets'][1]['data'])); // Removed for today.
+        Assert::assertSame(4, (int)end($data['datasets'][2]['data'])); // Total for today.
 
         // To make this interesting, lets' remove some contacts to see what happens.
         $segmentModel->removeLead($contacts[1], $segment); // Emulating removing by a filter.
@@ -94,8 +98,8 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
             ['leadlist_id' => ['value' => $segment->getId(), 'list_column_name' => 't.lead_id']]
         );
 
-        Assert::assertSame(4, end($data['datasets'][0]['data'])); // Added for today.
-        Assert::assertSame('2', end($data['datasets'][1]['data'])); // Removed for today.
-        Assert::assertSame(2, end($data['datasets'][2]['data'])); // Total for today.
+        Assert::assertSame(4, (int)end($data['datasets'][0]['data'])); // Added for today.
+        Assert::assertSame(2, (int)end($data['datasets'][1]['data'])); // Removed for today.
+        Assert::assertSame(2, (int)end($data['datasets'][2]['data'])); // Total for today.
     }
 }
