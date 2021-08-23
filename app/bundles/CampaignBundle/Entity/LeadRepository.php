@@ -553,9 +553,11 @@ class LeadRepository extends CommonRepository
 
     private function updateQueryWithExistingMembershipExclusion(int $campaignId, QueryBuilder $qb, bool $campaignCanBeRestarted = false)
     {
-        $membershipConditions = $qb->expr()->and(
-            $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
-            $qb->expr()->eq('cl.campaign_id', (int) $campaignId)
+        $qb->leftJoin(
+            'll',
+            MAUTIC_TABLE_PREFIX.'campaign_leads',
+            'cl',
+            "cl.lead_id = ll.lead_id AND cl.campaign_id = {$campaignId}"
         );
 
         if ($campaignCanBeRestarted) {
@@ -565,22 +567,10 @@ class LeadRepository extends CommonRepository
                 $qb->expr()->isNull('cl.date_last_exited'),
             );
 
-            $membershipConditions = $qb->expr()->and(
-                $membershipConditions,
-                $qb->expr()->or($alreadyInCampaign, $removedFromCampaignManually)
-            );
+            $qb->expr()->or($alreadyInCampaign, $removedFromCampaignManually, $qb->expr()->isNull('cl.lead_id'));
+        } else {
+            $qb->andWhere($qb->expr()->isNull('cl.lead_id'));
         }
-
-        $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
-            ->where(
-                $qb->expr()->andX($membershipConditions)
-            );
-
-        $qb->andWhere(
-            sprintf('NOT EXISTS (%s)', $subq->getSQL())
-        );
     }
 
     private function updateQueryWithSegmentMembershipExclusion(array $segments, QueryBuilder $qb)
