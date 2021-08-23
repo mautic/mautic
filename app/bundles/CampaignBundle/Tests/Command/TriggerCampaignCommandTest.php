@@ -7,6 +7,17 @@ use PHPUnit\Framework\Assert;
 use DateTime;
 use DateTimeZone;
 use Doctrine\DBAL\Connection;
+use Mautic\CampaignBundle\Entity\Lead;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
+use Mautic\LeadBundle\Entity\Lead as Contact;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository as ContactRepository;
+use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
+use PHPUnit\Framework\Assert;
 
 class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
@@ -492,6 +503,173 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertFalse(isset($tags['EmailNotOpen']));
     }
 
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Exception
+     */
+    public function testSegmentCacheCountInBackground(): void
+    {
+        // remove redis key if exist
+        $this->segmentCountCacheHelper->deleteSegmentContactCount(1);
+
+        // Execute the command again to trigger related events.
+        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1]);
+
+        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
+        self::assertEquals(0, $count);
+
+        $this->runCommand(SegmentCountCacheCommand::COMMAND_NAME);
+
+        // Segment cache count should be 50.
+        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
+        self::assertEquals(50, $count);
+    }
+
+    public function testSegmentCacheCount(): void
+    {
+        // Execute the command again to trigger related events.
+        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1]);
+
+        // Segment cache count should be 50.
+        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
+        self::assertEquals(50, $count);
+    }
+
+    public function testNonRepeatableCampaignBcForQueryOptimization(): void
+    {
+        /** @var ListLeadRepository $segmentContactsRepository */
+        $segmentContactsRepository = $this->em->getRepository(ListLead::class);
+
+        /** @var LeadRepository $campaignContactsRepository */
+        $campaignContactsRepository = $this->em->getRepository(Lead::class);
+
+        /** @var ContactRepository $contactsRepository */
+        $contactsRepository = $this->em->getRepository(Contact::class);
+
+        $campaign = $this->createCampaign('Campaign 1');
+        $segment  = $this->createSegment('Segment A', [['object' => 'lead', 'glue' => 'and', 'field' => 'firstname', 'type' => 'text', 'operator' => 'startsWith', 'properties' => ['filter' => 'Contact A']]]);
+        $contact1 = $this->createLead('Contact A1');
+
+        $this->createLead('Contact A2');
+        $this->createEvent('Add 2 points', $campaign, 'lead.changepoints', 'action', ['points' => 2]);
+        $this->createEvent('Remove 1 point', $campaign, 'lead.changepoints', 'action', ['points' => -1]);
+
+        $campaign->addList($segment);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->runCommand('mautic:segments:update', ['--list-id' => $segment->getId()]);
+        $this->runCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
+        $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        /** @var ListLead[] $segmentContacts */
+        $segmentContacts  = $segmentContactsRepository->findBy(['list' => $segment]);
+
+        /** @var Lead[] $campaignContacts */
+        $campaignContacts = $campaignContactsRepository->findBy(['campaign' => $campaign]);
+
+        Assert::assertCount(2, $segmentContacts);
+        Assert::assertCount(2, $campaignContacts);
+        Assert::assertSame(1, $contactsRepository->find($contact1->getId())->getPoints());
+
+        foreach ($campaignContacts as $campaignContact) {
+            Assert::assertNull($campaignContact->getDateLastExited());
+            Assert::assertFalse($campaignContact->getManuallyRemoved());
+            Assert::assertSame(1, $campaignContact->getRotation());
+        }
+
+        // Delete the campaign members manually and build again to see if the campaign will behave correctly.
+        // We used to delete the members when they were removed from the campaign. That's the BC we are mimicing here.
+        $campaignContactsRepository->deleteEntities($campaignContacts);
+
+        $this->runCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
+        $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        /** @var ListLead[] $segmentContacts */
+        $segmentContacts  = $segmentContactsRepository->findBy(['list' => $segment]);
+
+        /** @var Lead[] $campaignContacts */
+        $campaignContacts = $campaignContactsRepository->findBy(['campaign' => $campaign]);
+
+        Assert::assertCount(2, $campaignContacts);
+        Assert::assertSame(1, $contactsRepository->find($contact1->getId())->getPoints());
+
+        foreach ($campaignContacts as $campaignContact) {
+            Assert::assertNotNull($campaignContact->getDateLastExited());
+            Assert::assertTrue($campaignContact->getManuallyRemoved());
+            Assert::assertSame(1, $campaignContact->getRotation());
+        }
+    }
+
+    public function testRepeatableCampaignBcForQueryOptimization(): void
+    {
+        /** @var ListLeadRepository $segmentContactsRepository */
+        $segmentContactsRepository = $this->em->getRepository(ListLead::class);
+
+        /** @var LeadRepository $campaignContactsRepository */
+        $campaignContactsRepository = $this->em->getRepository(Lead::class);
+
+        /** @var ContactRepository $contactsRepository */
+        $contactsRepository = $this->em->getRepository(Contact::class);
+
+        $campaign = $this->createCampaign('Campaign 1');
+        $segment  = $this->createSegment('Segment A', [['object' => 'lead', 'glue' => 'and', 'field' => 'firstname', 'type' => 'text', 'operator' => 'startsWith', 'properties' => ['filter' => 'Contact A']]]);
+        $contact1 = $this->createLead('Contact A1');
+
+        $this->createLead('Contact A2');
+        $this->createEvent('Add 2 points', $campaign, 'lead.changepoints', 'action', ['points' => 2]);
+        $this->createEvent('Remove 1 point', $campaign, 'lead.changepoints', 'action', ['points' => -1]);
+
+        $campaign->addList($segment);
+        $campaign->setAllowRestart(1);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->runCommand('mautic:segments:update', ['--list-id' => $segment->getId()]);
+        $this->runCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
+        $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        /** @var ListLead[] $segmentContacts */
+        $segmentContacts  = $segmentContactsRepository->findBy(['list' => $segment]);
+
+        /** @var Lead[] $campaignContacts */
+        $campaignContacts = $campaignContactsRepository->findBy(['campaign' => $campaign]);
+
+        Assert::assertCount(2, $segmentContacts);
+        Assert::assertCount(2, $campaignContacts);
+        Assert::assertSame(1, $contactsRepository->find($contact1->getId())->getPoints());
+
+        foreach ($campaignContacts as $campaignContact) {
+            Assert::assertNull($campaignContact->getDateLastExited());
+            Assert::assertFalse($campaignContact->getManuallyRemoved());
+            Assert::assertSame(1, $campaignContact->getRotation());
+        }
+
+        // Delete the campaign members manually and build again to see if the campaign will behave correctly.
+        // We used to delete the members when they were removed from the campaign. That's the BC we are mimicing here.
+        $campaignContactsRepository->deleteEntities($campaignContacts);
+
+        $this->runCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
+        $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        /** @var ListLead[] $segmentContacts */
+        $segmentContacts  = $segmentContactsRepository->findBy(['list' => $segment]);
+
+        /** @var Lead[] $campaignContacts */
+        $campaignContacts = $campaignContactsRepository->findBy(['campaign' => $campaign]);
+
+        Assert::assertCount(2, $campaignContacts);
+        Assert::assertSame(2, $contactsRepository->find($contact1->getId())->getPoints());
+
+        foreach ($campaignContacts as $campaignContact) {
+            Assert::assertNull($campaignContact->getDateLastExited());
+            Assert::assertFalse($campaignContact->getManuallyRemoved());
+            Assert::assertSame(2, $campaignContact->getRotation());
+        }
+    }
+
     public function testCampaignActionChangeMembership(): void
     {
         $campaign1 = $this->createCampaign('Campaign 1');
@@ -579,5 +757,16 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->execute();
 
         $this->em->clear();
+    }
+
+    protected function createSegment(string $alias, array $filters): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setAlias($alias);
+        $segment->setName($alias);
+        $segment->setFilters($filters);
+        $this->em->persist($segment);
+
+        return $segment;
     }
 }
