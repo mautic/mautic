@@ -347,6 +347,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.list',
                     'mautic.stage.model.stage',
+                    'mautic.integrations.helper.builder_integrations',
                 ],
             ],
             'mautic.form.type.dynamic_content_filter_entry_filters' => [
@@ -367,6 +368,12 @@ return [
                     'translator',
                     'database_connection',
                     'router',
+                ],
+            ],
+            'mautic.form.type.dynamic_content_filter' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,
+                'arguments' => [
+                    'mautic.integrations.helper.builder_integrations',
                 ],
             ],
         ],
@@ -1166,6 +1173,7 @@ return [
     'parameters' => [
         'site_url'                        => '',
         'webroot'                         => '',
+        '404_page'                        => '',
         'cache_path'                      => '%kernel.root_dir%/../var/cache',
         'log_path'                        => '%kernel.root_dir%/../var/logs',
         'max_log_files'                   => 7,
