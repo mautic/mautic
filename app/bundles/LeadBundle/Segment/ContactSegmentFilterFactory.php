@@ -88,9 +88,6 @@ class ContactSegmentFilterFactory
         return $this->container->get($qbServiceId);
     }
 
-    /**
-     * @param $filters
-     */
     private function mergeFilters(array $filters): array
     {
         $shrinkedFilters = [];
@@ -137,9 +134,6 @@ class ContactSegmentFilterFactory
         return array_values($shrinkedFilters);
     }
 
-    /**
-     * @param $filters
-     */
     private function groupFilters(array $stack): array
     {
         if (empty($stack)) {
