@@ -160,14 +160,6 @@ class SegmentContactsLineChartQuery extends ChartQuery
     }
 
     /**
-     * @return bool
-     */
-    public function isStatsFromEventLog()
-    {
-        return $this->statsFromEventLog;
-    }
-
-    /**
      * @return array
      */
     public function getAddedEventLogStats()
@@ -188,15 +180,8 @@ class SegmentContactsLineChartQuery extends ChartQuery
      */
     private function init(): void
     {
-        $this->firstEventLog        = $this->getFirstDateAddedSegmentEventLog();
-        $this->addedLeadListStats   = $this->getDataFromLeadListLeads();
         $this->addedEventLogStats   = $this->getDataFromLeadEventLog('added');
         $this->removedEventLogStats = $this->getDataFromLeadEventLog('removed');
-        $this->statsFromEventLog    = (
-            empty(array_filter($this->addedLeadListStats))
-            && (!empty(array_filter($this->addedEventLogStats))
-            || !empty(array_filter($this->removedEventLogStats)))
-        );
     }
 
     private function optimizeListLeadQuery(QueryBuilder $qb): QueryBuilder
