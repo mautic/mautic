@@ -36,24 +36,25 @@ class Adder
      */
     public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction)
     {
-        // BC support for prior to 2.14.
-        // If the contact was in the campaign to start with then removed, their logs remained but the original membership was removed
-        // Start the new rotation at 2
-        $rotation = 1;
-        if ($this->leadEventLogRepository->hasBeenInCampaignRotation($contact->getId(), $campaign->getId(), 1)) {
-            if (!$campaign->allowRestart()) {
-                throw new ContactCannotBeAddedToCampaignException("Contact {$contact->getId()} could not be added to the campaign {$campaign->getId()} because it should start new campaign rotation but is not configured to be repeatable.");
-            }
-
-            $rotation = 2;
-        }
-
         $campaignMember = new CampaignMember();
         $campaignMember->setLead($contact);
         $campaignMember->setCampaign($campaign);
         $campaignMember->setManuallyAdded($isManualAction);
         $campaignMember->setDateAdded(new \DateTime());
-        $campaignMember->setRotation($rotation);
+        $campaignMember->setRotation(1);
+
+        // BC support for prior to 2.14.
+        // If the contact was in the campaign to start with then removed, their logs remained but the original membership was removed
+        // Start the new rotation at 2
+        if ($this->leadEventLogRepository->hasBeenInCampaignRotation($contact->getId(), $campaign->getId(), 1)) {
+            if (!$campaign->allowRestart()) {
+                $campaignMember->setManuallyRemoved(1);
+                $campaignMember->setDateLastExited(new \DateTime());
+            } else {
+                $campaignMember->setRotation(2);
+            }
+        }
+
         $this->saveCampaignMember($campaignMember);
 
         return $campaignMember;
