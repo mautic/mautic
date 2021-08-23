@@ -13,7 +13,7 @@
     "start-helloWorld": "parcel Demo/helloWorld/index.html",
     "start-mautic-full": "cp -r Demo/data dist && parcel Demo/mautic/full.html",
     "start-mautic": "cp -r Demo/data dist && parcel Demo/mautic/index.html",
-    "update-mautic-preset": "rm -r node_modules/grapesjs-preset-mautic && npm install mautic/grapesjs-preset-mautic#master"
+    "update-mautic-preset": "rm -r node_modules/grapesjs-preset-mautic && npm install mautic/grapesjs-preset-mautic#main"
   },
   "repository": {
     "type": "git",
@@ -29,7 +29,7 @@
     "grapesjs": "^0.17.3",
     "grapesjs-mjml": "^0.5.4",
     "grapesjs-parser-postcss": "^0.1.1",
-    "grapesjs-preset-mautic": "github:mautic/grapesjs-preset-mautic#master",
+    "grapesjs-preset-mautic": "github:mautic/grapesjs-preset-mautic#main",
     "grapesjs-preset-newsletter": "^0.2.21",
     "grapesjs-preset-webpage": "^0.1.11"
   },
