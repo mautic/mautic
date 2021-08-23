@@ -371,7 +371,7 @@ class LeadRepository extends CommonRepository
             );
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter, true);
-        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb, $campaignCanBeRestarted);
+        $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
 
         $result = $qb->execute()->fetch();
 
@@ -401,7 +401,7 @@ class LeadRepository extends CommonRepository
             );
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter);
-        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb, $campaignCanBeRestarted);
+        $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
 
         $results = $qb->execute()->fetchAll();
 
@@ -529,30 +529,25 @@ class LeadRepository extends CommonRepository
         return $segments;
     }
 
-    /**
-     * @param int $campaignId
-     */
-    private function updateQueryWithExistingMembershipExclusion($campaignId, QueryBuilder $qb, $campaignCanBeRestarted = false)
+    private function updateQueryWithExistingMembershipExclusion(int $campaignId, QueryBuilder $qb, bool $campaignCanBeRestarted = false)
     {
-        $membershipConditions = [
-            $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
-            $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
-        ];
+        $qb->leftJoin(
+            'll',
+            MAUTIC_TABLE_PREFIX.'campaign_leads',
+            'cl',
+            "cl.lead_id = ll.lead_id AND cl.campaign_id = {$campaignId}"
+        );
 
         if ($campaignCanBeRestarted) {
-            $membershipConditions[] = $qb->expr()->eq('cl.manually_removed', 0);
-        }
-
-        $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
-            ->where(
-                $qb->expr()->andX(...$membershipConditions)
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->isNull('cl.lead_id'),
+                    $qb->expr()->eq('cl.manually_removed', 1)
+                )
             );
-
-        $qb->andWhere(
-            sprintf('NOT EXISTS (%s)', $subq->getSQL())
-        );
+        } else {
+            $qb->andWhere($qb->expr()->isNull('cl.lead_id'));
+        }
     }
 
     private function updateQueryWithSegmentMembershipExclusion(array $segments, QueryBuilder $qb)
