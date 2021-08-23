@@ -269,8 +269,10 @@ class InstallCommand extends ContainerAwareCommand
             return 0;
         }
 
-        // Prevents querying of database tables that do not exist during the installation process
-        define('MAUTIC_INSTALLER', 1);
+        if (!defined('IS_PHPUNIT')) {
+            // Prevents querying of database tables that do not exist during the installation process
+            define('MAUTIC_INSTALLER', 1);
+        }
 
         $output->writeln([
             'Mautic Install',
