@@ -275,8 +275,10 @@ class InstallCommand extends ContainerAwareCommand
             '',
         ]);
 
-        //Prevents querying of DB-Tables which not exist while the installation process
-        define('MAUTIC_INSTALLER', 1);
+        if (!defined('IS_PHPUNIT')) {
+            // Prevents querying of database tables that do not exist during the installation process
+            define('MAUTIC_INSTALLER', 1);
+        }
 
         // Build objects to pass to the install service from local.php or command line options
         $output->writeln('Parsing options and arguments...');
