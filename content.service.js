@@ -43,6 +43,12 @@ export default class ContentService {
     const originalContent = ContentService.getOriginalContentHtml();
     const doctype = ContentService.serializeDoctype(originalContent.doctype);
 
+    /**
+     * Sanitize the content. This updates the originalContent variable directly
+     * (as it's passed by reference), so we don't need to re-assign anything here
+     */
+    Mautic.sanitizeHtmlBeforeSave(mQuery(originalContent));
+
     const htmlCombined = `${doctype}${editor.getHtml()}<style>${editor.getCss({
       avoidProtected: true,
     })}</style>`;
