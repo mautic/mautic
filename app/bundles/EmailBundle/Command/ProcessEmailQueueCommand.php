@@ -20,7 +20,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -29,10 +29,10 @@ use Symfony\Component\Finder\Finder;
 class ProcessEmailQueueCommand extends ModeratedCommand
 {
     private Swift_Transport $swiftTransport;
-    private EventDispatcher $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
     private CoreParametersHelper $parametersHelper;
 
-    public function __construct(Swift_Transport $swiftTransport, EventDispatcher $eventDispatcher, CoreParametersHelper $parametersHelper)
+    public function __construct(Swift_Transport $swiftTransport, EventDispatcherInterface $eventDispatcher, CoreParametersHelper $parametersHelper)
     {
         parent::__construct();
 
