@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -11,11 +13,14 @@
 
 namespace Mautic\InstallBundle\Command;
 
+use Doctrine\DBAL\Exception;
+use Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -28,15 +33,17 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class InstallCommand extends ContainerAwareCommand
 {
+    public const COMMAND = 'mautic:install';
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('mautic:install')
+            ->setName(self::COMMAND)
             ->setDescription('Installs Mautic')
-            ->setHelp('This command allows you to trigger the install process.')
+            ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from app/config/local.php and command line options/arguments, where the latter takes precedence.')
             ->addArgument(
                 'site_url',
                 InputArgument::REQUIRED,
@@ -237,9 +244,20 @@ class InstallCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $command = $this->getApplication()->find('cache:clear');
+
+        $arguments = [
+            '--env'    => $input->getOptions()['env'] ?? 'prod',
+        ];
+
+        $commandInput = new ArrayInput($arguments);
+        $returnCode   = $command->run($commandInput, $output);
+
         $container = $this->getContainer();
         /** @var \Mautic\InstallBundle\Install\InstallService $installer */
         $installer = $container->get('mautic.install.service');
@@ -257,15 +275,34 @@ class InstallCommand extends ContainerAwareCommand
             '',
         ]);
 
+        if (!defined('IS_PHPUNIT')) {
+            // Prevents querying of database tables that do not exist during the installation process
+            define('MAUTIC_INSTALLER', 1);
+        }
+
         // Build objects to pass to the install service from local.php or command line options
         $output->writeln('Parsing options and arguments...');
         $options = $input->getOptions();
 
-        $dbParams   = [];
+        /**
+         * We need to have some default database parameters, as it could be the case that the
+         * user didn't set them both in local.php and the command line options.
+         */
+        $dbParams   = [
+            'driver'        => null,
+            'host'          => null,
+            'port'          => null,
+            'name'          => null,
+            'user'          => null,
+            'password'      => null,
+            'table_prefix'  => null,
+            'backup_tables' => null,
+            'backup_prefix' => null,
+        ];
         $adminParam = [
-          'firstname' => 'Admin',
-          'lastname'  => 'Mautic',
-          'username'  => 'admin',
+            'firstname' => 'Admin',
+            'lastname'  => 'Mautic',
+            'username'  => 'admin',
         ];
         $allParams  = $installer->localConfigParameters();
 
@@ -292,31 +329,31 @@ class InstallCommand extends ContainerAwareCommand
             }
         }
 
-        if (isset($allParams['site_url']) && !empty($allParams['site_url'])) {
+        if (!empty($allParams['site_url'])) {
             $siteUrl = $allParams['site_url'];
         } else {
             $siteUrl               = $input->getArgument('site_url');
             $allParams['site_url'] = $siteUrl;
         }
 
-        if ((!isset($allParams['mailer_from_name']) || empty($allParams['mailer_from_name']))
-            && isset($adminParam['firstname']) && isset($adminParam['lastname'])) {
+        if (empty($allParams['mailer_from_name'])
+            && isset($adminParam['firstname'])
+            && isset($adminParam['lastname'])) {
             $allParams['mailer_from_name'] = $adminParam['firstname'].' '.$adminParam['lastname'];
         }
 
-        if ((!isset($allParams['mailer_from_email']) || empty($allParams['mailer_from_email']))
-            && isset($adminParam['email'])) {
+        if (empty($allParams['mailer_from_email']) && isset($adminParam['email'])) {
             $allParams['mailer_from_email'] = $adminParam['email'];
         }
 
-        $step = $input->getArgument('step');
+        $step = (float) $input->getArgument('step');
 
         switch ($step) {
             default:
             case InstallService::CHECK_STEP:
                 $output->writeln($step.' - Checking installation requirements...');
                 $messages = $this->stepAction($installer, ['site_url' => $siteUrl], $step);
-                if (is_array($messages) && !empty($messages)) {
+                if (!empty($messages)) {
                     if (isset($messages['requirements']) && !empty($messages['requirements'])) {
                         // Stop install if requirements not met
                         $output->writeln('Missing requirements:');
@@ -346,8 +383,11 @@ class InstallCommand extends ContainerAwareCommand
                 // no break
             case InstallService::DOCTRINE_STEP:
                 $output->writeln($step.' - Creating database...');
+                /** @var ConnectionWrapper $connectionWrapper */
+                $connectionWrapper = $container->get('doctrine')->getConnection();
+                $connectionWrapper->initConnection($dbParams);
                 $messages = $this->stepAction($installer, $dbParams, $step);
-                if (is_array($messages) && !empty($messages)) {
+                if (!empty($messages)) {
                     $output->writeln('Errors in database configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -355,11 +395,11 @@ class InstallCommand extends ContainerAwareCommand
 
                     return -$step;
                 }
-                $step = InstallService::DOCTRINE_STEP + .1;
 
+                $step = InstallService::DOCTRINE_STEP + .1;
                 $output->writeln($step.' - Creating schema...');
                 $messages = $this->stepAction($installer, $dbParams, $step);
-                if (is_array($messages) && !empty($messages)) {
+                if (!empty($messages)) {
                     $output->writeln('Errors in schema configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -367,11 +407,11 @@ class InstallCommand extends ContainerAwareCommand
 
                     return -InstallService::DOCTRINE_STEP;
                 }
-                $step = InstallService::DOCTRINE_STEP + .2;
 
+                $step = InstallService::DOCTRINE_STEP + .2;
                 $output->writeln($step.' - Loading fixtures...');
                 $messages = $this->stepAction($installer, $dbParams, $step);
-                if (is_array($messages) && !empty($messages)) {
+                if (!empty($messages)) {
                     $output->writeln('Errors in fixtures configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -379,6 +419,7 @@ class InstallCommand extends ContainerAwareCommand
 
                     return -InstallService::DOCTRINE_STEP;
                 }
+
                 // Keep on with next step
                 $step = InstallService::USER_STEP;
 
@@ -386,7 +427,7 @@ class InstallCommand extends ContainerAwareCommand
             case InstallService::USER_STEP:
                 $output->writeln($step.' - Creating admin user...');
                 $messages = $this->stepAction($installer, $adminParam, $step);
-                if (is_array($messages) && !empty($messages)) {
+                if (!empty($messages)) {
                     $output->writeln('Errors in admin user configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -401,7 +442,7 @@ class InstallCommand extends ContainerAwareCommand
             case InstallService::EMAIL_STEP:
                 $output->writeln($step.' - Email configuration...');
                 $messages = $this->stepAction($installer, $allParams, $step);
-                if (is_array($messages) && !empty($messages)) {
+                if (!empty($messages)) {
                     $output->writeln('Errors in email configuration:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -416,9 +457,8 @@ class InstallCommand extends ContainerAwareCommand
             case InstallService::FINAL_STEP:
                 $output->writeln($step.' - Final steps...');
                 $messages = $this->stepAction($installer, $allParams, $step);
-
-                if (is_array($messages) && !empty($messages)) {
-                    $output->writeln('Errors in final migration:');
+                if (!empty($messages)) {
+                    $output->writeln('Errors in final step:');
                     $this->handleInstallerErrors($output, $messages);
 
                     $output->writeln('Install canceled');
@@ -442,35 +482,35 @@ class InstallCommand extends ContainerAwareCommand
      *
      * @param InstallService $installer The install process
      * @param array          $params    The install parameters
-     * @param int            $index     The step number to process
-     *
-     * @return int|array|bool
+     * @param float          $index     The step number to process
      *
      * @throws \Exception
      */
-    protected function stepAction(InstallService $installer, $params, $index = 0)
+    protected function stepAction(InstallService $installer, array $params, float $index = 0): array
     {
-        if (false !== strpos($index, '.')) {
-            list($index, $subIndex) = explode('.', $index);
+        if ($index - floor($index) > 0) {
+            $subIndex = (int) (round($index - floor($index), 1) * 10);
+            $index    = floor($index);
         }
+        $index = (int) $index;
 
-        $step = $installer->getStep($index);
+        $messages = [];
 
-        $messages = false;
         switch ($index) {
             case InstallService::CHECK_STEP:
                 // Check installation requirements
+                $step = $installer->getStep($index);
                 if ($step instanceof CheckStep) {
                     // Set all step fields based on parameters
                     $step->site_url = $params['site_url'];
                 }
 
-                $messages                 = [];
                 $messages['requirements'] = $installer->checkRequirements($step);
                 $messages['optional']     = $installer->checkOptionalSettings($step);
                 break;
 
             case InstallService::DOCTRINE_STEP:
+                $step = $installer->getStep($index);
                 if ($step instanceof DoctrineStep) {
                     // Set all step fields based on parameters
                     foreach ($step as $key => $value) {
@@ -479,21 +519,24 @@ class InstallCommand extends ContainerAwareCommand
                         }
                     }
                 }
+
                 if (!isset($subIndex)) {
                     // Install database
                     $messages = $installer->createDatabaseStep($step, $params);
-                } else {
-                    switch ((int) $subIndex) {
-                        case 1:
-                            // Install schema
-                            $messages = $installer->createSchemaStep($params);
-                            break;
 
-                        case 2:
-                            // Install fixtures
-                            $messages = $installer->createFixturesStep($this->getContainer());
-                            break;
-                    }
+                    break;
+                }
+
+                switch ($subIndex) {
+                    case 1:
+                        // Install schema
+                        $messages = $installer->createSchemaStep($params);
+                        break;
+
+                    case 2:
+                        // Install fixtures
+                        $messages = $installer->createFixturesStep($this->getContainer());
+                        break;
                 }
                 break;
 
@@ -504,6 +547,7 @@ class InstallCommand extends ContainerAwareCommand
 
             case InstallService::EMAIL_STEP:
                 // Save email configuration
+                $step = $installer->getStep($index);
                 if ($step instanceof EmailStep) {
                     // Set all step fields based on parameters
                     foreach ($step as $key => $value) {
@@ -519,7 +563,7 @@ class InstallCommand extends ContainerAwareCommand
                 // Save final configuration
                 $siteUrl  = $params['site_url'];
                 $messages = $installer->createFinalConfigStep($siteUrl);
-                if (is_bool($messages) && true === $messages) {
+                if (empty($messages)) {
                     $installer->finalMigrationStep();
                 }
                 break;
