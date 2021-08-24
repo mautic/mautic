@@ -61,7 +61,6 @@ Installing Mautic is a simple three-step process:
 sudo apt install software-properties-common -y && sudo add-apt-repository ppa:ondrej/php -y && sudo apt update && sudo apt upgrade -y && sudo apt install mariadb-server apache2 libapache2-mod-php8.0 php8.0 unzip php8.0-xml php8.0-mysql php8.0-imap php8.0-zip php8.0-intl php8.0-curl ntp -y && sudo apt autoremove -y && sudo a2enmod rewrite && sudo wget https://mauteam.org/wp-content/uploads/2019/10/000-default.txt && sudo mv 000-default.txt /etc/apache2/sites-available/000-default.conf && sudo mysql -u root 
 ```
 The above command will connect you to your database, the only difference you will notice is that the text before your command prompt will change to “MariaDB [(none)]>”
-
 ```
 MariaDB [(none)]> CREATE DATABASE mautic DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 MariaDB [(none)]> GRANT ALL ON mautic.* TO 'root'@'localhost' IDENTIFIED BY 'password';
@@ -73,16 +72,12 @@ MariaDB [(none)]> EXIT;
 ----------
 ```
 cd /var/www/html && sudo wget https://github.com/mautic/mautic/releases/download/3.3.3/3.3.3.zip && sudo unzip 3.3.3.zip && sudo wget https://github.com/mautic/mautic/releases/download/3.3.3/3.3.3-update.zip && sudo unzip -o 3.3.3-update.zip 
-
 ```
-
 ----------
 ----------
 ```
-
 sudo chown -R www-data:www-data /var/www/html && sudo chmod -R 775 /var/www/html && sudo service apache2 reload
 ```
-
 ----------
 
 3. Open your browser and complete the installation through the web installer.
