@@ -426,6 +426,15 @@
       "contributions": [
         "review"
       ]
+    },
+    {
+      "login": "vijayhrdm",
+      "name": "vijayhrdm",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9714242?v=4",
+      "profile": "https://github.com/vijayhrdm",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
