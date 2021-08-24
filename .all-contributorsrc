@@ -436,6 +436,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "julienWebmecanik",
+      "name": "julienWebmecanik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/79137416?v=4",
+      "profile": "https://github.com/julienWebmecanik",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
