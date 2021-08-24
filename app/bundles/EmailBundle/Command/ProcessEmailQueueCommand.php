@@ -36,8 +36,8 @@ class ProcessEmailQueueCommand extends ModeratedCommand
     {
         parent::__construct();
 
-        $this->swiftTransport = $swiftTransport;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->swiftTransport   = $swiftTransport;
+        $this->eventDispatcher  = $eventDispatcher;
         $this->parametersHelper = $parametersHelper;
     }
 
