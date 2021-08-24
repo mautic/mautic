@@ -14,6 +14,8 @@ namespace Mautic\CoreBundle\Templating\Helper;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Asset\Packages;
 
 class AssetsHelper
@@ -64,6 +66,8 @@ class AssetsHelper
      * @var PathsHelper
      */
     protected $pathsHelper;
+
+    protected BuilderIntegrationsHelper $builderIntegrationsHelper;
 
     public function __construct(Packages $packages)
     {
@@ -455,6 +459,20 @@ class AssetsHelper
                 echo '<script src="'.$this->getUrl($url).'" data-source="mautic"></script>'."\n";
             }
         }
+
+        /**
+         * We want to enable JS consumers to simply query Mautic.getActiveBuilderName() so they can add logic based on the active builder.
+         * The $builderName variable is passed to the template so we can get that info on the JS-side.
+         */
+        try {
+            $builder     = $this->builderIntegrationsHelper->getBuilder('email');
+            $builderName = $builder->getName();
+        } catch (IntegrationNotFoundException $exception) {
+            // Assume legacy builder
+            $builderName = 'legacy';
+        }
+
+        echo '<script>Mautic.getActiveBuilderName = function() { return \''.$builderName.'\'; }</script>'."\n";
     }
 
     /**
@@ -729,6 +747,11 @@ class AssetsHelper
     public function setVersion($secretKey, $version)
     {
         $this->version = substr(hash('sha1', $secretKey.$version), 0, 8);
+    }
+
+    public function setBuilderIntegrationsHelper(BuilderIntegrationsHelper $builderIntegrationsHelper)
+    {
+        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
     }
 
     /**
