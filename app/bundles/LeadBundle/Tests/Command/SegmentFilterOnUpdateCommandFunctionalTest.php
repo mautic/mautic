@@ -28,15 +28,21 @@ class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCase
         $application->setAutoExit(false);
         $applicationTester = new ApplicationTester($application);
 
-        $contacts  = $this->saveContacts();
-        $segment   = $this->saveSegment();
-        $segmentId = $segment->getId();
+        $contacts   = $this->saveContacts();
+        $segmentA   = $this->saveSegmentA();
+        $segmentAId = $segmentA->getId();
 
         // Run segments update command.
-        $exitCode = $applicationTester->run(['command' => 'mautic:segments:update', '-i' => $segmentId]);
+        $exitCode = $applicationTester->run(['command' => 'mautic:segments:update', '-i' => $segmentAId]);
         self::assertSame(0, $exitCode, $applicationTester->getDisplay());
+        self::assertCount(5, $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentAId]));
 
-        self::assertCount(5, $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentId]));
+        $segmentB   = $this->saveSegmentB($segmentAId);
+        $segmentBId = $segmentB->getId();
+        // Run segments update command.
+        $exitCode = $applicationTester->run(['command' => 'mautic:segments:update', '-i' => $segmentBId]);
+        self::assertSame(0, $exitCode, $applicationTester->getDisplay());
+        self::assertCount(3, $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentBId]));
     }
 
     private function saveContacts(): array
@@ -58,7 +64,7 @@ class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCase
         return $contacts;
     }
 
-    private function saveSegment(): LeadList
+    private function saveSegmentA(): LeadList
     {
         // Add 1 segment
         /** @var LeadListRepository $contactRepo */
@@ -126,6 +132,63 @@ class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCase
         $segment->setName('Segment A')
             ->setFilters($filters)
             ->setAlias('segment-a');
+        $segmentRepo->saveEntity($segment);
+
+        return $segment;
+    }
+
+    private function saveSegmentB(int $segmentAId): LeadList
+    {
+        // Add 1 segment
+        /** @var LeadListRepository $contactRepo */
+        $segmentRepo = $this->em->getRepository(LeadList::class);
+        $segment     = new LeadList();
+        $filters     = [
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
+                'field'      => 'firstname',
+                'type'       => 'text',
+                'operator'   => '=',
+                'properties' => ['filter' => 'fn6'],
+            ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'or',
+                'field'      => 'firstname',
+                'type'       => 'text',
+                'operator'   => '=',
+                'properties' => ['filter' => 'fn2'],
+            ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'or',
+                'field'      => 'firstname',
+                'type'       => 'text',
+                'operator'   => '=',
+                'properties' => ['filter' => 'fn3'],
+            ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
+                'field'      => 'lastname',
+                'type'       => 'text',
+                'operator'   => '=',
+                'properties' => ['filter' => 'ln3'],
+            ],
+            [
+                    'glue'       => 'and',
+                    'field'      => 'leadlist',
+                    'object'     => 'lead',
+                    'type'       => 'leadlist',
+                    'operator'   => 'in',
+                    'properties' => ['filter' => [$segmentAId]],
+            ],
+        ];
+
+        $segment->setName('Segment B')
+            ->setFilters($filters)
+            ->setAlias('segment-b');
         $segmentRepo->saveEntity($segment);
 
         return $segment;
