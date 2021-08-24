@@ -177,12 +177,12 @@ class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCase
                 'properties' => ['filter' => 'ln3'],
             ],
             [
-                    'glue'       => 'and',
-                    'field'      => 'leadlist',
-                    'object'     => 'lead',
-                    'type'       => 'leadlist',
-                    'operator'   => 'in',
-                    'properties' => ['filter' => [$segmentAId]],
+                'glue'       => 'and',
+                'field'      => 'leadlist',
+                'object'     => 'lead',
+                'type'       => 'leadlist',
+                'operator'   => 'in',
+                'properties' => ['filter' => [$segmentAId]],
             ],
         ];
 
