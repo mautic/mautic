@@ -875,6 +875,15 @@ return [
                 ],
                 'tag' => 'console.command',
             ],
+            'mautic.email.command.queue' => [
+                'class' => \Mautic\EmailBundle\Command\ProcessEmailQueueCommand::class,
+                'arguments' => [
+                    'swiftmailer.mailer.default.transport.real',
+                    'event_dispatcher',
+                    'mautic.helper.core_parameters',
+                ],
+                'tag' => 'console.command',
+            ]
         ],
         'validator' => [
             'mautic.email.validator.multiple_emails_valid_validator' => [
