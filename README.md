@@ -63,6 +63,8 @@ sudo apt install software-properties-common -y && sudo add-apt-repository ppa:on
 The above command will connect you to your database, the only difference you will notice is that the text before your command prompt will change to “MariaDB [(none)]>”
 ```
 MariaDB [(none)]> CREATE DATABASE mautic DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+MariaDB [(none)]> CREATE USER 'mautic'@'localhost' IDENTIFIED BY 'password';
+MariaDB [(none)]> GRANT ALL ON mautic.* TO 'mautic'@'localhost' IDENTIFIED BY 'password';
 MariaDB [(none)]> GRANT ALL ON mautic.* TO 'root'@'localhost' IDENTIFIED BY 'password';
 MariaDB [(none)]> FLUSH PRIVILEGES;
 MariaDB [(none)]> EXIT;
