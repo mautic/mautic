@@ -48,9 +48,9 @@ if (isset($form)) {
     // that's why we can't use the bodyclose customdeclaration
     if (isset($custom_tag)) {
         echo $custom_tag;
-        $view['assets']->addCustomDeclaration($view['form']->end($form), 'customTag');
+        $view['assets']->addCustomDeclaration($view['form']->rest($form), 'customTag');
     } else {
-        $view['assets']->addCustomDeclaration($view['form']->end($form), 'bodyClose');
+        $view['assets']->addCustomDeclaration($view['form']->rest($form), 'bodyClose');
     }
 }
 ?>
