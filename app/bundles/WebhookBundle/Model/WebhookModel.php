@@ -45,6 +45,8 @@ class WebhookModel extends FormModel
 
     private const DELETE_BATCH_LIMIT = 5000;
 
+    public const WEBHOOK_LOG_MAX = 1000;
+
     /**
      * Whet queue mode is turned on.
      *
@@ -673,7 +675,7 @@ class WebhookModel extends FormModel
         $this->webhookTimeLimit = (int) $coreParametersHelper->get('webhook_time_limit', 600);
         $this->disableLimit     = (int) $coreParametersHelper->get('webhook_disable_limit', 100);
         $this->webhookTimeout   = (int) $coreParametersHelper->get('webhook_timeout', 15);
-        $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', 1000);
+        $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', self::WEBHOOK_LOG_MAX);
         $this->queueMode        = $coreParametersHelper->get('queue_mode');
         $this->eventsOrderByDir = $coreParametersHelper->get('events_orderby_dir', Criteria::ASC);
     }
