@@ -1527,6 +1527,34 @@ Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, 
 
 Mautic.listOnLoad = function(container, response) {
     Mautic.lazyLoadContactListOnSegmentDetail();
+    
+    if (mQuery('#segment-dependencies-container').length) {
+        mQuery.ajax({
+            showLoadingBar: true,
+            url: mauticAjaxUrl,
+            type: 'GET',
+            data: {
+                action: 'lead:getSegmentDependencyTree',
+                id: mQuery('input#entityId').val()
+            },
+            dataType: 'json',
+            success: function (response) {
+                Mautic.stopPageLoadingBar();
+                console.log(response);
+                const toolkit = jsPlumb.getInstance({
+                    data: response,
+                    container: document.querySelector("#segment-dependencies-container")
+                });
+                const surface = toolkit.repaintEverything();
+            },
+            error: function (request, textStatus, errorThrown) {
+                Mautic.processAjaxError(request, textStatus, errorThrown);
+            },
+            complete: function () {
+                mQuery('#segment-dependencies-container .spinner').remove();
+            }
+        });
+    }
 };
 
 Mautic.lazyLoadContactListOnSegmentDetail = function() {

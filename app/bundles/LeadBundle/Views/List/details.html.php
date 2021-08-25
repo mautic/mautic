@@ -158,6 +158,11 @@ $view['slots']->set(
                     </a>
                 </li>
                 <li>
+                    <a id="segment-dependencies" href="#segment-dependencies-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.lead.segment.dependencies'); ?>
+                    </a>
+                </li>
+                <li>
                     <a id="campaign-share-tab" href="#campaign-container" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.lead.campaign.share'); ?>
                     </a>
@@ -177,6 +182,11 @@ $view['slots']->set(
 
             <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
             </div>
+
+            <div class="tab-pane bdr-w-0 page-list" id="segment-dependencies-container">
+                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+            </div>
+
             <div class="tab-pane bdr-w-0 page-list" id="campaign-container">
                 <div id="campaign-share-container" style="position: relative">
                     <table id="campaign-share-table" class="table table-bordered table-striped mb-0">
