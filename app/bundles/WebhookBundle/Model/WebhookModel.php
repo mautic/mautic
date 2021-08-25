@@ -438,7 +438,7 @@ class WebhookModel extends FormModel
             return;
         }
 
-        if (!$this->coreParametersHelper->get('delete_webhook_logs_from_cleanup')) {
+        if (!$this->coreParametersHelper->get('delete_webhook_logs_from_cleanup_job')) {
             $this->getLogRepository()->removeOldLogs($webhook->getId(), $this->logMax);
         }
 
