@@ -11,47 +11,51 @@
 
 namespace Mautic\WebhookBundle\Entity;
 
+use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 class LogRepository extends CommonRepository
 {
+    private const LOG_DELETE_BATCH_SIZE = 5000;
+
+    public function getWebhooksBasedOnLogLimit(int $logMaxLimit): array
+    {
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb->select('webhook_id')
+            ->from(MAUTIC_TABLE_PREFIX.'webhook_logs', $this->getTableAlias())
+            ->groupBy('webhook_id')
+            ->having('count(id) > :logMaxLimit')
+            ->setParameter('logMaxLimit', $logMaxLimit);
+
+        return $qb->execute()->fetchAll();
+    }
+
     /**
      * Retains a rolling number of log records for a webhook id.
-     *
-     * @param int $webhookId
-     * @param int $logMax    how many recent logs should remain, the rest will be deleted
-     *
-     * @return int
      */
-    public function removeOldLogs($webhookId, $logMax)
+    public function removeOldLogs(int $webHookId, int $logMax): int
     {
-        // if the hook was deleted then return a count of 0
-        if (!$webhookId) {
-            return false;
+        $deletedLogs   = 0;
+        $table_name    = $this->getTableName();
+        $conn          = $this->getEntityManager()->getConnection();
+
+        $id = $conn->createQueryBuilder()
+            ->select('id')
+            ->from($table_name)
+            ->where('webhook_id = '.$webHookId)
+            ->orderBy('date_added', 'DESC')
+            ->setMaxResults(1)
+            ->setFirstResult($logMax) // if log max limit is 1000 then it will fetch id of 1001'th record from last and we will delete all log which have id less than or equal to this id.
+            ->execute()->fetchColumn();
+
+        if ($id) {
+            $sql = "DELETE FROM {$table_name} WHERE webhook_id = (?) and id <= (?) LIMIT ".self::LOG_DELETE_BATCH_SIZE;
+            while ($rows = $conn->executeQuery($sql, [$webHookId, $id], [ParameterType::INTEGER, ParameterType::INTEGER])->rowCount()) {
+                $deletedLogs += $rows;
+            }
         }
 
-        $qb = $this->_em->getConnection()->createQueryBuilder();
-
-        $count = $qb->select('count(id) as log_count')
-            ->from(MAUTIC_TABLE_PREFIX.'webhook_logs', $this->getTableAlias())
-            ->where('webhook_id = '.$webhookId)
-            ->execute()->fetch();
-
-        if ((int) $count['log_count'] >= (int) $logMax) {
-            $qb = $this->_em->getConnection()->createQueryBuilder();
-
-            $id = $qb->select('id')
-                ->from(MAUTIC_TABLE_PREFIX.'webhook_logs', $this->getTableAlias())
-                ->where('webhook_id = '.$webhookId)
-                ->orderBy('date_added', 'ASC')->setMaxResults(1)
-                ->execute()->fetch();
-
-            $qb = $this->_em->getConnection()->createQueryBuilder();
-
-            $qb->delete(MAUTIC_TABLE_PREFIX.'webhook_logs')
-                ->where($qb->expr()->in('id', $id))
-                ->execute();
-        }
+        return $deletedLogs;
     }
 
     /**

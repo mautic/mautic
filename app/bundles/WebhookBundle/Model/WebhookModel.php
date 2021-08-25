@@ -428,29 +428,26 @@ class WebhookModel extends FormModel
 
     /**
      * Add a log for the webhook response HTTP status and save it.
-     *
-     * @param int    $statusCode
-     * @param float  $runtime    in seconds
-     * @param string $note
+     * $runtime variable unit is in seconds.
      */
-    public function addLog(Webhook $webhook, $statusCode, $runtime, $note = null)
+    public function addLog(Webhook $webhook, int $statusCode, float $runtime, string $note = null): void
     {
-        $log = new Log();
-
         if ($webhook->getId()) {
-            $log->setWebhook($webhook);
+            return;
+        }
+
+        if (!$this->coreParametersHelper->get('delete_webhook_logs_from_cleanup')) {
             $this->getLogRepository()->removeOldLogs($webhook->getId(), $this->logMax);
         }
 
+        $log = new Log();
+        $log->setWebhook($webhook);
         $log->setNote($note);
         $log->setRuntime($runtime);
         $log->setStatusCode($statusCode);
         $log->setDateAdded(new \DateTime());
         $webhook->addLog($log);
-
-        if ($webhook->getId()) {
-            $this->saveEntity($webhook);
-        }
+        $this->saveEntity($webhook);
     }
 
     /**
