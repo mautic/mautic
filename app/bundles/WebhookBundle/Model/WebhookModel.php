@@ -434,7 +434,7 @@ class WebhookModel extends FormModel
      */
     public function addLog(Webhook $webhook, int $statusCode, float $runtime, string $note = null): void
     {
-        if ($webhook->getId()) {
+        if (!$webhook->getId()) {
             return;
         }
 
