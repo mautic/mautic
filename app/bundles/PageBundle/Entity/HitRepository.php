@@ -273,6 +273,10 @@ class HitRepository extends CommonRepository
         }
         $result = $sq->execute()->fetch();
 
+        if ($result == false) {
+            return $result;
+        }
+
         return new \DateTime($result['latest_hit'], new \DateTimeZone('UTC'));
     }
 
