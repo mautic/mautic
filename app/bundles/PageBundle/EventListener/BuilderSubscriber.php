@@ -563,67 +563,61 @@ class BuilderSubscriber implements EventSubscriberInterface
 
     private function renderLanguageBar(Page $page): string
     {
-        static $langbar = '';
+        return $this->renderTemplate(
+            'MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php',
+            ['pages' => $this->getRelatedPagesForLanguageBar($page)]
+        );
+    }
 
-        if (empty($langbar)) {
-            $parent   = $page->getTranslationParent();
-            $children = $page->getTranslationChildren();
+    private function getRelatedPagesForLanguageBar(Page $page): array
+    {
+        $related  = [];
+        $parent   = $page->getTranslationParent();
+        $children = $page->getTranslationChildren();
 
-            //check to see if this page is grouped with another
-            if (empty($parent) && empty($children)) {
-                return '';
-            }
-
-            $related = [];
-
-            //get a list of associated pages/languages
-            if (!empty($parent)) {
-                $children = $parent->getTranslationChildren();
-            } else {
-                $parent = $page; //parent is self
-            }
-
-            if (!empty($children)) {
-                $lang  = $parent->getLanguage();
-                $trans = $this->translator->trans('mautic.page.lang.'.$lang);
-                if ($trans == 'mautic.page.lang.'.$lang) {
-                    $trans = $lang;
-                }
-                $related[$parent->getId()] = [
-                    'lang' => $trans,
-                    // Add ntrd to not auto redirect to another language
-                    'url'  => $this->pageModel->generateUrl($parent, false).'?ntrd=1',
-                ];
-                foreach ($children as $c) {
-                    $lang  = $c->getLanguage();
-                    $trans = $this->translator->trans('mautic.page.lang.'.$lang);
-                    if ($trans == 'mautic.page.lang.'.$lang) {
-                        $trans = $lang;
-                    }
-                    $related[$c->getId()] = [
-                        'lang' => $trans,
-                        // Add ntrd to not auto redirect to another language
-                        'url'  => $this->pageModel->generateUrl($c, false).'?ntrd=1',
-                    ];
-                }
-            }
-
-            //sort by language
-            uasort(
-                $related,
-                function ($a, $b) {
-                    return strnatcasecmp($a['lang'], $b['lang']);
-                }
-            );
-
-            if (empty($related)) {
-                return '';
-            }
-
-            $langbar = $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', ['pages' => $related]);
+        if (empty($parent) && empty($children)) {
+            return $related;
         }
 
-        return $langbar;
+        // If this page has a parent, then fetch the children from the parent
+        if (!empty($parent)) {
+            $children = $parent->getTranslationChildren();
+        } else {
+            // Otherwise this is the parent page.
+            $parent = $page;
+        }
+
+        if (empty($children)) {
+            return $related;
+        }
+
+        $related[$parent->getId()] = $this->buildRelatedArrayForPage($parent);
+
+        foreach ($children as $child) {
+            $related[$child->getId()] = $this->buildRelatedArrayForPage($child);
+        }
+
+        uasort($related, function ($a, $b) {
+            return strnatcasecmp($a['lang'], $b['lang']);
+        });
+
+        return $related;
+    }
+
+    private function buildRelatedArrayForPage(Page $page): array
+    {
+        $language   = $page->getLanguage();
+        $translated = $this->translator->trans('mautic.page.lang.'.$language);
+
+        if ($translated == 'mautic.page.lang.'.$language) {
+            $translated = $language;
+        }
+
+        return [
+            'lang' => $translated,
+            // Add ntrd to not auto redirect to another language
+            'url'  => $this->pageModel->generateUrl($page, false).'?ntrd=1',
+        ];
     }
 
     private function setSlotContentToTokenForReplacement(DOMXPath $xpath, string $slotName, string $tokenValue): void
