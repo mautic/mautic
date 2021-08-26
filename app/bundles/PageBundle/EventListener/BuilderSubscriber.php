@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
 use DOMDocument;
+use DOMElement;
 use DOMNode;
 use DOMXPath;
 use InvalidArgumentException;
@@ -36,6 +37,7 @@ use Mautic\PageBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use RuntimeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -95,7 +97,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     const successmessage           = '{successmessage}';
     const identifierToken          = '{leadidentifier}';
     const saveButtonContainerClass = 'prefs-saveprefs';
-    const firstSlotAttribute       = 'data-prefs-center-first="1"';
+    const firstSlotAttribute       = ' data-prefs-center-first="1"';
 
     private $renderedContentCache  = [];
 
@@ -134,6 +136,24 @@ class BuilderSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_ON_SEND    => ['onEmailGenerate', 0],
             EmailEvents::EMAIL_ON_DISPLAY => ['onEmailGenerate', 0],
         ];
+    }
+
+    public function onEmailBuild(EmailBuilderEvent $event)
+    {
+        if ($event->tokensRequested([static::pageTokenRegex])) {
+            $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
+            $event->addTokensFromHelper($tokenHelper, static::pageTokenRegex, 'title', 'id', true);
+        }
+    }
+
+    public function onEmailGenerate(EmailSendEvent $event)
+    {
+        $content      = $event->getContent();
+        $plainText    = $event->getPlainText();
+        $clickthrough = $event->shouldAppendClickthrough() ? $event->generateClickthrough() : [];
+        $tokens       = $this->tokenHelper->findPageTokens($content.$plainText, $clickthrough);
+
+        $event->addTokens($tokens);
     }
 
     /**
@@ -393,149 +413,64 @@ class BuilderSubscriber implements EventSubscriberInterface
 
     private function replaceCommonTokens(string $content, Page $page): string
     {
-        return str_ireplace(
-            [
-                static::langBarRegex,
-                static::shareButtonsRegex,
-                static::titleRegex,
-                static::descriptionRegex,
-            ],
-            [
-                $this->renderLanguageBar($page),
-                $this->renderSocialShareButtons(),
-                $page->getTitle(),
-                $page->getMetaDescription(),
-            ],
-            $content
-        );
+        return str_ireplace([
+            static::langBarRegex,
+            static::shareButtonsRegex,
+            static::titleRegex,
+            static::descriptionRegex,
+            static::successmessage,
+        ], [
+            $this->renderLanguageBar($page),
+            $this->renderSocialShareButtons(),
+            $page->getTitle(),
+            $page->getMetaDescription(),
+            $this->renderSuccessMessage(),
+        ], $content);
     }
 
-    private function handlePreferenceCenterReplacements(string $content, array $params)
+    private function handlePreferenceCenterReplacements(string $content, array $params): string
     {
-        // replace slots
-        if (count($params)) {
-            $dom = new DOMDocument('1.0', 'utf-8');
-            $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
-            $xpath = new DOMXPath($dom);
+        $xpath = $this->createDOMXPathForContent($content);
 
-            $divContent = $xpath->query('//*[@data-slot="segmentlist"]');
-            for ($i = 0; $i < $divContent->length; ++$i) {
-                $slot            = $divContent->item($i);
-                $slot->nodeValue = static::segmentListRegex;
-                $slot->setAttribute('data-prefs-center', '1');
-                $content = $dom->saveHTML();
-            }
-
-            $divContent = $xpath->query('//*[@data-slot="categorylist"]');
-            for ($i = 0; $i < $divContent->length; ++$i) {
-                $slot            = $divContent->item($i);
-                $slot->nodeValue = static::categoryListRegex;
-                $slot->setAttribute('data-prefs-center', '1');
-                $content = $dom->saveHTML();
-            }
-
-            $divContent = $xpath->query('//*[@data-slot="preferredchannel"]');
-            for ($i = 0; $i < $divContent->length; ++$i) {
-                $slot            = $divContent->item($i);
-                $slot->nodeValue = static::preferredchannel;
-                $slot->setAttribute('data-prefs-center', '1');
-                $content = $dom->saveHTML();
-            }
-
-            $divContent = $xpath->query('//*[@data-slot="channelfrequency"]');
-            for ($i = 0; $i < $divContent->length; ++$i) {
-                $slot            = $divContent->item($i);
-                $slot->nodeValue = static::channelfrequency;
-                $slot->setAttribute('data-prefs-center', '1');
-                $content = $dom->saveHTML();
-            }
-
-            $divContent = $xpath->query('//*[@data-slot="saveprefsbutton"]');
-            for ($i = 0; $i < $divContent->length; ++$i) {
-                $slot            = $divContent->item($i);
-                $saveButton      = $xpath->query('//*[@data-slot="saveprefsbutton"]//a')->item(0);
-                $slot->nodeValue = static::saveprefsRegex;
-                $slot->setAttribute('data-prefs-center', '1');
-                $content = $dom->saveHTML();
-
-                $params['saveprefsbutton'] = [
-                    'style'      => $saveButton->getAttribute('style'),
-                    'background' => $saveButton->getAttribute('background'),
-                ];
-            }
-
-            unset($slot, $xpath, $dom);
+        if ($saveButton = $xpath->query('//*[@data-slot="saveprefsbutton"]//a')->item(0)) {
+            $params['saveprefsbutton'] = [
+                'style'      => $saveButton->getAttribute('style'),
+                'background' => $saveButton->getAttribute('background'),
+            ];
         }
 
-        $content = $this->replacePreferenceCenterTokens($content, $params);
+        $slotNamesAndTokenValues = [
+            'segmentlist'      => static::segmentListRegex,
+            'categorylist'     => static::categoryListRegex,
+            'preferredchannel' => static::preferredchannel,
+            'channelfrequency' => static::channelfrequency,
+            'saveprefsbutton'  => static::saveprefsRegex,
+        ];
 
-        // Find the parent dom node that contains all the preference center inputs, and wrap it in a <form> tag
-        if (isset($params['startform']) && false !== strpos($content, 'data-prefs-center')) {
-            $dom = new DOMDocument('1.0', 'utf-8');
-            $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
-            $xpath = new DOMXPath($dom);
-            // If use slots
-            $divContent = $xpath->query('//*[@data-prefs-center="1"]');
-            if (!$divContent->length) {
-                // If use tokens
-                $divContent = $xpath->query('//*[@data-prefs-center-first="1"]');
-            }
-
-            // keep walking up the nodes until we find the parent node that includes the first slot AND the `save-prefs` button
-            if ($divContent->length) {
-                $parentNode = $this->getOutermostNodeThatContainsAllFormInputs($divContent->item(0));
-
-                $parentNode->insertBefore($dom->createElement('startform'), $parentNode->firstChild);
-                $parentNode->appendChild($dom->createElement('endform'));
-
-                $content = str_replace(['<startform></startform>', '<endform></endform>'], [$params['startform'], '</form>'], $dom->saveHTML());
-            }
+        foreach ($slotNamesAndTokenValues as $slotName => $tokenValue) {
+            $this->setSlotContentToTokenForReplacement($xpath, $slotName, $tokenValue);
         }
 
-        $content = str_ireplace(static::successmessage, $this->renderSuccessMessage($params), $content);
+        $content = $this->replacePreferenceCenterTokens($xpath->document->saveHTML(), $params);
 
-        return $content;
+        return $this->wrapPreferenceCenterInFormTag($content, $params);
     }
 
-    /**
-     * Replace tokens in content with their proper values.
-     */
     private function replacePreferenceCenterTokens(string $content, array $params): string
     {
-        return str_ireplace(
-            [
-                static::segmentListRegex,
-                static::categoryListRegex,
-                static::preferredchannel,
-                static::channelfrequency,
-                static::saveprefsRegex,
-            ],
-            [
-                $this->renderSegmentList($params),
-                $this->renderCategoryList($params),
-                $this->renderPreferredChannel($params),
-                $this->renderChannelFrequency($params),
-                $this->renderSavePrefs($params),
-            ],
-            $content
-        );
-    }
-
-    /**
-     * Traverses the node parents until it finds the one which
-     * includes the first slot AND the save prefs button, then
-     * returns that node.
-     */
-    private function getOutermostNodeThatContainsAllFormInputs(DOMNode $node): DOMNode
-    {
-        $content = implode(array_map([$node->ownerDocument, 'saveHTML'], iterator_to_array($node->childNodes)));
-
-        // Check if the save button exists in the content. If not, try again with the parentNode.
-        if (false === strpos($content, static::saveButtonContainerClass)) {
-            return $this->getOutermostNodeThatContainsAllFormInputs($node->parentNode);
-        }
-
-        return $node;
+        return str_ireplace([
+            static::segmentListRegex,
+            static::categoryListRegex,
+            static::preferredchannel,
+            static::channelfrequency,
+            static::saveprefsRegex,
+        ], [
+            $this->renderSegmentList($params),
+            $this->renderCategoryList($params),
+            $this->renderPreferredChannel($params),
+            $this->renderChannelFrequency($params),
+            $this->renderSavePrefs($params),
+        ], $content);
     }
 
     private function renderTemplate(string $templateName, array $templateParams, string $wrapperTemplate = '', ...$wrapperTemplateValues): string
@@ -544,7 +479,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             return $this->renderedContentCache[$templateName];
         }
 
-        $content = $this->templating->getTemplating()->render($templateName, $templateParams) ?: '';
+        $content = $this->templating->getTemplating()->render($templateName, $templateParams);
 
         if ($wrapperTemplate) {
             // If the content is not empty, ensure that the $wrapperTemplate contains a place to put it.
@@ -573,7 +508,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         return $this->renderTemplate(
             'MauticCoreBundle:Slots:segmentlist.html.php',
             $params,
-            '<div class="pref-segmentlist %s">{templateContent}</div>',
+            '<div class="pref-segmentlist"%s>{templateContent}</div>',
             static::firstSlotAttribute
         );
     }
@@ -583,7 +518,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         return $this->renderTemplate(
             'MauticCoreBundle:Slots:categorylist.html.php',
             $params,
-            '<div class="pref-categorylist %s">{templateContent}</div>',
+            '<div class="pref-categorylist"%s>{templateContent}</div>',
             static::firstSlotAttribute
         );
     }
@@ -611,29 +546,22 @@ class BuilderSubscriber implements EventSubscriberInterface
         return $this->renderTemplate(
             'MauticCoreBundle:Slots:saveprefsbutton.html.php',
             $params,
-            '<div class="%s %s">{templateContent}</div>',
+            '<div class="%s"%s>{templateContent}</div>',
             static::saveButtonContainerClass,
             static::firstSlotAttribute
         );
     }
 
-    private function renderSuccessMessage(array $params): string
+    private function renderSuccessMessage(): string
     {
         return $this->renderTemplate(
             'MauticCoreBundle:Slots:successmessage.html.php',
-            $params,
+            [],
             '<div class="pref-successmessage">{templateContent}</div>'
         );
     }
 
-    /**
-     * Renders the HTML for the language bar for a given page.
-     *
-     * @param $page
-     *
-     * @return string
-     */
-    private function renderLanguageBar($page)
+    private function renderLanguageBar(Page $page): string
     {
         static $langbar = '';
 
@@ -643,7 +571,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
             //check to see if this page is grouped with another
             if (empty($parent) && empty($children)) {
-                return;
+                return '';
             }
 
             $related = [];
@@ -689,7 +617,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             );
 
             if (empty($related)) {
-                return;
+                return '';
             }
 
             $langbar = $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', ['pages' => $related]);
@@ -698,21 +626,79 @@ class BuilderSubscriber implements EventSubscriberInterface
         return $langbar;
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event)
+    private function setSlotContentToTokenForReplacement(DOMXPath $xpath, string $slotName, string $tokenValue): void
     {
-        if ($event->tokensRequested([$this->pageTokenRegex])) {
-            $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
-            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', true);
+        $nodeList = $xpath->query(sprintf('//*[@data-slot="%s"]', $slotName));
+
+        for ($i = 0; $i < $nodeList->length; ++$i) {
+            $slot            = $nodeList->item($i);
+            $slot->nodeValue = $tokenValue;
+
+            if (static::successmessage !== $tokenValue) {
+                $slot->setAttribute('data-prefs-center', '1');
+            }
         }
     }
 
-    public function onEmailGenerate(EmailSendEvent $event)
+    private function createDOMXPathForContent(string $content): DOMXPath
     {
-        $content      = $event->getContent();
-        $plainText    = $event->getPlainText();
-        $clickthrough = $event->shouldAppendClickthrough() ? $event->generateClickthrough() : [];
-        $tokens       = $this->tokenHelper->findPageTokens($content.$plainText, $clickthrough);
+        $domDocument = new DOMDocument('1.0', 'utf-8');
+        $domDocument->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
 
-        $event->addTokens($tokens);
+        return new DOMXPath($domDocument);
+    }
+
+    private function wrapPreferenceCenterInFormTag(string $content, array $params): string
+    {
+        if (!isset($params['startform']) || false === strpos($content, 'data-prefs-center')) {
+            return $content;
+        }
+
+        $xpath = $this->createDOMXPathForContent($content);
+        $node  = $this->getFirstNodeThatContainsAPreferenceCenterSlot($xpath);
+
+        if (null === $node) {
+            return $content;
+        }
+
+        $parentNode = $this->getFirstParentNodeThatContainsAllFormInputs($node);
+
+        $parentNode->insertBefore(new DOMElement('startform'), $parentNode->firstChild);
+        $parentNode->appendChild(new DOMElement('endform'));
+
+        return str_replace(['<startform></startform>', '<endform></endform>'], [$params['startform'], '</form>'], $xpath->document->saveHTML());
+    }
+
+    private function getFirstNodeThatContainsAPreferenceCenterSlot(DOMXPath $xpath): ?DOMNode
+    {
+        // Query if we're using slots.
+        $nodeList = $xpath->query('//*[@data-prefs-center="1"]');
+
+        if (!$nodeList->length) {
+            // If slots aren't found, query for tokens
+            $nodeList = $xpath->query('//*[@data-prefs-center-first="1"]');
+        }
+
+        if (false !== $nodeList) {
+            return $nodeList->item(0);
+        }
+
+        return null;
+    }
+
+    private function getFirstParentNodeThatContainsAllFormInputs(DOMNode $node): DOMNode
+    {
+        $content = implode(array_map([$node->ownerDocument, 'saveHTML'], iterator_to_array($node->childNodes)));
+
+        // Check if the save button exists in the content. If not, try again with the parentNode.
+        if (false === strpos($content, static::saveButtonContainerClass)) {
+            if (null === $node->parentNode) {
+                throw new RuntimeException("Can't get parent node of #document. Did you forget to insert a save button in your preference center form?");
+            }
+
+            return $this->getFirstParentNodeThatContainsAllFormInputs($node->parentNode);
+        }
+
+        return $node;
     }
 }
