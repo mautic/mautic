@@ -11,6 +11,8 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -20,8 +22,25 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DynamicContentFilterType extends AbstractType
 {
+    private BuilderIntegrationsHelper $builderIntegrationsHelper;
+
+    public function __construct(BuilderIntegrationsHelper $builderIntegrationsHelper)
+    {
+        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $extraClasses = '';
+
+        try {
+            $mauticBuilder = $this->builderIntegrationsHelper->getBuilder('email');
+            $mauticBuilder->getName();
+        } catch (IntegrationNotFoundException $exception) {
+            // Assume legacy builder
+            $extraClasses = ' legacy-builder';
+        }
+
         $builder->add(
             'tokenName',
             TextType::class,
@@ -39,7 +58,7 @@ class DynamicContentFilterType extends AbstractType
             [
                 'label' => 'mautic.core.dynamicContent.default_content',
                 'attr'  => [
-                    'class' => 'form-control editor editor-dynamic-content',
+                    'class' => 'form-control editor editor-dynamic-content'.$extraClasses,
                 ],
             ]
         );
