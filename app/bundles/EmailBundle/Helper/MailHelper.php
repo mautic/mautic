@@ -304,7 +304,7 @@ class MailHelper
             return $this->getMailer($cleanSlate);
         }
 
-        $transport  = $this->factory->get('swiftmailer.transport.real');
+        $transport  = $this->factory->get('swiftmailer.mailer.default.transport.real');
         $mailer     = new \Swift_Mailer($transport);
         $mailHelper = new self($this->factory, $mailer, $this->from);
 
