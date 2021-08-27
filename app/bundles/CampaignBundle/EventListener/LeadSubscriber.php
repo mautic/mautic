@@ -11,7 +11,7 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
@@ -37,6 +37,11 @@ class LeadSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
      * @var RouterInterface
      */
     private $router;
@@ -44,7 +49,7 @@ class LeadSubscriber implements EventSubscriberInterface
     public function __construct(
         EventCollector $eventCollector,
         TranslatorInterface $translator,
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         RouterInterface $router
     ) {
         $this->eventCollector = $eventCollector;
