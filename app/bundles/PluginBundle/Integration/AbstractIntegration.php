@@ -12,7 +12,9 @@
 namespace Mautic\PluginBundle\Integration;
 
 use Doctrine\ORM\EntityManager;
-use Joomla\Http\HttpFactory;
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\CurlHandler;
+use GuzzleHttp\HandlerStack;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -39,6 +41,7 @@ use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
 use Monolog\Logger;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
@@ -64,142 +67,38 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     const FIELD_TYPE_DATETIME = 'datetime';
     const FIELD_TYPE_DATE     = 'date';
 
-    /**
-     * @var bool
-     */
-    protected $coreIntegration = false;
-
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    /**
-     * @var Integration
-     */
-    protected $settings;
-
-    /**
-     * @var array Decrypted keys
-     */
-    protected $keys = [];
-
-    /**
-     * @var CacheStorageHelper
-     */
-    protected $cache;
-
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    protected $em;
-
-    /**
-     * @var SessionInterface|null
-     */
-    protected $session;
-
-    /**
-     * @var Request|null
-     */
-    protected $request;
-
-    /**
-     * @var Router
-     */
-    protected $router;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var EncryptionHelper
-     */
-    protected $encryptionHelper;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
-
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
-
-    /**
-     * @var NotificationModel
-     */
-    protected $notificationModel;
-
-    /**
-     * @var FieldModel
-     */
-    protected $fieldModel;
+    protected bool $coreIntegration = false;
+    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
+    protected Integration $settings;
+    protected array $keys = [];
+    protected ?CacheStorageHelper $cache;
+    protected \Doctrine\ORM\EntityManager $em;
+    protected ?SessionInterface $session;
+    protected ?Request $request;
+    protected Router $router;
+    protected LoggerInterface $logger;
+    protected TranslatorInterface $translator;
+    protected EncryptionHelper $encryptionHelper;
+    protected LeadModel $leadModel;
+    protected CompanyModel $companyModel;
+    protected PathsHelper $pathsHelper;
+    protected NotificationModel $notificationModel;
+    protected FieldModel $fieldModel;
 
     /**
      * Used for notifications.
-     *
-     * @var array|null
      */
-    protected $adminUsers;
+    protected ?array $adminUsers;
 
-    /**
-     * @var array
-     */
-    protected $notifications = [];
-
-    /**
-     * @var string|null
-     */
-    protected $lastIntegrationError;
-
-    /**
-     * @var array
-     */
-    protected $mauticDuplicates = [];
-
-    /**
-     * @var array
-     */
-    protected $salesforceIdMapping = [];
-
-    /**
-     * @var array
-     */
-    protected $deleteIntegrationEntities = [];
-
-    /**
-     * @var array
-     */
-    protected $persistIntegrationEntities = [];
-
-    /**
-     * @var IntegrationEntityModel
-     */
-    protected $integrationEntityModel;
-
-    /**
-     * @var DoNotContactModel
-     */
-    protected $doNotContact;
-
-    /**
-     * @var array
-     */
-    protected $commandParameters = [];
+    protected array $notifications = [];
+    protected ?string $lastIntegrationError;
+    protected array $mauticDuplicates           = [];
+    protected array $salesforceIdMapping        = [];
+    protected array $deleteIntegrationEntities  = [];
+    protected array $persistIntegrationEntities = [];
+    protected IntegrationEntityModel $integrationEntityModel;
+    protected DoNotContactModel $doNotContact;
+    protected array  $commandParameters = [];
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -777,9 +676,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * @param        $url
      * @param array  $parameters
      * @param string $method
-     * @param array  $settings
+     * @param array  $settings   Set $settings['return_raw'] to receive a ResponseInterface
      *
-     * @return mixed|string
+     * @return mixed|string|ResponseInterface
      */
     public function makeRequest($url, $parameters = [], $method = 'GET', $settings = [])
     {
@@ -869,8 +768,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
+        /**
+         * Set some cURL settings for backward compatibility
+         * https://docs.guzzlephp.org/en/latest/faq.html?highlight=curl#how-can-i-add-custom-curl-options.
+         */
         $options = [
-            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
             CURLOPT_HEADER         => 1,
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_FOLLOWLOCATION => 0,
@@ -886,11 +788,14 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $options[CURLOPT_SSL_VERIFYPEER] = $settings['ssl_verifypeer'];
         }
 
-        $connector = HttpFactory::getHttp(
-            [
-                'transport.curl' => $options,
-            ]
-        );
+        /**
+         * Because so many integrations extend this class and mautic.http.client is not in the
+         * constructor at the time of writing, let's just create a new client here. In addition,
+         * we add some custom cURL options.
+         */
+        $client = new Client(['handler' => HandlerStack::create(new CurlHandler([
+            'options' => $options,
+        ]))]);
 
         $parseHeaders = (isset($settings['headers'])) ? array_merge($headers, $settings['headers']) : $headers;
         // HTTP library requires that headers are in key => value pairs
@@ -912,16 +817,25 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $timeout = (isset($settings['request_timeout'])) ? (int) $settings['request_timeout'] : 10;
             switch ($method) {
                 case 'GET':
-                    $result = $connector->get($url, $headers, $timeout);
+                    $result = $client->get($url, [
+                        \GuzzleHttp\RequestOptions::HEADERS => $headers,
+                        \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                    ]);
                     break;
                 case 'POST':
                 case 'PUT':
                 case 'PATCH':
-                    $connectorMethod = strtolower($method);
-                    $result          = $connector->$connectorMethod($url, $parameters, $headers, $timeout);
+                    $result = $client->request($method, $url, [
+                        \GuzzleHttp\RequestOptions::BODY    => $parameters,
+                        \GuzzleHttp\RequestOptions::HEADERS => $headers,
+                        \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                    ]);
                     break;
                 case 'DELETE':
-                    $result = $connector->delete($url, $headers, $timeout);
+                    $result = $client->delete($url, [
+                        \GuzzleHttp\RequestOptions::HEADERS => $headers,
+                        \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                    ]);
                     break;
             }
         } catch (\Exception $exception) {
@@ -937,7 +851,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         if (!empty($settings['return_raw'])) {
             return $result;
         } else {
-            return $this->parseCallbackResponse($result->body, !empty($settings['authorize_session']));
+            return $this->parseCallbackResponse($result->getBody(), !empty($settings['authorize_session']));
         }
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -14,21 +16,22 @@ namespace Mautic\LeadBundle\Tests\Model;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\SegmentActionModel;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject
      */
     private $contactMock5;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject
      */
     private $contactMock6;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject
      */
     private $contactModelMock;
 
@@ -45,137 +48,104 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
         $this->actionModel         = new SegmentActionModel($this->contactModelMock);
     }
 
-    public function testAddContactsToSegmentsEntityAccess()
+    public function testAddContactsToSegmentsEntityAccess(): void
     {
         $contacts = [5, 6];
         $segments = [4, 5];
 
-        $this->contactModelMock->expects($this->at(0))
+        $this->contactModelMock->expects($this->once())
             ->method('getLeadsByIds')
             ->with($contacts)
             ->willReturn([$this->contactMock5, $this->contactMock6]);
 
-        $this->contactModelMock->expects($this->at(1))
+        $this->contactModelMock->expects($this->exactly(2))
             ->method('canEditContact')
-            ->with($this->contactMock5)
-            ->willReturn(false);
+            ->withConsecutive([$this->contactMock5], [$this->contactMock6])
+            ->willReturnOnConsecutiveCalls(false, true);
 
-        $this->contactModelMock->expects($this->at(2))
-            ->method('canEditContact')
-            ->with($this->contactMock6)
-            ->willReturn(true);
-
-        $this->contactModelMock->expects($this->at(3))
+        $this->contactModelMock->expects($this->once())
             ->method('addToLists')
             ->with($this->contactMock6, $segments);
 
-        $this->contactModelMock->expects($this->at(4))
+        $this->contactModelMock->expects($this->once())
             ->method('saveEntities')
             ->with([$this->contactMock5, $this->contactMock6]);
 
         $this->actionModel->addContacts($contacts, $segments);
     }
 
-    public function testRemoveContactsFromSementsEntityAccess()
+    public function testRemoveContactsFromSementsEntityAccess(): void
     {
         $contacts = [5, 6];
         $segments = [1, 2];
 
-        $this->contactModelMock->expects($this->at(0))
+        $this->contactModelMock->expects($this->once())
             ->method('getLeadsByIds')
             ->with($contacts)
             ->willReturn([$this->contactMock5, $this->contactMock6]);
 
-        $this->contactModelMock->expects($this->at(1))
+        $this->contactModelMock->expects($this->exactly(2))
             ->method('canEditContact')
-            ->with($this->contactMock5)
-            ->willReturn(false);
+            ->withConsecutive([$this->contactMock5], [$this->contactMock6])
+            ->willReturnOnConsecutiveCalls(false, true);
 
-        $this->contactModelMock->expects($this->at(2))
-            ->method('canEditContact')
-            ->with($this->contactMock6)
-            ->willReturn(true);
-
-        $this->contactModelMock->expects($this->at(3))
+        $this->contactModelMock->expects($this->once())
             ->method('removeFromLists')
             ->with($this->contactMock6, $segments);
 
-        $this->contactModelMock->expects($this->at(4))
+        $this->contactModelMock->expects($this->once())
             ->method('saveEntities')
             ->with([$this->contactMock5, $this->contactMock6]);
 
         $this->actionModel->removeContacts($contacts, $segments);
     }
 
-    public function testAddContactsToSegments()
+    public function testAddContactsToSegments(): void
     {
         $contacts = [5, 6];
         $segments = [1, 2];
 
-        $this->contactModelMock->expects($this->at(0))
+        $this->contactModelMock->expects($this->once())
             ->method('getLeadsByIds')
             ->with($contacts)
             ->willReturn([$this->contactMock5, $this->contactMock6]);
 
-        // Loop 1
-        $this->contactModelMock->expects($this->at(1))
+        $this->contactModelMock->expects($this->exactly(2))
             ->method('canEditContact')
-            ->with($this->contactMock5)
+            ->withConsecutive([$this->contactMock5], [$this->contactMock6])
             ->willReturn(true);
 
-        $this->contactModelMock->expects($this->at(2))
+        $this->contactModelMock->expects($this->exactly(2))
             ->method('addToLists')
-            ->with($this->contactMock5, $segments);
+            ->withConsecutive([$this->contactMock5, $segments], [$this->contactMock6, $segments]);
 
-        // Loop 2
-        $this->contactModelMock->expects($this->at(3))
-            ->method('canEditContact')
-            ->with($this->contactMock6)
-            ->willReturn(true);
-
-        $this->contactModelMock->expects($this->at(4))
-            ->method('addToLists')
-            ->with($this->contactMock6, $segments);
-
-        $this->contactModelMock->expects($this->at(5))
+        $this->contactModelMock->expects($this->once())
             ->method('saveEntities')
             ->with([$this->contactMock5, $this->contactMock6]);
 
         $this->actionModel->addContacts($contacts, $segments);
     }
 
-    public function testRemoveContactsFromCategories()
+    public function testRemoveContactsFromCategories(): void
     {
         $contacts = [5, 6];
         $segments = [1, 2];
 
-        $this->contactModelMock->expects($this->at(0))
+        $this->contactModelMock->expects($this->once())
             ->method('getLeadsByIds')
             ->with($contacts)
             ->willReturn([$this->contactMock5, $this->contactMock6]);
 
-        // Loop 1
-        $this->contactModelMock->expects($this->at(1))
+        $this->contactModelMock->expects($this->exactly(2))
             ->method('canEditContact')
-            ->with($this->contactMock5)
+            ->withConsecutive([$this->contactMock5], [$this->contactMock6])
             ->willReturn(true);
 
-        $this->contactModelMock->expects($this->at(2))
+        $this->contactModelMock->expects($this->exactly(2))
             ->method('removeFromLists')
-            ->with($this->contactMock5, $segments);
+            ->withConsecutive([$this->contactMock5, $segments], [$this->contactMock6]);
 
-        // Loop 2
-        $this->contactModelMock->expects($this->at(3))
-            ->method('canEditContact')
-            ->with($this->contactMock6)
-            ->willReturn(true);
-
-        $this->contactModelMock->expects($this->at(4))
-            ->method('removeFromLists')
-            ->with($this->contactMock6)
-            ->willReturn($this->contactMock6, $segments);
-
-        $this->contactModelMock->expects($this->at(5))
+        $this->contactModelMock->expects($this->once())
             ->method('saveEntities')
             ->with([$this->contactMock5, $this->contactMock6]);
 
