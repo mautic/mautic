@@ -21,7 +21,7 @@ final class RemoveOldLogTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        $this->configParams['delete_webhook_logs_from_cleanup_job'] = 'testRemoveLogUsingCleanUpJob' === $this->getName();
+        $this->configParams['clean_webhook_logs_in_background']     = 'testRemoveLogUsingCleanUpJob' === $this->getName();
         $this->configParams['webhook_log_max']                      = 5;
         parent::setUp();
 

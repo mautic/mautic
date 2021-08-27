@@ -160,7 +160,7 @@ return [
         'webhook_limit'                        => 10, // How many entities can be sent in one webhook
         'webhook_time_limit'                   => 600, // How long the webhook processing can run in seconds
         'webhook_log_max'                      => 5, // How many recent logs to keep
-        'delete_webhook_logs_from_cleanup_job' => false,
+        'clean_webhook_logs_in_background'     => false,
         'webhook_disable_limit'                => 100, // How many times the webhook response can fail until the webhook will be unpublished
         'webhook_timeout'                      => 15, // How long the CURL request can wait for response before Mautic hangs up. In seconds
         'queue_mode'                           => \Mautic\WebhookBundle\Model\WebhookModel::IMMEDIATE_PROCESS, // Trigger the webhook immediately or queue it for faster response times
