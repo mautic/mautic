@@ -47,10 +47,10 @@ class LeadSubscriber implements EventSubscriberInterface
         EntityManager $entityManager,
         RouterInterface $router
     ) {
-        $this->eventCollector            = $eventCollector;
-        $this->translator                = $translator;
-        $this->entityManager             = $entityManager;
-        $this->router                    = $router;
+        $this->eventCollector = $eventCollector;
+        $this->translator     = $translator;
+        $this->entityManager  = $entityManager;
+        $this->router         = $router;
     }
 
     /**
