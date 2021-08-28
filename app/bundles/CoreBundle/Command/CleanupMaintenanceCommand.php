@@ -13,43 +13,51 @@ namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CLI Command to purge old data per settings.
  */
-class CleanupMaintenanceCommand extends ContainerAwareCommand
+class CleanupMaintenanceCommand extends Command
 {
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    const NAME = 'mautic:maintenance:cleanup';
 
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
+    private AuditLogModel $auditLogModel;
 
-    public function __construct(AuditLogModel $auditLogModel, IpLookupHelper $ipLookupHelper)
+    private IpLookupHelper $ipLookupHelper;
+
+    private TranslatorInterface $translator;
+
+    private EventDispatcherInterface $eventDispatcher;
+
+    private CoreParametersHelper $coreParametersHelper;
+
+    public function __construct(AuditLogModel $auditLogModel, IpLookupHelper $ipLookupHelper, TranslatorInterface $translator, EventDispatcherInterface $eventDispatcher, CoreParametersHelper $coreParametersHelper)
     {
         parent::__construct();
-        $this->auditLogModel  = $auditLogModel;
-        $this->ipLookupHelper = $ipLookupHelper;
+        $this->auditLogModel        = $auditLogModel;
+        $this->ipLookupHelper       = $ipLookupHelper;
+        $this->translator           = $translator;
+        $this->eventDispatcher      = $eventDispatcher;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
-        $this->setName('mautic:maintenance:cleanup')
+        $this->setName(self::NAME)
             ->setDescription('Updates the Mautic application')
             ->setDefinition(
                 [
@@ -84,11 +92,9 @@ EOT
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
-        $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->getParameter('mautic.locale', 'en_US'));
+        $this->translator->setLocale($this->coreParametersHelper->get('locale', 'en_US'));
 
         $daysOld       = $input->getOption('days-old');
         $dryRun        = $input->getOption('dry-run');
@@ -108,7 +114,7 @@ EOT
             /** @var \Symfony\Component\Console\Helper\SymfonyQuestionHelper $helper */
             $helper   = $this->getHelperSet()->get('question');
             $question = new ConfirmationQuestion(
-                '<info>'.$translator->trans('mautic.maintenance.confirm_data_purge', ['%days%' => $daysOld]).'</info> ', false
+                '<info>'.$this->translator->trans('mautic.maintenance.confirm_data_purge', ['%days%' => $daysOld]).'</info> ', false
             );
 
             if (!$helper->ask($input, $output, $question)) {
@@ -116,9 +122,7 @@ EOT
             }
         }
 
-        $dispatcher = $this->getContainer()->get('event_dispatcher');
-
-        $event = $dispatcher->dispatch(CoreEvents::MAINTENANCE_CLEANUP_DATA, new MaintenanceEvent($daysOld, !empty($dryRun), !empty($gdpr)));
+        $event = $this->eventDispatcher->dispatch(CoreEvents::MAINTENANCE_CLEANUP_DATA, new MaintenanceEvent($daysOld, !empty($dryRun), !empty($gdpr)));
         $stats = $event->getStats();
 
         $rows = [];
@@ -128,7 +132,7 @@ EOT
 
         $table = new Table($output);
         $table
-            ->setHeaders([$translator->trans('mautic.maintenance.header.key'), $translator->trans('mautic.maintenance.header.records_affected')])
+            ->setHeaders([$this->translator->trans('mautic.maintenance.header.key'), $this->translator->trans('mautic.maintenance.header.records_affected')])
             ->setRows($rows);
         $table->render();
 

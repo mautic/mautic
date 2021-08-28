@@ -617,6 +617,9 @@ return [
                 'arguments' => [
                     'mautic.core.model.auditlog',
                     'mautic.helper.ip_lookup',
+                    'translator',
+                    'event_dispatcher',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.core.command.transifex_push' => [
