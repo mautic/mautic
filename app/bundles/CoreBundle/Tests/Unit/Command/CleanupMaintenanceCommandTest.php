@@ -102,6 +102,8 @@ class CleanupMaintenanceCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testCommandDryRun()
     {
+        $this->auditLogModel->expects($this->never())->method('writeToLog');
+
         $commandTester = $this->getCommandTester();
         $commandTester->execute(['--dry-run' => true]);
         $output = $commandTester->getDisplay();
@@ -110,6 +112,8 @@ class CleanupMaintenanceCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testCommandInteraction()
     {
+        $this->auditLogModel->expects($this->never())->method('writeToLog');
+
         $commandTester = $this->getCommandTester();
         $commandTester->execute([]);
         $output = $commandTester->getDisplay();
@@ -118,6 +122,8 @@ class CleanupMaintenanceCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testCommandNoInteraction()
     {
+        $this->auditLogModel->expects($this->once())->method('writeToLog');
+
         $commandTester = $this->getCommandTester();
         $commandTester->execute(['--no-interaction' => true]);
         $output = $commandTester->getDisplay();
