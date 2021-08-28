@@ -249,10 +249,6 @@ class ModeratedCommandTest extends TestCase
                 };
             });
 
-        $this->container->expects($this->once())
-            ->method('getParameter')
-            ->with('cach');
-
         $this->input->method('getOption')
             ->willReturnCallback(
                 function (string $name) {
@@ -267,10 +263,9 @@ class ModeratedCommandTest extends TestCase
                 }
             );
 
-        $command->run($this->input, $this->output);
+        $this->expectException(\RedisException::class);
 
-        // Finish the command
-        $command->forceCompleteRun();
+        $command->run($this->input, $this->output);
     }
 
     private function getFirstFile(Finder $finder): SplFileInfo
