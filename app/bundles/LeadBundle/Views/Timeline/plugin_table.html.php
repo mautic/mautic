@@ -9,9 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $leadId = isset($lead) ? $lead->getId() : null;
-
-$view->extend('MauticLeadBundle:Timeline:plugin_index.html.php');
-
+if (!$this->request->isXmlHttpRequest()) {
+    $view->extend('MauticLeadBundle:Timeline:plugin_index.html.php');
+}
 $baseUrl = isset($lead) ? $view['router']->path(
     'mautic_plugin_timeline_view',
     ['leadId' => $lead->getId(), 'integration' => $integration]
