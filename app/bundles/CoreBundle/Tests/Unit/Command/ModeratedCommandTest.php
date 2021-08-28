@@ -235,8 +235,6 @@ class ModeratedCommandTest extends TestCase
         $command = new FakeModeratedCommand();
         $command->setContainer($this->container);
 
-        $cacheDir = __DIR__.'/resource/cache/tmp';
-
         $this->container->expects($this->once())
             ->method('get')
             ->with('mautic.helper.core_parameters')
