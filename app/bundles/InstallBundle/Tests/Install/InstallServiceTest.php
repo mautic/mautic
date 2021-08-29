@@ -25,7 +25,7 @@ use Mautic\InstallBundle\Configurator\Step\EmailStep;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -54,7 +54,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->kernel               = $this->createMock(KernelInterface::class);
         $this->validator            = $this->createMock(ValidatorInterface::class);
-        $this->encoder              = $this->createMock(EncoderFactory::class);
+        $this->encoder              = $this->createMock(UserPasswordEncoder::class);
 
         $this->installer = new InstallService(
             $this->configurator,
@@ -172,7 +172,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $step       = $this->createMock(StepInterface::class);
         $clearCache = false;
 
-        $messages = true;
+        $messages = [];
 
         $step->expects($this->once())
             ->method('update')
@@ -196,7 +196,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $step       = $this->createMock(StepInterface::class);
         $clearCache = true;
 
-        $messages = true;
+        $messages = [];
 
         $step->expects($this->once())
             ->method('update')
@@ -257,6 +257,24 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             'user'   => 'mautic',
         ];
 
-        $this->assertEquals(true, $this->installer->validateDatabaseParams($dbParams));
+        $this->assertEquals([], $this->installer->validateDatabaseParams($dbParams));
+    }
+
+    /**
+     * When an exception is raised while creating a database, there must be an array returned.
+     */
+    public function testCreateDatabaseStepWithErrors(): void
+    {
+        $dbParams = [
+            'driver'       => 'pdo_mysql',
+            'host'         => 'localhost',
+            'port'         => '3306',
+            'name'         => 'mautic',
+            'user'         => 'mautic',
+            'table_prefix' => 'mautic_',
+        ];
+
+        $step = $this->createMock(StepInterface::class);
+        $this->assertEquals(['error' => null], $this->installer->createDatabaseStep($step, $dbParams));
     }
 }

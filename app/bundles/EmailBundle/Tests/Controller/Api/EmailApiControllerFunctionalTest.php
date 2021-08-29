@@ -169,7 +169,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('Email Stat with tracking hash tracking_hash_123 was not found', $responseData['errors'][0]['message']);
     }
 
-    public function testReplyAction()
+    public function testReplyAction(): void
     {
         $trackingHash = 'tracking_hash_123';
 
@@ -199,7 +199,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         // Check that the email reply was created correctly.
         $this->assertSame('1', $fetchedReplyData['total']);
         $this->assertSame($stat->getId(), $fetchedReplyData['stats'][0]['stat_id']);
-        $this->assertRegExp('/api-[a-z0-9]*/', $fetchedReplyData['stats'][0]['message_id']);
+        $this->assertMatchesRegularExpression('/api-[a-z0-9]*/', $fetchedReplyData['stats'][0]['message_id']);
 
         // Get the email stat that was just updated from the stat API.
         $statQuery = ['where' => [['col' => 'id', 'expr' => 'eq', 'val' => $stat->getId()]]];
@@ -210,6 +210,6 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('1', $fetchedStatData['total']);
         $this->assertSame($stat->getId(), $fetchedStatData['stats'][0]['id']);
         $this->assertSame('1', $fetchedStatData['stats'][0]['is_read']);
-        $this->assertRegExp('/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/', $fetchedStatData['stats'][0]['date_read']);
+        $this->assertMatchesRegularExpression('/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/', $fetchedStatData['stats'][0]['date_read']);
     }
 }
