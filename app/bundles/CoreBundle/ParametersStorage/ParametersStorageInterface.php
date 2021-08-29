@@ -13,4 +13,13 @@ namespace Mautic\CoreBundle\ParametersStorage;
 
 interface ParametersStorageInterface
 {
+    /**
+     * @return array
+     */
+    public function read();
+
+    /**
+     * @return void
+     */
+    public function write(array $parameters);
 }

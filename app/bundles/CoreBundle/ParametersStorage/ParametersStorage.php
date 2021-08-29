@@ -37,7 +37,7 @@ class ParametersStorage
         $this->storages[$id] = $storage;
     }
 
-    public function getStorage(string $name = null)
+    public function getStorage(string $name = null): ParametersStorageInterface
     {
         if (!$name) {
             $name = $this->coreParametersHelper->get(self::STORAGE_DEFAULT);

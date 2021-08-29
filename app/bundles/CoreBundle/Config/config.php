@@ -683,6 +683,9 @@ return [
             // Local storage
             'mautic.parameters.storage.local' => [
                 'class'     => \Mautic\CoreBundle\ParametersStorage\Local\LocalParametersStorage::class,
+                'arguments' => [
+                    'mautic.configurator',
+                ],
                 'tag'       => 'mautic.parameters.storage.service',
             ],
 

@@ -23,9 +23,24 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class ConfigController extends FormController
 {
+    /**
+     * @var \Mautic\CoreBundle\ParametersStorage\ParametersStorage
+     */
+    private $parametersStorage;
+
+    /**
+     * Initialize some variables.
+     */
+    public function initialize(FilterControllerEvent $event)
+    {
+        $this->parametersStorage = $this->get('mautic.parameters.storage');
+    }
+
     /**
      * Controller action for editing the application configuration.
      *
@@ -44,7 +59,6 @@ class ConfigController extends FormController
         $fileFields  = $event->getFileFields();
         $formThemes  = $event->getFormThemes();
         $formConfigs = $this->get('mautic.config.mapper')->bindFormConfigsWithRealValues($event->getForms());
-
         $this->mergeParamsWithLocal($formConfigs);
 
         // Create the form
@@ -60,16 +74,13 @@ class ConfigController extends FormController
 
         $originalNormData = $form->getNormData();
 
-        /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
-        $configurator = $this->get('mautic.configurator');
-        $isWritabale  = $configurator->isFileWritable();
         $openTab      = null;
 
         // Check for a submitted form and process it
         if ('POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $isValid = false;
-                if ($isWritabale && $isValid = $this->isFormValid($form)) {
+                if ($isValid = $this->isFormValid($form)) {
                     // Bind request to the form
                     $post     = $this->request->request;
                     $formData = $form->getData();
@@ -84,6 +95,7 @@ class ConfigController extends FormController
 
                     $errors      = $configEvent->getErrors();
                     $fieldErrors = $configEvent->getFieldErrors();
+                    $parameters  = [];
 
                     if ($errors || $fieldErrors) {
                         foreach ($errors as $message => $messageVars) {
@@ -113,18 +125,12 @@ class ConfigController extends FormController
                                     unset($object[$checkMe]);
                                 }
                             }
-
-                            $configurator->mergeParameters($object);
+                            $parameters = array_merge($parameters, $object);
                         }
 
                         try {
-                            // Ensure the config has a secret key
-                            $params = $configurator->getParameters();
-                            if (empty($params['secret_key'])) {
-                                $configurator->mergeParameters(['secret_key' => EncryptionHelper::generateKey()]);
-                            }
+                            $this->parametersStorage->getStorage()->write($parameters);
 
-                            $configurator->write();
                             $dispatcher->dispatch(ConfigEvents::CONFIG_POST_SAVE, $configEvent);
 
                             $this->addFlash('mautic.config.config.notice.updated');
@@ -140,12 +146,6 @@ class ConfigController extends FormController
                             $this->addFlash('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
                         }
                     }
-                } elseif (!$isWritabale) {
-                    $form->addError(
-                        new FormError(
-                            $this->translator->trans('mautic.config.notwritable')
-                        )
-                    );
                 }
             }
 
@@ -173,7 +173,7 @@ class ConfigController extends FormController
                     'security'    => $this->get('mautic.security'),
                     'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', $formThemes),
                     'formConfigs' => $formConfigs,
-                    'isWritable'  => $isWritabale,
+                    'isWritable'  => $isWritabale ?? false,
                 ],
                 'contentTemplate' => 'MauticConfigBundle:Config:form.html.php',
                 'passthroughVars' => [
@@ -269,16 +269,8 @@ class ConfigController extends FormController
     private function mergeParamsWithLocal(array &$forms): void
     {
         $doNotChange = $this->getParameter('mautic.security.restrictedConfigFields');
-        /** @var PathsHelper $pathsHelper */
-        $pathsHelper     = $this->get('mautic.helper.paths');
-        $localConfigFile = $pathsHelper->getLocalConfigurationFile();
 
-        // Import the current local configuration, $parameters is defined in this file
-
-        /** @var array $parameters */
-        include $localConfigFile;
-
-        $localParams = $parameters;
+        $localParams = $this->parametersStorage->getStorage()->read();
 
         foreach ($forms as &$form) {
             // Merge the bundle params with the local params
