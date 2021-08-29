@@ -14,8 +14,10 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Tests\Builder;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use PHPUnit\Framework\Assert;
@@ -44,6 +46,11 @@ final class MauticReportBuilderTest extends \PHPUnit\Framework\TestCase
      */
     private $channelListHelper;
 
+    /**
+     * @var ExpressionBuilder|mixed|MockObject
+     */
+    private $expressionBuilderMock;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -52,12 +59,12 @@ final class MauticReportBuilderTest extends \PHPUnit\Framework\TestCase
         $this->connection        = $this->createMock(Connection::class);
         $this->queryBuilder      = new QueryBuilder($this->connection);
         $this->channelListHelper = $this->createMock(ChannelListHelper::class);
-
-        $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
     }
 
     public function testColumnSanitization(): void
     {
+        $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
+
         $report = new Report();
         $report->setColumns(['a.b', 'b.c']);
         $builder = $this->buildBuilder($report);
@@ -65,6 +72,54 @@ final class MauticReportBuilderTest extends \PHPUnit\Framework\TestCase
             'columns' => ['a.b' => [], 'b.c' => []],
         ]);
         Assert::assertSame('SELECT `a`.`b`, `b`.`c`', $query->getSql());
+    }
+
+    public function testReportsFilterNotEqual(): void
+    {
+        $this->expressionBuilderMock = $this->createMock(ExpressionBuilder::class);
+        $this->expressionBuilderMock->expects($this->any())
+            ->method('andX')
+            ->willReturn(new CompositeExpression(CompositeExpression::TYPE_AND));
+
+        $this->expressionBuilderMock->expects($this->once())->method('isNull');
+        $this->expressionBuilderMock->expects($this->once())->method('neq');
+
+        $this->connection->method('getExpressionBuilder')->willReturn($this->expressionBuilderMock);
+
+        $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
+
+        $report  = new Report();
+        $columns = ['a.b', 'b.c', 'foo.firstname'];
+        $report->setColumns($columns);
+        $filters = [
+            'foo.firstname' => [
+                'column'    => 'foo.firstname',
+                'condition' => 'neq',
+                'value'     => 'xxx',
+                'glue'      => 'and',
+                'dynamic'   => null,
+            ],
+        ];
+
+        $options = [
+            'columns' => [
+                'foo.firstname' => [
+                    'label'     => 'Firstname',
+                    'type'      => 'string',
+                    'alias'     => 'firstname',
+                ],
+            ],
+            'filters' => [
+                'foo.firstname' => [
+                    'label'     => 'Firstname',
+                    'type'      => 'string',
+                    'alias'     => 'firstname',
+                ],
+            ],
+        ];
+        $report->setFilters($filters);
+        $builder = $this->buildBuilder($report);
+        $builder->getQuery($options);
     }
 
     private function buildBuilder(Report $report): MauticReportBuilder
