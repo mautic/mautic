@@ -19,6 +19,10 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
     const SAVE_BUTTON_SELECTOR = '.prefs-saveprefs';
     const FORM_SELECTOR        = 'form[name="lead_contact_frequency_rules"]';
 
+    protected $configParams = [
+        'show_contact_preferences' => 1,
+    ];
+
     public function testOnPageDisplayCorrectlyWrapsAllFrequencyFormInputsIncludingTokenAndSaveButton(): void
     {
         $emailStat = $this->createStat(
