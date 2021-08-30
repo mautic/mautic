@@ -562,16 +562,24 @@ class AjaxController extends CommonAjaxController
                 $emailRepo          = $this->getModel('email')->getRepository();
                 $indexMode          = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
                 $template           = ('list' == $indexMode) ? 'list_rows' : 'grid_cards';
+                $dnc = [];
+                $results = $emailRepo->getDoNotEmailList(array_keys($results['results']));
+                foreach ($results as $r) {
+                    $dnc[$r['id']] = [
+                        'email' => strtolower($r['email']),
+                    ];
+                }
                 $dataArray['leads'] = $this->factory->getTemplating()->render(
                     "MauticLeadBundle:Lead:{$template}.html.php",
                     [
                         'items'         => $results['results'],
-                        'noContactList' => $emailRepo->getDoNotEmailList(array_keys($results['results'])),
+                        'noContactList' => $dnc,
                         'permissions'   => $permissions,
                         'security'      => $this->get('mautic.security'),
                         'highlight'     => true,
                     ]
                 );
+
                 $dataArray['indexMode'] = $indexMode;
                 $dataArray['maxId']     = $maxLeadId;
                 $dataArray['success']   = 1;

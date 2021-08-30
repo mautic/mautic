@@ -34,7 +34,7 @@ class EmailRepository extends CommonRepository
     public function getDoNotEmailList($leadIds = [])
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('l.id, l.email')
+        $q->select('l.id, l.email, dnc.reason')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dnc.lead_id')
             ->where('dnc.channel = "email"')
@@ -48,12 +48,7 @@ class EmailRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        $dnc = [];
-        foreach ($results as $r) {
-            $dnc[$r['id']] = strtolower($r['email']);
-        }
-
-        return $dnc;
+        return $results;
     }
 
     /**

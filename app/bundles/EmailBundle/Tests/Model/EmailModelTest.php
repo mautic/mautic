@@ -534,7 +534,14 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue(false));
 
         $this->emailRepository->method('getDoNotEmailList')
-            ->will($this->returnValue([1 => 'someone@domain.com']));
+            ->will($this->returnValue([
+                [
+                    'id' => 1,
+                    'email' => 'someone@domain.com',
+                    'reason' => \Mautic\LeadBundle\Entity\DoNotContact::BOUNCED
+                ]
+            ]));
+
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
@@ -557,6 +564,49 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue(0 === count($this->emailModel->sendEmail($this->emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']])));
     }
+
+    /**
+     * Test that DoNotContact Transactional emails MANULA type.
+     */
+    public function testDoNotContactManual()
+    {
+        $this->translator->expects($this->any())
+            ->method('hasId')
+            ->will($this->returnValue(false));
+
+        $this->emailRepository->method('getDoNotEmailList')
+            ->will($this->returnValue([
+                [
+                    'id' => 1,
+                    'email' => 'someone@domain.com',
+                    'reason' => \Mautic\LeadBundle\Entity\DoNotContact::MANUAL
+                ]
+            ]));
+
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['MauticEmailBundle:Email', $this->emailRepository],
+                        ['MauticEmailBundle:Stat', $this->statRepository],
+                        ['MauticLeadBundle:FrequencyRule', $this->frequencyRepository],
+                    ]
+                )
+            );
+
+        $this->companyRepository->method('getCompaniesForContacts')
+            ->will($this->returnValue([]));
+
+        $this->companyModel->method('getRepository')
+            ->willReturn($this->companyRepository);
+
+        $this->emailEntity->method('getId')
+            ->will($this->returnValue(1));
+
+        $this->assertTrue(1 === count($this->emailModel->sendEmail($this->emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']])));
+    }
+
 
     /**
      * Test that message is queued for a frequency rule value.

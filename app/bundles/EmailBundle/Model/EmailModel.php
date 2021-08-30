@@ -1394,14 +1394,19 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $dnc = $emailRepo->getDoNotEmailList($leadIds);
 
             if (!empty($dnc)) {
-                foreach ($dnc as $removeMeId => $removeMeEmail) {
-                    if ($dncAsError) {
-                        $errors[$removeMeId] = $this->translator->trans('mautic.email.dnc');
+                foreach ($dnc as $leadDNC) {
+                    $removeMeId = $leadDNC['id'] ?? null;
+                    $reason = $leadDNC['reason'] ?? null;
+                    if (!$isMarketing && $reason == DoNotContact::BOUNCED) {
+                        if ($dncAsError) {
+                            $errors[$removeMeId] = $this->translator->trans('mautic.email.bounced.emails');
+                        }
+                        unset($sendTo[$removeMeId]);
+                        unset($leadIds[$removeMeId]);
                     }
-                    unset($sendTo[$removeMeId]);
-                    unset($leadIds[$removeMeId]);
                 }
             }
+
         }
 
         // Process frequency rules for email
