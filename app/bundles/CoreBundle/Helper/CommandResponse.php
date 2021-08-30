@@ -12,7 +12,7 @@ final class CommandResponse
     private $statusCode;
 
     /*
-     * string
+     * @var string
      */
     private $message;
 
