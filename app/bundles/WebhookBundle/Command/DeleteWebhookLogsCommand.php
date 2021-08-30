@@ -43,9 +43,9 @@ class DeleteWebhookLogsCommand extends Command
     {
         $logMaxLimit = $this->coreParametersHelper->get('webhook_log_max', WebhookModel::WEBHOOK_LOG_MAX);
         $webHookIds  = $this->logRepository->getWebhooksBasedOnLogLimit($logMaxLimit);
-        if (empty($webHookIds)) {
-            $output->writeln('<info>Webhooks does not exist with logs more than defined limit.</info>');
-        }
+        $webhookCount = count($webHookIds);
+        $output->writeln("<info>There is {$webhookCount} webhooks with logs more than defined limit.</info>");
+
         foreach ($webHookIds as $webHookId) {
             $deletedLogCount = $this->logRepository->removeLimitExceedLogs($webHookId, $logMaxLimit);
             $output->writeln(sprintf('<info>%s logs deleted successfully for webhook id - %s</info>', $deletedLogCount, $webHookId));
