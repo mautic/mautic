@@ -79,6 +79,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         $page->setAlias('preference-center');
         $page->setIsPreferenceCenter(true);
         $page->setContent($this->getPageContent());
+        $page->setCustomHtml($this->getPageContent());
         $page->setIsPublished(true);
         $this->em->persist($page);
 
