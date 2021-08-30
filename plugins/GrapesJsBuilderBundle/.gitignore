@@ -1,0 +1,10 @@
+.*
+!.babelrc
+!.eslintrc
+!.prettierignore
+!.prettierrc
+!.gitignore
+!.htaccess
+!.gitkeep
+!Assets/library/js/dist
+vendor/*

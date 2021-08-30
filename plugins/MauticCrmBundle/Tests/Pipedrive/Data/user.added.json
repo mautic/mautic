@@ -1,0 +1,46 @@
+{
+  "v": 1,
+  "matches_filters": null,
+  "meta": {
+    "v": 1,
+    "action": "added",
+    "object": "user",
+    "id": 2540581,
+    "company_id": 1734032,
+    "user_id": 2499712,
+    "host": "test.pipedrive.com",
+    "timestamp": 1495005013,
+    "timestamp_micro": 1495005013667300,
+    "permitted_user_ids": [
+      "*"
+    ],
+    "trans_pending": false,
+    "is_bulk_update": false
+  },
+  "retry": 0,
+  "current": [
+    {
+      "id": 2540581,
+      "name": "Mirek Marecki",
+      "default_currency": "PLN",
+      "locale": "en_US",
+      "lang": 1,
+      "email": "test_user@test.com",
+      "phone": null,
+      "activated": false,
+      "last_login": "0000-00-00 00:00:00",
+      "created": "2017-05-17 07:10:13",
+      "modified": "2017-05-17 07:10:13",
+      "signup_flow_variation": "invite",
+      "has_created_company": false,
+      "is_admin": 0,
+      "role_id": "1",
+      "timezone_name": "Europe/Berlin",
+      "active_flag": true,
+      "icon_url": null,
+      "is_you": false
+    }
+  ],
+  "previous": null,
+  "event": "added.user"
+}
