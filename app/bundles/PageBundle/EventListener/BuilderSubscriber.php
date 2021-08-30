@@ -386,9 +386,13 @@ class BuilderSubscriber implements EventSubscriberInterface
 
     public function onPageDisplay(Events\PageDisplayEvent $event)
     {
+        if (empty($content = $event->getContent())) {
+            return;
+        }
+
         $page    = $event->getPage();
         $params  = $event->getParams();
-        $content = $this->replaceCommonTokens($event->getContent(), $page);
+        $content = $this->replaceCommonTokens($content, $page);
 
         if ($page->getIsPreferenceCenter()) {
             $content = $this->handlePreferenceCenterReplacements($content, $params);
