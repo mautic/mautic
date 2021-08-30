@@ -10,7 +10,7 @@
  */
 $count = count($pages);
 
-if (empty($pages)) {
+if (0 === $count) {
     return '';
 }
 ?>
