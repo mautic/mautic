@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Helper;
 
 use Mautic\CoreBundle\Helper\CommandHelper;
+use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 
@@ -23,13 +24,15 @@ class CommandHelperTest extends MauticMysqlTestCase
 
     public function testRunCommandWithParam(): void
     {
-        $outPut = $this->commandHelper->runCommand('help', ['--version']);
-        Assert::assertStringContainsString('(kernel: app, env: test, debug: false)', $outPut);
+        $response = $this->commandHelper->runCommand('help', ['--version']);
+        Assert::assertSame(ExitCode::SUCCESS, $response->getStatusCode());
+        Assert::assertStringContainsString('(kernel: app, env: test, debug: false)', $response->getMessage());
     }
 
     public function testRunCommandWithoutParam(): void
     {
-        $outPut = $this->commandHelper->runCommand('list');
-        Assert::assertStringContainsString('doctrine:database:create', $outPut);
+        $response = $this->commandHelper->runCommand('list');
+        Assert::assertSame(ExitCode::SUCCESS, $response->getStatusCode());
+        Assert::assertStringContainsString('doctrine:database:create', $response->getMessage());
     }
 }

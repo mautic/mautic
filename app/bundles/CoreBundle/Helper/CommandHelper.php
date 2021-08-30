@@ -21,7 +21,7 @@ class CommandHelper
         $this->kernel = $kernel;
     }
 
-    public function runCommand(string $name, array $params = []): string
+    public function runCommand(string $name, array $params = []): CommandResponse
     {
         $params      = array_merge(['command' => $name], $params);
         $application = new Application($this->kernel);
@@ -29,8 +29,9 @@ class CommandHelper
 
         $input      = new ArrayInput($params);
         $output     = new BufferedOutput();
-        $application->run($input, $output);
+        $statusCode = $application->run($input, $output);
+        $message    = $output->fetch();
 
-        return $output->fetch();
+        return new CommandResponse($statusCode, $message);
     }
 }

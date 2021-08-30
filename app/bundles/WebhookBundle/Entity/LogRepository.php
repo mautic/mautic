@@ -18,6 +18,9 @@ class LogRepository extends CommonRepository
 {
     private const LOG_DELETE_BATCH_SIZE = 5000;
 
+    /**
+     * @return int[]
+     */
     public function getWebhooksBasedOnLogLimit(int $logMaxLimit): array
     {
         $qb = $this->_em->getConnection()->createQueryBuilder();
@@ -27,13 +30,59 @@ class LogRepository extends CommonRepository
             ->having('count(id) > :logMaxLimit')
             ->setParameter('logMaxLimit', $logMaxLimit);
 
-        return $qb->execute()->fetchAll();
+        return array_map(
+            function ($row) {
+                return (int) $row['webhook_id'];
+            },
+            $qb->execute()->fetchAll()
+        );
+    }
+
+    /**
+     * Retains a rolling number of log records for a webhook id.
+     *
+     * @depreacated use removeLimitExceedLogs() instead
+     *
+     * @param int $webhookId
+     * @param int $logMax    how many recent logs should remain, the rest will be deleted
+     *
+     * @return int
+     */
+    public function removeOldLogs($webhookId, $logMax)
+    {
+        // if the hook was deleted then return a count of 0
+        if (!$webhookId) {
+            return false;
+        }
+
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+
+        $count = $qb->select('count(id) as log_count')
+            ->from(MAUTIC_TABLE_PREFIX.'webhook_logs', $this->getTableAlias())
+            ->where('webhook_id = '.$webhookId)
+            ->execute()->fetch();
+
+        if ((int) $count['log_count'] >= (int) $logMax) {
+            $qb = $this->_em->getConnection()->createQueryBuilder();
+
+            $id = $qb->select('id')
+                ->from(MAUTIC_TABLE_PREFIX.'webhook_logs', $this->getTableAlias())
+                ->where('webhook_id = '.$webhookId)
+                ->orderBy('date_added', 'ASC')->setMaxResults(1)
+                ->execute()->fetch();
+
+            $qb = $this->_em->getConnection()->createQueryBuilder();
+
+            $qb->delete(MAUTIC_TABLE_PREFIX.'webhook_logs')
+                ->where($qb->expr()->in('id', $id))
+                ->execute();
+        }
     }
 
     /**
      * Retains a rolling number of log records for a webhook id.
      */
-    public function removeOldLogs(int $webHookId, int $logMax): int
+    public function removeLimitExceedLogs(int $webHookId, int $logMax): int
     {
         $deletedLogs   = 0;
         $table_name    = $this->getTableName();

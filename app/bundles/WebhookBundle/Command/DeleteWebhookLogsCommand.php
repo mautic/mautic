@@ -46,9 +46,8 @@ class DeleteWebhookLogsCommand extends Command
         if (empty($webHookIds)) {
             $output->writeln('<info>Webhooks does not exist with logs more than defined limit.</info>');
         }
-        foreach ($webHookIds as $webHook) {
-            $webHookId       = (int) $webHook['webhook_id'];
-            $deletedLogCount = $this->logRepository->removeOldLogs($webHookId, $logMaxLimit);
+        foreach ($webHookIds as $webHookId) {
+            $deletedLogCount = $this->logRepository->removeLimitExceedLogs($webHookId, $logMaxLimit);
             $output->writeln(sprintf('<info>%s logs deleted successfully for webhook id - %s</info>', $deletedLogCount, $webHookId));
         }
 
