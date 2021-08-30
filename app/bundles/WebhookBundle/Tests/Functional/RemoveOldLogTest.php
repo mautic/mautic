@@ -85,7 +85,7 @@ final class RemoveOldLogTest extends MauticMysqlTestCase
     public function testRemoveLogCommandForNoWebhook(): void
     {
         $output = $this->runCommand(DeleteWebhookLogsCommand::COMMAND_NAME);
-        Assert::assertStringContainsString('Webhooks does not exist with logs more than defined limit.', $output);
+        Assert::assertStringContainsString('There is 0 webhooks with logs more than defined limit.', $output);
     }
 
     private function assertLogs(Webhook $webhook, int $expectedCount, array $expectedIds): void
