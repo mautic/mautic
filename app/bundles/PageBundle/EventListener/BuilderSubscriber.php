@@ -631,10 +631,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         for ($i = 0; $i < $nodeList->length; ++$i) {
             $slot            = $nodeList->item($i);
             $slot->nodeValue = $tokenValue;
-
-            if (static::successmessage !== $tokenValue) {
-                $slot->setAttribute('data-prefs-center', '1');
-            }
+            $slot->setAttribute('data-prefs-center', '1');
         }
     }
 

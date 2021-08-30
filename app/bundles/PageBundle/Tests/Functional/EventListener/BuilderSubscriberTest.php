@@ -26,8 +26,6 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
             $lead  = $this->createLead()
         );
 
-        $this->em->flush();
-
         $unsubscribeUrl = $this->router->generate('mautic_email_unsubscribe', [
             'idHash'     => $emailStat->getTrackingHash(),
             'urlEmail'   => $lead->getEmail(),
@@ -37,8 +35,8 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         $crawler = $this->client->request('GET', $unsubscribeUrl);
         $form    = $crawler->filter(static::FORM_SELECTOR);
 
-        Assert::assertCount(1, $form->filter(static::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token. %s', $form->html()));
-        Assert::assertCount(1, $form->filter(static::SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $form->html()));
+        Assert::assertCount(1, $form->filter(static::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token. %s', $crawler->html()));
+        Assert::assertCount(1, $form->filter(static::SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $crawler->html()));
     }
 
     private function createStat(Email $email, Lead $lead): Stat
@@ -50,6 +48,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         $stat->setDateSent(new DateTime());
         $stat->setTrackingHash(uniqid());
         $this->em->persist($stat);
+        $this->em->flush();
 
         return $stat;
     }
