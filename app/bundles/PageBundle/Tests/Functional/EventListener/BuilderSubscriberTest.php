@@ -37,8 +37,8 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         $crawler = $this->client->request('GET', $unsubscribeUrl);
         $form    = $crawler->filter(static::FORM_SELECTOR);
 
-        Assert::assertCount(1, $form->filter(static::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token.', $form->html()));
-        Assert::assertCount(1, $form->filter(static::SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button.', $form->html()));
+        Assert::assertCount(1, $form->filter(static::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token. %s', $form->html()));
+        Assert::assertCount(1, $form->filter(static::SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $form->html()));
     }
 
     private function createStat(Email $email, Lead $lead): Stat
