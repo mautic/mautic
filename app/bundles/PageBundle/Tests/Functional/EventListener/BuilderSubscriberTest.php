@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class BuilderSubscriberTest extends AbstractMauticTestCase
 {
     const TOKEN_SELECTOR       = '#lead_contact_frequency_rules__token';
-    const SAVE_BUTTON_SELECTOR = '#lead_contact_frequency_rules_buttons_save';
+    const SAVE_BUTTON_SELECTOR = '.prefs-saveprefs';
     const FORM_SELECTOR        = 'form[name="lead_contact_frequency_rules"]';
 
     public function testOnPageDisplayCorrectlyWrapsAllFrequencyFormInputsIncludingTokenAndSaveButton(): void
