@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Helper;
 final class CommandResponse
 {
     /*
-     * int
+     * @var int
      */
     private $statusCode;
 
