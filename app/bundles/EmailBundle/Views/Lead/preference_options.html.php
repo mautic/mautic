@@ -107,41 +107,40 @@ JS;
                 else:
                     unset($form['lead_channels']['preferred_channel']);
                 endif; ?>
-                <?php if ($showContactSegments && count($form['lead_lists'])):?>
-                <hr />
-                <div id="contact-segments"> <div class="text-left"><?php echo  $view['form']->label($form['lead_lists']); ?></div>
-                    <?php
-                    foreach ($form['lead_lists'] as $key=>$leadList) {
-                        ?>
-                        <div id="segment-<?php echo $key; ?>" class="text-left">
-                            <?php echo $view['form']->widget($leadList); ?>
-                            <?php echo $view['form']->label($leadList); ?>
-                        </div>
-                    <?php
-                    }
 
-                    unset($form['lead_lists']);
-                    ?>
+                <?php if ($showContactSegments && count($form['lead_lists']->vars['choices'])):?>
+                    <hr />
+                    <div id="contact-segments"> <div class="text-left"><?php echo  $view['form']->label($form['lead_lists']); ?></div>
+                        <?php
+                        $segmentNumber = count($form['lead_lists']->vars['choices']);
+                        for ($i = ($segmentNumber - 1); $i >= 0; --$i): ?>
+                            <div id="segment-<?php echo $i; ?>" class="text-left">
+                                <?php echo $view['form']->widget($form['lead_lists'][$i]); ?>
+                                <?php echo $view['form']->label($form['lead_lists'][$i]); ?>
+                            </div>
+                        <?php
+                        endfor;
+                        unset($form['lead_lists']);
+                        ?>
                 </div>
                     <?php
                 else:
                     unset($form['lead_lists']);
                 endif; ?>
-                <?php if ($showContactCategories && count($form['global_categories'])):?>
-                <hr />
-                <div id="global-categories" class="text-left">
-                    <div><?php echo  $view['form']->label($form['global_categories']); ?></div>
-                    <?php $categoryNumber = count($form['global_categories']->vars['choices']);
-                    for ($i = ($categoryNumber - 1); $i >= 0; --$i): ?>
-                        <div id="category-<?php echo $i; ?>" class="text-left">
-                            <?php echo $view['form']->widget($form['global_categories'][$i]); ?>
-                            <?php echo $view['form']->label($form['global_categories'][$i]); ?>
-                        </div>
-                    <?php
-                    endfor;
-                    unset($form['global_categories']);
-                    ?>
-                </div>
+                <?php if ($showContactCategories && count($form['global_categories']->vars['choices'])):?>
+                    <hr />
+                    <div id="global-categories" class="text-left">
+                        <div><?php echo  $view['form']->label($form['global_categories']); ?></div>
+                        <?php $categoryNumber = count($form['global_categories']->vars['choices']);
+                        for ($i = ($categoryNumber - 1); $i >= 0; --$i): ?>
+                            <div id="category-<?php echo $i; ?>" class="text-left">
+                                <?php echo $view['form']->widget($form['global_categories'][$i]); ?>
+                                <?php echo $view['form']->label($form['global_categories'][$i]); ?>
+                            </div>
+                        <?php
+                        endfor;
+                        ?>
+                    </div>
                 <?php
                 else:
                     unset($form['global_categories']);
