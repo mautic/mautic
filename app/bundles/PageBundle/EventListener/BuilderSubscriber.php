@@ -443,16 +443,16 @@ class BuilderSubscriber implements EventSubscriberInterface
             ];
         }
 
-        $slotNamesAndTokenValues = [
-            'segmentlist'      => static::segmentListRegex,
-            'categorylist'     => static::categoryListRegex,
-            'preferredchannel' => static::preferredchannel,
-            'channelfrequency' => static::channelfrequency,
-            'saveprefsbutton'  => static::saveprefsRegex,
+        $slotNamesAndConfig = [
+            'segmentlist'      => [static::segmentListRegex, (bool) $params['showContactSegments']],
+            'categorylist'     => [static::categoryListRegex, (bool) $params['showContactCategories']],
+            'preferredchannel' => [static::preferredchannel, (bool) $params['showContactPreferredChannels']],
+            'channelfrequency' => [static::channelfrequency, (bool) ($params['showContactFrequency'] || $params['showContactPauseDates'])],
+            'saveprefsbutton'  => [static::saveprefsRegex, true],
         ];
 
-        foreach ($slotNamesAndTokenValues as $slotName => $tokenValue) {
-            $this->setSlotContentToTokenForReplacement($xpath, $slotName, $tokenValue);
+        foreach ($slotNamesAndConfig as $slotName => list($tokenValue, $shouldShow)) {
+            $this->setSlotContentToTokenForReplacement($xpath, $slotName, $tokenValue, $shouldShow);
         }
 
         $content = $this->replacePreferenceCenterTokens($xpath->document->saveHTML(), $params);
@@ -624,14 +624,18 @@ class BuilderSubscriber implements EventSubscriberInterface
         ];
     }
 
-    private function setSlotContentToTokenForReplacement(DOMXPath $xpath, string $slotName, string $tokenValue): void
+    private function setSlotContentToTokenForReplacement(DOMXPath $xpath, string $slotName, string $tokenValue, bool $shouldShow): void
     {
         $nodeList = $xpath->query(sprintf('//*[@data-slot="%s"]', $slotName));
 
-        for ($i = 0; $i < $nodeList->length; ++$i) {
-            $slot            = $nodeList->item($i);
-            $slot->nodeValue = $tokenValue;
-            $slot->setAttribute('data-prefs-center', '1');
+        /** @var DOMElement $node */
+        foreach ($nodeList as $node) {
+            if ($shouldShow) {
+                $node->nodeValue = $tokenValue;
+                $node->setAttribute('data-prefs-center', '1');
+            } else {
+                $node->parentNode->removeChild($node);
+            }
         }
     }
 

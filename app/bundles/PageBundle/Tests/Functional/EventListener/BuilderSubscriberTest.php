@@ -5,30 +5,56 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Functional\EventListener;
 
 use DateTime;
+use Generator;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList as Segment;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class BuilderSubscriberTest extends AbstractMauticTestCase
 {
-    const TOKEN_SELECTOR       = '#lead_contact_frequency_rules__token';
-    const SAVE_BUTTON_SELECTOR = '.prefs-saveprefs';
-    const FORM_SELECTOR        = 'form[name="lead_contact_frequency_rules"]';
+    // Custom preference center page
+    const CUSTOM_SEGMENT_SELECTOR           = '.pref-segmentlist';
+    const CUSTOM_CATEGORY_SELECTOR          = '.pref-categorylist';
+    const CUSTOM_PREFERRED_CHANNEL_SELECTOR = '.pref-preferredchannel';
+    const CUSTOM_CHANNEL_FREQ_SELECTOR      = '.pref-channelfrequency';
+    const CUSTOM_SAVE_BUTTON_SELECTOR       = '.prefs-saveprefs';
 
-    protected $configParams = [
-        'show_contact_preferences' => 1,
-    ];
+    // Default preference center page
+    const DEFAULT_SEGMENT_SELECTOR           = '#contact-segments';
+    const DEFAULT_CATEGORY_SELECTOR          = '#global-categories';
+    const DEFAULT_PREFERRED_CHANNEL_SELECTOR = '#preferred_channel';
+    const DEFAULT_CHANNEL_FREQ_SELECTOR      = '[data-contact-frequency="1"]';
+    const DEFAULT_PAUSE_DATES_SELECTOR       = '[data-contact-pause-dates="1"]';
+    const DEFAULT_SAVE_BUTTON_SELECTOR       = '#lead_contact_frequency_rules_buttons_save';
 
-    public function testOnPageDisplayCorrectlyWrapsAllFrequencyFormInputsIncludingTokenAndSaveButton(): void
+    // Common to both custom and default
+    const TOKEN_SELECTOR = '#lead_contact_frequency_rules__token';
+    const FORM_SELECTOR  = 'form[name="lead_contact_frequency_rules"]';
+
+    /**
+     * Tests both the default and custom preference center pages.
+     *
+     * @dataProvider frequencyFormRenderingDataProvider
+     */
+    public function testUnsubscribeFormRendersPreferenceCenterPageCorrectly(array $configParams, array $selectorsAndExpectedCounts, bool $hasPreferenceCenter): void
     {
+        $this->setUpSymfony(array_merge(['show_contact_preferences' => 1], $configParams));
+
         $emailStat = $this->createStat(
-            $email = $this->createEmail(),
-            $lead  = $this->createLead()
+            $this->createEmail($hasPreferenceCenter),
+            $lead = $this->createLead()
         );
+
+        $this->createSegment();
+        $this->createCategory();
+
+        $this->em->flush();
 
         $unsubscribeUrl = $this->router->generate('mautic_email_unsubscribe', [
             'idHash'     => $emailStat->getTrackingHash(),
@@ -38,9 +64,256 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
 
         $crawler = $this->client->request('GET', $unsubscribeUrl);
         $form    = $crawler->filter(static::FORM_SELECTOR);
+        $html    = $form->html();
 
-        Assert::assertCount(1, $form->filter(static::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token. %s', $crawler->html()));
-        Assert::assertCount(1, $form->filter(static::SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $crawler->html()));
+        foreach ($selectorsAndExpectedCounts as $selector => $expectedCount) {
+            $message = sprintf(
+                'The form HTML %s not contain the %s section. %s',
+                0 === $expectedCount ? 'should' : 'does',
+                $selector,
+                $html
+            );
+
+            Assert::assertCount(
+                $expectedCount,
+                $form->filter($selector),
+                $message
+            );
+        }
+
+        // Ensure the token and save button are always included within the <form> tag
+        Assert::assertCount(1, $form->filter(static::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token. %s', $html));
+
+        if ($hasPreferenceCenter) {
+            Assert::assertCount(1, $form->filter(static::CUSTOM_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
+        } else {
+            Assert::assertCount(1, $form->filter(static::DEFAULT_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
+        }
+    }
+
+    public function frequencyFormRenderingDataProvider(): Generator
+    {
+        // Custom Preference Center: All preferences enabled
+        yield [
+            [
+                'show_contact_segments'           => 1,
+                'show_contact_categories'         => 1,
+                'show_contact_preferred_channels' => 1,
+                'show_contact_frequency'          => 1,
+                'show_contact_pause_dates'        => 1,
+            ],
+            [
+                static::CUSTOM_SEGMENT_SELECTOR           => 1, // determined by show_contact_segments
+                static::CUSTOM_CATEGORY_SELECTOR          => 1, // determined by show_contact_categories
+                static::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 1, // determined by show_contact_preferred_channels
+                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 1, // determined by EITHER show_contact_frequency & show_contact_pause_dates
+            ],
+            true,
+        ];
+
+        // Custom Preference Center: Segments & Categories disabled
+        yield [
+            [
+                'show_contact_segments'           => 0,
+                'show_contact_categories'         => 0,
+                'show_contact_preferred_channels' => 1,
+                'show_contact_frequency'          => 1,
+                'show_contact_pause_dates'        => 1,
+            ],
+            [
+                static::CUSTOM_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                static::CUSTOM_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                static::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 1, // determined by show_contact_preferred_channels
+                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 1, // determined by EITHER show_contact_frequency & show_contact_pause_dates
+            ],
+            true,
+        ];
+
+        // Custom Preference Center: Preferred Channels & Frequency disabled
+        yield [
+            [
+                'show_contact_segments'           => 1,
+                'show_contact_categories'         => 1,
+                'show_contact_preferred_channels' => 0,
+                'show_contact_frequency'          => 0,
+                'show_contact_pause_dates'        => 0,
+            ],
+            [
+                static::CUSTOM_SEGMENT_SELECTOR           => 1, // determined by show_contact_segments
+                static::CUSTOM_CATEGORY_SELECTOR          => 1, // determined by show_contact_categories
+                static::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 0, // determined by EITHER show_contact_frequency & show_contact_pause_dates
+            ],
+            true,
+        ];
+
+        // Custom Preference Center: Frequency enabled & Pause Dates disabled
+        yield [
+            [
+                'show_contact_segments'           => 0,
+                'show_contact_categories'         => 0,
+                'show_contact_preferred_channels' => 0,
+                'show_contact_frequency'          => 1,
+                'show_contact_pause_dates'        => 0,
+            ],
+            [
+                static::CUSTOM_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                static::CUSTOM_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                static::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 1, // determined by EITHER show_contact_frequency & show_contact_pause_dates
+            ],
+            true,
+        ];
+
+        // Custom Preference Center: Frequency disabled & Pause Dates enabled
+        yield [
+            [
+                'show_contact_segments'           => 0,
+                'show_contact_categories'         => 0,
+                'show_contact_preferred_channels' => 0,
+                'show_contact_frequency'          => 0,
+                'show_contact_pause_dates'        => 1,
+            ],
+            [
+                static::CUSTOM_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                static::CUSTOM_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                static::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 1, // determined by EITHER show_contact_frequency & show_contact_pause_dates
+            ],
+            true,
+        ];
+
+        // Custom Preference Center: All preferences disabled
+        yield [
+            [
+                'show_contact_segments'           => 0,
+                'show_contact_categories'         => 0,
+                'show_contact_preferred_channels' => 0,
+                'show_contact_frequency'          => 0,
+                'show_contact_pause_dates'        => 0,
+            ],
+            [
+                static::CUSTOM_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                static::CUSTOM_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                static::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 0, // determined by EITHER show_contact_frequency & show_contact_pause_dates
+            ],
+            true,
+        ];
+
+        // Default Preference Center: All preferences enabled
+        yield [
+            [
+                'show_contact_segments'           => 1,
+                'show_contact_categories'         => 1,
+                'show_contact_preferred_channels' => 1,
+                'show_contact_frequency'          => 1,
+                'show_contact_pause_dates'        => 1,
+            ],
+            [
+                static::DEFAULT_SEGMENT_SELECTOR           => 1, // determined by show_contact_segments
+                static::DEFAULT_CATEGORY_SELECTOR          => 1, // determined by show_contact_categories
+                static::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 1, // determined by show_contact_preferred_channels
+                static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 1, // determined by show_contact_frequency. This differs from a custom page.
+                static::DEFAULT_PAUSE_DATES_SELECTOR       => 1, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
+            ],
+            false,
+        ];
+
+        // Default Preference Center: Segments & Categories disabled
+        yield [
+            [
+                'show_contact_segments'           => 0,
+                'show_contact_categories'         => 0,
+                'show_contact_preferred_channels' => 1,
+                'show_contact_frequency'          => 1,
+                'show_contact_pause_dates'        => 1,
+            ],
+            [
+                static::DEFAULT_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                static::DEFAULT_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                static::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 1, // determined by show_contact_preferred_channels
+                static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 1, // determined by show_contact_frequency. This differs from a custom page.
+                static::DEFAULT_PAUSE_DATES_SELECTOR       => 1, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
+            ],
+            false,
+        ];
+
+        // Default Preference Center: Preferred Channels & Frequency disabled
+        yield [
+            [
+                'show_contact_segments'           => 1,
+                'show_contact_categories'         => 1,
+                'show_contact_preferred_channels' => 0,
+                'show_contact_frequency'          => 0,
+                'show_contact_pause_dates'        => 0,
+            ],
+            [
+                static::DEFAULT_SEGMENT_SELECTOR           => 1, // determined by show_contact_segments
+                static::DEFAULT_CATEGORY_SELECTOR          => 1, // determined by show_contact_categories
+                static::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency. This differs from a custom page.
+                static::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
+            ],
+            false,
+        ];
+
+        // Default Preference Center: Frequency enabled & Pause Dates disabled
+        yield [
+            [
+                'show_contact_segments'           => 0,
+                'show_contact_categories'         => 0,
+                'show_contact_preferred_channels' => 0,
+                'show_contact_frequency'          => 1,
+                'show_contact_pause_dates'        => 0,
+            ],
+            [
+                static::DEFAULT_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                static::DEFAULT_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                static::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 1, // determined by show_contact_frequency. This differs from a custom page.
+                static::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
+            ],
+            false,
+        ];
+
+        // Default Preference Center: Frequency disabled & Pause Dates enabled
+        yield [
+            [
+                'show_contact_segments'           => 0,
+                'show_contact_categories'         => 0,
+                'show_contact_preferred_channels' => 0,
+                'show_contact_frequency'          => 0,
+                'show_contact_pause_dates'        => 1,
+            ],
+            [
+                static::DEFAULT_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                static::DEFAULT_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                static::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency. This differs from a custom page.
+                static::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
+            ],
+            false,
+        ];
+
+        // Default Preference Center: All preferences disabled
+        yield [
+            [
+                'show_contact_segments'           => 0,
+                'show_contact_categories'         => 0,
+                'show_contact_preferred_channels' => 0,
+                'show_contact_frequency'          => 0,
+                'show_contact_pause_dates'        => 0,
+            ],
+            [
+                static::DEFAULT_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                static::DEFAULT_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                static::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency. This differs from a custom page.
+                static::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
+            ],
+            false,
+        ];
     }
 
     private function createStat(Email $email, Lead $lead): Stat
@@ -52,16 +325,19 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         $stat->setDateSent(new DateTime());
         $stat->setTrackingHash(uniqid());
         $this->em->persist($stat);
-        $this->em->flush();
 
         return $stat;
     }
 
-    private function createEmail(): Email
+    private function createEmail(bool $hasPreferenceCenter = true): Email
     {
         $email = new Email();
         $email->setName('Example');
-        $email->setPreferenceCenter($this->createPage());
+
+        if ($hasPreferenceCenter) {
+            $email->setPreferenceCenter($this->createPage());
+        }
+
         $this->em->persist($email);
 
         return $email;
@@ -74,6 +350,29 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         $this->em->persist($lead);
 
         return $lead;
+    }
+
+    private function createSegment(): Segment
+    {
+        $segment = new Segment();
+        $segment->setName('My Segment');
+        $segment->setAlias('my-segment');
+        $segment->setIsPreferenceCenter(true);
+        $this->em->persist($segment);
+
+        return $segment;
+    }
+
+    private function createCategory(): Category
+    {
+        $category = new Category();
+        $category->setTitle('My Category');
+        $category->setAlias('my-category');
+        $category->setIsPublished(true);
+        $category->setBundle('global');
+        $this->em->persist($category);
+
+        return $category;
     }
 
     private function createPage(): Page

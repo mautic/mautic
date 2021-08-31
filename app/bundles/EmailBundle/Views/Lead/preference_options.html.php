@@ -72,7 +72,7 @@ JS;
                             <div id="frequency_<?php echo $channel->value; ?>" class="text-left row">
                                 <?php
                                 if ($showContactFrequency):?>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6" data-contact-frequency="1">
                                         <label class="text-muted"><?php echo $view['translator']->trans($form['lead_channels']['frequency_number_'.$channel->value]->vars['label']); ?></label>
                                         <?php echo $view['form']->widget($form['lead_channels']['frequency_number_'.$channel->value]); ?>
                                         <?php echo $view['form']->label($form['lead_channels']['frequency_time_'.$channel->value]); ?>
@@ -83,7 +83,7 @@ JS;
                                     unset($form['lead_channels']['frequency_number_'.$channel->value]);
                                 endif; ?>
                                 <?php if ($showContactPauseDates):?>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6" data-contact-pause-dates="1">
                                         <label class="text-muted"><?php echo $view['translator']->trans('mautic.lead.frequency.dates.label'); ?></label>
                                         <?php echo $view['form']->widget($form['lead_channels']['contact_pause_start_date_'.$channel->value]); ?>
                                         <?php echo $view['form']->label($form['lead_channels']['contact_pause_end_date_'.$channel->value]); ?>
