@@ -424,11 +424,11 @@ class BuilderSubscriber implements EventSubscriberInterface
             static::descriptionRegex,
             static::successmessage,
         ], [
-            $this->renderLanguageBar($page),
-            $this->renderSocialShareButtons(),
-            $page->getTitle(),
-            $page->getMetaDescription(),
-            $this->renderSuccessMessage(),
+            false !== strpos($content, static::langBarRegex) ? $this->renderLanguageBar($page) : '',
+            false !== strpos($content, static::shareButtonsRegex) ? $this->renderSocialShareButtons() : '',
+            false !== strpos($content, static::titleRegex) ? $page->getTitle() : '',
+            false !== strpos($content, static::descriptionRegex) ? $page->getMetaDescription() : '',
+            false !== strpos($content, static::successmessage) ? $this->renderSuccessMessage() : '',
         ], $content);
     }
 
@@ -469,11 +469,11 @@ class BuilderSubscriber implements EventSubscriberInterface
             static::channelfrequency,
             static::saveprefsRegex,
         ], [
-            $this->renderSegmentList($params),
-            $this->renderCategoryList($params),
-            $this->renderPreferredChannel($params),
-            $this->renderChannelFrequency($params),
-            $this->renderSavePrefs($params),
+            false !== strpos($content, static::segmentListRegex) ? $this->renderSegmentList($params) : '',
+            false !== strpos($content, static::categoryListRegex) ? $this->renderCategoryList($params) : '',
+            false !== strpos($content, static::preferredchannel) ? $this->renderPreferredChannel($params) : '',
+            false !== strpos($content, static::channelfrequency) ? $this->renderChannelFrequency($params) : '',
+            false !== strpos($content, static::saveprefsRegex) ? $this->renderSavePrefs($params) : '',
         ], $content);
     }
 

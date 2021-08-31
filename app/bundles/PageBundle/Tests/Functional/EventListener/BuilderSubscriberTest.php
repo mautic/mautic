@@ -97,13 +97,30 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
     <title>{pagetitle}</title>
+    <meta name="description" content="{pagemetadescription}">
 </head>
 <body>
     <div>
-        <div data-slot="channelfrequency"></div>
+        {langbar}
+        {sharebuttons}
     </div>
     <div>
-        <div data-slot="saveprefsbutton"></div>
+        {successmessage}
+        <div>
+            <div data-slot="segmentlist"></div>
+        </div>
+        <div>
+            <div data-slot="categorylist"></div>
+        </div>
+        <div>
+            <div data-slot="preferredchannel"></div>
+        </div>
+        <div>
+            <div data-slot="channelfrequency"></div>
+        </div>
+        <div>
+            <div data-slot="saveprefsbutton"></div>
+        </div>
     </div>
 </body>
 </html>
