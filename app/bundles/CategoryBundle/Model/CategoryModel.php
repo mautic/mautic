@@ -23,6 +23,11 @@ class CategoryModel extends FormModel
     protected $requestStack;
 
     /**
+     * @var array
+     */
+    private $categoriesByBundleCache = [];
+
+    /**
      * CategoryModel constructor.
      */
     public function __construct(RequestStack $requestStack)
@@ -187,13 +192,12 @@ class CategoryModel extends FormModel
      */
     public function getLookupResults($bundle, $filter = '', $limit = 10)
     {
-        static $results = [];
-
         $key = $bundle.$filter.$limit;
-        if (!isset($results[$key])) {
-            $results[$key] = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
+
+        if (!empty($this->categoriesByBundleCache[$key])) {
+            return $this->categoriesByBundleCache[$key];
         }
 
-        return $results[$key];
+        return $this->categoriesByBundleCache[$key] = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
     }
 }
