@@ -172,7 +172,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $step       = $this->createMock(StepInterface::class);
         $clearCache = false;
 
-        $messages = true;
+        $messages = [];
 
         $step->expects($this->once())
             ->method('update')
@@ -196,7 +196,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $step       = $this->createMock(StepInterface::class);
         $clearCache = true;
 
-        $messages = true;
+        $messages = [];
 
         $step->expects($this->once())
             ->method('update')
@@ -257,6 +257,24 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             'user'   => 'mautic',
         ];
 
-        $this->assertEquals(true, $this->installer->validateDatabaseParams($dbParams));
+        $this->assertEquals([], $this->installer->validateDatabaseParams($dbParams));
+    }
+
+    /**
+     * When an exception is raised while creating a database, there must be an array returned.
+     */
+    public function testCreateDatabaseStepWithErrors(): void
+    {
+        $dbParams = [
+            'driver'       => 'pdo_mysql',
+            'host'         => 'localhost',
+            'port'         => '3306',
+            'name'         => 'mautic',
+            'user'         => 'mautic',
+            'table_prefix' => 'mautic_',
+        ];
+
+        $step = $this->createMock(StepInterface::class);
+        $this->assertEquals(['error' => null], $this->installer->createDatabaseStep($step, $dbParams));
     }
 }
