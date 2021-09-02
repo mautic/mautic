@@ -90,11 +90,13 @@ class BuilderSubscriber implements EventSubscriberInterface
         return [
             EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
             EmailEvents::EMAIL_ON_SEND  => [
+                ['fixAccessibilityEmail', 0],
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
                 ['convertUrlsToTokens', -9999],
             ],
             EmailEvents::EMAIL_ON_DISPLAY => [
+                ['fixAccessibilityEmail', 0],
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
                 ['convertUrlsToTokens', -9999],
@@ -249,6 +251,36 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
+    public function fixAccessibilityEmail(EmailSendEvent $event)
+    {
+        if ($event->isDynamicContentParsing()) {
+            // prevent a loop
+            return;
+        }
+        $content = $event->getContent();
+        $content = preg_replace_callback(
+                "/<title>(.*?)<\/title>/is",
+                function ($matches) {
+                    if (empty(trim($matches[1]))) {
+                        return '<title>{subject}</title>';
+                    }
+
+                    return $matches[0];
+                },
+                $content,
+                -1,
+                $fixedCount
+            );
+
+        if ($fixedCount) {
+            $content = str_replace('</head>', '<title>{subject}</title></head>', $content);
+        }
+
+        $content = str_replace('<html ', '<html lang="'.$event->getEmail()->getLanguage().'" ', $content);
+
+        $event->setContent($content);
+    }
+
     public function onEmailGenerate(EmailSendEvent $event)
     {
         $idHash = $event->getIdHash();
@@ -289,6 +321,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
         $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
+        $event->addToken('{lang}', $email->getLanguage());
     }
 
     /**
