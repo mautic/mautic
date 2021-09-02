@@ -90,13 +90,13 @@ class BuilderSubscriber implements EventSubscriberInterface
         return [
             EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
             EmailEvents::EMAIL_ON_SEND  => [
-                ['fixAccessibilityEmail', 0],
+                ['fixEmailAccessibility', 0],
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
                 ['convertUrlsToTokens', -9999],
             ],
             EmailEvents::EMAIL_ON_DISPLAY => [
-                ['fixAccessibilityEmail', 0],
+                ['fixEmailAccessibility', 0],
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
                 ['convertUrlsToTokens', -9999],
@@ -251,7 +251,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function fixAccessibilityEmail(EmailSendEvent $event)
+    public function fixEmailAccessibility(EmailSendEvent $event)
     {
         if ($event->isDynamicContentParsing()) {
             // prevent a loop
@@ -269,14 +269,19 @@ class BuilderSubscriber implements EventSubscriberInterface
                 },
                 $content,
                 -1,
-                $fixedCount
+                $fixed
             );
 
-        if ($fixedCount) {
+        if (!$fixed) {
             $content = str_replace('</head>', '<title>{subject}</title></head>', $content);
         }
 
-        $content = str_replace('<html ', '<html lang="'.$event->getEmail()->getLanguage().'" ', $content);
+        if ($event->getEmail()) {
+            preg_match_all("~<html.*lang\s*=\s*[\"']([^\"']+)[\"'][^>]*>~i", $content, $matches);
+            if (empty($matches[1])) {
+                $content = str_replace('<html', '<html lang="'.$event->getEmail()->getLanguage().'"', $content);
+            }
+        }
 
         $event->setContent($content);
     }
