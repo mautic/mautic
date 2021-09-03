@@ -92,7 +92,7 @@ class LogRepository extends CommonRepository
             ->select('id')
             ->from($table_name)
             ->where('webhook_id = '.$webHookId)
-            ->orderBy('date_added', 'DESC')
+            ->orderBy('id', 'DESC')
             ->setMaxResults(1)
             ->setFirstResult($logMax) // if log max limit is 1000 then it will fetch id of 1001'th record from last and we will delete all log which have id less than or equal to this id.
             ->execute()->fetchColumn();

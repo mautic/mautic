@@ -25,7 +25,7 @@ class CommandHelperTest extends MauticMysqlTestCase
     {
         $response = $this->commandHelper->runCommand('help', ['--version']);
         Assert::assertSame(0, $response->getStatusCode());
-        Assert::assertStringContainsString('(kernel: app, env: test, debug: false)', $response->getMessage());
+        Assert::assertStringContainsString('(env: test, debug: false)', $response->getMessage());
     }
 
     public function testRunCommandWithoutParam(): void
