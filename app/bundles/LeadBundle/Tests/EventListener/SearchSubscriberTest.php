@@ -153,7 +153,7 @@ class SearchSubscriberTest extends TestCase
         $event = new LeadBuildSearchEvent('1', 'import_id', $alias, false, new QueryBuilder($connection));
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
-        $this->assertEquals('SELECT  WHERE lel.object_id = ? GROUP BY l.id', $sql);
+        $this->assertEquals('SELECT  WHERE (lel.object_id = ?) AND (lel.object = ?) GROUP BY l.id', $sql);
 
         // test import action
         $event = new LeadBuildSearchEvent('1', 'import_action', $alias, false, new QueryBuilder($connection));
