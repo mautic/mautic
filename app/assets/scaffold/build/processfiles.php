@@ -133,9 +133,6 @@ system('rm -f vendor/twig/twig/README.rst');
 // webfactory/exceptions-bundle
 system('rm -rf vendor/webfactory/exceptions-bundle/Resources/doc');
 
-// willdurand/oauth-server-bundle
-system('rm -rf vendor/willdurand/oauth-server-bundle/Resources/doc');
-
 // Delete random files
 system('find . -type f -name phpunit.xml -exec rm -f {} \\;');
 system('find . -type f -name phpunit.xml.dist -exec rm -f {} \\;');

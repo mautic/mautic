@@ -122,12 +122,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'CS Fixer']
+        commands: ['PHPSTAN', 'CS Fixer', 'Rector']
 
     name: ${{ matrix.commands }}
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Get changed files
       id: changed-files

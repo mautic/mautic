@@ -521,6 +521,40 @@ class FormModel extends CommonFormModel
             return ($a->getOrder() < $b->getOrder()) ? -1 : 1;
         });
 
+        [$pages, $lastPage] = $this->getPages($fields);
+        $html               = $this->templatingHelper->getTemplating()->render(
+            $theme.'MauticFormBundle:Builder:form.html.php',
+            [
+                'fieldSettings'  => $this->getCustomComponents()['fields'],
+                'viewOnlyFields' => $this->getCustomComponents()['viewOnlyFields'],
+                'fields'         => $fields,
+                'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
+                'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'form'           => $entity,
+                'theme'          => $theme,
+                'submissions'    => $submissions,
+                'lead'           => $lead,
+                'formPages'      => $pages,
+                'lastFormPage'   => $lastPage,
+                'style'          => $style,
+                'inBuilder'      => false,
+            ]
+        );
+
+        if (!$entity->usesProgressiveProfiling()) {
+            $entity->setCachedHtml($html);
+
+            if ($persist) {
+                //bypass model function as events aren't needed for this
+                $this->getRepository()->saveEntity($entity);
+            }
+        }
+
+        return $html;
+    }
+
+    public function getPages(array $fields): array
+    {
         $pages = ['open' => [], 'close' => []];
 
         $openFieldId  =
@@ -560,35 +594,7 @@ class FormModel extends CommonFormModel
             }
         }
 
-        $html = $this->templatingHelper->getTemplating()->render(
-            $theme.'MauticFormBundle:Builder:form.html.php',
-            [
-                'fieldSettings'  => $this->getCustomComponents()['fields'],
-                'viewOnlyFields' => $this->getCustomComponents()['viewOnlyFields'],
-                'fields'         => $fields,
-                'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
-                'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
-                'form'           => $entity,
-                'theme'          => $theme,
-                'submissions'    => $submissions,
-                'lead'           => $lead,
-                'formPages'      => $pages,
-                'lastFormPage'   => $lastPage,
-                'style'          => $style,
-                'inBuilder'      => false,
-            ]
-        );
-
-        if (!$entity->usesProgressiveProfiling()) {
-            $entity->setCachedHtml($html);
-
-            if ($persist) {
-                //bypass model function as events aren't needed for this
-                $this->getRepository()->saveEntity($entity);
-            }
-        }
-
-        return $html;
+        return [$pages, $lastPage];
     }
 
     /**
