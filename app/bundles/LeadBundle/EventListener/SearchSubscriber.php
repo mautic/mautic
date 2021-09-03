@@ -310,6 +310,9 @@ class SearchSubscriber implements EventSubscriberInterface
 
         $config = [
             'column' => 'lel.object_id',
+            'params' => [
+                'lel.object' => 'import',
+            ],
         ];
 
         $this->buildJoinQuery($event, $tables, $config);
