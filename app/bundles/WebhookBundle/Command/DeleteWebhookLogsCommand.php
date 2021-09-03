@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\WebhookBundle\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\Console\Command\Command;
@@ -51,6 +50,6 @@ class DeleteWebhookLogsCommand extends Command
             $output->writeln(sprintf('<info>%s logs deleted successfully for webhook id - %s</info>', $deletedLogCount, $webHookId));
         }
 
-        return ExitCode::SUCCESS;
+        return 0;
     }
 }
