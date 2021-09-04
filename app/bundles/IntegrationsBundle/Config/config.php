@@ -156,6 +156,7 @@ return [
                     'mautic.lead.model.company',
                     'mautic.lead.repository.company',
                     'doctrine.dbal.default_connection',
+                    'mautic.lead.model.field',
                 ],
             ],
             'mautic.integrations.sync.data_exchange.mautic.order_executioner' => [

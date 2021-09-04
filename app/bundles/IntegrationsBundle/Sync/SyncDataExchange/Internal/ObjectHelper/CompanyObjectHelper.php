@@ -8,19 +8,33 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\FieldModel;
 
 class CompanyObjectHelper implements ObjectHelperInterface
 {
+    /**
+     * @var array
+     */
+    private $uniqueIdentifierFields;
+
+    /**
+     * @var array
+     */
+    private $companiesCreated = [];
+
     public function __construct(
         private CompanyModel $model,
         private CompanyRepository $repository,
-        private Connection $connection
+        private Connection $connection,
+        private FieldModel $fieldModel
     ) {
     }
 
@@ -33,15 +47,14 @@ class CompanyObjectHelper implements ObjectHelperInterface
     {
         $objectMappings = [];
         foreach ($objects as $object) {
-            $company = new Company();
             $fields  = $object->getFields();
+            $company = $this->getCompanyEntity($fields);
 
             foreach ($fields as $field) {
                 $company->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
             }
 
             $this->model->saveEntity($company);
-            $this->repository->detachEntity($company);
 
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
@@ -61,6 +74,14 @@ class CompanyObjectHelper implements ObjectHelperInterface
                 ->setInternalObjectId($company->getId());
             $objectMappings[] = $objectMapping;
         }
+
+        // Detach to free RAM after all companies are processed in case there are duplicates in the same batch
+        foreach ($this->companiesCreated as $company) {
+            $this->repository->detachEntity($company);
+        }
+
+        // Reset companies created for the next batch
+        $this->companiesCreated = [];
 
         return $objectMappings;
     }
@@ -209,5 +230,41 @@ class CompanyObjectHelper implements ObjectHelperInterface
     public function setFieldValues(Company $company): void
     {
         $this->model->setFieldValues($company, []);
+    }
+
+    private function getUniqueIdentifierFields(): array
+    {
+        if (null === $this->uniqueIdentifierFields) {
+            $uniqueIdentifierFields       = $this->fieldModel->getUniqueIdentifierFields(['object' => MauticSyncDataExchange::OBJECT_COMPANY]);
+            $this->uniqueIdentifierFields = array_keys($uniqueIdentifierFields);
+        }
+
+        return $this->uniqueIdentifierFields;
+    }
+
+    /**
+     * @var FieldDAO[] $fields
+     */
+    private function getCompanyEntity(array $fields): Company
+    {
+        $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
+
+        // Create a key based on the concatenation of unique identifier values
+        $companyKey = '';
+        foreach ($uniqueIdentifierFields as $uniqueIdentifierField) {
+            if (isset($fields[$uniqueIdentifierField])) {
+                $companyKey .= strtolower($fields[$uniqueIdentifierField]->getValue()->getNormalizedValue());
+            }
+        }
+
+        // Check if a company with matching values was created in the same batch as another
+        if (!empty($companyKey) && isset($this->companiesCreated[$companyKey])) {
+            return $this->companiesCreated[$companyKey];
+        }
+
+        // Create a new company but ensure a unique key
+        $companyKey = $companyKey ?: uniqid();
+
+        return $this->companiesCreated[$companyKey] = new Company();
     }
 }
