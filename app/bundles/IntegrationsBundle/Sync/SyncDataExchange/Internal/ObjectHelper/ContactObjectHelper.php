@@ -364,7 +364,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * @var FieldDAO[] $fields
+     * @var FieldDAO[]
      */
     private function getContactEntity(array $fields): Lead
     {

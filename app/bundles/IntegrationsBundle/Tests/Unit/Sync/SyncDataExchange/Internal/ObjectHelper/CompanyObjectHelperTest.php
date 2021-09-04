@@ -43,7 +43,7 @@ class CompanyObjectHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->model = $this->createMock(CompanyModel::class);
+        $this->model      = $this->createMock(CompanyModel::class);
         $this->repository = $this->createMock(CompanyRepository::class);
         $this->connection = $this->createMock(Connection::class);
         $this->fieldModel = $this->createMock(FieldModel::class);

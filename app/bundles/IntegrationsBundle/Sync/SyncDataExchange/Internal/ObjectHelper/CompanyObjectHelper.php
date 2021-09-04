@@ -243,7 +243,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * @var FieldDAO[] $fields
+     * @var FieldDAO[]
      */
     private function getCompanyEntity(array $fields): Company
     {
