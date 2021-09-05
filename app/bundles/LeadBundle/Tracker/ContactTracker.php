@@ -301,7 +301,7 @@ class ContactTracker
             return $this->createNewContact($ip, false);
         }
 
-        if ($this->coreParametersHelper->get('track_contact_by_ip') && ! $this->coreParametersHelper->get('anonymize_ip')) {
+        if ($this->coreParametersHelper->get('track_contact_by_ip') && !$this->coreParametersHelper->get('anonymize_ip')) {
             /** @var Lead[] $leads */
             $leads = $this->leadRepository->getLeadsByIp($ip->getIpAddress());
             if (count($leads)) {
