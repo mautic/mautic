@@ -273,7 +273,7 @@ class HitRepository extends CommonRepository
         }
         $result = $sq->execute()->fetch();
 
-        if ($result == false) {
+        if (false == $result) {
             return $result;
         }
 

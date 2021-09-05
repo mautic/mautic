@@ -87,7 +87,6 @@ class PointActionHelper
         $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC, 'second_to_last' => $eventDetails->getId()]);
 
         if (false != $latestHit) {
-
             if ($action['properties']['accumulative_time']) {
                 if (!isset($hitStats)) {
                     $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
@@ -127,7 +126,6 @@ class PointActionHelper
                     $changePoints['returns_after'] = false;
                 }
             }
-
         }
 
         // return true only if all configured options are true
