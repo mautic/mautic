@@ -1180,6 +1180,7 @@ return [
                 'class'     => \Mautic\LeadBundle\Services\SegmentDependencyTreeFactory::class,
                 'arguments' => [
                     'mautic.lead.model.list',
+                    'router',
                 ],
             ],
             'mautic.lead.repository.lead_segment_query_builder' => [

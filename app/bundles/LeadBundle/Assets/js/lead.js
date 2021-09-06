@@ -1567,7 +1567,7 @@ Mautic.renderSegmentTree = function(containerId, data) {
         wrapper.append(row);
         for (let index = 0; index < data.levels[level].nodes.length; index++) {
             const nodeData = data.levels[level].nodes[index];
-            const node = mQuery('<div class="segment-node" id="segment-node'+nodeData['id']+'">'+nodeData['name']+'</div>');
+            const node = mQuery('<div class="segment-node" id="segment-node'+nodeData['id']+'"><a href="'+nodeData['link']+'" data-toggle="ajax">'+nodeData['name']+'</a></div>');
             row.append(node);
             nodes[nodeData['id']] = node;
         }

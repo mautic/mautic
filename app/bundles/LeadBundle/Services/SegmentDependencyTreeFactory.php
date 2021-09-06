@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\Tree\IntNode;
 use Mautic\CoreBundle\Helper\Tree\NodeInterface;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\Routing\RouterInterface;
 
 class SegmentDependencyTreeFactory
 {
@@ -23,9 +24,15 @@ class SegmentDependencyTreeFactory
      */
     private $segmentModel;
 
-    public function __construct(ListModel $segmentModel)
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    public function __construct(ListModel $segmentModel, RouterInterface $router)
     {
         $this->segmentModel = $segmentModel;
+        $this->router       = $router;
     }
 
     public function buildTree(LeadList $segment, NodeInterface $rootNode = null): NodeInterface
@@ -34,11 +41,13 @@ class SegmentDependencyTreeFactory
         $childSegments = $this->findChildSegments($segment);
 
         $rootNode->addParam('name', $segment->getName());
+        $rootNode->addParam('link', $this->generateSegmentDetailRoute($segment));
 
         foreach ($childSegments as $childSegment) {
             $childNode = new IntNode($childSegment->getId());
             $rootNode->addChild($childNode);
             $childNode->addParam('name', $childSegment->getName());
+            $childNode->addParam('link', $this->generateSegmentDetailRoute($childSegment));
             $this->buildTree($childSegment, $childNode);
         }
 
@@ -70,5 +79,16 @@ class SegmentDependencyTreeFactory
         }
 
         return $this->segmentModel->getRepository()->findBy(['id' => $childSegmentIds]);
+    }
+
+    private function generateSegmentDetailRoute(LeadList $segment): string
+    {
+        return $this->router->generate(
+            'mautic_segment_action',
+            [
+                'objectAction' => 'view',
+                'objectId'     => $segment->getId(),
+            ]
+        );
     }
 }

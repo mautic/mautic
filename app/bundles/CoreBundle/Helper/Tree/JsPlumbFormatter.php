@@ -37,7 +37,11 @@ class JsPlumbFormatter implements NodeFormatterInterface
 
     private function addNodeAndEdges(NodeInterface $parentNode, array $data, int $depth): array
     {
-        $data['levels'][$depth]['nodes'][] = ['id' => $parentNode->getValue(), 'name' => $parentNode->getParam('name')];
+        $data['levels'][$depth]['nodes'][] = [
+            'id'   => $parentNode->getValue(),
+            'name' => $parentNode->getParam('name'),
+            'link' => $parentNode->getParam('link'),
+        ];
 
         foreach ($parentNode->getChildrenArray() as $childNode) {
             $data['edges'][] = ['source' => $parentNode->getValue(), 'target' => $childNode->getValue()];
