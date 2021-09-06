@@ -1555,7 +1555,7 @@ Mautic.listOnLoad = function(container, response) {
 
 Mautic.renderSegmentTree = function(containerId, data) {
     const plumbInstance = jsPlumb.getInstance({
-        connectionsDetachable:false,
+        elementsDraggable:false,
         container: document.querySelector(containerId)
     });
 

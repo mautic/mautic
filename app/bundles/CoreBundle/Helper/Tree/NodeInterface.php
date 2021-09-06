@@ -13,4 +13,8 @@ interface NodeInterface extends \RecursiveIterator
     public function addChild(NodeInterface $child): void;
 
     public function getChildrenArray(): array;
+
+    public function addParam(string $key, $value): void;
+
+    public function getParam(string $key, $default = null);
 }

@@ -24,6 +24,11 @@ class IntNode implements NodeInterface
     private $children = [];
 
     /**
+     * @var array
+     */
+    private $params = [];
+
+    /**
      * @var int
      */
     private $position = 0;
@@ -56,6 +61,16 @@ class IntNode implements NodeInterface
         $this->children[] = $child;
     }
 
+    public function addParam(string $key, $value): void
+    {
+        $this->params[$key] = $value;
+    }
+
+    public function getParam(string $key, $default = null)
+    {
+        return $this->params[$key] ?? $default;
+    }
+
     public function getChildrenArray(): array
     {
         return $this->children;
@@ -63,8 +78,6 @@ class IntNode implements NodeInterface
 
     public function getChildren(): RecursiveIterator
     {
-        // return $this->children;
-        // return $this->current()->getChildren();
         return $this->current();
     }
 

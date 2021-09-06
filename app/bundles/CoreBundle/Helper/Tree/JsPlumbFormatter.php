@@ -12,12 +12,12 @@ use RecursiveIteratorIterator;
  * [
  *  "levels":[
  *    "nodes":[
- *      { "id":"foo", "name":"foo" },
- *      { "id":"bar", "name":"bar" }
+ *      { "id":"1", "name":"foo" },
+ *      { "id":"2", "name":"bar" }
  *    ],
  *  ],
  *  "edges":[
- *    { "source":"foo", "target":"bar" }
+ *    { "source":"1", "target":"2" }
  *  ]
  *];
  */
@@ -37,7 +37,7 @@ class JsPlumbFormatter implements NodeFormatterInterface
 
     private function addNodeAndEdges(NodeInterface $parentNode, array $data, int $depth): array
     {
-        $data['levels'][$depth]['nodes'][] = ['id' => $parentNode->getValue(), 'name' => $parentNode->getValue()];
+        $data['levels'][$depth]['nodes'][] = ['id' => $parentNode->getValue(), 'name' => $parentNode->getParam('name')];
 
         foreach ($parentNode->getChildrenArray() as $childNode) {
             $data['edges'][] = ['source' => $parentNode->getValue(), 'target' => $childNode->getValue()];
