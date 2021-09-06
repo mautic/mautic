@@ -1540,12 +1540,7 @@ Mautic.listOnLoad = function(container, response) {
             dataType: 'json',
             success: function (response) {
                 Mautic.stopPageLoadingBar();
-                console.log(response);
-                const toolkit = jsPlumb.getInstance({
-                    data: response,
-                    container: document.querySelector("#segment-dependencies-container")
-                });
-                const surface = toolkit.repaintEverything();
+                Mautic.renderSegmentTree('#temporary-segment-dependencies-container', response);
             },
             error: function (request, textStatus, errorThrown) {
                 Mautic.processAjaxError(request, textStatus, errorThrown);
@@ -1556,6 +1551,39 @@ Mautic.listOnLoad = function(container, response) {
         });
     }
 };
+
+
+Mautic.renderSegmentTree = function(containerId, data) {
+    const plumbInstance = jsPlumb.getInstance({
+        connectionsDetachable:false,
+        container: document.querySelector(containerId)
+    });
+
+    const wrapper = mQuery(containerId);
+    const nodes = {};
+
+    for (let level = 0; level < data.levels.length; level++) {
+        const row = mQuery('<div class="segment-level" id="segment-level-'+level+'"></div>');
+        wrapper.append(row);
+        for (let index = 0; index < data.levels[level].nodes.length; index++) {
+            const nodeData = data.levels[level].nodes[index];
+            const node = mQuery('<div class="segment-node" id="segment-node'+nodeData['id']+'">'+nodeData['name']+'</div>');
+            row.append(node);
+            nodes[nodeData['id']] = node;
+        }
+    }
+
+    for (let index = 0; index < data.edges.length; index++) {
+        const edge = data.edges[index];
+        plumbInstance.connect({
+            source:nodes[edge.source],
+            target:nodes[edge.target],
+            connector: 'Flowchart',
+            anchor: ['Top', 'Bottom'],
+            endpoint:"Blank",
+        });
+    }
+}
 
 Mautic.lazyLoadContactListOnSegmentDetail = function() {
     const containerId = '#contacts-container';

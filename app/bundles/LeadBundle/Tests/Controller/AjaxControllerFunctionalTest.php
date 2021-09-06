@@ -167,12 +167,24 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertSame(
             [
-                'nodes' => [
-                    ['id' => $segmentA->getId(), 'name' => $segmentA->getId()],
-                    ['id' => $segmentB->getId(), 'name' => $segmentB->getId()],
-                    ['id' => $segmentC->getId(), 'name' => $segmentC->getId()],
-                    ['id' => $segmentE->getId(), 'name' => $segmentE->getId()],
-                    ['id' => $segmentD->getId(), 'name' => $segmentD->getId()],
+                'levels' => [
+                    [
+                        'nodes' => [
+                            ['id' => $segmentA->getId(), 'name' => $segmentA->getId()],
+                        ],
+                    ],
+                    [
+                        'nodes' => [
+                            ['id' => $segmentB->getId(), 'name' => $segmentB->getId()],
+                            ['id' => $segmentC->getId(), 'name' => $segmentC->getId()],
+                            ['id' => $segmentD->getId(), 'name' => $segmentD->getId()],
+                        ],
+                    ],
+                    [
+                        'nodes' => [
+                            ['id' => $segmentE->getId(), 'name' => $segmentE->getId()],
+                        ],
+                    ],
                 ],
                 'edges' => [
                     ['source' => $segmentA->getId(), 'target' => $segmentB->getId()],

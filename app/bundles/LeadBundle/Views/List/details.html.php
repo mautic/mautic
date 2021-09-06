@@ -170,6 +170,9 @@ $view['slots']->set(
             </ul>
             <!--/ tabs controls -->
         </div>
+        Temporary testing div:
+        <div style="width:100%;height: 300px;position:relative" id="temporary-segment-dependencies-container">
+        </div>
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
