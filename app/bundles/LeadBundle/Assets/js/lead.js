@@ -1527,31 +1527,49 @@ Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, 
 
 Mautic.listOnLoad = function(container, response) {
     Mautic.lazyLoadContactListOnSegmentDetail();
+
+    const segmentDependenciesTab = mQuery('a#segment-dependencies');
+    let segmentDependenciesLoaded = false;
+    let jsPlumbData = null;
     
-    if (mQuery('#segment-dependencies-container').length) {
-        mQuery.ajax({
-            showLoadingBar: true,
-            url: mauticAjaxUrl,
-            type: 'GET',
-            data: {
-                action: 'lead:getSegmentDependencyTree',
-                id: mQuery('input#entityId').val()
-            },
-            dataType: 'json',
-            success: function (response) {
-                Mautic.stopPageLoadingBar();
-                Mautic.renderSegmentTree('#temporary-segment-dependencies-container', response);
-            },
-            error: function (request, textStatus, errorThrown) {
-                Mautic.processAjaxError(request, textStatus, errorThrown);
-            },
-            complete: function () {
-                mQuery('#segment-dependencies-container .spinner').remove();
+    if (segmentDependenciesTab.length) {
+        mQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+            // JsPlumb has a problem with z-index when using tabs so we need to re-initialize it.
+            mQuery('.jtk-connector').remove();
+            mQuery('#segment-dependencies-container').empty();
+
+            let plumbInstance;
+            if (!segmentDependenciesLoaded && mQuery(e.target).attr('id') === 'segment-dependencies') {
+                segmentDependenciesLoaded = true;
+                plumbInstance = null;
+                mQuery.ajax({
+                    showLoadingBar: true,
+                    url: mauticAjaxUrl,
+                    type: 'GET',
+                    data: {
+                        action: 'lead:getSegmentDependencyTree',
+                        id: mQuery('input#entityId').val()
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        mQuery('#segment-dependencies-container .spinner').remove();
+                        Mautic.stopPageLoadingBar();
+                        Mautic.renderSegmentTree('#segment-dependencies-container', response);
+                        jsPlumbData = response;
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                        Mautic.processAjaxError(request, textStatus, errorThrown);
+                    },
+                    complete: function () {
+                        mQuery('#segment-dependencies-container .spinner').remove();
+                    }
+                });
+            } else if (jsPlumbData) {
+                Mautic.renderSegmentTree('#segment-dependencies-container', jsPlumbData);
             }
         });
     }
 };
-
 
 Mautic.renderSegmentTree = function(containerId, data) {
     const plumbInstance = jsPlumb.getInstance({
@@ -1583,6 +1601,8 @@ Mautic.renderSegmentTree = function(containerId, data) {
             endpoint:"Blank",
         });
     }
+
+    return plumbInstance;
 }
 
 Mautic.lazyLoadContactListOnSegmentDetail = function() {
