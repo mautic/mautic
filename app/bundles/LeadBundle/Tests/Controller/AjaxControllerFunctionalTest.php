@@ -175,14 +175,14 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                     ],
                     [
                         'nodes' => [
-                            ['id' => $segmentB->getId(), 'name' => $segmentB->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
-                            ['id' => $segmentC->getId(), 'name' => $segmentC->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
-                            ['id' => $segmentD->getId(), 'name' => $segmentD->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
+                            ['id' => $segmentB->getId(), 'name' => $segmentB->getName(), 'link' => "/s/segments/view/{$segmentB->getId()}"],
+                            ['id' => $segmentC->getId(), 'name' => $segmentC->getName(), 'link' => "/s/segments/view/{$segmentC->getId()}"],
+                            ['id' => $segmentD->getId(), 'name' => $segmentD->getName(), 'link' => "/s/segments/view/{$segmentD->getId()}"],
                         ],
                     ],
                     [
                         'nodes' => [
-                            ['id' => $segmentE->getId(), 'name' => $segmentE->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
+                            ['id' => $segmentE->getId(), 'name' => $segmentE->getName(), 'link' => "/s/segments/view/{$segmentE->getId()}"],
                         ],
                     ],
                 ],
