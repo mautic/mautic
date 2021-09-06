@@ -28,15 +28,12 @@ Installing and using Mautic
 
 | Branch | RC Release | Initial Release | Active Support Until | Security Support Until*
 |--|--|--|--|--|
-|2.15  | 27 Sep 2019 | 8 Oct 2019 | 8 Oct 2019 | 8 Oct 2019
 |2.16  | 30 Jan 2020 | 13 Feb 2020 | 15 June 2020 | 15 December 2020
-|3.x   | 27 Jan 2020 | 15 June 2020 | 15 June 2021 | 15 December 2021
-|3.1   | 17 Aug 2020 | 24 Aug 2020 | 23 Nov 2020 | 30 Nov 2020
-|3.2   | 23 Nov 2020 | 30 Nov 2020 | 16 Feb 2021 | 22 Feb 2021
-|3.3   | 16 Feb 2021 | 22 Feb 2021 | 17 May 2021 | 24 May 2021
-|4.x   | 17 May 2021 | 24 May 2021 | 24 May 2022 | 20 Dec 2022
+|3.x   | 27 Jan 2020 | 15 June 2020 | 15 June 2021 | 28 February 2022
+|3.3   | 16 Feb 2021 | 22 Feb 2021 | 17 May 2021 | 28 February 2022
+|4.x   | 17 May 2021 | 30 August 2021 | 26 September 2022 | 27 February 2023
 
-`*`Security support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL, such as Symfony 2.8.
+`*`Security support will only be provided for Mautic itself, not for core dependencies that are end of life, such as Symfony.
 
 ## Software Downloads
 The GitHub version is recommended for both development and testing. The production package (including all libraries) is available at [mautic.org/download][download-mautic].
@@ -48,9 +45,9 @@ The GitHub version is recommended for both development and testing. The producti
 *Also note that source code outside of a [tagged release][tagged-release] should be considered ‘alpha’. It may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*
 
 ### How to install Mautic
-You must already have [Composer v1][composer-v1] available on your computer because this is a development release and you'll need Composer to download the vendor packages. Note that Composer v2 is not yet supported.
+You must already have [Composer v2][composer-v2] available on your computer because this is a development release and you'll need Composer to download the vendor packages.
 
-Also note that if you have DDEV installed, you can run 'ddev config' followed by 'ddev start'. This will kick off the Mautic first-run process which will automatically install dependencies and configure Mautic for use. ✨ 🚀 Read more [here][ddev-mautic]
+Also note that if you have DDEV installed, you can run 'ddev start'. This will kick off the Mautic first-run process which will automatically install dependencies and configure Mautic for use. ✨ 🚀 Read more [here][ddev-mautic]
 
 Installing Mautic is a simple three-step process:
 
@@ -154,7 +151,7 @@ This project follows the [all-contributors][all-contributors] specification. Con
 [t1-issues]: <https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AT1>
 [download-mautic]: <https://www.mautic.org/download>
 [tagged-release]: <https://github.com/mautic/mautic/releases>
-[composer-v1]: <http://getcomposer.org/>
+[composer-v2]: <http://getcomposer.org/>
 [download-zip]: <https://github.com/mautic/mautic/archive/refs/heads/features.zip>
 [ddev-mautic]: <https://kb.mautic.org/knowledgebase/development/how-to-install-mautic-using-ddev>
 [troubleshooting]: <https://docs.mautic.org/en/troubleshooting>
