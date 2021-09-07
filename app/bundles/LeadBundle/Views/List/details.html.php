@@ -189,7 +189,6 @@ $hasSegmentMembershipFilter = $list->hasFilterTypeOf('leadlist');
 
             <?php if ($hasSegmentMembershipFilter) : ?>
             <div class="tab-pane bdr-w-0 page-list" id="segment-dependencies-container">
-                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
             </div>
             <?php endif; ?>
 

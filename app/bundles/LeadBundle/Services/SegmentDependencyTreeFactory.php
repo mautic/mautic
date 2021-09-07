@@ -29,6 +29,8 @@ class SegmentDependencyTreeFactory
      */
     private $router;
 
+    private $usedSegmentIds = [];
+
     public function __construct(ListModel $segmentModel, RouterInterface $router)
     {
         $this->segmentModel = $segmentModel;
@@ -43,12 +45,21 @@ class SegmentDependencyTreeFactory
         $rootNode->addParam('name', $segment->getName());
         $rootNode->addParam('link', $this->generateSegmentDetailRoute($segment));
 
+        $this->usedSegmentIds[] = $segment->getId();
+
         foreach ($childSegments as $childSegment) {
             $childNode = new IntNode($childSegment->getId());
             $rootNode->addChild($childNode);
             $childNode->addParam('name', $childSegment->getName());
             $childNode->addParam('link', $this->generateSegmentDetailRoute($childSegment));
-            $this->buildTree($childSegment, $childNode);
+
+            // Be aware of the loops here. We must stop building children
+            // and report the problem instead if there is a loop or duplicate segments.
+            if (!in_array($childSegment->getId(), $this->usedSegmentIds)) {
+                $this->buildTree($childSegment, $childNode);
+            } else {
+                $childNode->addParam('message', 'This segment already exists in the segment dependency tree');
+            }
         }
 
         return $rootNode;

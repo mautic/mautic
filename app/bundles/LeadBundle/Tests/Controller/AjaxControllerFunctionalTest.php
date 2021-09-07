@@ -92,9 +92,6 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('{"message":"Segment 9999 could not be found."}', $response->getContent());
     }
 
-    /**
-     * @throws MappingException
-     */
     public function testSegmentDependencyTree(): void
     {
         $segmentA = new LeadList();
@@ -170,27 +167,153 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                 'levels' => [
                     [
                         'nodes' => [
-                            ['id' => $segmentA->getId(), 'name' => $segmentA->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
+                            ['id' => "0-{$segmentA->getId()}", 'name' => $segmentA->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
                         ],
                     ],
                     [
                         'nodes' => [
-                            ['id' => $segmentB->getId(), 'name' => $segmentB->getName(), 'link' => "/s/segments/view/{$segmentB->getId()}"],
-                            ['id' => $segmentC->getId(), 'name' => $segmentC->getName(), 'link' => "/s/segments/view/{$segmentC->getId()}"],
-                            ['id' => $segmentD->getId(), 'name' => $segmentD->getName(), 'link' => "/s/segments/view/{$segmentD->getId()}"],
+                            ['id' => "{$segmentA->getId()}-{$segmentB->getId()}", 'name' => $segmentB->getName(), 'link' => "/s/segments/view/{$segmentB->getId()}"],
+                            ['id' => "{$segmentA->getId()}-{$segmentC->getId()}", 'name' => $segmentC->getName(), 'link' => "/s/segments/view/{$segmentC->getId()}"],
+                            ['id' => "{$segmentA->getId()}-{$segmentD->getId()}", 'name' => $segmentD->getName(), 'link' => "/s/segments/view/{$segmentD->getId()}"],
                         ],
                     ],
                     [
                         'nodes' => [
-                            ['id' => $segmentE->getId(), 'name' => $segmentE->getName(), 'link' => "/s/segments/view/{$segmentE->getId()}"],
+                            ['id' => "{$segmentC->getId()}-{$segmentE->getId()}", 'name' => $segmentE->getName(), 'link' => "/s/segments/view/{$segmentE->getId()}"],
                         ],
                     ],
                 ],
                 'edges' => [
-                    ['source' => $segmentA->getId(), 'target' => $segmentB->getId()],
-                    ['source' => $segmentA->getId(), 'target' => $segmentC->getId()],
-                    ['source' => $segmentA->getId(), 'target' => $segmentD->getId()],
-                    ['source' => $segmentC->getId(), 'target' => $segmentE->getId()],
+                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentB->getId()}"],
+                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentC->getId()}"],
+                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentD->getId()}"],
+                    ['source' => "{$segmentA->getId()}-{$segmentC->getId()}", 'target' => "{$segmentC->getId()}-{$segmentE->getId()}"],
+                ],
+            ],
+            json_decode($response->getContent(), true)
+        );
+    }
+
+    public function testSegmentDependencyTreeWithLoop(): void
+    {
+        $segmentA = new LeadList();
+        $segmentA->setName('Segment A');
+        $segmentA->setAlias('segment-a');
+
+        $segmentB = new LeadList();
+        $segmentB->setName('Segment B');
+        $segmentB->setAlias('segment-b');
+
+        $segmentC = new LeadList();
+        $segmentC->setName('Segment C');
+        $segmentC->setAlias('segment-c');
+
+        $segmentD = new LeadList();
+        $segmentD->setName('Segment D');
+        $segmentD->setAlias('segment-d');
+
+        $segmentE = new LeadList();
+        $segmentE->setName('Segment E');
+        $segmentE->setAlias('segment-e');
+
+        $this->em->persist($segmentA);
+        $this->em->persist($segmentB);
+        $this->em->persist($segmentC);
+        $this->em->persist($segmentD);
+        $this->em->persist($segmentE);
+        $this->em->flush();
+
+        $segmentA->setFilters(
+            [
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'leadlist',
+                    'type'       => 'leadlist',
+                    'operator'   => 'in',
+                    'properties' => ['filter' => [$segmentB->getId()]],
+                ], [
+                    'object'     => 'lead',
+                    'glue'       => 'or',
+                    'field'      => 'leadlist',
+                    'type'       => 'leadlist',
+                    'operator'   => '!in',
+                    'properties' => ['filter' => [$segmentC->getId(), $segmentD->getId()]],
+                ],
+            ]
+        );
+
+        $segmentC->setFilters(
+            [
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'leadlist',
+                    'type'       => 'leadlist',
+                    'operator'   => 'in',
+                    'properties' => ['filter' => [$segmentE->getId()]],
+                ],
+            ]
+        );
+
+        $segmentE->setFilters(
+            [
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'leadlist',
+                    'type'       => 'leadlist',
+                    'operator'   => 'in',
+                    'properties' => ['filter' => [$segmentA->getId()]],
+                ],
+            ]
+        );
+
+        $this->em->persist($segmentA);
+        $this->em->persist($segmentC);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, "/s/ajax?action=lead:getSegmentDependencyTree&id={$segmentA->getId()}");
+        $response = $this->client->getResponse();
+        self::assertTrue($response->isOk(), $response->getContent());
+
+        Assert::assertSame(
+            [
+                'levels' => [
+                    [
+                        'nodes' => [
+                            ['id' => "0-{$segmentA->getId()}", 'name' => $segmentA->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
+                        ],
+                    ],
+                    [
+                        'nodes' => [
+                            ['id' => "{$segmentA->getId()}-{$segmentB->getId()}", 'name' => $segmentB->getName(), 'link' => "/s/segments/view/{$segmentB->getId()}"],
+                            ['id' => "{$segmentA->getId()}-{$segmentC->getId()}", 'name' => $segmentC->getName(), 'link' => "/s/segments/view/{$segmentC->getId()}"],
+                            ['id' => "{$segmentA->getId()}-{$segmentD->getId()}", 'name' => $segmentD->getName(), 'link' => "/s/segments/view/{$segmentD->getId()}"],
+                        ],
+                    ],
+                    [
+                        'nodes' => [
+                            ['id' => "{$segmentC->getId()}-{$segmentE->getId()}", 'name' => $segmentE->getName(), 'link' => "/s/segments/view/{$segmentE->getId()}"],
+                        ],
+                    ],
+                    [
+                        'nodes' => [
+                            [
+                                'id'      => "{$segmentE->getId()}-{$segmentA->getId()}",
+                                'name'    => $segmentA->getName(),
+                                'link'    => "/s/segments/view/{$segmentA->getId()}",
+                                'message' => 'This segment already exists in the segment dependency tree',
+                            ],
+                        ],
+                    ],
+                ],
+                'edges' => [
+                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentB->getId()}"],
+                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentC->getId()}"],
+                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentD->getId()}"],
+                    ['source' => "{$segmentA->getId()}-{$segmentC->getId()}", 'target' => "{$segmentC->getId()}-{$segmentE->getId()}"],
+                    ['source' => "{$segmentC->getId()}-{$segmentE->getId()}", 'target' => "{$segmentE->getId()}-{$segmentA->getId()}"],
                 ],
             ],
             json_decode($response->getContent(), true)

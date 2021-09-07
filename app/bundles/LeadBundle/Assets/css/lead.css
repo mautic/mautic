@@ -267,10 +267,15 @@ ul.tag-cloud li {
     flex-grow: 0;
     flex-shrink: 0;
     flex-basis: 200px;
+    flex-flow: column wrap;
     padding: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.segment-node.has-message {
+    border: red solid 4px;
 }
 
 .segment-level {

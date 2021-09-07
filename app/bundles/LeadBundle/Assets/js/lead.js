@@ -1534,9 +1534,7 @@ Mautic.listOnLoad = function(container, response) {
     
     if (segmentDependenciesTab.length) {
         mQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
-            // JsPlumb has a problem with z-index when using tabs so we need to re-initialize it.
-            mQuery('.jtk-connector').remove();
-            mQuery('#segment-dependencies-container').empty();
+            Mautic.cleanSegmentDependencies();
 
             let plumbInstance;
             if (!segmentDependenciesLoaded && mQuery(e.target).attr('id') === 'segment-dependencies') {
@@ -1552,16 +1550,12 @@ Mautic.listOnLoad = function(container, response) {
                     },
                     dataType: 'json',
                     success: function (response) {
-                        mQuery('#segment-dependencies-container .spinner').remove();
                         Mautic.stopPageLoadingBar();
                         Mautic.renderSegmentTree('#segment-dependencies-container', response);
                         jsPlumbData = response;
                     },
                     error: function (request, textStatus, errorThrown) {
                         Mautic.processAjaxError(request, textStatus, errorThrown);
-                    },
-                    complete: function () {
-                        mQuery('#segment-dependencies-container .spinner').remove();
                     }
                 });
             } else if (jsPlumbData) {
@@ -1570,6 +1564,18 @@ Mautic.listOnLoad = function(container, response) {
         });
     }
 };
+
+Mautic.listOnUnload = function() {
+    Mautic.cleanSegmentDependencies();
+}
+
+/**
+ *  JsPlumb has a problem with z-index when using tabs or change content by ajax so we need to re-initialize it.
+ */
+Mautic.cleanSegmentDependencies = function() {
+    mQuery('.jtk-connector').remove();
+    mQuery('#segment-dependencies-container').empty();
+}
 
 Mautic.renderSegmentTree = function(containerId, data) {
     const plumbInstance = jsPlumb.getInstance({
@@ -1585,7 +1591,7 @@ Mautic.renderSegmentTree = function(containerId, data) {
         wrapper.append(row);
         for (let index = 0; index < data.levels[level].nodes.length; index++) {
             const nodeData = data.levels[level].nodes[index];
-            const node = mQuery('<div class="segment-node" id="segment-node'+nodeData['id']+'"><a href="'+nodeData['link']+'" data-toggle="ajax">'+nodeData['name']+'</a></div>');
+            const node = Mautic.buildSegmentDependencyNode(nodeData);
             row.append(node);
             nodes[nodeData['id']] = node;
         }
@@ -1603,6 +1609,22 @@ Mautic.renderSegmentTree = function(containerId, data) {
     }
 
     return plumbInstance;
+}
+
+Mautic.buildSegmentDependencyNode = function(nodeData) {
+    let message = '';
+    let hasMessageClass = '';
+
+    if (nodeData['message']) {
+        message = '<span class="segment-dependency-message text-danger">'+nodeData['message']+'</span>';
+        hasMessageClass = ' has-message';
+    }
+
+    const link = '<a href="'+nodeData['link']+'" data-toggle="ajax">'+nodeData['name']+'</a>';
+
+    const node = mQuery('<div class="segment-node'+hasMessageClass+'" id="segment-node'+nodeData['id']+'">'+link+message+'</div>');
+
+    return node;
 }
 
 Mautic.lazyLoadContactListOnSegmentDetail = function() {
