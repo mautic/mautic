@@ -702,10 +702,6 @@ Mautic.leadfieldOnLoad = function (container) {
 };
 
 Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
-    if (selectedVal == 'multiselect') {
-        // Use select
-        selectedVal = 'select';
-    }
 
     if (mQuery('#field-templates .' + selectedVal).length) {
         mQuery('#leadfield_properties').html(
@@ -790,10 +786,14 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
             isSelect = true;
             break;
         case 'select':
-        case 'multiselect':
         case 'lookup':
             html = mQuery('#field-templates .default_template_select').html();
             tempType = 'select';
+            isSelect = true;
+            break;
+            case 'multiselect':
+            html = mQuery('#field-templates .default_template_multiselect').html();
+            tempType = 'multiselect';
             isSelect = true;
             break;
         case 'textarea':

@@ -367,6 +367,7 @@ class LeadField extends FormEntity
      */
     public function setDefaultValue($defaultValue)
     {
+        $defaultValue = is_array($defaultValue) ? implode('|', $defaultValue) : $defaultValue;
         $this->isChanged('defaultValue', $defaultValue);
         $this->defaultValue = $defaultValue;
 
