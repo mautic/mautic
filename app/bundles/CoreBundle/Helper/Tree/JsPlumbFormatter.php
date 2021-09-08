@@ -26,16 +26,16 @@ class JsPlumbFormatter implements NodeFormatterInterface
     public function format(NodeInterface $node): array
     {
         $iterator = new RecursiveIteratorIterator($node, RecursiveIteratorIterator::SELF_FIRST);
-        $data     = $this->addNodeAndEdges($node, ['levels' => [], 'edges' => []], 0, -1);
+        $data     = $this->addNodeAndEdges($node, ['levels' => [], 'edges' => []], 0);
 
         foreach ($iterator as $childNode) {
-            $data = $this->addNodeAndEdges($childNode, $data, $iterator->getDepth() + 1, $iterator->key());
+            $data = $this->addNodeAndEdges($childNode, $data, $iterator->getDepth() + 1);
         }
 
         return $data;
     }
 
-    private function addNodeAndEdges(NodeInterface $parentNode, array $data, int $depth, $key): array
+    private function addNodeAndEdges(NodeInterface $parentNode, array $data, int $depth): array
     {
         $parentParentId = $parentNode->getParent() ? $parentNode->getParent()->getValue() : 0;
         $id             = "{$parentParentId}-{$parentNode->getValue()}";
