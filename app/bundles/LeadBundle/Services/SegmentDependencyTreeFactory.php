@@ -29,6 +29,9 @@ class SegmentDependencyTreeFactory
      */
     private $router;
 
+    /**
+     * @var int[]
+     */
     private $usedSegmentIds = [];
 
     public function __construct(ListModel $segmentModel, RouterInterface $router)
