@@ -1536,10 +1536,8 @@ Mautic.listOnLoad = function(container, response) {
         mQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
             Mautic.cleanSegmentDependencies();
 
-            let plumbInstance;
             if (!segmentDependenciesLoaded && mQuery(e.target).attr('id') === 'segment-dependencies') {
                 segmentDependenciesLoaded = true;
-                plumbInstance = null;
                 mQuery.ajax({
                     showLoadingBar: true,
                     url: mauticAjaxUrl,
