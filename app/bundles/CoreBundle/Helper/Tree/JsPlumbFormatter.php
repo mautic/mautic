@@ -23,10 +23,10 @@ use RecursiveIteratorIterator;
  */
 class JsPlumbFormatter implements NodeFormatterInterface
 {
-    public function format(NodeInterface $parentNode): array
+    public function format(NodeInterface $node): array
     {
-        $iterator = new RecursiveIteratorIterator($parentNode, RecursiveIteratorIterator::SELF_FIRST);
-        $data     = $this->addNodeAndEdges($parentNode, ['levels' => [], 'edges' => []], 0, -1);
+        $iterator = new RecursiveIteratorIterator($node, RecursiveIteratorIterator::SELF_FIRST);
+        $data     = $this->addNodeAndEdges($node, ['levels' => [], 'edges' => []], 0, -1);
 
         foreach ($iterator as $childNode) {
             $data = $this->addNodeAndEdges($childNode, $data, $iterator->getDepth() + 1, $iterator->key());
