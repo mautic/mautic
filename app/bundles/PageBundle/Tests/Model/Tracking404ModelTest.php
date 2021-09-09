@@ -55,7 +55,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockCoreParametersHelper->expects($this->at(0))
             ->method('get')
-            ->with('disable_tracking_404_anonymous')
+            ->with('do_not_track_404_anonymous')
             ->willReturn(true);
 
         $tracking404Model = new Tracking404Model($this->mockCoreParametersHelper, $this->mockContactTracker, $this->mockPageModel);
@@ -66,7 +66,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockCoreParametersHelper->expects($this->at(0))
             ->method('get')
-            ->with('disable_tracking_404_anonymous')
+            ->with('do_not_track_404_anonymous')
             ->willReturn(false);
 
         $tracking404Model = new Tracking404Model($this->mockCoreParametersHelper, $this->mockContactTracker, $this->mockPageModel);
@@ -77,7 +77,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockCoreParametersHelper->expects($this->at(0))
             ->method('get')
-            ->with('disable_tracking_404_anonymous')
+            ->with('do_not_track_404_anonymous')
             ->willReturn(true);
 
         $this->lead->setFirstname('identified');
@@ -93,7 +93,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockCoreParametersHelper->expects($this->at(0))
             ->method('get')
-            ->with('disable_tracking_404_anonymous')
+            ->with('do_not_track_404_anonymous')
             ->willReturn(true);
 
         $this->mockContactTracker->expects($this->any())

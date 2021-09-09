@@ -62,7 +62,7 @@ class Tracking404Model
      */
     public function isTrackable()
     {
-        if (!$this->coreParametersHelper->get('disable_tracking_404_anonymous')) {
+        if (!$this->coreParametersHelper->get('do_not_track_404_anonymous')) {
             return true;
         }
         // already tracked and identified contact

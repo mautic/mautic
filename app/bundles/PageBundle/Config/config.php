@@ -405,6 +405,6 @@ return [
         'facebook_pixel_id'                     => null,
         'facebook_pixel_trackingpage_enabled'   => false,
         'facebook_pixel_landingpage_enabled'    => false,
-        'disable_tracking_404_anonymous'        => false,
+        'do_not_track_404_anonymous'            => false,
     ],
 ];
