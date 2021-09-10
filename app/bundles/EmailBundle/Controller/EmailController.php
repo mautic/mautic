@@ -230,7 +230,7 @@ class EmailController extends FormController
         $pageModel = $this->getModel('page.page');
 
         /** @var \Mautic\PageBundle\Entity\HitRepository $pageRepo */
-        $pageRepo = $pageModel->getHitRepository();
+        $hitRepo = $pageModel->getHitRepository();
 
         return $this->delegateView(
             [
@@ -244,7 +244,7 @@ class EmailController extends FormController
                     'tmpl'        => $this->request->get('tmpl', 'index'),
                     'permissions' => $permissions,
                     'model'       => $model,
-                    'pageRepo'    => $pageRepo,
+                    'hitRepo'     => $hitRepo,
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:list.html.php',
                 'passthroughVars' => [

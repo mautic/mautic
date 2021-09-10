@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -1145,6 +1146,29 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         } else {
             return 0;
         }
+    }
+
+    /**
+     * Return clicks count of email.
+     *
+     * @param $hitRepo Mautic\PageBundle\Entity\HitRepository
+     */
+    public function getClicksCount($hitRepo)
+    {
+        $emailClicksResult = $hitRepo->getEmailClickthroughHitCount($this->getId());
+        $emailClicks       = is_array($emailClicksResult) && count($emailClicksResult) > 0 ? $emailClicksResult[$this->getId()] : 0;
+
+        return $emailClicks;
+    }
+
+    /**
+     * Get CTR of email.
+     *
+     * @param $emailClicks clicks of email
+     */
+    public function getCtrPercentage($emailClicks = 0)
+    {
+        return 0 !== $this->getSentCount(true) ? round($emailClicks / $this->getSentCount(true) * 100, 2) : 0;
     }
 
     /**
