@@ -13,16 +13,7 @@
             </thead>
             <tbody>
                 <?php
-                    $clickCounts = array_reduce($trackables, function ($accumulator, $link) {
-                        $accumulator[0] += $link['hits'];
-                        $accumulator[1] += $link['unique_hits'];
-
-                        return $accumulator;
-                    }, [
-                        0,
-                        0,
-                    ]);
-                    [$totalClicks, $totalUniqueClicks] = $clickCounts;
+                    [$totalClicks, $totalUniqueClicks] = $entity->getEmailClickCounters($trackables);
                     foreach ($trackables as $link):
                         ?>
                         <tr>
