@@ -26,4 +26,29 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($ctr, $email->getCtrPercentage(4));
     }
+
+    public function testEmailClickCounters()
+    {
+        $email      = new Email();
+        $trackables = [
+            [
+                'hits'        => 3,
+                'unique_hits' => 2,
+            ],
+            [
+                'hits'        => 4,
+                'unique_hits' => 1,
+            ],
+            [
+                'hits'        => 8,
+                'unique_hits' => 3,
+            ],
+            [
+                'hits'        => 0,
+                'unique_hits' => 0,
+            ],
+        ];
+
+        $this->assertEquals([15, 6], $email->getEmailClickCounters($trackables));
+    }
 }
