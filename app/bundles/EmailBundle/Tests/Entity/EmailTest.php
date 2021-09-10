@@ -17,4 +17,13 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($readCount, $email->getReadCount());
     }
+
+    public function testCtrCalculation()
+    {
+        $ctr   = 80;
+        $email = new Email();
+        $email->setSentCount(5);
+
+        $this->assertEquals($ctr, $email->getCtrPercentage(4));
+    }
 }
