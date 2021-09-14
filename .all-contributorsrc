@@ -448,6 +448,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "johbuch",
+      "name": "Johan Buchert",
+      "avatar_url": "https://avatars.githubusercontent.com/u/31535432?v=4",
+      "profile": "https://github.com/johbuch",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
