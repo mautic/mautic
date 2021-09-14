@@ -120,7 +120,8 @@
       "contributions": [
         "code",
         "test",
-        "userTesting"
+        "userTesting",
+        "review"
       ]
     },
     {
@@ -427,7 +428,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/13075514?v=4",
       "profile": "http://www.idea2.ch",
       "contributions": [
-        "review"
+        "review",
+        "userTesting"
       ]
     },
     {
@@ -446,6 +448,15 @@
       "profile": "https://github.com/julienWebmecanik",
       "contributions": [
         "code"
+      ]
+    },
+    {
+      "login": "johbuch",
+      "name": "Johan Buchert",
+      "avatar_url": "https://avatars.githubusercontent.com/u/31535432?v=4",
+      "profile": "https://github.com/johbuch",
+      "contributions": [
+        "userTesting"
       ]
     }
   ],
