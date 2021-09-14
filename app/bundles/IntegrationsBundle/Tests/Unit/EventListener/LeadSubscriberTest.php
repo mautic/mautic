@@ -203,7 +203,7 @@ class LeadSubscriberTest extends TestCase
             ->with(Contact::NAME)
             ->willReturn(true);
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $lead);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Lead::class);
 
         $this->eventDispatcherInterfaceMock
             ->method('hasListeners')
@@ -241,7 +241,7 @@ class LeadSubscriberTest extends TestCase
 
         $fieldChanges['fields']['owner_id'] = $fieldChanges['owner'];
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $lead);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Lead::class);
 
         $this->eventDispatcherInterfaceMock
             ->method('hasListeners')
@@ -279,7 +279,7 @@ class LeadSubscriberTest extends TestCase
 
         $fieldChanges['fields']['points'] = $fieldChanges['points'];
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $lead);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Lead::class);
 
         $this->eventDispatcherInterfaceMock
             ->method('hasListeners')
@@ -371,7 +371,7 @@ class LeadSubscriberTest extends TestCase
             ->with(MauticSyncDataExchange::OBJECT_COMPANY)
             ->willReturn(true);
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $company);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Company::class);
 
         $this->eventDispatcherInterfaceMock
             ->method('hasListeners')
@@ -409,7 +409,7 @@ class LeadSubscriberTest extends TestCase
 
         $fieldChanges['fields']['owner_id'] = $fieldChanges['owner'];
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $company);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Company::class);
 
         $this->eventDispatcherInterfaceMock
             ->method('hasListeners')
@@ -440,7 +440,7 @@ class LeadSubscriberTest extends TestCase
         $this->subscriber->onCompanyPostDelete($this->companyEvent);
     }
 
-    private function handleRecordFieldChanges(array $fieldChanges, int $objectId, object $object): void
+    private function handleRecordFieldChanges(array $fieldChanges, int $objectId, string $objectType): void
     {
         $integrationName     = 'testIntegration';
         $enabledIntegrations = [$integrationName];
@@ -453,7 +453,6 @@ class LeadSubscriberTest extends TestCase
         $values     = [];
         $valueDAOs  = [];
         $i          = 0;
-        $objectType = get_class($object);
 
         foreach ($fieldChanges as $fieldName => [$oldValue, $newValue]) {
             $values[]     = [$newValue];
