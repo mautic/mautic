@@ -25,7 +25,7 @@ class LeadSubscriberTest extends MauticMysqlTestCase
      */
     private $fieldChangeRepository;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
