@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use PHPUnit\Framework\Assert;
 
-class LeadSubscriberTest extends MauticMysqlTestCase
+final class LeadSubscriberTest extends MauticMysqlTestCase
 {
     /**
      * @var EventDispatcherInterface
