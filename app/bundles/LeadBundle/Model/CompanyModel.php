@@ -22,7 +22,6 @@ use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
@@ -756,21 +755,16 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array        $fields
-     * @param array        $data
-     * @param null         $owner
-     * @param null         $list
-     * @param null         $tags
-     * @param bool         $persist
-     * @param LeadEventLog $eventLog
-     * @param null         $importId
-     * @param bool         $skipIfExists
+     * @param array $fields
+     * @param array $data
+     * @param null  $owner
+     * @param bool  $skipIfExists
      *
      * @return bool|null
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false)
+    public function import($fields, $data, $owner = null, $skipIfExists = false)
     {
         $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists);
 
