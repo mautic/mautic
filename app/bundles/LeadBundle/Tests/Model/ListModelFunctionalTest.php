@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use DateTime;
+use DateTimeZone;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -33,19 +35,6 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
             $lists,
             'Non-global lists should not be returned by the `getGlobalLists()` method.'
         );
-    }
-
-    private function createLeadList(User $user, string $name, bool $isGlobal): LeadList
-    {
-        $leadList = new LeadList();
-        $leadList->setName($name);
-        $leadList->setPublicName('Public'.$name);
-        $leadList->setAlias(mb_strtolower($name));
-        $leadList->setCreatedBy($user);
-        $leadList->setIsGlobal($isGlobal);
-        $this->em->persist($leadList);
-
-        return $leadList;
     }
 
     public function testSegmentLineChartData(): void
@@ -106,7 +95,7 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
     public function testSegmentLineChartDataWithoutFetchDataFromLeadListTable(): void
     {
         /** @var ListModel $segmentModel */
-        $segmentModel = $this->container->get('mautic.lead.model.list');
+        $segmentModel = self::$container->get('mautic.lead.model.list');
 
         /** @var LeadRepository $contactRepository */
         $contactRepository = $this->em->getRepository(Lead::class);
@@ -161,6 +150,7 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
     {
         $leadList = new LeadList();
         $leadList->setName($name);
+        $leadList->setPublicName('Public'.$name);
         $leadList->setAlias(mb_strtolower($name));
         $leadList->setCreatedBy($user);
         $leadList->setIsGlobal($isGlobal);
