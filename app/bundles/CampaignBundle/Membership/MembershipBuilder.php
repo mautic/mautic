@@ -120,7 +120,6 @@ class MembershipBuilder
      */
     private function addNewlyQualifiedMembers($totalContactsProcessed)
     {
-        $progress          = null;
         $contactsProcessed = 0;
 
         if ($this->output) {
@@ -165,7 +164,11 @@ class MembershipBuilder
             }
 
             // Get next batch
-            $contacts = $this->campaignMemberRepository->getCampaignContactsBySegments($this->campaign->getId(), $this->contactLimiter);
+            $contacts = $this->campaignMemberRepository->getCampaignContactsBySegments(
+                $this->campaign->getId(),
+                $this->contactLimiter,
+                $this->campaign->allowRestart()
+            );
         }
 
         $this->finishProgressBar();
@@ -182,7 +185,6 @@ class MembershipBuilder
      */
     private function removeUnqualifiedMembers($totalContactsProcessed)
     {
-        $progress          = null;
         $contactsProcessed = 0;
 
         if ($this->output) {
