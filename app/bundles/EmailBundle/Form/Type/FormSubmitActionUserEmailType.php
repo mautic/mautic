@@ -15,6 +15,7 @@ use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class FormSubmitActionUserEmailType extends AbstractType
 {
@@ -42,7 +43,12 @@ class FormSubmitActionUserEmailType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.help.autocomplete',
                 ],
-                'required' => false,
+                'required'    => true,
+                'constraints' => new NotBlank(
+                    [
+                        'message' => 'mautic.core.value.required',
+                    ]
+                ),
             ]
         );
     }
