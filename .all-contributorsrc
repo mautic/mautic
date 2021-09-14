@@ -120,7 +120,8 @@
       "contributions": [
         "code",
         "test",
-        "userTesting"
+        "userTesting",
+        "review"
       ]
     },
     {
