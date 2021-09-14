@@ -12,7 +12,6 @@
 namespace Mautic\InstallBundle\Controller;
 
 use Doctrine\DBAL\DBALException;
-use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\Form\Form;
