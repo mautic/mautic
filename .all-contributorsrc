@@ -56,7 +56,8 @@
       "contributions": [
         "userTesting",
         "review",
-        "code"
+        "code",
+        "test"
       ]
     },
     {
@@ -118,7 +119,9 @@
       "profile": "https://www.linkedin.com/in/miroslavfedeles",
       "contributions": [
         "code",
-        "test"
+        "test",
+        "userTesting",
+        "review"
       ]
     },
     {
@@ -273,7 +276,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/48244990?v=4",
       "profile": "https://github.com/dadarya0",
       "contributions": [
-        "code"
+        "code",
+        "review"
       ]
     },
     {
@@ -407,6 +411,52 @@
       "profile": "https://github.com/rohitpavaskar",
       "contributions": [
         "code"
+      ]
+    },
+    {
+      "login": "disha-pishavadia24",
+      "name": "Disha P",
+      "avatar_url": "https://avatars.githubusercontent.com/u/22201881?v=4",
+      "profile": "https://www.udemy.com/certificate/UC-5CZA2NJ8/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "adiux",
+      "name": "Adrian",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13075514?v=4",
+      "profile": "http://www.idea2.ch",
+      "contributions": [
+        "review",
+        "userTesting"
+      ]
+    },
+    {
+      "login": "vijayhrdm",
+      "name": "vijayhrdm",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9714242?v=4",
+      "profile": "https://github.com/vijayhrdm",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "julienWebmecanik",
+      "name": "julienWebmecanik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/79137416?v=4",
+      "profile": "https://github.com/julienWebmecanik",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "johbuch",
+      "name": "Johan Buchert",
+      "avatar_url": "https://avatars.githubusercontent.com/u/31535432?v=4",
+      "profile": "https://github.com/johbuch",
+      "contributions": [
+        "userTesting"
       ]
     }
   ],
