@@ -265,6 +265,12 @@ return [
                     'router',
                 ],
             ],
+            'mautic.email.dashboard.best.hours.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\DashboardBestHoursSubscriber::class,
+                'arguments' => [
+                    'mautic.email.model.email',
+                ],
+            ],
             'mautic.email.broadcast.subscriber' => [
                 'class'     => \Mautic\EmailBundle\EventListener\BroadcastSubscriber::class,
                 'arguments' => [
@@ -379,7 +385,7 @@ return [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\Spool\DelegatingSpool::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'swiftmailer.transport.real',
+                    'swiftmailer.mailer.default.transport.real',
                 ],
             ],
 
@@ -663,7 +669,7 @@ return [
             'mautic.message.processor.bounce' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class,
                 'arguments' => [
-                    'swiftmailer.transport.real',
+                    'swiftmailer.mailer.default.transport.real',
                     'mautic.message.search.contact',
                     'mautic.email.repository.stat',
                     'mautic.lead.model.lead',
@@ -675,7 +681,7 @@ return [
             'mautic.message.processor.unsubscribe' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class,
                 'arguments' => [
-                    'swiftmailer.transport.real',
+                    'swiftmailer.mailer.default.transport.real',
                     'mautic.message.search.contact',
                     'translator',
                     'monolog.logger.mautic',
@@ -866,6 +872,15 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.email.fetcher',
+                ],
+                'tag' => 'console.command',
+            ],
+            'mautic.email.command.queue' => [
+                'class'     => \Mautic\EmailBundle\Command\ProcessEmailQueueCommand::class,
+                'arguments' => [
+                    'swiftmailer.mailer.default.transport.real',
+                    'event_dispatcher',
+                    'mautic.helper.core_parameters',
                 ],
                 'tag' => 'console.command',
             ],

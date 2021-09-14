@@ -14,7 +14,6 @@ namespace Mautic\CoreBundle\Menu;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
