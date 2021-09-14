@@ -32,6 +32,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -41,7 +42,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class FormModel extends CommonFormModel
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
+     * @var Request|null
      */
     protected $request;
 
@@ -111,7 +112,7 @@ class FormModel extends CommonFormModel
         ColumnSchemaHelper $columnSchemaHelper,
         TableSchemaHelper $tableSchemaHelper
     ) {
-        $this->request                = $requestStack->getCurrentRequest();
+        $this->request                = $requestStack;
         $this->templatingHelper       = $templatingHelper;
         $this->themeHelper            = $themeHelper;
         $this->formActionModel        = $formActionModel;
@@ -492,7 +493,7 @@ class FormModel extends CommonFormModel
         //generate cached HTML
         $theme       = $entity->getTemplate();
         $submissions = null;
-        $lead        = ($this->request) ? $this->contactTracker->getContact() : null;
+        $lead        = ($this->getCurrentRequest()) ? $this->contactTracker->getContact() : null;
         $style       = '';
 
         if (!empty($theme)) {
@@ -792,21 +793,22 @@ class FormModel extends CommonFormModel
     /**
      * Writes in form values from get parameters.
      *
-     * @param $form
      * @param $formHtml
      */
-    public function populateValuesWithGetParameters(Form $form, &$formHtml)
+    public function populateValuesWithGetParameters(Form $form, &$formHtml): void
     {
         $formName = $form->generateFormName();
-
         $fields = $form->getFields()->toArray();
-        /** @var \Mautic\FormBundle\Entity\Field $f */
-        foreach ($fields as $f) {
-            $alias = $f->getAlias();
-            if ($this->request->query->has($alias)) {
-                $value = $this->request->query->get($alias);
+        $currentRequest = $this->getCurrentRequest();
 
-                $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
+        if (isset($currentRequest)) {
+            /** @var Field $f */
+            foreach ($fields as $f) {
+                $alias = $f->getAlias();
+                if ($currentRequest->query->has($alias)) {
+                    $value = $currentRequest->query->get($alias);
+                    $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
+                }
             }
         }
     }
@@ -820,7 +822,7 @@ class FormModel extends CommonFormModel
         $fields         = $form->getFields();
         $autoFillFields = [];
 
-        /** @var \Mautic\FormBundle\Entity\Field $field */
+        /** @var Field $field */
         foreach ($fields as $key => $field) {
             $leadField  = $field->getLeadField();
             $isAutoFill = $field->getIsAutoFill();
@@ -1137,5 +1139,10 @@ class FormModel extends CommonFormModel
         }
 
         return null;
+    }
+
+    private function getCurrentRequest(): ?Request
+    {
+        return $this->request->getCurrentRequest();
     }
 }
