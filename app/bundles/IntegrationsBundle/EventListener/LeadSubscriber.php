@@ -120,7 +120,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
 
         if (isset($changes['fields'])) {
-            $this->recordFieldChanges($changes['fields'], $lead->getId(), $lead);
+            $this->recordFieldChanges($changes['fields'], $lead->getId(), Lead::class, $lead);
         }
 
         if (isset($changes['dnc_channel_status'])) {
@@ -132,7 +132,7 @@ class LeadSubscriber implements EventSubscriberInterface
                 $dncChanges['mautic_internal_dnc_'.$channel] = [$oldValue, $newValue];
             }
 
-            $this->recordFieldChanges($dncChanges, $lead->getId(), $lead);
+            $this->recordFieldChanges($dncChanges, $lead->getId(), Lead::class, $lead);
         }
     }
 
@@ -170,7 +170,7 @@ class LeadSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->recordFieldChanges($changes['fields'], $company->getId(), $company);
+        $this->recordFieldChanges($changes['fields'], $company->getId(), Company::class, $company);
     }
 
     public function onCompanyPostDelete(Events\CompanyEvent $event): void
@@ -189,7 +189,7 @@ class LeadSubscriber implements EventSubscriberInterface
             1 => $lead->getCompany(),
         ];
 
-        $this->recordFieldChanges($changes, $lead->getId(), $lead);
+        $this->recordFieldChanges($changes, $lead->getId(), Lead::class, $lead);
     }
 
     /**
@@ -197,12 +197,11 @@ class LeadSubscriber implements EventSubscriberInterface
      *
      * @throws IntegrationNotFoundException
      */
-    private function recordFieldChanges(array $fieldChanges, $objectId, object $object): void
+    private function recordFieldChanges(array $fieldChanges, $objectId, string $objectType, object $object): void
     {
         $toPersist     = [];
         $changedFields = [];
         $objectId      = (int) $objectId;
-        $objectType    = get_class($object);
 
         foreach ($this->syncIntegrationsHelper->getEnabledIntegrations() as $integrationName) {
             try {
