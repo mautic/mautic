@@ -18,11 +18,10 @@ parameters:
 		- app/bundles/CoreBundle/Configurator/Configurator.php
 	ignoreErrors:
 		- '#Cannot unset offset#'
-		- '#Undefined variable: \$container#'
 		- '#Undefined variable: \$parameters#'
-		- '#Call to an undefined static method Mautic\\IntegrationsBundle\\Bundle\\AbstractPluginBundle::installAllTablesIfMissing\(\).#'
 		- '#Constant MAUTIC_TABLE_PREFIX not found.#'
 		- '#Constant MAUTIC_ENV not found.#'
 		- '#Constant MAUTIC_VERSION not found.#'
 		- '/Variable \$\w+ might not be defined\./'
 		- '/Variable \$paths in isset\(\) is never defined\./'
+		- '#Call to an undefined static method static\(Mautic\\IntegrationsBundle\\Bundle\\AbstractPluginBundle\)::installAllTablesIfMissing\(\).#'
