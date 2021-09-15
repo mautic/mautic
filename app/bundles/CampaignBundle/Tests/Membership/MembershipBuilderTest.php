@@ -118,11 +118,23 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testWhileLoopBreaksWithNoMoreContacts(): void
     {
-        $campaign       = new Campaign();
+        $campaign = new class() extends Campaign {
+            public function getId()
+            {
+                return 111;
+            }
+        };
+
         $contactLimiter = new ContactLimiter(1);
 
         $this->campaignMemberRepository->expects($this->exactly(4))
             ->method('getCampaignContactsBySegments')
+            ->withConsecutive(
+                [111, $contactLimiter, false],
+                [111, $contactLimiter, false],
+                [111, $contactLimiter, false],
+                [111, $contactLimiter, false]
+            )
             ->willReturnOnConsecutiveCalls([20], [21], [22], []);
 
         $this->manager->expects($this->exactly(3))
@@ -140,7 +152,52 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new ArrayCollection([new Lead()]));
 
         $this->eventDispatcher
-            ->expects($this->at(0))
+            ->expects($this->exactly(3))
+            ->method('dispatch')
+            ->with($this->equalTo(CampaignEvents::ON_CAMPAIGN_BATCH_UPDATE_COMPLETED), $this->isInstanceOf(CampaignUpdateIterationCompletedEvent::class));
+
+        $this->membershipBuilder->build($campaign, $contactLimiter, 100);
+    }
+
+    public function testWhileLoopBreaksWithNoMoreContactsForRepeatableCampaign(): void
+    {
+        $campaign = new class() extends Campaign {
+            public function getId()
+            {
+                return 111;
+            }
+        };
+
+        $campaign->setAllowRestart(true);
+
+        $contactLimiter = new ContactLimiter(1);
+
+        $this->campaignMemberRepository->expects($this->exactly(4))
+            ->method('getCampaignContactsBySegments')
+            ->withConsecutive(
+                [111, $contactLimiter, true],
+                [111, $contactLimiter, true],
+                [111, $contactLimiter, true],
+                [111, $contactLimiter, true]
+            )
+            ->willReturnOnConsecutiveCalls([20], [21], [22], []);
+
+        $this->manager->expects($this->exactly(3))
+            ->method('addContacts');
+
+        $this->campaignMemberRepository->expects($this->exactly(4))
+            ->method('getOrphanedContacts')
+            ->willReturnOnConsecutiveCalls([23], [24], [25], []);
+
+        $this->manager->expects($this->exactly(3))
+            ->method('removeContacts');
+
+        $this->leadRepository->expects($this->exactly(6))
+            ->method('getContactCollection')
+            ->willReturn(new ArrayCollection([new Lead()]));
+
+        $this->eventDispatcher
+            ->expects($this->exactly(3))
             ->method('dispatch')
             ->with($this->equalTo(CampaignEvents::ON_CAMPAIGN_BATCH_UPDATE_COMPLETED), $this->isInstanceOf(CampaignUpdateIterationCompletedEvent::class));
 
