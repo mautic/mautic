@@ -13,7 +13,7 @@ namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -168,8 +168,8 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                     ],
                 ],
                 'populate'        => true,
-                'manually_add'    => [48, 49, 50],
-                'manually_remove' => [3, 4],
+                'manually_add'    => [$this->getReference('lead-1')->id, $this->getReference('lead-2')->id, $this->getReference('lead-3')->id],
+                'manually_remove' => [$this->getReference('lead-4')->id, $this->getReference('lead-5')->id],
             ],
             [ // ID 10
                 'name'    => 'Include segment membership with filters',
