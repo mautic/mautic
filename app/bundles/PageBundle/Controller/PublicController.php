@@ -379,12 +379,13 @@ class PublicController extends CommonFormController
      */
     public function trackingAction(Request $request)
     {
+        $notSuccessResponse = new JsonResponse(
+            [
+                'success' => 0,
+            ]
+        );
         if (!$this->get('mautic.security')->isAnonymous()) {
-            return new JsonResponse(
-                [
-                    'success' => 0,
-                ]
-            );
+            return $notSuccessResponse;
         }
 
         /** @var \Mautic\PageBundle\Model\PageModel $model */
@@ -393,11 +394,8 @@ class PublicController extends CommonFormController
         try {
             $model->hitPage(null, $this->request);
         } catch (InvalidDecodedStringException $invalidDecodedStringException) {
-            // Invalid ct value so we must unset it
-            // and process the request without it
-            $this->request->request->set('ct', '');
-            $this->request->query->set('ct', '');
-            $model->hitPage(null, $this->request);
+            // do not track invalid ct
+            return $notSuccessResponse;
         }
 
         /** @var ContactTracker $contactTracker */
