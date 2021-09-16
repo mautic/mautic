@@ -30,6 +30,7 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\IntegrationEvents;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
@@ -143,6 +144,17 @@ class ConfigController extends AbstractFormController
             }
 
             $settings['sync']['fieldMappings'] = $fieldMerger->getFieldMappings();
+            // add new flag for each integration object based on the each fields sync direction
+            $settings['sync']['directions'] = [];
+            foreach ($settings['sync']['fieldMappings'] as $integrationObject => $objectFieldMappings) {
+                $settings['sync']['directions'][$integrationObject] = ObjectMappingDAO::SYNC_TO_MAUTIC;
+                foreach ($objectFieldMappings as $eachFieldMapping) {
+                    if (ObjectMappingDAO::SYNC_TO_MAUTIC != $eachFieldMapping['syncDirection']) {
+                        $settings['sync']['directions'][$integrationObject] = $eachFieldMapping['syncDirection'];
+                        break;
+                    }
+                }
+            }
 
             /** @var FieldValidationHelper $fieldValidator */
             $fieldValidator = $this->get('mautic.integrations.helper.field_validator');

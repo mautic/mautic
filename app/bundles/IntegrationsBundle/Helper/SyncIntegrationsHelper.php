@@ -17,6 +17,7 @@ use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\SyncInterface;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
@@ -128,7 +129,14 @@ class SyncIntegrationsHelper
                 $mappedObjectNames = $mappingManual->getMappedIntegrationObjectsNames($mauticObject);
                 foreach ($mappedObjectNames as $mappedObjectName) {
                     if (in_array($mappedObjectName, $featureSettings['sync']['objects'])) {
-                        return true;
+                        // check the syncDirection (consolidated flag) of the object
+                        if (isset($featureSettings['sync']['directions'])
+                            && isset($featureSettings['sync']['directions'][$mappedObjectName])
+                            && ObjectMappingDAO::SYNC_TO_MAUTIC != $featureSettings['sync']['directions'][$mappedObjectName]) {
+                            return true;
+                        } else {
+                            return false;
+                        }
                     }
                 }
             } catch (ObjectNotFoundException $exception) {
