@@ -389,7 +389,16 @@ class PublicController extends CommonFormController
 
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
-        $model->hitPage(null, $this->request);
+
+        try {
+            $model->hitPage(null, $this->request);
+        } catch (InvalidDecodedStringException $invalidDecodedStringException) {
+            // Invalid ct value so we must unset it
+            // and process the request without it
+            $this->request->request->set('ct', '');
+            $this->request->query->set('ct', '');
+            $model->hitPage(null, $this->request);
+        }
 
         /** @var ContactTracker $contactTracker */
         $contactTracker = $this->get(ContactTracker::class);
