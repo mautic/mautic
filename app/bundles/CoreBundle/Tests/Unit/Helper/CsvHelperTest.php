@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * @copyright   2018 Mautic Contributors. All rights reserved
+ * @copyright   2021 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -12,10 +14,11 @@
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CsvHelper;
+use PHPUnit\Framework\TestCase;
 
-class CsvHelperTest extends \PHPUnit\Framework\TestCase
+class CsvHelperTest extends TestCase
 {
-    public function testSanitizeHeaders()
+    public function testSanitizeHeaders(): void
     {
         $headers = [
             'withoutSpaces',
@@ -34,17 +37,19 @@ class CsvHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, CsvHelper::sanitizeHeaders($headers));
     }
 
-    public function testConvertHeadersIntoFields()
+    public function testConvertHeadersIntoFields(): void
     {
         $headers = [
             'České znáčky',
             '',
             'First Name',
+            'File',
         ];
 
         $expected = [
-            'first_name' => 'First Name',
-            'esk_znky'   => 'České znáčky',
+            'h_first_name' => 'First Name',
+            'h_esk_znky'   => 'České znáčky',
+            'h_file'       => 'File',
         ];
 
         $this->assertEquals($expected, CsvHelper::convertHeadersIntoFields($headers));
