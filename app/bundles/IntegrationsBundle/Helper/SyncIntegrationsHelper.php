@@ -129,13 +129,12 @@ class SyncIntegrationsHelper
                 $mappedObjectNames = $mappingManual->getMappedIntegrationObjectsNames($mauticObject);
                 foreach ($mappedObjectNames as $mappedObjectName) {
                     if (in_array($mappedObjectName, $featureSettings['sync']['objects'])) {
-                        // check the syncDirection (consolidated flag) of the object
                         if (isset($featureSettings['sync']['directions'])
-                            && isset($featureSettings['sync']['directions'][$mappedObjectName])
-                            && ObjectMappingDAO::SYNC_TO_MAUTIC != $featureSettings['sync']['directions'][$mappedObjectName]) {
-                            return true;
+                            && isset($featureSettings['sync']['directions'][$mappedObjectName])) { // fallback condition
+                            // check the syncDirection (consolidated flag) of the object
+                            return ObjectMappingDAO::SYNC_TO_MAUTIC != $featureSettings['sync']['directions'][$mappedObjectName];
                         } else {
-                            return false;
+                            return true;
                         }
                     }
                 }
