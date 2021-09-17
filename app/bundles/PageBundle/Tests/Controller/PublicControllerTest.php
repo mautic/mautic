@@ -466,6 +466,50 @@ class PublicControllerTest extends AbstractMauticTestCase
         );
     }
 
+    public function testTrackingActionWithInvalidCt()
+    {
+        $request = new Request();
+
+        $pageModel    = $this->createMock(PageModel::class);
+        $pageModel->expects($this->once())->method('hitPage')->willReturnCallback(
+            function () {
+                throw new InvalidDecodedStringException();
+            }
+        );
+
+        $modelFactory = $this->createMock(ModelFactory::class);
+        $modelFactory->expects($this->once())
+            ->method('getModel')
+            ->with('page')
+            ->willReturn($pageModel);
+
+        $security = $this->createMock(CorePermissions::class);
+        $security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
+        $container = $this->createMock(Container::class);
+        $container->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mautic.security', Container::EXCEPTION_ON_INVALID_REFERENCE, $security],
+                        ['mautic.model.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $modelFactory],
+                    ]
+                )
+            );
+
+        $publicController = new PublicController();
+        $publicController->setContainer($container);
+        $publicController->setRequest($request);
+
+        $response = $publicController->trackingAction($request);
+        $this->assertEquals(
+            ['success' => 0],
+            json_decode($response->getContent(), true)
+        );
+    }
+
     public function testTrackingImageAction()
     {
         $this->client->request('GET', '/mtracking.gif?url=http%3A%2F%2Fmautic.org');
