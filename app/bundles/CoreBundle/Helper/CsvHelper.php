@@ -52,10 +52,7 @@ class CsvHelper
         return array_map('trim', $headers);
     }
 
-    /**
-     * @return array
-     */
-    public static function convertHeadersIntoFields(array $headers)
+    public static function convertHeadersIntoFields(array $headers): array
     {
         sort($headers);
 
@@ -66,7 +63,9 @@ class CsvHelper
 
             // Skip columns with empty names as they cannot be mapped.
             if (!empty($fieldName)) {
-                $importedFields[$fieldName] = $header;
+                // Add prefix to field names to avoid errors in form rendering,
+                // e.g. header with 'file' will be h_file.
+                $importedFields['h_'.$fieldName] = $header;
             }
         }
 
