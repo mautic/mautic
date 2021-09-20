@@ -106,4 +106,36 @@ class FieldApiController extends CommonApiController
             }
         }
     }
+
+    /**
+     * Creates a new entity.
+     *
+     * @return Response
+     */
+    public function newEntityAction()
+    {
+        $parameters = $this->request->request->all();
+        $parameters = $this->sanitizeProperties($parameters);
+        $entity     = $this->getNewEntity($parameters);
+
+        if (!$this->checkEntityAccess($entity, 'create')) {
+            return $this->accessDenied();
+        }
+
+        return $this->processForm($entity, $parameters, 'POST');
+    }
+
+    /**
+     * @param array parameters
+     */
+    protected function sanitizeProperties(array $parameters)
+    {
+        if (isset($parameters['type']) && 'boolean' === $parameters['type']) {
+            $parameters['properties']        = $parameters['properties'] ?? [];
+            $parameters['properties']['yes'] = $parameters['properties']['yes'] ?? $this->translator->trans('mautic.core.yes');
+            $parameters['properties']['no']  = $parameters['properties']['no'] ?? $this->translator->trans('mautic.core.no');
+        }
+
+        return $parameters;
+    }
 }

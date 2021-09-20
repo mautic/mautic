@@ -55,4 +55,19 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
+
+    public function testCreatingBooleanField()
+    {
+        // Create contact
+        $payload = [
+            'label'      => 'foo',
+            'alias'      => 'foo',
+            'type'       => 'boolean',
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $fieldResponse  = json_decode($clientResponse->getContent(), true);
+        Assert::assertSame(['yes' => 'Yes', 'no' => 'No'], $fieldResponse['field']['properties']);
+    }
 }
