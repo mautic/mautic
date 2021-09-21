@@ -458,6 +458,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "TS16V",
+      "name": "TS16V",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38064792?v=4",
+      "profile": "https://github.com/TS16V",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
