@@ -144,17 +144,8 @@ class ConfigController extends AbstractFormController
             }
 
             $settings['sync']['fieldMappings'] = $fieldMerger->getFieldMappings();
-            // add new flag for each integration object based on the each fields sync direction
-            $settings['sync']['directions'] = [];
-            foreach ($settings['sync']['fieldMappings'] as $integrationObject => $objectFieldMappings) {
-                $settings['sync']['directions'][$integrationObject] = ObjectMappingDAO::SYNC_TO_MAUTIC;
-                foreach ($objectFieldMappings as $eachFieldMapping) {
-                    if (ObjectMappingDAO::SYNC_TO_MAUTIC != $eachFieldMapping['syncDirection']) {
-                        $settings['sync']['directions'][$integrationObject] = $eachFieldMapping['syncDirection'];
-                        break;
-                    }
-                }
-            }
+            // add new flag for each integration object based on each field's sync direction
+            $settings['sync']['directions'] = $this->setObjectSyncDirection($settings['sync']['fieldMappings']);
 
             /** @var FieldValidationHelper $fieldValidator */
             $fieldValidator = $this->get('mautic.integrations.helper.field_validator');
@@ -287,5 +278,25 @@ class ConfigController extends AbstractFormController
         /** @var Session $session */
         $session = $this->get('session');
         $session->remove("{$this->integrationObject->getName()}-fields");
+    }
+
+    /**
+     * @return array $syncDirections
+     */
+    private function setObjectSyncDirection(array $fieldMappings): array
+    {
+        $syncDirections = [];
+
+        foreach ($fieldMappings as $integrationObject => $objectFieldMappings) {
+            $syncDirections[$integrationObject] = ObjectMappingDAO::SYNC_TO_MAUTIC;
+            foreach ($objectFieldMappings as $eachFieldMapping) {
+                if (ObjectMappingDAO::SYNC_TO_MAUTIC != $eachFieldMapping['syncDirection']) {
+                    $syncDirections[$integrationObject] = $eachFieldMapping['syncDirection'];
+                    break;
+                }
+            }
+        }
+
+        return $syncDirections;
     }
 }
