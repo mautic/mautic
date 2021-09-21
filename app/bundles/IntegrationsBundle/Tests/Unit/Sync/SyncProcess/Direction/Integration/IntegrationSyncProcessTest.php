@@ -89,11 +89,6 @@ class IntegrationSyncProcessTest extends TestCase
             ->method('getSyncToDateTime')
             ->willReturn($toSyncDateTime);
 
-        $this->syncDateHelper->expects($this->once())
-            ->method('getLastSyncDateForObject')
-            ->with(self::INTEGRATION_NAME, $objectName)
-            ->willReturn(null);
-
         // SyncDateExchangeInterface::getSyncReport should sync because an object was added to the report
         $this->syncDataExchange->expects($this->once())
             ->method('getSyncReport')
@@ -211,11 +206,6 @@ class IntegrationSyncProcessTest extends TestCase
         $this->syncDateHelper->expects($this->exactly(2))
             ->method('getSyncToDateTime')
             ->willReturn($toSyncDateTime);
-
-        $this->syncDateHelper->expects($this->exactly(2))
-            ->method('getLastSyncDateForObject')
-            ->withConsecutive([self::INTEGRATION_NAME, 'Contact'], [self::INTEGRATION_NAME, 'Lead'])
-            ->willReturn(null);
 
         // SyncDateExchangeInterface::getSyncReport should sync because an object was added to the report
         $this->syncDataExchange->expects($this->once())
