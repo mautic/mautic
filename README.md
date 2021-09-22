@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-47-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-48-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -135,6 +135,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/julienWebmecanik"><img src="https://avatars.githubusercontent.com/u/79137416?v=4?s=100" width="100px;" alt=""/><br /><sub><b>julienWebmecanik</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=julienWebmecanik" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/johbuch"><img src="https://avatars.githubusercontent.com/u/31535432?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Johan Buchert</b></sub></a><br /><a href="#userTesting-johbuch" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/TS16V"><img src="https://avatars.githubusercontent.com/u/38064792?v=4?s=100" width="100px;" alt=""/><br /><sub><b>TS16V</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3ATS16V" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/rafalsk"><img src="https://avatars.githubusercontent.com/u/9338163?v=4?s=100" width="100px;" alt=""/><br /><sub><b>rafalsk</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Arafalsk" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
