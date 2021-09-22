@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * @copyright   2018 Mautic Contributors. All rights reserved
+ * @copyright   2021 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
  *
  * @link        https://mautic.org
@@ -16,7 +16,6 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\LeadList;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
