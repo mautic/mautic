@@ -643,8 +643,8 @@ class ImportController extends FormController
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
-                        'failedRows'        => $this->model->getFailedRows($entity->getId(), $entity->getObject()),
-                        'importedRowsChart' => $entity->getDateStarted() ? $this->model->getImportedRowsLineChartData(
+                        'failedRows'        => $this->importModel->getFailedRows($entity->getId(), $entity->getObject()),
+                        'importedRowsChart' => $entity->getDateStarted() ? $this->importModel->getImportedRowsLineChartData(
                             'i',
                             $entity->getDateStarted(),
                             $entity->getDateEnded() ? $entity->getDateEnded() : $entity->getDateModified(),
