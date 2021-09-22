@@ -1391,7 +1391,7 @@ class MailHelper
 
         $this->replyTo = $email->getReplyToAddress();
         if (empty($this->replyTo)) {
-            if (!empty($fromEmail)) {
+            if (!empty($fromEmail) && empty($this->factory->getParameter('mailer_reply_to_email'))) {
                 $this->replyTo = $fromEmail;
             } else {
                 $this->replyTo = $this->systemReplyTo;
