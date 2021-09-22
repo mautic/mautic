@@ -19,7 +19,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testUnsubscribeAction()
+    public function testUnsubscribeAction(): void
     {
         $client  = $this->client;
         $segment = $this->createSegment();
@@ -45,7 +45,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         return $segment;
     }
 
-    private function createEmail(string $suffix = 'A', string $emailType = 'list')
+    private function createEmail(string $suffix = 'A', string $emailType = 'list'): Email
     {
         $email = new Email();
         $email->setName("Email $suffix");
