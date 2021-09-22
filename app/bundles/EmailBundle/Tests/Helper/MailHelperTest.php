@@ -427,6 +427,15 @@ class MailHelperTest extends \PHPUnit\Framework\TestCase
         $mailer->setEmail($email);
         $replyTo = key($mailer->message->getReplyTo());
         $this->assertEquals('replytooverride@nowhere.com', $replyTo);
+
+        // From address is set
+        $email->setFromAddress('from@nowhere.com');
+        // Reply to should not be set
+        $email->setReplyToAddress(null);
+        $mailer->setEmail($email);
+        $replyTo = key($mailer->message->getReplyTo());
+        // Expect from address in reply to
+        $this->assertEquals('from@nowhere.com', $replyTo);
     }
 
     public function testStandardOwnerAsMailer()
