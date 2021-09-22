@@ -155,6 +155,9 @@ class FormTestAbstract extends TestCase
         $formUploaderMock         = $this->createMock(FormUploader::class);
         $deviceTrackingService    = $this->createMock(DeviceTrackingServiceInterface::class);
         $file1Mock                = $this->createMock(UploadedFile::class);
+        $router                   = $this->createMock(RouterInterface::class);
+        $router->method('generate')->willReturn('absolute/path/somefile.jpg');
+
         $lead                     = new Lead();
         $lead->setId(123);
 
@@ -215,7 +218,6 @@ class FormTestAbstract extends TestCase
         $companyModel->expects($this->any())
             ->method('fetchCompanyFields')
             ->willReturn([]);
-
         $submissionModel = new SubmissionModel(
             $ipLookupHelper,
             $templatingHelperMock,
@@ -230,11 +232,10 @@ class FormTestAbstract extends TestCase
             $uploadFieldValidatorMock,
             $formUploaderMock,
             $deviceTrackingService,
-            new FieldValueTransformer($this->createMock(RouterInterface::class)),
+            new FieldValueTransformer($router),
             $dateHelper,
             $contactTracker
         );
-
         $submissionModel->setDispatcher($dispatcher);
         $submissionModel->setTranslator($translator);
         $submissionModel->setEntityManager($entityManager);
