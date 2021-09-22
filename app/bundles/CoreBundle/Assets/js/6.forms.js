@@ -572,6 +572,10 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
 
     Mautic.ajaxActionRequest(action, {'alias': fieldAlias, 'operator': fieldOperator, 'changed': fieldType}, function(response) {
         if (typeof response.options != 'undefined') {
+            // console.log('fieldAlias: ' +fieldAlias);
+            // console.log('fieldOperator: ' +fieldOperator);
+            // console.log('fieldType: ' +fieldType);
+
             var valueField = mQuery('#'+fieldPrefix+'value');
             var valueFieldAttrs = {
                 'class': valueField.attr('class'),
@@ -593,6 +597,13 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
                     .attr('name', valueFieldAttrs['name'])
                     .attr('autocomplete', valueFieldAttrs['autocomplete'])
                     .attr('value', valueFieldAttrs['value']);
+
+                // @todo, add comments why this is added. (looking for
+                //  alternate if possible). [Remove this comment].
+                if (['in', '!in'].indexOf(fieldOperator) >= 0) {
+                    newValueField.attr('multiple', 'multiple');
+                }
+
                 mQuery.each(response.options, function(value, optgroup) {
                     if (typeof optgroup === 'object') {
                         var optgroupEl = mQuery('<optgroup/>').attr('label', value);

@@ -156,31 +156,43 @@ class CampaignEventLeadFieldValueType extends AbstractType
             $supportsValue   = !in_array($operator, ['empty', '!empty']);
             $supportsChoices = !in_array($operator, ['empty', '!empty', 'regexp', '!regexp']);
 
+            $includeExcludeChoices = in_array($operator, ['in', '!in']);
+
             // Display selectbox for a field with choices, textbox for others
             if (!empty($fieldValues) && $supportsChoices) {
+
+                $options = [
+                    'choices'           => array_flip($fieldValues),
+                    'label'             => 'mautic.form.field.form.value',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'attr'              => [
+                        'class'                => 'form-control',
+                        'onchange'             => 'Mautic.updateLeadFieldValueOptions(this)',
+                        'data-toggle'          => $fieldType,
+                        'data-onload-callback' => 'updateLeadFieldValueOptions',
+                    ],
+                    'choice_attr' => $choiceAttr,
+                    'required'    => true,
+                    'constraints' => [
+                        new NotBlank(
+                            ['message' => 'mautic.core.value.required']
+                        ),
+                    ],
+                ];
+
+                if ($includeExcludeChoices) {
+                    $multiSelectValue = is_string($data['properties']['value']) ? [$data['properties']['value']] : [];
+                    $data['properties']['value'] = $multiSelectValue;
+                    $e->setData($data);
+                    $options['multiple'] = true;
+                }
                 $form->add(
                     'value',
                     ChoiceType::class,
-                    [
-                        'choices'           => array_flip($fieldValues),
-                        'label'             => 'mautic.form.field.form.value',
-                        'label_attr'        => ['class' => 'control-label'],
-                        'attr'              => [
-                            'class'                => 'form-control',
-                            'onchange'             => 'Mautic.updateLeadFieldValueOptions(this)',
-                            'data-toggle'          => $fieldType,
-                            'data-onload-callback' => 'updateLeadFieldValueOptions',
-                        ],
-                        'choice_attr' => $choiceAttr,
-                        'required'    => true,
-                        'constraints' => [
-                            new NotBlank(
-                                ['message' => 'mautic.core.value.required']
-                            ),
-                        ],
-                    ]
+                    $options
                 );
-            } else {
+            }
+            else {
                 $attr = [
                     'class'                => 'form-control',
                     'data-toggle'          => $fieldType,
