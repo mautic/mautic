@@ -159,7 +159,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
 
             // Display selectbox for a field with choices, textbox for others
             if (!empty($fieldValues) && $supportsChoices) {
-
                 $options = [
                     'choices'           => array_flip($fieldValues),
                     'label'             => 'mautic.form.field.form.value',
@@ -190,8 +189,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     ChoiceType::class,
                     $options
                 );
-            }
-            else {
+            } else {
                 $attr = [
                     'class'                => 'form-control',
                     'data-toggle'          => $fieldType,
