@@ -572,9 +572,6 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
 
     Mautic.ajaxActionRequest(action, {'alias': fieldAlias, 'operator': fieldOperator, 'changed': fieldType}, function(response) {
         if (typeof response.options != 'undefined') {
-            // console.log('fieldAlias: ' +fieldAlias);
-            // console.log('fieldOperator: ' +fieldOperator);
-            // console.log('fieldType: ' +fieldType);
 
             var valueField = mQuery('#'+fieldPrefix+'value');
             var valueFieldAttrs = {
@@ -598,10 +595,13 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
                     .attr('autocomplete', valueFieldAttrs['autocomplete'])
                     .attr('value', valueFieldAttrs['value']);
 
-                // @todo, add comments why this is added. (looking for
-                //  alternate if possible). [Remove this comment].
+                // If the operator is selected as include or exclude then
+                // add multiple attribute to the field and adjust the field
+                // name to accept the array.
                 if (['in', '!in'].indexOf(fieldOperator) >= 0) {
-                    newValueField.attr('multiple', 'multiple');
+                    const attrName = valueFieldAttrs['name'] + '[]';
+                    newValueField.attr('multiple', 'multiple')
+                        .attr('name', attrName);
                 }
 
                 mQuery.each(response.options, function(value, optgroup) {

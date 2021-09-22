@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -156,8 +157,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
             $supportsValue   = !in_array($operator, ['empty', '!empty']);
             $supportsChoices = !in_array($operator, ['empty', '!empty', 'regexp', '!regexp']);
 
-            $includeExcludeChoices = in_array($operator, ['in', '!in']);
-
             // Display selectbox for a field with choices, textbox for others
             if (!empty($fieldValues) && $supportsChoices) {
 
@@ -180,12 +179,12 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     ],
                 ];
 
-                if ($includeExcludeChoices) {
-                    $multiSelectValue = is_string($data['properties']['value']) ? [$data['properties']['value']] : [];
-                    $data['properties']['value'] = $multiSelectValue;
-                    $e->setData($data);
+                // If user selects the operator as include or exclude then the
+                // `value` field should be accepting multiple values.
+                if (in_array($operator, [OperatorOptions::IN, OperatorOptions::NOT_IN])) {
                     $options['multiple'] = true;
                 }
+
                 $form->add(
                     'value',
                     ChoiceType::class,
