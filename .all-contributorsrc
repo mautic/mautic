@@ -478,6 +478,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "jonathandhn",
+      "name": "Jonathan Dahan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/55917666?v=4",
+      "profile": "https://jonathanphoto.fr",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
