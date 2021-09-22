@@ -208,7 +208,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/4246909?v=4",
       "profile": "https://github.com/jos0405",
       "contributions": [
-        "code"
+        "code",
+        "userTesting"
       ]
     },
     {
@@ -429,7 +430,8 @@
       "profile": "http://www.idea2.ch",
       "contributions": [
         "review",
-        "userTesting"
+        "userTesting",
+        "code"
       ]
     },
     {
