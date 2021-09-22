@@ -639,8 +639,6 @@ class CommonController extends Controller implements MauticController
      * @param string|null $level
      * @param string|null $domain
      * @param bool|null   $addNotification
-     *
-     * @deprecated Will be removed in Mautic 3.0. Use CommonController::flashBag->addFlash() instead.
      */
     public function addFlash($message, $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false)
     {
