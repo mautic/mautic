@@ -128,17 +128,6 @@ class FieldType extends AbstractType
         );
 
         $builder->add(
-            'properties_multiselect_template',
-            SortableListType::class,
-            [
-                'mapped'          => false,
-                'label'           => 'mautic.lead.field.form.properties.select',
-                'option_required' => false,
-                'with_labels'     => true,
-            ]
-        );
-
-        $builder->add(
             'properties_lookup_template',
             SortableListType::class,
             [
@@ -289,7 +278,7 @@ class FieldType extends AbstractType
                             'required'          => false,
                             'choices'           => array_flip($list),
                             'multiple'          => 'multiselect' === $type,
-                            'data'              => (array) $options['data']->getDefaultValue(),
+                            'data'              => 'multiselect' === $type ? (array) $options['data']->getDefaultValue() : $options['data']->getDefaultValue(),
                         ]
                     );
                     break;
