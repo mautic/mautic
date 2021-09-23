@@ -24,6 +24,8 @@ trait CustomFieldRepositoryTrait
      */
     protected $customFieldList = [];
 
+    private $uniqueIdentifiersOperator;
+
     /**
      * @var string
      */

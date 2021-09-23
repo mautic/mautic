@@ -13,39 +13,25 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CampaignBundle\Entity\Summary;
-use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
-final class Version20201120122846 extends PreUpAssertionMigration
+final class Version20201120122846 extends AbstractMauticMigration
 {
     private const SIGNED   = 'SIGNED';
     private const UNSIGNED = 'UNSIGNED';
 
-    protected function preUpAssertions(): void
+    public function preUp(Schema $schema): void
     {
         $campaignSummaryTableName = $this->generateTableName(Summary::TABLE_NAME);
-        $this->skipAssertion(
-            function (Schema $schema) {
-                return $schema->hasTable($this->generateTableName(Summary::TABLE_NAME));
-            },
-            sprintf('Schema already includes %s table', $campaignSummaryTableName)
-        );
-
-        $campaignIdFK = $this->getForeignKeyName($campaignSummaryTableName, 'campaign_id');
-        $this->skipAssertion(
-            function (Schema $schema) use ($campaignSummaryTableName, $campaignIdFK) {
-                return $schema->getTable($campaignSummaryTableName)->hasForeignKey($campaignIdFK);
-            },
-            sprintf('Foreign key %s already exists in table %s', $campaignIdFK, $campaignSummaryTableName)
-        );
-
-        $eventIdFK = $this->getForeignKeyName($campaignSummaryTableName, 'event_id');
-        $this->skipAssertion(
-            function (Schema $schema) use ($campaignSummaryTableName, $eventIdFK) {
-                return $schema->getTable($campaignSummaryTableName)->hasForeignKey($eventIdFK);
-            },
-            sprintf('Foreign key %s already exists in table %s', $eventIdFK, $campaignSummaryTableName)
-        );
+        $campaignIdFK             = $this->getForeignKeyName($campaignSummaryTableName, 'campaign_id');
+        $eventIdFK                = $this->getForeignKeyName($campaignSummaryTableName, 'event_id');
+        if ($schema->hasTable($this->generateTableName(Summary::TABLE_NAME))
+            && $schema->getTable($campaignSummaryTableName)->hasForeignKey($campaignIdFK)
+            && $schema->getTable($campaignSummaryTableName)->hasForeignKey($eventIdFK)) {
+            throw new SkipMigration('Schema includes this migration');
+        }
     }
 
     public function up(Schema $schema): void

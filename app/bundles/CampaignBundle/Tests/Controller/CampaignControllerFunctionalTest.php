@@ -40,8 +40,8 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
     protected function setUp(): void
     {
         parent::setUp();
-        $this->campaignModel      = $this->container->get('mautic.model.factory')->getModel('campaign');
-        $this->campaignLeadsLabel = $this->container->get('translator')->trans('mautic.campaign.campaign.leads');
+        $this->campaignModel      = self::$container->get('mautic.model.factory')->getModel('campaign');
+        $this->campaignLeadsLabel = self::$container->get('translator')->trans('mautic.campaign.campaign.leads');
     }
 
     public function testCampaignContactCountThroughStats(): void
@@ -224,7 +224,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
 
     private function getCanvasTotalContacts(int $campaignId): int
     {
-        $crawler       = $this->getCrawler($campaignId);
+        $crawler       = $this->getCrawlers($campaignId);
         $canvasJson    = trim($crawler->filter('canvas')->html());
         $canvasData    = json_decode($canvasJson, true);
         $datasets      = $canvasData['datasets'] ?? [];
@@ -234,7 +234,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
 
     private function setSummaryCoreParameter(array $parameters): CoreParametersHelper
     {
-        $coreParam = new class($this->container, $parameters) extends CoreParametersHelper {
+        $coreParam = new class(self::$container, $parameters) extends CoreParametersHelper {
             private $parameters;
 
             public function __construct(ContainerInterface $container, array $parameters)
@@ -248,7 +248,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
                 return $this->parameters[$name] ?? parent::get($name, $default);
             }
         };
-        $this->container->set('mautic.helper.core_parameters', $coreParam);
+        //self::$container->set('mautic.helper.core_parameters', $coreParam);
 
         return $coreParam;
     }
@@ -268,7 +268,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         return $totalContacts;
     }
 
-    private function getCrawler(int $campaignId): Crawler
+    private function getCrawlers(int $campaignId): Crawler
     {
         $parameters = [
             'daterange' => [
@@ -282,7 +282,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
 
     private function getActionCounts(int $campaignId): array
     {
-        $crawler        = $this->getCrawler($campaignId);
+        $crawler        = $this->getCrawlers($campaignId);
         $successPercent = trim($crawler->filter('#actions-container')->filter('span')->eq(0)->html());
         $completed      = trim($crawler->filter('#actions-container')->filter('span')->eq(1)->html());
         $pending        = trim($crawler->filter('#actions-container')->filter('span')->eq(2)->html());
