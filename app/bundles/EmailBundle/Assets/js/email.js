@@ -66,7 +66,8 @@ Mautic.emailOnLoad = function (container, response) {
                     }
                 },
                 false,
-                true
+                true,
+                "GET"
             );
         }
     }
