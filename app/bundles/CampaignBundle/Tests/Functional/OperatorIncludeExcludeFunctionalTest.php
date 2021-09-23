@@ -22,8 +22,8 @@ final class OperatorIncludeExcludeFunctionalTest extends MauticMysqlTestCase
 
         $payload = [
             'action'            => 'lead:updateLeadFieldValues',
-            'alias'             => 'test_multiselect_field',
-            'operator'          => 'in',
+            'alias'             => $fieldDetails['alias'],
+            'operator'          => $fieldDetails['operator'],
             'changed'           => 'operator',
         ];
 
@@ -40,6 +40,14 @@ final class OperatorIncludeExcludeFunctionalTest extends MauticMysqlTestCase
             [
                 'type'      => 'multiselect',
                 'alias'     => 'test_multiselect_field',
+                'operator'  => 'in',
+            ],
+            'multiselect',
+        ];
+        yield [
+            [
+                'type'      => 'multiselect',
+                'alias'     => 'test_multiselect_field_one',
                 'operator'  => '!in',
             ],
             'multiselect',
@@ -48,9 +56,9 @@ final class OperatorIncludeExcludeFunctionalTest extends MauticMysqlTestCase
             [
                 'type'      => 'text',
                 'alias'     => 'test_text_field',
-                'operator'  => 'in',
+                'operator'  => 'like',
             ],
-            'multiselect',
+            'text',
         ];
     }
 
