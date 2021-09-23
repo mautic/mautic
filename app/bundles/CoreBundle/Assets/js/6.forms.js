@@ -598,7 +598,7 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
                 // If the operator is selected as include or exclude then
                 // add multiple attribute to the field and adjust the field
                 // name to accept the array.
-                if (['in', '!in'].indexOf(fieldOperator) >= 0) {
+                if (fieldOperator === 'in' || fieldOperator === '!in') {
                     const attrName = valueFieldAttrs['name'] + '[]';
                     newValueField.attr('multiple', 'multiple')
                         .attr('name', attrName);

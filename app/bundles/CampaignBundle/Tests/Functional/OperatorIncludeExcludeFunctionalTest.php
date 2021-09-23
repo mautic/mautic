@@ -9,10 +9,10 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class OperatorIncludeExcludeFunctionalTest extends MauticMysqlTestCase
+final class OperatorIncludeExcludeFunctionalTest extends MauticMysqlTestCase
 {
     /**
-     * The include/exclude operator should retuen the multiselect field.
+     * The include/exclude operator should return the multiselect field.
      *
      * @dataProvider dataCustomFields
      */
@@ -62,10 +62,8 @@ class OperatorIncludeExcludeFunctionalTest extends MauticMysqlTestCase
         $field->setAlias($alias);
         $field->setName($alias);
 
-        $fields[] = $field;
-
         /** @var FieldModel $fieldModel */
         $fieldModel = $this->container->get('mautic.lead.model.field');
-        $fieldModel->saveEntities($fields);
+        $fieldModel->saveEntity($field);
     }
 }
