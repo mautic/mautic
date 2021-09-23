@@ -1534,9 +1534,11 @@ Mautic.listOnLoad = function(container, response) {
     
     if (segmentDependenciesTab.length) {
         mQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
-            Mautic.cleanSegmentDependencies();
+            if (!mQuery(e.target).attr('id') === 'segment-dependencies') {
+                return;
+            }
 
-            if (!segmentDependenciesLoaded && mQuery(e.target).attr('id') === 'segment-dependencies') {
+            if (!segmentDependenciesLoaded) {
                 segmentDependenciesLoaded = true;
                 mQuery.ajax({
                     showLoadingBar: true,
@@ -1560,6 +1562,12 @@ Mautic.listOnLoad = function(container, response) {
                 Mautic.renderSegmentTree('#segment-dependencies-container', jsPlumbData);
             }
         });
+
+        mQuery(document).on('hide.bs.tab', 'a[data-toggle="tab"]', function (e) {
+            if (!mQuery(e.target).attr('id') !== 'segment-dependencies') {
+                Mautic.cleanSegmentDependencies();
+            }
+        });
     }
 };
 
@@ -1576,6 +1584,8 @@ Mautic.cleanSegmentDependencies = function() {
 }
 
 Mautic.renderSegmentTree = function(containerId, data) {
+    Mautic.cleanSegmentDependencies(); // Make sure there is no tree rendered already
+
     const plumbInstance = jsPlumb.getInstance({
         elementsDraggable:false,
         container: document.querySelector(containerId)
