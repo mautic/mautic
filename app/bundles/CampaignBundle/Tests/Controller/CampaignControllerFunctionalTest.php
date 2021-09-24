@@ -26,176 +26,112 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
      */
     private $campaignLeadsLabel;
 
-    //protected $useCleanupRollback = false;
-
     protected function setUp(): void
     {
+        $functionForUseSummary = ['testCampaignContactCountThroughStatsWithSummary',
+            'testCampaignContactCountOnCanvasWithSummaryWithoutRange', 'testCampaignContactCountOnCanvasWithSummaryAndRange',
+            'testCampaignCountsBeforeSummarizeCommandWithSummaryWithoutRange', 'testCampaignCountsBeforeSummarizeCommandWithSummaryAndRange',
+            'testCampaignCountsAfterSummarizeCommandWithSummaryWithoutRange', 'testCampaignCountsAfterSummarizeCommandWithSummaryAndRange',
+            'testCampaignPendingCountsWithSummaryWithoutRange', 'testCampaignPendingCountsWithSummaryAndRange', ];
+        $functionForUseRange = ['testCampaignContactCountOnCanvasWithoutSummaryWithRange', 'testCampaignContactCountOnCanvasWithSummaryAndRange',
+            'testCampaignCountsBeforeSummarizeCommandWithoutSummaryWithRange', 'testCampaignCountsBeforeSummarizeCommandWithSummaryAndRange',
+            'testCampaignCountsAfterSummarizeCommandWithoutSummaryWithRange', 'testCampaignCountsAfterSummarizeCommandWithSummaryAndRange',
+            'testCampaignPendingCountsWithoutSummaryAndRange', 'testCampaignPendingCountsWithoutSummaryWithRange', ];
+        $this->configParams[self::CAMPAIGN_SUMMARY_PARAM] = in_array($this->getName(), $functionForUseSummary);
+        $this->configParams[self::CAMPAIGN_RANGE_PARAM]   = in_array($this->getName(), $functionForUseRange);
         parent::setUp();
         $this->campaignModel      = self::$container->get('mautic.model.factory')->getModel('campaign');
         $this->campaignLeadsLabel = self::$container->get('translator')->trans('mautic.campaign.campaign.leads');
     }
 
-    public function testCampaignContactCountThroughStats(): void
+    public function testCampaignContactCountThroughStatsWithSummary(): void
     {
-        $campaign   = $this->saveSomeCampaignLeadEventLogs();
-        $campaignId = $campaign->getId();
-
-        // Campaign Summary OFF
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => false]);
-
-        $totalContacts = $this->getStatTotalContacts($campaignId);
-        Assert::assertSame(2, $totalContacts);
-
-        // Campaign Summary ON
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => true]);
-        $totalContacts = $this->getStatTotalContacts($campaignId);
-        Assert::assertSame(2, $totalContacts);
+        $this->campaignContactCountThroughStats();
     }
 
-    public function testCampaignContactCountOnCanvas(): void
+    public function testCampaignContactCountThroughStatsWithoutSummary(): void
     {
-        $campaign   = $this->saveSomeCampaignLeadEventLogs();
-        $campaignId = $campaign->getId();
-
-        // Campaign Summary OFF, Campaign Range OFF
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => false, self::CAMPAIGN_RANGE_PARAM => false]);
-        $totalContacts = $this->getCanvasTotalContacts($campaignId);
-        Assert::assertSame(2, $totalContacts);
-
-        // Campaign Summary ON, Campaign Range OFF
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => true, self::CAMPAIGN_RANGE_PARAM => false]);
-        $totalContacts = $this->getCanvasTotalContacts($campaignId);
-        Assert::assertSame(2, $totalContacts);
-
-        // Campaign Summary OFF, Campaign Range ON
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => false, self::CAMPAIGN_RANGE_PARAM => true]);
-        $totalContacts = $this->getCanvasTotalContacts($campaignId);
-        Assert::assertSame(2, $totalContacts);
-
-        // Campaign Summary ON, Campaign Range ON
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => true, self::CAMPAIGN_RANGE_PARAM => true]);
-        $totalContacts = $this->getCanvasTotalContacts($campaignId);
-        Assert::assertSame(2, $totalContacts);
+        $this->campaignContactCountThroughStats();
     }
 
-    public function testCampaignCountsBeforeSummarizeCommand(): void
+    public function testCampaignContactCountOnCanvasWithoutSummaryAndRange(): void
     {
-        $campaign   = $this->saveSomeCampaignLeadEventLogs();
-        $campaignId = $campaign->getId();
-
-        // Campaign Summary OFF, Campaign Range OFF
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => false, self::CAMPAIGN_RANGE_PARAM => false]);
-        $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame('100%', $actionCounts['successPercent']);
-        Assert::assertSame('2', $actionCounts['completed']);
-        Assert::assertSame('0', $actionCounts['pending']);
-
-        // Campaign Summary ON, Campaign Range OFF
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => true, self::CAMPAIGN_RANGE_PARAM => false]);
-        $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame('0%', $actionCounts['successPercent']);
-        Assert::assertSame('0', $actionCounts['completed']);
-        Assert::assertSame('0', $actionCounts['pending']);
-
-        // Campaign Summary OFF, Campaign Range ON
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => false, self::CAMPAIGN_RANGE_PARAM => true]);
-        $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame('100%', $actionCounts['successPercent']);
-        Assert::assertSame('2', $actionCounts['completed']);
-        Assert::assertSame('0', $actionCounts['pending']);
-
-        // Campaign Summary ON, Campaign Range ON
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => true, self::CAMPAIGN_RANGE_PARAM => true]);
-        $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame('0%', $actionCounts['successPercent']);
-        Assert::assertSame('0', $actionCounts['completed']);
-        Assert::assertSame('0', $actionCounts['pending']);
+        $this->campaignContactCountOnCanvas();
     }
 
-    public function testCampaignCountsAfterSummarizeCommand(): void
+    public function testCampaignContactCountOnCanvasWithSummaryWithoutRange(): void
     {
-        $campaign   = $this->saveSomeCampaignLeadEventLogs();
-        $campaignId = $campaign->getId();
-
-        $this->runCommand(
-            SummarizeCommand::NAME,
-            [
-                '--env'       => 'test',
-                '--max-hours' => 9999999,
-            ]
-        );
-
-        // Campaign Summary OFF, Campaign Range OFF
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => false, self::CAMPAIGN_RANGE_PARAM => false]);
-        $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame('100%', $actionCounts['successPercent']);
-        Assert::assertSame('2', $actionCounts['completed']);
-        Assert::assertSame('0', $actionCounts['pending']);
-
-        // Campaign Summary ON, Campaign Range OFF
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => true, self::CAMPAIGN_RANGE_PARAM => false]);
-        $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame('100%', $actionCounts['successPercent']);
-        Assert::assertSame('2', $actionCounts['completed']);
-        Assert::assertSame('0', $actionCounts['pending']);
-
-        // Campaign Summary OFF, Campaign Range ON
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => false, self::CAMPAIGN_RANGE_PARAM => true]);
-        $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame('100%', $actionCounts['successPercent']);
-        Assert::assertSame('2', $actionCounts['completed']);
-        Assert::assertSame('0', $actionCounts['pending']);
-
-        // Campaign Summary ON, Campaign Range ON
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => true, self::CAMPAIGN_RANGE_PARAM => true]);
-        $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame('100%', $actionCounts['successPercent']);
-        Assert::assertSame('2', $actionCounts['completed']);
-        Assert::assertSame('0', $actionCounts['pending']);
+        $this->campaignContactCountOnCanvas();
     }
 
-    public function testCampaignPendingCounts(): void
+    public function testCampaignContactCountOnCanvasWithoutSummaryWithRange(): void
     {
-        // emulate pending count
-        $campaign   = $this->saveSomeCampaignLeadEventLogs(true);
-        $campaignId = $campaign->getId();
+        $this->campaignContactCountOnCanvas();
+    }
 
-        $this->runCommand(
-            SummarizeCommand::NAME,
-            [
-                '--env'       => 'test',
-                '--max-hours' => 9999999,
-            ]
-        );
+    public function testCampaignContactCountOnCanvasWithSummaryAndRange(): void
+    {
+        $this->campaignContactCountOnCanvas();
+    }
 
-        // Campaign Summary OFF, Campaign Range OFF
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => false, self::CAMPAIGN_RANGE_PARAM => false]);
-        $actionCounts = $this->getActionCounts($campaignId);
+    public function testCampaignCountsBeforeSummarizeCommandWithoutSummaryAndRange(): void
+    {
+        $this->getCountAndDetails(false, false, 100, 2, 0);
+    }
 
-        Assert::assertSame('100%', $actionCounts['successPercent']);
-        Assert::assertSame('2', $actionCounts['completed']);
-        Assert::assertSame('1', $actionCounts['pending']);
+    public function testCampaignCountsBeforeSummarizeCommandWithSummaryWithoutRange(): void
+    {
+        $this->getCountAndDetails(false, false, 0, 0, 0);
+    }
 
-        // Campaign Summary ON, Campaign Range OFF
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => true, self::CAMPAIGN_RANGE_PARAM => false]);
-        $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame('100%', $actionCounts['successPercent']);
-        Assert::assertSame('2', $actionCounts['completed']);
-        Assert::assertSame('1', $actionCounts['pending']);
+    public function testCampaignCountsBeforeSummarizeCommandWithoutSummaryWithRange(): void
+    {
+        $this->getCountAndDetails(false, false, 100, 2, 0);
+    }
 
-        // Campaign Summary OFF, Campaign Range ON
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => false, self::CAMPAIGN_RANGE_PARAM => true]);
-        $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame('100%', $actionCounts['successPercent']);
-        Assert::assertSame('2', $actionCounts['completed']);
-        Assert::assertSame('1', $actionCounts['pending']);
+    public function testCampaignCountsBeforeSummarizeCommandWithSummaryAndRange(): void
+    {
+        $this->getCountAndDetails(false, false, 0, 0, 0);
+    }
 
-        // Campaign Summary ON, Campaign Range ON
-        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => true, self::CAMPAIGN_RANGE_PARAM => true]);
-        $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame('100%', $actionCounts['successPercent']);
-        Assert::assertSame('2', $actionCounts['completed']);
-        Assert::assertSame('1', $actionCounts['pending']);
+    public function testCampaignCountsAfterSummarizeCommandWithoutSummaryAndRange(): void
+    {
+        $this->getCountAndDetails(false, true, 100, 2, 0);
+    }
+
+    public function testCampaignCountsAfterSummarizeCommandWithSummaryWithoutRange(): void
+    {
+        $this->getCountAndDetails(false, true, 100, 2, 0);
+    }
+
+    public function testCampaignCountsAfterSummarizeCommandWithoutSummaryWithRange(): void
+    {
+        $this->getCountAndDetails(false, true, 100, 2, 0);
+    }
+
+    public function testCampaignCountsAfterSummarizeCommandWithSummaryAndRange(): void
+    {
+        $this->getCountAndDetails(false, true, 100, 2, 0);
+    }
+
+    public function testCampaignPendingCountsWithoutSummaryAndRange(): void
+    {
+        $this->getCountAndDetails(true, true, 100, 2, 1);
+    }
+
+    public function testCampaignPendingCountsWithSummaryWithoutRange(): void
+    {
+        $this->getCountAndDetails(true, true, 100, 2, 1);
+    }
+
+    public function testCampaignPendingCountsWithoutSummaryWithRange(): void
+    {
+        $this->getCountAndDetails(true, true, 100, 2, 1);
+    }
+
+    public function testCampaignPendingCountsWithSummaryAndRange(): void
+    {
+        $this->getCountAndDetails(true, true, 100, 2, 1);
     }
 
     private function getStatTotalContacts(int $campaignId): int
@@ -220,11 +156,6 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         $datasets      = $canvasData['datasets'] ?? [];
 
         return $this->processTotalContactStats($datasets);
-    }
-
-    private function setSummaryCoreParameter(array $parameters): void
-    {
-        $this->setUpSymfony($parameters);
     }
 
     private function processTotalContactStats(array $datasets): int
@@ -266,5 +197,43 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
             'completed'      => $completed,
             'pending'        => $pending,
         ];
+    }
+
+    private function campaignContactCountThroughStats(): void
+    {
+        $campaign   = $this->saveSomeCampaignLeadEventLogs();
+        $campaignId = $campaign->getId();
+
+        $totalContacts = $this->getStatTotalContacts($campaignId);
+        Assert::assertSame(2, $totalContacts);
+    }
+
+    private function campaignContactCountOnCanvas(): void
+    {
+        $campaign      = $this->saveSomeCampaignLeadEventLogs();
+        $campaignId    = $campaign->getId();
+        $totalContacts = $this->getCanvasTotalContacts($campaignId);
+        Assert::assertSame(2, $totalContacts);
+    }
+
+    private function getCountAndDetails(bool $emulatePendingCount = false, bool $runCommand = false, int $expectedSuccessPercent, int $expectedCompleted, int $expectedPending): void
+    {
+        $campaign   = $this->saveSomeCampaignLeadEventLogs($emulatePendingCount);
+        $campaignId = $campaign->getId();
+
+        if ($runCommand) {
+            $this->runCommand(
+                SummarizeCommand::NAME,
+                [
+                    '--env'       => 'test',
+                    '--max-hours' => 9999999,
+                ]
+            );
+        }
+
+        $actionCounts = $this->getActionCounts($campaignId);
+        Assert::assertSame($expectedSuccessPercent.'%', $actionCounts['successPercent']);
+        Assert::assertSame($expectedCompleted, (int) $actionCounts['completed']);
+        Assert::assertSame($expectedPending, (int) $actionCounts['pending']);
     }
 }
