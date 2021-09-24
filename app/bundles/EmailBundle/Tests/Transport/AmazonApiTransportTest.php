@@ -188,6 +188,11 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    public function testGetBatchRecipientCount()
+    {
+        $this->assertEquals(3, $this->amazonTransport->getBatchRecipientCount($this->message, 0));
+    }
+
     public function testProcessInvalidJsonRequest()
     {
         $payload = <<< 'PAYLOAD'
