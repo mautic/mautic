@@ -30,7 +30,7 @@
                     </span>
                     <?php endif; ?>
                 <span class="mt-xs label label-warning" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.completed.actions'); ?>">
-                    <?php echo $event['logCount']; ?>
+                    <?php echo $event['logCountProcessed']; ?>
                 </span>
                 <span class="mt-xs label label-default"  data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.pending.actions'); ?>">
                     <?php echo $event['logCountForPending']; ?>
