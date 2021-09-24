@@ -487,7 +487,8 @@ class ImportController extends FormController
             // Ajax request to batch process so just return ajax response unless complete
 
             return new JsonResponse(['success' => 1, 'ignore_wdt' => 1]);
-        } else {
+        } else
+            $viewParameters['step'] = $step;
             return $this->delegateView(
                 [
                     'viewParameters'  => $viewParameters,
