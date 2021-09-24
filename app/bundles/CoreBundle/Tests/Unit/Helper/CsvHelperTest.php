@@ -47,9 +47,9 @@ class CsvHelperTest extends TestCase
         ];
 
         $expected = [
-            'h_first_name' => 'First Name',
-            'h_esk_znky'   => 'České znáčky',
-            'h_file'       => 'File',
+            'first_name' => 'First Name',
+            'esk_znky'   => 'České znáčky',
+            'file'       => 'File',
         ];
 
         $this->assertEquals($expected, CsvHelper::convertHeadersIntoFields($headers));
