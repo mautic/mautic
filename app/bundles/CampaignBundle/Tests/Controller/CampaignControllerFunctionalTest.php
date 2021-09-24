@@ -26,7 +26,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
      */
     private $campaignLeadsLabel;
 
-    protected $useCleanupRollback = false;
+    //protected $useCleanupRollback = false;
 
     protected function setUp(): void
     {
