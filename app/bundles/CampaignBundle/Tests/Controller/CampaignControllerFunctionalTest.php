@@ -37,6 +37,8 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
      */
     private $campaignLeadsLabel;
 
+    protected $useCleanupRollback = false;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -50,14 +52,13 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         $campaignId = $campaign->getId();
 
         // Campaign Summary OFF
-        $coreParam = $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => false]);
-        $this->campaignModel->setCoreParametersHelper($coreParam);
+        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => false]);
+
         $totalContacts = $this->getStatTotalContacts($campaignId);
         Assert::assertSame(2, $totalContacts);
 
         // Campaign Summary ON
-        $coreParam = $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => true]);
-        $this->campaignModel->setCoreParametersHelper($coreParam);
+        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => true]);
         $totalContacts = $this->getStatTotalContacts($campaignId);
         Assert::assertSame(2, $totalContacts);
     }
@@ -232,25 +233,9 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         return $this->processTotalContactStats($datasets);
     }
 
-    private function setSummaryCoreParameter(array $parameters): CoreParametersHelper
+    private function setSummaryCoreParameter(array $parameters): void
     {
-        $coreParam = new class(self::$container, $parameters) extends CoreParametersHelper {
-            private $parameters;
-
-            public function __construct(ContainerInterface $container, array $parameters)
-            {
-                $this->parameters = $parameters;
-                parent::__construct($container);
-            }
-
-            public function get($name, $default = null)
-            {
-                return $this->parameters[$name] ?? parent::get($name, $default);
-            }
-        };
-        //self::$container->set('mautic.helper.core_parameters', $coreParam);
-
-        return $coreParam;
+        $this->setUpSymfony($parameters);
     }
 
     private function processTotalContactStats(array $datasets): int
