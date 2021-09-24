@@ -65,7 +65,7 @@ class CsvHelper
             if (!empty($fieldName)) {
                 // Add prefix to field names to avoid errors in form rendering,
                 // e.g. header with 'file' will be h_file.
-                $importedFields['h_'.$fieldName] = $header;
+                $importedFields[$fieldName] = $header;
             }
         }
 
