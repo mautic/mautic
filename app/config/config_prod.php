@@ -8,21 +8,37 @@ if (file_exists(__DIR__.'/security_local.php')) {
     $loader->import('security.php');
 }
 
-/*
-$container->loadFromExtension("framework", array(
-    "validation" => array(
-        "cache" => "apc"
-    )
-));
-
-$container->loadFromExtension("doctrine", array(
-    "orm" => array(
-        "metadata_cache_driver" => "apc",
-        "result_cache_driver"   => "apc",
-        "query_cache_driver"    => "apc"
-    )
-));
-*/
+if (function_exists('apcu_store')) {
+    // Validation caching does not work in Mautic currently - https://github.com/mautic/mautic/issues/6259
+    // $container->loadFromExtension('framework', array(
+    //     'validation' => array(
+    //         'cache' => 'apcu',
+    //     )
+    // ));
+    $container->loadFromExtension('doctrine', [
+        'orm' => [
+            'metadata_cache_driver' => 'apcu',
+            'query_cache_driver'    => 'apcu',
+            // You can use APCu for result caching if using a single node in production, otherwise Redis works well.
+            'result_cache_driver'   => 'apcu',
+        ],
+    ]);
+} elseif (function_exists('apc_store')) {
+    // Validation caching does not work in Mautic currently - https://github.com/mautic/mautic/issues/6259
+    // $container->loadFromExtension('framework', array(
+    //     'validation' => array(
+    //         'cache' => 'apc',
+    //     )
+    // ));
+    $container->loadFromExtension('doctrine', [
+        'orm' => [
+            'metadata_cache_driver' => 'apc',
+            'query_cache_driver'    => 'apc',
+            // You can use APC for result caching if using a single node in production, otherwise Redis works well.
+            'result_cache_driver'   => 'apc',
+        ],
+    ]);
+}
 
 $container->loadFromExtension('monolog', [
     'channels' => [
