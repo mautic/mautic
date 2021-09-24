@@ -14,11 +14,9 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadsRepository;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -277,40 +275,5 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
             'completed'      => $completed,
             'pending'        => $pending,
         ];
-    }
-
-    private function addCampaignLead(Campaign $campaign): void
-    {
-        /** @var LeadEventLogRepository $leadEventLogRepo */
-        $leadEventLogRepo = $this->em->getRepository(LeadEventLog::class);
-
-        /** @var CampaignRepository $campaignRepo */
-        $campaignRepo = $this->em->getRepository(Campaign::class);
-
-        /** @var CampaignLeadsRepository $campaignLeadsRepo */
-        $campaignLeadsRepo = $this->em->getRepository(CampaignLeads::class);
-
-        /** @var LeadRepository $contactRepo */
-        $contactRepo = $this->em->getRepository(Lead::class);
-
-        $eventX = new Event();
-        $eventX->setName('Event X');
-        $eventX->setType('type.x');
-        $eventX->setEventType('action');
-        $eventX->setCampaign($campaign);
-        $campaign->addEvent(3, $eventX);
-        $campaignRepo->saveEntity($campaign);
-
-        $contactX = new Lead();
-        $contactRepo->saveEntity($contactX);
-
-        $campaignLeadsX = new CampaignLeads();
-        $campaignLeadsX->setLead($contactX);
-        $campaignLeadsX->setCampaign($campaign);
-        $campaignLeadsX->setDateAdded(new \DateTime('2020-11-21'));
-        $campaignLeadsX->setRotation(0);
-        $campaignLeadsX->setManuallyRemoved(true);
-
-        $campaignLeadsRepo->saveEntity($campaignLeadsX);
     }
 }
