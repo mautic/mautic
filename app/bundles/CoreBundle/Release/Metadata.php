@@ -11,7 +11,7 @@
 
 namespace Mautic\CoreBundle\Release;
 
-class Metadata
+class Metadata implements \JsonSerializable
 {
     private string $version;
     private int $majorVersion;
@@ -123,5 +123,20 @@ class Metadata
     public function getMinSupportedMariaDbVersion(): string
     {
         return $this->minSupportedMariaDbVersion;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'version'                           => $this->version,
+            'stability'                         => $this->stability,
+            'minimum_php_version'               => $this->minSupportedPHPVersion,
+            'maximum_php_version'               => $this->maxSupportedPHPVersion,
+            'show_php_version_warning_if_under' => $this->showPHPVersionWarningIfUnder,
+            'minimum_mautic_version'            => $this->minSupportedMauticVersion,
+            'announcement_url'                  => $this->announcementUrl,
+            'minimum_mysql_version'             => $this->minSupportedMySqlVersion,
+            'minimum_mariadb_version'           => $this->minSupportedMariaDbVersion,
+        ];
     }
 }
