@@ -22,8 +22,11 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class InstallController extends CommonController
 {
-    private Configurator $configurator;
-    private InstallService $installer;
+    /** @var Configurator */
+    private $configurator;
+
+    /** @var InstallService */
+    private $installer;
 
     /**
      * Initialize controller.
