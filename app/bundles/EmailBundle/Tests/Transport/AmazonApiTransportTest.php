@@ -40,16 +40,22 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|AmazonCallback
      */
     private $amazonCallback;
+
     private $amazonMock;
+
     private $amazonTransport;
+
     private $logger;
+
     private $headers;
+
     private $request;
 
     /**
      * @var MockObject|Client
      */
     private $mockHttp;
+
     /**
      * @var MockObject|TransportCallback
      */
@@ -64,19 +70,19 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator         = $this->createMock(TranslatorInterface::class);
-        $this->amazonCallback     = $this->createMock(AmazonCallback::class);
-        $this->logger             = $this->createMock(LoggerInterface::class);
-        $this->message            = $this->createMock(MauticMessage::class);
-        $this->headers            = $this->createMock(\Swift_Mime_SimpleHeaderSet::class);
-        $this->request            =  $this->createMock(Request::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->amazonCallback = $this->createMock(AmazonCallback::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->message = $this->createMock(MauticMessage::class);
+        $this->headers = $this->createMock(\Swift_Mime_SimpleHeaderSet::class);
+        $this->request = $this->createMock(Request::class);
 
         // Mock http connector
-        $this->mockHttp          = $this->createMock(Client::class);
+        $this->mockHttp = $this->createMock(Client::class);
         $this->transportCallback = $this->createMock(TransportCallback::class);
-        $this->amazonMock        = new MockHandler();
+        $this->amazonMock = new MockHandler();
 
-        $this->amazonTransport   = new AmazonApiTransport(
+        $this->amazonTransport = new AmazonApiTransport(
             $this->translator,
             $this->amazonCallback,
             $this->logger
@@ -136,6 +142,7 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
         $this->message->method('getTo')->willReturn(['jane@doe.email' => 'Jane']);
         $this->message->method('getCc')->willReturn(['cc@doe.email' => 'Jane']);
         $this->message->method('getBcc')->willReturn(['bcc@doe.email' => 'Jane']);
+        $this->message->method('getReturnPath')->willReturn('john+return@doe.email');
         $this->message->method('getHeaders')->willReturn($this->headers);
         $this->headers->method('getAll')->willReturn([]);
         $this->message->method('getBody')->willReturn('Test Body');
@@ -167,133 +174,21 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $sent);
     }
 
-    public function testGetAmazonMessageBatch()
+    public function testGetAmazonMessage()
     {
-        $emailBody = <<< 'EOD'
-Hi {contactfield=firstname},
-lorem ipsum dolor.   
-     
-{signature}
-
-{unsubscribe_text}
-EOD;
-
-        $recipient1Email = 'johnny.cage@teleworm.us';
-        $recipient2Email = 'noob.saibot@teleworm.us';
-
-        $recipient1Metadata = [
-            'name'        => 'Johnny Cage',
-            'leadId'      => 1,
-            'emailId'     => 1,
-            'emailName'   => 'Test batch email',
-            'hashId'      => '5f86a61cc8084320276637',
-            'hashIdState' => true,
-            'source'      => [
-                'campaign.event',
-                23,
-            ],
-            'tokens' => [
-                '{dynamiccontent="Dynamic Content 1"}' => 'Default Dynamic Content',
-                '{unsubscribe_text}'                   => '<a href="https://mautic.local/email/unsubscribe/5f86a61cc8084320276637">Unsubscribe</a> to no longer receive emails from us.',
-                '{unsubscribe_url}'                    => 'https://mautic.local/email/unsubscribe/5f86a61cc8084320276637',
-                '{webview_text}'                       => '<a href="https://mautic.local/email/view/5f86a61cc8084320276637">Having trouble reading this email? Click here.</a>',
-                '{webview_url}'                        => 'https://mautic.local/email/view/5f86a61cc8084320276637',
-                '{signature}'                          => 'Best regards, Johnny Cage',
-                '{subject}'                            => 'Test batch email',
-                '{contactfield=firstname}'             => 'Johnny',
-                '{contactfield=lastname}'              => 'Cage',
-                '{ownerfield=email}'                   => '',
-                '{ownerfield=firstname}'               => '',
-                '{ownerfield=lastname}'                => '',
-                '{ownerfield=position}'                => '',
-                '{ownerfield=signature}'               => '',
-                '{tracking_pixel}'                     => 'https://mautic.local/email/5f86a61cc8084320276637.gif',
-            ],
-            'utmTags' => [
-                'utmSource'   => 'c_source',
-                'utmMedium'   => 'c_medium',
-                'utmCampaign' => 'c_name',
-                'utmContent'  => 'c_content',
-            ],
-        ];
-        $recipient2Metadata = [
-            'name'        => 'Noob Saibot',
-            'leadId'      => 2,
-            'emailId'     => 1,
-            'emailName'   => 'Test batch email',
-            'hashId'      => '6f86a61cc415555ecf6412',
-            'hashIdState' => true,
-            'source'      => [
-                'campaign.event',
-                23,
-            ],
-            'tokens' => [
-                '{dynamiccontent="Dynamic Content 1"}' => 'Default Dynamic Content',
-                '{unsubscribe_text}'                   => '<a href="https://mautic.local/email/unsubscribe/6f86a61cc415555ecf6412">Unsubscribe</a> to no longer receive emails from us.',
-                '{unsubscribe_url}'                    => 'https://mautic.local/email/unsubscribe/6f86a61cc415555ecf6412',
-                '{webview_text}'                       => '<a href="https://mautic.local/email/view/6f86a61cc415555ecf6412">Having trouble reading this email? Click here.</a>',
-                '{webview_url}'                        => 'https://mautic.local/email/view/6f86a61cc415555ecf6412',
-                '{signature}'                          => 'Best regards, Noob Saibot',
-                '{subject}'                            => 'Test batch email',
-                '{contactfield=firstname}'             => 'Noob',
-                '{contactfield=lastname}'              => 'Saibot',
-                '{ownerfield=email}'                   => '',
-                '{ownerfield=firstname}'               => '',
-                '{ownerfield=lastname}'                => '',
-                '{ownerfield=position}'                => '',
-                '{ownerfield=signature}'               => '',
-                '{tracking_pixel}'                     => 'https://mautic.local/email/6f86a61cc415555ecf6412.gif',
-            ],
-            'utmTags' => [
-                'utmSource'   => 'c_source',
-                'utmMedium'   => 'c_medium',
-                'utmCampaign' => 'c_name',
-                'utmContent'  => 'c_content',
-            ],
-        ];
-
-        $fromEmail = 'shang.tsung@teleworm.us';
-        $fromName  = 'Shang Tsung';
-        $subject   = 'Test batch email';
-
-        $msg = new MauticMessage($subject, $emailBody, 'text/html', 'utf-8');
-        $msg->addMetadata($recipient1Email, $recipient1Metadata);
-        $msg->addMetadata($recipient2Email, $recipient2Metadata);
-        $msg->setFrom($fromEmail, $fromName);
-        $msg->setTo([
-            $recipient1Email => $recipient1Metadata['name'],
-            $recipient2Email => $recipient2Metadata['name'],
-        ]);
-        $msg->setSubject($subject);
-        $msg->setBody($emailBody, 'text/html', 'utf-8');
-
-        // Mautic creates Unsubscribe-List header with for all message recipients, this should be filtered
-        $msg->getHeaders()->addTextHeader('List-Unsubscribe', '<mailto:return+unsubscribe_5f86a61cc8084320276637@teleworm.us>, <mailto:return+unsubscribe_6f86a61cc415555ecf6412@teleworm.us>, <http://mautic.local/email/unsubscribe/5f86a61cc8084320276637>,<http://mautic.local/email/unsubscribe/6f86a61cc415555ecf6412>');
-
-        $amazonMessages = iterator_to_array($this->amazonTransport->getAmazonMessage($msg));
-
-        $this->assertCount(2, $amazonMessages);
-        $this->assertEquals([
-            'ToAddresses'  => ['johnny.cage@teleworm.us'],
-        ], $amazonMessages[0]['Destination']);
-        $this->assertEquals([
-            'ToAddresses'  => ['noob.saibot@teleworm.us'],
-        ], $amazonMessages[1]['Destination']);
-
-        // Test replaced tokens
-        $this->assertStringContainsString('Hi Johnny', $amazonMessages[0]['Content']['Raw']['Data']);
-        $this->assertStringContainsString('Hi Noob', $amazonMessages[1]['Content']['Raw']['Data']);
-
-        // We want to ensure that the hashes of other leads will not be compromised when sending batch emails
-        $this->assertStringNotContainsString('6f86a61cc415555ecf6412', $amazonMessages[0]['Content']['Raw']['Data']);
-        $this->assertStringNotContainsString('5f86a61cc8084320276637', $amazonMessages[1]['Content']['Raw']['Data']);
-
-        // Persist filtered List-Unsubscribe header
-        $this->assertStringContainsString('List-Unsubscribe: <mailto:return+unsubscribe_5f86a61cc8084320276637@teleworm.us>,<http://mautic.local/email/unsubscribe/5f86a61cc8084320276637>', $amazonMessages[0]['Content']['Raw']['Data']);
-        $this->assertStringContainsString('List-Unsubscribe: <mailto:return+unsubscribe_6f86a61cc415555ecf6412@teleworm.us>,<http://mautic.local/email/unsubscribe/6f86a61cc415555ecf6412>', $amazonMessages[1]['Content']['Raw']['Data']);
+        foreach ($this->amazonTransport->getAmazonMessage($this->message) as $rawEmail) {
+            $this->assertEquals('John <john@doe.email>', $rawEmail['FromEmailAddress']);
+            $this->assertEquals([
+                'ToAddresses'  => ['success227@simulator.amazonses.com'],
+                'CcAddresses'  => ['cc@doe.email'],
+                'BccAddresses' => ['bcc@doe.email'],
+            ], $rawEmail['Destination']);
+            $this->assertEquals('john+return@doe.email', $rawEmail['ReturnPath']);
+            $this->assertStringContainsString('Test Body', $rawEmail['Content']['Raw']['Data']);
+        }
     }
 
-    public function testprocessInvalidJsonRequest()
+    public function testProcessInvalidJsonRequest()
     {
         $payload = <<< 'PAYLOAD'
 {
@@ -316,7 +211,7 @@ PAYLOAD;
         $amazonCallback->processCallbackRequest($request);
     }
 
-    public function testprocessValidJsonWithoutTypeRequest()
+    public function testProcessValidJsonWithoutTypeRequest()
     {
         $payload = <<< 'PAYLOAD'
 {
@@ -339,7 +234,7 @@ PAYLOAD;
         $amazonCallback->processCallbackRequest($request);
     }
 
-    public function testprocessSubscriptionConfirmationRequest()
+    public function testProcessSubscriptionConfirmationRequest()
     {
         $payload = <<< 'PAYLOAD'
 {
@@ -357,7 +252,7 @@ PAYLOAD;
 PAYLOAD;
 
         $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
-        $request        = $this->createMock(Request::class);
+        $request = $this->createMock(Request::class);
 
         $request->expects($this->any())
             ->method('getContent')
@@ -373,7 +268,7 @@ PAYLOAD;
         $amazonCallback->processCallbackRequest($request);
     }
 
-    public function testprocessNotificationBounceRequest()
+    public function testProcessNotificationBounceRequest()
     {
         $payload = <<< 'PAYLOAD'
 {
@@ -400,7 +295,7 @@ PAYLOAD;
             ->will($this->returnValue($payload));
 
         // Mock a successful response
-        $mockResponse       = $this->getMockBuilder(Response::class)->getMock();
+        $mockResponse = $this->getMockBuilder(Response::class)->getMock();
         $mockResponse->code = 200;
 
         $this->transportCallback->expects($this->once())
@@ -409,7 +304,7 @@ PAYLOAD;
         $amazonCallback->processCallbackRequest($request);
     }
 
-    public function testprocessNotificationComplaintRequest()
+    public function testProcessNotificationComplaintRequest()
     {
         $payload = <<< 'PAYLOAD'
 {
@@ -436,7 +331,7 @@ PAYLOAD;
             ->will($this->returnValue($payload));
 
         // Mock a successful response
-        $mockResponse       = $this->getMockBuilder(Response::class)->getMock();
+        $mockResponse = $this->getMockBuilder(Response::class)->getMock();
         $mockResponse->code = 200;
 
         $this->transportCallback->expects($this->once())
@@ -445,15 +340,15 @@ PAYLOAD;
         $amazonCallback->processCallbackRequest($request);
     }
 
-    public function testprocessBounce()
+    public function testProcessBounce()
     {
         $messageMock = $this->getMockBuilder(Message::class)
                         ->disableOriginalConstructor()
                         ->getMock();
         $messageMock->fromAddress = 'no-reply@sns.amazonaws.com';
-        $messageMock->textPlain   = '{"notificationType":"Bounce","bounce":{"bounceType":"Permanent","bounceSubType":"General","bouncedRecipients":[{"emailAddress":"nope@nope.com","action":"failed","status":"5.1.1","diagnosticCode":"smtp; 550 5.1.1 <nope@nope.com>: Recipient address rejected: User unknown in virtual alias table"}],"timestamp":"2016-08-17T07:43:12.776Z","feedbackId":"0102015697743d4c-619f1aa8-763f-4bea-8648-0b3bbdedd1ea-000000","reportingMTA":"dsn; a4-24.smtp-out.eu-west-1.amazonses.com"},"mail":{"timestamp":"2016-08-17T07:43:11.000Z","source":"admin@55hubs.ch","sourceArn":"arn:aws:ses:eu-west-1:918057160339:identity/nope.com","sendingAccountId":"918057160339","messageId":"010201569774384f-81311784-10dd-48a8-921f-8316c145e64d-000000","destination":["nope@nope.com"]}}';
-        $amazonCallback           = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
-        $bounce                   = new BouncedEmail();
+        $messageMock->textPlain = '{"notificationType":"Bounce","bounce":{"bounceType":"Permanent","bounceSubType":"General","bouncedRecipients":[{"emailAddress":"nope@nope.com","action":"failed","status":"5.1.1","diagnosticCode":"smtp; 550 5.1.1 <nope@nope.com>: Recipient address rejected: User unknown in virtual alias table"}],"timestamp":"2016-08-17T07:43:12.776Z","feedbackId":"0102015697743d4c-619f1aa8-763f-4bea-8648-0b3bbdedd1ea-000000","reportingMTA":"dsn; a4-24.smtp-out.eu-west-1.amazonses.com"},"mail":{"timestamp":"2016-08-17T07:43:11.000Z","source":"admin@55hubs.ch","sourceArn":"arn:aws:ses:eu-west-1:918057160339:identity/nope.com","sendingAccountId":"918057160339","messageId":"010201569774384f-81311784-10dd-48a8-921f-8316c145e64d-000000","destination":["nope@nope.com"]}}';
+        $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
+        $bounce = new BouncedEmail();
         $bounce->setContactEmail('nope@nope.com')
             ->setBounceAddress('admin@55hubs.ch')
             ->setType('unknown')
@@ -464,19 +359,19 @@ PAYLOAD;
         $this->assertEquals($bounce, $amazonCallback->processBounce($messageMock));
     }
 
-    public function testprocessUnsubscription()
+    public function testProcessUnsubscription()
     {
         $messageMock = $this->getMockBuilder(Message::class)
                         ->disableOriginalConstructor()
                         ->getMock();
         $messageMock->fromAddress = 'no-reply@sns.amazonaws.com';
-        $messageMock->textPlain   = '{"notificationType":"Complaint", "complaint":{ "complainedRecipients":[ { "emailAddress":"nope@nope.com" } ], "timestamp":"2016-01-27T14:59:38.237Z", "feedbackId":"0000013786031775-fea503bc-7497-49e1-881b-a0379bb037d3-000000" }, "mail":{"source": "unknown"} }';
-        $amazonCallback           = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
-        $unsubscribe              = new UnsubscribedEmail('nope@nope.com', 'unknown');
+        $messageMock->textPlain = '{"notificationType":"Complaint", "complaint":{ "complainedRecipients":[ { "emailAddress":"nope@nope.com" } ], "timestamp":"2016-01-27T14:59:38.237Z", "feedbackId":"0000013786031775-fea503bc-7497-49e1-881b-a0379bb037d3-000000" }, "mail":{"source": "unknown"} }';
+        $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
+        $unsubscribe = new UnsubscribedEmail('nope@nope.com', 'unknown');
         $this->assertEquals($unsubscribe, $amazonCallback->processUnsubscription($messageMock));
     }
 
-    public function testprocessNotificationBounceRequestConfigSet()
+    public function testProcessNotificationBounceRequestConfigSet()
     {
         $payload = <<< 'PAYLOAD'
         {"eventType":"Bounce","bounce":{"bounceType":"Permanent","bounceSubType":"General","bouncedRecipients":[{"emailAddress":"recipient@example.com","action":"failed","status":"5.1.1","diagnosticCode":"smtp; 550 5.1.1 user unknown"}],"timestamp":"2017-08-05T00:41:02.669Z","feedbackId":"01000157c44f053b-61b59c11-9236-11e6-8f96-7be8aexample-000000","reportingMTA":"dsn; mta.example.com"},"mail":{"timestamp":"2017-08-05T00:40:02.012Z","source":"Sender Name <sender@example.com>","sourceArn":"arn:aws:ses:us-east-1:123456789012:identity/sender@example.com","sendingAccountId":"123456789012","messageId":"EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000","destination":["recipient@example.com"],"headersTruncated":false,"headers":[{"name":"From","value":"Sender Name <sender@example.com>"},{"name":"To","value":"recipient@example.com"},{"name":"Subject","value":"Message sent from Amazon SES"},{"name":"MIME-Version","value":"1.0"},{"name":"Content-Type","value":"multipart/alternative; boundary=\"----=_Part_7307378_1629847660.1516840721503\""}],"commonHeaders":{"from":["Sender Name <sender@example.com>"],"to":["recipient@example.com"],"messageId":"EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000","subject":"Message sent from Amazon SES"},"tags":{"ses:configuration-set":["ConfigSet"],"ses:source-ip":["192.0.2.0"],"ses:from-domain":["example.com"],"ses:caller-identity":["ses_user"]}}}
@@ -493,7 +388,7 @@ PAYLOAD;
             ->will($this->returnValue($payload));
 
         // Mock a successful response
-        $mockResponse       = $this->getMockBuilder(Response::class)->getMock();
+        $mockResponse = $this->getMockBuilder(Response::class)->getMock();
         $mockResponse->code = 200;
 
         $this->transportCallback->expects($this->once())
@@ -502,7 +397,7 @@ PAYLOAD;
         $amazonCallback->processCallbackRequest($request);
     }
 
-    public function testprocessNotificationComplaintRequestConfigSet()
+    public function testProcessNotificationComplaintRequestConfigSet()
     {
         $payload = <<< 'PAYLOAD'
         {"eventType":"Complaint","complaint":{"complainedRecipients":[{"emailAddress":"recipient@example.com"}],"timestamp":"2017-08-05T00:41:02.669Z","feedbackId":"01000157c44f053b-61b59c11-9236-11e6-8f96-7be8aexample-000000","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36","complaintFeedbackType":"abuse","arrivalDate":"2017-08-05T00:41:02.669Z"},"mail":{"timestamp":"2017-08-05T00:40:01.123Z","source":"Sender Name <sender@example.com>","sourceArn":"arn:aws:ses:us-east-1:123456789012:identity/sender@example.com","sendingAccountId":"123456789012","messageId":"EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000","destination":["recipient@example.com"],"headersTruncated":false,"headers":[{"name":"From","value":"Sender Name <sender@example.com>"},{"name":"To","value":"recipient@example.com"},{"name":"Subject","value":"Message sent from Amazon SES"},{"name":"MIME-Version","value":"1.0"},{"name":"Content-Type","value":"multipart/alternative; boundary=\"----=_Part_7298998_679725522.1516840859643\""}],"commonHeaders":{"from":["Sender Name <sender@example.com>"],"to":["recipient@example.com"],"messageId":"EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000","subject":"Message sent from Amazon SES"},"tags":{"ses:configuration-set":["ConfigSet"],"ses:source-ip":["192.0.2.0"],"ses:from-domain":["example.com"],"ses:caller-identity":["ses_user"]}}}
@@ -519,7 +414,7 @@ PAYLOAD;
             ->will($this->returnValue($payload));
 
         // Mock a successful response
-        $mockResponse       = $this->getMockBuilder(Response::class)->getMock();
+        $mockResponse = $this->getMockBuilder(Response::class)->getMock();
         $mockResponse->code = 200;
 
         $this->transportCallback->expects($this->once())
@@ -528,15 +423,15 @@ PAYLOAD;
         $amazonCallback->processCallbackRequest($request);
     }
 
-    public function testprocessBounceConfigSet()
+    public function testProcessBounceConfigSet()
     {
         $messageMock = $this->getMockBuilder(Message::class)
                         ->disableOriginalConstructor()
                         ->getMock();
         $messageMock->fromAddress = 'no-reply@sns.amazonaws.com';
-        $messageMock->textPlain   = '{"eventType":"Bounce","bounce":{"bounceType":"Permanent","bounceSubType":"General","bouncedRecipients":[{"emailAddress":"nope@nope.com","action":"failed","status":"5.1.1","diagnosticCode":"smtp; 550 5.1.1 <nope@nope.com>: Recipient address rejected: User unknown in virtual alias table"}],"timestamp":"2016-08-17T07:43:12.776Z","feedbackId":"0102015697743d4c-619f1aa8-763f-4bea-8648-0b3bbdedd1ea-000000","reportingMTA":"dsn; a4-24.smtp-out.eu-west-1.amazonses.com"},"mail":{"timestamp":"2016-08-17T07:43:11.000Z","source":"admin@55hubs.ch","sourceArn":"arn:aws:ses:eu-west-1:918057160339:identity/nope.com","sendingAccountId":"918057160339","messageId":"010201569774384f-81311784-10dd-48a8-921f-8316c145e64d-000000","destination":["nope@nope.com"]}}';
-        $amazonCallback           = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
-        $bounce                   = new BouncedEmail();
+        $messageMock->textPlain = '{"eventType":"Bounce","bounce":{"bounceType":"Permanent","bounceSubType":"General","bouncedRecipients":[{"emailAddress":"nope@nope.com","action":"failed","status":"5.1.1","diagnosticCode":"smtp; 550 5.1.1 <nope@nope.com>: Recipient address rejected: User unknown in virtual alias table"}],"timestamp":"2016-08-17T07:43:12.776Z","feedbackId":"0102015697743d4c-619f1aa8-763f-4bea-8648-0b3bbdedd1ea-000000","reportingMTA":"dsn; a4-24.smtp-out.eu-west-1.amazonses.com"},"mail":{"timestamp":"2016-08-17T07:43:11.000Z","source":"admin@55hubs.ch","sourceArn":"arn:aws:ses:eu-west-1:918057160339:identity/nope.com","sendingAccountId":"918057160339","messageId":"010201569774384f-81311784-10dd-48a8-921f-8316c145e64d-000000","destination":["nope@nope.com"]}}';
+        $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
+        $bounce = new BouncedEmail();
         $bounce->setContactEmail('nope@nope.com')
             ->setBounceAddress('admin@55hubs.ch')
             ->setType('unknown')
@@ -547,15 +442,15 @@ PAYLOAD;
         $this->assertEquals($bounce, $amazonCallback->processBounce($messageMock));
     }
 
-    public function testprocessUnsubscriptionConfigSet()
+    public function testProcessUnsubscriptionConfigSet()
     {
         $messageMock = $this->getMockBuilder(Message::class)
                         ->disableOriginalConstructor()
                         ->getMock();
         $messageMock->fromAddress = 'no-reply@sns.amazonaws.com';
-        $messageMock->textPlain   = '{"eventType":"Complaint", "complaint":{ "complainedRecipients":[ { "emailAddress":"nope@nope.com" } ], "timestamp":"2016-01-27T14:59:38.237Z", "feedbackId":"0000013786031775-fea503bc-7497-49e1-881b-a0379bb037d3-000000" }, "mail":{"source": "unknown"} }';
-        $amazonCallback           = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
-        $unsubscribe              = new UnsubscribedEmail('nope@nope.com', 'unknown');
+        $messageMock->textPlain = '{"eventType":"Complaint", "complaint":{ "complainedRecipients":[ { "emailAddress":"nope@nope.com" } ], "timestamp":"2016-01-27T14:59:38.237Z", "feedbackId":"0000013786031775-fea503bc-7497-49e1-881b-a0379bb037d3-000000" }, "mail":{"source": "unknown"} }';
+        $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
+        $unsubscribe = new UnsubscribedEmail('nope@nope.com', 'unknown');
         $this->assertEquals($unsubscribe, $amazonCallback->processUnsubscription($messageMock));
     }
 }

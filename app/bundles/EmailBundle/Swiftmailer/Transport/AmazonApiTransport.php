@@ -199,7 +199,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
     }
 
-    public function createAmazonClient()
+    public function createAmazonClient(): SesV2Client
     {
         $config  = [
             'version'     => '2019-09-27',
@@ -234,7 +234,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
      *
      * @throws \Exception
      */
-    public function send(\Swift_Mime_SimpleMessage $toSendMessage, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $toSendMessage, &$failedRecipients = null): int
     {
         $this->message    = $toSendMessage;
         $failedRecipients = (array) $failedRecipients;
@@ -245,7 +245,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 return 0;
             }
         }
-        $count = $this->getBatchRecipientCount($toSendMessage);
 
         try {
             $this->start();
@@ -257,7 +256,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 'concurrency' => $this->concurrency,
                 'fulfilled'   => function (ResultInterface $result, $iteratorId) use ($evt, $failedRecipients) {
                     if ($evt) {
-                        // $this->logger->info("SES Result: " . $result->get('MessageId'));
                         $evt->setResult(\Swift_Events_SendEvent::RESULT_SUCCESS);
                         $evt->setFailedRecipients($failedRecipients);
                         $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
@@ -294,11 +292,9 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             array_keys((array) $this->message->getBcc())
         );
 
-        if ($evt) {
-            $evt->setResult(\Swift_Events_SendEvent::RESULT_FAILED);
-            $evt->setFailedRecipients($failedRecipients);
-            $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
-        }
+        $evt->setResult(\Swift_Events_SendEvent::RESULT_FAILED);
+        $evt->setFailedRecipients($failedRecipients);
+        $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
     }
 
     /*
@@ -366,7 +362,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             /**
              * This is a message with tokens.
              */
-            $mauticTokens  = [];
             $metadataSet   = reset($metadata);
             $tokens        = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
             $mauticTokens  = array_keys($tokens);
@@ -418,6 +413,12 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                     $toSendMessage->setReplyTo([$tokenizedMessage['replyTo']['email']]);
                     $sesArray['ReplyToAddresses'] = [$tokenizedMessage['replyTo']['email']];
                 }
+
+                if (isset($tokenizedMessage['returnPath'])) {
+                    $toSendMessage->setReturnPath($tokenizedMessage['returnPath']);
+                    $sesArray['ReturnPath'] = $tokenizedMessage['returnPath'];
+                }
+
                 if (isset($tokenizedMessage['headers']['X-SES-CONFIGURATION-SET'])) {
                     $sesArray['ConfigurationSetName'] = $tokenizedMessage['headers']['X-SES-CONFIGURATION-SET'];
                 }
@@ -444,8 +445,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * Set plain text to a message.
-     *
-     * @return bool
      */
     private function setPlainTextToMessage(\Swift_Mime_SimpleMessage $message, $text)
     {
@@ -459,10 +458,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getMaxBatchLimit()
+    public function getMaxBatchLimit(): int
     {
         return 0;
     }
@@ -483,10 +479,8 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
-     *
-     * @return mixed
      */
-    public function getCallbackPath()
+    public function getCallbackPath(): string
     {
         return 'amazon_api';
     }
@@ -499,10 +493,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->amazonCallback->processCallbackRequest($request);
     }
 
-    /**
-     * @return bool
-     */
-    public function ping()
+    public function ping(): bool
     {
         return true;
     }
