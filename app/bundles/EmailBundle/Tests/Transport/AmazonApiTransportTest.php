@@ -12,12 +12,8 @@
 
 namespace Mautic\EmailBundle\Tests\Transport;
 
-use Aws\CommandInterface;
-use Aws\Credentials\Credentials;
-use Aws\Exception\AwsException;
 use Aws\MockHandler;
 use Aws\Result;
-use Aws\SesV2\SesV2Client;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Mautic\EmailBundle\Model\TransportCallback;
@@ -28,7 +24,6 @@ use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\AmazonApiTransport;
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
