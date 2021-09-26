@@ -131,7 +131,7 @@ class EmailApiController extends CommonApiController
             $cleanTokens = [];
 
             foreach ($tokens as $token => $value) {
-                if (stripos($value, 'rawhtml://') === 0) {
+                if (0 === stripos($value, 'rawhtml://')) {
                     $value = substr($value, 10);
                 } else {
                     $value = InputHelper::clean($value);
