@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 
 class ImportControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -22,25 +23,6 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         ['test2.pdf', 'john2@doe.email', 'John', 'Doe2'],
         ['test3.pdf', 'john3@doe.email', 'John', 'Doe3'],
     ];
-
-    public function testImportCSVWithFileAsHeaderName(): void
-    {
-        $this->loginUser('admin');
-        // Create 'file' field.
-        $this->createField('text', 'file');
-
-        // Create contact import.
-        $import = $this->createCsvContactImport();
-
-        // Run import command.
-        $output = $this->runCommand('mautic:import', ['-e' => 'dev', '--id' => $import->getId(), '--limit' => 10000]);
-        Assert::assertStringContainsString(
-            '4 lines were processed, 3 items created, 0 items updated, 1 items ignored',
-            $output
-        );
-        $leadCount = $this->em->getRepository(Lead::class)->count(['firstname' => 'John']);
-        Assert::assertSame(3, $leadCount);
-    }
 
     protected function setUp(): void
     {
@@ -53,6 +35,43 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         if (isset($this->csvFile) && file_exists($this->csvFile)) {
             unlink($this->csvFile);
         }
+    }
+
+    public function testImportCSVWithFileAsHeaderName(): void
+    {
+        $this->loginUser('admin');
+        // Create 'file' field.
+        $this->createField('text', 'file');
+        // Create contact import.
+        $import = $this->createCsvContactImport();
+
+        // Show mapping page.
+        $crawler      = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
+        $uploadButton = $crawler->selectButton('Upload');
+        $form         = $uploadButton->form();
+        $form->setValues(
+            [
+                'lead_import[file]'       => $this->csvFile,
+                'lead_import[batchlimit]' => 100,
+                'lead_import[delimiter]'  => ',',
+                'lead_import[enclosure]'  => '"',
+                'lead_import[escape]'     => '\\',
+            ]
+        );
+        $html = $this->client->submit($form);
+        Assert::assertStringContainsString(
+            'Match the columns from the imported file to Mautic\'s contact fields.',
+            $html->text()
+        );
+
+        // Run command to import CSV.
+        $output = $this->runCommand('mautic:import', ['-e' => 'dev', '--id' => $import->getId(), '--limit' => 10000]);
+        Assert::assertStringContainsString(
+            '4 lines were processed, 3 items created, 0 items updated, 1 items ignored',
+            $output
+        );
+        $leadCount = $this->em->getRepository(Lead::class)->count(['firstname' => 'John']);
+        Assert::assertSame(3, $leadCount);
     }
 
     private function createField(string $type, string $alias): void
