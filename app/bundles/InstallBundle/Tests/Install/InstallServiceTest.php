@@ -309,7 +309,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             'firstname' => 'Demo',
             'lastname'  => 'User',
             'username'  => 'admin',
-            'email'     => 'demo@demo.com'
+            'email'     => 'demo@demo.com',
         ];
 
         $this->assertEquals(['password' => null], $this->installer->createAdminUserStep($data));
