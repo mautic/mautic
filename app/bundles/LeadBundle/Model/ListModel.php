@@ -324,6 +324,16 @@ class ListModel extends FormModel
             $choices[$field->getObject()][$field->getAlias()]['operators'] = $this->getOperatorsForFieldType($type);
         }
 
+        $choices['lead']['tags'] =
+            [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
+                'properties' => [
+                    'type' => 'tags',
+                ],
+                'operators'  => $this->getOperatorsForFieldType('multiselect'),
+                'object'     => 'lead',
+            ];
+
         // Add custom choices
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
             $event = new LeadListFiltersChoicesEvent($choices, $this->getOperatorsForFieldType(), $this->translator, $this->requestStack->getCurrentRequest());
