@@ -17,7 +17,6 @@ use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;

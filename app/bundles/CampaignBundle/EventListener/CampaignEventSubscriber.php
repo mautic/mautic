@@ -87,7 +87,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
+    /**app/bundles/WebhookBundle/Tests/Notificator/WebhookKillNotificatorTest.php
      * Process the FailedEvent event. Notifies users and checks
      * failed thresholds to notify CS and/or disable the campaign.
      *

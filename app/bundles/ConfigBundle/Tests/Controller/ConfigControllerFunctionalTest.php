@@ -244,19 +244,17 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form['config[notification_config][campaign_notification_email_addresses]']->setValue($campaign_notification_email_addresses);
         $form['config[notification_config][webhook_send_notification_to_author]']->setValue($send_notification_to_author);
         $form['config[notification_config][webhook_notification_email_addresses]']->setValue($webhook_notification_email_addresses);
-        $form['config[coreconfig][site_url]']->setValue('https://mautic-cloud.local');
+        $form['config[coreconfig][site_url]']->setValue('https://mautic-community.local');
         $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk());
 
         $crawler        = $this->client->request(Request::METHOD_GET, '/s/config/edit');
         $buttonCrawler  =  $crawler->selectButton('Save & Close');
         $form           = $buttonCrawler->form();
+
         Assert::assertEquals($send_notification_to_author, $form['config[notification_config][campaign_send_notification_to_author]']->getValue());
         Assert::assertEquals($campaign_notification_email_addresses, $form['config[notification_config][campaign_notification_email_addresses]']->getValue());
         Assert::assertEquals($send_notification_to_author, $form['config[notification_config][webhook_send_notification_to_author]']->getValue());
         Assert::assertEquals($webhook_notification_email_addresses, $form['config[notification_config][webhook_notification_email_addresses]']->getValue());
-
-        // re-create the Symfony client to make config changes applied
-        $this->setUpSymfony();
     }
 }

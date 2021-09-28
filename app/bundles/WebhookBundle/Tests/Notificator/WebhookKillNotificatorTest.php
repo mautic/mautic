@@ -59,22 +59,9 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             ->willReturnOnConsecutiveCalls($subject, $reason, $details);
         $coreParamHelperMock = $this->createMock(CoreParametersHelper::class);
         $coreParamHelperMock
-            ->expects($this->at(0))
             ->method('get')
             ->with('webhook_send_notification_to_author')
             ->willReturn(1);
-
-        $translatorMock = $this->createMock(TranslatorInterface::class);
-        $translatorMock
-            ->expects($this->at(0))
-            ->method('trans')
-            ->with('mautic.webhook.stopped')
-            ->willReturn($subject);
-        $translatorMock
-            ->expects($this->at(1))
-            ->method('trans')
-            ->with($reason)
-            ->willReturn($reason);
 
         $webhook = $this->createMock(Webhook::class);
         $webhook->expects($this->once())
@@ -159,7 +146,6 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $owner                 = $this->createMock(User::class);
         $modifier              = $this->createMock(User::class);
         $translatorMock        = $this->createMock(TranslatorInterface::class);
-        $webhook               = $this->createMock(Webhook::class);
         $routerMock            = $this->createMock(Router::class);
         $entityManagerMock     = $this->createMock(EntityManager::class);
         $notificationModelMock = $this->createMock(NotificationModel::class);
@@ -178,21 +164,9 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
         $coreParamHelperMock = $this->createMock(CoreParametersHelper::class);
         $coreParamHelperMock
-            ->expects($this->at(0))
             ->method('get')
             ->with('webhook_send_notification_to_author')
             ->willReturn(1);
-        $translatorMock = $this->createMock(TranslatorInterface::class);
-        $translatorMock
-            ->expects($this->at(0))
-            ->method('trans')
-            ->with('mautic.webhook.stopped')
-            ->willReturn($subject);
-        $translatorMock
-            ->expects($this->at(1))
-            ->method('trans')
-            ->with($reason)
-            ->willReturn($reason);
 
         $webhook = $this->createMock(Webhook::class);
         $webhook->expects($this->once())

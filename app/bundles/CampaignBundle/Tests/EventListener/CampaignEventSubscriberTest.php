@@ -27,6 +27,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventListener\CampaignEventSubscriber;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
@@ -63,12 +64,18 @@ class CampaignEventSubscriberTest extends TestCase
      */
     private $leadEventLogRepositoryMock;
 
+    /**
+     * @var CoreParametersHelper|mixed|MockObject
+     */
+    private $coreParametersHelperMock;
+
     protected function setUp(): void
     {
         $this->eventRepo                  = $this->createMock(EventRepository::class);
         $this->notificationHelper         = $this->createMock(NotificationHelper::class);
         $this->campaignModel              = $this->createMock(CampaignModel::class);
         $this->leadEventLogRepositoryMock = $this->createMock(LeadEventLogRepository::class);
+        $this->coreParametersHelperMock   = $this->createMock(CoreParametersHelper::class);
         $this->fixture                    = new CampaignEventSubscriber(
             $this->eventRepo,
             $this->notificationHelper,
@@ -350,7 +357,8 @@ class CampaignEventSubscriberTest extends TestCase
             $userModelMock,
             $notificationModelMock,
             $translatorInterfaceMock,
-            $routerMock
+            $routerMock,
+            $this->coreParametersHelperMock
         );
         $campaignEventSubscriberObj = new CampaignEventSubscriber(
             $this->eventRepo,

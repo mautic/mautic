@@ -95,7 +95,7 @@ class UserModelTest extends TestCase
             ->method('generateSecret')
             ->willReturn($this->userToken);
 
-        $this->mailHelper->expects($this->once())
+        $this->mailHelper
             ->method('getMailer')
             ->willReturn($this->mailHelper);
 
