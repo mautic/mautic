@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-46-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-49-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -99,7 +99,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/domparry"><img src="https://avatars.githubusercontent.com/u/19376765?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dom Parry</b></sub></a><br /><a href="#userTesting-domparry" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/sensalot"><img src="https://avatars.githubusercontent.com/u/6697244?v=4?s=100" width="100px;" alt=""/><br /><sub><b>sensalot</b></sub></a><br /><a href="#userTesting-sensalot" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/shinde-rahul"><img src="https://avatars.githubusercontent.com/u/1046788?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rahul Shinde</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Ashinde-rahul" title="Reviewed Pull Requests">👀</a> <a href="#userTesting-shinde-rahul" title="User Testing">📓</a> <a href="https://github.com/mautic/mautic/commits?author=shinde-rahul" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/jos0405"><img src="https://avatars.githubusercontent.com/u/4246909?v=4?s=100" width="100px;" alt=""/><br /><sub><b>jos0405</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=jos0405" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/jos0405"><img src="https://avatars.githubusercontent.com/u/4246909?v=4?s=100" width="100px;" alt=""/><br /><sub><b>jos0405</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=jos0405" title="Code">💻</a> <a href="#userTesting-jos0405" title="User Testing">📓</a></td>
     <td align="center"><a href="http://veenhof.be"><img src="https://avatars.githubusercontent.com/u/161341?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nick Veenhof</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Anickveenhof" title="Reviewed Pull Requests">👀</a></td>
   </tr>
   <tr>
@@ -130,10 +130,13 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.udemy.com/certificate/UC-5CZA2NJ8/"><img src="https://avatars.githubusercontent.com/u/22201881?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Disha P</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=disha-pishavadia24" title="Code">💻</a></td>
   </tr>
   <tr>
-    <td align="center"><a href="http://www.idea2.ch"><img src="https://avatars.githubusercontent.com/u/13075514?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Adrian</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Aadiux" title="Reviewed Pull Requests">👀</a> <a href="#userTesting-adiux" title="User Testing">📓</a></td>
+    <td align="center"><a href="http://www.idea2.ch"><img src="https://avatars.githubusercontent.com/u/13075514?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Adrian</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Aadiux" title="Reviewed Pull Requests">👀</a> <a href="#userTesting-adiux" title="User Testing">📓</a> <a href="https://github.com/mautic/mautic/commits?author=adiux" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/vijayhrdm"><img src="https://avatars.githubusercontent.com/u/9714242?v=4?s=100" width="100px;" alt=""/><br /><sub><b>vijayhrdm</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Avijayhrdm" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/julienWebmecanik"><img src="https://avatars.githubusercontent.com/u/79137416?v=4?s=100" width="100px;" alt=""/><br /><sub><b>julienWebmecanik</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=julienWebmecanik" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/johbuch"><img src="https://avatars.githubusercontent.com/u/31535432?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Johan Buchert</b></sub></a><br /><a href="#userTesting-johbuch" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://github.com/TS16V"><img src="https://avatars.githubusercontent.com/u/38064792?v=4?s=100" width="100px;" alt=""/><br /><sub><b>TS16V</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3ATS16V" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/rafalsk"><img src="https://avatars.githubusercontent.com/u/9338163?v=4?s=100" width="100px;" alt=""/><br /><sub><b>rafalsk</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Arafalsk" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://jonathanphoto.fr"><img src="https://avatars.githubusercontent.com/u/55917666?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jonathan Dahan</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Ajonathandhn" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
