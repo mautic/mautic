@@ -223,7 +223,6 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $this->prepareCommonMocks($event, $user);
 
         $this->coreParametersHelper
-            ->expects($this->at(0))
             ->method('get')
             ->with('campaign_send_notification_to_author')
             ->willReturn(1);
@@ -245,18 +244,11 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $this->prepareCommonMocks($event, $user);
 
-        $this->coreParametersHelper
-            ->expects($this->at(0))
-            ->method('get')
-            ->with('campaign_send_notification_to_author')
-            ->willReturn(0);
-
         $emails = 'a@test.co, b@test.co';
         $this->coreParametersHelper
-            ->expects($this->at(1))
             ->method('get')
-            ->with('campaign_notification_email_addresses')
-            ->willReturn($emails);
+            ->withConsecutive(['campaign_send_notification_to_author'], ['campaign_notification_email_addresses'])
+            ->willReturn(0, $emails);
 
         $this->userModel->expects($this->once())
             ->method('sendMailToEmailAddresses')

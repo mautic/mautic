@@ -27,9 +27,14 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventListener\CampaignEventSubscriber;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignEventSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -57,6 +62,10 @@ class CampaignEventSubscriberTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|LeadEventLogRepository
      */
     private $leadEventLogRepositoryMock;
+    /**
+     * @var CoreParametersHelper|mixed|MockObject
+     */
+    private $coreParametersHelperMock;
 
     public function setUp(): void
     {
@@ -64,6 +73,7 @@ class CampaignEventSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->notificationHelper         = $this->createMock(NotificationHelper::class);
         $this->campaignModel              = $this->createMock(CampaignModel::class);
         $this->leadEventLogRepositoryMock = $this->createMock(LeadEventLogRepository::class);
+        $this->coreParametersHelperMock   = $this->createMock(CoreParametersHelper::class);
         $this->fixture                    = new CampaignEventSubscriber(
             $this->eventRepo,
             $this->notificationHelper,
@@ -241,12 +251,10 @@ class CampaignEventSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(42);
 
-        $mockEventLog->expects($this->at(0))
-            ->method('getEvent')
+        $mockEventLog->method('getEvent')
             ->willReturn($eventMock);
 
-        $mockEventLog->expects($this->at(1))
-            ->method('getLead')
+        $mockEventLog->method('getLead')
             ->willReturn($lead);
 
         $this->leadEventLogRepositoryMock->expects($this->once())
