@@ -97,12 +97,12 @@ class CustomFieldValueHelper
                 return $value;
             }
             foreach ($list as $property) {
-                if ($property['value'] == $value) {
-                    $value = $property['label'];
+                if (isset($property[$value])) {
+                    return $property[$value];
+                } elseif ($property['value'] == $value) {
+                    return $property['label'];
                 }
             }
         }
-
-        return $value;
     }
 }
