@@ -37,17 +37,18 @@ class ContactSegmentFilterFactory
     }
 
     /**
-     * @return ContactSegmentFilters
-     *
      * @throws Exception
      */
-    public function getSegmentFilters(LeadList $leadList)
+    public function getSegmentFilters(LeadList $leadList, array $batchLimiters = []): ContactSegmentFilters
     {
         $contactSegmentFilters = new ContactSegmentFilters();
 
         $filters = $leadList->getFilters();
         foreach ($filters as $filter) {
-            $contactSegmentFilters->addContactSegmentFilter($this->factorSegmentFilter($filter));
+            if (!in_array($filter['operator'], $this->operatorsWithEmptyValuesAllowed) && empty($filter['filter']) && !is_numeric($filter['filter'])) {
+                continue; // If no value set for the filter, don't consider it
+            }
+            $contactSegmentFilters->addContactSegmentFilter($this->factorSegmentFilter($filter, $batchLimiters));
         }
 
         return $contactSegmentFilters;
@@ -56,11 +57,9 @@ class ContactSegmentFilterFactory
     /**
      * @param mixed[] $filter
      *
-     * @return ContactSegmentFilter
-     *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function factorSegmentFilter(array $filter)
+    public function factorSegmentFilter(array $filter, array $batchLimiters = []): ContactSegmentFilter
     {
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 
@@ -68,7 +67,7 @@ class ContactSegmentFilterFactory
 
         $filterQueryBuilder = $this->getQueryBuilderForFilter($decorator, $contactSegmentFilterCrate);
 
-        return new ContactSegmentFilter($contactSegmentFilterCrate, $decorator, $this->schemaCache, $filterQueryBuilder);
+        return new ContactSegmentFilter($contactSegmentFilterCrate, $decorator, $this->schemaCache, $filterQueryBuilder, $batchLimiters);
     }
 
     /**

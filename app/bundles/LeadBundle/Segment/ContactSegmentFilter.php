@@ -7,6 +7,7 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts;
+use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBatchLimiterBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
@@ -35,16 +36,23 @@ class ContactSegmentFilter
      */
     private $schemaCache;
 
+    /**
+     * @var array
+     */
+    private $batchLimiters = [];
+
     public function __construct(
         ContactSegmentFilterCrate $contactSegmentFilterCrate,
         FilterDecoratorInterface $filterDecorator,
         TableSchemaColumnsCache $cache,
-        FilterQueryBuilderInterface $filterQueryBuilder
+        FilterQueryBuilderInterface $filterQueryBuilder,
+        array $batchLimiters = []
     ) {
         $this->contactSegmentFilterCrate = $contactSegmentFilterCrate;
         $this->filterDecorator           = $filterDecorator;
         $this->schemaCache               = $cache;
         $this->filterQueryBuilder        = $filterQueryBuilder;
+        $this->batchLimiters             = $batchLimiters;
     }
 
     /**
@@ -157,12 +165,14 @@ class ContactSegmentFilter
         return $this->filterQueryBuilder;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function applyQuery(QueryBuilder $queryBuilder)
+    public function applyQuery(QueryBuilder $queryBuilder): QueryBuilder
     {
-        return $this->filterQueryBuilder->applyQuery($queryBuilder, $this);
+        $filterQueryBuilder = $this->filterQueryBuilder->applyQuery($queryBuilder, $this);
+        if ($this->filterQueryBuilder instanceof FilterQueryBatchLimiterBuilderInterface) {
+            $filterQueryBuilder = $this->filterQueryBuilder->applyFilterOperators($queryBuilder, $this, $filterQueryBuilder);
+        }
+
+        return $filterQueryBuilder;
     }
 
     /**
@@ -239,5 +249,10 @@ class ContactSegmentFilter
     public function doesColumnSupportEmptyValue(): bool
     {
         return !in_array($this->contactSegmentFilterCrate->getType(), ['date', 'datetime'], true);
+    }
+
+    public function getBatchLimiters(): array
+    {
+        return $this->batchLimiters;
     }
 }

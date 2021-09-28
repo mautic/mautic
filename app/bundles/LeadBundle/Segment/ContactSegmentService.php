@@ -43,7 +43,7 @@ class ContactSegmentService
      */
     public function getNewLeadListLeadsCount(LeadList $segment, array $batchLimiters)
     {
-        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
+        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment, $batchLimiters);
 
         if (!count($segmentFilters)) {
             $this->logger->debug('Segment QB: Segment has no filters', ['segmentId' => $segment->getId()]);
@@ -56,7 +56,7 @@ class ContactSegmentService
             ];
         }
 
-        $qb              = $this->getNewSegmentContactsQuery($segment);
+        $qb              = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
         $leadsTableAlias = $qb->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
 
         $this->addMinMaxLimiters($qb, $batchLimiters);
@@ -201,11 +201,11 @@ class ContactSegmentService
      * @throws Exception\SegmentQueryException
      * @throws \Exception
      */
-    private function getNewSegmentContactsQuery(LeadList $segment)
+    private function getNewSegmentContactsQuery(LeadList $segment, array $batchLimiters = [])
     {
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder(
             $segment->getId(),
-            $this->contactSegmentFilterFactory->getSegmentFilters($segment)
+            $this->contactSegmentFilterFactory->getSegmentFilters($segment, $batchLimiters)
         );
 
         $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId());
