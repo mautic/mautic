@@ -489,6 +489,7 @@ class ImportController extends FormController
             return new JsonResponse(['success' => 1, 'ignore_wdt' => 1]);
         } else {
             $viewParameters['step'] = $step;
+
             return $this->delegateView(
                 [
                     'viewParameters'  => $viewParameters,
