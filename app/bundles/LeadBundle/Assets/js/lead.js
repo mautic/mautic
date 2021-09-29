@@ -244,6 +244,25 @@ Mautic.getLeadId = function() {
 }
 
 Mautic.leadlistOnLoad = function(container, response) {
+    const segmentCountElem = mQuery('a.col-count');
+
+    if (segmentCountElem.length) {
+        segmentCountElem.each(function() {
+            const elem = mQuery(this);
+            const id = elem.attr('data-id');
+
+            Mautic.ajaxActionRequest(
+                'lead:getLeadCount',
+                {id: id},
+                function (response) {
+                    elem.html(response.html);
+                },
+                false,
+                true,
+                "GET"
+            );
+        });
+    }
 
     mQuery('#campaign-share-tab').hover(function () {
         if (Mautic.shareTableLoaded != true) {
@@ -1085,7 +1104,7 @@ Mautic.reloadLeadImportProgress = function() {
                     mQuery('.progress-bar-import span.sr-only').html(response.percent + '%');
                 }
             }
-        });
+        }, false, false, "GET");
 
         // Initiate import
         mQuery.ajax({
@@ -1233,7 +1252,7 @@ Mautic.getLeadEmailContent = function (el) {
         mQuery('#'+idPrefix+'subject').val(response.subject);
 
         Mautic.removeLabelLoadingIndicator();
-    });
+    }, false, false, "GET");
 };
 
 Mautic.updateLeadTags = function () {
@@ -1430,7 +1449,7 @@ Mautic.initUniqueIdentifierFields = function() {
                 } else {
                     input.parent().find('div.exists-warning').remove();
                 }
-            });
+            }, false, false, "GET");
         });
     }
 };

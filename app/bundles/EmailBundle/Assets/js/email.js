@@ -66,7 +66,7 @@ Mautic.emailOnLoad = function (container, response) {
                     }
                 },
                 false,
-                true,
+                false,
                 "GET"
             );
         }
@@ -243,7 +243,7 @@ Mautic.getTotalAttachmentSize = function() {
         };
         Mautic.ajaxActionRequest('email:getAttachmentsSize', assets, function(response) {
             mQuery('#attachment-size').text(response.size);
-        });
+        }, false, false, "GET");
     } else {
         mQuery('#attachment-size').text('0');
     }

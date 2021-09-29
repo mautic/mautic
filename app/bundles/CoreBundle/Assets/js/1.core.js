@@ -820,7 +820,7 @@ var Mautic = {
      * @param queue
      * @param method
      */
-    ajaxActionRequest: function (action, data, successClosure, showLoadingBar, queue, method = 'POST') {
+    ajaxActionRequest: function (action, data, successClosure, showLoadingBar, queue, method = "POST") {
         if (typeof Mautic.ajaxActionXhrQueue == 'undefined') {
             Mautic.ajaxActionXhrQueue = {};
         }
