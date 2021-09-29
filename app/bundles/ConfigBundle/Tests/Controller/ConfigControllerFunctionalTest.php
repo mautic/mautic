@@ -209,16 +209,16 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // page 3 for 404_page
         $form->setValues(
             [
-                'config[coreconfig][site_url]' => 'https://mautic-community.local', // required
-                'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'],
-                'config[coreconfig][404_page]' => $page3,
+                'config[coreconfig][site_url]'        => 'https://mautic-community.local', // required
+                'config[leadconfig][contact_columns]' => ['name', 'email', 'id'],
+                'config[coreconfig][404_page]'        => $page3,
             ]
         );
 
         $crawler = $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk());
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $crawler       = $this->client->request(Request::METHOD_GET, '/s/config/edit');
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
         Assert::assertEquals($page3, $form['config[coreconfig][404_page]']->getValue());
@@ -243,12 +243,12 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         $form->setValues(
             [
-                'config[coreconfig][site_url]' => 'https://mautic-community.local', // required
-                'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'],
-                'config[notification_config][campaign_send_notification_to_author]' => $send_notification_to_author,
+                'config[coreconfig][site_url]'                                       => 'https://mautic-community.local', // required
+                'config[leadconfig][contact_columns]'                                => ['name', 'email', 'id'],
+                'config[notification_config][campaign_send_notification_to_author]'  => $send_notification_to_author,
                 'config[notification_config][campaign_notification_email_addresses]' => $campaign_notification_email_addresses,
-                'config[notification_config][webhook_send_notification_to_author]' => $send_notification_to_author,
-                'config[notification_config][webhook_notification_email_addresses]' => $webhook_notification_email_addresses,
+                'config[notification_config][webhook_send_notification_to_author]'   => $send_notification_to_author,
+                'config[notification_config][webhook_notification_email_addresses]'  => $webhook_notification_email_addresses,
             ]
         );
 
