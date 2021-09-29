@@ -39,7 +39,6 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testImportCSVWithFileAsHeaderName(): void
     {
-        $this->loginUser('admin');
         // Create 'file' field.
         $this->createField('text', 'file');
         // Create contact import.
@@ -83,7 +82,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $field->setName($alias);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->container->get('mautic.lead.model.field');
+        $fieldModel = self::$container->get('mautic.lead.model.field');
         $fieldModel->saveEntity($field);
     }
 
@@ -131,7 +130,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $import->setProperties($properties);
 
         /** @var ImportModel $importModel */
-        $importModel = $this->container->get('mautic.lead.model.import');
+        $importModel = self::$container->get('mautic.lead.model.import');
         $importModel->saveEntity($import);
 
         return $import;
