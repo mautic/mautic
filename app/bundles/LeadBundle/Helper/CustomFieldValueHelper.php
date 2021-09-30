@@ -104,5 +104,7 @@ class CustomFieldValueHelper
                 }
             }
         }
+
+        return $value;
     }
 }
