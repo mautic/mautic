@@ -217,6 +217,18 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.page.subscriber.redirect' => [
+                'class'     => \Mautic\PageBundle\EventListener\RedirectSubscriber::class,
+                'arguments' => [
+                    'request_stack',
+                    'mautic.helper.ip_lookup',
+                    'mautic.lead.model.lead',
+                    'mautic.page.model.page',
+                    'monolog.logger.mautic',
+                    'mautic.lead.helper.primary_company',
+                    'translator',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.page' => [

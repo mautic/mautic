@@ -129,6 +129,14 @@ final class PageEvents
     const ON_REDIRECT_GENERATE = 'mautic.page.on_redirect_generate';
 
     /**
+     * The mautic.page.on_redirect event is fired when redirect is provided.
+     *
+     * The event listener receives a
+     * Mautic\PageBundle\Event\RedirectEvent
+     */
+    const ON_REDIRECT = 'mautic.page.on_redirect';
+
+    /**
      * The mautic.page.on_bounce_rate_winner event is fired when there is a need to determine bounce rate winner.
      *
      * The event listener receives a

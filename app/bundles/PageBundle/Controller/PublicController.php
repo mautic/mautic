@@ -12,29 +12,40 @@
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
-use Mautic\CoreBundle\Helper\UrlHelper;
-use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
-use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Event\RedirectEvent;
 use Mautic\PageBundle\Event\TrackingEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
-use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PublicController extends CommonFormController
 {
+    /**
+     * @var object|\Symfony\Bridge\Monolog\Logger|null
+     */
+    private $logger;
+
+    /**
+     * Initialize controller.
+     */
+    public function initialize(FilterControllerEvent $event)
+    {
+        $this->logger    = $this->container->get('monolog.logger.mautic');
+    }
+
     /**
      * @param $slug
      *
@@ -422,85 +433,34 @@ class PublicController extends CommonFormController
     /**
      * @param $redirectId
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse
      *
      * @throws \Exception
      */
     public function redirectAction($redirectId)
     {
-        $logger = $this->container->get('monolog.logger.mautic');
-
-        $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
+        $this->logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->getModel('page.redirect');
         $redirect      = $redirectModel->getRedirectById($redirectId);
 
-        $logger->debug('Executing Redirect: '.$redirect);
+        $this->logger->debug('Executing Redirect: '.$redirect);
 
         if (null === $redirect || !$redirect->isPublished(false)) {
-            $logger->debug('Redirect with tracking_id of '.$redirectId.' not found');
+            $this->logger->debug('Redirect with tracking_id of '.$redirectId.' not found');
 
             $url = ($redirect) ? $redirect->getUrl() : 'n/a';
 
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
         }
 
-        // Ensure the URL does not have encoded ampersands
-        $url = str_replace('&amp;', '&', $redirect->getUrl());
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher         = $this->get('event_dispatcher');
+        $redirectEvent           = new RedirectEvent($redirect);
+        $eventDispatcher->dispatch(PageEvents::ON_REDIRECT, $redirectEvent);
 
-        // Get query string
-        $query = $this->request->query->all();
-
-        // Unset the clickthrough from the URL query
-        $ct = $query['ct'];
-        unset($query['ct']);
-
-        // Tak on anything left to the URL
-        if (count($query)) {
-            $url = UrlHelper::appendQueryToUrl($url, http_build_query($query));
-        }
-
-        // If the IP address is not trackable, it means it came form a configured "do not track" IP or a "do not track" user agent
-        // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
-        $ipAddress = $this->container->get('mautic.helper.ip_lookup')->getIpAddress();
-        if ($ipAddress->isTrackable()) {
-            // Search replace lead fields in the URL
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->getModel('lead');
-
-            /** @var PageModel $pageModel */
-            $pageModel = $this->getModel('page');
-
-            try {
-                $lead = $leadModel->getContactFromRequest(['ct' => $ct]);
-                $pageModel->hitPage($redirect, $this->request, 200, $lead);
-            } catch (InvalidDecodedStringException $e) {
-                // Invalid ct value so we must unset it
-                // and process the request without it
-
-                $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
-
-                $this->request->request->set('ct', '');
-                $this->request->query->set('ct', '');
-                $lead = $leadModel->getContactFromRequest();
-                $pageModel->hitPage($redirect, $this->request, 200, $lead);
-            }
-
-            /** @var PrimaryCompanyHelper $primaryCompanyHelper */
-            $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');
-            $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
-
-            $url = TokenHelper::findLeadTokens($url, $leadArray, true);
-        }
-
-        $url = UrlHelper::sanitizeAbsoluteUrl($url);
-
-        if (!UrlHelper::isValidUrl($url)) {
-            throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
-        }
-
-        return $this->redirect($url);
+        return $redirectEvent->getRedirectResponse();
     }
 
     /**
