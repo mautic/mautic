@@ -17,13 +17,14 @@ class SyncIntegrationsHelperTest extends TestCase
     {
         $mauticObject           = 'some_integration';
         $integrationsHelperMock = $this->createMock(IntegrationsHelper::class);
-        $objectProviderMock     = $this->createMock(ObjectProvider::class);
-        $syncIntegrationsHelper = new SyncIntegrationsHelper($integrationsHelperMock, $objectProviderMock);
-        $syncInterfaceMock      = $this->createMock(SyncInterface::class);
+
+        $syncInterfaceMock = $this->createMock(SyncInterface::class);
         $syncInterfaceMock->method('getName')->willReturn($mauticObject);
-        $syncIntegrationsHelper->addIntegration($syncInterfaceMock);
 
         $integrationMock = $this->createMock(Integration::class);
+        $integrationsHelperMock->method('getIntegrationConfiguration')
+            ->with($syncInterfaceMock)
+            ->willReturn($integrationMock);
         $integrationMock->method('getIsPublished')->willReturn(true);
         $supportedFeatures = [
             'integration' => [
@@ -36,9 +37,9 @@ class SyncIntegrationsHelperTest extends TestCase
                 ],
                 'syncStrategiesPush' => [
                     'lead' => [
-                            'operator' => null,
-                            'field'    => null,
-                        ],
+                        'operator' => null,
+                        'field'    => null,
+                    ],
                 ],
                 'activitySync'       => null,
                 'activityEvents'     => [
@@ -72,10 +73,13 @@ class SyncIntegrationsHelperTest extends TestCase
             ],
         ];
         $integrationMock->method('getSupportedFeatures')->willReturn($supportedFeatures);
-        $integrationsHelperMock->method('getIntegrationConfiguration')
-            ->with($syncInterfaceMock)
-            ->willReturn($integrationMock);
 
+        $syncInterfaceMock->method('getIntegrationConfiguration')->willReturn($integrationMock);
+
+        $objectProviderMock = $this->createMock(ObjectProvider::class);
+
+        $syncIntegrationsHelper = new SyncIntegrationsHelper($integrationsHelperMock, $objectProviderMock);
+        $syncIntegrationsHelper->addIntegration($syncInterfaceMock);
         $syncIntegrationsHelper->hasObjectSyncEnabled($mauticObject);
     }
 }
