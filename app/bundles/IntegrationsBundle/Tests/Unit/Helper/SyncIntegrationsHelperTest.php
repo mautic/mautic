@@ -10,6 +10,7 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\SyncInterface;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\PluginBundle\Entity\Integration;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 class SyncIntegrationsHelperTest extends TestCase
@@ -73,6 +74,9 @@ class SyncIntegrationsHelperTest extends TestCase
                         ],
                     ],
                 ],
+                'directions' => [
+                    'Lead' => 'mautic',
+                ],
             ],
         ];
         $integrationMock->method('getFeatureSettings')->willReturn($featureSettings);
@@ -80,14 +84,17 @@ class SyncIntegrationsHelperTest extends TestCase
         $syncInterfaceMock->method('getIntegrationConfiguration')->willReturn($integrationMock);
 
         $mappingManualDAOMock          = $this->createMock(MappingManualDAO::class);
-        $mappedIntegrationObjectsNames = ['this', 'that'];
-        $mappingManualDAOMock->method('getMappedIntegrationObjectsNames')->with($mauticObject)->willReturn($mappedIntegrationObjectsNames);
+        $mappedIntegrationObjectsNames = ['Lead'];
+        $mappingManualDAOMock->method('getMappedIntegrationObjectsNames')->with($mauticObject)
+            ->willReturn($mappedIntegrationObjectsNames);
         $syncInterfaceMock->method('getMappingManual')->willReturn($mappingManualDAOMock);
 
         $objectProviderMock = $this->createMock(ObjectProvider::class);
 
         $syncIntegrationsHelper = new SyncIntegrationsHelper($integrationsHelperMock, $objectProviderMock);
         $syncIntegrationsHelper->addIntegration($syncInterfaceMock);
-        $syncIntegrationsHelper->hasObjectSyncEnabled($mauticObject);
+        $hasObject = $syncIntegrationsHelper->hasObjectSyncEnabled($mauticObject);
+
+        Assert::assertFalse($hasObject);
     }
 }
