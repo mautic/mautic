@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2017 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -60,7 +58,7 @@ class RequestSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function validateCsrfTokenForAjaxPost(GetResponseEvent $event): void
+    public function validateCsrfTokenForAjaxPost(GetResponseEvent $event)
     {
         $request = $event->getRequest();
 
@@ -74,17 +72,26 @@ class RequestSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function isAjaxPost(Request $request): bool
+    /**
+     * @return bool
+     */
+    private function isAjaxPost(Request $request)
     {
         return $request->isXmlHttpRequest() && Request::METHOD_POST === $request->getMethod();
     }
 
-    private function isSecurePath(Request $request): bool
+    /**
+     * @return bool
+     */
+    private function isSecurePath(Request $request)
     {
         return 1 === preg_match('/^\/s\//', $request->getPathinfo());
     }
 
-    private function isCsrfTokenFromRequestHeaderValid(Request $request): bool
+    /**
+     * @return bool
+     */
+    private function isCsrfTokenFromRequestHeaderValid(Request $request)
     {
         $csrfRequestToken = $request->headers->get('X-CSRF-Token');
         $csrfSessionToken = $this->tokenManager->getToken('mautic_ajax_post')->getValue();
