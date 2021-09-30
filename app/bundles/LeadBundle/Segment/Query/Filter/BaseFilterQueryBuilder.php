@@ -29,12 +29,12 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         $this->dispatcher             = $dispatcher;
     }
 
-    public static function getServiceId(): string
+    public static function getServiceId()
     {
         return 'mautic.lead.query.builder.basic';
     }
 
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
         // Check if the column exists in the table
         $filter->getColumn();

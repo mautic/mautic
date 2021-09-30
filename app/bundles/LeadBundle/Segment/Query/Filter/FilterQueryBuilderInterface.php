@@ -7,10 +7,13 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 interface FilterQueryBuilderInterface
 {
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder;
+    /**
+     * @return QueryBuilder
+     */
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter);
 
     /**
      * @return string returns the service id in the DIC container
      */
-    public static function getServiceId(): string;
+    public static function getServiceId();
 }
