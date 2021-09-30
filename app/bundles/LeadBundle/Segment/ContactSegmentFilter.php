@@ -7,7 +7,6 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts;
-use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBatchLimiterBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
@@ -167,12 +166,7 @@ class ContactSegmentFilter
 
     public function applyQuery(QueryBuilder $queryBuilder): QueryBuilder
     {
-        $filterQueryBuilder = $this->filterQueryBuilder->applyQuery($queryBuilder, $this);
-        if ($this->filterQueryBuilder instanceof FilterQueryBatchLimiterBuilderInterface) {
-            $filterQueryBuilder = $this->filterQueryBuilder->applyFilterOperators($queryBuilder, $this, $filterQueryBuilder);
-        }
-
-        return $filterQueryBuilder;
+        return $this->filterQueryBuilder->applyQuery($queryBuilder, $this);
     }
 
     /**
