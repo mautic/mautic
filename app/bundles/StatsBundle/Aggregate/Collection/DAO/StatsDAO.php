@@ -82,10 +82,10 @@ class StatsDAO
         foreach ($this->getDays() as $day => $stats) {
             $week = CalculatorHelper::getWeekFromDayString($day);
             if (!isset($flattenedWeeks[$week])) {
-                $flattenedWeeks[$week] = new WeekStat();
-                $flattenedWeeks[$week]->setCount($stats->getCount());
+                $flattenedWeeks[$week] = new WeekStat($week);
+                $flattenedWeeks[$week]->setCount($stats->getSum());
             } else {
-                $flattenedWeeks[$week]->addToCount($stats->getCount());
+                $flattenedWeeks[$week]->addToCount($stats->getSum());
             }
         }
 

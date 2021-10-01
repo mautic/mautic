@@ -14,6 +14,7 @@ namespace Mautic\StatsBundle\Tests\Aggregate\Collection\DAO;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\MonthStat;
+use Mautic\StatsBundle\Aggregate\Collection\Stats\WeekStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat;
 use PHPUnit\Framework\TestCase;
 
@@ -47,6 +48,22 @@ class StatsDAOTest extends TestCase
 
         array_walk($stats, function ($stat) {
             $this->assertInstanceOf(MonthStat::class, $stat);
+        });
+    }
+
+    public function testGetWeekReturnsFlattenedMonths()
+    {
+        $expected = [
+            '2018-49',
+            '2019-45',
+            '2019-49',
+        ];
+
+        $stats = $this->getStats()->getWeeks();
+        $this->assertEquals($expected, array_keys($stats));
+
+        array_walk($stats, function ($stat) {
+            $this->assertInstanceOf(WeekStat::class, $stat);
         });
     }
 
