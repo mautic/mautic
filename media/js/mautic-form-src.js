@@ -774,7 +774,18 @@
         };
 
         Core.parseToObject = function(params) {
-            return JSON.parse('{"' + decodeURI(params.trim().replace(/&/g, "\",\"").replace(/=/g,"\":\"")) + '"}');
+            return JSON.parse(
+                '{"' +
+                decodeURI(url)
+                  .replace(/\s/g, "")
+                  .split("=")
+                  .filter((n) => n)
+                  .toString()
+                  .replace(/,/g, '":"')
+                  .replace(/&/g, '","')
+                  .replace(/\?/g, "") +
+                '"}'
+              );
         };
 
         Core.setConfig = function (options) {
