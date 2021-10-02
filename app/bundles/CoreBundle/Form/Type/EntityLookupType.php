@@ -103,15 +103,13 @@ class EntityLookupType extends AbstractType
                 'entity_label_column'    => 'name',
                 'entity_id_column'       => 'id',
                 'choice_loader'          => function (Options $options) {
-                    if (!isset($this->choiceLoaders[$options['model']])) {
-                        // This class is defined as a service therefore the choice loader has to be unique per field that inherits this class as a parent
-                        $this->choiceLoaders[$options['model']] = new EntityLookupChoiceLoader(
+                    // This class is defined as a service therefore the choice loader has to be unique per field that inherits this class as a parent
+                    $this->choiceLoaders[$options['model']] = new EntityLookupChoiceLoader(
                             $this->modelFactory,
                             $this->translator,
                             $this->connection,
                             $options
                         );
-                    }
 
                     return $this->choiceLoaders[$options['model']];
                 },

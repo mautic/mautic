@@ -11,7 +11,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Joomla\Http\Http;
+use GuzzleHttp\Client;
 use Mautic\CoreBundle\Helper\Language\Installer;
 use Monolog\Logger;
 use Symfony\Component\Finder\Finder;
@@ -21,57 +21,22 @@ use Symfony\Component\Finder\Finder;
  */
 class LanguageHelper
 {
-    /**
-     * @var string
-     */
-    private $cacheFile;
+    private string $cacheFile;
+    private Client $client;
+    private PathsHelper $pathsHelper;
+    private Logger $logger;
+    private Installer $installer;
+    private CoreParametersHelper $coreParametersHelper;
+    private array $supportedLanguages = [];
+    private string $installedTranslationsDirectory;
+    private string $defaultTranslationsDirectory;
 
-    /**
-     * @var Http
-     */
-    private $connector;
-
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * @var Installer
-     */
-    private $installer;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var array
-     */
-    private $supportedLanguages = [];
-
-    /**
-     * @var string
-     */
-    private $installedTranslationsDirectory;
-
-    /**
-     * @var string
-     */
-    private $defaultTranslationsDirectory;
-
-    public function __construct(PathsHelper $pathsHelper, Logger $logger, CoreParametersHelper $coreParametersHelper, Http $connector)
+    public function __construct(PathsHelper $pathsHelper, Logger $logger, CoreParametersHelper $coreParametersHelper, Client $client)
     {
         $this->pathsHelper                    = $pathsHelper;
         $this->logger                         = $logger;
         $this->coreParametersHelper           = $coreParametersHelper;
-        $this->connector                      = $connector;
+        $this->client                         = $client;
         $this->defaultTranslationsDirectory   = __DIR__.'/../Translations';
         $this->installedTranslationsDirectory = $this->pathsHelper->getSystemPath('translations_root').'/translations';
         $this->installer                      = new Installer($this->installedTranslationsDirectory);
@@ -206,8 +171,11 @@ class LanguageHelper
 
         // Get the language data
         try {
-            $data      = $this->connector->get($this->coreParametersHelper->get('translations_list_url'), [], 10);
-            $manifest  = json_decode($data->body, true);
+            $data = $this->client->get(
+                $this->coreParametersHelper->get('translations_list_url'),
+                [\GuzzleHttp\RequestOptions::TIMEOUT => 10]
+            );
+            $manifest  = json_decode($data->getBody(), true);
             $languages = [];
 
             // translate the manifest (plain array) to a format
@@ -228,13 +196,13 @@ class LanguageHelper
                 ];
         }
 
-        if (200 != $data->code) {
+        if (200 != $data->getStatusCode()) {
             // Log the error
             $this->logger->addError(
                 sprintf(
                     'An unexpected %1$s code was returned while attempting to fetch the language.  The message received was: %2$s',
                     $data->code,
-                    is_string($data->body) ? $data->body : implode('; ', $data->body)
+                    (string) $data->getBody()
                 )
             );
 
@@ -288,7 +256,7 @@ class LanguageHelper
 
         // GET the update data
         try {
-            $data = $this->connector->get($langUrl);
+            $data = $this->client->get($langUrl);
         } catch (\Exception $exception) {
             $this->logger->addError('An error occurred while attempting to fetch the package: '.$exception->getMessage());
 
@@ -301,7 +269,7 @@ class LanguageHelper
             ];
         }
 
-        if ($data->code >= 300 && $data->code < 400) {
+        if ($data->getStatusCode() >= 300 && $data->getStatusCode() < 400) {
             return [
                 'error'   => true,
                 'message' => 'mautic.core.language.helper.error.follow.redirects',
@@ -309,12 +277,12 @@ class LanguageHelper
                     '%url%' => $langUrl,
                 ],
             ];
-        } elseif (200 != $data->code) {
+        } elseif (200 != $data->getStatusCode()) {
             return [
                 'error'   => true,
                 'message' => 'mautic.core.language.helper.error.on.language.server.side',
                 'vars'    => [
-                    '%code%' => $data->code,
+                    '%code%' => $data->getStatusCode(),
                 ],
             ];
         }
@@ -323,7 +291,7 @@ class LanguageHelper
         $target = $this->pathsHelper->getSystemPath('cache').'/'.$languageCode.'.zip';
 
         // Write the response to the filesystem
-        file_put_contents($target, $data->body);
+        file_put_contents($target, $data->getBody());
 
         // Return an array for the sake of consistency
         return [

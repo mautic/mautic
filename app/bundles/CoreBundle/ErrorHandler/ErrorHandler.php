@@ -15,7 +15,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
     use Psr\Log\LoggerInterface;
     use Psr\Log\LogLevel;
     use Symfony\Component\Debug\Debug;
-    use Symfony\Component\Debug\Exception\ContextErrorException;
     use Symfony\Component\Debug\Exception\FatalErrorException;
     use Symfony\Component\Debug\Exception\FatalThrowableError;
     use Symfony\Component\Debug\Exception\FlattenException;
@@ -140,7 +139,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          *
          * @return bool
          *
-         * @throws ContextErrorException
+         * @throws \ErrorException
          */
         public function handleError($level, $message, $file = 'unknown', $line = 0, $context = [])
         {
@@ -168,7 +167,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 if (LogLevel::DEBUG === $logLevel) {
                     $this->log($logLevel, "$message - in file $file - at line $line", $context);
                 } elseif ($this->displayErrors) {
-                    throw new ContextErrorException($message, 0, $level, $file, $line, $context);
+                    throw new \ErrorException($message, 0, $level, $file, $line);
                 } else {
                     $this->log($logLevel, "$message - in file $file - at line $line", $context);
                 }
