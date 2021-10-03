@@ -394,7 +394,6 @@ return [
                     'monolog.logger.mautic',
                     'mautic.lead.helper.primary_company',
                     'translator',
-                    'mautic.page.model.redirect',
                 ],
             ],
         ],

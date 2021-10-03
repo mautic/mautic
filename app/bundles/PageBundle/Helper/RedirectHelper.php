@@ -19,7 +19,6 @@ use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Model\PageModel;
-use Mautic\PageBundle\Model\RedirectModel;
 use Monolog\Logger;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,9 +42,7 @@ class RedirectHelper
 
     private TranslatorInterface $translator;
 
-    private RedirectModel $redirectModel;
-
-    public function __construct(RequestStack $requestStack, IpLookupHelper $ipLookupHelper, LeadModel $leadModel, PageModel $pageModel, Logger $logger, PrimaryCompanyHelper $primaryCompanyHelper, TranslatorInterface $translator, RedirectModel $redirectModel)
+    public function __construct(RequestStack $requestStack, IpLookupHelper $ipLookupHelper, LeadModel $leadModel, PageModel $pageModel, Logger $logger, PrimaryCompanyHelper $primaryCompanyHelper, TranslatorInterface $translator)
     {
         $this->request              = $requestStack->getCurrentRequest();
         $this->ipLookupHelper       = $ipLookupHelper;
@@ -54,16 +51,6 @@ class RedirectHelper
         $this->logger               = $logger;
         $this->primaryCompanyHelper = $primaryCompanyHelper;
         $this->translator           = $translator;
-        $this->redirectModel        = $redirectModel;
-    }
-
-    public function internalRedirectById(string $redirectId)
-    {
-        if (!$redirect = $this->redirectModel->getRedirectById($redirectId)) {
-            return;
-        }
-
-        return $this->internalRedirect($redirect);
     }
 
     /**
