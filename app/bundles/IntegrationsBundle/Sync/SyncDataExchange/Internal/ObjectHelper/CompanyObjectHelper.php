@@ -26,7 +26,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
     private $uniqueIdentifierFields;
 
     /**
-     * @var array
+     * @var string[]
      */
     private $companiesCreated = [];
 
