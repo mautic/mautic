@@ -884,4 +884,38 @@ class AjaxController extends CommonAjaxController
 
         return new JsonResponse($data);
     }
+
+    /**
+     * @throws DBALException
+     * @throws InvalidArgumentException
+     */
+    protected function getLeadCountAction(Request $request): JsonResponse
+    {
+        $id = (int) InputHelper::clean($request->get('id'));
+
+        /** @var ListModel $model */
+        $model          = $this->getModel('lead.list');
+        $leadListExists = $model->leadListExists($id);
+
+        if (!$leadListExists) {
+            return new JsonResponse($this->prepareJsonResponse(0), Response::HTTP_NOT_FOUND);
+        }
+
+        $leadCounts = $model->getSegmentContactCount([$id]);
+        $leadCount  = $leadCounts[$id];
+
+        return new JsonResponse($this->prepareJsonResponse($leadCount));
+    }
+
+    private function prepareJsonResponse(int $leadCount): array
+    {
+        return [
+            'html' => $this->translator->transChoice(
+                'mautic.lead.list.viewleads_count',
+                $leadCount,
+                ['%count%' => $leadCount]
+            ),
+            'leadCount' => $leadCount,
+        ];
+    }
 }
