@@ -21,7 +21,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 class CompanyObjectHelper implements ObjectHelperInterface
 {
     /**
-     * @var array
+     * @var string[]|null
      */
     private $uniqueIdentifierFields;
 
