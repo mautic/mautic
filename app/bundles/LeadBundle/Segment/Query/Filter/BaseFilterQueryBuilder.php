@@ -82,7 +82,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         return $this->parameterNameGenerator->generateRandomParameterName();
     }
 
-    public function addMinMaxLimiters(QueryBuilder $queryBuilder, array $batchLimiters, string $tableName, string $columnName): void
+    public function addMinMaxLimiters(QueryBuilder $queryBuilder, array $batchLimiters, string $tableName, string $columnName = 'lead_id'): void
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.$tableName);
 
@@ -101,7 +101,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         }
     }
 
-    public function addLeadLimiter(QueryBuilder $queryBuilder, array $batchLimiters, string $tableName, string $columnName): void
+    public function addLeadLimiter(QueryBuilder $queryBuilder, array $batchLimiters, string $tableName, string $columnName = 'lead_id'): void
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.$tableName);
 
