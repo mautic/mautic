@@ -505,7 +505,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$MAX_RECORDS;
                 $oparams['$select']                               = implode(',', $mappedData);
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
-                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', substr($params['start'], 0, '-6'));
+                    $startDate = new DateTime($params['start']);
+                    $startDate->setTimezone(new DateTimeZone("UTC"));
+                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', $startDate->format("Y-m-d\TH:i:s"));
                 }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
