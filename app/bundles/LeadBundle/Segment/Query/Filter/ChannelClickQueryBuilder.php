@@ -19,6 +19,7 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
         $leadsTableAlias  = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $filterOperator   = $filter->getOperator();
         $filterChannel    = $this->getChannel($filter->getField());
+        $batchLimiters    = $filter->getBatchLimiters();
         $filterParameters = $filter->getParameterValue();
 
         if (is_array($filterParameters)) {
@@ -48,6 +49,9 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
         $subQb->select($tableAlias.'.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', $tableAlias)
             ->where($expr);
+
+        $this->addMinMaxLimiters($subQb, $batchLimiters, 'page_hits');
+        $this->addLeadLimiter($subQb, $batchLimiters, 'page_hits');
 
         if ('empty' === $filterOperator && !$this->isDateBased($filter->getField())) {
             $queryBuilder->addLogic($queryBuilder->expr()->notIn($leadsTableAlias.'.id', $subQb->getSQL()), $filter->getGlue());
