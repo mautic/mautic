@@ -239,7 +239,7 @@ class ContactSegmentService
      */
     private function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters = [], $limit = null)
     {
-        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
+        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment, $batchLimiters);
 
         $queryBuilder    = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segment->getId(), $segmentFilters);
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
