@@ -14,9 +14,9 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
-        $filterOperator  = $filter->getOperator();
-
+        $leadsTableAlias  = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
+        $filterOperator   = $filter->getOperator();
+        $batchLimiters    = $filter->getBatchLimiters();
         $filterParameters = $filter->getParameterValue();
 
         if (is_array($filterParameters)) {
@@ -38,22 +38,25 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
             $subQueryBuilder->andWhere(str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $filter->getWhere()));
         }
 
+        $subQueryBuilder->from($filter->getTable(), $tableAlias);
+
+        $this->addMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), 'lead_id');
+        $this->addLeadLimiter($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), 'lead_id');
+
         switch ($filterOperator) {
             case 'empty':
                 $subQueryBuilder->select($tableAlias.'.lead_id')
-                    ->from($filter->getTable(), $tableAlias)
                     ->andWhere($subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()));
                 $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'notEmpty':
                 $subQueryBuilder->select($tableAlias.'.lead_id')
-                    ->from($filter->getTable(), $tableAlias)
                     ->andWhere($subQueryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()));
                 $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'notIn':
                 $subQueryBuilder
-                    ->select('NULL')->from($filter->getTable(), $tableAlias)
+                    ->select('NULL')
                     ->andWhere($tableAlias.'.lead_id = '.$leadsTableAlias.'.id');
 
                 // The use of NOT EXISTS here requires the use of IN instead of NOT IN to prevent a "double negative."
@@ -70,7 +73,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             case 'neq':
                 $subQueryBuilder
-                    ->select('NULL')->from($filter->getTable(), $tableAlias)
+                    ->select('NULL')
                     ->andWhere($tableAlias.'.lead_id = '.$leadsTableAlias.'.id');
 
                 $expression = $subQueryBuilder->expr()->orX(
@@ -84,7 +87,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             case 'notLike':
                 $subQueryBuilder
-                    ->select('NULL')->from($filter->getTable(), $tableAlias)
+                    ->select('NULL')
                     ->andWhere($tableAlias.'.lead_id = '.$leadsTableAlias.'.id');
 
                 $expression = $subQueryBuilder->expr()->orX(
@@ -109,8 +112,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             default:
-                $subQueryBuilder->select($tableAlias.'.lead_id')
-                    ->from($filter->getTable(), $tableAlias);
+                $subQueryBuilder->select($tableAlias.'.lead_id');
 
                 $expression = $subQueryBuilder->expr()->$filterOperator(
                     $tableAlias.'.'.$filter->getField(),
