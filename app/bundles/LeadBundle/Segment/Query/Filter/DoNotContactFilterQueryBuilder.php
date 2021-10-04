@@ -20,6 +20,7 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
     {
         $leadsTableAlias   = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $doNotContactParts = $filter->getDoNotContactParts();
+        $batchLimiters     = $filter->getBatchLimiters();
         $expr              = $queryBuilder->expr();
         $queryAlias        = $this->generateRandomParameterName();
         $reasonParameter   = ":{$queryAlias}reason";
@@ -33,6 +34,9 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', $queryAlias)
             ->andWhere($expr->eq($queryAlias.'.reason', $reasonParameter))
             ->andWhere($expr->eq($queryAlias.'.channel', $channelParameter));
+
+        $this->addMinMaxLimiters($filterQueryBuilder, $batchLimiters, 'lead_donotcontact');
+        $this->addLeadLimiter($filterQueryBuilder, $batchLimiters, 'lead_donotcontact');
 
         if ('eq' === $filter->getOperator() xor !$filter->getParameterValue()) {
             $expression = $expr->in($leadsTableAlias.'.id', $filterQueryBuilder->getSQL());
