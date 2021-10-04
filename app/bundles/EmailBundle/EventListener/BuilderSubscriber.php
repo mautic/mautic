@@ -326,7 +326,8 @@ class BuilderSubscriber implements EventSubscriberInterface
         $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
         $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
-        $event->addToken('{lang}', $email->getLanguage());
+        $event->addToken('{lang}', $email instanceof Email ? $email->getLanguage() : $this->coreParametersHelper->get(
+            'locale'));
     }
 
     /**
