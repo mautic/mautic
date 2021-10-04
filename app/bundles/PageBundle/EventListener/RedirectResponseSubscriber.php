@@ -16,7 +16,7 @@ use Mautic\PageBundle\Helper\RedirectHelper;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class RedirectSubscriber implements EventSubscriberInterface
+class RedirectResponseSubscriber implements EventSubscriberInterface
 {
     private RedirectHelper $redirectHelper;
 

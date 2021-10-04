@@ -217,8 +217,8 @@ return [
                     'translator',
                 ],
             ],
-            'mautic.page.subscriber.redirect' => [
-                'class'     => \Mautic\PageBundle\EventListener\RedirectSubscriber::class,
+            'mautic.page.subscriber.redirect.response' => [
+                'class'     => \Mautic\PageBundle\EventListener\RedirectResponseSubscriber::class,
                 'arguments' => [
                    'mautic.page.helper.redirect',
                 ],
