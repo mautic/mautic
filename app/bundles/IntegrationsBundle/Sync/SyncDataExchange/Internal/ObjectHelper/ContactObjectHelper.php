@@ -27,7 +27,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     private ?array $availableFields = null;
 
     /**
-     * @var array
+     * @var string[]|null
      */
     private $uniqueIdentifierFields;
 
