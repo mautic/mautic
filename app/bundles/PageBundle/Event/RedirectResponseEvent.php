@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class RedirectEvent extends Event
+class RedirectResponseEvent extends Event
 {
     private Redirect $redirect;
 

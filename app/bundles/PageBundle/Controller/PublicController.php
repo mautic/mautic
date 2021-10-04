@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Mautic\PageBundle\Event\RedirectEvent;
+use Mautic\PageBundle\Event\RedirectResponseEvent;
 use Mautic\PageBundle\Event\TrackingEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\VideoModel;
@@ -456,14 +456,14 @@ class PublicController extends CommonFormController
         }
 
         /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher         = $this->get('event_dispatcher');
-        $redirectEvent           = new RedirectEvent($redirect, $this->request->query->all());
-        $eventDispatcher->dispatch(PageEvents::ON_REDIRECT, $redirectEvent);
+        $eventDispatcher                 = $this->get('event_dispatcher');
+        $redirectResponseEvent           = new RedirectResponseEvent($redirect, $this->request->query->all());
+        $eventDispatcher->dispatch(PageEvents::ON_REDIRECT, $redirectResponseEvent);
 
-        if ($redirectEvent->getRedirectResponse() instanceof RedirectResponse) {
-            return $redirectEvent->getRedirectResponse();
-        } elseif ($redirectEvent->getContentResponse() instanceof Response) {
-            return $redirectEvent->getContentResponse();
+        if ($redirectResponseEvent->getRedirectResponse() instanceof RedirectResponse) {
+            return $redirectResponseEvent->getRedirectResponse();
+        } elseif ($redirectResponseEvent->getContentResponse() instanceof Response) {
+            return $redirectResponseEvent->getContentResponse();
         }
     }
 

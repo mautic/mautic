@@ -56,7 +56,7 @@ class RedirectHelper
     /**
      * @throws \Exception
      */
-    public function internalRedirect(Redirect $redirect): RedirectResponse
+    public function trackedRedirect(Redirect $redirect): RedirectResponse
     {
         // Ensure the URL does not have encoded ampersands
         $url = str_replace('&amp;', '&', $redirect->getUrl());

@@ -11,7 +11,7 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\PageBundle\Event\RedirectEvent;
+use Mautic\PageBundle\Event\RedirectResponseEvent;
 use Mautic\PageBundle\Helper\RedirectHelper;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -35,9 +35,9 @@ class RedirectSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onRedirect(RedirectEvent $redirectEvent)
+    public function onRedirect(RedirectResponseEvent $redirectResponseEvent)
     {
-        $redirectResponse = $this->redirectHelper->internalRedirect($redirectEvent->getRedirect());
-        $redirectEvent->setRedirectResponse($redirectResponse);
+        $redirectResponse = $this->redirectHelper->trackedRedirect($redirectResponseEvent->getRedirect());
+        $redirectResponseEvent->setRedirectResponse($redirectResponse);
     }
 }
