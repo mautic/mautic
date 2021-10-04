@@ -458,7 +458,7 @@ class PublicController extends CommonFormController
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher                 = $this->get('event_dispatcher');
         $redirectResponseEvent           = new RedirectResponseEvent($redirect, $this->request->query->all());
-        $eventDispatcher->dispatch(PageEvents::ON_REDIRECT, $redirectResponseEvent);
+        $eventDispatcher->dispatch(PageEvents::ON_REDIRECT_RESPONSE, $redirectResponseEvent);
 
         if ($redirectResponseEvent->getRedirectResponse() instanceof RedirectResponse) {
             return $redirectResponseEvent->getRedirectResponse();

@@ -31,7 +31,7 @@ class RedirectSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            PageEvents::ON_REDIRECT => ['onRedirect', 0],
+            PageEvents::ON_REDIRECT_RESPONSE => ['onRedirect', 0],
         ];
     }
 
