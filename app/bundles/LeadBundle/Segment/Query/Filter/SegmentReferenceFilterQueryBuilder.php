@@ -63,8 +63,9 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
-        $segmentIds      = $filter->getParameterValue();
+        $leadsTableAlias  = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
+        $segmentIds       = $filter->getParameterValue();
+        $batchLimiters    = $filter->getBatchLimiters();
 
         if (!is_array($segmentIds)) {
             $segmentIds = [intval($segmentIds)];
@@ -104,6 +105,9 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
             $segmentQueryWherePart = $segmentQueryBuilder->getQueryPart('where');
             $segmentQueryBuilder->where("$leadsTableAlias.id = $subSegmentLeadsTableAlias.id");
             $segmentQueryBuilder->andWhere($segmentQueryWherePart);
+
+            $this->addMinMaxLimiters($segmentQueryBuilder, $batchLimiters, 'leads', 'id');
+            $this->addLeadLimiter($segmentQueryBuilder, $batchLimiters, 'leads', 'id');
 
             if ($exclusion) {
                 $expression = $queryBuilder->expr()->notExists($segmentQueryBuilder->getSQL());
