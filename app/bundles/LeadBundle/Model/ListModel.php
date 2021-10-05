@@ -252,6 +252,9 @@ class ListModel extends FormModel
             case 'post_delete':
                 $name = LeadEvents::LIST_POST_DELETE;
                 break;
+            case 'pre_unpublish':
+                $name = LeadEvents::LIST_PRE_UNPUBLISH;
+                break;
             default:
                 return null;
         }
@@ -282,6 +285,17 @@ class ListModel extends FormModel
 
         $choices = [];
 
+        $choices['lead']['tags'] =
+            [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
+                'properties' => [
+                    'type' => 'tags',
+                ],
+                'operators'  => $this->getOperatorsForFieldType('multiselect'),
+                'object'     => 'lead',
+            ];
+
+        // Add custom choices
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
             $event = new LeadListFiltersChoicesEvent([], $this->getOperatorsForFieldType(), $this->translator, $this->requestStack->getCurrentRequest());
             $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE, $event);
@@ -1207,6 +1221,7 @@ class ListModel extends FormModel
                     } else {
                         $dependents[] = $entity;
                     }
+                    break;
                 }
             }
         }

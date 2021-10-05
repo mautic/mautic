@@ -2,9 +2,12 @@
 *   Platform Requirements
     *   Minimal PHP version was increased from 7.3 to 7.4.
     *   Minimal MySQL version was increased from x to x
+*   API
+    *   OAuth1 support has been removed. Mautic supports the OAuth2 standard, including the Client Credentials grant, which was added in Mautic 4. Documentation can be found here: https://developer.mautic.org/#client-credentials
 *   Symfony 4
     *   Symfony deprecations were removed or refactored [https://github.com/symfony/symfony/blob/4.4/UPGRADE-4.0.md](https://github.com/symfony/symfony/blob/4.4/UPGRADE-4.0.md)
     *   Services are now private by default in Symfony 4. Mautic has a "hack" to register its own services as public but dependency injection should be preferred for Commands, Controllers, and services. Some Symfony services may no longer be available to the Controller via the Container.
+    *   \Mautic\CoreBundle\Form\Type\YesNoButtonGroupType now uses false/true values which Symfony 4 will convert to empty values for No in the UI. This shouldn't cause issues for most unless the field is using a NotBlank constraint, which is no longer valid, or submitting a form via a functional test with 0 as the value of a YesNoButtonGroupType field. 
 *   Packages removed
     *   debril/rss-atom-bundle removed
     *   egeloen/ordered-form-bundle removed
@@ -31,6 +34,7 @@
     *   phpstan/phpstan to ^0.12.82
 *   Commands
     * \Mautic\CoreBundle\Command\ModeratedCommand::$lockHandler is now private
+    * \Mautic\InstallBundle\Command\InstallCommand (Mautic's CLI installer) had some bugs fixed and might as well be slightly stricter in some edge cases. Please validate if your CLI installation scripts are still working correctly.
 *   Services
     * `mautic.http.client` has been upgraded from GuzzleHttp 6 to 7. You can now leverage `Psr\Http\Client\ClientInterface` (PSR-18) or `GuzzleHttp\Client` (more convenience methods) in your class constructors! Example:
 
@@ -59,7 +63,22 @@
     ```
 
     * `mautic.http.connector` has been removed in favor of `mautic.http.client`. See the example above on how to use it in your class constructors.
+*   IntegrationsBundle
+    * The `IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE` event was moved to a slightly later point in time. Thanks to this change, plugin developers can actually get the updated values that were submitted by the user. This way, listeners can modify values before persisting them to the database. This brings the functionality in line with `ConfigEvents::CONFIG_PRE_SAVE`.
 
-*   Plugins
+*   PluginBundle
     * If you extend `AbstractIntegration` and use the method `makeRequest`, including `$options['return_raw']`, you will now get `\Psr\Http\Message\ResponseInterface` as the response type (was `\Joomla\CMS\Http\Response`)
     * If you're listening on the `Mautic\PluginBundle\PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE` event, `PluginIntegrationRequestEvent->getResponse()` now returns `\Psr\Http\Message\ResponseInterface` as the type (was not explicitly defined)
+
+*   WebhookBundle
+    * \Mautic\WebhookBundle\Entity\Webhook::getQueues() removed and there is no replacement
+    * \Mautic\WebhookBundle\Entity\Webhook::addQueues() removed and there is no replacement
+    * \Mautic\WebhookBundle\Entity\Webhook::addQueue() removed and there is no replacement
+    * \Mautic\WebhookBundle\Entity\Webhook::removeQueue() removed and there is no replacement
+*   Support for unique fields for companies
+    * Mautic never use unique fields for companies and use hard coded algorithm to match duplicate companies. Mautic 4 add support with Company Name as default unique field. You can configure any other fields and also expression between fields (AND/OR) in Configuration.
+
+*   Misc
+    * Second constructor argument of `\Mautic\CoreBundle\Doctrine\Provider\VersionProvider` has been removed as it's no longer necessary.
+    
+=======

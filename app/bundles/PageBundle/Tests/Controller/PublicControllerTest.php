@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -32,7 +33,6 @@ use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\PageEvents;
-use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -41,13 +41,13 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 
-class PublicControllerTest extends TestCase
+class PublicControllerTest extends AbstractMauticTestCase
 {
     /** @var PublicControllerTest */
     private $controller;
 
     /** @var Container */
-    private $container;
+    private $internalContainer;
 
     /** @var Logger */
     private $logger;
@@ -83,7 +83,7 @@ class PublicControllerTest extends TestCase
     {
         $this->controller           = new PublicController();
         $this->request              = new Request();
-        $this->container            = $this->createMock(Container::class);
+        $this->internalContainer    = $this->createMock(Container::class);
         $this->logger               = $this->createMock(Logger::class);
         $this->modelFactory         = $this->createMock(ModelFactory::class);
         $this->redirectModel        = $this->createMock(RedirectModel::class);
@@ -94,7 +94,7 @@ class PublicControllerTest extends TestCase
         $this->pageModel            = $this->createMock(PageModel::class);
         $this->primaryCompanyHelper = $this->createMock(PrimaryCompanyHelper::class);
 
-        $this->controller->setContainer($this->container);
+        $this->controller->setContainer($this->internalContainer);
         $this->controller->setRequest($this->request);
 
         parent::setUp();
@@ -348,7 +348,7 @@ class PublicControllerTest extends TestCase
             ->method('getContactFromRequest')
             ->will($this->returnCallback($getContactFromRequestCallback));
 
-        $this->container->expects($this->exactly(6))
+        $this->internalContainer->expects($this->exactly(6))
             ->method('get')
             ->withConsecutive(
                 ['monolog.logger.mautic'],
@@ -464,5 +464,12 @@ class PublicControllerTest extends TestCase
             ],
             $json['events']
         );
+    }
+
+    public function testTrackingImageAction()
+    {
+        $this->client->request('GET', '/mtracking.gif?url=http%3A%2F%2Fmautic.org');
+
+        $this->assertResponseStatusCodeSame(200);
     }
 }
