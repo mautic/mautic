@@ -771,7 +771,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->emailModel->getLookupResults('email', '', 0, 0)
         );
     }
-    
+
     public function testGetEmailListStatsOneSegment()
     {
         $list = $this->createMock(LeadList::class);
