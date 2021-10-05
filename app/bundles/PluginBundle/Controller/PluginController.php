@@ -262,9 +262,9 @@ class PluginController extends FormController
 
                     if ($valid || $authorize) {
                         $dispatcher = $this->get('event_dispatcher');
-                        $this->get('logger')->info('Dispatching integration config save event.');
+                        $this->get('monolog.logger.mautic')->info('Dispatching integration config save event.');
                         if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
-                            $this->get('logger')->info('Event dispatcher has integration config save listeners.');
+                            $this->get('monolog.logger.mautic')->info('Event dispatcher has integration config save listeners.');
                             $event = new PluginIntegrationEvent($integrationObject);
 
                             $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, $event);
