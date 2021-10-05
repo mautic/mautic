@@ -5,12 +5,15 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 {
+    use LeadBatchLimiterTrait;
+
     /**
      * @var RandomParameterName
      */
@@ -80,36 +83,5 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
     protected function generateRandomParameterName()
     {
         return $this->parameterNameGenerator->generateRandomParameterName();
-    }
-
-    public function addMinMaxLimiters(QueryBuilder $queryBuilder, array $batchLimiters, string $tableName, string $columnName = 'lead_id'): void
-    {
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.$tableName);
-
-        if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->comparison($leadsTableAlias.'.'.$columnName, 'BETWEEN', "{$batchLimiters['minId']} and {$batchLimiters['maxId']}")
-            );
-        } elseif (!empty($batchLimiters['maxId'])) {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->lte($leadsTableAlias.'.'.$columnName, $batchLimiters['maxId'])
-            );
-        } elseif (!empty($batchLimiters['minId'])) {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->gte($leadsTableAlias.'.'.$columnName, $queryBuilder->expr()->literal((int) $batchLimiters['minId']))
-            );
-        }
-    }
-
-    public function addLeadLimiter(QueryBuilder $queryBuilder, array $batchLimiters, string $tableName, string $columnName = 'lead_id'): void
-    {
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.$tableName);
-
-        if (empty($batchLimiters['lead_id'])) {
-            return;
-        }
-
-        $queryBuilder->andWhere($leadsTableAlias.'.'.$columnName.' = :leadId')
-            ->setParameter('leadId', $batchLimiters['lead_id']);
     }
 }
