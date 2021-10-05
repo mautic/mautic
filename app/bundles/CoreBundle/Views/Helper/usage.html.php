@@ -14,7 +14,7 @@
     <table class="table table-bordered table-striped mb-0">
         <tbody>
         <tr>
-            <th colspan="2" class="bg-primary">
+            <th colspan="2" class="bg-primary segment-title">
                 <?php echo $title; ?>
             </th>
         </tr>

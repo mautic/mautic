@@ -17,12 +17,15 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUse;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class LeadList extends FormEntity
 {
+    const TABLE_NAME = 'lead_lists';
+
     /**
      * @var int|null
      */
@@ -82,7 +85,7 @@ class LeadList extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('lead_lists')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(LeadListRepository::class);
 
         $builder->addIdColumns();
@@ -122,6 +125,8 @@ class LeadList extends FormEntity
             'field'   => 'alias',
             'message' => 'mautic.lead.list.alias.unique',
         ]));
+
+        $metadata->addConstraint(new SegmentInUse());
     }
 
     /**
@@ -137,6 +142,7 @@ class LeadList extends FormEntity
                     'publicName',
                     'alias',
                     'description',
+                    'category',
                 ]
             )
             ->addProperties(
@@ -271,8 +277,8 @@ class LeadList extends FormEntity
      */
     public function setIsGlobal($isGlobal)
     {
-        $this->isChanged('isGlobal', $isGlobal);
-        $this->isGlobal = $isGlobal;
+        $this->isChanged('isGlobal', (bool) $isGlobal);
+        $this->isGlobal = (bool) $isGlobal;
 
         return $this;
     }
@@ -350,8 +356,8 @@ class LeadList extends FormEntity
      */
     public function setIsPreferenceCenter($isPreferenceCenter)
     {
-        $this->isChanged('isPreferenceCenter', $isPreferenceCenter);
-        $this->isPreferenceCenter = $isPreferenceCenter;
+        $this->isChanged('isPreferenceCenter', (bool) $isPreferenceCenter);
+        $this->isPreferenceCenter = (bool) $isPreferenceCenter;
     }
 
     /**
