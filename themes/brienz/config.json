@@ -1,8 +1,8 @@
 {
   "name": "Brienz",
-  "author": "Friendly Automate",
-  "authorUrl": "https://friendly.is",
-  "builder": "grapesjsbuilder",
+  "author": "Mautic team",
+  "authorUrl": "https://mautic.org",
+  "builder": ["grapesjsbuilder"],
   "features": [
     "email"
   ]

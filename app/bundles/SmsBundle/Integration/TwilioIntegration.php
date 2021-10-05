@@ -22,10 +22,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
  */
 class TwilioIntegration extends AbstractIntegration
 {
-    /**
-     * @var bool
-     */
-    protected $coreIntegration = true;
+    protected bool $coreIntegration = true;
 
     /**
      * {@inheritdoc}
