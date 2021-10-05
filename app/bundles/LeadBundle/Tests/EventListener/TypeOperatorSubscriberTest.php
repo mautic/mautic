@@ -265,6 +265,20 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onSegmentFilterFormHandleLookupId($event);
     }
 
+    public function testOnSegmentFilterFormHandleLookupIdIfLookupIdEmptyOperator(): void
+    {
+        $alias    = 'owner';
+        $object   = 'lead';
+        $operator = OperatorOptions::EMPTY;
+        $details  = ['properties' => ['type' => 'lookup_id']];
+        $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->expects($this->never())
+            ->method('add');
+
+        $this->subscriber->onSegmentFilterFormHandleLookupId($event);
+    }
+
     public function testOnSegmentFilterFormHandleLookupIdIfLookupId(): void
     {
         $alias    = 'owner';

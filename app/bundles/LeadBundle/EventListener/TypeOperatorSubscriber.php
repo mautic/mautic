@@ -200,7 +200,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
      */
     public function onSegmentFilterFormHandleLookupId(FormAdjustmentEvent $event): void
     {
-        if (!$event->fieldTypeIsOneOf('lookup_id')) {
+        if (!$event->fieldTypeIsOneOf('lookup_id') || !$event->operatorIsOneOf(OperatorOptions::EQUAL_TO, OperatorOptions::NOT_EQUAL_TO)) {
             return;
         }
 
