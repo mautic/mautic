@@ -697,11 +697,26 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
-            // Local storage
+            'mautic.parameters.storage.restricted.parameters' => [
+                'class'     => \Mautic\CoreBundle\ParametersStorage\RestrictedParameters\RestrictedParameters::class,
+                'arguments' => [
+                    '%mautic.security.restrictedConfigFields%',
+                    'service_container',
+                ],
+            ],
+            // Local parameters storage
             'mautic.parameters.storage.local' => [
                 'class'     => \Mautic\CoreBundle\ParametersStorage\Local\LocalParametersStorage::class,
                 'arguments' => [
                     'mautic.configurator',
+                ],
+                'tag'       => 'mautic.parameters.storage.service',
+            ],
+            // DB parameters storage
+            'mautic.parameters.storage.database' => [
+                'class'     => \Mautic\CoreBundle\ParametersStorage\Database\DatabaseParametersStorage::class,
+                'arguments' => [
+                    'mautic.cache.provider',
                 ],
                 'tag'       => 'mautic.parameters.storage.service',
             ],
