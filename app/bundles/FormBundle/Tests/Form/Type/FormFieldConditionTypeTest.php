@@ -64,55 +64,51 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
         $this->propertiesAccessor->expects($this->never())
             ->method('getChoices');
 
-        $this->formBuilder->expects($this->at(1))
+        $this->formBuilder->expects($this->exactly(3))
             ->method('add')
-            ->with(
-                'values',
-                ChoiceType::class,
+            ->withConsecutive(
                 [
-                    'choices'  => [],
-                    'multiple' => true,
-                    'label'    => false,
-                    'attr'     => [
-                        'class'        => 'form-control',
-                        'data-show-on' => '{"formfield_conditions_any_0": "checked","formfield_conditions_expr": "notIn"}',
+                    'values',
+                    ChoiceType::class,
+                    [
+                        'choices'  => [],
+                        'multiple' => true,
+                        'label'    => false,
+                        'attr'     => [
+                            'class'        => 'form-control',
+                            'data-show-on' => '{"formfield_conditions_any_0": "checked","formfield_conditions_expr": "notIn"}',
+                        ],
+                        'required' => false,
                     ],
-                    'required' => false,
-                ]
-            );
-
-        $this->formBuilder->expects($this->at(2))
-            ->method('add')
-            ->with(
-                'any',
-                YesNoButtonGroupType::class,
-                [
-                    'label' => 'mautic.form.field.form.condition.any_value',
-                    'attr'  => [
-                        'data-show-on' => '{"formfield_conditions_expr": "in"}',
                     ],
-                    'data' => isset($options['data']['any']) ? $options['data']['any'] : false,
-                ]
-            );
-
-        $this->formBuilder->expects($this->at(3))
-            ->method('add')
-            ->with(
-                'expr',
-                ChoiceType::class,
-                [
-                    'choices'  => [
-                        'mautic.core.operator.in'    => 'in',
-                        'mautic.core.operator.notin' => 'notIn',
+                    [
+                        'any',
+                        YesNoButtonGroupType::class,
+                        [
+                            'label' => 'mautic.form.field.form.condition.any_value',
+                            'attr'  => [
+                                'data-show-on' => '{"formfield_conditions_expr": "in"}',
+                            ],
+                            'data' => isset($options['data']['any']) ? $options['data']['any'] : false,
+                        ],
                     ],
-                    'label'       => false,
-                    'placeholder' => false,
-                    'attr'        => [
-                        'class' => 'form-control',
-                    ],
-                    'required' => false,
-                ]
-            );
+                    [
+                        'expr',
+                        ChoiceType::class,
+                        [
+                            'choices'  => [
+                                'mautic.core.operator.in'    => 'in',
+                                'mautic.core.operator.notin' => 'notIn',
+                            ],
+                            'label'       => false,
+                            'placeholder' => false,
+                            'attr'        => [
+                                'class' => 'form-control',
+                            ],
+                            'required' => false,
+                        ],
+                    ]
+                );
 
         $this->form->buildForm($this->formBuilder, $options);
     }
@@ -139,20 +135,21 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
             ->with(['some_choice_here' => 'Some choice here'])
             ->willReturn(['some_choice_here' => 'Some choice here']);
 
-        $this->formBuilder->expects($this->at(1))
-            ->method('add')
-            ->with(
-                'values',
-                ChoiceType::class,
+        $this->formBuilder->method('add')
+            ->withConsecutive(
                 [
-                    'choices'  => ['some_choice_here' => 'Some choice here'],
-                    'multiple' => true,
-                    'label'    => false,
-                    'attr'     => [
-                        'class'        => 'form-control',
-                        'data-show-on' => '{"formfield_conditions_any_0": "checked","formfield_conditions_expr": "notIn"}',
+                    'values',
+                    ChoiceType::class,
+                    [
+                        'choices'  => ['some_choice_here' => 'Some choice here'],
+                        'multiple' => true,
+                        'label'    => false,
+                        'attr'     => [
+                            'class'        => 'form-control',
+                            'data-show-on' => '{"formfield_conditions_any_0": "checked","formfield_conditions_expr": "notIn"}',
+                        ],
+                        'required' => false,
                     ],
-                    'required' => false,
                 ]
             );
 
