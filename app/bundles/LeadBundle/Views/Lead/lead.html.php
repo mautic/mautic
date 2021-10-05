@@ -91,7 +91,7 @@ if ($view['security']->isGranted('campaign:campaigns:edit')) {
             'data-target' => '#MauticSharedModal',
             'data-header' => $view['translator']->trans(
                 'mautic.lead.lead.header.campaigns',
-                ['%name%' => $lead->getPrimaryIdentifier()]
+                ['%name%' => $view->escape($lead->getPrimaryIdentifier())]
             ),
             'data-footer' => 'false',
             'href'        => $view['router']->path(
@@ -216,7 +216,7 @@ $view['slots']->set(
                                         <tbody>
                                         <?php foreach ($fields[$group] as $field): ?>
                                             <tr>
-                                                <td width="20%"><span class="fw-b"><?php echo $view->escape($field['label']); ?></span>
+                                                <td width="20%"><span class="fw-b textTitle"><?php echo $view->escape($field['label']); ?></span>
                                                 </td>
                                                 <td>
                                                     <?php if ('core' == $group && 'country' == $field['alias'] && !empty($flag)): ?>
