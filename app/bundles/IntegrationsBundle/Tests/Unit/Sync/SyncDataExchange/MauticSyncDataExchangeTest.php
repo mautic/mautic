@@ -16,8 +16,6 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
-use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectMappingsDAO;
-use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
@@ -70,7 +68,7 @@ class MauticSyncDataExchangeTest extends TestCase
      */
     private $mauticSyncDataExchange;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldChangeRepository      = $this->createMock(FieldChangeRepository::class);
         $this->fieldHelper                = $this->createMock(FieldHelper::class);
@@ -152,21 +150,6 @@ class MauticSyncDataExchangeTest extends TestCase
             ->with($requestDAO);
 
         $this->mauticSyncDataExchange->getSyncReport($requestDAO);
-    }
-
-    public function testExecuteSyncOrderReturnsObjectMappingsDAO()
-    {
-        $objectMappingsDAO = new ObjectMappingsDAO();
-
-        $this->orderExecutioner->expects($this->once())
-            ->method('execute')
-            ->willReturn($objectMappingsDAO);
-
-        $orderDAO = new OrderDAO(new \DateTime(), false, 'foobar');
-
-        $returnedObjectMappingsDAO = $this->mauticSyncDataExchange->executeSyncOrder($orderDAO);
-
-        Assert::assertSame($objectMappingsDAO, $returnedObjectMappingsDAO);
     }
 
     public function testGetConflictedInternalObjectWithNoObjectId(): void
