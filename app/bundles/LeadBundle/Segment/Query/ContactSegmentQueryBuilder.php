@@ -22,6 +22,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ContactSegmentQueryBuilder
 {
+    use LeadBatchLimiterTrait;
+
     /** @var EntityManager */
     private $entityManager;
 
@@ -145,7 +147,7 @@ class ContactSegmentQueryBuilder
      *
      * @throws QueryException
      */
-    public function addNewContactsRestrictions(QueryBuilder $queryBuilder, $segmentId)
+    public function addNewContactsRestrictions(QueryBuilder $queryBuilder, int $segmentId, array $batchLimiters = []): QueryBuilder
     {
         $leadsTableAlias    = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $expr               = $queryBuilder->expr();
@@ -158,22 +160,30 @@ class ContactSegmentQueryBuilder
             ->andWhere($expr->eq($tableAlias.'.leadlist_id', $segmentIdParameter));
 
         $queryBuilder->setParameter($segmentIdParameter, $segmentId);
+
+        $this->addMinMaxLimiters($segmentQueryBuilder, $batchLimiters, 'lead_lists_leads');
+        $this->addLeadLimiter($segmentQueryBuilder, $batchLimiters, 'lead_lists_leads');
+
         $queryBuilder->andWhere($expr->notIn($leadsTableAlias.'.id', $segmentQueryBuilder->getSQL()));
 
         return $queryBuilder;
     }
 
+<<<<<<< HEAD
     /**
      * @param int $leadListId
      *
      * @return QueryBuilder
      */
     public function addManuallySubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
+=======
+    public function addManuallySubscribedQuery(QueryBuilder $queryBuilder, int $leadListId): QueryBuilder
+>>>>>>> e708dc4d7f... Added filter for addNewContactsRestrictions
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $tableAlias      = $this->generateRandomParameterName();
 
-        $existsQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
+        $existsQueryBuilder = $queryBuilder->createQueryBuilder($queryBuilder->getConnection());
 
         $existsQueryBuilder
             ->select('null')
@@ -198,6 +208,7 @@ class ContactSegmentQueryBuilder
     }
 
     /**
+<<<<<<< HEAD
      * @param int $leadListId
      *
      * @return QueryBuilder
@@ -205,6 +216,11 @@ class ContactSegmentQueryBuilder
      * @throws QueryException
      */
     public function addManuallyUnsubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
+=======
+     * @throws QueryException
+     */
+    public function addManuallyUnsubscribedQuery(QueryBuilder $queryBuilder, int $leadListId): QueryBuilder
+>>>>>>> e708dc4d7f... Added filter for addNewContactsRestrictions
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $tableAlias      = $this->generateRandomParameterName();

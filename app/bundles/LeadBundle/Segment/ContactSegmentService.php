@@ -206,7 +206,7 @@ class ContactSegmentService
             $this->contactSegmentFilterFactory->getSegmentFilters($segment, $batchLimiters)
         );
 
-        $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId());
+        $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, (int) $segment->getId(), $batchLimiters);
 
         $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
 
