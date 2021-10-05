@@ -142,6 +142,16 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
                         'filter'  => '4',
                     ],
                 ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'email',
+                    'type'       => 'email',
+                    'operator'   => '!empty',
+                    'properties' => [
+                        'filter'  => null,
+                    ],
+                ],
             ],
             $response['list']['filters']
         );
