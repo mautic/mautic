@@ -208,7 +208,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/4246909?v=4",
       "profile": "https://github.com/jos0405",
       "contributions": [
-        "code"
+        "code",
+        "userTesting"
       ]
     },
     {
@@ -429,7 +430,8 @@
       "profile": "http://www.idea2.ch",
       "contributions": [
         "review",
-        "userTesting"
+        "userTesting",
+        "code"
       ]
     },
     {
@@ -466,6 +468,33 @@
       "profile": "https://github.com/TS16V",
       "contributions": [
         "bug"
+      ]
+    },
+    {
+      "login": "rafalsk",
+      "name": "rafalsk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9338163?v=4",
+      "profile": "https://github.com/rafalsk",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "jonathandhn",
+      "name": "Jonathan Dahan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/55917666?v=4",
+      "profile": "https://jonathanphoto.fr",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "j26w",
+      "name": "j26w",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1260184?v=4",
+      "profile": "http://twitter.com/j26w",
+      "contributions": [
+        "userTesting"
       ]
     }
   ],
