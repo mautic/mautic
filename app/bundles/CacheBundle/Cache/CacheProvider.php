@@ -47,9 +47,9 @@ final class CacheProvider implements CacheProviderInterface
         $this->container            = $container;
     }
 
-    public function getCacheAdapter(): TagAwareAdapterInterface
+    public function getCacheAdapter(?string $cacheAdapter = null): TagAwareAdapterInterface
     {
-        $selectedAdapter = $this->coreParametersHelper->get('cache_adapter');
+        $selectedAdapter = $cacheAdapter ? $cacheAdapter : $this->coreParametersHelper->get('cache_adapter');
         if (!$selectedAdapter || !$this->container->has($selectedAdapter)) {
             throw new InvalidArgumentException('Requested cache adapter "'.$selectedAdapter.'" is not available');
         }
@@ -62,10 +62,10 @@ final class CacheProvider implements CacheProviderInterface
         return $adaptor;
     }
 
-    public function getSimpleCache(): Psr6Cache
+    public function getSimpleCache(?string $cacheAdapter = null): Psr6Cache
     {
         if (is_null($this->psr16)) {
-            $this->psr16 = new Psr6Cache($this->getCacheAdapter());
+            $this->psr16 = new Psr6Cache($this->getCacheAdapter($cacheAdapter));
         }
 
         return $this->psr16;
