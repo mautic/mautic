@@ -9,15 +9,9 @@ use Symfony\Component\EventDispatcher\Event;
 
 class InternalContactEvent extends Event
 {
-    /**
-     * @var string
-     */
-    private $integrationName;
+    private string $integrationName;
 
-    /**
-     * @var Lead
-     */
-    private $contact;
+    private Lead $contact;
 
     public function __construct(string $integrationName, Lead $contact)
     {

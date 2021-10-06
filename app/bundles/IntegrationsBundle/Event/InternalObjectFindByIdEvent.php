@@ -9,20 +9,11 @@ use Symfony\Component\EventDispatcher\Event;
 
 class InternalObjectFindByIdEvent extends Event
 {
-    /**
-     * @var ObjectInterface
-     */
-    private $object;
+    private ObjectInterface $object;
 
-    /**
-     * @var int
-     */
-    private $id;
+    private ?int $id;
 
-    /**
-     * @var object
-     */
-    private $entity;
+    private ?object $entity;
 
     public function __construct(ObjectInterface $object)
     {

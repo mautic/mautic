@@ -9,15 +9,9 @@ use Symfony\Component\EventDispatcher\Event;
 
 class InternalCompanyEvent extends Event
 {
-    /**
-     * @var string
-     */
-    private $integrationName;
+    private string $integrationName;
 
-    /**
-     * @var Company
-     */
-    private $company;
+    private Company $company;
 
     public function __construct(string $integrationName, Company $company)
     {
