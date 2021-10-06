@@ -243,5 +243,29 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
                 $this->fail('There is no violation');
             },
         ];
+
+        // Test valid email addresses and valid token but without a comma between.
+        yield [
+            'jone@doe.email {contactfield=somefield}',
+            function (string $alias) {
+                Assert::assertSame('somefield', $alias);
+
+                $field = new LeadField();
+                $field->setAlias($alias);
+                $field->setType('email');
+
+                return $field;
+            },
+            function ($message, array $parameters = []) {
+                Assert::assertSame('mautic.email.email_or_token.not_valid', $message);
+                Assert::assertSame(
+                    [
+                        '%value%'   => 'jone@doe.email {contactfield=somefield}',
+                        '%details%' => '\'jone@doe.email {contactfield=somefield}\' is not a valid contact field token. A valid token example: \'{contactfield=firstname|John}\'',
+                    ],
+                    $parameters
+                );
+            },
+        ];
     }
 }

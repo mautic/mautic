@@ -18,8 +18,8 @@ use Mautic\CoreBundle\Exception\RecordException;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
-use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\LeadBundle\DataObject\ContactFieldToken;
+use Mautic\LeadBundle\Exception\InvalidContactFieldTokenException;
 use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -27,20 +27,11 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 final class EmailOrEmailTokenListValidator extends ConstraintValidator
 {
-    /**
-     * @var EmailValidator
-     */
-    private $emailValidator;
+    private EmailValidator $emailValidator;
 
-    /**
-     * @var CustomFieldValidator
-     */
-    private $customFieldValidator;
+    private CustomFieldValidator $customFieldValidator;
 
-    /**
-     * @var ArrayStringTransformer
-     */
-    private $transformer;
+    private ArrayStringTransformer $transformer;
 
     public function __construct(
         EmailValidator $emailValidator,
@@ -89,7 +80,7 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
 
                     // Validate that the contact field exists and is type of email.
                     $this->customFieldValidator->validateFieldType($contactFieldToken->getFieldAlias(), 'email');
-                } catch (RecordException | InvalidValueException $tokenException) {
+                } catch (RecordException | InvalidValueException | InvalidContactFieldTokenException $tokenException) {
                     $this->context->addViolation(
                         'mautic.email.email_or_token.not_valid',
                         ['%value%' => $emailOrToken, '%details%' => $tokenException->getMessage()]

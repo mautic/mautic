@@ -21,22 +21,11 @@ use Mautic\LeadBundle\Exception\InvalidContactFieldTokenException;
  */
 class ContactFieldToken
 {
-    const REGEX = '{contactfield=(.*?)}';
+    private string $fullToken;
 
-    /**
-     * @var string
-     */
-    private $fullToken;
+    private string $fieldAlias;
 
-    /**
-     * @var string
-     */
-    private $fieldAlias;
-
-    /**
-     * @var string|null
-     */
-    private $defaultValue;
+    private ?string $defaultValue;
 
     /**
      * @throws InvalidContactFieldTokenException
@@ -44,7 +33,7 @@ class ContactFieldToken
     public function __construct(string $fullToken)
     {
         $this->fullToken = $fullToken;
-        $this->parse($fullToken);
+        $this->parse(trim($fullToken));
     }
 
     public function getFullToken(): string
@@ -64,7 +53,7 @@ class ContactFieldToken
 
     private function parse(string $fullToken): void
     {
-        preg_match('/'.self::REGEX.'/', $fullToken, $matches);
+        preg_match('/^{contactfield=(.*?)}$/', $fullToken, $matches);
 
         if (empty($matches[1])) {
             throw new InvalidContactFieldTokenException("'{$fullToken}' is not a valid contact field token. A valid token example: '{contactfield=firstname|John}'");
