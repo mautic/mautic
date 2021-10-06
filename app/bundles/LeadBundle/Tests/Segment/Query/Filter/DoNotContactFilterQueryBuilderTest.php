@@ -181,6 +181,11 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
              */
             private $parameterValue;
 
+            /**
+             * @var array
+             */
+            private $batchLimiters;
+
             /** @noinspection PhpMissingParentConstructorInspection */
             public function __construct(string $operator, string $parameterValue, array $batchLimiters)
             {
