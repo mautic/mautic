@@ -18,19 +18,13 @@ use Mautic\CoreBundle\Exception\RecordNotFoundException;
 use Mautic\CoreBundle\Exception\RecordNotPublishedException;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldValidator
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
+    private FieldModel $fieldModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
 
     public function __construct(FieldModel $fieldModel, TranslatorInterface $translator)
     {

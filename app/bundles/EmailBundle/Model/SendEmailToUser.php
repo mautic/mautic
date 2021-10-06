@@ -30,25 +30,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SendEmailToUser
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
+    private EmailModel $emailModel;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var CustomFieldValidator
-     */
-    private $customFieldValidator;
+    private CustomFieldValidator $customFieldValidator;
 
-    /**
-     * @var EmailValidator
-     */
-    private $emailValidator;
+    private EmailValidator $emailValidator;
 
     public function __construct(
         EmailModel $emailModel,
