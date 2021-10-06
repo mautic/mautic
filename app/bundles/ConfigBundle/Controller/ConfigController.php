@@ -17,12 +17,9 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Form\Type\ConfigType;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\CacheHelper;
-use Mautic\CoreBundle\Helper\EncryptionHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class ConfigController extends FormController
@@ -172,7 +169,7 @@ class ConfigController extends FormController
                     'security'    => $this->get('mautic.security'),
                     'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', $formThemes),
                     'formConfigs' => $formConfigs,
-                    'isWritable'  => $isWritabale ?? false,
+                    'isWritable'  => $this->parametersStorage->getStorage()->isValid() ?? false,
                 ],
                 'contentTemplate' => 'MauticConfigBundle:Config:form.html.php',
                 'passthroughVars' => [

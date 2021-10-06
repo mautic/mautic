@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class ParametersStorage
 {
-    const STORAGE_DEFAULT = 'parameters_storage';
+    const PARAMETERS_STORAGE = 'parameters_storage';
 
     /**
      * @var CoreParametersHelper
@@ -40,7 +40,7 @@ class ParametersStorage
     public function getStorage(string $name = null): ParametersStorageInterface
     {
         if (!$name) {
-            $name = $this->coreParametersHelper->get(self::STORAGE_DEFAULT);
+            $name = $this->coreParametersHelper->get(self::PARAMETERS_STORAGE);
         }
         if (isset($this->storages[$name])) {
             return $this->storages[$name];

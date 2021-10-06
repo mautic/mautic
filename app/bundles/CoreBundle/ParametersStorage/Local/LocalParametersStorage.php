@@ -24,8 +24,9 @@ class LocalParametersStorage implements ParametersStorageInterface
         $this->configurator = $configurator;
     }
 
-    public function validation()
+    public function isValid(): bool
     {
+        return $this->configurator->isFileWritable();
     }
 
     public function read(): array

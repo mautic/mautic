@@ -13,10 +13,9 @@ namespace Mautic\CoreBundle\ParametersStorage;
 
 interface ParametersStorageInterface
 {
-    /**
-     * @return array
-     */
-    public function read();
+    public function isValid(): bool;
+
+    public function read(): array;
 
     /**
      * @return void
