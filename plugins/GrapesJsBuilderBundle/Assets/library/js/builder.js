@@ -20,6 +20,7 @@ function launchBuilderGrapesjs(formName) {
 
   const builder = new BuilderService(assets);
 
+  Mautic.grapesBuilder = builder;
   Mautic.showChangeThemeWarning = true;
 
   // Prepare HTML
