@@ -14,11 +14,11 @@ trait LeadBatchLimiterTrait
             );
         } elseif (!empty($batchLimiters['maxId'])) {
             $queryBuilder->andWhere(
-                $queryBuilder->expr()->lte($leadsTableAlias.'.'.$columnName, $batchLimiters['maxId'])
+                $queryBuilder->expr()->lte($leadsTableAlias.'.'.$columnName, (int) $batchLimiters['maxId'])
             );
         } elseif (!empty($batchLimiters['minId'])) {
             $queryBuilder->andWhere(
-                $queryBuilder->expr()->gte($leadsTableAlias.'.'.$columnName, $queryBuilder->expr()->literal((int) $batchLimiters['minId']))
+                $queryBuilder->expr()->gte($leadsTableAlias.'.'.$columnName, (int) $batchLimiters['minId'])
             );
         }
     }
@@ -31,7 +31,6 @@ trait LeadBatchLimiterTrait
             return;
         }
 
-        $queryBuilder->andWhere($leadsTableAlias.'.'.$columnName.' = :leadId')
-            ->setParameter('leadId', $batchLimiters['lead_id']);
+        $queryBuilder->andWhere($leadsTableAlias.'.'.$columnName.' = '.$batchLimiters['lead_id']);
     }
 }
