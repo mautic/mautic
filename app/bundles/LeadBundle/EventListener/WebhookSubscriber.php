@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
@@ -40,14 +41,16 @@ class WebhookSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            WebhookEvents::WEBHOOK_ON_BUILD           => ['onWebhookBuild', 0],
-            LeadEvents::LEAD_POST_SAVE                => ['onLeadNewUpdate', 0],
-            LeadEvents::LEAD_POINTS_CHANGE            => ['onLeadPointChange', 0],
-            LeadEvents::LEAD_POST_DELETE              => ['onLeadDelete', 0],
-            LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED  => ['onChannelSubscriptionChange', 0],
-            LeadEvents::LEAD_COMPANY_CHANGE           => ['onLeadCompanyChange', 0],
-            LeadEvents::COMPANY_POST_SAVE             => ['onCompanySave', 0],
-            LeadEvents::COMPANY_POST_DELETE           => ['onCompanyDelete', 0],
+            WebhookEvents::WEBHOOK_ON_BUILD          => ['onWebhookBuild', 0],
+            LeadEvents::LEAD_POST_SAVE               => ['onLeadNewUpdate', 0],
+            LeadEvents::LEAD_POINTS_CHANGE           => ['onLeadPointChange', 0],
+            LeadEvents::LEAD_POST_DELETE             => ['onLeadDelete', 0],
+            LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED => ['onChannelSubscriptionChange', 0],
+            LeadEvents::LEAD_COMPANY_CHANGE          => ['onLeadCompanyChange', 0],
+            LeadEvents::COMPANY_POST_SAVE            => ['onCompanySave', 0],
+            LeadEvents::COMPANY_POST_DELETE          => ['onCompanyDelete', 0],
+            LeadEvents::LEAD_LIST_CHANGE             => ['onSegmentChange', 0],
+            LeadEvents::LEAD_LIST_BATCH_CHANGE       => ['onSegmentChange', 0],
         ];
     }
 
@@ -125,6 +128,15 @@ class WebhookSubscriber implements EventSubscriberInterface
             [
                 'label'       => 'mautic.lead.webhook.event.company.deleted',
                 'description' => 'mautic.lead.webhook.event.company.deleted_desc',
+            ]
+        );
+
+        // add checkbox to the webhook contact segment membership changed
+        $event->addEvent(
+            LeadEvents::LEAD_LIST_CHANGE,
+            [
+                'label'       => 'mautic.lead.webhook.event.lead.segment.change',
+                'description' => 'mautic.lead.webhook.event.lead.segment.change.desc',
             ]
         );
     }
@@ -257,5 +269,20 @@ class WebhookSubscriber implements EventSubscriberInterface
                 'company' => $event->getCompany(),
             ]
         );
+    }
+
+    public function onSegmentChange(ListChangeEvent $changeEvent)
+    {
+        $contacts = null !== $changeEvent->getLeads() ? $changeEvent->getLeads() : [$changeEvent->getLead()];
+        foreach ($contacts as $contact) {
+            $this->webhookModel->queueWebhooksByType(
+                LeadEvents::LEAD_LIST_CHANGE,
+                [
+                    'contact'  => $contact,
+                    'segment'  => $changeEvent->getList(),
+                    'action'   => $changeEvent->wasAdded() ? 'added' : 'removed',
+                ]
+            );
+        }
     }
 }
