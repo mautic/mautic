@@ -105,7 +105,7 @@ class CoreParametersHelper
         }
     }
 
-    private function getParameters()
+    private function getParameters(): ParameterBag
     {
         if (null === $this->parameters) {
             $loader           = new ParameterLoader();

@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use function array_merge;
+use const __DIR__;
 
 /**
  * Class MauticCoreExtension.
@@ -34,25 +36,18 @@ class MauticCoreExtension extends Extension
      *
      * @throws \Exception
      */
-    public static function getBundles(ContainerBuilder $container)
-    {
-        // Auto-wire commands to keep support for the M3 way although best practice is to register each command
-        // as a service and tag with console.command or include in a Mautic config.php services[command] array.
-        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));
-        $loader->load('services.php');
-
-        return array_merge(
-            $container->getParameter('mautic.bundles'),
-            $container->getParameter('mautic.plugin.bundles')
-        );
-    }
 
     /**
      * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $bundles = self::getBundles($container);
+        // Auto-wire commands to keep support for the M3 way although best practice is to register each command
+        // as a service and tag with console.command or include in a Mautic config.php services[command] array.
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));
+        $loader->load('services.php');
+
+        $bundles = array_merge($container->getParameter('mautic.bundles'), $container->getParameter('mautic.plugin.bundles'));
 
         // Store menu renderer options to create unique renderering classes per menu
         // since KNP menus doesn't seem to support a Renderer factory
@@ -60,6 +55,7 @@ class MauticCoreExtension extends Extension
 
         // Keep track of names used to prevent overwriting any and thus losing functionality
         $serviceNames = [];
+
         foreach ($bundles as $bundle) {
             if (!empty($bundle['config']['services'])) {
                 $config = $bundle['config']['services'];

@@ -694,13 +694,6 @@ return [
             'mautic.parameters.storage' => [
                 'class'     => \Mautic\CoreBundle\ParametersStorage\ParametersStorage::class,
             ],
-            'mautic.parameters.storage.restricted.parameters' => [
-                'class'     => \Mautic\CoreBundle\ParametersStorage\RestrictedParameters\RestrictedParameters::class,
-                'arguments' => [
-                    '%mautic.security.restrictedConfigFields%',
-                    'service_container',
-                ],
-            ],
             // Local parameters storage
             'mautic.parameters.storage.local' => [
                 'class'     => \Mautic\CoreBundle\ParametersStorage\Local\LocalParametersStorage::class,
