@@ -32,12 +32,6 @@ use const __DIR__;
 class MauticCoreExtension extends Extension
 {
     /**
-     * @return array|bool|float|int|string|null
-     *
-     * @throws \Exception
-     */
-
-    /**
      * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
