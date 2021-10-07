@@ -518,6 +518,7 @@ return [
                 'class'     => \Mautic\CoreBundle\Helper\CoreParametersHelper::class,
                 'arguments' => [
                     'service_container',
+                     'mautic.parameters.storage',
                 ],
                 'serviceAlias' => 'mautic.config',
             ],
@@ -690,12 +691,8 @@ return [
                     'mautic.helper.paths',
                 ],
             ],
-
             'mautic.parameters.storage' => [
                 'class'     => \Mautic\CoreBundle\ParametersStorage\ParametersStorage::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
             ],
             'mautic.parameters.storage.restricted.parameters' => [
                 'class'     => \Mautic\CoreBundle\ParametersStorage\RestrictedParameters\RestrictedParameters::class,

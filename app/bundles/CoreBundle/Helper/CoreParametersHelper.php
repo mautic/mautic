@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\CoreBundle\ParametersStorage\ParametersStorage;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -35,14 +36,12 @@ class CoreParametersHelper
      */
     private $resolvedParameters;
 
-    public function __construct(ContainerInterface $container)
+    private ParametersStorage $parametersStorage;
+
+    public function __construct(ContainerInterface $container, ParametersStorage $parametersStorage)
     {
-        $loader = new ParameterLoader();
-
-        $this->parameters = $loader->getParameterBag();
-        $this->container  = $container;
-
-        $this->resolveParameters();
+        $this->container         = $container;
+        $this->parametersStorage = $parametersStorage;
     }
 
     /**
@@ -66,7 +65,7 @@ class CoreParametersHelper
             return $this->container->getParameter($containerName);
         }
 
-        return $this->parameters->get($name, $default);
+        return $this->getParameters()->get($name, $default);
     }
 
     /**
@@ -74,11 +73,13 @@ class CoreParametersHelper
      */
     public function has($name): bool
     {
-        return $this->parameters->has($this->stripMauticPrefix($name));
+        return $this->getParameters()->has($this->stripMauticPrefix($name));
     }
 
     public function all(): array
     {
+        $this->getParameters();
+
         return $this->resolvedParameters;
     }
 
@@ -97,10 +98,23 @@ class CoreParametersHelper
 
     private function resolveParameters(): void
     {
-        $all = $this->parameters->all();
+        $all = $this->getParameters()->all();
 
         foreach ($all as $key => $value) {
             $this->resolvedParameters[$key] = $this->get($key, $value);
         }
+    }
+
+    private function getParameters()
+    {
+        if (null === $this->parameters) {
+            $loader           = new ParameterLoader();
+            $loader->getParameterBag()->add($this->parametersStorage->getStorage()->read());
+            $loader->loadIntoEnvironment();
+            $this->parameters = $loader->getParameterBag();
+            $this->resolveParameters();
+        }
+
+        return $this->parameters;
     }
 }

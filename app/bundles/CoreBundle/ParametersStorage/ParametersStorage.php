@@ -11,26 +11,26 @@
 
 namespace Mautic\CoreBundle\ParametersStorage;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 
 class ParametersStorage
 {
     const PARAMETERS_STORAGE = 'parameters_storage';
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Symfony\Component\HttpFoundation\ParameterBag $parameters;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct()
     {
-        $this->coreParametersHelper = $coreParametersHelper;
+        // we cannot load CoreParametersHelper, because this service is used in it
+        $loader = new ParameterLoader();
+
+        $this->parameters = $loader->getLocalParameterBag();
     }
 
     /**
      * @var ParametersStorageInterface[]
      */
-    private $storages = [];
+    private array $storages = [];
 
     public function addStorage(string $id, ParametersStorageInterface $storage)
     {
@@ -40,7 +40,7 @@ class ParametersStorage
     public function getStorage(string $name = null): ParametersStorageInterface
     {
         if (!$name) {
-            $name = $this->coreParametersHelper->get(self::PARAMETERS_STORAGE);
+            $name = $this->parameters->get(self::PARAMETERS_STORAGE);
         }
         if (isset($this->storages[$name])) {
             return $this->storages[$name];
