@@ -29,10 +29,10 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->dispatcher            = $this->container->get('event_dispatcher');
+        $this->dispatcher            = self::$container->get('event_dispatcher');
         $this->fieldChangeRepository = $this->em->getRepository(FieldChange::class);
 
-        $this->container->set(
+        self::$container->set(
             'mautic.integrations.helper.sync_integrations',
             new class() extends SyncIntegrationsHelper {
                 public function __construct()
