@@ -22,7 +22,7 @@ class DatabaseParametersStorage implements ParametersStorageInterface
 
     public function __construct(CacheProvider $cacheProvider)
     {
-        $this->simpleCache = $cacheProvider->getSimpleCache();
+        $this->simpleCache = $cacheProvider->getSimpleCache('mautic.cache.adapter.db');
     }
 
     public function isValid(): bool
