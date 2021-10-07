@@ -66,6 +66,16 @@ return [
                 ],
                 'tag'       => 'mautic.cache.adapter',
             ],
+            'mautic.cache.adapter.db'      => [
+                'class'     => \Mautic\CacheBundle\Cache\Adapter\DatabaseTagAwareAdapter::class,
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
+                    '%mautic.cache_adapter_db%',
+                    '%mautic.cache_prefix%',
+                    '%mautic.cache_lifetime%',
+                ],
+                'tag'       => 'mautic.cache.adapter',
+            ],
         ],
         'models'    => [],
         'validator' => [],
@@ -75,6 +85,9 @@ return [
         'cache_adapter'           => 'mautic.cache.adapter.filesystem',
         'cache_prefix'            => '',
         'cache_lifetime'          => 86400,
+        'cache_adapter_db'        => [
+            'timeout' => 86400,
+        ],
         'cache_adapter_memcached' => [
             'servers' => ['memcached://localhost'],
             'options' => [
