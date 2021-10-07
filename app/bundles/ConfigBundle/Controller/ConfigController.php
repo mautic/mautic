@@ -55,6 +55,7 @@ class ConfigController extends FormController
         $fileFields  = $event->getFileFields();
         $formThemes  = $event->getFormThemes();
         $formConfigs = $this->get('mautic.config.mapper')->bindFormConfigsWithRealValues($event->getForms());
+
         $this->mergeParamsWithLocal($formConfigs);
 
         // Create the form
@@ -76,7 +77,7 @@ class ConfigController extends FormController
         if ('POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $isValid = false;
-                if ($isValid = $this->isFormValid($form)) {
+                if ($this->parametersStorage->getStorage()->isValid() && $isValid = $this->isFormValid($form)) {
                     // Bind request to the form
                     $post     = $this->request->request;
                     $formData = $form->getData();
