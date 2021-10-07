@@ -53,105 +53,39 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
         yield ['neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
     }
 
-    public function dataApplyQueryWithBatchLimitersMinMaxBoth(): iterable
+    public function dataApplyQueryWithBatchLimiters(): iterable
     {
-        yield ['eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id BETWEEN 1 and 1))'];
-        yield ['eq', '0', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id BETWEEN 1 and 1))'];
-        yield ['neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id BETWEEN 1 and 1))'];
-        yield ['neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id BETWEEN 1 and 1))'];
+        yield [['minId' => 1, 'maxId' => 1], 'eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id BETWEEN 1 and 1))'];
+        yield [['minId' => 1, 'maxId' => 1], 'eq', '0', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id BETWEEN 1 and 1))'];
+        yield [['minId' => 1, 'maxId' => 1], 'neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id BETWEEN 1 and 1))'];
+        yield [['minId' => 1, 'maxId' => 1], 'neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id BETWEEN 1 and 1))'];
+
+        yield [['minId' => 1], 'eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id >= 1))'];
+        yield [['minId' => 1], 'eq', '0', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id >= 1))'];
+        yield [['minId' => 1], 'neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id >= 1))'];
+        yield [['minId' => 1], 'neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id >= 1))'];
+
+        yield [['maxId' => 1], 'eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id <= 1))'];
+        yield [['maxId' => 1], 'eq', '0', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id <= 1))'];
+        yield [['maxId' => 1], 'neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id <= 1))'];
+        yield [['maxId' => 1], 'neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id <= 1))'];
+
+        yield [['lead_id' => 1], 'eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id = 1))'];
+        yield [['lead_id' => 1], 'eq', '0', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id = 1))'];
+        yield [['lead_id' => 1], 'neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id = 1))'];
+        yield [['lead_id' => 1], 'neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id = 1))'];
     }
 
     /**
-     * @dataProvider dataApplyQueryWithBatchLimitersMinMaxBoth
+     * @dataProvider dataApplyQueryWithBatchLimiters
      */
-    public function testApplyQueryWithBatchLimitersMinMaxBoth(string $operator, string $parameterValue, string $expectedQuery): void
+    public function testApplyQueryWithBatchLimiters(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
     {
         $queryBuilder = new QueryBuilder($this->createConnection());
         $queryBuilder->select('1');
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-        $filter             = $this->createFilter($operator, $parameterValue, [
-            'minId' => 1,
-            'maxId' => 1,
-        ]);
-        $filterQueryBuilder = new DoNotContactFilterQueryBuilder(new RandomParameterName(), new EventDispatcher());
-
-        Assert::assertSame($queryBuilder, $filterQueryBuilder->applyQuery($queryBuilder, $filter));
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
-    }
-
-    public function dataApplyQueryWithBatchLimitersMinOnly(): iterable
-    {
-        yield ['eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id >= 1))'];
-        yield ['eq', '0', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id >= 1))'];
-        yield ['neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id >= 1))'];
-        yield ['neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id >= 1))'];
-    }
-
-    /**
-     * @dataProvider dataApplyQueryWithBatchLimitersMinOnly
-     */
-    public function testApplyQueryWithBatchLimitersMinOnly(string $operator, string $parameterValue, string $expectedQuery): void
-    {
-        $queryBuilder = new QueryBuilder($this->createConnection());
-        $queryBuilder->select('1');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-
-        $filter             = $this->createFilter($operator, $parameterValue, [
-            'minId' => 1,
-        ]);
-        $filterQueryBuilder = new DoNotContactFilterQueryBuilder(new RandomParameterName(), new EventDispatcher());
-
-        Assert::assertSame($queryBuilder, $filterQueryBuilder->applyQuery($queryBuilder, $filter));
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
-    }
-
-    public function dataApplyQueryWithBatchLimitersMaxOnly(): iterable
-    {
-        yield ['eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id <= 1))'];
-        yield ['eq', '0', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id <= 1))'];
-        yield ['neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id <= 1))'];
-        yield ['neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id <= 1))'];
-    }
-
-    /**
-     * @dataProvider dataApplyQueryWithBatchLimitersMaxOnly
-     */
-    public function testApplyQueryWithBatchLimitersMaxOnly(string $operator, string $parameterValue, string $expectedQuery): void
-    {
-        $queryBuilder = new QueryBuilder($this->createConnection());
-        $queryBuilder->select('1');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-
-        $filter             = $this->createFilter($operator, $parameterValue, [
-            'maxId' => 1,
-        ]);
-        $filterQueryBuilder = new DoNotContactFilterQueryBuilder(new RandomParameterName(), new EventDispatcher());
-
-        Assert::assertSame($queryBuilder, $filterQueryBuilder->applyQuery($queryBuilder, $filter));
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
-    }
-
-    public function dataApplyQueryWithBatchLimiterLeadId(): iterable
-    {
-        yield ['eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id = 1))'];
-        yield ['eq', '0', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id = 1))'];
-        yield ['neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id = 1))'];
-        yield ['neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id = 1))'];
-    }
-
-    /**
-     * @dataProvider dataApplyQueryWithBatchLimiterLeadId
-     */
-    public function testApplyQueryWithBatchLimiterLeadId(string $operator, string $parameterValue, string $expectedQuery): void
-    {
-        $queryBuilder = new QueryBuilder($this->createConnection());
-        $queryBuilder->select('1');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-
-        $filter             = $this->createFilter($operator, $parameterValue, [
-            'lead_id' => 1,
-        ]);
+        $filter             = $this->createFilter($operator, $parameterValue, $batchLimiters);
         $filterQueryBuilder = new DoNotContactFilterQueryBuilder(new RandomParameterName(), new EventDispatcher());
 
         Assert::assertSame($queryBuilder, $filterQueryBuilder->applyQuery($queryBuilder, $filter));
