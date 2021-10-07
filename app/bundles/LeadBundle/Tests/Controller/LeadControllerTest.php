@@ -17,10 +17,6 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- */
 class LeadControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
