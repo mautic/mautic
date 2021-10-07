@@ -27,23 +27,24 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
 use Mautic\LeadBundle\Entity\Company as CompanyEntity;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
 
 class CompanyObjectSubscriberTest extends TestCase
 {
     /**
-     * @var CompanyObjectHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var CompanyObjectHelper|MockObject
      */
     private $companyObjectHelper;
 
     /**
-     * @var Router|\PHPUnit\Framework\MockObject\MockObject
+     * @var Router|MockObject
      */
     private $router;
 
     /**
-     * @var CompanyObjectHelper
+     * @var CompanyObjectSubscriber
      */
     private $subscriber;
 
