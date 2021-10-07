@@ -20,8 +20,6 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use function array_merge;
-use const __DIR__;
 
 /**
  * Class MauticCoreExtension.
