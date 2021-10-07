@@ -11,6 +11,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use \Datetime;
+use \DateTimeZone;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -506,8 +508,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $oparams['$select']                               = implode(',', $mappedData);
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
                     $startDate = new DateTime($params['start']);
-                    $startDate->setTimezone(new DateTimeZone("UTC"));
-                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', $startDate->format("Y-m-d\TH:i:s"));
+                    $startDate->setTimezone(new DateTimeZone('UTC'));
+                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', $startDate->format('Y-m-d\TH:i:s'));
                 }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
