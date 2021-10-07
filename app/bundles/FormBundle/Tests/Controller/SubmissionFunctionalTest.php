@@ -19,6 +19,10 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 final class SubmissionFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
