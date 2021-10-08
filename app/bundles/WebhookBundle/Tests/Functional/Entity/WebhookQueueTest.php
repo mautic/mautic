@@ -20,7 +20,7 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 use PHPUnit\Framework\Assert;
 use ReflectionProperty;
 
-class WebhookQueueFunctionalTest extends MauticMysqlTestCase
+class WebhookQueueTest extends MauticMysqlTestCase
 {
     public function testPayloadBackwardCompatible(): void
     {
