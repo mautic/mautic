@@ -58,7 +58,7 @@ Installing Mautic is a simple three-step process:
 2. Run the below command to install the required packages.
 ----------
 ```
-sudo apt install software-properties-common -y && sudo add-apt-repository ppa:ondrej/php -y && sudo apt update && sudo apt upgrade -y && sudo apt install mariadb-server apache2 libapache2-mod-php8.0 php8.0 unzip php8.0-xml php8.0-mysql php8.0-imap php8.0-zip php8.0-intl php8.0-curl ntp -y && sudo apt autoremove -y && sudo a2enmod rewrite && sudo wget https://mauteam.org/wp-content/uploads/2019/10/000-default.txt && sudo mv 000-default.txt /etc/apache2/sites-available/000-default.conf && sudo mysql -u root 
+sudo apt install software-properties-common -y && sudo add-apt-repository ppa:ondrej/php -y && sudo apt update && sudo apt upgrade -y && sudo apt install mariadb-server apache2 libapache2-mod-php7.3 php7.3 unzip php7.3-xml php7.3-mysql php7.3-imap php7.3-zip php7.3-intl php7.3-curl ntp -y && sudo apt autoremove -y && sudo mysql -u root
 ```
 The above command will connect you to your database, the only difference you will notice is that the text before your command prompt will change to “MariaDB [(none)]>”
 ```
