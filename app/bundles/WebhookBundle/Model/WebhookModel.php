@@ -502,24 +502,41 @@ class WebhookModel extends FormModel
         /** @var WebhookQueueRepository $queueRepo */
         $queueRepo = $this->getQueueRepository();
 
-        return $queueRepo->getEntities(
-            [
-                'iterator_mode' => true,
-                'start'         => 0,
-                'limit'         => $this->webhookLimit,
-                'orderBy'       => $queueRepo->getTableAlias().'.dateAdded',
-                'orderByDir'    => $this->getEventsOrderbyDir($webhook),
-                'filter'        => [
-                    'force' => [
-                        [
-                            'column' => 'IDENTITY('.$queueRepo->getTableAlias().'.webhook)',
-                            'expr'   => 'eq',
-                            'value'  => $webhook->getId(),
-                        ],
+        $parameters = [
+            'iterator_mode' => true,
+            'start'         => 0,
+            'limit'         => $this->webhookLimit,
+            'orderBy'       => $queueRepo->getTableAlias().'.id',
+            'orderByDir'    => $this->getEventsOrderbyDir($webhook),
+            'filter'        => [
+                'force' => [
+                    [
+                        'column' => 'IDENTITY('.$queueRepo->getTableAlias().'.webhook)',
+                        'expr'   => 'eq',
+                        'value'  => $webhook->getId(),
                     ],
                 ],
-            ]
-        );
+            ],
+        ];
+
+        if ($this->minQueueId && $this->maxQueueId) {
+            unset($parameters['start']);
+            unset($parameters['limit']);
+
+            $parameters['filter']['force'][] = [
+                'column' => $queueRepo->getTableAlias().'.id',
+                'expr'   => 'gte',
+                'value'  => $this->minQueueId,
+            ];
+
+            $parameters['filter']['force'][] = [
+                'column' => $queueRepo->getTableAlias().'.id',
+                'expr'   => 'lte',
+                'value'  => $this->maxQueueId,
+            ];
+        }
+
+        return $queueRepo->getEntities($parameters);
     }
 
     /**
