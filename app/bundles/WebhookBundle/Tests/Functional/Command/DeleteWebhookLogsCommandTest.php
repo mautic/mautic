@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\WebhookBundle\Tests\Functional;
+namespace Mautic\WebhookBundle\Tests\Functional\Command;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Command\DeleteWebhookLogsCommand;
@@ -12,7 +12,7 @@ use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\Assert;
 
-final class RemoveOldLogTest extends MauticMysqlTestCase
+final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
 {
     /**
      * @var WebhookModel

@@ -2,13 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Mautic\WebhookBundle\Tests\Entity;
+/*
+ * @copyright   2020 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\WebhookBundle\Tests\Functional\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use PHPUnit\Framework\Assert;
+use ReflectionProperty;
 
 class WebhookQueueFunctionalTest extends MauticMysqlTestCase
 {
@@ -17,7 +27,7 @@ class WebhookQueueFunctionalTest extends MauticMysqlTestCase
         $webhookQueue = $this->createWebhookQueue();
 
         $payload  = 'BC payload';
-        $property = new \ReflectionProperty(WebhookQueue::class, 'payload');
+        $property = new ReflectionProperty(WebhookQueue::class, 'payload');
         $property->setAccessible(true);
         $property->setValue($webhookQueue, $payload);
 
@@ -79,15 +89,12 @@ class WebhookQueueFunctionalTest extends MauticMysqlTestCase
         return $webhookQueue;
     }
 
-    /**
-     * @return mixed[]
-     */
     private function fetchPayloadDbValues(WebhookQueue $webhookQueue): array
     {
-        $prefix = self::$container->getParameter('mautic.db_table_prefix');
+        $prefix = $this->container->getParameter('mautic.db_table_prefix');
         $query  = sprintf('SELECT payload, payload_compressed FROM %swebhook_queue WHERE id = ?', $prefix);
 
         return $this->connection->executeQuery($query, [$webhookQueue->getId()])
-            ->fetchAssociative();
+            ->fetch();
     }
 }

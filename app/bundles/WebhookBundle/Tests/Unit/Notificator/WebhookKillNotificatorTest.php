@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\WebhookBundle\Tests\Notificator;
+namespace Mautic\WebhookBundle\Tests\Unit\Notificator;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
