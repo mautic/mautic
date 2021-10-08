@@ -14,6 +14,15 @@ final class WebhookModelTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Cleanup from previous tests
+        $this->connection->exec('DELETE FROM '.MAUTIC_TABLE_PREFIX.'webhook_queue');
+        $this->connection->exec('ALTER TABLE '.MAUTIC_TABLE_PREFIX.'webhook_queue AUTO_INCREMENT = 1');
+    }
+
     public function testEventsOrderByDirAsc(): void
     {
         $webhookModel = $this->getWebhookModel(Criteria::ASC);
@@ -22,6 +31,7 @@ final class WebhookModelTest extends MauticMysqlTestCase
 
         // Order should be 1 to 10
         $counter = 1;
+
         foreach ($queueArray as $queues) {
             foreach ($queues as $queuedEvent) {
                 Assert::assertSame($counter, $queuedEvent->getId());
