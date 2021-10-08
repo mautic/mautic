@@ -25,6 +25,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -756,5 +757,43 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailEntity->method('getLists')->willReturn($lists);
 
         return $this->emailModel->getEmailListStats($this->emailEntity, true, $dateFromObject, $dateToObject);
+    }
+
+    public function testGetBestHours()
+    {
+        $dbalMock = new DBALMocker($this);
+        $dbalMock->setQueryResponse(
+            [
+                [
+                    'hour'  => 0,
+                    'count' => 0,
+                ],
+                [
+                    'hour'  => 1,
+                    'count' => 4,
+                ],
+                [
+                    'hour'  => 2,
+                    'count' => 10,
+                ],
+                [
+                    'hour'  => 3,
+                    'count' => 6,
+                ],
+            ]
+        );
+        $mockConnection = $dbalMock->getMockConnection();
+
+        $this->entityManager->method('getConnection')->willReturn($mockConnection);
+        $this->emailModel->setEntityManager($this->entityManager);
+
+        $chartData = $this->emailModel->getBestHours(
+            'date_read',
+            new \DateTime(),
+            new \DateTime()
+        );
+
+        $this->assertSame([0, 1, 2, 3], $chartData['labels']);
+        $this->assertSame([0.0, 20.0, 50.0, 30.0], $chartData['datasets'][0]['data']);
     }
 }

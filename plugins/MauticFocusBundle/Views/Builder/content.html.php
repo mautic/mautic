@@ -29,7 +29,7 @@ $props = $focus['properties'];
 
         <?php if (isset($props['colors'])): ?>
 
-        .mf-content a.mf-link, .mf-content .mauticform-button {
+        .mf-content a.mf-link, .mf-content .mauticform-button, .mf-content .mauticform-pagebreak {
             background-color: #<?php echo $props['colors']['button']; ?>;
             color: #<?php echo $props['colors']['button_text']; ?>;
         }
