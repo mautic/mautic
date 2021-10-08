@@ -81,7 +81,6 @@ final class WebhookModelTest extends MauticMysqlTestCase
             ++$counter;
         }
 
-
         return $webhook;
     }
 
