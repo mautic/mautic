@@ -77,7 +77,7 @@ MariaDB [(none)]> EXIT;
 ----------
 ----------
 ```
-cd /var/www/html && sudo wget https://github.com/mautic/mautic/releases/download/3.3.3/3.3.3.zip && sudo unzip 3.3.3.zip && sudo wget https://github.com/mautic/mautic/releases/download/3.3.3/3.3.3-update.zip && sudo unzip -o 3.3.3-update.zip 
+cd /var/www/html && sudo wget https://github.com/mautic/mautic/releases/download/4.0.1/4.0.1.zip && sudo unzip 4.0.1.zip && sudo wget https://github.com/mautic/mautic/releases/download/4.0.1/4.0.1-update.zip && sudo unzip -o 4.0.1-update.zip
 ```
 ----------
 ----------
