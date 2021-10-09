@@ -23,12 +23,12 @@ export default class MjmlService {
       const mjml = this.getEditorMjmlContent(editor);
       const code = this.mjmlToHtml(mjml);
 
-      return code.html ? code.html.trim() : null;
+      return code.html ? code.html.trim() : '';
     } catch (error) {
       console.warn(error.message);
       alert('Errors inside your template. Template will not be saved.');
     }
-    return null;
+    return '';
   }
 
   /**
@@ -54,7 +54,7 @@ export default class MjmlService {
       return mjml2html(mjml, { validationLevel: 'strict', beautify: true });
     } catch (error) {
       console.warn(error);
-      return null;
+      return '';
     }
   }
 }
