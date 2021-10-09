@@ -382,7 +382,6 @@ return [
             'mautic.page.helper.tracking' => [
                 'class'     => 'Mautic\PageBundle\Helper\TrackingHelper',
                 'arguments' => [
-                    'session',
                     'mautic.helper.core_parameters',
                     'request_stack',
                     'mautic.tracker.contact',

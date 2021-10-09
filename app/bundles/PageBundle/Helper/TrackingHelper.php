@@ -3,22 +3,15 @@
 namespace Mautic\PageBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Class TrackinHelper.
  */
 class TrackingHelper
 {
-    /**
-     * @var Session
-     */
-    protected $session;
-
     /**
      * @var CoreParametersHelper
      */
@@ -35,18 +28,16 @@ class TrackingHelper
     protected $contactTracker;
 
     /** @var array */
-    private $localSession = [];
+    private $localCache = [];
 
     /**
      * BuildJsSubscriber constructor.
      */
     public function __construct(
-        Session $session,
         CoreParametersHelper $coreParametersHelper,
         RequestStack $requestStack,
         ContactTracker $contactTracker
     ) {
-        $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->requestStack         = $requestStack;
         $this->contactTracker       = $contactTracker;
@@ -78,16 +69,11 @@ class TrackingHelper
 
     /**
      * @param array $values
-     *
-     * @return array
      */
     public function updateSession($values)
     {
         $sessionName                      = $this->getSessionName();
-        $this->localSession[$sessionName] = array_merge($values, $this->getSession());
-        $this->session->set($sessionName, serialize($this->localSession[$sessionName]));
-
-        return (array) $values;
+        $this->localCache[$sessionName]   = array_merge($values, $this->getSession());
     }
 
     /**
@@ -96,17 +82,13 @@ class TrackingHelper
     public function getSession($remove = false)
     {
         $sessionName = $this->getSessionName();
-        if (isset($this->localSession[$sessionName])) {
-            $sesionValue = $this->localSession[$sessionName];
-        } else {
-            $sesionValue = Serializer::decode($this->session->get($sessionName));
-        }
+        $output      = $this->localCache[$sessionName] ?? [];
+
         if ($remove) {
-            unset($this->localSession[$sessionName]);
-            $this->session->remove($sessionName);
+            unset($this->localCache[$sessionName]);
         }
 
-        return (array) $sesionValue;
+        return (array) $output;
     }
 
     /**
