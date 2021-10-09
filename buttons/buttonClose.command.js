@@ -10,11 +10,9 @@ export default class ButtonCloseCommands {
     editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
 
     const htmlDocument = ContentService.getCanvasAsHtmlDocument(editor);
+    const htmlCode = ContentService.serializeHtmlDocument(htmlDocument);
 
-    ButtonCloseCommands.returnContentToTextarea(
-      editor,
-      ContentService.serializeHtmlDocument(htmlDocument)
-    );
+    ButtonCloseCommands.returnContentToTextarea(editor, htmlCode);
 
     // Reset HTML
     ButtonCloseCommands.resetHtml(editor);
@@ -28,9 +26,9 @@ export default class ButtonCloseCommands {
     editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
 
     // Getting HTML with CSS inline (only available for "grapesjs-preset-newsletter"):
-    const html = ContentService.getEditorHtmlContent(editor);
+    const htmlCode = ContentService.getEditorHtmlContent(editor);
 
-    ButtonCloseCommands.returnContentToTextarea(editor, html);
+    ButtonCloseCommands.returnContentToTextarea(editor, htmlCode);
 
     // Reset HTML
     ButtonCloseCommands.resetHtml(editor);
