@@ -52,7 +52,7 @@ export default class ContentService {
     const htmlCombined = `${doctype}<html>${editor.getHtml()}<style>${editor.getCss({
       avoidProtected: true,
     })}</style></html>`;
-console.warn({ htmlCombined });
+
     // get a DocumentHTML from the string
     const htmlDocument = parser.parseFromString(htmlCombined, 'text/html');
 
