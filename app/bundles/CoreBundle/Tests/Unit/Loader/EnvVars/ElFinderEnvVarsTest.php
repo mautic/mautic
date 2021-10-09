@@ -32,7 +32,7 @@ class ElFinderEnvVarsTest extends TestCase
      */
     protected $envVars;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->config        = new ParameterBag();
         $this->defaultConfig = new ParameterBag();

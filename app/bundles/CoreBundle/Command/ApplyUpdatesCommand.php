@@ -14,7 +14,6 @@ namespace Mautic\CoreBundle\Command;
 use Mautic\CoreBundle\Exception\UpdateFailedException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Update\StepProvider;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -31,7 +30,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ApplyUpdatesCommand extends ContainerAwareCommand
 {
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     private $translator;
 

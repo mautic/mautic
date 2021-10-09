@@ -20,18 +20,23 @@
     <?php if ($count > 0 && 0 == $count % 2): echo '</div><div class="row">'; endif; ?>
     <div class="col-md-6">
         <div class="panel panel-default">
-            <div class="panel-heading pr-0">
-                <h3 class="panel-title"><?php echo $details['integration']; ?></h3>
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <?php if (isset($details['link'])): ?>
+                        <a href="<?php echo $details['link']; ?>" class="pull-right"><i class="fa fa-external-link"></i></a>
+                    <?php endif; ?>
+                    <?php echo $details['integration']; ?>
+                </h3>
             </div>
             <div class="panel-body">
                 <dl class="dl-horizontal">
-                    <dt>Object</dt>
+                    <dt><?php echo $view['translator']->trans('mautic.integration.object'); ?></dt>
                     <dd><?php echo $details['integration_entity']; ?></dd>
-                    <dt>Object ID</dt>
+                    <dt><?php echo $view['translator']->trans('mautic.integration.object_id'); ?></dt>
                     <dd><?php echo $details['integration_entity_id']; ?></dd>
-                    <dt>Date Added</dt>
+                    <dt><?php echo $view['translator']->trans('mautic.core.date.added'); ?></dt>
                     <dd><?php echo $view['date']->toText($details['date_added'], 'UTC', 'Y-m-d H:i:s', true); ?></dd>
-                    <dt>Last Sync Date</dt>
+                    <dt><?php echo $view['translator']->trans('mautic.integration.last_sync_date'); ?></dt>
                     <dd><?php echo $view['date']->toText($details['last_sync_date'], 'UTC', 'Y-m-d H:i:s', true); ?></dd>
                 </dl>
             </div>

@@ -70,8 +70,11 @@ class AssetApiController extends CommonApiController
                 }
             } elseif ('remote' === $parameters['storageLocation']) {
                 $parameters['remotePath'] = $parameters['file'];
-                $entity->setFileInfoFromFile();
-                $entity->setFileNameFromRemote();
+                $entity->setTitle($parameters['title']);
+                $entity->setStorageLocation('remote');
+                $entity->setRemotePath($parameters['remotePath']);
+                $entity->preUpload();
+                $entity->upload();
             }
 
             unset($parameters['file']);

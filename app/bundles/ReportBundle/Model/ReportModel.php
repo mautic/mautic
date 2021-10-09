@@ -515,11 +515,6 @@ class ReportModel extends FormModel
                 $options['dateTo'] = new \DateTime();
             }
 
-            // Fix the time frames
-            if ($options['dateFrom'] == $options['dateTo']) {
-                $options['dateTo']->modify('+1 day');
-            }
-
             // Adjust dateTo to be end of day or to current hour if today
             $now = new \DateTime();
             if ($now->format('Y-m-d') == $options['dateTo']->format('Y-m-d')) {

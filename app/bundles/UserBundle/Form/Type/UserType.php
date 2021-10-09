@@ -65,7 +65,7 @@ class UserType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
+        $builder->addEventSubscriber(new CleanFormSubscriber(['signature' => 'html', 'email' => 'email']));
         $builder->addEventSubscriber(new FormExitSubscriber('user.user', $options));
 
         $builder->add(

@@ -315,6 +315,101 @@ trait LeadDetailsTrait
     }
 
     /**
+     * Get an array with engagements and points of a contact.
+     *
+     * @return array
+     */
+    protected function getStatsCount(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null)
+    {
+        if (null == $fromDate) {
+            $fromDate = new \DateTime('first day of this month 00:00:00');
+            $fromDate->modify('-6 months');
+        }
+        if (null == $toDate) {
+            $toDate = new \DateTime();
+        }
+
+        /** @var LeadModel $model */
+        $model       = $this->getModel('lead');
+        $chartQuery  = new ChartQuery($this->getDoctrine()->getConnection(), $fromDate, $toDate);
+
+        $engagements = $model->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
+        $pointStats  = $chartQuery->fetchSumTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()], 'delta');
+
+        return [
+            'engagements' => $engagements,
+            'points'      => $pointStats,
+        ];
+    }
+
+    /**
+     * Get an array to create company's engagements graph.
+     *
+     * @param array $contacts
+     *
+     * @return array
+     */
+    protected function getCompanyEngagementData($contacts)
+    {
+        $engagements = [0, 0, 0, 0, 0, 0];
+        $points      = [0, 0, 0, 0, 0, 0];
+        foreach ($contacts as $contact) {
+            $model = $this->getModel('lead.lead');
+            // When we change lead data these changes get cached
+            // so we need to clear the entity manager
+            $model->getRepository()->clear();
+
+            /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+            if (!isset($contact['lead_id'])) {
+                continue;
+            }
+            $lead            = $model->getEntity($contact['lead_id']);
+            if (!$lead instanceof Lead) {
+                continue;
+            }
+            $engagementsData = $this->getStatsCount($lead);
+
+            $engagements = array_map(function ($a, $b) {
+                return $a + $b;
+            }, $engagementsData['engagements']['byUnit'], $engagements);
+            $points = array_map(function ($points_first_user, $points_second_user) {
+                return $points_first_user + $points_second_user;
+            }, $engagementsData['points'], $points);
+        }
+
+        return [
+            'engagements' => $engagements,
+            'points'      => $points,
+        ];
+    }
+
+    /**
+     * Get company graph for points and engagements.
+     *
+     * @param $contacts
+     *
+     * @return mixed
+     */
+    protected function getCompanyEngagementsForGraph($contacts)
+    {
+        $graphData  = $this->getCompanyEngagementData($contacts);
+        $translator = $this->get('translator');
+
+        $fromDate = new \DateTime('first day of this month 00:00:00');
+        $fromDate->modify('-6 months');
+
+        $toDate = new \DateTime();
+
+        $lineChart  = new LineChart(null, $fromDate, $toDate);
+
+        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $graphData['engagements']);
+
+        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.points'), $graphData['points']);
+
+        return $lineChart->render();
+    }
+
+    /**
      * @return array
      */
     protected function getScheduledCampaignEvents(Lead $lead)

@@ -315,19 +315,48 @@ class ConfigType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => [
-                    'mautic.email.config.mailer.amazon_host.eu_west_1' => 'email-smtp.eu-west-1.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_host.us_east_1' => 'email-smtp.us-east-1.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_host.eu_west_2' => 'email-smtp.us-west-2.amazonaws.com',
+                    'mautic.email.config.mailer.amazon_region.us_east_1'      => 'us-east-1',
+                    'mautic.email.config.mailer.amazon_region.us_east_2'      => 'us-east-2',
+                    'mautic.email.config.mailer.amazon_region.us_west_2'      => 'us-west-2',
+                    'mautic.email.config.mailer.amazon_region.ap_south_1'     => 'ap-south-1',
+                    'mautic.email.config.mailer.amazon_region.ap_northeast_2' => 'ap-northeast-2',
+                    'mautic.email.config.mailer.amazon_region.ap_southeast_1' => 'ap-southeast-1',
+                    'mautic.email.config.mailer.amazon_region.ap_southeast_2' => 'ap-southeast-2',
+                    'mautic.email.config.mailer.amazon_region.ap_northeast_1' => 'ap-northeast-1',
+                    'mautic.email.config.mailer.amazon_region.ca_central_1'   => 'ca-central-1',
+                    'mautic.email.config.mailer.amazon_region.eu_central_1'   => 'eu-central-1',
+                    'mautic.email.config.mailer.amazon_region.eu_west_1'      => 'eu-west-1',
+                    'mautic.email.config.mailer.amazon_region.eu_west_2'      => 'eu-west-2',
+                    'mautic.email.config.mailer.amazon_region.sa_east_1'      => 'sa-east-1',
+                    'mautic.email.config.mailer.amazon_region.us_gov_west_1'  => 'us-gov-west-1',
+                    'mautic.email.config.mailer.amazon_region.other'          => 'other',
                 ],
-                'label'       => 'mautic.email.config.mailer.amazon_host',
+                'label'       => 'mautic.email.config.mailer.amazon_region',
                 'required'    => false,
                 'attr'        => [
                     'class'        => 'form-control',
                     'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getAmazonService().']}',
-                    'tooltip'      => 'mautic.email.config.mailer.amazon_host.tooltip',
+                    'tooltip'      => 'mautic.email.config.mailer.amazon_region.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
                 'placeholder' => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_amazon_other_region',
+            TextType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.amazon_region.other',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_emailconfig_mailer_amazon_region":["other"]}',
+                    'data-hide-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedAmazonRegion().']}',
+                    'tooltip'      => 'mautic.email.config.mailer.amazon_region.other.tooltip',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'required'   => false,
             ]
         );
 
@@ -383,7 +412,7 @@ class ConfigType extends AbstractType
                             "plain",
                             "login",
                             "cram-md5"
-                        ], 
+                        ],
                         "config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresUser().']
                     }',
                     'data-hide-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedUser().']}',
@@ -410,7 +439,7 @@ class ConfigType extends AbstractType
                             "plain",
                             "login",
                             "cram-md5"
-                        ], 
+                        ],
                         "config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresPassword().']
                     }',
                     'data-hide-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedPassword().']}',

@@ -4,7 +4,7 @@
  * @author Abdullah ELEN <abdullahelen@msn.com>
  * @author Osman KAYAN <osmnkayan@gmail.com>
  * @author alikayan95@gmail.com
- * @version 2018-11-02
+ * @version 2020-05-11
  */
 (function(root, factory) {
 	if (typeof define === 'function' && define.amd) {
@@ -19,9 +19,9 @@
 		translator : 'I.Taskinoglu & A.Kaya &lt;alikaya@armsyazilim.com&gt;, Abdullah ELEN &lt;abdullahelen@msn.com&gt;, Osman KAYAN &lt;osmnkayan@gmail.com&gt;, alikayan95@gmail.com',
 		language   : 'Türkçe',
 		direction  : 'ltr',
-		dateFormat : 'd.m.Y H:i', // will show like: 02.11.2018 11:51
-		fancyDateFormat : '$1 H:i', // will show like: Bugün 11:51
-		nonameDateFormat : 'ymd-His', // noname upload will show like: 181102-115159
+		dateFormat : 'd.m.Y H:i', // will show like: 11.05.2020 18:59
+		fancyDateFormat : '$1 H:i', // will show like: Bugün 18:59
+		nonameDateFormat : 'ymd-His', // noname upload will show like: 200511-185939
 		messages   : {
 
 			/********************************** errors **********************************/
@@ -117,6 +117,7 @@
 			'errEditorNotFound'    : 'Editör bu dosya türünü bulamıyor.', // from v2.1.25 added 23.5.2017
 			'errServerError'       : 'Sunucu tarafında beklenilmeyen bir hata oluştu.', // from v2.1.25 added 16.6.2017
 			'errEmpty'             : '"$1" klasörü boşaltılamıyor.', // from v2.1.25 added 22.6.2017
+			'moreErrors'           : 'There are $1 more errors.', // from v2.1.44 added 9.12.2018
 
 			/******************************* commands names ********************************/
 			'cmdarchive'   : 'Arşiv oluştur',
@@ -304,6 +305,7 @@
 			'confirmNonUTF8'  : 'Bu dosyanın karakter kodlaması tespit edilemedi. Düzenleme için geçici olarak UTF-8\'e dönüştürülmesi gerekir.<br/>Lütfen bu dosyanın karakter kodlamasını seçin.', // from v2.1.19 added 28.11.2016
 			'confirmNotSave'  : 'Düzenlenmiş içerik.<br/>Değişiklikleri kaydetmek istemiyorsanız son yapılanlar kaybolacak.', // from v2.1 added 15.7.2015
 			'confirmTrash'    : 'Öğeleri çöp kutusuna taşımak istediğinizden emin misiniz?', //from v2.1.24 added 29.4.2017
+			'confirmMove'     : 'Are you sure you want to move items to "$1"?', //from v2.1.50 added 27.7.2019
 			'apllyAll'        : 'Tümüne uygula',
 			'name'            : 'İsim',
 			'size'            : 'Boyut',
@@ -443,6 +445,7 @@
 			'clearBrowserData': 'Bu tarayıcıda kayıtlı ayarları başlat', // from v2.1.26 added 28.6.2017
 			'toolbarPref'     : 'Araç çubuğu ayarları', // from v2.1.27 added 2.8.2017
 			'charsLeft'       : '... $1 karakter kaldı',  // from v2.1.29 added 30.8.2017
+			'linesLeft'       : '... $1 lines left.',  // from v2.1.52 added 16.1.2020
 			'sum'             : 'Toplam', // from v2.1.29 added 28.9.2017
 			'roughFileSize'   : 'Kaba dosya boyutu', // from v2.1.30 added 2.11.2017
 			'autoFocusDialog' : 'Fare ile üzerine gelince diyalog öğesi odaklansın',  // from v2.1.30 added 2.11.2017
@@ -470,15 +473,15 @@
 			'all'             : 'Tümü', // from v2.1.38 added 4.4.2018
 			'iconSize'        : 'İcon Boyutu (İcon Görünümü İçin)', // from v2.1.39 added 7.5.2018
 			'editorMaximized' : 'Maksimum düzenleyici penceresini aç', // from v2.1.40 added 30.6.2018
-			'editorConvNoApi' : 'Because conversion by API is not currently available, please convert on the website.', //from v2.1.40 added 8.7.2018
-			'editorConvNeedUpload' : 'After conversion, you must be upload with the item URL or a downloaded file to save the converted file.', //from v2.1.40 added 8.7.2018
+			'editorConvNoApi' : 'API ile dönüşüm şu anda mevcut olmadığından, lütfen web sitesinde dönüştürün.', //from v2.1.40 added 8.7.2018
+			'editorConvNeedUpload' : 'Dönüştürmeden sonra, dönüştürülen dosyayı kaydetmek için öğe URL\'si veya indirilen bir dosya ile karşıya yüklemeniz gerekir.', //from v2.1.40 added 8.7.2018
 			'convertOn'       : 'Convert on the site of $1', // from v2.1.40 added 10.7.2018
 			'integrations'    : 'Entegrasyonlar', // from v2.1.40 added 11.7.2018
-			'integrationWith' : 'This elFinder has the following external services integrated. Please check the terms of use, privacy policy, etc. before using it.', // from v2.1.40 added 11.7.2018
+			'integrationWith' : 'Bu elFinder aşağıdaki harici hizmetlere entegre edilmiştir. Lütfen kullanmadan önce kullanım koşullarını, gizlilik politikasını vb. Kontrol edin.', // from v2.1.40 added 11.7.2018
 			'showHidden'      : 'Gizli ögeleri aç.', // from v2.1.41 added 24.7.2018
 			'hideHidden'      : 'Gizli ögeleri kapat.', // from v2.1.41 added 24.7.2018
 			'toggleHidden'    : 'Gizli ögeleri aç/kapat', // from v2.1.41 added 24.7.2018
-			'makefileTypes'   : 'File types to enable with "New file"', // from v2.1.41 added 7.8.2018
+			'makefileTypes'   : '"Yeni dosya" ile etkinleştirilecek dosya türleri', // from v2.1.41 added 7.8.2018
 			'typeOfTextfile'  : 'Text dosyası tipi.', // from v2.1.41 added 7.8.2018
 			'add'             : 'Ekle', // from v2.1.41 added 7.8.2018
 			'theme'           : 'Tema', // from v2.1.43 added 19.10.2018
@@ -488,6 +491,9 @@
 			'author'          : 'Yazar', // from v2.1.43 added 19.10.2018
 			'email'           : 'E-mail', // from v2.1.43 added 19.10.2018
 			'license'         : 'Lisans', // from v2.1.43 added 19.10.2018
+			'exportToSave'    : 'This item can\'t be saved. To avoid losing the edits you need to export to your PC.', // from v2.1.44 added 1.12.2018
+			'dblclickToSelect': 'Double click on the file to select it.', // from v2.1.47 added 22.1.2019
+			'useFullscreen'   : 'Use fullscreen mode', // from v2.1.47 added 19.2.2019
 
 			/********************************** mimetypes **********************************/
 			'kindUnknown'     : 'Bilinmiyor',

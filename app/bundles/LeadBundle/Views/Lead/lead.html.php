@@ -91,7 +91,7 @@ if ($view['security']->isGranted('campaign:campaigns:edit')) {
             'data-target' => '#MauticSharedModal',
             'data-header' => $view['translator']->trans(
                 'mautic.lead.lead.header.campaigns',
-                ['%name%' => $lead->getPrimaryIdentifier()]
+                ['%name%' => $view->escape($lead->getPrimaryIdentifier())]
             ),
             'data-footer' => 'false',
             'href'        => $view['router']->path(
@@ -223,12 +223,18 @@ $view['slots']->set(
                                                     <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
                                                     <span class="mt-1"><?php echo $view->escape($field['value']); ?>
                                                     <?php else: ?>
-                                                        <?php if (is_array($field['value']) && 'multiselect' === $field['type']): ?>
-                                                            <?php echo implode(', ', $field['value']); ?>
+                                                        <?php if ('multiselect' === $field['type']): ?>
+                                                            <?php if (is_array($field['value'])): ?>
+                                                                <?php echo implode(', ', $field['value']); ?>
+                                                            <?php else: ?>
+                                                                <?php echo str_replace('|', ', ', $view->escape($field['normalizedValue'])); ?>
+                                                            <?php endif; ?>
                                                         <?php elseif (is_string($field['value']) && 'url' === $field['type']): ?>
                                                             <a href="<?php echo $view->escape($field['value']); ?>" target="_blank">
                                                                 <?php echo $field['value']; ?>
                                                             </a>
+                                                        <?php elseif (is_string($field['value']) && 'datetime' === $field['type']): ?>
+                                                            <?php echo $view['date']->toFullConcat($field['value'], 'UTC'); ?>
                                                         <?php else: ?>
                                                             <?php echo $view->escape($field['normalizedValue']); ?>
                                                         <?php endif; ?>
@@ -464,35 +470,23 @@ $view['slots']->set(
                     <hr>
                 <?php endif; ?>
             </div>
-            <?php if ($doNotContact) : ?>
-                <div id="bounceLabel<?php echo $doNotContact->getId(); ?>">
-                    <div class="panel-heading text-center">
-                        <h4 class="fw-sb">
-                            <?php if (\Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED == $doNotContact->getReason()): ?>
-                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $view['lead_dnc_reason']->toText($doNotContact->getReason()); ?>">
-                                <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
-                            </span>
-
-                            <?php elseif (\Mautic\LeadBundle\Entity\DoNotContact::MANUAL == $doNotContact->getReason()): ?>
-                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $view['lead_dnc_reason']->toText($doNotContact->getReason()); ?>">
-                                <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
-                                    <span data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.lead.remove_dnc_status'); ?>">
-                                    <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact->getId(); ?>);"></i>
-                                </span>
-                            </span>
-
-                            <?php elseif (\Mautic\LeadBundle\Entity\DoNotContact::BOUNCED == $doNotContact->getReason()): ?>
-                                <span class="label label-warning" data-toggle="tooltip" title="<?php echo $view->escape($doNotContact->getComments()); ?>">
-                                <?php echo $view['translator']->trans('mautic.lead.do.not.contact_bounced'); ?>
-                                    <span data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.lead.remove_dnc_status'); ?>">
-                                    <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact->getId(); ?>);"></i>
-                                </span>
-                            </span>
-                            <?php endif; ?>
-                        </h4>
-                    </div>
-                    <hr/>
-                </div>
+            <?php if ($doNotContact) :
+                ?>
+                <?php echo $view->render(
+                    'MauticLeadBundle:Lead:dnc_large.html.php',
+                    [
+                        'doNotContact' => $doNotContact,
+                    ]
+                ); ?>
+            <?php endif; ?>
+            <?php if ($doNotContactSms) :
+                ?>
+                <?php echo $view->render(
+                'MauticLeadBundle:Lead:dnc_large.html.php',
+                [
+                    'doNotContact' => $doNotContactSms,
+                ]
+            ); ?>
             <?php endif; ?>
             <div class="panel-heading">
                 <div class="panel-title">
@@ -578,7 +572,7 @@ $view['slots']->set(
         <div class="pa-sm">
             <?php $tags = $lead->getTags(); ?>
             <?php foreach ($tags as $tag): ?>
-                <h5 class="pull-left mt-xs mr-xs"><span class="label label-success"><?php echo $view->escape($tag->getTag()); ?></span>
+                <h5 class="pull-left mt-xs mr-xs"><span class="label label-success label-tag"><?php echo $view->escape($tag->getTag()); ?></span>
                 </h5>
             <?php endforeach; ?>
             <div class="clearfix"></div>
@@ -595,7 +589,7 @@ $view['slots']->set(
                         onclick="Mautic.setAsPrimaryCompany(<?php echo $company['id']; ?>, <?php echo $lead->getId(); ?>);" 
                         title="<?php echo $view['translator']->trans('mautic.lead.company.set.primary'); ?>">
                     </i>
-                    <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $company['id']]); ?>" style="color: white;">
+                    <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'view', 'objectId' => $company['id']]); ?>" style="color: white;">
                         <?php echo $view->escape($company['companyname']); ?>
                     </a>
                 </span>

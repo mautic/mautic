@@ -12,6 +12,8 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
+use Mautic\LeadBundle\Event\CompanyEvent;
+use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -38,11 +40,14 @@ class WebhookSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            WebhookEvents::WEBHOOK_ON_BUILD          => ['onWebhookBuild', 0],
-            LeadEvents::LEAD_POST_SAVE               => ['onLeadNewUpdate', 0],
-            LeadEvents::LEAD_POINTS_CHANGE           => ['onLeadPointChange', 0],
-            LeadEvents::LEAD_POST_DELETE             => ['onLeadDelete', 0],
-            LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED => ['onChannelSubscriptionChange', 0],
+            WebhookEvents::WEBHOOK_ON_BUILD           => ['onWebhookBuild', 0],
+            LeadEvents::LEAD_POST_SAVE                => ['onLeadNewUpdate', 0],
+            LeadEvents::LEAD_POINTS_CHANGE            => ['onLeadPointChange', 0],
+            LeadEvents::LEAD_POST_DELETE              => ['onLeadDelete', 0],
+            LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED  => ['onChannelSubscriptionChange', 0],
+            LeadEvents::LEAD_COMPANY_CHANGE           => ['onLeadCompanyChange', 0],
+            LeadEvents::COMPANY_POST_SAVE             => ['onCompanySave', 0],
+            LeadEvents::COMPANY_POST_DELETE           => ['onCompanyDelete', 0],
         ];
     }
 
@@ -95,6 +100,33 @@ class WebhookSubscriber implements EventSubscriberInterface
                 'description' => 'mautic.lead.webhook.event.lead.dnc_desc',
             ]
         );
+
+        // add checkbox to the webhook form for new/updated companies
+        $event->addEvent(
+            LeadEvents::LEAD_COMPANY_CHANGE,
+            [
+                'label'       => 'mautic.lead.webhook.event.lead.company.change',
+                'description' => 'mautic.lead.webhook.event.lead.company.change.desc',
+            ]
+        );
+
+        // add checkbox to the webhook form for new/updated companies
+        $event->addEvent(
+            LeadEvents::COMPANY_POST_SAVE,
+            [
+                'label'       => 'mautic.lead.webhook.event.company.new_or_update',
+                'description' => 'mautic.lead.webhook.event.company.new_or_update_desc',
+            ]
+        );
+
+        // add checkbox to the webhook form for deleted companies
+        $event->addEvent(
+            LeadEvents::COMPANY_POST_DELETE,
+            [
+                'label'       => 'mautic.lead.webhook.event.company.deleted',
+                'description' => 'mautic.lead.webhook.event.company.deleted_desc',
+            ]
+        );
     }
 
     public function onLeadNewUpdate(LeadEvent $event)
@@ -117,6 +149,7 @@ class WebhookSubscriber implements EventSubscriberInterface
                 'userList',
                 'publishDetails',
                 'ipAddress',
+                'doNotContactList',
                 'tagList',
             ]
         );
@@ -138,6 +171,7 @@ class WebhookSubscriber implements EventSubscriberInterface
                 'userList',
                 'publishDetails',
                 'ipAddress',
+                'doNotContactList',
                 'tagList',
             ]
         );
@@ -156,6 +190,7 @@ class WebhookSubscriber implements EventSubscriberInterface
                 'leadDetails',
                 'userList',
                 'publishDetails',
+                'doNotContactList',
                 'ipAddress',
             ]
         );
@@ -176,7 +211,50 @@ class WebhookSubscriber implements EventSubscriberInterface
                 'userList',
                 'publishDetails',
                 'ipAddress',
+                'doNotContactList',
                 'tagList',
+            ]
+        );
+    }
+
+    public function onLeadCompanyChange(LeadChangeCompanyEvent $event)
+    {
+        $leads = $event->getLeads();
+        if (empty($leads)) {
+            $leads = [$event->getLead()];
+        }
+        foreach ($leads as $lead) {
+            $this->webhookModel->queueWebhooksByType(
+                LeadEvents::LEAD_COMPANY_CHANGE,
+                [
+                    'added'    => $event->wasAdded(),
+                    'contact'  => $lead,
+                    'company'  => $event->getCompany(),
+                ],
+                [
+                ]
+            );
+        }
+    }
+
+    public function onCompanySave(CompanyEvent $event)
+    {
+        $this->webhookModel->queueWebhooksByType(
+            LeadEvents::COMPANY_POST_SAVE,
+            [
+                'company'    => $event->getCompany(),
+            ]
+        );
+    }
+
+    public function onCompanyDelete(CompanyEvent $event)
+    {
+        $company = $event->getCompany();
+        $this->webhookModel->queueWebhooksByType(
+            LeadEvents::COMPANY_POST_DELETE,
+            [
+                'id'      => $company->deletedId,
+                'company' => $event->getCompany(),
             ]
         );
     }

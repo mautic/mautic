@@ -196,10 +196,6 @@ class LeadEventLogRepository extends CommonRepository
 
         $query->orderBy('ll.trigger_date');
 
-        if (!empty($ipIds)) {
-            $query->orWhere('ll.ip_address IN ('.implode(',', $ipIds).')');
-        }
-
         if (empty($options['canViewOthers']) && isset($this->currentUser)) {
             $query->andWhere('c.created_by = :userId')
                 ->setParameter('userId', $this->currentUser->getId());
@@ -477,7 +473,7 @@ class LeadEventLogRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'l')
             ->join('l', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'l.campaign_id = c.id')
             ->where($expr)
-            ->setParameter('campaignId', $campaignId)
+            ->setParameter('campaignId', (int) $campaignId)
             ->setParameter('now', $now->format('Y-m-d H:i:s'))
             ->setParameter('true', true, \PDO::PARAM_BOOL)
             ->groupBy('l.event_id')
@@ -598,5 +594,20 @@ SQL;
                 ]
             )
             ->execute();
+    }
+
+    /**
+     * Removes logs by event_id.
+     * It uses batch processing for removing
+     * large quantities of records.
+     *
+     * @param int $eventId
+     */
+    public function removeEventLogs($eventId)
+    {
+        $conn = $this->_em->getConnection();
+        $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', [
+            'event_id' => (int) $eventId,
+        ]);
     }
 }

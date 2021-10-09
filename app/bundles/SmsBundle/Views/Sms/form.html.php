@@ -12,7 +12,9 @@
 $view->extend('MauticCoreBundle:FormTheme:form_simple.html.php');
 $view->addGlobal('translationBase', 'mautic.sms');
 $view->addGlobal('mauticContent', 'sms');
-
+/** @var \Mautic\SmsBundle\Entity\Sms $sms */
+$type       = $sms->getSmsType();
+$isExisting = $sms->getId();
 ?>
 
 <?php $view['slots']->start('primaryFormContent'); ?>
@@ -32,11 +34,40 @@ $view->addGlobal('mauticContent', 'sms');
 <?php $view['slots']->start('rightFormContent'); ?>
 <?php echo $view['form']->row($form['category']); ?>
 <?php echo $view['form']->row($form['language']); ?>
-<div class="hide">
-    <?php echo $view['form']->row($form['isPublished']); ?>
+<?php echo $view['form']->row($form['isPublished']); ?>
+
+<div id="leadList"<?php echo ('template' == $type) ? ' class="hide"' : ''; ?>>
+    <?php echo $view['form']->row($form['lists']); ?>
     <?php echo $view['form']->row($form['publishUp']); ?>
     <?php echo $view['form']->row($form['publishDown']); ?>
+</div>
 
+<div class="hide">
     <?php echo $view['form']->rest($form); ?>
 </div>
+
+<?php
+if ((empty($updateSelect) && !$isExisting && !$view['form']->containsErrors($form)) || empty($type)):
+    echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
+        [
+            'item'       => $sms,
+            'mauticLang' => [
+                'newListSms'     => 'mautic.sms.type.list.header',
+                'newTemplateSms' => 'mautic.sms.type.template.header',
+            ],
+            'typePrefix'         => 'sms',
+            'cancelUrl'          => 'mautic_sms_index',
+            'header'             => 'mautic.sms.type.header',
+            'typeOneHeader'      => 'mautic.sms.type.template.header',
+            'typeOneIconClass'   => 'fa-cube',
+            'typeOneDescription' => 'mautic.sms.type.template.description',
+            'typeOneOnClick'     => "Mautic.selectSmsType('template');",
+            'typeTwoHeader'      => 'mautic.sms.type.list.header',
+            'typeTwoIconClass'   => 'fa-pie-chart',
+            'typeTwoDescription' => 'mautic.sms.type.list.description',
+            'typeTwoOnClick'     => "Mautic.selectSmsType('list');",
+        ]);
+endif;
+?>
 <?php $view['slots']->stop(); ?>
+

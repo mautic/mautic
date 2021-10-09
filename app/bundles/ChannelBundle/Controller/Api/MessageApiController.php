@@ -34,7 +34,7 @@ class MessageApiController extends CommonApiController
         parent::initialize($event);
     }
 
-    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [])
+    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [], $fields = [])
     {
         parent::prepareParametersFromRequest($form, $params, $entity, $masks);
 
@@ -47,12 +47,12 @@ class MessageApiController extends CommonApiController
             foreach ($channels as $channelType => $channel) {
                 if (!isset($params['channels'][$channelType])) {
                     $params['channels'][$channelType] = [
-                        'isEnabled' => 0,
+                        'isEnabled' => false,
                         'channel'   => $channelType,
                     ];
                 } else {
                     $params['channels'][$channelType]['channel']   = $channelType;
-                    $params['channels'][$channelType]['isEnabled'] = (int) $params['channels'][$channelType]['isEnabled'];
+                    $params['channels'][$channelType]['isEnabled'] = (bool) $params['channels'][$channelType]['isEnabled'];
                 }
             }
         }

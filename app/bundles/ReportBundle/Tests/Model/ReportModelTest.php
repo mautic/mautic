@@ -22,7 +22,7 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
      */
     private $reportModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $fieldModelMock = $this->createMock(FieldModel::class);
         $fieldModelMock->method('getPublishedFieldArrays')->willReturn([]);

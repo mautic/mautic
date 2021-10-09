@@ -13,14 +13,14 @@ namespace Mautic\CampaignBundle\Tests\Command;
 
 class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 

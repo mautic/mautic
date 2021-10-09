@@ -12,10 +12,10 @@
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
 use Mautic\CoreBundle\Templating\Helper\SlotsHelper;
-use Twig_Extension;
-use Twig_SimpleFunction;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class SlotExtension extends Twig_Extension
+class SlotExtension extends AbstractExtension
 {
     /**
      * @var SlotsHelper
@@ -33,8 +33,8 @@ class SlotExtension extends Twig_Extension
     public function getFunctions()
     {
         return [
-            'slot'           => new Twig_SimpleFunction('slot', [$this, 'getSlot'], ['is_safe' => ['html']]),
-            'slotHasContent' => new Twig_SimpleFunction('slotHasContent', [$this, 'slotHasContent'], ['is_safe' => ['html']]),
+            'slot'           => new TwigFunction('slot', [$this, 'getSlot'], ['is_safe' => ['html']]),
+            'slotHasContent' => new TwigFunction('slotHasContent', [$this, 'slotHasContent'], ['is_safe' => ['html']]),
         ];
     }
 

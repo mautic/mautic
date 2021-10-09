@@ -660,7 +660,7 @@ switch ($style) {
                     if (Focus.debug)
                         console.log('Visitor converted');
 
-                    Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', -1, Infinity);
+                    Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', -1, Infinity, '/');
                 } else if (Focus.debug) {
                     console.log('Visitor converted but ignoreConverted not enabled');
                 }

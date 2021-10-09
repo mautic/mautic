@@ -255,6 +255,16 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
+     * Returns the user to be used for permissions.
+     *
+     * @return User|int
+     */
+    public function getPermissionUser()
+    {
+        return (null === $this->getOwner()) ? $this->getCreatedBy() : $this->getOwner();
+    }
+
+    /**
      * Set score.
      *
      * @param User $score

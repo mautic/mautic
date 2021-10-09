@@ -19,7 +19,6 @@ use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Url;
 
 /**
  * Class CampaignEventRemoteUrlType.
@@ -50,11 +49,6 @@ class CampaignEventSendWebhookType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'required'    => true,
                 'constraints' => [
-                    new Url(
-                        [
-                            'message' => 'mautic.form.submission.url.invalid',
-                        ]
-                    ),
                     new NotBlank(
                         [
                             'message' => 'mautic.core.value.required',

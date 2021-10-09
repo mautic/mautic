@@ -49,12 +49,14 @@ class TrackingPixelHelper
 
         //check to ses if request is a POST
         if ('GET' == $request->getMethod()) {
-            $response->headers->set('Connection', 'close');
+            if ('HTTP/1.1' == $request->getProtocolVersion()) {
+                $response->headers->set('Connection', 'close');
+            }
 
             //return 1x1 pixel transparent gif
             $response->headers->set('Content-Type', 'image/gif');
             //avoid cache time on browser side
-            $response->headers->set('Content-Length', '42');
+            $response->headers->set('Content-Length', '43');
             $response->headers->set('Cache-Control', 'private, no-cache, no-cache=Set-Cookie, proxy-revalidate');
             $response->headers->set('Expires', 'Wed, 11 Jan 2000 12:59:00 GMT');
             $response->headers->set('Last-Modified', 'Wed, 11 Jan 2006 12:59:00 GMT');

@@ -40,7 +40,7 @@ class CustomFormExtension extends AbstractTypeExtension
         if ($this->dispatcher->hasListeners(CoreEvents::ON_FORM_TYPE_BUILD)) {
             $event = $this->dispatcher->dispatch(
                 CoreEvents::ON_FORM_TYPE_BUILD,
-                new CustomFormEvent($builder->getName(), $builder->getType()->getName(), $builder)
+                new CustomFormEvent($builder->getName(), $builder->getType()->getBlockPrefix(), $builder)
             );
 
             if ($listeners = $event->getListeners()) {

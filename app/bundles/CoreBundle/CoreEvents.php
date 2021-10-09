@@ -160,4 +160,13 @@ final class CoreEvents
      * @var string
      */
     const ON_FORM_TYPE_BUILD = 'mautic.on_form_type_build';
+
+    /**
+     * The mautic.on_generated_columns_build event is dispatched when a list of generated columns is being built.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\GeneratedColumnsEvent instance.
+     *
+     * @var string
+     */
+    const ON_GENERATED_COLUMNS_BUILD = 'mautic.on_generated_columns_build';
 }

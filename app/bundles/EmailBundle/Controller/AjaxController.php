@@ -208,7 +208,12 @@ class AjaxController extends CommonAjaxController
                         $mailer = $this->container->get($transport);
 
                         if ('mautic.transport.amazon' == $transport) {
-                            $mailer->setHost($settings['amazon_region']);
+                            $amazonHost = $mailer->buildHost($settings['amazon_region'], $settings['amazon_other_region']);
+                            $mailer->setHost($amazonHost, $settings['port']);
+                        }
+
+                        if ('mautic.transport.amazon_api' == $transport) {
+                            $mailer->setRegion($settings['amazon_region'], $settings['amazon_other_region']);
                         }
                     }
             }

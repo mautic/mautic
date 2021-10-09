@@ -55,7 +55,7 @@ class EmailStep implements StepInterface
     public $mailer_port;
 
     /**
-     * SMTP username
+     * Mailer username
      * Required in step.
      *
      * @var string
@@ -63,11 +63,25 @@ class EmailStep implements StepInterface
     public $mailer_user;
 
     /**
-     * SMTP password.
+     * Mailer password.
      *
      * @var string
      */
     public $mailer_password;
+
+    /**
+     * Amazon Region.
+     *
+     * @var string
+     */
+    public $mailer_amazon_region = 'us-east-1';
+
+    /**
+     * Amazon Region.
+     *
+     * @var string
+     */
+    public $mailer_amazon_other_region;
 
     /**
      * Mailer API key if applicable.

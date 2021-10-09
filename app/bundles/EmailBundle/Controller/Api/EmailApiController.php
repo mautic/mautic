@@ -11,16 +11,16 @@
 
 namespace Mautic\EmailBundle\Controller\Api;
 
+use Doctrine\ORM\EntityNotFoundException;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-/**
- * Class EmailApiController.
- */
 class EmailApiController extends CommonApiController
 {
     use LeadAccessTrait;
@@ -48,7 +48,7 @@ class EmailApiController extends CommonApiController
     /**
      * Obtains a list of emails.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getEntitiesAction()
     {
@@ -66,7 +66,7 @@ class EmailApiController extends CommonApiController
      *
      * @param int $id Email ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -105,7 +105,7 @@ class EmailApiController extends CommonApiController
      * @param int $id     Email ID
      * @param int $leadId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -164,5 +164,29 @@ class EmailApiController extends CommonApiController
         }
 
         return $this->notFound();
+    }
+
+    /**
+     * @param string $trackingHash
+     *
+     * @return Response
+     */
+    public function replyAction($trackingHash)
+    {
+        /** @var Reply $replyService */
+        $replyService = $this->get('mautic.message.processor.replier');
+
+        /** @var RandomHelperInterface $randomHelper */
+        $randomHelper = $this->get('mautic.helper.random');
+
+        try {
+            $replyService->createReplyByHash($trackingHash, "api-{$randomHelper->generate()}");
+        } catch (EntityNotFoundException $e) {
+            return $this->notFound($e->getMessage());
+        }
+
+        return $this->handleView(
+            $this->view(['success' => true], Response::HTTP_CREATED)
+        );
     }
 }

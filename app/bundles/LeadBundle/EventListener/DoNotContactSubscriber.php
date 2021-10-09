@@ -33,8 +33,8 @@ final class DoNotContactSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            DoNotContactAddEvent::class    => ['addDncForLead', 0],
-            DoNotContactRemoveEvent::class => ['removeDncForLead', 0],
+            DoNotContactAddEvent::ADD_DONOT_CONTACT       => ['addDncForLead', 0],
+            DoNotContactRemoveEvent::REMOVE_DONOT_CONTACT => ['removeDncForLead', 0],
         ];
     }
 
@@ -49,14 +49,23 @@ final class DoNotContactSubscriber implements EventSubscriberInterface
 
     public function addDncForLead(DoNotContactAddEvent $doNotContactAddEvent): void
     {
-        $this->doNotContact->addDncForContact(
-            $doNotContactAddEvent->getLead()->getId(),
-            $doNotContactAddEvent->getChannel(),
-            $doNotContactAddEvent->getReason(),
-            $doNotContactAddEvent->getComments(),
-            $doNotContactAddEvent->isPersist(),
-            $doNotContactAddEvent->isCheckCurrentStatus(),
-            $doNotContactAddEvent->isOverride()
-        );
+        if (empty($doNotContactAddEvent->getLead()->getId())) {
+            $this->doNotContact->createDncRecord(
+                $doNotContactAddEvent->getLead(),
+                $doNotContactAddEvent->getChannel(),
+                $doNotContactAddEvent->getReason(),
+                $doNotContactAddEvent->getComments()
+            );
+        } else {
+            $this->doNotContact->addDncForContact(
+                $doNotContactAddEvent->getLead()->getId(),
+                $doNotContactAddEvent->getChannel(),
+                $doNotContactAddEvent->getReason(),
+                $doNotContactAddEvent->getComments(),
+                $doNotContactAddEvent->isPersist(),
+                $doNotContactAddEvent->isCheckCurrentStatus(),
+                $doNotContactAddEvent->isOverride()
+            );
+        }
     }
 }

@@ -111,12 +111,13 @@ class FormSubscriber implements EventSubscriberInterface
         ]);
 
         $event->addSubmitAction('lead.addutmtags', [
-            'group'       => 'mautic.lead.lead.submitaction',
-            'label'       => 'mautic.lead.lead.events.addutmtags',
-            'description' => 'mautic.lead.lead.events.addutmtags_descr',
-            'formType'    => ActionAddUtmTagsType::class,
-            'formTheme'   => 'MauticLeadBundle:FormTheme\\ActionAddUtmTags',
-            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'group'             => 'mautic.lead.lead.submitaction',
+            'label'             => 'mautic.lead.lead.events.addutmtags',
+            'description'       => 'mautic.lead.lead.events.addutmtags_descr',
+            'formType'          => ActionAddUtmTagsType::class,
+            'formTheme'         => 'MauticLeadBundle:FormTheme\\ActionAddUtmTags',
+            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'allowCampaignForm' => true,
         ]);
 
         $event->addSubmitAction('lead.remove_do_not_contact', [
@@ -169,6 +170,8 @@ class FormSubscriber implements EventSubscriberInterface
         $contact->addPointsChangeLog($pointsChangeLog);
 
         $this->leadModel->saveEntity($contact, false);
+
+        $event->getSubmission()->getLead()->setPoints($contact->getPoints());
     }
 
     public function onFormSubmitActionChangeList(SubmissionEvent $event): void

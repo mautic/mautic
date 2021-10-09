@@ -29,7 +29,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
      */
     private $integrationObject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->integrationHelper = $this->createMock(IntegrationHelper::class);
 

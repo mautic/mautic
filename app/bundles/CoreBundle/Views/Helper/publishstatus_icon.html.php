@@ -35,13 +35,13 @@ switch ($status) {
         break;
     case 'expired':
         $icon = ' fa-clock-o text-danger';
-        $text = $view['translator']->trans('mautic.core.form.expired', [
+        $text = $view['translator']->trans('mautic.core.form.expired_to', [
             '%date%' => $view['date']->toFull($item->getPublishDown()),
         ]);
         break;
     case 'pending':
         $icon = ' fa-clock-o text-warning';
-        $text = $view['translator']->trans('mautic.core.form.pending', [
+        $text = $view['translator']->trans('mautic.core.form.pending.start_at', [
             '%date%' => $view['date']->toFull($item->getPublishUp()),
         ]);
         break;
@@ -57,6 +57,10 @@ switch (true) {
         break;
 }
 
+if (isset($aditionalLabel)) {
+    $text .= $aditionalLabel;
+}
+
 if (!empty($disableToggle)) {
     $icon = str_replace(['success', 'danger', 'warning'], 'muted', $icon);
 }
@@ -65,4 +69,4 @@ $clickAction = (isset($disableToggle) && true === $disableToggle) ? ' disabled' 
 $idClass     = str_replace('.', '-', $model).'-publish-icon'.$item->getId().md5($query);
 ?>
 
-<i class="fa fa-fw <?php echo $size.' '.$icon.$clickAction.' '.$idClass; ?>" data-toggle="tooltip" data-container="body" data-placement="right" data-status="<?php echo $status; ?>" title="<?php echo $text; ?>"<?php if (empty($disableToggle)): ?> onclick="Mautic.togglePublishStatus(event, '.<?php echo $idClass; ?>', '<?php echo $model; ?>', <?php echo $item->getId(); ?>, '<?php echo $query; ?>', <?php echo (isset($backdrop)) ? 'true' : 'false'; ?>);"<?php endif; ?>></i>
+<i class="fa fa-fw <?php echo $size.' '.$icon.$clickAction.' '.$idClass; ?>" data-toggle="tooltip" data-container="body" data-placement="right" data-status="<?php echo $status; ?>" title="<?php echo $text; ?>"<?php if (empty($disableToggle)): ?> onclick="Mautic.togglePublishStatus(event, '.<?php echo $idClass; ?>', '<?php echo $model; ?>', '<?php echo $item->getId(); ?>', '<?php echo $query; ?>', <?php echo (isset($backdrop)) ? 'true' : 'false'; ?>);"<?php endif; ?>></i>

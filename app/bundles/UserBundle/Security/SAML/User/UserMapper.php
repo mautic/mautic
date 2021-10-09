@@ -13,7 +13,6 @@ namespace Mautic\UserBundle\Security\SAML\User;
 
 use LightSaml\Model\Assertion\Assertion;
 use LightSaml\Model\Protocol\Response;
-use LightSaml\SamlConstants;
 use LightSaml\SpBundle\Security\User\UsernameMapperInterface;
 use Mautic\UserBundle\Entity\User;
 
@@ -61,7 +60,9 @@ class UserMapper implements UsernameMapperInterface
         if (isset($attributes['email'])) {
             $user->setEmail($attributes['email']);
             $user->setUsername($attributes['email']);
-        } elseif (isset($attributes['username'])) {
+        }
+
+        if (isset($attributes['username']) && !empty($attributes['username'])) {
             $user->setUsername($attributes['username']);
         }
 

@@ -129,6 +129,21 @@ class FormType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'progressiveProfilingLimit',
+            TextType::class,
+            [
+                'label' => 'mautic.form.form.progressive_profiling_limit.max_fields',
+                'attr'  => [
+                    'style'       => 'width:75px;',
+                    'class'       => 'form-control',
+                    'tooltip'     => 'mautic.form.form.progressive_profiling_limit.max_fields.tooltip',
+                    'placeholder' => 'mautic.form.form.progressive_profiling_limit_unlimited',
+                ],
+                'data'  => $options['data']->getProgressiveProfilingLimit() ? $options['data']->getProgressiveProfilingLimit() : '',
+            ]
+        );
+
         // Render style for new form by default
         if (null === $options['data']->getId()) {
             $options['data']->setRenderStyle(true);

@@ -226,6 +226,7 @@ Mautic.launchFocusBuilder = function (forceFetch) {
         mQuery('#websiteCanvas').html('');
         mQuery('.website-placeholder').show();
         mQuery('#websiteUrlPlaceholderInput').val('');
+        Mautic.focusUpdatePreview();
     } else {
         mQuery('#websiteUrlPlaceholderInput').val(url).prop('disabled', false);
 
@@ -280,11 +281,6 @@ Mautic.launchFocusBuilder = function (forceFetch) {
 
 // Called when you  click on the show builder button
 Mautic.focusUpdatePreview = function () {
-
-    if (mQuery('#websiteCanvas iframe').length === 0) {
-        // iframe not loaded
-        return
-    };
 
     // Generate a preview
     var data = mQuery('form[name=focus]').formToArray();
