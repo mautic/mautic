@@ -73,7 +73,7 @@ class TrackingHelper
     public function updateSession($values)
     {
         $sessionName                      = $this->getSessionName();
-        $this->localCache[$sessionName]   = array_merge($values, $this->getSession());
+        $this->localCache[$sessionName]   = array_merge($this->getSession(), $values);
     }
 
     /**
