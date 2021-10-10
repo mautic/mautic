@@ -59,6 +59,16 @@ return [
                 'tag'       => 'console.command',
                 'arguments' => ['marketplace.service.plugin_collector'],
             ],
+            'marketplace.command.install' => [
+                'class'     => \Mautic\MarketplaceBundle\Command\InstallCommand::class,
+                'tag'       => 'console.command',
+                'arguments' => ['marketplace.service.composer'],
+            ],
+            'marketplace.command.remove' => [
+                'class'     => \Mautic\MarketplaceBundle\Command\RemoveCommand::class,
+                'tag'       => 'console.command',
+                'arguments' => ['marketplace.service.composer'],
+            ],
         ],
         'events' => [
             'marketplace.menu.subscriber' => [
@@ -104,6 +114,9 @@ return [
             'marketplace.service.config' => [
                 'class'     => \Mautic\MarketplaceBundle\Service\Config::class,
                 'arguments' => ['mautic.helper.core_parameters'],
+            ],
+            'marketplace.service.composer' => [
+                'class'     => \Mautic\MarketplaceBundle\Service\Composer::class,
             ],
         ],
     ],
