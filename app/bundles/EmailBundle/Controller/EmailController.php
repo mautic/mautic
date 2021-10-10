@@ -22,8 +22,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
-use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
-use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
@@ -35,11 +33,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EmailController extends FormController
 {
-    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
-
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
+    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
     /**
      * @param int $page
