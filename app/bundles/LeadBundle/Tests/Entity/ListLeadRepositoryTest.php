@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\ORM\AbstractQuery;
@@ -11,7 +13,7 @@ use Mautic\LeadBundle\Entity\ListLeadRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ListLeadRepositoryTest extends TestCase
+final class ListLeadRepositoryTest extends TestCase
 {
     /**
      * @var ListLeadRepository
@@ -33,7 +35,7 @@ class ListLeadRepositoryTest extends TestCase
      */
     private $query;
 
-    public function setUp()
+    public function setUp(): void
     {
         $classMetadata            = $this->createMock(ClassMetadata::class);
         $this->entityManager      = $this->createMock(EntityManager::class);
@@ -48,69 +50,40 @@ class ListLeadRepositoryTest extends TestCase
         $count     = 100;
         $filters   = ['manually_removed' => 0];
 
-        $this
-            ->entityManager
-            ->expects($this->at(0))
+        $this->entityManager->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($this->queryBuilder);
 
-        $this
-            ->queryBuilder
-            ->expects($this->at(0))
+        $this->queryBuilder->expects($this->exactly(2))
             ->method('select')
-            ->with('ll')
+            ->withConsecutive(['ll'], ['count(ll.list) as count'])
             ->willReturn($this->queryBuilder);
 
-        $this
-            ->queryBuilder
-            ->expects($this->at(1))
+        $this->queryBuilder
+            ->expects($this->once())
             ->method('from')
             ->willReturn($this->queryBuilder);
 
-        $this
-            ->queryBuilder
-            ->expects($this->at(2))
-            ->method('select')
-            ->with('count(ll.list) as count')
-            ->willReturn($this->queryBuilder);
-
-        $this
-            ->queryBuilder
-            ->expects($this->at(3))
+        $this->queryBuilder->expects($this->once())
             ->method('where')
             ->with('ll.list = :segmentId')
             ->willReturn($this->queryBuilder);
 
-        $this
-            ->queryBuilder
-            ->expects($this->at(4))
+        $this->queryBuilder->expects($this->exactly(2))
             ->method('setParameter')
-            ->with('segmentId', $segmentId)
+            ->withConsecutive(['segmentId', $segmentId], ['manuallyRemoved', 0])
             ->willReturn($this->queryBuilder);
 
-        $this
-            ->queryBuilder
-            ->expects($this->at(5))
+        $this->queryBuilder->expects($this->once())
             ->method('andWhere')
             ->with('ll.manuallyRemoved=:manuallyRemoved')
             ->willReturn($this->queryBuilder);
 
-        $this
-            ->queryBuilder
-            ->expects($this->at(6))
-            ->method('setParameter')
-            ->with('manuallyRemoved', 0)
-            ->willReturn($this->queryBuilder);
-
-        $this
-            ->queryBuilder
-            ->expects($this->at(7))
+        $this->queryBuilder->expects($this->once())
             ->method('getQuery')
             ->willReturn($this->query);
 
-        $this
-            ->query
-            ->expects($this->at(0))
+        $this->query->expects($this->once())
             ->method('getSingleScalarResult')
             ->willReturn($count);
 
