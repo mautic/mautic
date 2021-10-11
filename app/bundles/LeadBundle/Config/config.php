@@ -280,6 +280,11 @@ return [
                 'path'            => '/tags',
                 'controller'      => 'MauticLeadBundle:Api\TagApi',
             ],
+            'mautic_api_importcsv' => [
+                'path'       => '/contacts/importCsv',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:importCsv',
+                'method'     => 'POST',
+            ],
         ],
     ],
     'menu' => [
