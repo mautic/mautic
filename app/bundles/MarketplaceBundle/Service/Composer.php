@@ -6,12 +6,20 @@ namespace Mautic\MarketplaceBundle\Service;
 
 use Composer\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Provides several helper functions to interact with Composer (composer require, remove, etc.)
  */
 class Composer
 {
+    private KernelInterface $kernel;
+
+    public function __construct(KernelInterface $kernel)
+    {
+        $this->kernel = $kernel;
+    }
+
     /**
      * Installs a package using its Packagist name.
      * 
@@ -59,7 +67,7 @@ class Composer
         $arrayInput = new ArrayInput(array_merge(
             $input, [ 
                 '--no-interaction',
-                '--working-dir' => MAUTIC_ROOT_DIR
+                '--working-dir' => $this->kernel->getProjectDir()
         ]));
 
         $application = new Application();
