@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
+use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder;
@@ -105,6 +106,21 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
         Assert::assertSame(sprintf($expectedQuery, $this->segment->getId()), $queryBuilder->getDebugOutput());
+    }
+
+    public function testApplyQueryWhenSegmentNotExist(): void
+    {
+        $queryBuilder = new QueryBuilder($this->connectionMock);
+        $queryBuilder->select('1');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
+        $filter = $this->getContactSegmentFilter('eq', 'non_exist_segment_id');
+
+        $this->randomParameterMock->method('generateRandomParameterName')
+            ->willReturnOnConsecutiveCalls('queryAlias', 'para1', 'para2');
+
+        $this->expectException(SegmentNotFoundException::class);
+        $this->queryBuilder->applyQuery($queryBuilder, $filter);
     }
 
     private function createNewSegment(): LeadList
