@@ -21,6 +21,14 @@ use Symfony\Component\Validator\Constraints\File;
 
 class LeadImportType extends AbstractType
 {
+    const BATCH_LIMIT         = 100;
+
+    const ESCAPE    = '\\';
+
+    const DELIMITER = ',';
+
+    const ENCLOSURE = '&quot;';
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -56,7 +64,7 @@ class LeadImportType extends AbstractType
             ),
         ];
 
-        $default = (empty($options['data']['delimiter'])) ? ',' : htmlspecialchars($options['data']['delimiter']);
+        $default = (empty($options['data']['delimiter'])) ? self::DELIMITER : htmlspecialchars($options['data']['delimiter']);
         $builder->add(
             'delimiter',
             TextType::class,
@@ -70,7 +78,7 @@ class LeadImportType extends AbstractType
             ]
         );
 
-        $default = (empty($options['data']['enclosure'])) ? '&quot;' : htmlspecialchars($options['data']['enclosure']);
+        $default = (empty($options['data']['enclosure'])) ? self::ENCLOSURE : htmlspecialchars($options['data']['enclosure']);
         $builder->add(
             'enclosure',
             TextType::class,
@@ -84,7 +92,7 @@ class LeadImportType extends AbstractType
             ]
         );
 
-        $default = (empty($options['data']['escape'])) ? '\\' : $options['data']['escape'];
+        $default = (empty($options['data']['escape'])) ? self::ESCAPE : $options['data']['escape'];
         $builder->add(
             'escape',
             TextType::class,
@@ -98,7 +106,7 @@ class LeadImportType extends AbstractType
             ]
         );
 
-        $default = (empty($options['data']['batchlimit'])) ? 100 : (int) $options['data']['batchlimit'];
+        $default = (empty($options['data']['batchlimit'])) ? self::BATCH_LIMIT : (int) $options['data']['batchlimit'];
         $builder->add(
             'batchlimit',
             TextType::class,

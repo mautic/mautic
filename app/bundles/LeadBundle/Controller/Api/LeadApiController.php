@@ -21,6 +21,8 @@ use Mautic\LeadBundle\Controller\LeadDetailsTrait;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Field\FieldList;
+use Mautic\LeadBundle\Form\Type\LeadImportType;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Filesystem\Filesystem;
@@ -406,7 +408,7 @@ class LeadApiController extends CommonApiController
     {
         $files       = $this->request->files;
         $mapping     = $this->request->request->get('mapping');
-        $user_config = $this->request->request->get('config');
+        $userConfig  = $this->request->request->get('config');
 
         if (!$this->get('mautic.security')->isGranted('lead:leads:create')) {
             return $this->accessDenied();
@@ -415,6 +417,7 @@ class LeadApiController extends CommonApiController
         if (!$files || 1 !== count($files)) {
             return $this->badRequest('You must upload exactly one CSV file.');
         }
+
         $file      = $files->get('file');
         $extension = $file->getClientOriginalExtension();
         if ('csv' !== strtolower($extension)) {
@@ -429,16 +432,16 @@ class LeadApiController extends CommonApiController
 
         // Default configuration
         $config = [
-            'delimiter'  => ',',
-            'enclosure'  => '"',
-            'escape'     => '\\',
-            'batchlimit' => 200,
+            'delimiter'  => LeadImportType::DELIMITER,
+            'enclosure'  => LeadImportType::ENCLOSURE,
+            'escape'     => LeadImportType::ESCAPE,
+            'batchlimit' => LeadImportType::BATCH_LIMIT,
         ];
 
         // Apply user configuration
-        if ($user_config) {
-            $user_config = json_decode($user_config, true);
-            $config      = array_merge($config, $user_config);
+        if ($userConfig) {
+            $userConfig  = json_decode($userConfig, true);
+            $config      = array_merge($config, $userConfig);
         }
 
         /** @var \Mautic\LeadBundle\Model\ImportModel $importModel */
@@ -450,13 +453,13 @@ class LeadApiController extends CommonApiController
         $fileName  = $importModel->getUniqueFileName();
         $fullPath  = $importDir.'/'.$fileName;
 
-        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-        $fieldModel = $this->getModel('lead.field');
-        $leadFields = $fieldModel->getFieldList(false, false);
+        /** @var FieldList $fieldList */
+        $fieldList  = $this->getModel('mautic.lead.field.field_list');
+        $leadFields = $fieldList->getFieldList(false, false, ['isPublished' => true]);
 
-        foreach ($mapping as $csvField => $leadField) {
-            if (!isset($leadFields[$leadField])) {
-                return $this->badRequest('Unrecognized column mapping field: '.$leadField);
+        foreach ($mapping as  $csvField) {
+            if (!isset($leadFields[$csvField])) {
+                return $this->badRequest('Unrecognized column mapping field: '.$csvField);
             }
         }
 
