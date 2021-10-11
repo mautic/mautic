@@ -317,7 +317,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         if ('marketing' == $type) {
             // Determine if this lead has received the email before and if so, don't send it again
-            $stats = $this->emailModel->getStatRepository()->getSentCountForContacts($contactIds, $emailId);
+            $stats = $this->emailModel->getStatRepository()->getSentCountForContactsFromEmail($contactIds, $email);
 
             foreach ($stats as $contactId => $sentCount) {
                 /** @var LeadEventLog $log */

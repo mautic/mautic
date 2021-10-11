@@ -666,6 +666,34 @@ class StatRepository extends CommonRepository
     }
 
     /**
+     * @return array Formatted as [contactId => sentCount]
+     */
+    public function getSentCountForContactsFromEmail(array $contacts, Email $email): array
+    {
+        $emailIds = $email->getRelatedEntityIds();
+        $query    = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+        $query->select('count(s.id) as sent_count, s.lead_id')
+            ->andWhere('s.email_id in (:emailIds)')
+            ->andWhere('s.lead_id in (:contacts)')
+            ->andWhere('s.is_failed = 0')
+            ->setParameter(':emailIds', $emailIds, Connection::PARAM_INT_ARRAY)
+            ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->groupBy('s.lead_id');
+
+        $results = $query->execute()->fetchAll();
+
+        $contacts = [];
+        foreach ($results as $result) {
+            $contacts[$result['lead_id']] = $result['sent_count'];
+        }
+
+        return $contacts;
+    }
+
+    /**
+     * @deprecated use getSentCountForContactsFromEmail to check all variants
+     *
      * @param $emailId
      *
      * @return array Formatted as [contactId => sentCount]
