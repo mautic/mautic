@@ -145,10 +145,10 @@ trait MatchFilterForLeadTrait
                     break;
 
                 case OperatorOptions::IN:
-                    $groups[$groupNum] = $this->checkLeadValueInFilter($leadVal, $filterVal, false);
+                    $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, false);
                     break;
                 case OperatorOptions::NOT_IN:
-                    $groups[$groupNum] = $this->checkLeadValueInFilter($leadVal, $filterVal, true);
+                    $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, true);
                     break;
                 case 'regexp':
                     $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/i', $leadVal);
