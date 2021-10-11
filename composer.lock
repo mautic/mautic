@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "80c1127fab500af8e26dc96613c885ec",
+    "content-hash": "208a832a3ef0565f8e3a23eba62235cb",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -5382,11 +5382,11 @@
         },
         {
             "name": "mautic/core-lib",
-            "version": "3.2.x-dev",
+            "version": "4.1.0",
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "2171093d64277b5a828d5807e13d93947661ea2b"
+                "reference": "2ef5c7c4223382769804a0935d762b47fd0581b1"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
