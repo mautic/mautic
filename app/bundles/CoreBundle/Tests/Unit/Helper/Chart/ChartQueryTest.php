@@ -19,7 +19,6 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Mautic\LeadBundle\Entity\LeadEventLog;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class ChartQueryTest extends \PHPUnit\Framework\TestCase
@@ -356,6 +355,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
             ->method('setMaxResults')
             ->with(32);
 
+        $this->createChartQuery();
         $query = $this->chartQuery->prepareTimeDataQuery($table, $column, $filters);
         $this->assertInstanceOf(QueryBuilder::class, $query);
     }
