@@ -145,10 +145,10 @@ trait MatchFilterForLeadTrait
                     break;
 
                 case OperatorOptions::IN:
-                    $groups[$groupNum] = in_array($leadVal, $filterVal);
+                    $groups[$groupNum] = $this->checkLeadValueInFilter($leadVal, $filterVal, false);
                     break;
                 case OperatorOptions::NOT_IN:
-                    $groups[$groupNum] = !in_array($leadVal, $filterVal);
+                    $groups[$groupNum] = $this->checkLeadValueInFilter($leadVal, $filterVal, true);
                     break;
                 case 'regexp':
                     $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/i', $leadVal);
@@ -170,5 +170,52 @@ trait MatchFilterForLeadTrait
         }
 
         return in_array(true, $groups);
+    }
+
+    private function checkLeadValueIsInFilter(array $leadVal, array $filterVal, bool $defaultFlag): bool
+    {
+        $retFlag = $defaultFlag;
+        foreach ($leadVal as $v) {
+            if (in_array($v, $filterVal)) {
+                $retFlag = !$defaultFlag;
+                // Break once we find a match
+                break;
+            }
+        }
+
+        return $retFlag;
+    }
+
+    /**
+     * Duplicate method. Needs refactoring.
+     *
+     * @see \Mautic\LeadBundle\EventListener\DynamicContentSubscriber::isContactSegmentRelationshipValid
+     *
+     * @param string $operator empty, !empty, in, !in
+     */
+    private function isContactSegmentRelationshipValid(int $contactId, string $operator, array $segmentIds = null): bool
+    {
+        switch ($operator) {
+            case OperatorOptions::EMPTY:
+                // Contact is not in any segment
+                $return = $this->segmentRepository->isNotContactInAnySegment($contactId);
+                break;
+            case OperatorOptions::NOT_EMPTY:
+                // Contact is in any segment
+                $return = $this->segmentRepository->isContactInAnySegment($contactId);
+                break;
+            case OperatorOptions::IN:
+                // Contact is in one of the segment provided in $segmentsIds
+                $return = $this->segmentRepository->isContactInSegments($contactId, $segmentIds);
+                break;
+            case OperatorOptions::NOT_IN:
+                // Contact is not in all segments provided in $segmentsIds
+                $return = $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds);
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator));
+        }
+
+        return $return;
     }
 }
