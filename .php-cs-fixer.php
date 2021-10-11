@@ -25,5 +25,11 @@ return (new PhpCsFixer\Config())
             'syntax' => 'short',
         ],
         'no_unused_imports' => true,
+        /**
+         * Our templates rely heavily on things like endforeach, endif, etc.
+         * This setting should be turned off at least until we've switched to Twig
+         * (which is required for Symfony 5)
+         */
+        'no_alternative_syntax' => false
     ])
     ->setFinder($finder);
