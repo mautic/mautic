@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Provides several helper functions to interact with Composer (composer require, remove, etc.)
+ * Provides several helper functions to interact with Composer (composer require, remove, etc.).
  */
 class Composer
 {
@@ -22,19 +22,19 @@ class Composer
 
     /**
      * Installs a package using its Packagist name.
-     * 
+     *
      * @param string $packageName The package name, e.g. mautic/example-plugin
-     * @param bool $dryRun Whether to dry-run the installation. Comes in handy during automated tests
-     *                     and to test whether an installation would succeed or not.
+     * @param bool   $dryRun      Whether to dry-run the installation. Comes in handy during automated tests
+     *                            and to test whether an installation would succeed or not.
      */
     public function install(string $packageName, bool $dryRun = false): void
     {
         $input = [
-            'command' => 'require',
-            'packages' => [$packageName]
+            'command'  => 'require',
+            'packages' => [$packageName],
         ];
 
-        if ($dryRun === true) {
+        if (true === $dryRun) {
             $input['--dry-run'] = null;
         }
 
@@ -43,19 +43,19 @@ class Composer
 
     /**
      * Removes a package using its Packagist name.
-     * 
+     *
      * @param string $packageName The package name, e.g. mautic/example-plugin
-     * @param bool $dryRun Whether to dry-run the removal. Comes in handy during automated tests
-     *                     and to test whether an removal would succeed or not.
+     * @param bool   $dryRun      Whether to dry-run the removal. Comes in handy during automated tests
+     *                            and to test whether an removal would succeed or not.
      */
     public function remove(string $packageName, bool $dryRun = false): void
     {
         $input = [
-            'command' => 'remove',
-            'packages' => [$packageName]
+            'command'  => 'remove',
+            'packages' => [$packageName],
         ];
 
-        if ($dryRun === true) {
+        if (true === $dryRun) {
             $input['--dry-run'] = null;
         }
 
@@ -65,9 +65,9 @@ class Composer
     private function runCommand(array $input): void
     {
         $arrayInput = new ArrayInput(array_merge(
-            $input, [ 
+            $input, [
                 '--no-interaction',
-                '--working-dir' => $this->kernel->getProjectDir()
+                '--working-dir' => $this->kernel->getProjectDir(),
         ]));
 
         $application = new Application();

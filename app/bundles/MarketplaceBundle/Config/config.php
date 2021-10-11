@@ -117,7 +117,7 @@ return [
             ],
             'marketplace.service.composer' => [
                 'class'     => \Mautic\MarketplaceBundle\Service\Composer::class,
-                'arguments' => ['kernel']
+                'arguments' => ['kernel'],
             ],
         ],
     ],
