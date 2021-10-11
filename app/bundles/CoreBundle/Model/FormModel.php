@@ -342,9 +342,9 @@ class FormModel extends AbstractCommonModel
     /**
      * Dispatches events for child classes.
      *
-     * @param string $action
-     * @param object $entity
-     * @param bool   $isNew
+     * @param       $action
+     * @param bool  $isNew
+     * @param Event $event
      *
      * @return Event|null
      */
