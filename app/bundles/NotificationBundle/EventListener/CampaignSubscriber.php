@@ -29,30 +29,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var NotificationModel
-     */
-    private $notificationModel;
-
-    /**
-     * @var AbstractNotificationApi
-     */
-    private $notificationApi;
-
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var DoNotContactModel
-     */
-    private $doNotContact;
+    private NotificationModel $notificationModel;
+    private AbstractNotificationApi $notificationApi;
+    private IntegrationHelper $integrationHelper;
+    private EventDispatcherInterface $dispatcher;
+    private DoNotContactModel $doNotContact;
 
     public function __construct(
         IntegrationHelper $integrationHelper,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -43,7 +45,7 @@ class ConsoleErrorListener
             $exception->getMessage(),
             $exception->getFile(),
             $exception->getLine(),
-            $command->getName(),
+            empty($command) ? 'UNKNOWN' : $command->getName(),
             $trace
         );
 
