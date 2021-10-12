@@ -60,11 +60,11 @@ return [
         ],
         'models' => [
             'mautic.dashboard.model.dashboard' => [
-                'class'     => 'Mautic\DashboardBundle\Model\DashboardModel',
+                'class'     => \Mautic\DashboardBundle\Model\DashboardModel::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.helper.paths',
-                    'symfony.filesystem',
+                    'mautic.dashboard.widget_detail.event.factory',
                 ],
             ],
         ],

@@ -1,12 +1,6 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
-  *
- * @link        http://mautic.com
- * @created     15.1.19
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\DashboardBundle\Widget;
 
@@ -19,28 +13,14 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class WidgetDetailEventFactory
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-    /**
-     * @var CacheProvider
-     */
-    private $cacheProvider;
-    /**
-     * @var CorePermissions|null
-     */
-    private $corePermissions;
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
+    private TranslatorInterface $translator;
 
-    /**
-     * WidgetDetailEventFactory constructor.
-     *
-     * @param CorePermissions|null $corePermissions
-     */
+    private CacheProvider $cacheProvider;
+
+    private CorePermissions $corePermissions;
+
+    private UserHelper $userHelper;
+
     public function __construct(
         TranslatorInterface $translator,
         CacheProvider $cacheProvider,
@@ -53,11 +33,13 @@ class WidgetDetailEventFactory
         $this->userHelper      = $userHelper;
     }
 
-    public function create(Widget $widget, ?string $cacheId)
+    public function create(Widget $widget): WidgetDetailEvent
     {
         $event = new WidgetDetailEvent($this->translator, $this->cacheProvider);
         $event->setWidget($widget);
         $event->setCacheDir(false, $this->userHelper->getUser()->getId());
         $event->setSecurity($this->corePermissions);
+
+        return $event;
     }
 }

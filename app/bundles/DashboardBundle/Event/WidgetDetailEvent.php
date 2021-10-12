@@ -19,9 +19,6 @@ use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Exception\CouldNotFormatDateTimeException;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class WidgetDetailEvent.
- */
 class WidgetDetailEvent extends CommonEvent
 {
     /** @var Widget */
@@ -50,9 +47,6 @@ class WidgetDetailEvent extends CommonEvent
      */
     private $cacheProvider;
 
-    /**
-     * WidgetDetailEvent constructor.
-     */
     public function __construct(TranslatorInterface $translator, CacheProvider $cacheProvider = null)
     {
         $this->translator    = $translator;
