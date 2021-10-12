@@ -802,15 +802,15 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
     public function testIsUpdatingTranslationChildren()
     {
-        $email       = $this->createMock(Email::class);
-        $userHelper = $this->createMock(UserHelper::class);
+        $email       = new Email();
+        $parentEmail = new Email();
+        $userHelper  = $this->createMock(UserHelper::class);
         $this->emailModel->setUserHelper($userHelper);
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->emailModel->setDispatcher($dispatcher);
         $emailRepository = $this->createMock(EmailRepository::class);
         $this->entityManager->method('getRepository')->willReturn($emailRepository);
         $this->emailModel->saveEntity($email);
-        $this->assertFalse($this->emailModel->isUpdatingTranslationChildren());;
-
+        $this->assertFalse($this->emailModel->isUpdatingTranslationChildren());
     }
 }
