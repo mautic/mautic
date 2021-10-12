@@ -83,6 +83,7 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.cache.provider',
+                    'mautic.security',
                     'mautic.helper.user',
                 ],
             ],
