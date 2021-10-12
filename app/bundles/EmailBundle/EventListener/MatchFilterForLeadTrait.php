@@ -83,7 +83,6 @@ trait MatchFilterForLeadTrait
                     if (!is_array($leadVal)) {
                         $leadVal = explode('|', $leadVal);
                     }
-
                     if (!is_array($filterVal)) {
                         $filterVal = explode('|', $filterVal);
                     }
@@ -93,6 +92,10 @@ trait MatchFilterForLeadTrait
                     $filterVal = (int) $filterVal;
                     break;
                 case 'select':
+                    if (!is_array($filterVal)) {
+                        $filterVal = explode('|', $filterVal);
+                    }
+                    break;
                 default:
                     if (is_numeric($leadVal)) {
                         $leadVal   = (int) $leadVal;
@@ -172,9 +175,15 @@ trait MatchFilterForLeadTrait
         return in_array(true, $groups);
     }
 
-    private function checkLeadValueIsInFilter(array $leadVal, array $filterVal, bool $defaultFlag): bool
+    /**
+     * @param mixed $leadVal
+     * @param mixed $filterVal
+     */
+    private function checkLeadValueIsInFilter($leadVal, $filterVal, bool $defaultFlag): bool
     {
-        $retFlag = $defaultFlag;
+        $leadVal    = !is_array($leadVal) ? [$leadVal] : $leadVal;
+        $filterVal  = !is_array($filterVal) ? [$filterVal] : $filterVal;
+        $retFlag    = $defaultFlag;
         foreach ($leadVal as $v) {
             if (in_array($v, $filterVal)) {
                 $retFlag = !$defaultFlag;
