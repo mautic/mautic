@@ -41,13 +41,11 @@ class DashboardModel extends FormModel
         PathsHelper $pathsHelper,
         WidgetDetailEventFactory $eventFactory,
         Filesystem $filesystem
-
     ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->pathsHelper          = $pathsHelper;
         $this->eventFactory         = $eventFactory;
         $this->filesystem           = $filesystem;
-
     }
 
     public function setSession(Session $session)
