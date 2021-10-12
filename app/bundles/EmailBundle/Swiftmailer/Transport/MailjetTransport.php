@@ -112,7 +112,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
                 continue;
             }
 
-            if ('blocked' === $event['event'] || ('bounce' === $event['event'] && true === $event['hard_bounce'])) {
+            if ('blocked' === $event['event'] || ('bounce' === $event['event'] && true === (bool) $event['hard_bounce'])) {
                 $reason = $event['error_related_to'].': '.$event['error'];
                 $type   = DoNotContact::BOUNCED;
             } elseif ('spam' === $event['event']) {
