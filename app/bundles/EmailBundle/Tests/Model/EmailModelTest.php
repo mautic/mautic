@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Model;
 
+define('SORTARRIVAL', 1);
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
@@ -55,6 +57,7 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class EmailModelTest extends \PHPUnit\Framework\TestCase
@@ -795,5 +798,19 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame([0, 1, 2, 3], $chartData['labels']);
         $this->assertSame([0.0, 20.0, 50.0, 30.0], $chartData['datasets'][0]['data']);
+    }
+
+    public function testIsUpdatingTranslationChildren()
+    {
+        $email       = $this->createMock(Email::class);
+        $userHelper = $this->createMock(UserHelper::class);
+        $this->emailModel->setUserHelper($userHelper);
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->emailModel->setDispatcher($dispatcher);
+        $emailRepository = $this->createMock(EmailRepository::class);
+        $this->entityManager->method('getRepository')->willReturn($emailRepository);
+        $this->emailModel->saveEntity($email);
+        $this->assertFalse($this->emailModel->isUpdatingTranslationChildren());;
+
     }
 }
