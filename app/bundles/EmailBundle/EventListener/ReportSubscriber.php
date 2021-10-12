@@ -442,6 +442,10 @@ class ReportSubscriber implements EventSubscriberInterface
                     $qb->join('es', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = es.lead_id AND s.manually_removed = 0');
                 }
 
+                if (!$event->hasGroupBy()) {
+                    $qb->groupBy('es.id');
+                }
+
                 break;
         }
 

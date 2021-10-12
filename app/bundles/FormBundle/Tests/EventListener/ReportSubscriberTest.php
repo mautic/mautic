@@ -55,7 +55,7 @@ class ReportSubscriberTest extends TestCase
     {
         $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'checkContext',
                 'addGraph',
                 'getStandardColumns',
@@ -126,7 +126,7 @@ class ReportSubscriberTest extends TestCase
         $mockQueryBuilder = $this->createMock(QueryBuilder::class);
         $mockEvent        = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'getContext',
                 'getQueryBuilder',
                 'addCategoryLeftJoin',
@@ -154,7 +154,7 @@ class ReportSubscriberTest extends TestCase
         $mockQueryBuilder = $this->createMock(QueryBuilder::class);
         $mockEvent        = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'getContext',
                 'getQueryBuilder',
                 'addCategoryLeftJoin',

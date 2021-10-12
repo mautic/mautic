@@ -25,16 +25,3 @@ $container->loadFromExtension('fos_oauth_server', [
         ],
     ],
 ]);
-
-//oAuth 1.0a
-$container->loadFromExtension('bazinga_oauth_server', [
-    'mapping' => [
-        'db_driver'           => 'orm',
-        'consumer_class'      => 'Mautic\ApiBundle\Entity\oAuth1\Consumer',
-        'request_token_class' => 'Mautic\ApiBundle\Entity\oAuth1\RequestToken',
-        'access_token_class'  => 'Mautic\ApiBundle\Entity\oAuth1\AccessToken',
-    ],
-    'service' => [
-        'nonce_provider' => 'mautic.api.oauth1.nonce_provider',
-    ],
-]);
