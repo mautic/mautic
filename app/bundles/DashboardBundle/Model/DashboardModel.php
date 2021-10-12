@@ -35,6 +35,8 @@ class DashboardModel extends FormModel
     protected PathsHelper $pathsHelper;
 
     private WidgetDetailEventFactory $eventFactory;
+    
+    private Filesystem $filesystem;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
