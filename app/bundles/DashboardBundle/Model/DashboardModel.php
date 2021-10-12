@@ -31,15 +31,9 @@ class DashboardModel extends FormModel
      */
     protected $session;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    protected CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
+    protected PathsHelper $pathsHelper;
 
     private WidgetDetailEventFactory $eventFactory;
 
@@ -50,7 +44,7 @@ class DashboardModel extends FormModel
     ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->pathsHelper          = $pathsHelper;
-        $this->eventFactory           = $eventFactory;
+        $this->eventFactory         = $eventFactory;
     }
 
     public function setSession(Session $session)
