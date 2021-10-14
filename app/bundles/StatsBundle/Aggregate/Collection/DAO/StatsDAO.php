@@ -131,7 +131,7 @@ class StatsDAO
             $stats = $dayStats->getStats();
 
             foreach ($stats as $hour => $hourStat) {
-                $flattenedHours[$hour] = $hourStat->getCount();
+                $flattenedHours[$hour] = $hourStat;
             }
         }
 
