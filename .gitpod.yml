@@ -17,44 +17,25 @@ vscode:
     - ziyasal.vscode-open-in-github
 
 ports:
-  # Used by projector
-  - port: 6942
-    onOpen: ignore
-    visibility: private
-  # Direct-connect ddev-webserver port that is the main port
+  # Main web port
   - port: 8080
     onOpen: ignore
     visibility: public
-  # Currently un-notified and unsupported mailhog http port
+  # mailhog http port
   - port: 8025
     onOpen: ignore
     visibility: private
-  # Currently un-notified and unsupported mailhog https port
-  - port: 8026
-    onOpen: ignore
-    visibility: private
-  # Currently un-notified and unsupported phpmyadmin http port
+  # phpmyadmin http port
   - port: 8036
-    onOpen: ignore
-    visibility: private
-  # Currently un-notified and unsupported phpmyadmin https port
-  - port: 8037
     onOpen: ignore
     visibility: private
   # router http port that we're ignoring.
   - port: 8888
     onOpen: ignore
     visibility: private
-  # router https port that we're ignoring.
-  - port: 8889
-    onOpen: ignore
-    visibility: private
   # xdebug port
   - port: 9000
     onOpen: ignore
-    visibility: private
-  # projector port
-  - port: 9999
     visibility: private
 
 github:
@@ -68,10 +49,10 @@ github:
     # enable for pull requests coming from forks (defaults to false)
     pullRequestsFromForks: true
     # add a check to pull requests (defaults to true)
-    addCheck: true
+    addCheck: false
     # add a "Review in Gitpod" button as a comment to pull requests (defaults to false)
-    addComment: true
+    addComment: false
     # add a "Review in Gitpod" button to the pull request's description (defaults to false)
     addBadge: true
     # add a label once the prebuild is ready to pull requests (defaults to false)
-    addLabel: true
+    addLabel: false
