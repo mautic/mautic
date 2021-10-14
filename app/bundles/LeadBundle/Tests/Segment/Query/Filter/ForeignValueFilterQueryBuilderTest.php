@@ -30,12 +30,12 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     private $randomParameter;
 
     /**
-     * @var EventDispatcherInterface
+     * @var EventDispatcherInterface|MockObject
      */
     private $dispatcher;
 
     /**
-     * @var QueryBuilder
+     * @var ForeignValueFilterQueryBuilder
      */
     private $queryBuilder;
 

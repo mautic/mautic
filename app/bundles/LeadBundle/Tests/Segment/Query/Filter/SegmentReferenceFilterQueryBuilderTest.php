@@ -21,7 +21,6 @@ use Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
-use MauticPlugin\SalesforceBundle\Segment\Query\Filter\SalesforceContactFilterQueryBuilder;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -44,7 +43,7 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
     private $connectionMock;
 
     /**
-     * @var SalesforceContactFilterQueryBuilder
+     * @var SegmentReferenceFilterQueryBuilder
      */
     private $queryBuilder;
 

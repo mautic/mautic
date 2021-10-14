@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
-use MauticPlugin\SalesforceBundle\Segment\Query\Filter\SalesforceContactFilterQueryBuilder;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -40,7 +39,7 @@ class ChannelClickQueryBuilderTest extends TestCase
     private $connectionMock;
 
     /**
-     * @var SalesforceContactFilterQueryBuilder
+     * @var ChannelClickQueryBuilder
      */
     private $queryBuilder;
 
