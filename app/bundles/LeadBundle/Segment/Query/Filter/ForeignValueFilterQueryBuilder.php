@@ -38,25 +38,27 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
             $subQueryBuilder->andWhere(str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $filter->getWhere()));
         }
 
-        $subQueryBuilder->from($filter->getTable(), $tableAlias);
-
-        $this->addMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), 'lead_id');
-        $this->addLeadLimiter($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), 'lead_id');
-
         switch ($filterOperator) {
             case 'empty':
                 $subQueryBuilder->select($tableAlias.'.lead_id')
+                    ->from($filter->getTable(), $tableAlias)
                     ->andWhere($subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()));
+
                 $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'notEmpty':
                 $subQueryBuilder->select($tableAlias.'.lead_id')
+                    ->from($filter->getTable(), $tableAlias)
                     ->andWhere($subQueryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()));
+
+                $this->addMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
+                $this->addLeadLimiter($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
+
                 $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'notIn':
                 $subQueryBuilder
-                    ->select('NULL')
+                    ->select('NULL')->from($filter->getTable(), $tableAlias)
                     ->andWhere($tableAlias.'.lead_id = '.$leadsTableAlias.'.id');
 
                 // The use of NOT EXISTS here requires the use of IN instead of NOT IN to prevent a "double negative."
@@ -73,7 +75,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             case 'neq':
                 $subQueryBuilder
-                    ->select('NULL')
+                    ->select('NULL')->from($filter->getTable(), $tableAlias)
                     ->andWhere($tableAlias.'.lead_id = '.$leadsTableAlias.'.id');
 
                 $expression = $subQueryBuilder->expr()->orX(
@@ -87,7 +89,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             case 'notLike':
                 $subQueryBuilder
-                    ->select('NULL')
+                    ->select('NULL')->from($filter->getTable(), $tableAlias)
                     ->andWhere($tableAlias.'.lead_id = '.$leadsTableAlias.'.id');
 
                 $expression = $subQueryBuilder->expr()->orX(
@@ -104,7 +106,10 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $subQueryBuilder->select('NULL')
                     ->from($filter->getTable(), $tableAlias);
 
-                $not        = ('notRegexp' === $filterOperator) ? ' NOT' : '';
+                $this->addMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
+                $this->addLeadLimiter($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
+
+                $not            = ('notRegexp' === $filterOperator) ? ' NOT' : '';
                 $expression = $tableAlias.'.'.$filter->getField().$not.' REGEXP '.$filterParametersHolder;
 
                 $subQueryBuilder->andWhere($expression);
@@ -112,7 +117,11 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             default:
-                $subQueryBuilder->select($tableAlias.'.lead_id');
+                $subQueryBuilder->select($tableAlias.'.lead_id')
+                    ->from($filter->getTable(), $tableAlias);
+
+                $this->addMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
+                $this->addLeadLimiter($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
 
                 $expression = $subQueryBuilder->expr()->$filterOperator(
                     $tableAlias.'.'.$filter->getField(),
