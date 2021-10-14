@@ -15,10 +15,16 @@ use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateLeadListsCommand extends ModeratedCommand
 {
+    /**
+     * @var bool
+     */
+    private $quiet;
+
     protected function configure()
     {
         $this
@@ -69,8 +75,10 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $batch                 = $input->getOption('batch-limit');
         $max                   = $input->getOption('max-contacts');
         $enableTimeMeasurement = (bool) $input->getOption('timing');
+        $this->quiet           = $input->getOption('quiet');
+        $this->output          = ($this->quiet) ? new NullOutput() : $output;
 
-        if (!$this->checkRunStatus($input, $output, $id)) {
+        if (!$this->checkRunStatus($input, $this->output, $id)) {
             return 0;
         }
 
@@ -83,15 +91,15 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
             if (null !== $list) {
                 if ($list->isPublished()) {
-                    $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $id]).'</info>');
+                    $this->output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $id]).'</info>');
                     $processed = 0;
                     try {
-                        $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
+                        $processed = $listModel->rebuildListLeads($list, $batch, $max, $this->output);
                     } catch (QueryException $e) {
                         $this->getContainer()->get('monolog.logger.mautic')->error('Query Builder Exception: '.$e->getMessage());
                     }
 
-                    $output->writeln(
+                    $this->output->writeln(
                         '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
                     );
                 }
@@ -110,10 +118,10 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 $l = reset($l);
 
                 if ($l->isPublished()) {
-                    $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $l->getId()]).'</info>');
+                    $this->output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $l->getId()]).'</info>');
 
-                    $processed = $listModel->rebuildListLeads($l, $batch, $max, $output);
-                    $output->writeln(
+                    $processed = $listModel->rebuildListLeads($l, $batch, $max, $this->output);
+                    $this->output->writeln(
                         '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'."\n"
                     );
                 }
@@ -128,7 +136,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
         if ($enableTimeMeasurement) {
             $totalTime = round(microtime(true) - $startTime, 2);
-            $output->writeln("Total time: {$totalTime} seconds");
+            $this->output->writeln("Total time: {$totalTime} seconds");
         }
 
         return 0;
