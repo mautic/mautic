@@ -597,19 +597,21 @@ $view['slots']->set(
             <?php endforeach; ?>
             <div class="clearfix"></div>
         </div>
-        <div class="pa-sm panel-segments">
-          <div class="panel-title">
-            <?php echo $view['translator']->trans('mautic.lead.lead.lists'); ?>
-          </div>
-          <?php foreach ($lists[$lead->getId()] as $key => $list): ?>
-            <h5 class="pull-left mt-xs mr-xs">
-                  <span class="label label-success">
-                      <a href="<?php echo $view['router']->path('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list['id']]); ?>" data-toggle="ajax" style="color: white;">
-                          <?php echo $view->escape($list['name']); ?>
-                      </a>
-                  </span>
-            </h5>
-          <?php endforeach; ?>
+        <?php if (isset($lists[$lead->getId()])): ?>
+          <div class="pa-sm panel-segments">
+            <div class="panel-title">
+              <?php echo $view['translator']->trans('mautic.lead.lead.lists'); ?>
+            </div>
+            <?php foreach ($lists[$lead->getId()] as $key => $list): ?>
+              <h5 class="pull-left mt-xs mr-xs">
+                    <span class="label label-success">
+                        <a href="<?php echo $view['router']->path('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list['id']]); ?>" data-toggle="ajax" style="color: white;">
+                            <?php echo $view->escape($list['name']); ?>
+                        </a>
+                    </span>
+              </h5>
+            <?php endforeach; ?>
+          <?php endif; ?>
           <div class="clearfix"></div>
         </div>
     </div>
