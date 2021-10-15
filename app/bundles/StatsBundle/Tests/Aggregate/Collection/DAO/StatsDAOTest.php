@@ -99,7 +99,7 @@ class StatsDAOTest extends TestCase
         $this->assertEquals($expected, array_keys($stats));
 
         array_walk($stats, function ($stat) {
-            $this->assertTrue(is_int($stat));
+            $this->assertTrue(is_int($stat->getCount()));
         });
     }
 
