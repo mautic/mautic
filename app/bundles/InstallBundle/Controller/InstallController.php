@@ -12,7 +12,6 @@
 namespace Mautic\InstallBundle\Controller;
 
 use Doctrine\DBAL\DBALException;
-use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\Form\Form;
@@ -20,7 +19,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
 class InstallController extends CommonController
 {
@@ -99,11 +97,22 @@ class InstallController extends CommonController
                             $formData->password = $params['db_password'];
                         }
                         $dbParams = (array) $formData;
-                        $messages = $this->installer->createDatabaseStep($step, $dbParams, true);
+                        $messages = $this->installer->createDatabaseStep($step, $dbParams);
                         if (!empty($messages)) {
                             $this->handleInstallerErrors($form, $messages);
                             break;
                         }
+
+                        /** @var \Doctrine\ORM\EntityManager */
+                        $entityManager = $this->get('doctrine.orm.default_entity_manager');
+
+                        /**
+                         * We need to clear the ORM metadata cache before creating the schema. If the user provided a database
+                         * table prefix in the UI installer, cached table names don't have the prefix yet (e.g. oauth2_clients).
+                         * After clearing the metadata cache, Doctrine automatically recreates it with the correct prefixes (e.g.
+                         * mau_oauth2_clients), if applicable.
+                         */
+                        $entityManager->getConfiguration()->getMetadataCache()->clear();
 
                         // Refresh to install schema with new connection information in the container
                         return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1.1]));
