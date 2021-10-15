@@ -570,7 +570,7 @@ class AssetsHelper
      */
     public function includeScript($assetFilePath, $onLoadCallback = '', $alreadyLoadedCallback = '')
     {
-        return  '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '$onLoadCallback', '$alreadyLoadedCallback');</script>";
+        return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '$onLoadCallback', '$alreadyLoadedCallback');</script>";
     }
 
     /**
@@ -582,7 +582,7 @@ class AssetsHelper
      */
     public function includeStylesheet($assetFilePath)
     {
-        return  '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadStylesheet(\''.$this->getUrl($assetFilePath).'\');</script>';
+        return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadStylesheet(\''.$this->getUrl($assetFilePath).'\');</script>';
     }
 
     /**

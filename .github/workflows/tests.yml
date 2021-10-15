@@ -159,7 +159,7 @@ jobs:
             fi
           done
           if [[ $cs_fix_files ]]; then
-            bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots --diff $cs_fix_files
+            bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --using-cache=no --show-progress=dots --diff $cs_fix_files
           fi
         else
           echo "Invalid command"
