@@ -205,10 +205,14 @@ class SchemaHelper
         $platform = strtolower(get_class($this->db->getDatabasePlatform()));
         $metadata = ThisRelease::getMetadata();
 
-        if (false !== strpos($platform, 'mysql')) {
-            $minSupported = $metadata->getMinSupportedMySqlVersion();
-        } elseif (false !== strpos($platform, 'mariadb')) {
+        /**
+         * The second case is for MariaDB < 10.2, where Doctrine reports it as MySQLPlatform. Here we can use a little
+         * help from the version string, which contains "MariaDB" in that case: 10.1.48-MariaDB-1~bionic
+         */
+        if (false !== strpos($platform, 'mariadb') || false !== strpos(strtolower($version), 'mariadb')) {
             $minSupported = $metadata->getMinSupportedMariaDbVersion();
+        } elseif (false !== strpos($platform, 'mysql')) {
+            $minSupported = $metadata->getMinSupportedMySqlVersion();
         } else {
             throw new \Exception('Invalid database platform '.$platform.'. Mautic only supports MySQL and MariaDB!');
         }
