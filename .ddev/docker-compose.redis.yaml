@@ -1,0 +1,22 @@
+# ddev redis recipe file
+#
+version: "3.6"
+
+services:
+  redis:
+    container_name: ddev-${DDEV_SITENAME}-redis
+    image: redis:4
+    ports:
+      - 6379
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+    volumes:
+      - ".:/mnt/ddev_config"
+      - "./redis:/usr/local/etc/redis"
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+  web:
+    depends_on:
+      - redis
+    links:
+      - redis:redis
