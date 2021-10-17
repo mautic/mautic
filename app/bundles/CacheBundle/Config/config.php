@@ -86,7 +86,7 @@ return [
         'cache_prefix'            => '',
         'cache_lifetime'          => 86400,
         'cache_adapter_db'        => [
-            'timeout' => 86400,
+            'options' => [],
         ],
         'cache_adapter_memcached' => [
             'servers' => ['memcached://localhost'],

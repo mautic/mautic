@@ -20,10 +20,6 @@ class DatabaseTagAwareAdapter extends TagAwareAdapter
 {
     public function __construct(Connection $connection, array $servers, ?string $namespace, int $lifetime)
     {
-        if (isset($servers['cache_lifetime'])) {
-            $lifetime = $servers['cache_lifetime'];
-        }
-
         $options = array_key_exists('options', $servers) ? $servers['options'] : [];
 
         parent::__construct(
