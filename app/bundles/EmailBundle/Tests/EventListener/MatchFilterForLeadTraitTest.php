@@ -208,6 +208,9 @@ class MatchFilterForLeadTraitTest extends TestCase
 
     /**
      * @dataProvider dataForInNotInOperatorFilter
+     *
+     * @param array<string,string> $fieldDetails
+     * @param array<string,string> $filterDetails
      */
     public function testCheckLeadValueIsInFilter(array $fieldDetails, array $filterDetails, bool $expected): void
     {
@@ -233,6 +236,9 @@ class MatchFilterForLeadTraitTest extends TestCase
         $this->assertSame($expected, $trait->match($filter, $lead));
     }
 
+    /**
+     * @return mixed[]
+     */
     public function dataForInNotInOperatorFilter(): iterable
     {
         // field details, filter details, expected.
