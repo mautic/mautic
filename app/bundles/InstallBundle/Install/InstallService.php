@@ -255,12 +255,8 @@ class InstallService
     /**
      * Create the database.
      */
-    public function createDatabaseStep(StepInterface $step, array $dbParams, bool $nukeCache = false): array
+    public function createDatabaseStep(StepInterface $step, array $dbParams): array
     {
-        if ($nukeCache) {
-            $this->cacheHelper->nukeCache();
-        }
-
         $messages = $this->validateDatabaseParams($dbParams);
 
         if (!empty($messages)) {
