@@ -281,7 +281,9 @@ class ConfigController extends AbstractFormController
     }
 
     /**
-     * @return array $syncDirections
+     * @param mixed[] $fieldMappings
+     *
+     * @return mixed[]
      */
     private function setObjectSyncDirection(array $fieldMappings): array
     {
