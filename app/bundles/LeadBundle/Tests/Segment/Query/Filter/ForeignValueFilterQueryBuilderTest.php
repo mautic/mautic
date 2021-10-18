@@ -138,6 +138,76 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
         Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
+    public function dataApplyQueryWithBatchFilters(): iterable
+    {
+        yield [['minId' => 1, 'maxId' => 2], 'regexp', '.com$', "SELECT 1 FROM leads l WHERE EXISTS(SELECT NULL FROM page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url REGEXP '.com$'))"];
+        yield [['minId' => 1], 'regexp', '.com$', "SELECT 1 FROM leads l WHERE EXISTS(SELECT NULL FROM page_hits par1 WHERE (par1.lead_id >= 1) AND (par1.url REGEXP '.com$'))"];
+        yield [['maxId' => 2], 'regexp', '.com$', "SELECT 1 FROM leads l WHERE EXISTS(SELECT NULL FROM page_hits par1 WHERE (par1.lead_id <= 2) AND (par1.url REGEXP '.com$'))"];
+        yield [['lead_id' => 1], 'regexp', '.com$', "SELECT 1 FROM leads l WHERE EXISTS(SELECT NULL FROM page_hits par1 WHERE (par1.lead_id = 1) AND (par1.url REGEXP '.com$'))"];
+
+        yield [['minId' => 1, 'maxId' => 2], 'notRegexp', '.com$', "SELECT 1 FROM leads l WHERE EXISTS(SELECT NULL FROM page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url NOT REGEXP '.com$'))"];
+        yield [['minId' => 1], 'notRegexp', '.com$', "SELECT 1 FROM leads l WHERE EXISTS(SELECT NULL FROM page_hits par1 WHERE (par1.lead_id >= 1) AND (par1.url NOT REGEXP '.com$'))"];
+        yield [['maxId' => 2], 'notRegexp', '.com$', "SELECT 1 FROM leads l WHERE EXISTS(SELECT NULL FROM page_hits par1 WHERE (par1.lead_id <= 2) AND (par1.url NOT REGEXP '.com$'))"];
+        yield [['lead_id' => 1], 'notRegexp', '.com$', "SELECT 1 FROM leads l WHERE EXISTS(SELECT NULL FROM page_hits par1 WHERE (par1.lead_id = 1) AND (par1.url NOT REGEXP '.com$'))"];
+
+        yield [['minId' => 1, 'maxId' => 2], 'eq', 'https://acquia.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url = 'https://acquia.com'))"];
+        yield [['minId' => 1], 'eq', 'https://acquia.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id >= 1) AND (par1.url = 'https://acquia.com'))"];
+        yield [['maxId' => 2], 'eq', 'https://acquia.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id <= 2) AND (par1.url = 'https://acquia.com'))"];
+        yield [['lead_id' => 1], 'eq', 'https://acquia.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id = 1) AND (par1.url = 'https://acquia.com'))"]; //        yield ['empty', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE par1.url IS NULL)'];
+
+        yield [['minId' => 1, 'maxId' => 2], 'notEmpty', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.url IS NOT NULL) AND (par1.lead_id BETWEEN 1 and 2))'];
+        yield [['minId' => 1], 'notEmpty', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.url IS NOT NULL) AND (par1.lead_id >= 1))'];
+        yield [['maxId' => 2], 'notEmpty', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.url IS NOT NULL) AND (par1.lead_id <= 2))'];
+        yield [['lead_id' => 1], 'notEmpty', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.url IS NOT NULL) AND (par1.lead_id = 1))'];
+
+        yield [['minId' => 1, 'maxId' => 2], 'like', '%.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url LIKE '%.com'))"];
+        yield [['minId' => 1], 'like', '%.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id >= 1) AND (par1.url LIKE '%.com'))"];
+        yield [['maxId' => 2], 'like', '%.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id <= 2) AND (par1.url LIKE '%.com'))"];
+        yield [['lead_id' => 1], 'like', '%.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id = 1) AND (par1.url LIKE '%.com'))"];
+
+        yield [['minId' => 1, 'maxId' => 2], 'contains', '.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url LIKE '%.com%'))"];
+        yield [['minId' => 1], 'contains', '.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id >= 1) AND (par1.url LIKE '%.com%'))"];
+        yield [['maxId' => 2], 'contains', '.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id <= 2) AND (par1.url LIKE '%.com%'))"];
+        yield [['lead_id' => 1], 'contains', '.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id = 1) AND (par1.url LIKE '%.com%'))"];
+
+        yield [['minId' => 1, 'maxId' => 2], 'startsWith', 'https://', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url LIKE 'https://%'))"];
+        yield [['minId' => 1], 'startsWith', 'https://', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id >= 1) AND (par1.url LIKE 'https://%'))"];
+        yield [['maxId' => 2], 'startsWith', 'https://', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id <= 2) AND (par1.url LIKE 'https://%'))"];
+        yield [['lead_id' => 1], 'startsWith', 'https://', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id = 1) AND (par1.url LIKE 'https://%'))"];
+
+        yield [['minId' => 1, 'maxId' => 2], 'endsWith', '.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url LIKE '%.com'))"];
+        yield [['minId' => 1], 'endsWith', '.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id >= 1) AND (par1.url LIKE '%.com'))"];
+        yield [['maxId' => 2], 'endsWith', '.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id <= 2) AND (par1.url LIKE '%.com'))"];
+        yield [['lead_id' => 1], 'endsWith', '.com', "SELECT 1 FROM leads l WHERE l.id IN (SELECT par1.lead_id FROM page_hits par1 WHERE (par1.lead_id = 1) AND (par1.url LIKE '%.com'))"];
+    }
+
+    /**
+     * @dataProvider dataApplyQueryWithBatchFilters
+     */
+    public function testApplyQueryWithBatchFilters(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
+    {
+        $queryBuilder = new QueryBuilder($this->connectionMock);
+        $queryBuilder->select('1');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
+        $filter = $this->getContactSegmentFilter([
+            'object'     => 'behaviors',
+            'glue'       => 'and',
+            'field'      => 'hit_url',
+            'type'       => 'text',
+            'operator'   => $operator,
+            'properties' => [
+                'filter' => $parameterValue,
+            ],
+            'filter'  => null,
+            'display' => null,
+        ], $batchLimiters);
+
+        $this->queryBuilder->applyQuery($queryBuilder, $filter);
+
+        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+    }
+
     public function dataApplyQueryAdditionalFiltersWithBatchLimiters(): iterable
     {
         yield [['minId' => 1, 'maxId' => 2], 'in', [1, 2], 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par2.lead_id FROM lead_categories par2 WHERE (par2.lead_id BETWEEN 1 and 2) AND (par2.category_id IN (1, 2)))'];
