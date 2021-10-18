@@ -89,30 +89,59 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
         $queryBuilder->select('1');
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-        $filter = $this->getContactSegmentFilter($operator, $parameterValue);
+        $filter = $this->getContactSegmentFilter([
+            'object'     => 'behaviors',
+            'glue'       => 'and',
+            'field'      => 'hit_url',
+            'type'       => 'text',
+            'operator'   => $operator,
+            'properties' => [
+                'filter' => $parameterValue,
+            ],
+            'filter'  => null,
+            'display' => null,
+        ]);
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
         Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
-    private function getContactSegmentFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter
+    public function dataApplyQueryAdditionalFilters(): iterable
+    {
+        yield ['in', [1, 2], 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par2.lead_id FROM lead_categories par2 WHERE par2.category_id IN (1, 2))'];
+        yield ['notIn', [1, 2], 'SELECT 1 FROM leads l WHERE NOT EXISTS(SELECT NULL FROM lead_categories par2 WHERE (par2.lead_id = l.id) AND (par2.category_id IN (1, 2)))'];
+    }
+
+    /**
+     * @dataProvider dataApplyQueryAdditionalFilters
+     */
+    public function testApplyQueryAdditionalFilters(string $operator, array $parameterValue, string $expectedQuery): void
+    {
+        $queryBuilder = new QueryBuilder($this->connectionMock);
+        $queryBuilder->select('1');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
+        $filter = $this->getContactSegmentFilter([
+            'glue'       => 'and',
+            'field'      => 'globalcategory',
+            'object'     => 'lead',
+            'type'       => 'globalcategory',
+            'operator'   => $operator,
+            'properties' => [
+                'filter' => $parameterValue,
+            ],
+        ]);
+
+        $this->queryBuilder->applyQuery($queryBuilder, $filter);
+
+        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+    }
+
+    private function getContactSegmentFilter(array $filter, array $batchLimiters = []): ContactSegmentFilter
     {
         return new ContactSegmentFilter(
-            new ContactSegmentFilterCrate(
-                [
-                    'object'     => 'behaviors',
-                    'glue'       => 'and',
-                    'field'      => 'hit_url',
-                    'type'       => 'text',
-                    'operator'   => $operator,
-                    'properties' => [
-                            'filter' => $parameterValue,
-                        ],
-                    'filter'  => null,
-                    'display' => null,
-                ]
-            ),
+            new ContactSegmentFilterCrate($filter),
             new CustomMappedDecorator(
                 new ContactSegmentFilterOperator(
                     new FilterOperatorProvider($this->dispatcher, $this->createMock(TranslatorInterface::class))
