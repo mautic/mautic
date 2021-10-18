@@ -123,6 +123,8 @@ class ChannelClickQueryBuilderTest extends TestCase
     }
 
     /**
+     * @dataProvider dataApplyQueryWithBatchLimitersMinMaxBoth
+     *
      *  @param array<string, mixed> $batchLimiters
      */
     public function testApplyQueryWithBatchLimitersMinMaxBoth(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
