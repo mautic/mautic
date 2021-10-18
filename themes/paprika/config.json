@@ -1,7 +1,7 @@
 {
   "name": "Paprika",
-  "author": "Friendly Automate",
-  "authorUrl": "https://friendly.is",
+  "author": "Mautic team",
+  "authorUrl": "https://mautic.org",
   "builder": ["grapesjsbuilder"],
   "features": [
     "email"

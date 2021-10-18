@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 class RequestHelperTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject | Request
+     * @var \PHPUnit\Framework\MockObject\MockObject|Request
      */
     private $request;
 
