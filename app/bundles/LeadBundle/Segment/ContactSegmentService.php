@@ -194,7 +194,7 @@ class ContactSegmentService
     }
 
     /**
-     * @param $batchLimiters
+     * @param array<string, mixed> $batchLimiters
      *
      * @throws Exception\SegmentQueryException
      * @throws \Exception
