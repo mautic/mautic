@@ -11,35 +11,21 @@
 
 namespace Mautic\ApiBundle\Event;
 
-use Mautic\ApiBundle\Entity\oAuth1\Consumer;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Event\CommonEvent;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class ClientEvent.
  */
 class ClientEvent extends CommonEvent
 {
-    /**
-     * @var string
-     */
-    private $apiMode;
+    private string $apiMode;
 
-    /**
-     * @param Client|Consumer $client
-     * @param bool            $isNew
-     */
-    public function __construct($client, $isNew = false)
+    public function __construct(Client $client, $isNew = false)
     {
-        if (!$client instanceof Client && !$client instanceof Consumer) {
-            throw new MethodNotAllowedHttpException(['Client', 'Consumer']);
-        }
-
-        $this->apiMode = ($client instanceof Client) ? 'oauth2' : 'oauth1';
-
-        $this->entity = $client;
-        $this->isNew  = $isNew;
+        $this->apiMode = 'oauth2';
+        $this->entity  = $client;
+        $this->isNew   = $isNew;
     }
 
     /**
