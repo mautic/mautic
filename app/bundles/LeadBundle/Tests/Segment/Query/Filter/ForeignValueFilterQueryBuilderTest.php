@@ -138,6 +138,39 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
         Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
+    public function dataApplyQueryAdditionalFiltersWithBatchLimiters(): iterable
+    {
+        yield [['minId' => 1, 'maxId' => 2], 'in', [1, 2], 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par2.lead_id FROM lead_categories par2 WHERE (par2.lead_id BETWEEN 1 and 2) AND (par2.category_id IN (1, 2)))'];
+        yield [['minId' => 1], 'in', [1, 2], 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par2.lead_id FROM lead_categories par2 WHERE (par2.lead_id >= 1) AND (par2.category_id IN (1, 2)))'];
+        yield [['maxId' => 2], 'in', [1, 2], 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par2.lead_id FROM lead_categories par2 WHERE (par2.lead_id <= 2) AND (par2.category_id IN (1, 2)))'];
+        yield [['lead_id' => 1], 'in', [1, 2], 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par2.lead_id FROM lead_categories par2 WHERE (par2.lead_id = 1) AND (par2.category_id IN (1, 2)))'];
+    }
+
+    /**
+     * @dataProvider dataApplyQueryAdditionalFiltersWithBatchLimiters
+     */
+    public function testApplyQueryAdditionalFiltersWithBatchLimiters(array $batchLimiters, string $operator, array $parameterValue, string $expectedQuery): void
+    {
+        $queryBuilder = new QueryBuilder($this->connectionMock);
+        $queryBuilder->select('1');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
+        $filter = $this->getContactSegmentFilter([
+            'glue'       => 'and',
+            'field'      => 'globalcategory',
+            'object'     => 'lead',
+            'type'       => 'globalcategory',
+            'operator'   => $operator,
+            'properties' => [
+                'filter' => $parameterValue,
+            ],
+        ], $batchLimiters);
+
+        $this->queryBuilder->applyQuery($queryBuilder, $filter);
+
+        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+    }
+
     private function getContactSegmentFilter(array $filter, array $batchLimiters = []): ContactSegmentFilter
     {
         return new ContactSegmentFilter(
