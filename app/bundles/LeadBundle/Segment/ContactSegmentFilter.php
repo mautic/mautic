@@ -36,10 +36,13 @@ class ContactSegmentFilter
     private $schemaCache;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     private $batchLimiters = [];
 
+    /**
+     * @param array<string, mixed> $batchLimiters
+     */
     public function __construct(
         ContactSegmentFilterCrate $contactSegmentFilterCrate,
         FilterDecoratorInterface $filterDecorator,
@@ -245,6 +248,9 @@ class ContactSegmentFilter
         return !in_array($this->contactSegmentFilterCrate->getType(), ['date', 'datetime'], true);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getBatchLimiters(): array
     {
         return $this->batchLimiters;
