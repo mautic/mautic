@@ -89,7 +89,7 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param int[] $exoectedIds
+     * @param int[] $expectedIds
      */
     private function assertLogs(Webhook $webhook, int $expectedCount, array $expectedIds): void
     {

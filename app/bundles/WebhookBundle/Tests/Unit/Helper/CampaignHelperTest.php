@@ -142,6 +142,9 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->campaignHelper->fireWebhook($this->provideSampleConfig(), $this->contact);
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     private function provideSampleConfig(string $method = 'get'): array
     {
         $sample = [
