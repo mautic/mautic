@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 
 class StatsDAOTest extends TestCase
 {
-    public function testGetYearsReturnsYears()
+    public function testGetYearsReturnsYears(): void
     {
         $expected = [
             2018,
@@ -35,7 +35,7 @@ class StatsDAOTest extends TestCase
         });
     }
 
-    public function testGetMonthsReturnsFlattenedMonths()
+    public function testGetMonthsReturnsFlattenedMonths(): void
     {
         $expected = [
             '2018-12',
@@ -51,7 +51,7 @@ class StatsDAOTest extends TestCase
         });
     }
 
-    public function testGetWeekReturnsFlattenedMonths()
+    public function testGetWeekReturnsFlattenedMonths(): void
     {
         $expected = [
             '2018-49',
@@ -67,7 +67,7 @@ class StatsDAOTest extends TestCase
         });
     }
 
-    public function testGetDaysReturnsFlattenedDays()
+    public function testGetDaysReturnsFlattenedDays(): void
     {
         $expected = [
             '2018-12-07',
@@ -84,7 +84,7 @@ class StatsDAOTest extends TestCase
         });
     }
 
-    public function testGetHoursReturnsFlattenedHours()
+    public function testGetHoursReturnsFlattenedHours(): void
     {
         $expected = [
             '2018-12-07 12',
@@ -103,10 +103,7 @@ class StatsDAOTest extends TestCase
         });
     }
 
-    /**
-     * @return StatsDAO
-     */
-    private function getStats()
+    private function getStats(): StatsDAO
     {
         $stats = new StatsDAO();
 
