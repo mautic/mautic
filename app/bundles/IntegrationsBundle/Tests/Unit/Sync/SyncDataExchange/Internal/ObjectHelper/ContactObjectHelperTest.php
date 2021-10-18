@@ -364,7 +364,7 @@ class ContactObjectHelperTest extends TestCase
     }
 
     /**
-     * @param array<string,string>
+     * @param array<string,string> $fieldValues
      */
     private function getObject(int $mappedId, array $fieldValues): ObjectChangeDAO
     {
