@@ -89,6 +89,9 @@ class WebhookQueueTest extends MauticMysqlTestCase
         return $webhookQueue;
     }
 
+    /**
+     * @return mixed[]
+     */
     private function fetchPayloadDbValues(WebhookQueue $webhookQueue): array
     {
         $prefix = $this->container->getParameter('mautic.db_table_prefix');

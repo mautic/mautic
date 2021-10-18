@@ -94,6 +94,9 @@ final class WebhookModelTest extends MauticMysqlTestCase
         return $webhook;
     }
 
+    /**
+     * @param mixed[] $payload
+     */
     private function createWebhookQueue(Webhook $webhook, Event $event, array $payload): void
     {
         $queue = new WebhookQueue();

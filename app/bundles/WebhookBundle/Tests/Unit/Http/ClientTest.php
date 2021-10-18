@@ -8,9 +8,34 @@ use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\WebhookBundle\Http\Client;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ClientTest extends TestCase
 {
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
+    private $parametersMock;
+
+    /**
+     * @var MockObject|GuzzleClient
+     */
+    private $httpClientMock;
+
+    /**
+     * @var Client
+     */
+    private $client;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->parametersMock = $this->createMock(CoreParametersHelper::class);
+        $this->httpClientMock = $this->createMock(GuzzleClient::class);
+        $this->client         = new Client($this->parametersMock, $this->httpClientMock);
+    }
+
     public function testPost(): void
     {
         $method  = 'POST';

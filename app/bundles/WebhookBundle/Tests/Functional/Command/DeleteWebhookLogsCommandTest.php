@@ -89,11 +89,11 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param array<int> $expectedIds
+     * @param int[] $exoectedIds
      */
     private function assertLogs(Webhook $webhook, int $expectedCount, array $expectedIds): void
     {
-        $logs   = $this->em->getRepository(Log::class)->findBy(['webhook'=>$webhook]);
+        $logs   = $this->em->getRepository(Log::class)->findBy(['webhook' => $webhook]);
         $logIds = array_map(fn (Log $log) => $log->getId(), $logs);
 
         Assert::assertCount($expectedCount, $logs);

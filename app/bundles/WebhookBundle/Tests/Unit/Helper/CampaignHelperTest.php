@@ -11,10 +11,14 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject&Lead
+     */
     private \PHPUnit\Framework\MockObject\MockObject $contact;
 
     /**
@@ -26,6 +30,9 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject $companyRepository;
 
+    /**
+     * @var ArrayCollection<int,IpAddress>
+     */
     private \Doctrine\Common\Collections\ArrayCollection $ipCollection;
 
     private \Mautic\WebhookBundle\Helper\CampaignHelper $campaignHelper;
@@ -86,8 +93,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testFireWebhookWithPost(): void
     {
-        $config      = $this->provideSampleConfig('post');
-        $expectedUrl = 'https://mautic.org?test=tee&email=john%40doe.email&IP=127.0.0.1%2C127.0.0.2';
+        $config = $this->provideSampleConfig('post');
 
         $this->client->expects($this->once())
             ->method('request')
@@ -136,7 +142,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->campaignHelper->fireWebhook($this->provideSampleConfig(), $this->contact);
     }
 
-    private function provideSampleConfig($method = 'get', $type = 'application/x-www-form-urlencoded')
+    private function provideSampleConfig(string $method = 'get'): array
     {
         $sample = [
             'url'             => 'https://mautic.org',
