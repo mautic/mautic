@@ -363,6 +363,9 @@ class ContactObjectHelperTest extends TestCase
         $this->assertSame($objectName, $manipulator->getObjectName());
     }
 
+    /**
+     * @param array<string,string>
+     */
     private function getObject(int $mappedId, array $fieldValues): ObjectChangeDAO
     {
         $object = new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', $mappedId, new DateTime());

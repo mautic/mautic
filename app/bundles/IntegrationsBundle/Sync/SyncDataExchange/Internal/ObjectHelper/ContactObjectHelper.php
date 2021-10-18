@@ -32,7 +32,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     private $uniqueIdentifierFields;
 
     /**
-     * @var string[]
+     * @var array<string,Lead>
      */
     private $contactsCreated = [];
 
@@ -305,6 +305,9 @@ class ContactObjectHelper implements ObjectHelperInterface
         return $this->availableFields;
     }
 
+    /**
+     * @return string[]
+     */
     private function getUniqueIdentifierFields(): array
     {
         if (null === $this->uniqueIdentifierFields) {
@@ -364,7 +367,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * @var FieldDAO[]
+     * @param FieldDAO[] $fields
      */
     private function getContactEntity(array $fields): Lead
     {

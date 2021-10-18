@@ -249,6 +249,9 @@ class CompanyObjectHelperTest extends TestCase
         return new CompanyObjectHelper($this->model, $this->repository, $this->connection, $this->fieldModel);
     }
 
+    /**
+     * @param array<string,string>
+     */
     private function getObject(int $mappedId, array $fieldValues): ObjectChangeDAO
     {
         $object = new ObjectChangeDAO(

@@ -26,7 +26,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
     private $uniqueIdentifierFields;
 
     /**
-     * @var string[]
+     * @var array<string,Company>
      */
     private $companiesCreated = [];
 
@@ -232,6 +232,9 @@ class CompanyObjectHelper implements ObjectHelperInterface
         $this->model->setFieldValues($company, []);
     }
 
+    /**
+     * @return string[]
+     */
     private function getUniqueIdentifierFields(): array
     {
         if (null === $this->uniqueIdentifierFields) {
@@ -243,7 +246,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * @var FieldDAO[]
+     * @param FieldDAO[] $fields
      */
     private function getCompanyEntity(array $fields): Company
     {
