@@ -66,6 +66,9 @@ class ChannelClickQueryBuilderTest extends TestCase
         );
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function dataApplyQuery(): iterable
     {
         yield ['eq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email))'];
@@ -93,6 +96,9 @@ class ChannelClickQueryBuilderTest extends TestCase
         Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function dataApplyQueryWithBatchLimitersMinMaxBoth(): iterable
     {
         yield [['minId' => 1, 'maxId' => 1], 'eq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id BETWEEN 1 and 1))'];
@@ -117,7 +123,7 @@ class ChannelClickQueryBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider dataApplyQueryWithBatchLimitersMinMaxBoth
+     *  @param array<string, mixed> $batchLimiters
      */
     public function testApplyQueryWithBatchLimitersMinMaxBoth(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
     {
@@ -135,6 +141,9 @@ class ChannelClickQueryBuilderTest extends TestCase
         Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
+    /**
+     *  @param array<string, mixed> $batchLimiters
+     */
     private function getContactSegmentFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter
     {
         return new ContactSegmentFilter(

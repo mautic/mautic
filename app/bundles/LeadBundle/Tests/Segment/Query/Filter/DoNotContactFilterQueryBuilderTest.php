@@ -53,6 +53,9 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
         yield ['neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function dataApplyQueryWithBatchLimiters(): iterable
     {
         yield [['minId' => 1, 'maxId' => 1], 'eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id BETWEEN 1 and 1))'];
@@ -78,6 +81,8 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
 
     /**
      * @dataProvider dataApplyQueryWithBatchLimiters
+     *
+     * @param array<string, mixed> $batchLimiters
      */
     public function testApplyQueryWithBatchLimiters(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
     {
@@ -102,6 +107,11 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
         };
     }
 
+    /**
+     * @dataProvider dataApplyQueryWithBatchLimitersMinMaxBoth
+     *
+     *  @param array<string, mixed> $batchLimiters
+     */
     private function createFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter
     {
         return new class($operator, $parameterValue, $batchLimiters) extends ContactSegmentFilter {
@@ -116,7 +126,7 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
             private $parameterValue;
 
             /**
-             * @var array
+             * @var array<string, mixed>
              */
             private $batchLimiters;
 

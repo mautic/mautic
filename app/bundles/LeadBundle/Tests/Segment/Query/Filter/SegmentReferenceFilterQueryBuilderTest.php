@@ -82,6 +82,9 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
         );
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function dataApplyQuery(): iterable
     {
         yield ['eq', "SELECT 1 FROM leads l WHERE EXISTS(SELECT null FROM leads queryAlias WHERE (l.id = queryAlias.id) AND (EXISTS(SELECT null FROM lead_lists_leads para1 WHERE (queryAlias.id = para1.lead_id) AND ((para1.leadlist_id = %s) AND ((para1.manually_added = 1) OR (para1.manually_removed = ''))))))"];

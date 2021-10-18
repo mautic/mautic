@@ -65,6 +65,9 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
         );
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function dataApplyQuery(): iterable
     {
         yield ['regexp', '.com$', "SELECT 1 FROM leads l WHERE EXISTS(SELECT NULL FROM page_hits par1 WHERE par1.url REGEXP '.com$')"];
@@ -107,6 +110,9 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
         Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function dataApplyQueryAdditionalFilters(): iterable
     {
         yield ['in', [1, 2], 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par2.lead_id FROM lead_categories par2 WHERE par2.category_id IN (1, 2))'];
@@ -115,6 +121,8 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
 
     /**
      * @dataProvider dataApplyQueryAdditionalFilters
+     *
+     * @param array<string, mixed> $parameterValue
      */
     public function testApplyQueryAdditionalFilters(string $operator, array $parameterValue, string $expectedQuery): void
     {
@@ -138,6 +146,9 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
         Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function dataApplyQueryWithBatchFilters(): iterable
     {
         yield [['minId' => 1, 'maxId' => 2], 'regexp', '.com$', "SELECT 1 FROM leads l WHERE EXISTS(SELECT NULL FROM page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url REGEXP '.com$'))"];
@@ -183,6 +194,8 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
 
     /**
      * @dataProvider dataApplyQueryWithBatchFilters
+     *
+     *  @param array<string, mixed> $batchLimiters
      */
     public function testApplyQueryWithBatchFilters(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
     {
@@ -208,6 +221,9 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
         Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function dataApplyQueryAdditionalFiltersWithBatchLimiters(): iterable
     {
         yield [['minId' => 1, 'maxId' => 2], 'in', [1, 2], 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par2.lead_id FROM lead_categories par2 WHERE (par2.lead_id BETWEEN 1 and 2) AND (par2.category_id IN (1, 2)))'];
@@ -218,6 +234,9 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
 
     /**
      * @dataProvider dataApplyQueryAdditionalFiltersWithBatchLimiters
+     *
+     * @param array<string, mixed> $batchLimiters
+     * @param array<string, mixed> $parameterValue
      */
     public function testApplyQueryAdditionalFiltersWithBatchLimiters(array $batchLimiters, string $operator, array $parameterValue, string $expectedQuery): void
     {
@@ -241,6 +260,10 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
         Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
+    /**
+     * @param array<string, mixed> $filter
+     * @param array<string, mixed> $batchLimiters
+     */
     private function getContactSegmentFilter(array $filter, array $batchLimiters = []): ContactSegmentFilter
     {
         return new ContactSegmentFilter(

@@ -37,6 +37,8 @@ class ContactSegmentFilterFactory
     }
 
     /**
+     * @param array<string, mixed> $batchLimiters
+     *
      * @throws Exception
      */
     public function getSegmentFilters(LeadList $leadList, array $batchLimiters = []): ContactSegmentFilters
@@ -55,7 +57,7 @@ class ContactSegmentFilterFactory
     }
 
     /**
-     * @param mixed[] $filter
+     * @param array<string, mixed> $batchLimiters
      *
      * @throws Exception
      */

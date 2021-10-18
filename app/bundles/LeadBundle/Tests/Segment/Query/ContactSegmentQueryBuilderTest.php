@@ -33,6 +33,9 @@ class ContactSegmentQueryBuilderTest extends TestCase
         Assert::assertSame('SELECT 1 FROM leads l WHERE (NULL) AND (l.id NOT IN (SELECT par0.lead_id FROM lead_lists_leads par0 WHERE par0.leadlist_id = 8))', $queryBuilder->getDebugOutput());
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function dataAddNewContactsRestrictionsWithBatchLimiters(): iterable
     {
         yield [['minId' => 1,  'maxId' => 2], 'par0.lead_id BETWEEN 1 and 2'];
@@ -43,6 +46,8 @@ class ContactSegmentQueryBuilderTest extends TestCase
 
     /**
      * @dataProvider dataAddNewContactsRestrictionsWithBatchLimiters
+     *
+     * @param array<string, mixed> $batchLimiters
      */
     public function testAddNewContactsRestrictionsWithBatchLimiters(array $batchLimiters, string $expectedWhereClause): void
     {
