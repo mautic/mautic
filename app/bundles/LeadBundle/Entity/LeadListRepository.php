@@ -496,6 +496,8 @@ class LeadListRepository extends CommonRepository
     public static function getRelativeDateTranslationKeys()
     {
         return [
+            'mautic.lead.list.day',
+            'mautic.lead.list.month',
             'mautic.lead.list.month_last',
             'mautic.lead.list.month_next',
             'mautic.lead.list.month_this',

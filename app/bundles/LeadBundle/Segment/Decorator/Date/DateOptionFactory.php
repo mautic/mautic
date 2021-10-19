@@ -12,9 +12,11 @@
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDay;
 use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayToday;
 use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayTomorrow;
 use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday;
+use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonth;
 use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthLast;
 use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthNext;
 use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthThis;
@@ -82,6 +84,10 @@ class DateOptionFactory
                     false !== strpos($timeframe, 'birthday')
                 ):
                 return new DateAnniversary($this->dateDecorator, $dateOptionParameters);
+            case 'day':
+                return new DateDay($this->dateDecorator, $dateOptionParameters);
+            case 'month':
+                return new DateMonth($this->dateDecorator, $dateOptionParameters);
             case 'today':
                 return new DateDayToday($this->dateDecorator, $dateOptionParameters);
             case 'tomorrow':
