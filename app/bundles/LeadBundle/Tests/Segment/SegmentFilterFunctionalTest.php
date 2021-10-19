@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentService;
 class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 {
     /**
-     * @var array
+     * @var Lead[]
      */
     private $leads = [];
 
@@ -28,6 +28,10 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /**
+     * @param mixed[] $contacts
+     * @param mixed[] $segment
+     */
     private function runTestSegments(array $contacts, array $segment): void
     {
         $countInSegment = $this->createLeads($contacts);
@@ -36,6 +40,9 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $this->cleanAfterTest($leadList);
     }
 
+    /**
+     * @param mixed[] $contacts
+     */
     private function createLeads(array $contacts): int
     {
         $countInSegment = 0;
@@ -52,6 +59,9 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         return $countInSegment;
     }
 
+    /**
+     * @param mixed[] $values
+     */
     private function createLead(array $values): Lead
     {
         $lead = new Lead();
@@ -65,6 +75,9 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         return $lead;
     }
 
+    /**
+     * @param mixed[] $segmentFilters
+     */
     private function createSegment(array $segmentFilters): LeadList
     {
         $filters = [];
@@ -120,7 +133,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         );
     }
 
-    private function cleanAfterTest($segment): void
+    private function cleanAfterTest(LeadList $segment): void
     {
         $this->em->remove($segment);
         foreach ($this->leads as $lead) {
@@ -133,6 +146,8 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @see self::testSegments
+     *
+     * @return mixed[]
      */
     private function getSegmentsProvider(): \Generator
     {
