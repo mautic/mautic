@@ -41,6 +41,34 @@ class RelativeDate
     /**
      * @return array
      */
+    public function getDefaultRelativeDateStrings()
+    {
+        $keys = $this->getRelativeDateTranslationKeys();
+
+        $strings = [];
+        foreach ($keys as $key) {
+            $strings[$key] = $this->translator->trans($key, [], null, 'en_US');
+
+        }
+
+        return $strings;
+    }
+
+    public function getParsedTimeFrame(string $filter): string
+    {
+        $key = array_search($filter, $this->getRelativeDateStrings(), true);
+        $key = (false === $key) ? array_search($filter, $this->getDefaultRelativeDateStrings(), true) : $key;
+        if (false === $key) {
+            // Time frame does not match any option from $relativeDateStrings, so return original value
+            return $filter;
+        }
+
+        return str_replace('mautic.lead.list.', '', $key);
+    }
+
+    /**
+     * @return array
+     */
     private function getRelativeDateTranslationKeys()
     {
         return [
