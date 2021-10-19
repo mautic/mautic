@@ -65,8 +65,11 @@ class DateOptionFactory
     {
         $originalValue        = $leadSegmentFilterCrate->getFilter();
         $relativeDateStrings  = $this->relativeDate->getRelativeDateStrings();
+
         $dateOptionParameters = new DateOptionParameters($leadSegmentFilterCrate, $relativeDateStrings, $this->timezoneResolver);
+
         $timeframe            = $this->relativeDate->getParsedTimeFrame($leadSegmentFilterCrate->getFilter());
+
         if (!$timeframe) {
             return new DateDefault($this->dateDecorator, $originalValue);
         }
