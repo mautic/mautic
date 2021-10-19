@@ -40,7 +40,7 @@ class RelativeDate
 
     public function getParsedTimeFrame(string $filter): string
     {
-        $key = array_key($filter, $this->getRelativeDateStrings(), true);
+        $key = array_search($filter, $this->getRelativeDateStrings(), true);
         $key = (false === $key) ? array_search($filter, $this->getRelativeDateStrings('en_US'), true) : $key;
         if (false === $key) {
             // Time frame does not match any option from $relativeDateStrings, so return original value

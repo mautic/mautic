@@ -73,6 +73,7 @@ class DateOptionFactory
         if (!$timeframe) {
             return new DateDefault($this->dateDecorator, $originalValue);
         }
+
         switch ($timeframe) {
             case 'birthday':
             case 'anniversary':
