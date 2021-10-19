@@ -31,13 +31,13 @@ class FieldFilterTransformer implements DataTransformerInterface
     public function __construct($translator, $default = [])
     {
         $this->relativeDateStrings = LeadListRepository::getRelativeDateTranslationKeys();
-        $defaultStrings = [];
+        $defaultStrings            = [];
         foreach ($this->relativeDateStrings as &$string) {
-            $defaultStrings[] = $translator->trans($string, [], null, 'en_US');;
-            $string = $translator->trans($string);
+            $defaultStrings[] = $translator->trans($string, [], null, 'en_US');
+            $string           = $translator->trans($string);
         }
         $this->relativeDateStrings = array_merge($this->relativeDateStrings, $defaultStrings);
-        $this->default = $default;
+        $this->default             = $default;
     }
 
     /**

@@ -48,7 +48,6 @@ class RelativeDate
         $strings = [];
         foreach ($keys as $key) {
             $strings[$key] = $this->translator->trans($key, [], null, 'en_US');
-
         }
 
         return $strings;
