@@ -147,7 +147,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
     /**
      * @see self::testSegments
      *
-     * @return mixed[]
+     * @return Generator<string,mixed>
      */
     private function getSegmentsProvider(): \Generator
     {
