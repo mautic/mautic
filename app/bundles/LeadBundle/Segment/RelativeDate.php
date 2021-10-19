@@ -38,7 +38,7 @@ class RelativeDate
         return $strings;
     }
 
-    public function getParsedTimeFrame(string $filter): string
+    public function getParsedTimeFrame(string $filter = null): ?string
     {
         $key = array_search($filter, $this->getRelativeDateStrings(), true);
         $key = (false === $key) ? array_search($filter, $this->getRelativeDateStrings('en_US'), true) : $key;

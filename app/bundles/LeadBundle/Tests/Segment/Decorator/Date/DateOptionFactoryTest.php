@@ -267,25 +267,36 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
         $relativeDate     = $this->createMock(RelativeDate::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
+        $dates = [
+            'mautic.lead.list.month_last'  => 'last month',
+            'mautic.lead.list.month_next'  => 'next month',
+            'mautic.lead.list.month_this'  => 'this month',
+            'mautic.lead.list.today'       => 'today',
+            'mautic.lead.list.tomorrow'    => 'tomorrow',
+            'mautic.lead.list.yesterday'   => 'yesterday',
+            'mautic.lead.list.week_last'   => 'last week',
+            'mautic.lead.list.week_next'   => 'next week',
+            'mautic.lead.list.week_this'   => 'this week',
+            'mautic.lead.list.year_last'   => 'last year',
+            'mautic.lead.list.year_next'   => 'next year',
+            'mautic.lead.list.year_this'   => 'this year',
+            'mautic.lead.list.birthday'    => 'birthday',
+            'mautic.lead.list.anniversary' => 'anniversary',
+            'mautic.lead.list.day'         => 'day',
+            'mautic.lead.list.month'       => 'month',
+        ];
         $relativeDate->method('getRelativeDateStrings')
             ->willReturn(
-                [
-                    'mautic.lead.list.month_last'  => 'last month',
-                    'mautic.lead.list.month_next'  => 'next month',
-                    'mautic.lead.list.month_this'  => 'this month',
-                    'mautic.lead.list.today'       => 'today',
-                    'mautic.lead.list.tomorrow'    => 'tomorrow',
-                    'mautic.lead.list.yesterday'   => 'yesterday',
-                    'mautic.lead.list.week_last'   => 'last week',
-                    'mautic.lead.list.week_next'   => 'next week',
-                    'mautic.lead.list.week_this'   => 'this week',
-                    'mautic.lead.list.year_last'   => 'last year',
-                    'mautic.lead.list.year_next'   => 'next year',
-                    'mautic.lead.list.year_this'   => 'this year',
-                    'mautic.lead.list.birthday'    => 'birthday',
-                    'mautic.lead.list.anniversary' => 'anniversary',
-                ]
+                $dates
             );
+
+        $relativeDate->method('getParsedTimeFrame')
+            ->with($filterName)
+            ->willReturnCallback(function ($filter) use ($dates) {
+                $key = array_search($filter, $dates, true);
+
+                return false === $key ? $filter : str_replace('mautic.lead.list.', '', $key);
+            });
 
         $dateOptionFactory = new DateOptionFactory($dateDecorator, $relativeDate, $timezoneResolver);
 
