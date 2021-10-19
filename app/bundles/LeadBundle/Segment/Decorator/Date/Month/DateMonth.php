@@ -24,7 +24,6 @@ class DateMonth extends DateMonthAbstract
         $dateTimeHelper->setDateTime('midnight first day of this month', null);
     }
 
-
     /**
      * @return array|bool|float|string|null
      */
