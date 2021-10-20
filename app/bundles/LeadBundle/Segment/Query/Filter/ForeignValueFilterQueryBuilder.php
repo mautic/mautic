@@ -3,10 +3,13 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 {
+    use LeadBatchLimiterTrait;
+
     public static function getServiceId()
     {
         return 'mautic.lead.query.builder.foreign.value';
@@ -51,8 +54,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     ->from($filter->getTable(), $tableAlias)
                     ->andWhere($subQueryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()));
 
-                $this->addMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
-                $this->addLeadLimiter($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
+                $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
 
                 $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
@@ -106,8 +108,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $subQueryBuilder->select('NULL')
                     ->from($filter->getTable(), $tableAlias);
 
-                $this->addMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
-                $this->addLeadLimiter($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
+                $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
 
                 $not            = ('notRegexp' === $filterOperator) ? ' NOT' : '';
                 $expression = $tableAlias.'.'.$filter->getField().$not.' REGEXP '.$filterParametersHolder;
@@ -120,8 +121,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $subQueryBuilder->select($tableAlias.'.lead_id')
                     ->from($filter->getTable(), $tableAlias);
 
-                $this->addMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
-                $this->addLeadLimiter($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
+                $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
 
                 $expression = $subQueryBuilder->expr()->$filterOperator(
                     $tableAlias.'.'.$filter->getField(),

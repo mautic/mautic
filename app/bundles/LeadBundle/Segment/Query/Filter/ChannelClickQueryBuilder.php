@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
 {
+    use LeadBatchLimiterTrait;
+
+    /**
+     * @return string
+     */
     public static function getServiceId()
     {
         return 'mautic.lead.query.builder.channel_click.value';
@@ -50,8 +56,7 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', $tableAlias)
             ->where($expr);
 
-        $this->addMinMaxLimiters($subQb, $batchLimiters, 'page_hits');
-        $this->addLeadLimiter($subQb, $batchLimiters, 'page_hits');
+        $this->addLeadAndMinMaxLimiters($subQb, $batchLimiters, 'page_hits');
 
         if ('empty' === $filterOperator && !$this->isDateBased($filter->getField())) {
             $queryBuilder->addLogic($queryBuilder->expr()->notIn($leadsTableAlias.'.id', $subQb->getSQL()), $filter->getGlue());

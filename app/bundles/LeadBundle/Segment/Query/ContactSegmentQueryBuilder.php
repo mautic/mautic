@@ -159,8 +159,7 @@ class ContactSegmentQueryBuilder
 
         $queryBuilder->setParameter($segmentIdParameter, $segmentId);
 
-        $this->addMinMaxLimiters($segmentQueryBuilder, $batchLimiters, 'lead_lists_leads');
-        $this->addLeadLimiter($segmentQueryBuilder, $batchLimiters, 'lead_lists_leads');
+        $this->addLeadAndMinMaxLimiters($segmentQueryBuilder, $batchLimiters, 'lead_lists_leads');
 
         $queryBuilder->andWhere($expr->notIn($leadsTableAlias.'.id', $segmentQueryBuilder->getSQL()));
 

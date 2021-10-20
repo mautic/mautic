@@ -39,4 +39,13 @@ trait LeadBatchLimiterTrait
 
         $queryBuilder->andWhere($leadsTableAlias.'.'.$columnName.' = '.$batchLimiters['lead_id']);
     }
+
+    /**
+     * @param array<string, mixed> $batchLimiters
+     */
+    private function addLeadAndMinMaxLimiters(QueryBuilder $queryBuilder, array $batchLimiters, string $tableName, string $columnName = 'lead_id'): void
+    {
+        $this->addLeadLimiter($queryBuilder, $batchLimiters, $tableName, $columnName);
+        $this->addMinMaxLimiters($queryBuilder, $batchLimiters, $tableName, $columnName);
+    }
 }
