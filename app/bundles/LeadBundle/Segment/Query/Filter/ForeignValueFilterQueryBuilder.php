@@ -111,7 +111,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
 
                 $not            = ('notRegexp' === $filterOperator) ? ' NOT' : '';
-                $expression = $tableAlias.'.'.$filter->getField().$not.' REGEXP '.$filterParametersHolder;
+                $expression     = $tableAlias.'.'.$filter->getField().$not.' REGEXP '.$filterParametersHolder;
 
                 $subQueryBuilder->andWhere($expression);
 
