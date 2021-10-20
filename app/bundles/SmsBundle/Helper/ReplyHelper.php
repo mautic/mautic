@@ -25,9 +25,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-/**
- * Class ReplyHelper.
- */
 class ReplyHelper
 {
     /**
@@ -45,9 +42,6 @@ class ReplyHelper
      */
     private $contactTracker;
 
-    /**
-     * ReplyHelper constructor.
-     */
     public function __construct(EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, ContactTracker $contactTracker)
     {
         $this->eventDispatcher = $eventDispatcher;
@@ -104,7 +98,7 @@ class ReplyHelper
                     '%s: %s was not found. The message sent was "%s"',
                     $handler->getTransportName(),
                     $exception->getNumber(),
-                    isset($message) ? $message : 'unknown'
+                    !empty($message) ? $message : 'unknown'
                 )
             );
         }

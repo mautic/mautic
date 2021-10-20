@@ -7,5 +7,5 @@
     "email",
     "form"
   ],
-  "builder": "custom"
+  "builder": ["custom"]
 }
