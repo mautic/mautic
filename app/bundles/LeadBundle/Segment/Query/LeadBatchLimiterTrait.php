@@ -29,7 +29,7 @@ trait LeadBatchLimiterTrait
     /**
      * @param array<string, mixed> $batchLimiters
      */
-    public function addLeadLimiter(QueryBuilder $queryBuilder, array $batchLimiters, string $tableName, string $columnName = 'lead_id'): void
+    private function addLeadLimiter(QueryBuilder $queryBuilder, array $batchLimiters, string $tableName, string $columnName = 'lead_id'): void
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.$tableName);
 
