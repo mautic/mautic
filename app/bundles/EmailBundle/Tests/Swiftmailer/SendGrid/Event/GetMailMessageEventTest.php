@@ -95,8 +95,12 @@ class GetMailMessageEventTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('quuz', $categories);
 
         // Test that all custom args were added.
-        $this->assertArraySubset(['baz' => 'qux'], $customArgs);
-        $this->assertArraySubset(['corge' => 'grault', 'garply' => 'thud'], $customArgs);
+        $this->assertArrayHasKey('baz', $customArgs);
+        $this->assertEquals('qux', $customArgs['baz'] ?? null);
+        $this->assertArrayHasKey('corge', $customArgs);
+        $this->assertEquals('grault', $customArgs['corge'] ?? null);
+        $this->assertArrayHasKey('garply', $customArgs);
+        $this->assertEquals('thud', $customArgs['garply'] ?? null);
     }
 
     /**
