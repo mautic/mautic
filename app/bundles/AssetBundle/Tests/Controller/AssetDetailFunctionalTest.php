@@ -8,6 +8,7 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 
 class AssetDetailFunctionalTest extends MauticMysqlTestCase
 {
