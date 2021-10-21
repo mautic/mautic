@@ -11,8 +11,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use \Datetime;
-use \DateTimeZone;
+use Datetime;
+use DateTimeZone;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
