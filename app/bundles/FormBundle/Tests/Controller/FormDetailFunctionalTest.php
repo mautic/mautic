@@ -18,6 +18,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Tests\FormTestAbstract;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
@@ -36,10 +37,12 @@ class FormDetailFunctionalTest extends MauticMysqlTestCase
     /**
      * Test contact list exists for form.
      *
-     * @dataProvider formContactProvider
+     * @dataProvider formLeadCountProvider
      */
-    public function testContactListExists(int $leadCount)
+    public function testContactListExists(int $leadCount): void
     {
+        $this->loadFixtures([LoadLeadData::class]);
+
         $container       = $this->getContainer();
         $formModel       = $container->get('mautic.form.model.form');
         $leadModel       = $container->get('mautic.lead.model.lead');
@@ -72,14 +75,11 @@ class FormDetailFunctionalTest extends MauticMysqlTestCase
         // StatSubscriber gets the request from the stack
         $container->get('request_stack')->push($request);
 
-        for ($i = 0; $i < $leadCount; ++$i) {
-            $lead = (new Lead())
-                ->setFirstname('Test'.$i)
-                ->setLastname('FormTest'.$i)
-                ->setEmail('test'.$i.'@example.com');
+        $leads = $leadCount
+            ? $leadModel->getLeadsByIds(range(1, $leadCount))
+            : [];
 
-            $leadModel->saveEntity($lead);
-
+        foreach ($leads as $lead) {
             $submissionModel->saveSubmission(['email' => $lead->getEmail()], [], $form, $request);
         }
 
@@ -92,11 +92,11 @@ class FormDetailFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * Form contact provider.
+     * Form lead count provider.
      *
      * @return array
      */
-    public function formContactProvider(): iterable
+    public function formLeadCountProvider(): iterable
     {
         yield 'no leads'  => [0];
         yield '5 leads'   => [5];
