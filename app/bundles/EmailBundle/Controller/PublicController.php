@@ -18,6 +18,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
+use Mautic\EmailBundle\Form\Type\ConfigType;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Swiftmailer\Transport\CallbackTransportInterface;
@@ -212,9 +213,19 @@ class PublicController extends CommonFormController
                     );
                 }
 
-                $formView = $form->createView();
-                /** @var Page $prefCenter */
-                if ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())) {
+                $formView                = $form->createView();
+                $isEmailPreferenceCenter = ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter());
+
+                if (false === $isEmailPreferenceCenter) {
+                    /** @var Page $prefCenter */
+                    if ($defaultPreferenceCenterPageId = $this->coreParametersHelper->get(ConfigType::DEFAULT_PREFERENCE_CENTER_PAGE)) {
+                        $pageModel               = $this->getModel('page.page');
+                        $prefCenter              = $pageModel->getEntity($defaultPreferenceCenterPageId);
+                        $isEmailPreferenceCenter =  ($prefCenter instanceof Page && $prefCenter->getIsPreferenceCenter());
+                    }
+                }
+
+                if ($email && $isEmailPreferenceCenter) {
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
                     $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"') ||

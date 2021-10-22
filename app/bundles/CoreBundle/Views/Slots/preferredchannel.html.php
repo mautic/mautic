@@ -10,7 +10,7 @@
  */
 
 ?>
-<?php if (isset($form)) : ?>
+<?php if (isset($form) && isset($form['lead_channels']['preferred_channel'])) : ?>
     <?php if ($showContactPreferredChannels):?>
         <div class="preferred_channel text-left"><?php echo $view['form']->row($form['lead_channels']['preferred_channel']); ?></div>
         <?php

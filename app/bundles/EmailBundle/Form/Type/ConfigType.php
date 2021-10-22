@@ -11,11 +11,13 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\EmailBundle\Model\TransportType;
+use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -29,6 +31,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ConfigType extends AbstractType
 {
+    const DEFAULT_PREFERENCE_CENTER_PAGE = 'default_preference_center_page';
+
+    private EntityManager $entityManager;
+
     /**
      * @var TranslatorInterface
      */
@@ -39,10 +45,11 @@ class ConfigType extends AbstractType
      */
     private $transportType;
 
-    public function __construct(TranslatorInterface $translator, TransportType $transportType)
+    public function __construct(TranslatorInterface $translator, TransportType $transportType, EntityManager $entityManager)
     {
         $this->translator    = $translator;
         $this->transportType = $transportType;
+        $this->entityManager = $entityManager;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -851,6 +858,24 @@ class ConfigType extends AbstractType
                 ],
                 'data'       => empty($options['data']['show_contact_preferred_channels']) ? false : true,
                 'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            self::DEFAULT_PREFERENCE_CENTER_PAGE,
+            PreferenceCenterListType::class,
+            [
+                'label'       => 'mautic.email.form.default_preference_center',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.email.form.unique_preference_center.tooltip',
+                    'data-placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
+                    'data-show-on'     => '{"config_emailconfig_show_contact_preferences_1":"checked"}',
+                ],
+                'required'    => false,
+                'multiple'    => false,
+                'placeholder' => '',
             ]
         );
     }

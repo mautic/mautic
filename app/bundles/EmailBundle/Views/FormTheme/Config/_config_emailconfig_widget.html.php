@@ -182,6 +182,7 @@ $template  = '<div class="col-md-6">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'show_contact_categories', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'show_contact_preferred_channels', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, \Mautic\EmailBundle\Form\Type\ConfigType::DEFAULT_PREFERENCE_CENTER_PAGE, $template); ?>
         </div>
     </div>
 </div>
