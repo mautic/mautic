@@ -51,7 +51,7 @@ class SegmentReportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $fields = $this->fieldsBuilder->getLeadFieldsColumns('l.');
+        $fields  = $this->fieldsBuilder->getLeadFieldsColumns('l.');
         $columns = array_merge($fields, $event->getLeadColumns());
 
         $filters = $this->fieldsBuilder->getLeadFilter('l.', 'lll.');
