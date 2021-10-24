@@ -27,6 +27,6 @@ final class DeviceDetectorFactory implements DeviceDetectorFactoryInterface
      */
     public function create($userAgent)
     {
-        return new DeviceDetector($userAgent);
+        return new DeviceDetector((string) $userAgent);
     }
 }

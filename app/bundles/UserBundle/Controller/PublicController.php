@@ -90,7 +90,7 @@ class PublicController extends FormController
                 } else {
                     if ($this->request->getSession()->has('resetToken')) {
                         $resetToken = $this->request->getSession()->get('resetToken');
-                        $encoder    = $this->get('security.encoder_factory')->getEncoder($user);
+                        $encoder    = $this->get('security.password_encoder');
 
                         if ($model->confirmResetToken($user, $resetToken)) {
                             $encodedPassword = $model->checkNewPassword($user, $encoder, $data['plainPassword']);
