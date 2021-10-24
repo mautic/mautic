@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Tests\Form\Type;
 
-use Mautic\ApiBundle\Entity\oAuth1\Consumer;
+use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\ApiBundle\Form\Type\ClientType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -68,10 +68,7 @@ class ClientTypeTest extends TestCase
      */
     private $request;
 
-    /**
-     * @var Consumer
-     */
-    private $consumer;
+    private Client $client;
 
     protected function setUp(): void
     {
@@ -82,7 +79,7 @@ class ClientTypeTest extends TestCase
         $this->router       = $this->createMock(RouterInterface::class);
         $this->builder      = $this->createMock(FormBuilderInterface::class);
         $this->request      = $this->createMock(Request::class);
-        $this->consumer     = new Consumer();
+        $this->client       = new Client();
 
         $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
@@ -104,7 +101,7 @@ class ClientTypeTest extends TestCase
     public function testThatBuildFormCallsEventSubscribers(): void
     {
         $options = [
-            'data' => $this->consumer,
+            'data' => $this->client,
         ];
 
         $this->builder->expects($this->any())

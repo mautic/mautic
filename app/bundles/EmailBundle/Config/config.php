@@ -9,8 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Mautic\EmailBundle\EventListener\FormSubscriber;
-
 return [
     'routes' => [
         'main' => [
@@ -111,6 +109,12 @@ return [
     ],
     'services' => [
         'events' => [
+            'mautic.email.subscriber.aggregate_stats' => [
+                'class'     => \Mautic\EmailBundle\EventListener\GraphAggregateStatsSubscriber::class,
+                'arguments' => [
+                    'mautic.email.helper.stats_collection',
+                ],
+            ],
             'mautic.email.subscriber' => [
                 'class'     => \Mautic\EmailBundle\EventListener\EmailSubscriber::class,
                 'arguments' => [
@@ -193,7 +197,7 @@ return [
                 ],
             ],
             'mautic.email.formbundle.subscriber' => [
-                'class'     => FormSubscriber::class,
+                'class'     => \Mautic\EmailBundle\EventListener\FormSubscriber::class,
                 'arguments' => [
                     'mautic.email.model.email',
                     'mautic.tracker.contact',
@@ -264,6 +268,12 @@ return [
                 'arguments' => [
                     'mautic.email.model.email',
                     'router',
+                ],
+            ],
+            'mautic.email.dashboard.best.hours.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\DashboardBestHoursSubscriber::class,
+                'arguments' => [
+                    'mautic.email.model.email',
                 ],
             ],
             'mautic.email.broadcast.subscriber' => [
@@ -380,7 +390,7 @@ return [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\Spool\DelegatingSpool::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'swiftmailer.transport.real',
+                    'swiftmailer.mailer.default.transport.real',
                 ],
             ],
 
@@ -580,7 +590,7 @@ return [
                 'arguments' => [
                     'translator',
                     'monolog.logger.mautic',
-                    'mautic.http.connector',
+                    'mautic.http.client',
                     'mautic.email.model.transport_callback',
                 ],
             ],
@@ -664,7 +674,7 @@ return [
             'mautic.message.processor.bounce' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class,
                 'arguments' => [
-                    'swiftmailer.transport.real',
+                    'swiftmailer.mailer.default.transport.real',
                     'mautic.message.search.contact',
                     'mautic.email.repository.stat',
                     'mautic.lead.model.lead',
@@ -676,7 +686,7 @@ return [
             'mautic.message.processor.unsubscribe' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class,
                 'arguments' => [
-                    'swiftmailer.transport.real',
+                    'swiftmailer.mailer.default.transport.real',
                     'mautic.message.search.contact',
                     'translator',
                     'monolog.logger.mautic',
@@ -740,6 +750,75 @@ return [
                     'mautic.helper.cache_storage',
                 ],
             ],
+            'mautic.email.helper.stats_collection' => [
+                'class'     => \Mautic\EmailBundle\Helper\StatsCollectionHelper::class,
+                'arguments' => [
+                    'mautic.email.stats.helper_container',
+                ],
+            ],
+            'mautic.email.stats.helper_container' => [
+                'class' => \Mautic\EmailBundle\Stats\StatHelperContainer::class,
+            ],
+            'mautic.email.stats.helper_bounced' => [
+                'class'     => \Mautic\EmailBundle\Stats\Helper\BouncedHelper::class,
+                'arguments' => [
+                    'mautic.stats.aggregate.collector',
+                    'doctrine.dbal.default_connection',
+                    'mautic.generated.columns.provider',
+                    'mautic.helper.user',
+                ],
+                'tag' => 'mautic.email_stat_helper',
+            ],
+            'mautic.email.stats.helper_clicked' => [
+                'class'     => \Mautic\EmailBundle\Stats\Helper\ClickedHelper::class,
+                'arguments' => [
+                    'mautic.stats.aggregate.collector',
+                    'doctrine.dbal.default_connection',
+                    'mautic.generated.columns.provider',
+                    'mautic.helper.user',
+                ],
+                'tag' => 'mautic.email_stat_helper',
+            ],
+            'mautic.email.stats.helper_failed' => [
+                'class'     => \Mautic\EmailBundle\Stats\Helper\FailedHelper::class,
+                'arguments' => [
+                    'mautic.stats.aggregate.collector',
+                    'doctrine.dbal.default_connection',
+                    'mautic.generated.columns.provider',
+                    'mautic.helper.user',
+                ],
+                'tag' => 'mautic.email_stat_helper',
+            ],
+            'mautic.email.stats.helper_opened' => [
+                'class'     => \Mautic\EmailBundle\Stats\Helper\OpenedHelper::class,
+                'arguments' => [
+                    'mautic.stats.aggregate.collector',
+                    'doctrine.dbal.default_connection',
+                    'mautic.generated.columns.provider',
+                    'mautic.helper.user',
+                ],
+                'tag' => 'mautic.email_stat_helper',
+            ],
+            'mautic.email.stats.helper_sent' => [
+                'class'     => \Mautic\EmailBundle\Stats\Helper\SentHelper::class,
+                'arguments' => [
+                    'mautic.stats.aggregate.collector',
+                    'doctrine.dbal.default_connection',
+                    'mautic.generated.columns.provider',
+                    'mautic.helper.user',
+                ],
+                'tag' => 'mautic.email_stat_helper',
+            ],
+            'mautic.email.stats.helper_unsubscribed' => [
+                'class'     => \Mautic\EmailBundle\Stats\Helper\UnsubscribedHelper::class,
+                'arguments' => [
+                    'mautic.stats.aggregate.collector',
+                    'doctrine.dbal.default_connection',
+                    'mautic.generated.columns.provider',
+                    'mautic.helper.user',
+                ],
+                'tag' => 'mautic.email_stat_helper',
+            ],
         ],
         'models' => [
             'mautic.email.model.email' => [
@@ -760,7 +839,8 @@ return [
                     'mautic.helper.cache_storage',
                     'mautic.tracker.contact',
                     'mautic.lead.model.dnc',
-                    'mautic.generated.columns.provider',
+                    'mautic.email.helper.stats_collection',
+                    'mautic.security',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [
@@ -797,6 +877,15 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.email.fetcher',
+                ],
+                'tag' => 'console.command',
+            ],
+            'mautic.email.command.queue' => [
+                'class'     => \Mautic\EmailBundle\Command\ProcessEmailQueueCommand::class,
+                'arguments' => [
+                    'swiftmailer.mailer.default.transport.real',
+                    'event_dispatcher',
+                    'mautic.helper.core_parameters',
                 ],
                 'tag' => 'console.command',
             ],
@@ -845,6 +934,7 @@ return [
         'mailer_api_key'                 => null, // Api key from mail delivery provider.
         'mailer_from_name'               => 'Mautic',
         'mailer_from_email'              => 'email@yoursite.com',
+        'mailer_reply_to_email'          => null,
         'mailer_return_path'             => null,
         'mailer_transport'               => 'smtp',
         'mailer_append_tracking_pixel'   => true,
@@ -922,5 +1012,6 @@ return [
         'mailer_mailjet_sandbox'              => false,
         'mailer_mailjet_sandbox_default_mail' => null,
         'disable_trackable_urls'              => false,
+        'theme_email_default'                 => 'blank',
     ],
 ];

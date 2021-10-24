@@ -66,12 +66,6 @@ if (!isset($args['repackage'])) {
         exit;
     }
 
-    // Generate the bootstrap.php.cache file
-    system(__DIR__.'/packaging/vendor/sensio/distribution-bundle/Resources/bin/build_bootstrap.php', $result);
-    if (0 !== $result) {
-        exit;
-    }
-
     // Compile prod assets
     system('cd '.__DIR__.'/packaging && php '.__DIR__.'/packaging/bin/console mautic:assets:generate -e prod', $result);
     if (0 !== $result) {
@@ -159,10 +153,10 @@ chdir(__DIR__.'/packaging');
 system("rm -f ../packages/{$appVersion}.zip ../packages/{$appVersion}-update.zip");
 
 echo "Packaging Mautic Full Installation\n";
-system('zip -r ../packages/'.$appVersion.'.zip . -x@../exclude_files.txt -x@../exclude_files_full.txt > /dev/null');
+system('zip -qr ../packages/'.$appVersion.'.zip . -x@../exclude_files.txt -x@../exclude_files_full.txt');
 
 echo "Packaging Mautic Update Package\n";
-system('zip -r ../packages/'.$appVersion.'-update.zip -x@../exclude_files.txt -@ < modified_files.txt > /dev/null');
+system('zip -qr ../packages/'.$appVersion.'-update.zip -x@../exclude_files.txt -@ < modified_files.txt');
 
 // Write output to file (so that the CI pipeline can add it to the release notes), then output to console
 system('cd ../packages && openssl sha1 '.$appVersion.'.zip > build-sha1-all');
