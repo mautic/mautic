@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2017 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -20,6 +22,7 @@ use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use SparkPost\SparkPost;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,17 +30,64 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|TranslatorInterface
+     */
     private $translator;
+
+    /**
+     * @var MockObject|TransportCallback
+     */
     private $transportCallback;
+
+    /**
+     * @var MockObject|Client
+     */
     private $httpClient;
+
+    /**
+     * @var MockObject|Promise
+     */
     private $promise;
+
+    /**
+     * @var MockObject|Response
+     */
     private $response;
+
+    /**
+     * @var MockObject|Stream
+     */
     private $stream;
+
+    /**
+     * @var MockObject|MauticMessage
+     */
     private $message;
+
+    /**
+     * @var MockObject|\Swift_Mime_SimpleHeaderSet
+     */
     private $headers;
+
+    /**
+     * @var MockObject|SparkpostFactoryInterface
+     */
     private $sparkpostFactory;
+
+    /**
+     * @var SparkPost
+     */
     private $sparkpostClient;
+
+    /**
+     * @var SparkpostTransport
+     */
     private $sparkpostTransport;
+
+    /**
+     * @var MockObject|LoggerInterface
+     */
     private $logger;
 
     protected function setUp(): void
@@ -77,7 +127,7 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
         $this->sparkpostFactory->method('create')->willReturn($this->sparkpostClient);
     }
 
-    public function testWebhookPayloadIsProcessed()
+    public function testWebhookPayloadIsProcessed(): void
     {
         $this->transportCallback->expects($this->exactly(6))
             ->method('addFailureByHashId')
@@ -105,7 +155,7 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
     /**
      * @see https://www.sparkpost.com/blog/error-handling-transmissions-api/
      */
-    public function testSendWithOldErrorResponse()
+    public function testSendWithOldErrorResponse(): void
     {
         $templateCheckPayload = '{
             "results": {
@@ -127,13 +177,9 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
         $this->message->method('getTo')->willReturn(['jane@doe.email' => 'Jane']);
         $this->response->method('getStatusCode')->willReturn(200);
 
-        $this->stream->expects($this->at(0))
+        $this->stream->expects($this->exactly(2))
             ->method('__toString')
-            ->willReturn($templateCheckPayload);
-
-        $this->stream->expects($this->at(1))
-            ->method('__toString')
-            ->willReturn($transmissionPayload);
+            ->willReturnOnConsecutiveCalls($templateCheckPayload, $transmissionPayload);
 
         $this->transportCallback
             ->expects($this->once())
@@ -147,7 +193,7 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
     /**
      * @see https://www.sparkpost.com/blog/error-handling-transmissions-api/
      */
-    public function testSendWithNewErrorResponse()
+    public function testSendWithNewErrorResponse(): void
     {
         $templateCheckPayload = '{
             "results": {
@@ -170,13 +216,9 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
         $this->message->method('getTo')->willReturn(['jane@doe.email' => 'Jane']);
         $this->response->method('getStatusCode')->willReturn(200);
 
-        $this->stream->expects($this->at(0))
+        $this->stream->expects($this->exactly(2))
             ->method('__toString')
-            ->willReturn($templateCheckPayload);
-
-        $this->stream->expects($this->at(1))
-            ->method('__toString')
-            ->willReturn($transmissionPayload);
+            ->willReturnOnConsecutiveCalls($templateCheckPayload, $transmissionPayload);
 
         $this->transportCallback
             ->expects($this->once())
@@ -187,7 +229,7 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
         $this->sparkpostTransport->send($this->message);
     }
 
-    public function testCampaignIdFromUtmTagInPayload()
+    public function testCampaignIdFromUtmTagInPayload(): void
     {
         $metadata = [
             'name'        => 'Joe Smith',
@@ -232,7 +274,7 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($message['campaign_id'], 'Campaign Test');
     }
 
-    public function testCampaignIdFromEmailNameInPayload()
+    public function testCampaignIdFromEmailNameInPayload(): void
     {
         $metadata = [
             'name'        => 'Joe Smith',
@@ -277,7 +319,7 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($message['campaign_id'], '20:Campaign Test Email');
     }
 
-    private function getRequestWithPayload()
+    private function getRequestWithPayload(): Request
     {
         $json = <<<JSON
 [

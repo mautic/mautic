@@ -22,7 +22,7 @@ $footerButtonClass = (!isset($footerButtonClass)) ? 'modal-form-buttons' : $foot
 $dismissible       = (!isset($dismissible)) ? true : $dismissible;
 ?>
 
-<div class="modal fade<?php echo $containerClass; ?>" id="<?php echo $id; ?>" tabindex="-1" role="dialog" aria-labelledby="<?php echo $id; ?>-label" aria-hidden="true"<?php echo $containerAttr; ?>>
+<div class="modal fade<?php echo $containerClass; ?>" id="<?php echo $id; ?>" data-backdrop="static" role="dialog" aria-labelledby="<?php echo $id; ?>-label" aria-hidden="true"<?php echo $containerAttr; ?>>
     <div class="modal-dialog<?php echo $size; ?>">
         <div class="modal-content<?php echo $class; ?>">
             <?php if (false !== $header): ?>

@@ -24,7 +24,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
             'properties' => [],
         ],
         'textarea' => [
-            'properties' => [],
+            'properties' => [
+                'allowHtml' => [],
+            ],
         ],
         'multiselect' => [
             'properties' => [
@@ -161,7 +163,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $countryJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/countries.json');
         $countries   = json_decode($countryJson);
 
-        return  array_combine($countries, $countries);
+        return array_combine($countries, $countries);
     }
 
     /**
