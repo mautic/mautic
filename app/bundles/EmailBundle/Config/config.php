@@ -929,6 +929,7 @@ return [
         'mailer_api_key'                 => null, // Api key from mail delivery provider.
         'mailer_from_name'               => 'Mautic',
         'mailer_from_email'              => 'email@yoursite.com',
+        'mailer_reply_to_email'          => null,
         'mailer_return_path'             => null,
         'mailer_transport'               => 'smtp',
         'mailer_append_tracking_pixel'   => true,
