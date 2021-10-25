@@ -1697,13 +1697,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param      $checkEmailsInSF
      * @param      $fieldMapping
      * @param      $mauticLeadFieldString
      * @param      $limit
      * @param      $fromDate
      * @param      $toDate
-     * @param      $totalCount
      * @param null $progress
      *
      * @return array
@@ -1785,7 +1783,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param      $mauticData
      * @param      $objectFields
      * @param      $object
      * @param null $objectId
@@ -2182,11 +2179,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param      $mauticData
-     * @param      $checkEmailsInSF
-     * @param      $processedLeads
-     * @param      $trackedContacts
-     * @param      $leadsToSync
      * @param      $objectFields
      * @param      $mauticLeadFieldString
      * @param      $sfEntityRecords
@@ -2935,7 +2927,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param      $mauticData
      * @param      $objectFields
      * @param      $sfEntityRecords
      * @param null $progress
@@ -3112,12 +3103,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param      $checkIdsInSF
      * @param      $mauticCompanyFieldString
      * @param      $limit
      * @param      $fromDate
      * @param      $toDate
-     * @param      $totalCount
      * @param null $progress
      */
     protected function getMauticEntitesToCreate(

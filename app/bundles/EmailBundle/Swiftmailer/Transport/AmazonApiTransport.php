@@ -67,7 +67,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $concurrency;
 
     /**
-     * @var Aws\CommandInterface | Psr\Http\Message\RequestInterface
+     * @var Aws\CommandInterface|Psr\Http\Message\RequestInterface
      */
     private $handler;
 
