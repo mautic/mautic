@@ -24,6 +24,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class FormDetailFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     protected function setUp(): void
     {
         parent::setUp();
