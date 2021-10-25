@@ -96,6 +96,12 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
                         'type'  => 'bool',
                         'alias' => 'yyy',
                     ],
+                    'l.id' => [
+                        'label' => null,
+                        'type'  => 'int',
+                        'link'  => 'mautic_contact_action',
+                        'alias' => 'contactId',
+                    ],
                     'lll.manually_removed' => [
                         'label' => null,
                         'type'  => 'bool',
