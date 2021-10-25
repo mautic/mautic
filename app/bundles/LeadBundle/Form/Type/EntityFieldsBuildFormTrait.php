@@ -28,6 +28,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -273,6 +274,12 @@ trait EntityFieldsBuildFormTrait
 
                         case MultiselectType::class:
                             $constraints[] = new Length(['max' => 65535]);
+                            break;
+
+                        case TextareaType::class:
+                            if (!empty($properties['allowHtml'])) {
+                                $cleaningRules[$field['alias']] = 'html';
+                            }
                             break;
                     }
 

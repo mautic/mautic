@@ -325,7 +325,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getRepository'])
+            ->onlyMethods(['getRepository'])
             ->getMock();
 
         $mockLeadModel->expects($this->once())
@@ -368,7 +368,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getRepository'])
+            ->onlyMethods(['getRepository'])
             ->getMock();
 
         $mockLeadModel->expects($this->once())
@@ -400,7 +400,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $leadEventLog  = new LeadEventLog();
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['saveEntity', 'checkForDuplicateContact'])
+            ->onlyMethods(['saveEntity', 'checkForDuplicateContact'])
             ->getMock();
 
         $mockUserModel = $this->getMockBuilder(UserHelper::class)
@@ -414,7 +414,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['extractCompanyDataFromImport'])
+            ->onlyMethods(['extractCompanyDataFromImport'])
             ->getMock();
 
         $mockCompanyModel->expects($this->once())->method('extractCompanyDataFromImport')->willReturn([[], []]);
@@ -441,7 +441,49 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $lead          = new Lead();
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['saveEntity', 'checkForDuplicateContact'])
+            ->onlyMethods(['saveEntity', 'checkForDuplicateContact'])
+            ->getMock();
+
+        $mockUserModel = $this->getMockBuilder(UserHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockUserModel->method('getUser')
+            ->willReturn(new User());
+
+        $mockLeadModel->setUserHelper($mockUserModel);
+
+        $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['extractCompanyDataFromImport'])
+            ->getMock();
+
+        $mockCompanyModel->expects($this->once())->method('extractCompanyDataFromImport')->willReturn([[], []]);
+
+        $this->setProperty($mockLeadModel, LeadModel::class, 'companyModel', $mockCompanyModel);
+        $this->setProperty($mockLeadModel, LeadModel::class, 'leadFields', [['alias' => 'email', 'type' => 'email', 'defaultValue' => '']]);
+
+        $mockLeadModel->expects($this->once())->method('checkForDuplicateContact')->willReturn($lead);
+
+        try {
+            $mockLeadModel->import([], [], null, null, null, true, $leadEventLog);
+        } catch (\Exception $e) {
+            $this->assertEquals($lead, $leadEventLog->getLead());
+        }
+    }
+
+    /**
+     * Test lead matching by ID.
+     */
+    public function testImportMatchLeadById(): void
+    {
+        $leadEventLog  = new LeadEventLog();
+        $lead          = new Lead();
+        $lead->setId(21);
+
+        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['saveEntity', 'getEntity'])
             ->getMock();
 
         $mockUserModel = $this->getMockBuilder(UserHelper::class)
@@ -463,13 +505,10 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->setProperty($mockLeadModel, LeadModel::class, 'companyModel', $mockCompanyModel);
         $this->setProperty($mockLeadModel, LeadModel::class, 'leadFields', [['alias' => 'email', 'type' => 'email', 'defaultValue' => '']]);
 
-        $mockLeadModel->expects($this->once())->method('checkForDuplicateContact')->willReturn($lead);
+        $mockLeadModel->expects($this->once())->method('getEntity')->willReturn($lead);
 
-        try {
-            $mockLeadModel->import([], [], null, null, null, true, $leadEventLog);
-        } catch (\Exception $e) {
-            $this->assertEquals($lead, $leadEventLog->getLead());
-        }
+        $merged = $mockLeadModel->import(['identifier' => 'id'], ['identifier' => '21'], null, null, null, true, $leadEventLog);
+        $this->assertTrue($merged);
     }
 
     public function testSetFieldValuesWithStage(): void

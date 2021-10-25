@@ -11,7 +11,6 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
-use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
