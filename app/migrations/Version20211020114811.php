@@ -5,16 +5,11 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
-final class Version20211020114811 extends PreUpAssertionMigration
+final class Version20211020114811 extends AbstractMauticMigration
 {
     private const DATA_TYPES_FOR_CHANGE_CHARSET = ['longtext', 'varchar', 'char', 'tinytext'];
-
-    protected function preUpAssertions(): void
-    {
-        // Please add an assertion for every SQL you define in the `up()` method.
-    }
 
     public function up(Schema $schema): void
     {
