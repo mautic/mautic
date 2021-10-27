@@ -26,6 +26,9 @@ class EmailApiController extends CommonApiController
      */
     protected $model = null;
 
+    /**
+     * @var array<string, mixed>
+     */
     protected $extraGetEntitiesArguments = ['ignoreListJoin' => true];
 
     public function initialize(ControllerEvent $event)

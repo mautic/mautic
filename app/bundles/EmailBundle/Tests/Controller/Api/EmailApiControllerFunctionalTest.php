@@ -426,6 +426,11 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         return $segment;
     }
 
+    /**
+     * @param array<integer, mixed> $segments
+     *
+     * @throws \Doctrine\ORM\ORMException
+     */
     private function createEmail(string $name, string $subject, string $emailType, string $template, string $customHtml, array $segments = []): Email
     {
         $email = new Email();
