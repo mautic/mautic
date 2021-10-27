@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -43,6 +45,7 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->filesystemMock   = $this->createMock(Filesystem::class);
         $this->fileMock         = $this->createMock(UploadedFile::class);
         $this->inputHelper      = new InputHelper();
@@ -51,29 +54,21 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Get correct name if few previous names are taken
-     *
-     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::getUniqueFileName
      */
-    public function testGetUniqueName()
+    public function testGetUniqueName(): void
     {
         $uploadDir     = 'my/upload/dir';
         $extension     = 'jpg';
         $dirtyFileName = 'fileName_x./-u'.$extension;
 
-        $this->filesystemMock->expects($this->at(0))
+        $this->filesystemMock->expects($this->exactly(3))
             ->method('exists')
-            ->with('my/upload/dir/filename_x.jpg')
-            ->willReturn(true);
-
-        $this->filesystemMock->expects($this->at(1))
-            ->method('exists')
-            ->with('my/upload/dir/filename_x-1.jpg')
-            ->willReturn(true);
-
-        $this->filesystemMock->expects($this->at(2))
-            ->method('exists')
-            ->with('my/upload/dir/filename_x-2.jpg')
-            ->willReturn(false);
+            ->withConsecutive(
+                ['my/upload/dir/filename_x.jpg'],
+                ['my/upload/dir/filename_x-1.jpg'],
+                ['my/upload/dir/filename_x-2.jpg']
+            )
+            ->willReturnOnConsecutiveCalls(true, true, false);
 
         $this->fileMock->expects($this->once())
             ->method('getClientOriginalName')
@@ -92,10 +87,8 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Throws an Exception if name cannot be generated
-     *
-     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::getUniqueFileName
      */
-    public function testCouldNotGetUniqueName()
+    public function testCouldNotGetUniqueName(): void
     {
         $uploadDir     = 'my/upload/dir';
         $extension     = 'jpg';
@@ -123,10 +116,8 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox No action is taken when directory already exists
-     *
-     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::createDirectory
      */
-    public function testNoActionIfDirectoryExists()
+    public function testNoActionIfDirectoryExists(): void
     {
         $directory = 'my/directory';
 
@@ -140,10 +131,8 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Create new directory
-     *
-     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::createDirectory
      */
-    public function testCreateNewDirectory()
+    public function testCreateNewDirectory(): void
     {
         $directory = 'my/directory';
 
@@ -161,10 +150,8 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Directory could not be created
-     *
-     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::createDirectory
      */
-    public function testDirectoryCouldNotBeCreated()
+    public function testDirectoryCouldNotBeCreated(): void
     {
         $directory = 'my/directory';
 
@@ -186,10 +173,8 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Successfuly detete file
-     *
-     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::delete
      */
-    public function testDeleteFile()
+    public function testDeleteFile(): void
     {
         $file = 'my/file';
 
@@ -207,10 +192,8 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox File could not be deleted
-     *
-     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::delete
      */
-    public function testCouldNotDeleteFile()
+    public function testCouldNotDeleteFile(): void
     {
         $file = 'my/file';
 
@@ -229,10 +212,8 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox File could not be deleted
-     *
-     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::delete
      */
-    public function testDeleteFileWhichNotExists()
+    public function testDeleteFileWhichNotExists(): void
     {
         $file = 'my/file';
 
@@ -247,7 +228,7 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $this->filePathResolver->delete($file);
     }
 
-    public function testMove()
+    public function testMove(): void
     {
         $originalPath = 'my/file';
         $targetPath   = 'my/new/file';

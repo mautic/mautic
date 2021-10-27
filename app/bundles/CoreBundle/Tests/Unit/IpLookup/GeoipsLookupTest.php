@@ -11,6 +11,8 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\IpLookup\GeoipsLookup;
 
 class GeoipsLookupTest extends \PHPUnit\Framework\TestCase
@@ -20,15 +22,10 @@ class GeoipsLookupTest extends \PHPUnit\Framework\TestCase
     public function testIpLookupSuccessful()
     {
         // Mock http connector
-        $mockHttp = $this->getMockBuilder('Joomla\Http\Http')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockHttp = $this->createMock(Client::class);
 
         // Mock a successful response
-        $mockResponse = $this->getMockBuilder('Joomla\Http\Response')
-            ->getMock();
-        $mockResponse->code = 200;
-        $mockResponse->body = '{"response": {"status": "Propper Request","message": "Success","notes": "The following results has been returned","code": "200_1","location": {"ip": "8.8.8.8","owner": "LEVEL 3 COMMUNICATIONS INC","continent_name": "NORTH AMERICA","continent_code": "NA","country_name": "UNITED STATES","country_code": "US","region_name": "CALIFORNIA","region_code": "CA","county_name": "SANTA CLARA","city_name": "MOUNTAIN VIEW","latitude": "37.3801","longitude": "-122.0865","timezone": "PST"},"languages": {"language": [{"alpha2_code": "EN","alpha3_code": "ENG","language_name": "ENGLISH","native_name": "ENGLISH"}]},"currencies": {"currency": [{"alpha_code": "USD","numeric_code": "840","currency_name": "US DOLLAR","currency_symbol": "$","fractional_unit": "CENT"}]},"unit_test": {"elapsed_time": "0.0609","memory_usage": "0.76MB"}}}';
+        $mockResponse = new Response(200, [], '{"response": {"status": "Propper Request","message": "Success","notes": "The following results has been returned","code": "200_1","location": {"ip": "8.8.8.8","owner": "LEVEL 3 COMMUNICATIONS INC","continent_name": "NORTH AMERICA","continent_code": "NA","country_name": "UNITED STATES","country_code": "US","region_name": "CALIFORNIA","region_code": "CA","county_name": "SANTA CLARA","city_name": "MOUNTAIN VIEW","latitude": "37.3801","longitude": "-122.0865","timezone": "PST"},"languages": {"language": [{"alpha2_code": "EN","alpha3_code": "ENG","language_name": "ENGLISH","native_name": "ENGLISH"}]},"currencies": {"currency": [{"alpha_code": "USD","numeric_code": "840","currency_name": "US DOLLAR","currency_symbol": "$","fractional_unit": "CENT"}]},"unit_test": {"elapsed_time": "0.0609","memory_usage": "0.76MB"}}}');
 
         $mockHttp->expects($this->once())
             ->method('get')
