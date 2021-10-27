@@ -39,18 +39,25 @@ if (isset($latestVersion)) {
         ],
         'btnText'   => $view['translator']->trans('marketplace.package.issue.tracker'),
         'iconClass' => 'fa fa-question',
+        'primary'   => true,
     ];
 }
 
 if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) {
+    $installRoute = $view['router']->path(
+        RouteProvider::ROUTE_INSTALL,
+        ['vendor' => $packageDetail->packageBase->getVendorName(), 'package' => $packageDetail->packageBase->getPackageName()]
+    );
+
     $buttons[] = [
         'attr' => [
-            'data-toggle'      => 'confirmation',
-            'data-message'     => $view['translator']->trans('marketplace.install.coming.soon'),
-            'data-cancel-text' => $view['translator']->trans('mautic.core.close'),
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#InstallationInProgressModal',
+            'href'        => $installRoute,
         ],
         'btnText'   => $view['translator']->trans('mautic.core.theme.install'),
         'iconClass' => 'fa fa-download',
+        'primary'   => true,
     ];
 }
 
@@ -231,4 +238,9 @@ $view['slots']->set(
     </table>
 </div>
 
-
+<?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', [
+    'id'            => 'InstallationInProgressModal',
+    'header'        => 'Installing '.$packageDetail->packageBase->getHumanPackageName(),
+    'size'          => 'md',
+    'footerButtons' => false,
+]); ?>

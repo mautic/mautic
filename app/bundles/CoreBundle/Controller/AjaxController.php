@@ -98,12 +98,14 @@ class AjaxController extends CommonController
                     $bundleName = $parts[0];
                     $bundle     = ucfirst($bundleName);
                     $action     = $parts[1];
+
                     if (!$classExists = class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController')) {
                         // Check if a plugin is prefixed with Mautic
                         $bundle      = 'Mautic'.$bundle;
                         $classExists = class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController');
                     } elseif (!$isPlugin) {
-                        $bundle = 'Mautic'.$bundle;
+                        // TODO improve logic for case where bundle isn't prefixed with Mautic
+                        //$bundle = 'Mautic'.$bundle;
                     }
 
                     if ($classExists) {

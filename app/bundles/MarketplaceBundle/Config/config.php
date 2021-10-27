@@ -19,6 +19,11 @@ return [
                 'controller' => 'MarketplaceBundle:Package\Detail:view',
                 'method'     => 'GET',
             ],
+            RouteProvider::ROUTE_INSTALL => [
+                'path'       => '/marketplace/install/{vendor}/{package}',
+                'controller' => 'MarketplaceBundle:Package\Install:view',
+                'method'     => 'GET|POST',
+            ],
         ],
     ],
     'services' => [
@@ -40,6 +45,20 @@ return [
             ],
             'marketplace.controller.package.detail' => [
                 'class'     => \Mautic\MarketplaceBundle\Controller\Package\DetailController::class,
+                'arguments' => [
+                    'marketplace.model.package',
+                    'marketplace.service.route_provider',
+                    'mautic.security',
+                    'marketplace.service.config',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container',
+                    ],
+                ],
+            ],
+            'marketplace.controller.package.install' => [
+                'class'     => \Mautic\MarketplaceBundle\Controller\Package\InstallController::class,
                 'arguments' => [
                     'marketplace.model.package',
                     'marketplace.service.route_provider',

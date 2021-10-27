@@ -269,6 +269,18 @@ Mautic.showConfirmation = function (el) {
     var confirmText = mQuery(el).data('confirm-text');
     var confirmAction = mQuery(el).attr('href');
     var confirmCallback = mQuery(el).data('confirm-callback');
+    // Some packages have more advanced JS needs. Make sure to provide all t
+    /**
+     * Some packages have more advanced JS needs. Make sure to provide all three
+     * elements: the package, the action and the args. Example:
+     * - data-confirm-callback-package = 'Marketplace'
+     * - data-confirm-callback-action = 'installPackage'
+     * - data-confirm-callback-args = '{"package" => "demo"}'
+     */
+    var confirmCallbackPackage = mQuery(el).data('confirm-callback-package');
+    var confirmCallbackAction = mQuery(el).data('confirm-callback-action');
+    var confirmCallbackArgs = mQuery(el).data('confirm-callback-args');
+    var confirmCallbackExtended = mQuery(el).data('confirm-callback-args');
     var cancelText = mQuery(el).data('cancel-text');
     var cancelCallback = mQuery(el).data('cancel-callback');
 
@@ -286,6 +298,8 @@ Mautic.showConfirmation = function (el) {
             if (typeof Mautic[confirmCallback] === "function") {
                 window["Mautic"][confirmCallback].apply('window', [confirmAction, el]);
             }
+
+            console.log(typeof confirmCallbackExtended);
         })
         .html(confirmText);
     if (cancelText) {
