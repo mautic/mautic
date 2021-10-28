@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
@@ -33,8 +32,6 @@ class ConfigType extends AbstractType
 {
     const DEFAULT_PREFERENCE_CENTER_PAGE = 'default_preference_center_page';
 
-    private EntityManager $entityManager;
-
     /**
      * @var TranslatorInterface
      */
@@ -45,11 +42,10 @@ class ConfigType extends AbstractType
      */
     private $transportType;
 
-    public function __construct(TranslatorInterface $translator, TransportType $transportType, EntityManager $entityManager)
+    public function __construct(TranslatorInterface $translator, TransportType $transportType)
     {
         $this->translator    = $translator;
         $this->transportType = $transportType;
-        $this->entityManager = $entityManager;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
