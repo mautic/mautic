@@ -1000,6 +1000,7 @@ return [
         'email_frequency_number'                                                      => 0,
         'email_frequency_time'                                                        => 'DAY',
         'show_contact_preferences'                                                    => false,
+        'show_contact_channels'                                                       => false,
         'show_contact_frequency'                                                      => false,
         'show_contact_pause_dates'                                                    => false,
         'show_contact_preferred_channels'                                             => false,

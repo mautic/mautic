@@ -77,8 +77,9 @@ class ConfigType extends AbstractType
                 'label'      => 'mautic.email.config.unsubscribe_text',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.unsubscribe_text.tooltip',
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.email.config.unsubscribe_text.tooltip',
+                    'data-show-on'     => '{"config_emailconfig_show_contact_preferences_0":"checked"}',
                 ],
                 'required'   => false,
                 'data'       => (array_key_exists('unsubscribe_text', $options['data']) && !empty($options['data']['unsubscribe_text']))
@@ -97,8 +98,9 @@ class ConfigType extends AbstractType
                 'label'      => 'mautic.email.config.webview_text',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.webview_text.tooltip',
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.email.config.webview_text.tooltip',
+                    'data-show-on'     => '{"config_emailconfig_show_contact_preferences_0":"checked"}',
                 ],
                 'required'   => false,
                 'data'       => (array_key_exists('webview_text', $options['data']) && !empty($options['data']['webview_text']))
@@ -117,8 +119,9 @@ class ConfigType extends AbstractType
                 'label'      => 'mautic.email.config.unsubscribe_message',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.unsubscribe_message.tooltip',
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.email.config.unsubscribe_message.tooltip',
+                    'data-show-on'     => '{"config_emailconfig_show_contact_preferences_0":"checked"}',
                 ],
                 'required'   => false,
                 'data'       => (array_key_exists('unsubscribe_message', $options['data']) && !empty($options['data']['unsubscribe_message']))
@@ -140,8 +143,9 @@ class ConfigType extends AbstractType
                 'label'      => 'mautic.email.config.resubscribe_message',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.resubscribe_message.tooltip',
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.email.config.resubscribe_message.tooltip',
+                    'data-show-on'     => '{"config_emailconfig_show_contact_preferences_0":"checked"}',
                 ],
                 'required'   => false,
                 'data'       => (array_key_exists('resubscribe_message', $options['data']) && !empty($options['data']['resubscribe_message']))
@@ -783,8 +787,9 @@ class ConfigType extends AbstractType
                 'label'      => 'mautic.email.config.show.contact.segments',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.show.contact.segments.tooltip',
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.email.config.show.contact.segments.tooltip',
+                    'data-show-on'     => '{"config_emailconfig_show_contact_preferences_1":"checked"}',
                 ],
                 'data'       => empty($options['data']['show_contact_segments']) ? false : true,
                 'required'   => false,
@@ -794,16 +799,35 @@ class ConfigType extends AbstractType
             'show_contact_preferences',
             YesNoButtonGroupType::class,
             [
-                'label'      => 'mautic.email.config.show.preference.options',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
+                'label'             => 'mautic.email.config.unsubscribe.mode',
+                'label_attr'        => ['class' => 'control-label'],
+                'no_label'          => 'mautic.email.config.unsubscribe.message',
+                'yes_label'         => 'mautic.email.config.preference.center',
+                'attr'              => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.show.preference.options.tooltip',
+                    'tooltip' => 'mautic.email.config.unsubscribe.mode.tooltip',
                 ],
                 'data'       => empty($options['data']['show_contact_preferences']) ? false : true,
                 'required'   => false,
             ]
         );
+
+        $builder->add(
+            'show_contact_channels',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.config.show.contact.channels',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.email.config.show.contact.channels.tooltip',
+                    'data-show-on'     => '{"config_emailconfig_show_contact_preferences_1":"checked"}',
+                ],
+                'data'       => empty($options['data']['show_contact_channels']) ? false : true,
+                'required'   => false,
+            ]
+        );
+
         $builder->add(
             'show_contact_frequency',
             YesNoButtonGroupType::class,
@@ -811,8 +835,10 @@ class ConfigType extends AbstractType
                 'label'      => 'mautic.email.config.show.contact.frequency',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.show.contact.frequency.tooltip',
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.email.config.show.contact.frequency.tooltip',
+                    'data-show-on'     => '{"config_emailconfig_show_contact_preferences_1":"checked"}',
+                    'data-hide-on'     => '{"config_emailconfig_show_contact_channels_0":"checked"}',
                 ],
                 'data'       => empty($options['data']['show_contact_frequency']) ? false : true,
                 'required'   => false,
@@ -825,8 +851,10 @@ class ConfigType extends AbstractType
                 'label'      => 'mautic.email.config.show.contact.pause.dates',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.show.contact.pause.dates.tooltip',
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.email.config.show.contact.pause.dates.tooltip',
+                    'data-show-on'     => '{"config_emailconfig_show_contact_preferences_1":"checked"}',
+                    'data-hide-on'     => '{"config_emailconfig_show_contact_channels_0":"checked"}',
                 ],
                 'data'       => empty($options['data']['show_contact_pause_dates']) ? false : true,
                 'required'   => false,
@@ -839,8 +867,9 @@ class ConfigType extends AbstractType
                 'label'      => 'mautic.email.config.show.contact.categories',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.show.contact.categories.tooltip',
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.email.config.show.contact.categories.tooltip',
+                    'data-show-on'     => '{"config_emailconfig_show_contact_preferences_1":"checked"}',
                 ],
                 'data'       => empty($options['data']['show_contact_categories']) ? false : true,
                 'required'   => false,
@@ -853,8 +882,9 @@ class ConfigType extends AbstractType
                 'label'      => 'mautic.email.config.show.contact.preferred.channels',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.config.show.contact.preferred.channels',
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.email.config.show.contact.preferred.channels',
+                    'data-show-on'     => '{"config_emailconfig_show_contact_preferences_1":"checked"}',
                 ],
                 'data'       => empty($options['data']['show_contact_preferred_channels']) ? false : true,
                 'required'   => false,
@@ -865,11 +895,11 @@ class ConfigType extends AbstractType
             self::DEFAULT_PREFERENCE_CENTER_PAGE,
             PreferenceCenterListType::class,
             [
-                'label'       => 'mautic.email.form.default_preference_center',
+                'label'       => 'mautic.email.form.default_preference_landing_center',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
                     'class'            => 'form-control',
-                    'tooltip'          => 'mautic.email.form.unique_preference_center.tooltip',
+                    'tooltip'          => 'mautic.email.form.default_preference_landing_center.tooltip',
                     'data-placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
                     'data-show-on'     => '{"config_emailconfig_show_contact_preferences_1":"checked"}',
                 ],

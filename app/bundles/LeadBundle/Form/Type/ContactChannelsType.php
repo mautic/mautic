@@ -30,24 +30,10 @@ class ContactChannelsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $showContactChannels          = $this->coreParametersHelper->get('show_contact_channels');
         $showContactFrequency         = $this->coreParametersHelper->get('show_contact_frequency');
         $showContactPauseDates        = $this->coreParametersHelper->get('show_contact_pause_dates');
         $showContactPreferredChannels = $this->coreParametersHelper->get('show_contact_preferred_channels');
-
-        $builder->add(
-            'subscribed_channels',
-            ChoiceType::class,
-            [
-                'choices'           => $options['channels'],
-                'expanded'          => true,
-                'label_attr'        => ['class' => 'control-label'],
-                'attr'              => ['onClick' => 'Mautic.togglePreferredChannel(this.value);'],
-                'multiple'          => true,
-                'label'             => false,
-                'required'          => false,
-            ]
-        );
-
         if (!$options['public_view'] || $showContactPreferredChannels) {
             $builder->add(
                 'preferred_channel',
@@ -64,6 +50,21 @@ class ContactChannelsType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.lead.list.frequency.preferred.channel',
                     ],
+                ]
+            );
+        }
+        if (!$options['public_view'] || $showContactChannels) {
+            $builder->add(
+                'subscribed_channels',
+                ChoiceType::class,
+                [
+                    'choices'    => $options['channels'],
+                    'expanded'   => true,
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => ['onClick' => 'Mautic.togglePreferredChannel(this.value);'],
+                    'multiple'   => true,
+                    'label'      => false,
+                    'required'   => false,
                 ]
             );
         }

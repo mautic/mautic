@@ -190,9 +190,21 @@ class PublicController extends CommonFormController
             } elseif ($lead) {
                 $action = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
 
+                $isLandingPagePreferenceCenter = ($email && $prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter());
+
+                if (false === $isLandingPagePreferenceCenter) {
+                    /** @var Page $prefCenter */
+                    if ($defaultPreferenceCenterPageId = $this->coreParametersHelper->get(ConfigType::DEFAULT_PREFERENCE_CENTER_PAGE)) {
+                        $pageModel                     = $this->getModel('page.page');
+                        $prefCenter                    = $pageModel->getEntity($defaultPreferenceCenterPageId);
+                        $isLandingPagePreferenceCenter =  ($prefCenter instanceof Page && $prefCenter->getIsPreferenceCenter());
+                    }
+                }
+
                 $viewParameters = [
                     'lead'                         => $lead,
                     'idHash'                       => $idHash,
+                    'showContactChannels'          => $this->get('mautic.helper.core_parameters')->get('show_contact_channels'),
                     'showContactFrequency'         => $this->get('mautic.helper.core_parameters')->get('show_contact_frequency'),
                     'showContactPauseDates'        => $this->get('mautic.helper.core_parameters')->get('show_contact_pause_dates'),
                     'showContactPreferredChannels' => $this->get('mautic.helper.core_parameters')->get('show_contact_preferred_channels'),
@@ -214,18 +226,8 @@ class PublicController extends CommonFormController
                 }
 
                 $formView                = $form->createView();
-                $isEmailPreferenceCenter = ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter());
 
-                if (false === $isEmailPreferenceCenter) {
-                    /** @var Page $prefCenter */
-                    if ($defaultPreferenceCenterPageId = $this->coreParametersHelper->get(ConfigType::DEFAULT_PREFERENCE_CENTER_PAGE)) {
-                        $pageModel               = $this->getModel('page.page');
-                        $prefCenter              = $pageModel->getEntity($defaultPreferenceCenterPageId);
-                        $isEmailPreferenceCenter =  ($prefCenter instanceof Page && $prefCenter->getIsPreferenceCenter());
-                    }
-                }
-
-                if ($email && $isEmailPreferenceCenter) {
+                if ($email && $isLandingPagePreferenceCenter) {
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
                     $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"') ||
@@ -241,6 +243,7 @@ class PublicController extends CommonFormController
                                 'form'                         => $formView,
                                 'startform'                    => $formHelper->start($formView),
                                 'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
+                                'showContactChannels'          => false !== strpos($html, 'data-slot="channelfrequency"') || false !== strpos($html, BuilderSubscriber::channels),
                                 'showContactFrequency'         => false !== strpos($html, 'data-slot="channelfrequency"') || false !== strpos($html, BuilderSubscriber::channelfrequency),
                                 'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
                                 'showContactCategories'        => false !== strpos($html, 'data-slot="categorylist"') || false !== strpos($html, BuilderSubscriber::categoryListRegex),
@@ -278,7 +281,6 @@ class PublicController extends CommonFormController
                         unset($html);
                     }
                 }
-
                 if (empty($html)) {
                     $html = $this->get('mautic.helper.templating')->getTemplating()->render(
                         'MauticEmailBundle:Lead:preference_options.html.php',

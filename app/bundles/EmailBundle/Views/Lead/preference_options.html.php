@@ -14,17 +14,17 @@ $channelNumber = 0;
 $js            = <<<'JS'
 function togglePreferredChannel(channel){
        var status = document.getElementById(channel).checked;
-       if(status)
+     if(status)
            {
-                document.getElementById('lead_contact_frequency_rules_frequency_number_' + channel).disabled = false;
-                document.getElementById('lead_contact_frequency_rules_frequency_time_' + channel).disabled = false;
-                document.getElementById('lead_contact_frequency_rules_contact_pause_start_date_' + channel).disabled = false;
-                document.getElementById('lead_contact_frequency_rules_contact_pause_end_date_' + channel).disabled = false;
+                document.getElementById('lead_contact_frequency_rules_lead_channels_frequency_number_' + channel).disabled = false;
+                document.getElementById('lead_contact_frequency_rules_lead_channels_frequency_time_' + channel).disabled = false;
+                document.getElementById('lead_contact_frequency_rules_lead_channels_contact_pause_start_date_' + channel).disabled = false;
+                document.getElementById('lead_contact_frequency_rules_lead_channels_contact_pause_end_date_' + channel).disabled = false;
             } else {
-                document.getElementById('lead_contact_frequency_rules_frequency_number_' + channel).disabled = true;
-                document.getElementById('lead_contact_frequency_rules_frequency_time_' + channel).disabled = true;
-                document.getElementById('lead_contact_frequency_rules_contact_pause_start_date_' + channel).disabled = true;
-                document.getElementById('lead_contact_frequency_rules_contact_pause_end_date_' + channel).disabled = true;
+                document.getElementById('lead_contact_frequency_rules_lead_channels_frequency_number_' + channel).disabled = true;
+                document.getElementById('lead_contact_frequency_rules_lead_channels_frequency_time_' + channel).disabled = true;
+                document.getElementById('lead_contact_frequency_rules_lead_channels_contact_pause_start_date_' + channel).disabled = true;
+                document.getElementById('lead_contact_frequency_rules_lead_channels_contact_pause_end_date_' + channel).disabled = true;
             }
         }
 JS;
@@ -45,7 +45,7 @@ JS;
                         echo $view['translator']->trans('mautic.lead.message.preferences.descr'); ?></small>
                 </div>
                 <table class="table table-striped">
-                    <?php if ($showContactFrequency):?>
+                    <?php if ($showContactChannels):?>
                     <?php foreach ($form['lead_channels']['subscribed_channels']->vars['choices'] as $key => $channel):
                         $contactMe   = isset($leadChannels[$channel->value]);
                         $checked     = $contactMe ? 'checked' : '';
@@ -54,7 +54,7 @@ JS;
                     <tr>
                         <td>
                             <div class="text-left">
-                                <input type="hidden" id="<?php echo $channel->value; ?>"
+                                <input type="hidden" id="<?php echo $channel->value; ?>_h"
                                        name="lead_contact_frequency_rules[lead_channels][subscribed_channels][<?php echo $key; ?>]"
                                        value="">
                                 <input type="checkbox" id="<?php echo $channel->value; ?>"

@@ -8,14 +8,15 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 ?>
-<?php if (isset($form) && isset($form['lead_channels']['preferred_channel'])) : ?>
-    <?php if ($showContactPreferredChannels):?>
-        <div class="preferred_channel text-left"><?php echo $view['form']->row($form['lead_channels']['preferred_channel']); ?></div>
-        <?php
-    else:
-        unset($form['lead_channels']['preferred_channel']);
+<?php if (isset($form)) : ?>
+    <?php if (isset($form['lead_channels']['preferred_channel'])):?>
+        <?php if ($showContactPreferredChannels):?>
+            <div class="preferred_channel text-left"><?php echo $view['form']->row($form['lead_channels']['preferred_channel']); ?></div>
+            <?php
+        else:
+            unset($form['lead_channels']['preferred_channel']);
+        endif;
     endif;
 else :
 ?>

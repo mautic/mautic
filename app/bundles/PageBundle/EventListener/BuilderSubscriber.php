@@ -95,6 +95,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
     const segmentListRegex  = '{segmentlist}';
     const categoryListRegex = '{categorylist}';
+    const channels          = '{channels}';
     const channelfrequency  = '{channelfrequency}';
     const preferredchannel  = '{preferredchannel}';
     const saveprefsRegex    = '{saveprefsbutton}';
