@@ -355,7 +355,6 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.email.transport_type',
-                    'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.form.type.coreconfig_monitored_mailboxes' => [
