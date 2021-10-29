@@ -11,20 +11,12 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Day;
 
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
 class DateDay extends DateDayAbstract
 {
     /**
-     * {@inheritdoc}
-     */
-    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
-    {
-    }
-
-    /**
-     * @return array|bool|float|string|null
+     * @return string
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

@@ -25,7 +25,7 @@ class DateMonth extends DateMonthAbstract
     }
 
     /**
-     * @return array|bool|float|string|null
+     * @return string
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
