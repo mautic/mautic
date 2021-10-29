@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Model;
 
-define('SORTARRIVAL', 1);
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
