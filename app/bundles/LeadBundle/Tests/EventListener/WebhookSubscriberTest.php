@@ -14,10 +14,12 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\EventListener\WebhookSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\WebhookBundle\Model\WebhookModel;
@@ -193,5 +195,29 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new CompanyEvent($company);
         $dispatcher->dispatch(LeadEvents::COMPANY_POST_SAVE, $event);
         $dispatcher->dispatch(LeadEvents::COMPANY_POST_DELETE, $event);
+    }
+
+    public function testOnSegmentChange()
+    {
+        $mockModel  = $this->createMock(WebhookModel::class);
+
+        $mockModel->expects($this->once())
+            ->method('queueWebhooksByType')
+            ->with(
+                $this->callback(
+                    function ($type) {
+                        return LeadEvents::LEAD_LIST_CHANGE === $type;
+                    }
+                )
+            );
+
+        $webhookSubscriber = new WebhookSubscriber($mockModel);
+
+        $this->dispatcher->addSubscriber($webhookSubscriber);
+
+        $lead    = new Lead();
+        $segment = new LeadList();
+        $event   = new ListChangeEvent($lead, $segment, true);
+        $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
     }
 }
