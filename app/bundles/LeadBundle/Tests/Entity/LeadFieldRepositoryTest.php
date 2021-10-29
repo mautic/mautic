@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Portability\Statement;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
@@ -245,5 +246,120 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['id' => 456]);
 
         $this->assertTrue($this->repository->compareDateValue($contactId, $fieldAlias, $value));
+    }
+
+    /**
+     * @param mixed               $value
+     * @param array<mixed, mixed> $returnValue
+     *
+     * @dataProvider dataCompareValueForInNotInOperatorExpression
+     */
+    public function testCompareValueForInNotInOperator($value, string $operatorExpr, array $returnValue, bool $expected): void
+    {
+        $leadId         = 12;
+        $fieldAlias     = 'random-field';
+
+        $builderFieldAlias      = $this->createMock(QueryBuilder::class);
+        $builderCompare         = $this->createMock(QueryBuilder::class);
+        $statementAlias         = $this->createMock(Statement::class);
+        $statementCompare       = $this->createMock(Statement::class);
+        $exprCompare            = $this->createMock(ExpressionBuilder::class);
+        $compositeMock          = $this->createMock(CompositeExpression::class);
+
+        $exprCompare->expects($this->once())
+            ->method('andX')
+            ->willReturn($compositeMock);
+
+        $exprCompare->expects($this->once())
+            ->method('eq')
+            ->with('l.id', ':lead');
+
+        $exprCompare->expects($this->any())
+            ->method('orX')
+            ->willReturn($compositeMock);
+
+        $this->entityManager->method('getConnection')->willReturn($this->connection);
+        $builderFieldAlias->method('expr')->willReturn(new ExpressionBuilder($this->connection));
+        $builderCompare->method('expr')->willReturn($exprCompare);
+
+        $this->connection->expects($this->exactly(2))
+            ->method('createQueryBuilder')
+            ->will($this->onConsecutiveCalls($builderCompare, $builderFieldAlias));
+
+        $builderFieldAlias->expects($this->once())
+            ->method('select')
+            ->with('f.alias, f.is_unique_identifer as is_unique, f.type, f.object')
+            ->willReturnSelf();
+
+        $builderFieldAlias->expects($this->once())
+            ->method('from')
+            ->with(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+            ->willReturnSelf();
+
+        $builderFieldAlias->expects($this->once())
+            ->method('where')
+            ->willReturnSelf();
+
+        $builderFieldAlias->expects($this->once())
+            ->method('setParameter')
+            ->with('object', 'company')
+            ->willReturnSelf();
+
+        $builderFieldAlias->expects($this->once())
+            ->method('orderBy')
+            ->with('f.field_order', 'ASC')
+            ->willReturnSelf();
+
+        $builderFieldAlias->expects($this->once())
+            ->method('execute')
+            ->willReturn($statementAlias);
+
+        $statementAlias->expects($this->once())
+            ->method('fetchAll')
+            ->willReturn([]);
+
+        $builderCompare->expects($this->once())
+            ->method('select')
+            ->with('l.id')
+            ->willReturnSelf();
+
+        $builderCompare->expects($this->once())
+            ->method('from')
+            ->with(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->willReturnSelf();
+
+        $builderCompare->expects($this->once())
+            ->method('where')
+            ->willReturnSelf();
+
+        $builderCompare->expects($this->once())
+            ->method('setParameter')
+            ->with('lead', $leadId)
+            ->willReturnSelf();
+
+        $builderCompare->expects($this->once())
+            ->method('execute')
+            ->willReturn($statementCompare);
+
+        $statementCompare->expects($this->once())
+            ->method('fetch')
+            ->willReturn($returnValue);
+
+        $this->assertSame($expected, $this->repository->compareValue($leadId, $fieldAlias, $value, $operatorExpr));
+    }
+
+    /**
+     * @return iterable<mixed>
+     */
+    public function dataCompareValueForInNotInOperatorExpression(): iterable
+    {
+        // value operatorExpr returnValue expected
+        yield ['string', 'in', [], false];
+
+        yield [['array'], 'notIn', [], false];
+
+        yield ['string', 'in', ['id' => 12], true];
+
+        yield [['array'], 'notIn', ['id' => 12], true];
     }
 }
