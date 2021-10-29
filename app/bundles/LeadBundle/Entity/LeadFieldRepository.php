@@ -155,9 +155,14 @@ class LeadFieldRepository extends CommonRepository
     /**
      * Compare a form result value with defined value for defined lead.
      *
-     * @param mixed $value to compare with
+     * @param int    $lead         ID
+     * @param int    $field        alias
+     * @param mixed  $value        to compare with
+     * @param string $operatorExpr for WHERE clause
+     *
+     * @return bool
      */
-    public function compareValue(int $lead, string $field, $value, string $operatorExpr): bool
+    public function compareValue($lead, $field, $value, $operatorExpr)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
