@@ -141,6 +141,16 @@ class InstallService
             return false;
         }
 
+        /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
+        $params = $this->configurator->getParameters();
+
+        // if db_driver and mailer_from_name are present then it is assumed all the steps of the installation have been
+        // performed; manually deleting these values or deleting the config file will be required to re-enter
+        // installation.
+        if (empty($params['db_driver']) || empty($params['mailer_from_name'])) {
+            return false;
+        }
+
         return true;
     }
 
