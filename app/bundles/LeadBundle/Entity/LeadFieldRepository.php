@@ -155,14 +155,9 @@ class LeadFieldRepository extends CommonRepository
     /**
      * Compare a form result value with defined value for defined lead.
      *
-     * @param int    $lead         ID
-     * @param int    $field        alias
-     * @param string $value        to compare with
-     * @param string $operatorExpr for WHERE clause
-     *
-     * @return bool
+     * @param mixed $value to compare with
      */
-    public function compareValue($lead, $field, $value, $operatorExpr)
+    public function compareValue(int $lead, string $field, $value, string $operatorExpr): bool
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
@@ -225,11 +220,6 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
-                $value = $q->expr()->literal(
-                    InputHelper::clean($value)
-                );
-
-                $value = trim($value, "'");
                 if ('not' === substr($operatorExpr, 0, 3)) {
                     $operator = 'NOT REGEXP';
                 } else {
@@ -240,9 +230,29 @@ class LeadFieldRepository extends CommonRepository
                     $q->expr()->eq('l.id', ':lead')
                 );
 
-                $expr->add(
-                    $property." $operator '\\\\|?$value\\\\|?'"
-                );
+                if (is_array($value)) {
+                    $orExp = $q->expr()->orX();
+                    foreach ($value as $v) {
+                        $v = $q->expr()->literal(
+                            InputHelper::clean($v)
+                        );
+
+                        $v = trim($v, "'");
+                        $orExp->add(
+                            'l.'.$field." $operator '\\\\|?$v\\\\|?'"
+                        );
+                    }
+                    $expr->add($orExp);
+                } else {
+                    $value = $q->expr()->literal(
+                        InputHelper::clean($value)
+                    );
+
+                    $value = trim($value, "'");
+                    $expr->add(
+                        'l.'.$field." $operator '\\\\|?$value\\\\|?'"
+                    );
+                }
 
                 $q->where($expr)
                     ->setParameter('lead', (int) $lead);
