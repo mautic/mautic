@@ -18,6 +18,13 @@ use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionAbstract;
 abstract class DateDayAbstract extends DateOptionAbstract
 {
     /**
+     * {@inheritdoc}
+     */
+    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
+    {
+    }
+
+    /**
      * @return string
      */
     protected function getModifierForBetweenRange()
