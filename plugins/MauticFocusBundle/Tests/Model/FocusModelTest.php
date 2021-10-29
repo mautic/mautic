@@ -96,7 +96,6 @@ class FocusModelTest extends TestCase
 
     public function focusTypeProvider(): iterable
     {
-        // valid URL is reconstructed as expected
         yield ['form', self::once()];
         yield ['notice', self::never()];
     }
