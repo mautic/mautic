@@ -37,7 +37,7 @@ class SendGridMailAttachment
             foreach ($message->getChildren() as $child) {
                 if ($child instanceof \Swift_Attachment) {
                     $attachment = new Attachment();
-                    $base64 = base64_encode($child->getBody());
+                    $base64     = base64_encode($child->getBody());
                     $attachment->setContent($base64);
                     $attachment->setType($child->getContentType());
                     $attachment->setFilename($child->getFilename());
