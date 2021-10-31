@@ -8,6 +8,8 @@ use Mautic\MarketplaceBundle\Service\RouteProvider;
 
 /** @var PackageDetail $packageDetail */
 $packageDetail = $packageDetail;
+/** @var bool $isInstalled */
+$isInstalled = $isInstalled;
 
 $view['slots']->set('headerTitle', $view->escape($packageDetail->packageBase->getHumanPackageName()));
 $view->extend('MauticCoreBundle:Default:content.html.php');
@@ -43,7 +45,7 @@ if (isset($latestVersion)) {
     ];
 }
 
-if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) {
+if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES) && !$isInstalled) {
     $installRoute = $view['router']->path(
         RouteProvider::ROUTE_INSTALL,
         ['vendor' => $packageDetail->packageBase->getVendorName(), 'package' => $packageDetail->packageBase->getPackageName()]
@@ -55,8 +57,24 @@ if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) 
             'data-target' => '#InstallationInProgressModal',
             'href'        => $installRoute,
         ],
-        'btnText'   => $view['translator']->trans('mautic.core.theme.install'),
+        'btnText'   => $view['translator']->trans('marketplace.package.install'),
         'iconClass' => 'fa fa-download',
+        'primary'   => true,
+    ];
+} elseif ($view['security']->isGranted(MarketplacePermissions::CAN_REMOVE_PACKAGES)) {
+    $removeRoute = $view['router']->path(
+        RouteProvider::ROUTE_REMOVE,
+        ['vendor' => $packageDetail->packageBase->getVendorName(), 'package' => $packageDetail->packageBase->getPackageName()]
+    );
+
+    $buttons[] = [
+        'attr' => [
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#RemovalInProgressModal',
+            'href'        => $removeRoute,
+        ],
+        'btnText'   => $view['translator']->trans('marketplace.package.remove'),
+        'iconClass' => 'fa fa-trash',
         'primary'   => true,
     ];
 }
@@ -241,6 +259,13 @@ $view['slots']->set(
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', [
     'id'            => 'InstallationInProgressModal',
     'header'        => 'Installing '.$packageDetail->packageBase->getHumanPackageName(),
+    'size'          => 'md',
+    'footerButtons' => false,
+]); ?>
+
+<?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', [
+    'id'            => 'RemovalInProgressModal',
+    'header'        => 'Removing '.$packageDetail->packageBase->getHumanPackageName(),
     'size'          => 'md',
     'footerButtons' => false,
 ]); ?>

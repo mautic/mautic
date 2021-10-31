@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Mautic\MarketplaceBundle\Service;
 
 use Composer\Console\Application;
+use Mautic\MarketplaceBundle\Model\ConsoleOutputModel;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -27,7 +29,7 @@ class Composer
      * @param bool   $dryRun      Whether to dry-run the installation. Comes in handy during automated tests
      *                            and to test whether an installation would succeed or not.
      */
-    public function install(string $packageName, bool $dryRun = false): void
+    public function install(string $packageName, bool $dryRun = false): ConsoleOutputModel
     {
         $input = [
             'command'  => 'require',
@@ -38,7 +40,7 @@ class Composer
             $input['--dry-run'] = null;
         }
 
-        $this->runCommand($input);
+        return $this->runCommand($input);
     }
 
     /**
@@ -48,7 +50,7 @@ class Composer
      * @param bool   $dryRun      Whether to dry-run the removal. Comes in handy during automated tests
      *                            and to test whether an removal would succeed or not.
      */
-    public function remove(string $packageName, bool $dryRun = false): void
+    public function remove(string $packageName, bool $dryRun = false): ConsoleOutputModel
     {
         $input = [
             'command'  => 'remove',
@@ -59,10 +61,20 @@ class Composer
             $input['--dry-run'] = null;
         }
 
-        $this->runCommand($input);
+        return $this->runCommand($input);
     }
 
-    private function runCommand(array $input): void
+    /**
+     * Checks if the given Composer package is installed.
+     *
+     * @param string $packageName The package name, e.g. mautic/exmple-plugin
+     */
+    public function isInstalled(string $packageName): bool
+    {
+        return \Composer\InstalledVersions::isInstalled($packageName);
+    }
+
+    private function runCommand(array $input): ConsoleOutputModel
     {
         $arrayInput = new ArrayInput(array_merge(
             $input, [
@@ -74,7 +86,9 @@ class Composer
         // We don't want our script to stop after running a Composer command
         $application->setAutoExit(false);
 
-        // TODO capture output and return it with this function
-        $application->run($arrayInput);
+        $output   = new BufferedOutput();
+        $exitCode = $application->run($arrayInput, $output);
+
+        return new ConsoleOutputModel($exitCode, $output->fetch());
     }
 }

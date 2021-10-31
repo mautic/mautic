@@ -14,6 +14,8 @@ class RouteProvider
 
     public const ROUTE_INSTALL = 'mautic_marketplace_install';
 
+    public const ROUTE_REMOVE = 'mautic_marketplace_remove';
+
     private RouterInterface $router;
 
     public function __construct(RouterInterface $router)
@@ -38,6 +40,14 @@ class RouteProvider
     {
         return $this->router->generate(
             static::ROUTE_DETAIL,
+            ['vendor' => $vendor, 'package' => $package]
+        );
+    }
+
+    public function buildRemoveRoute(string $vendor, string $package): string
+    {
+        return $this->router->generate(
+            static::ROUTE_REMOVE,
             ['vendor' => $vendor, 'package' => $package]
         );
     }

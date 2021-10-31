@@ -8,12 +8,11 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
-use Mautic\MarketplaceBundle\Service\Composer;
 use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 use Symfony\Component\HttpFoundation\Response;
 
-class DetailController extends CommonController
+class RemoveController extends CommonController
 {
     private PackageModel $packageModel;
 
@@ -35,32 +34,27 @@ class DetailController extends CommonController
         $this->config          = $config;
     }
 
-    public function ViewAction(string $vendor, string $package): Response
+    public function viewAction(string $vendor, string $package): Response
     {
         if (!$this->config->marketplaceIsEnabled()) {
             return $this->notFound();
         }
 
-        if (!$this->corePermissions->isGranted(MarketplacePermissions::CAN_VIEW_PACKAGES)) {
+        if (!$this->corePermissions->isGranted(MarketplacePermissions::CAN_REMOVE_PACKAGES)) {
             return $this->accessDenied();
         }
-
-        /** @var Composer */
-        $composer    = $this->get('marketplace.service.composer');
-        $isInstalled = $composer->isInstalled("{$vendor}/{$package}");
 
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
                     'packageDetail'  => $this->packageModel->getPackageDetail("{$vendor}/{$package}"),
-                    'isInstalled'    => $isInstalled,
                 ],
-                'contentTemplate' => 'MarketplaceBundle:Package:detail.html.php',
+                'contentTemplate' => 'MarketplaceBundle:Package:remove.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'package',
                     'activeLink'    => '#mautic_marketplace',
-                    'route'         => $this->routeProvider->buildDetailRoute($vendor, $package),
+                    'route'         => $this->routeProvider->buildRemoveRoute($vendor, $package),
                 ],
             ]
         );

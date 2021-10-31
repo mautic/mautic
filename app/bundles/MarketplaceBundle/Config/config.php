@@ -24,6 +24,11 @@ return [
                 'controller' => 'MarketplaceBundle:Package\Install:view',
                 'method'     => 'GET|POST',
             ],
+            RouteProvider::ROUTE_REMOVE => [
+                'path'       => '/marketplace/remove/{vendor}/{package}',
+                'controller' => 'MarketplaceBundle:Package\Remove:view',
+                'method'     => 'GET|POST',
+            ],
         ],
     ],
     'services' => [
@@ -59,6 +64,20 @@ return [
             ],
             'marketplace.controller.package.install' => [
                 'class'     => \Mautic\MarketplaceBundle\Controller\Package\InstallController::class,
+                'arguments' => [
+                    'marketplace.model.package',
+                    'marketplace.service.route_provider',
+                    'mautic.security',
+                    'marketplace.service.config',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container',
+                    ],
+                ],
+            ],
+            'marketplace.controller.package.remove' => [
+                'class'     => \Mautic\MarketplaceBundle\Controller\Package\RemoveController::class,
                 'arguments' => [
                     'marketplace.model.package',
                     'marketplace.service.route_provider',
