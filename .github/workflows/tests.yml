@@ -97,7 +97,7 @@ jobs:
 
     - name: Upload coverage report
       if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' }}
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v2
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
