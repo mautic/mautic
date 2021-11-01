@@ -14,7 +14,6 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -180,7 +179,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
 
                 // If user selects the operator as include or exclude then the
                 // `value` field should be accepting multiple values.
-                if (in_array($operator, [OperatorOptions::IN, OperatorOptions::NOT_IN])) {
+                if (in_array($operator, ['in', '!in'])) {
                     $options['multiple'] = true;
                 }
 
