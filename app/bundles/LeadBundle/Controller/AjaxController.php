@@ -26,6 +26,7 @@ use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class AjaxController extends CommonAjaxController
 {
