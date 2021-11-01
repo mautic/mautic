@@ -71,7 +71,7 @@ final class OperatorIncludeExcludeFunctionalTest extends MauticMysqlTestCase
         $field->setName($alias);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->container->get('mautic.lead.model.field');
+        $fieldModel = self::$container->get('mautic.lead.model.field');
         $fieldModel->saveEntity($field);
     }
 }
