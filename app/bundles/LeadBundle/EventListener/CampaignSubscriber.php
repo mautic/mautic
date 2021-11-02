@@ -516,16 +516,19 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * Function to compare date value.
-     *
-     * @return bool
      */
-    private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate)
+    private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate): bool
     {
-        return $this->leadFieldModel->getRepository()->compareDateValue(
-            $lead->getId(),
-            $event->getConfig()['field'],
-            $triggerDate->format('Y-m-d')
-        );
+        $fieldValueToCompare  = $event->getLead()->getProfileFields()[$event->getConfig()['field']] ?? null;
+
+        if (empty($fieldValueToCompare)) {
+            return false;
+        }
+
+        $date = new \DateTime($fieldValueToCompare);
+        $date->setTimezone(new \DateTimeZone($this->coreParametersHelper->get('default_timezone', 'UTC')));
+
+        return $date->format('Y-m-d') === $triggerDate->format('Y-m-d');
     }
 
     protected function getFields(Lead $lead): array
