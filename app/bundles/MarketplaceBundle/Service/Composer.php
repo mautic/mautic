@@ -6,6 +6,7 @@ namespace Mautic\MarketplaceBundle\Service;
 
 use Composer\Console\Application;
 use Mautic\MarketplaceBundle\Model\ConsoleOutputModel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -16,10 +17,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class Composer
 {
     private KernelInterface $kernel;
+    private LoggerInterface $logger;
 
-    public function __construct(KernelInterface $kernel)
+    public function __construct(KernelInterface $kernel, LoggerInterface $logger)
     {
         $this->kernel = $kernel;
+        $this->logger = $logger;
     }
 
     /**
@@ -52,16 +55,48 @@ class Composer
      */
     public function remove(string $packageName, bool $dryRun = false): ConsoleOutputModel
     {
+        /**
+         * "composer remove package-name" also triggers an update of all other Mautic dependencies.
+         * By using the --no-update option first, we can work around that issue and only delete
+         * this specific package from the composer.json file.
+         */
         $input = [
-            'command'  => 'remove',
-            'packages' => [$packageName],
+            'command'     => 'remove',
+            'packages'    => [$packageName],
+            '--no-update' => null
         ];
 
         if (true === $dryRun) {
             $input['--dry-run'] = null;
         }
 
-        return $this->runCommand($input);
+        $firstOutput = $this->runCommand($input);
+
+        if ($firstOutput->exitCode === 0) {
+            /**
+             * Triggering an update of the package we just removed from composer.json
+             * will remove it from composer.lock and actually delete the plugin folder
+             * as well.
+             */
+            $input = [
+                'command'     => 'update',
+                'packages'    => [$packageName],
+            ];
+    
+            if (true === $dryRun) {
+                $input['--dry-run'] = null;
+            }
+    
+            $secondOutput = $this->runCommand($input);
+
+            // Let's merge the output so that we return all the output we have.
+            return new ConsoleOutputModel(
+                $secondOutput->exitCode, 
+                $firstOutput->output . "\n" . $secondOutput->output
+            );
+        }
+
+        return $firstOutput;
     }
 
     /**
@@ -86,8 +121,19 @@ class Composer
         // We don't want our script to stop after running a Composer command
         $application->setAutoExit(false);
 
+        $this->logger->info('Running Composer command: ' . $arrayInput->__toString());
+
         $output   = new BufferedOutput();
-        $exitCode = $application->run($arrayInput, $output);
+        $exitCode = 1;
+
+        try {
+            $exitCode = $application->run($arrayInput, $output);
+        } catch (\Exception $e) {
+            $output->writeln('Exception while running Composer command: ' . $e->getMessage());
+            $this->logger->error('Exception while running Composer command: ' . $e->getMessage());
+        }
+
+        $this->logger->info('Composer command output: ' . $output->fetch());
 
         return new ConsoleOutputModel($exitCode, $output->fetch());
     }

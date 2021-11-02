@@ -53,7 +53,12 @@ try {
             let error;
 
             try {
-                error = (JSON.parse(request.responseText)).error;
+                const res = JSON.parse(request.responseText);
+                if (res.error) {
+                    error = res.error;
+                } else {
+                    error = res.errors[0].message ?? 'Unknown error';
+                }
             } catch (e) {
                 error = 'An unknown error occurred. Please check the logs for more details.';
                 console.error(request.responseText);

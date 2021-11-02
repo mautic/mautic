@@ -64,7 +64,6 @@ class AjaxController extends CommonAjaxController
         $reloadFacade = $this->get('mautic.plugin.facade.reload');
         $reloadFacade->reloadPlugins();
 
-        // This works, now handle logic here
         return $this->sendJsonResponse([
             'success' => true,
         ]);
@@ -119,11 +118,6 @@ class AjaxController extends CommonAjaxController
 
         //$content = $output->fetch();
 
-        /** @var ReloadFacade */
-        $reloadFacade = $this->get('mautic.plugin.facade.reload');
-        $reloadFacade->reloadPlugins();
-
-        // This works, now handle logic here
         return $this->sendJsonResponse([
             'success' => true,
         ]);
