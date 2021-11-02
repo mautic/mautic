@@ -63,7 +63,7 @@ class Composer
         $input = [
             'command'     => 'remove',
             'packages'    => [$packageName],
-            '--no-update' => null
+            '--no-update' => null,
         ];
 
         if (true === $dryRun) {
@@ -72,7 +72,7 @@ class Composer
 
         $firstOutput = $this->runCommand($input);
 
-        if ($firstOutput->exitCode === 0) {
+        if (0 === $firstOutput->exitCode) {
             /**
              * Triggering an update of the package we just removed from composer.json
              * will remove it from composer.lock and actually delete the plugin folder
@@ -82,17 +82,17 @@ class Composer
                 'command'     => 'update',
                 'packages'    => [$packageName],
             ];
-    
+
             if (true === $dryRun) {
                 $input['--dry-run'] = null;
             }
-    
+
             $secondOutput = $this->runCommand($input);
 
             // Let's merge the output so that we return all the output we have.
             return new ConsoleOutputModel(
-                $secondOutput->exitCode, 
-                $firstOutput->output . "\n" . $secondOutput->output
+                $secondOutput->exitCode,
+                $firstOutput->output."\n".$secondOutput->output
             );
         }
 
@@ -121,7 +121,7 @@ class Composer
         // We don't want our script to stop after running a Composer command
         $application->setAutoExit(false);
 
-        $this->logger->info('Running Composer command: ' . $arrayInput->__toString());
+        $this->logger->info('Running Composer command: '.$arrayInput->__toString());
 
         $output   = new BufferedOutput();
         $exitCode = 1;
@@ -129,11 +129,11 @@ class Composer
         try {
             $exitCode = $application->run($arrayInput, $output);
         } catch (\Exception $e) {
-            $output->writeln('Exception while running Composer command: ' . $e->getMessage());
-            $this->logger->error('Exception while running Composer command: ' . $e->getMessage());
+            $output->writeln('Exception while running Composer command: '.$e->getMessage());
+            $this->logger->error('Exception while running Composer command: '.$e->getMessage());
         }
 
-        $this->logger->info('Composer command output: ' . $output->fetch());
+        $this->logger->info('Composer command output: '.$output->fetch());
 
         return new ConsoleOutputModel($exitCode, $output->fetch());
     }
