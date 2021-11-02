@@ -296,7 +296,9 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * Compare a form result value with defined date value for defined lead.
+     * @deprecated we do not use this method anymore
+     *
+     * Compare a form result value with defined date value for defined lead
      *
      * @param int    $lead  ID
      * @param int    $field alias
