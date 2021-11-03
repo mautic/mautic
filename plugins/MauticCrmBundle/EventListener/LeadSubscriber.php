@@ -43,6 +43,7 @@ class LeadSubscriber implements EventSubscriberInterface
     {
         return [
             LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
+            LeadEvents::LEAD_POINTS_CHANGE  => ['onLeadPointsChange', 0],
             LeadEvents::LEAD_PRE_DELETE     => ['onLeadPostDelete', 255],
             LeadEvents::LEAD_COMPANY_CHANGE => ['onLeadCompanyChange', 0],
         ];
@@ -51,10 +52,24 @@ class LeadSubscriber implements EventSubscriberInterface
     public function onLeadPostSave(Events\LeadEvent $event)
     {
         $lead = $event->getLead();
-        if ($lead->isAnonymous()) {
-            // Ignore this contact
-            return;
+        $this->syncContactToIntegration($lead);
+    }
+
+    public function onLeadPointsChange(Events\PointsChangeEvent $event)
+    {
+        $lead              = $event->getLead();
+        $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
+        if (false !== $integrationObject && $integrationObject->shouldImportDataToPipedrive()) {
+            $leadFields = $this->integrationHelper->getIntegrationSettings()->getFeatureSettings()['leadFields'];
+            if (false !== array_search('points', $leadFields)) {
+                $this->syncContactToIntegration($lead);
+            }
         }
+    }
+
+    public function onLeadPostDelete(Events\LeadEvent $event)
+    {
+        $lead = $event->getLead();
         if ($lead->getEventData('pipedrive.webhook')) {
             // Don't export what was just imported
             return;
@@ -74,37 +89,33 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onLeadPostDelete(Events\LeadEvent $event)
+    protected function syncContactToIntegration(\Mautic\LeadBundle\Entity\Lead $lead): void
     {
-        $lead = $event->getLead();
+        if ($lead->isAnonymous()) {
+            // Ignore this contact
+            return;
+        }
         if ($lead->getEventData('pipedrive.webhook')) {
             // Don't export what was just imported
             return;
         }
-
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
         if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
             return;
         }
         $this->leadExport->setIntegration($integrationObject);
-        $this->leadExport->delete($lead);
-    }
 
-    public function onLeadCompanyChange(Events\LeadChangeCompanyEvent $event)
-    {
-        $lead = $event->getLead();
-        if ($lead->getEventData('pipedrive.webhook')) {
-            // Don't export what was just imported
+        $changes = $lead->getChanges(true);
+
+        if (empty($changes)) {
             return;
         }
 
-        /** @var PipedriveIntegration $integrationObject */
-        $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
-            return;
+        if (!empty($changes['dateIdentified'])) {
+            $this->leadExport->create($lead);
+        } else {
+            $this->leadExport->update($lead);
         }
-        $this->leadExport->setIntegration($integrationObject);
-        $this->leadExport->update($lead);
     }
 }
