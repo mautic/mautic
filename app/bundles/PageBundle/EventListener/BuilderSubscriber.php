@@ -43,10 +43,14 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
+    private RouterInterface $router;
+
     /**
      * @var TokenHelper
      */
@@ -102,6 +106,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     const successmessage    = '{successmessage}';
     const identifierToken   = '{leadidentifier}';
     const doNotContactToken = '{do_not_contact_text}';
+    const dncUrl            = '{dnc_url}';
 
     /**
      * BuilderSubscriber constructor.
@@ -114,7 +119,8 @@ class BuilderSubscriber implements EventSubscriberInterface
         BuilderTokenHelperFactory $builderTokenHelperFactory,
         TranslatorInterface $translator,
         Connection $connection,
-        TemplatingHelper $templating
+        TemplatingHelper $templating,
+        RouterInterface $router
     ) {
         $this->security                  = $security;
         $this->tokenHelper               = $tokenHelper;
@@ -124,6 +130,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $this->translator                = $translator;
         $this->connection                = $connection;
         $this->templating                = $templating;
+        $this->router                    = $router;
     }
 
     /**
@@ -304,7 +311,16 @@ class BuilderSubscriber implements EventSubscriberInterface
                     'check',
                     'MauticCoreBundle:Slots:successmessage.html.php',
                     SlotSuccessMessageType::class,
-                    540
+                    600
+                );
+
+                $event->addSlotType(
+                    'donotcontact',
+                    $this->translator->trans('mautic.core.slot.label.donotcontact'),
+                    'ban',
+                    'MauticCoreBundle:Slots:donotcontact.html.php',
+                    SlotSuccessMessageType::class,
+                    595
                 );
             }
             $event->addSlotType(
@@ -396,6 +412,15 @@ class BuilderSubscriber implements EventSubscriberInterface
         if ($page->getIsPreferenceCenter()) {
             // replace slots
             if (count($params)) {
+                if (false !== strpos($content, self::dncUrl) && isset($params['idHash'])) {
+                    $dncUrl  = $this->router->generate(
+                        'mautic_email_dnc',
+                        ['idHash' => $params['idHash']],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    );
+                    $content = str_ireplace(self::dncUrl, $dncUrl, $content);
+                }
+
                 $dom = new DOMDocument('1.0', 'utf-8');
                 $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
                 $xpath = new DOMXPath($dom);

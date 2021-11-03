@@ -12,8 +12,8 @@
 
 <?php if (isset($form)) : ?>
     <?php if ($doNotContactText):?>
-        <?php echo $doNotContactText; ?>
+        <?php echo str_replace('|URL|', '{dnc_url}', $doNotContactText); ?>
     <?php endif; ?>
 <?php else: ?>
-    <?php echo $view['translator']->trans('mautic.email.do_not_contact.text'); ?>
+    <?php echo $view['translator']->trans('mautic.email.do_not_contact.text', ['%link%' => '{dnc_url}']); ?>
 <?php endif; ?>

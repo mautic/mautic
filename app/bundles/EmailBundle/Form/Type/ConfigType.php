@@ -98,6 +98,7 @@ class ConfigType extends AbstractType
                     'class'            => 'form-control',
                     'tooltip'          => 'mautic.email.config.do_not_contact_text.tooltip',
                     'data-show-on'     => '{"config_emailconfig_show_contact_preferences_1":"checked"}',
+                    'data-hide-on'     => '{"config_emailconfig_show_contact_dnc_0":"checked"}',
                 ],
                 'required'   => false,
                 'data'       => (array_key_exists('do_not_contact_text', $options['data']) && !empty($options['data']['do_not_contact_text']))

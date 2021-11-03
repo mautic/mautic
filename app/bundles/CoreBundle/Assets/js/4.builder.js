@@ -84,7 +84,8 @@ Mautic.launchBuilder = function (formName, actionName) {
             'preferredchannel',
             'channelfrequency',
             'saveprefsbutton',
-            'successmessage'
+            'successmessage',
+            'donotcontact'
         ];
         mQuery.each(slots, function(i, s){
             if (isPrefCenterEnabled) {
@@ -2056,7 +2057,8 @@ Mautic.prepareBuilderIframe = function(themeHtml, btnCloseBuilder, applyBtn) {
             'preferredchannel',
             'channelfrequency',
             'saveprefsbutton',
-            'successmessage'
+            'successmessage',
+            'donotcontact'
         ];
         mQuery.each(slots, function (i, s) {
             // delete existing tokens
