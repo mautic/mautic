@@ -159,8 +159,8 @@ class AssetsHelperTest extends TestCase
         $method           = $reflectionObject->getMethod('getCKEditorScripts');
         $method->setAccessible(true);
         $ckEditorScripts = $method->invokeArgs($assetHelper, []);
-        Assert::assertEquals(["app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js?v$version",
-            "app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js?v$version",
+        Assert::assertEquals(["node_modules/ckeditor4/ckeditor.js?v$version",
+            "node_modules/ckeditor4/adapters/jquery.js?v$version",
         ], $ckEditorScripts);
     }
 
