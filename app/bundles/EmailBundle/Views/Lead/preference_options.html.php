@@ -151,6 +151,12 @@ JS;
             <div class="panel-footer text-left">
                 <?php echo $view['form']->row($form['buttons']['save']); unset($form['buttons']['cancel']); ?></div>
         </div>
+
+        <?php if ($showContactDnc && !empty($doNotContactText)): ?>
+            <div id="do-not-contact-text">
+                <?php echo $doNotContactText; ?>
+            </div>
+        <?php endif; ?>
     </div>
 
     <?php
