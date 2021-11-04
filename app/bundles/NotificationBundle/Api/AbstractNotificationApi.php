@@ -11,33 +11,22 @@
 
 namespace Mautic\NotificationBundle\Api;
 
-use Joomla\Http\Http;
-use Joomla\Http\Response;
+use GuzzleHttp\Client;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Psr\Http\Message\ResponseInterface;
 
 abstract class AbstractNotificationApi
 {
-    /**
-     * @var Http
-     */
-    protected $http;
-
-    /**
-     * @var TrackableModel
-     */
-    protected $trackableModel;
-
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
+    protected Client $http;
+    protected TrackableModel $trackableModel;
+    protected IntegrationHelper $integrationHelper;
 
     /**
      * AbstractNotificationApi constructor.
      */
-    public function __construct(Http $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper)
+    public function __construct(Client $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper)
     {
         $this->http              = $http;
         $this->trackableModel    = $trackableModel;
@@ -46,11 +35,9 @@ abstract class AbstractNotificationApi
 
     /**
      * @param string $endpoint One of "apps", "players", or "notifications"
-     * @param string $data     JSON encoded array of data to send
-     *
-     * @return Response
+     * @param array  $data     Array of data to send
      */
-    abstract public function send($endpoint, $data);
+    abstract public function send(string $endpoint, array $data): ResponseInterface;
 
     /**
      * @param $id

@@ -184,7 +184,7 @@ class CommonController extends Controller implements MauticController
             $args = [
                 'contentTemplate' => $args,
                 'passthroughVars' => [
-                    'mauticContent' => strtolower($this->request->get('bundle')),
+                    'mauticContent' => strtolower(InputHelper::alphanum($this->request->query->get('bundle'))),
                 ],
             ];
         }
@@ -201,7 +201,7 @@ class CommonController extends Controller implements MauticController
             if (isset($args['passthroughVars']['mauticContent'])) {
                 $mauticContent = $args['passthroughVars']['mauticContent'];
             } else {
-                $mauticContent = strtolower($this->request->get('bundle'));
+                $mauticContent = strtolower(InputHelper::alphanum($this->request->query->get('bundle')));
             }
             $args['viewParameters']['mauticContent'] = $mauticContent;
         }
@@ -494,6 +494,17 @@ class CommonController extends Controller implements MauticController
      */
     public function notFound($msg = 'mautic.core.url.error.404')
     {
+        $page_404 = $this->coreParametersHelper->get('404_page');
+        if (!empty($page_404)) {
+            $pageModel = $this->getModel('page');
+            $page      = $pageModel->getEntity($page_404);
+            if (!empty($page) && $page->getIsPublished() && !empty($page->getCustomHtml())) {
+                $slug = $pageModel->generateSlug($page);
+
+                return $this->redirectToRoute('mautic_page_public', ['slug' => $slug]);
+            }
+        }
+
         return $this->renderException(
             new NotFoundHttpException(
                 $this->translator->trans($msg,

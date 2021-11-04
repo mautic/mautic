@@ -11,7 +11,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
+use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;

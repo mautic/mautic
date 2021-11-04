@@ -17,19 +17,25 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\EventListener\SegmentSubscriber;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSubscribedEvents()
     {
-        $ipLookupHelper = $this->createMock(IpLookupHelper::class);
-        $auditLogModel  = $this->createMock(AuditLogModel::class);
-        $subscriber     = new SegmentSubscriber($ipLookupHelper, $auditLogModel);
+        $ipLookupHelper   = $this->createMock(IpLookupHelper::class);
+        $auditLogModel    = $this->createMock(AuditLogModel::class);
+        $listModel        = $this->createMock(ListModel::class);
+        $translatorModel  = $this->createMock(TranslatorInterface::class);
+
+        $subscriber     = new SegmentSubscriber($ipLookupHelper, $auditLogModel, $listModel, $translatorModel);
 
         $this->assertEquals(
             [
-                LeadEvents::LIST_POST_SAVE   => ['onSegmentPostSave', 0],
-                LeadEvents::LIST_POST_DELETE => ['onSegmentDelete', 0],
+                LeadEvents::LIST_PRE_UNPUBLISH => ['onSegmentPreUnpublish', 0],
+                LeadEvents::LIST_POST_SAVE     => ['onSegmentPostSave', 0],
+                LeadEvents::LIST_POST_DELETE   => ['onSegmentDelete', 0],
             ],
             $subscriber->getSubscribedEvents()
         );
@@ -65,7 +71,10 @@ class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('writeToLog')
             ->with($log);
 
-        $subscriber = new SegmentSubscriber($ipLookupHelper, $auditLogModel);
+        $listModel        = $this->createMock(ListModel::class);
+        $translatorModel  = $this->createMock(TranslatorInterface::class);
+
+        $subscriber     = new SegmentSubscriber($ipLookupHelper, $auditLogModel, $listModel, $translatorModel);
 
         $segment            = $this->createMock(LeadList::class);
         $segment->deletedId = $segmentId;
@@ -111,7 +120,10 @@ class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('writeToLog')
             ->with($log);
 
-        $subscriber = new SegmentSubscriber($ipLookupHelper, $auditLogModel);
+        $listModel        = $this->createMock(ListModel::class);
+        $translatorModel  = $this->createMock(TranslatorInterface::class);
+
+        $subscriber     = new SegmentSubscriber($ipLookupHelper, $auditLogModel, $listModel, $translatorModel);
 
         $segment = $this->createMock(LeadList::class);
         $segment->expects($this->once())

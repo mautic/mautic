@@ -304,7 +304,7 @@ class MailHelper
             return $this->getMailer($cleanSlate);
         }
 
-        $transport  = $this->factory->get('swiftmailer.transport.real');
+        $transport  = $this->factory->get('swiftmailer.mailer.default.transport.real');
         $mailer     = new \Swift_Mailer($transport);
         $mailHelper = new self($this->factory, $mailer, $this->from);
 
@@ -348,7 +348,7 @@ class MailHelper
                 } elseif (!empty($emailToSend->getFromAddress())) {
                     $this->setFrom($emailToSend->getFromAddress(), $emailToSend->getFromName());
                 } else {
-                    $this->setFrom($this->systemFrom, null);
+                    $this->setFrom($this->from, null);
                 }
             } else {
                 $this->setFrom($this->from, null);

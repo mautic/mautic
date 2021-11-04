@@ -60,7 +60,6 @@ trait CustomFieldsApiControllerTrait
     /**
      * Flatten fields into an 'all' key for dev convenience.
      *
-     * @param        $entity
      * @param string $action
      */
     protected function preSerializeEntity(&$entity, $action = 'view')
@@ -97,6 +96,9 @@ trait CustomFieldsApiControllerTrait
                 }
 
                 // Some requests don't seem to have properties unserialized by default (even in M2)
+                if (!isset($fieldDefinition['properties'])) {
+                    $fieldDefinition['properties'] = [];
+                }
                 $properties = is_string($fieldDefinition['properties']) ? unserialize($fieldDefinition['properties']) : $fieldDefinition['properties'];
 
                 $fields[$group][$field]['value']           = empty($properties['scale']) ? (int) $fields[$group][$field]['value']
@@ -184,5 +186,18 @@ trait CustomFieldsApiControllerTrait
         }
 
         $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
+    }
+
+    /**
+     * @param string $object
+     */
+    protected function setCleaningRules($object = 'lead')
+    {
+        $fields = $this->getModel('lead.field')->getFieldListWithProperties($object);
+        foreach ($fields as $field) {
+            if (!empty($field['properties']['allowHtml'])) {
+                $this->dataInputMasks[$field['alias']]  = 'html';
+            }
+        }
     }
 }
