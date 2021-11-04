@@ -480,7 +480,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         foreach ($keys as $name => $key) {
             $key = $this->encryptionHelper->decrypt($key, $mainDecryptOnly);
             if (false === $key) {
-                return [];
+                continue;
             }
             $decrypted[$name] = $key;
         }
