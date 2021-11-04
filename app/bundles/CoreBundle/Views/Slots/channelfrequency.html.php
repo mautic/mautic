@@ -13,6 +13,13 @@ $channelNumber = 0;
 ?>
 <?php if (isset($form)) : ?>
     <?php if (isset($form['lead_channels']['subscribed_channels'])) : ?>
+
+        <?php if (isset($label_text)): ?>
+            <div class="text-left">dd
+                <label class="label0"><?php echo $label_text; ?></label>
+            </div>
+        <?php endif; ?>
+
         <table class="table table-striped">
             <?php
             foreach ($form['lead_channels']['subscribed_channels']->vars['choices'] as $key => $channel):
@@ -35,10 +42,7 @@ $channelNumber = 0;
                             <label for="<?php echo $channel->value; ?>"
                                    id="is-contactable-<?php echo $channel->value; ?>"
                                    data-channel="<?php echo $channelName; ?>">
-                                <?php echo $view['translator']->trans(
-                                    'mautic.lead.contact.me.label',
-                                    ['%channel%' => $channelName]
-                                ); ?>
+                                <?php echo $channelName; ?>
                             </label>
                             <?php endif; ?>
                         </div>
@@ -95,6 +99,10 @@ $channelNumber = 0;
         </table>
     <?php endif; ?>
 <?php else : ?>
+    <div class="text-left">
+        <label class="label0"><?php echo $view['translator']->trans('mautic.page.form.channels'); ?></label>
+    </div>
+
     <table class="table table-striped">
         <tbody>
         <tr>

@@ -33,6 +33,21 @@ class SlotChannelFrequencyType extends SlotType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
+            'label-channels',
+            TextType::class,
+            [
+                'label'      => 'mautic.page.form.channels',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class'           => 'form-control',
+                    'data-slot-param' => 'label-text0',
+                ],
+                'data'       => $this->translator->trans('mautic.page.form.channels'),
+            ]
+        );
+
+        $builder->add(
             'label-text',
             TextType::class,
             [
