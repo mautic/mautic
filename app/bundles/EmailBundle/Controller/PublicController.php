@@ -35,6 +35,8 @@ class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
 
+    const MAUTIC_EMAIL_PREFSCENTER_SUCCESS = 'mautic.email.prefscenter.success';
+
     /**
      * @param $idHash
      *
@@ -169,7 +171,7 @@ class PublicController extends CommonFormController
         }
         $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
         if (!empty($stat)) {
-            $successSessionName = 'mautic.email.prefscenter.success';
+            $successSessionName = self::MAUTIC_EMAIL_PREFSCENTER_SUCCESS;
 
             if ($lead = $stat->getLead()) {
                 // Set the lead as current lead
@@ -349,8 +351,10 @@ class PublicController extends CommonFormController
     public function doNotContactAction($idHash)
     {
         //find the email
-        $model = $this->getModel('email');
-        $stat  = $model->getEmailStatus($idHash);
+        $model             = $this->getModel('email');
+        $messageModel      = $this->get('mautic.channel.model.message');
+        $doNotContactModel = $this->get('mautic.lead.model.dnc');
+        $stat              = $model->getEmailStatus($idHash);
 
         if (!empty($stat)) {
             $email = $stat->getEmail();
@@ -365,45 +369,14 @@ class PublicController extends CommonFormController
                     $this->translator->setLocale($lead->getPreferredLocale());
                 }
             }
-
-            $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $this->translator);
-        } else {
-            $email   = $lead   = false;
-            $message = $this->translator->trans('mautic.email.stat_record.not_found');
+            foreach (array_keys($messageModel->getChannels()) as $channel) {
+                $channel = $email->getId() && 'email' === $channel ? [$channel => $email->getId()] : $channel;
+                $doNotContactModel->addDncForContact($lead->getId(), $channel, DoNotContact::UNSUBSCRIBED, $this->translator->trans('mautic.email.dnc.unsubscribed'));
+            }
+            $this->get('session')->set(self::MAUTIC_EMAIL_PREFSCENTER_SUCCESS.'.'.$lead->getId(), 1);
         }
 
-        $template = (!empty($email) && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->get('theme');
-
-        $theme = $this->factory->getTheme($template);
-
-        if ($theme->getTheme() != $template) {
-            $template = $theme->getTheme();
-        }
-
-        // Ensure template still exists
-        $theme = $this->factory->getTheme($template);
-        if (empty($theme) || $theme->getTheme() !== $template) {
-            $template = $this->coreParametersHelper->get('theme');
-        }
-
-        $analytics = $this->factory->getHelper('template.analytics')->getCode();
-
-        if (!empty($analytics)) {
-            $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
-        }
-
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
-
-        return $this->render(
-            $logicalName,
-            [
-                'message'  => $message,
-                'type'     => 'notice',
-                'email'    => $email,
-                'lead'     => $lead,
-                'template' => $template,
-            ]
-        );
+        return $this->redirect($this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]));
     }
 
     /**
