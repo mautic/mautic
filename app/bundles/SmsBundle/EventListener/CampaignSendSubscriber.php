@@ -84,6 +84,10 @@ class CampaignSendSubscriber implements EventSubscriberInterface
             return $event->setFailed('mautic.sms.campaign.failed.missing_entity');
         }
 
+        if (!$sms->isPublished()) {
+            return $event->setFailed('mautic.sms.campaign.failed.unpublished');
+        }
+
         $result = $this->smsModel->sendSms($sms, $lead, ['channel' => ['campaign.event', $event->getEvent()['id']]])[$lead->getId()];
 
         if ('Authenticate' === $result['status']) {
