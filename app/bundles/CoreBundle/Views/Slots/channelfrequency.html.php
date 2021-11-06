@@ -40,7 +40,7 @@ $channelNumber = 0;
                             <label for="<?php echo $channel->value; ?>"
                                    id="is-contactable-<?php echo $channel->value; ?>"
                                    data-channel="<?php echo $channelName; ?>">
-                                <?php echo $channelName; ?>
+                                <?php echo $view['translator']->trans('mautic.lead.contact.me.label', ['%channel%' => $channelName]); ?>
                             </label>
                             <?php endif; ?>
                         </div>
