@@ -14,11 +14,9 @@ $channelNumber = 0;
 <?php if (isset($form)) : ?>
     <?php if (isset($form['lead_channels']['subscribed_channels'])) : ?>
 
-        <?php if (isset($label_text)): ?>
-            <div class="text-left">dd
-                <label class="label0"><?php echo $label_text; ?></label>
+            <div class="text-left">
+                <label class="label0"><?php echo $view['translator']->trans($form['lead_channels']['subscribed_channels']->vars['label']); ?></label>
             </div>
-        <?php endif; ?>
 
         <table class="table table-striped">
             <?php
