@@ -58,7 +58,7 @@ class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new CampaignExecutionEvent($this->args, false, null);
 
         $this->CampaignSendSubscriber()->onCampaignTriggerAction($event);
-        self::assertSame(1, $event->getResult()['failed']);
+        self::assertTrue((bool) $event->getResult()['failed']);
         self::assertSame('mautic.sms.campaign.failed.missing_entity', $event->getResult()['reason']);
     }
 
@@ -73,7 +73,7 @@ class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new CampaignExecutionEvent($this->args, false, null);
 
         $this->CampaignSendSubscriber()->onCampaignTriggerAction($event);
-        self::assertSame(1, $event->getResult()['failed']);
+        self::assertTrue((bool) $event->getResult()['failed']);
         self::assertSame('mautic.sms.campaign.failed.unpublished', $event->getResult()['reason']);
     }
 
