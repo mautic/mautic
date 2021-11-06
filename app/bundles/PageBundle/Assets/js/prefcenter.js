@@ -15,7 +15,7 @@ if (typeof MauticPrefCenterLoaded === 'undefined') {
         }
 
         var numOfLabelsInSlot = 4;
-        for (i = 1; i <= numOfLabelsInSlot; i++) {
+        for (i = 0; i <= numOfLabelsInSlot; i++) {
             text = slot.dataset['paramLabelText' + i];
             if (typeof text !== "undefined") {
                 setLabelText(slot, 'label.label' + i, text);
