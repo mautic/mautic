@@ -65,8 +65,19 @@ return [
             ],
         ],
     ],
-
     'services' => [
+        'commands' => [
+            'mautic.plugin.command.create' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\PluginBundle\Command\CreateCommand::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'kernel',
+                    'mautic.http.client',
+                    'mautic.plugin.facade.reload'
+                ],
+            ],
+        ],
         'events' => [
             'mautic.plugin.pointbundle.subscriber' => [
                 'class' => \Mautic\PluginBundle\EventListener\PointSubscriber::class,
