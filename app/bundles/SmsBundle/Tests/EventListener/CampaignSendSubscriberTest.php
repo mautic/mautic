@@ -1,0 +1,87 @@
+<?php
+
+/*
+ * @copyright   2021 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\SmsBundle\Tests\EventListener;
+
+use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\EventListener\CampaignSendSubscriber;
+use Mautic\SmsBundle\Model\SmsModel;
+use Mautic\SmsBundle\Sms\TransportChain;
+
+class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
+{
+    private $args;
+
+    /**
+     * @var SmsModel
+     */
+    private $smsModel;
+
+    /**
+     * @var TransportChain
+     */
+    private $transportChain;
+
+    protected function setUp(): void
+    {
+        $this->smsModel       = $this->createMock(SmsModel::class);
+        $this->transportChain = $this->createMock(TransportChain::class);
+
+        $lead = new Lead();
+        $lead->setId(1);
+        $this->args = [
+            'lead'            => $lead,
+            'event'           => [
+                'type'       => 'sms.send_text_sms',
+                'properties' => ['sms' => 1],
+            ],
+            'eventDetails'    => [],
+            'systemTriggered' => true,
+            'eventSettings'   => [],
+        ];
+    }
+
+    public function testSendDeletedSms()
+    {
+        $this->smsModel->expects(self::once())->method('getEntity')->willReturn(null);
+
+        $event = new CampaignExecutionEvent($this->args, false, null);
+
+        $this->CampaignSendSubscriber()->onCampaignTriggerAction($event);
+        self::assertSame(1, $event->getResult()['failed']);
+        self::assertSame('mautic.sms.campaign.failed.missing_entity', $event->getResult()['reason']);
+    }
+
+    public function testSendUnpublishedSms()
+    {
+        $lead = new Lead();
+        $lead->setId(1);
+        $sms = new Sms();
+        $sms->setIsPublished(false);
+        $this->smsModel->expects(self::once())->method('getEntity')->willReturn($sms);
+
+        $event = new CampaignExecutionEvent($this->args, false, null);
+
+        $this->CampaignSendSubscriber()->onCampaignTriggerAction($event);
+        self::assertSame(1, $event->getResult()['failed']);
+        self::assertSame('mautic.sms.campaign.failed.unpublished', $event->getResult()['reason']);
+    }
+
+    /**
+     * @return CampaignSendSubscriber
+     */
+    private function CampaignSendSubscriber()
+    {
+        return new CampaignSendSubscriber($this->smsModel, $this->transportChain);
+    }
+}
