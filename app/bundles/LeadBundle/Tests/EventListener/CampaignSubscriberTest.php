@@ -123,22 +123,4 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $primaryCompany = $lead->getPrimaryCompany();
         $this->assertSame($this->configTo['companyname'], $primaryCompany['companyname']);
     }
-
-    public function testOnCampaignTriggerConditionDateField()
-    {
-        $lead = new Lead();
-        $lead->setId(1);
-        $args = [
-            'lead'            => $lead,
-            'event'           => [
-                'type'       => 'sms.send_text_sms',
-                'properties' => ['sms' => 1],
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
-
-        $event = new CampaignExecutionEvent($args, false, null);
-    }
 }
