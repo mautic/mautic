@@ -13,11 +13,11 @@ $channelNumber = 0;
 ?>
 <?php if (isset($form)) : ?>
     <?php if (isset($form['lead_channels']['subscribed_channels'])) : ?>
-
-            <div class="text-left">
-                <label class="label0"><?php echo $view['translator']->trans($form['lead_channels']['subscribed_channels']->vars['label']); ?></label>
-            </div>
-
+        <div class="text-left">
+            <label class="label0" style="display: inline"><?php echo $view['translator']->trans(
+                    $form['lead_channels']['subscribed_channels']->vars['label']
+                ); ?></label>
+        </div>
         <table class="table table-striped">
             <?php
             foreach ($form['lead_channels']['subscribed_channels']->vars['choices'] as $key => $channel):
@@ -98,7 +98,7 @@ $channelNumber = 0;
     <?php endif; ?>
 <?php else : ?>
     <div class="text-left">
-        <label class="label0"><?php echo $view['translator']->trans('mautic.page.form.channels'); ?></label>
+        <label class="label0"></label>
     </div>
 
     <table class="table table-striped">
