@@ -113,9 +113,9 @@ class CampaignHelper
                     $payload                 = json_encode($payload);
                 }
                 $response = $this->client->request($method, $url, [
-                    \GuzzleHttp\RequestOptions::BODY    => $payload,
-                    \GuzzleHttp\RequestOptions::HEADERS => $headers,
-                    \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                    \GuzzleHttp\RequestOptions::FORM_PARAMS => $payload,
+                    \GuzzleHttp\RequestOptions::HEADERS     => $headers,
+                    \GuzzleHttp\RequestOptions::TIMEOUT     => $timeout,
                 ]);
                 break;
             case 'delete':
