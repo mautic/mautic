@@ -97,7 +97,7 @@ jobs:
 
     - name: Upload coverage report
       if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' }}
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v2
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
@@ -122,7 +122,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'CS Fixer']
+        commands: ['PHPSTAN', 'CS Fixer', 'Rector']
 
     name: ${{ matrix.commands }}
 
@@ -159,7 +159,7 @@ jobs:
             fi
           done
           if [[ $cs_fix_files ]]; then
-            bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots --diff $cs_fix_files
+            bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --using-cache=no --show-progress=dots --diff $cs_fix_files
           fi
         else
           echo "Invalid command"
