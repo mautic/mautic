@@ -267,14 +267,10 @@ class BuilderSubscriber implements EventSubscriberInterface
             $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
         }
 
-        $doNotContactText = $this->coreParametersHelper->get('do_not_contact_text');
-        if (!$doNotContactText) {
-            $doNotContactText = $this->translator->trans('mautic.email.do_not_contact.text', ['%link%' => '|URL|']);
-        }
-
         $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]), $unsubscribeText);
         $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
 
+        $doNotContactText = $this->translator->trans('mautic.email.do_not_contact.text', ['%link%' => '|URL|']);
         $doNotContactText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_dnc', ['idHash' => $idHash]), $doNotContactText);
         $event->addToken('{dnc_text}', EmojiHelper::toHtml($doNotContactText));
 

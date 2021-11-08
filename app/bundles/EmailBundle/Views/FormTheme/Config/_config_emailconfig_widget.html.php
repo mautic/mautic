@@ -189,11 +189,10 @@ $template12  = '<div class="col-md-12">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'show_contact_segments', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'show_contact_categories', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'show_contact_preferred_channels', $template); ?>
         </div>
         <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'show_contact_preferred_channels', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'show_contact_dnc', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'do_not_contact_text', $template); ?>
         </div>
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, \Mautic\EmailBundle\Form\Type\ConfigType::DEFAULT_PREFERENCE_CENTER_PAGE, $template); ?>
