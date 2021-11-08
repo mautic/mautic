@@ -46,72 +46,6 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->leadModel  = self::$container->get('mautic.lead.model.lead');
     }
 
-    public function testSegmentDateTimeFieldDayMonthOperator(): void
-    {
-        $application = new Application(self::$kernel);
-        $application->setAutoExit(false);
-        $applicationTester = new ApplicationTester($application);
-
-        $dateTimeFieldAlias = 'datetime_field1';
-        if (!$this->fieldModel->getRepository()->findOneBy(['alias' => $dateTimeFieldAlias])) {
-            $field = new LeadField();
-            $field->setName('Datetime Field')
-                ->setAlias($dateTimeFieldAlias)
-                ->setType('datetime')
-                ->setObject('lead');
-
-            $this->fieldModel->saveEntity($field);
-        }
-
-        $dateTimeValues = [
-            (new \DateTime())->format('Y-m-d 00:00:00'),
-            (new \DateTime('+1 month'))->format('Y-m-d 00:00:00'),
-            (new \DateTime('-1  month'))->modify('-1 day')->format('Y-m-d 00:00:00'),
-        ];
-        $contacts = [];
-        foreach ($dateTimeValues as $dateTimeValue) {
-            $contact = new Lead();
-            $this->leadModel->setFieldValues($contact, [$dateTimeFieldAlias => $dateTimeValue]);
-            $this->leadModel->saveEntity($contact);
-        }
-
-        $filter = [[
-            'glue'     => 'and',
-            'field'    => $dateTimeFieldAlias,
-            'object'   => 'lead',
-            'type'     => 'datetime',
-            'operator' => '=',
-            'display'  => '',
-            'filter'   => 'month',
-        ]];
-
-        $segmentMonthOperator  = $this->saveSegment('segmentMonthOperator', 'segmentMonthOperator', $filter);
-
-        $filter = [[
-            'glue'     => 'and',
-            'field'    => $dateTimeFieldAlias,
-            'object'   => 'lead',
-            'type'     => 'datetime',
-            'operator' => '=',
-            'display'  => '',
-            'filter'   => 'day',
-        ]];
-
-        $segmentDayOperator  = $this->saveSegment('segmentDayOperator', 'segmentDayOperator', $filter);
-
-        $this->em->clear();
-        // Execute the campaign.
-        $exitCode = $applicationTester->run(
-            [
-                'command'       => 'mautic:segment:rebuild',
-            ]
-        );
-        Assert::assertSame(0, $exitCode, $applicationTester->getDisplay());
-        $segmentCounts = $this->listModel->getRepository()->getLeadCount([$segmentMonthOperator->getId(), $segmentDayOperator->getId()]);
-        Assert::assertEquals(1, $segmentCounts[$segmentMonthOperator->getId()]);
-        Assert::assertEquals(2, $segmentCounts[$segmentDayOperator->getId()]);
-    }
-
     public function testUnpublishUsedSegment(): void
     {
         $filter = [[
@@ -177,6 +111,72 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(2, $rows);
         $this->assertFalse($rows[0]->isPublished());
         $this->assertFalse($rows[1]->isPublished());
+    }
+
+    public function testSegmentDateTimeFieldDayMonthOperator(): void
+    {
+        $application = new Application(self::$kernel);
+        $application->setAutoExit(false);
+        $applicationTester = new ApplicationTester($application);
+
+        $dateTimeFieldAlias = 'datetime_field1';
+        if (!$this->fieldModel->getRepository()->findOneBy(['alias' => $dateTimeFieldAlias])) {
+            $field = new LeadField();
+            $field->setName('Datetime Field')
+                ->setAlias($dateTimeFieldAlias)
+                ->setType('datetime')
+                ->setObject('lead');
+
+            $this->fieldModel->saveEntity($field);
+        }
+
+        $dateTimeValues = [
+            (new \DateTime())->format('Y-m-d 00:00:00'),
+            (new \DateTime('+1 month'))->format('Y-m-d 00:00:00'),
+            (new \DateTime('-1  month'))->modify('-1 day')->format('Y-m-d 00:00:00'),
+        ];
+        $contacts = [];
+        foreach ($dateTimeValues as $dateTimeValue) {
+            $contact = new Lead();
+            $this->leadModel->setFieldValues($contact, [$dateTimeFieldAlias => $dateTimeValue]);
+            $this->leadModel->saveEntity($contact);
+        }
+
+        $filter = [[
+            'glue'     => 'and',
+            'field'    => $dateTimeFieldAlias,
+            'object'   => 'lead',
+            'type'     => 'datetime',
+            'operator' => '=',
+            'display'  => '',
+            'filter'   => 'month',
+        ]];
+
+        $segmentMonthOperator  = $this->saveSegment('segmentMonthOperator', 'segmentMonthOperator', $filter);
+
+        $filter = [[
+            'glue'     => 'and',
+            'field'    => $dateTimeFieldAlias,
+            'object'   => 'lead',
+            'type'     => 'datetime',
+            'operator' => '=',
+            'display'  => '',
+            'filter'   => 'day',
+        ]];
+
+        $segmentDayOperator  = $this->saveSegment('segmentDayOperator', 'segmentDayOperator', $filter);
+
+        $this->em->clear();
+        // Execute the campaign.
+        $exitCode = $applicationTester->run(
+            [
+                'command'       => 'mautic:segment:rebuild',
+            ]
+        );
+        Assert::assertSame(0, $exitCode, $applicationTester->getDisplay());
+        $segmentCounts = $this->listModel->getRepository()->getLeadCount([$segmentMonthOperator->getId(), $segmentDayOperator->getId()]);
+        Assert::assertEquals(1, $segmentCounts[$segmentMonthOperator->getId()]);
+        Assert::assertEquals(2, $segmentCounts[$segmentDayOperator->getId()]);
     }
 
     private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
