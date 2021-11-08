@@ -1,0 +1,55 @@
+name: 'Packages Split 2'
+
+on:
+    push:
+        # Only trigger for specific branches or changes in specific paths.
+        branches:
+            - '*'
+        paths:
+            - app/**
+            - plugins/**
+            - themes/**
+        # Tag push events should be ignored, they will be handled with the create event below.
+        tags-ignore:
+            - '*'
+    create:
+        tags:
+            - '*'
+        branches:
+            - '*'
+    delete:
+        tags:
+            - '*'
+        branches:
+            - '*'
+
+jobs:
+    sync_commits:
+        runs-on: ubuntu-latest
+        name: Sync commits
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+
+            # Add a personal access token to the repository secrets. This will allow the splitter action to push the new commits
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+
+            # Cache the splitsh executable to speedup future runs
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-splitsh-v101'
+
+            # Sync commits and tags for the configured subtree splits
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/subtree-splitter-config.json # Reference the location where you saved your config file
+    
