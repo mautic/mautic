@@ -586,6 +586,10 @@ return [
             ],
             'mautic.lead.generated_columns.subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\GeneratedColumnSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'translator',
+                ],
             ],
         ],
         'forms' => [

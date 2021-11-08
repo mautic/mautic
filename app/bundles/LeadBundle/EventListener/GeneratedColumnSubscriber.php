@@ -11,14 +11,17 @@ use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class GeneratedColumnSubscriber extends EventSubscriberInterface
+class GeneratedColumnSubscriber implements EventSubscriberInterface
 {
-    private ListModel $listModel;
+    private ListModel $segmentModel;
+    private TranslatorInterface $translator;
 
-    public function __construct(ListModel $listModel)
+    public function __construct(ListModel $segmentModel, TranslatorInterface $translator)
     {
-        $this->listModel = $listModel;
+        $this->segmentModel = $segmentModel;
+        $this->translator   = $translator;
     }
 
     public static function getSubscribedEvents(): array
@@ -46,7 +49,7 @@ class GeneratedColumnSubscriber extends EventSubscriberInterface
         $event->addChoice('lead', 'generated_email_domain', [
             'label'      => $this->translator->trans('mautic.email.segment.choice.generated_email_domain'),
             'properties' => ['type' => 'text'],
-            'operators'  => $this->listModel->getOperatorsForFieldType(
+            'operators'  => $this->segmentModel->getOperatorsForFieldType(
                 [
                     'include' => [
                         '=',
