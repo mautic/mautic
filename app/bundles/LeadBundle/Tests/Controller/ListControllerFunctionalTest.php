@@ -166,7 +166,8 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $segmentDayOperator  = $this->saveSegment('segmentDayOperator', 'segmentDayOperator', $filter);
 
-        $this->em->clear();
+        $this->em->flush();
+
         // Execute the campaign.
         $exitCode = $applicationTester->run(
             [
