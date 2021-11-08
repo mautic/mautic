@@ -1,28 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class GeneratedColumnSubscriber extends CommonSubscriber
+class GeneratedColumnSubscriber extends EventSubscriberInterface
 {
-    /**
-     * @var ListModel
-     */
-    private $listModel;
+    private ListModel $listModel;
 
     public function __construct(ListModel $listModel)
     {
         $this->listModel = $listModel;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::ON_GENERATED_COLUMNS_BUILD       => ['onGeneratedColumnsBuild', 0],
@@ -30,7 +29,7 @@ class GeneratedColumnSubscriber extends CommonSubscriber
         ];
     }
 
-    public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event)
+    public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {
         $emailDomain = new GeneratedColumn(
             'leads',
@@ -42,7 +41,7 @@ class GeneratedColumnSubscriber extends CommonSubscriber
         $event->addGeneratedColumn($emailDomain);
     }
 
-    public function onGenerateSegmentFilters(LeadListFiltersChoicesEvent $event)
+    public function onGenerateSegmentFilters(LeadListFiltersChoicesEvent $event): void
     {
         $event->addChoice('lead', 'generated_email_domain', [
             'label'      => $this->translator->trans('mautic.email.segment.choice.generated_email_domain'),
