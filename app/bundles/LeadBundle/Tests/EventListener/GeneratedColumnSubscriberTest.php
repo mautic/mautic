@@ -30,8 +30,7 @@ class GeneratedColumnSubscriberTest extends TestCase
 
         parent::setUp();
 
-        $segmentModel = new class extends ListModel
-        {
+        $segmentModel = new class extends ListModel {
             public function __construct()
             {
             }
