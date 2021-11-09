@@ -105,7 +105,7 @@ switch (true) {
                             <?php foreach ($sources as $sourceType => $typeNames): ?>
                             <?php if (!empty($typeNames)): ?>
                             <tr>
-                                <td width="20%"><span class="fw-b textTitle">
+                                <td width="20%"><span class="fw-b">
                                     <?php echo $view['translator']->trans('mautic.campaign.leadsource.'.$sourceType); ?>
                                 </td>
                                 <td>
