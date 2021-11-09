@@ -24,6 +24,9 @@ class GeneratedColumnSubscriber implements EventSubscriberInterface
         $this->translator   = $translator;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public static function getSubscribedEvents(): array
     {
         return [
