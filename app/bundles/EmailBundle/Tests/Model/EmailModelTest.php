@@ -809,7 +809,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $userHelper  = $this->createMock(UserHelper::class);
         $this->emailModel->setUserHelper($userHelper);
         $dispatcher = new EventDispatcher();
-        $listener = function (EmailEvent $event) use ($child) {
+        $listener   = function (EmailEvent $event) use ($child) {
             $isChild = $event->getEmail() === $child;
             $this->assertSame($isChild, $this->emailModel->isUpdatingTranslationChildren());
         };
