@@ -62,7 +62,7 @@ class PageModelTest extends PageTestAbstract
         $this->assertSame(['page_title' => $expectedTitle], $hit->getQuery());
     }
 
-    public function testGenerateUrlWhenCalledReturnsValidUrl()
+    public function testGenerateUrl_WhenCalled_ReturnsValidUrl()
     {
         $page = new Page();
         $page->setAlias('this-is-a-test');
@@ -71,7 +71,7 @@ class PageModelTest extends PageTestAbstract
         $this->assertStringContainsString('/this-is-a-test', $url);
     }
 
-    public function testCleanQueryWhenCalledReturnsSafeAndValidData()
+    public function testCleanQuery_WhenCalled_ReturnsSafeAndValidData()
     {
         $pageModel           = $this->getPageModel();
         $pageModelReflection = new ReflectionClass(get_class($pageModel));

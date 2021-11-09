@@ -21,7 +21,7 @@ class ObjectMappingTest extends TestCase
         parent::setUp();
     }
 
-    public function testConstruct(): void
+    public function test__construct(): void
     {
         $objectMapping = new ObjectMapping($this->dateCreated);
         $this->assertInstanceOf(ObjectMapping::class, $objectMapping);

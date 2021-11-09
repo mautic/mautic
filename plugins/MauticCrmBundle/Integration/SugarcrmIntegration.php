@@ -1597,6 +1597,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param      $mauticData
      * @param      $availableFields
      * @param      $object
      * @param      $lead

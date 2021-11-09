@@ -225,7 +225,7 @@ class PointsChangeLog
      *
      * @return PointsChangeLog
      */
-    public function setLead(Lead $lead)
+    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
     {
         $this->lead = $lead;
 

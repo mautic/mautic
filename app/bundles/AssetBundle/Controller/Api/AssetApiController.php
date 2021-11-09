@@ -34,6 +34,7 @@ class AssetApiController extends CommonApiController
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer.
      *
+     * @param        $entity
      * @param string $action
      *
      * @return mixed

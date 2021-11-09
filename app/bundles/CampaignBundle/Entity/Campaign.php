@@ -335,7 +335,7 @@ class Campaign extends FormEntity
     /**
      * Remove events.
      */
-    public function removeEvent(Event $event)
+    public function removeEvent(\Mautic\CampaignBundle\Entity\Event $event)
     {
         $this->changes['events']['removed'][$event->getId()] = $event->getName();
 

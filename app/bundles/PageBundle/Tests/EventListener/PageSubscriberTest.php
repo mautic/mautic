@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PageSubscriberTest extends TestCase
 {
-    public function testGetTokensWhenCalledReturnsValidTokens()
+    public function testGetTokens_WhenCalled_ReturnsValidTokens()
     {
         $translator       = $this->createMock(Translator::class);
         $pageBuilderEvent = new PageBuilderEvent($translator);
@@ -44,7 +44,7 @@ class PageSubscriberTest extends TestCase
         $this->assertEquals($tokens['{token_test}'], 'TOKEN VALUE');
     }
 
-    public function testOnPageHitWhenCalledAcknowledgesHit()
+    public function testOnPageHit_WhenCalled_AcknowledgesHit()
     {
         $dispatcher = new EventDispatcher();
         $subscriber = $this->getPageSubscriber();
@@ -59,7 +59,7 @@ class PageSubscriberTest extends TestCase
         $this->assertEquals($event->getResult(), QueueConsumerResults::ACKNOWLEDGE);
     }
 
-    public function testOnPageHitWhenCalledRejectsBadHit()
+    public function testOnPageHit_WhenCalled_RejectsBadHit()
     {
         $dispatcher = new EventDispatcher();
         $subscriber = $this->getPageSubscriber();

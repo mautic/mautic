@@ -4,7 +4,6 @@
 !.htaccess
 !.gitkeep
 !.ddev
-!.php-cs-fixer.php
 .ddev/mautic-preference
 .php_cs.cache
 /.env

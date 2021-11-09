@@ -462,6 +462,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @param array  $params
      * @param string $query
+     * @param        $executed
      * @param array  $result
      * @param string $object
      *

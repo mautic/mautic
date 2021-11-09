@@ -5,7 +5,7 @@
 .env.dist
 .github/*
 .gitignore
-.php-cs-fixer.php
+.php_cs
 .travis.yml
 codecov.yml
 Gruntfile.js

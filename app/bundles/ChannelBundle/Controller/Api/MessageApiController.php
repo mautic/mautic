@@ -61,6 +61,7 @@ class MessageApiController extends CommonApiController
     /**
      * Load and set channel names to the response.
      *
+     * @param        $entity
      * @param string $action
      *
      * @return mixed

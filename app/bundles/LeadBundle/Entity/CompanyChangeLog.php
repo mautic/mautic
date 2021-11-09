@@ -220,7 +220,7 @@ class CompanyChangeLog
      *
      * @return CompanyChangeLog
      */
-    public function setLead(Lead $lead)
+    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
     {
         $this->lead = $lead;
 

@@ -498,7 +498,7 @@ class Event implements ChannelInterface
      *
      * @return Event
      */
-    public function setCampaign(Campaign $campaign)
+    public function setCampaign(\Mautic\CampaignBundle\Entity\Campaign $campaign)
     {
         $this->campaign = $campaign;
 

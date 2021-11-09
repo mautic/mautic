@@ -8,7 +8,7 @@ use Mautic\MauticApi;
 require __DIR__.'/vendor/autoload.php';
 
 if ('cli' !== php_sapi_name()) {
-    exit('This script can only run on the command line');
+    die('This script can only run on the command line');
 }
 
 $vars = [
