@@ -8,7 +8,7 @@
     "mautic/core-lib": "^3.0"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "~2.16.1",
+    "friendsofphp/php-cs-fixer": "^2.19.2",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.2",
     "liip/test-fixtures-bundle": "^1.6",
@@ -98,7 +98,7 @@
       "@remove-git-submodules"
     ],
     "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
-    "phpstan": "bin/phpstan analyse app/bundles app/migrations plugins",
+    "phpstan": "php -d memory_limit=4G bin/phpstan analyse",
     "cs": "bin/php-cs-fixer fix -v --dry-run --diff",
     "fixcs": "bin/php-cs-fixer fix -v",
     "rector": "bin/rector process",
