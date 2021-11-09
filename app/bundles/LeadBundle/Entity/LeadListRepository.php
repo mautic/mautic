@@ -222,7 +222,7 @@ class LeadListRepository extends CommonRepository
             )
             ->setParameter('leadId', $lead->getId());
 
-        return  (bool) $q->execute()->fetchColumn();
+        return (bool) $q->execute()->fetchColumn();
     }
 
     /**
