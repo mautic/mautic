@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticFullContactBundle\Integration;
 
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
-use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\MauticFullContactBundle\MauticFullContactBundle;
 
 class Config
 {

@@ -6,7 +6,6 @@ namespace MauticPlugin\MauticFullContactBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\MauticFullContactBundle\Integration\Support\ConfigSupport;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
