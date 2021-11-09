@@ -19,12 +19,16 @@ use Mautic\CampaignBundle\EventListener\CampaignRealtimeTriggerSubscriber;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Membership\Action\Adder;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
 
 final class CampaignRealtimeTriggerSubscriberTest extends TestCase
 {
-    private KickoffExecutioner $kickoffExecutioner;
+    /**
+     * @var KickoffExecutioner|MockObject
+     */
+    private $kickoffExecutioner;
 
     protected function setUp(): void
     {
