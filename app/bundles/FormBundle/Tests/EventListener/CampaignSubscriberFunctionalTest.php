@@ -20,7 +20,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     /**
      * @dataProvider valueProvider
      */
-    public function testComparingValueWithAmpersand(string $valueToCompare, string $submittedValue, bool $result): void
+    public function testComparingFormSubmissionValues(string $valueToCompare, string $submittedValue, bool $result): void
     {
         $formPayload = [
             'name'     => 'Test Form',
@@ -104,10 +104,13 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'testing@ampersand.select']);
         $event   = new CampaignExecutionEvent(
             [
-                'lead'  => $contact,
-                'event' => $campaignEvent,
+                'lead'            => $contact,
+                'event'           => $campaignEvent,
+                'eventDetails'    => null,
+                'systemTriggered' => false,
+                'eventSettings'   => [],
             ],
-            false
+            null
         );
 
         /** @var EventDispatcherInterface $dispatcher */
