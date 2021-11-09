@@ -59,7 +59,6 @@ class FieldValueTransformer
         foreach ($fields as $field) {
             switch ($field->getType()) {
                 case 'file':
-
                     $newValue = $this->router->generate(
                         'mautic_form_file_download',
                         [
