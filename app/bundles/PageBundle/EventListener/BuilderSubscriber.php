@@ -199,7 +199,6 @@ class BuilderSubscriber implements EventSubscriberInterface
                         self::saveprefsRegex     => $this->translator->trans('mautic.page.form.saveprefs'),
                         self::successmessage     => $this->translator->trans('mautic.page.form.successmessage'),
                         self::identifierToken    => $this->translator->trans('mautic.page.form.leadidentifier'),
-                        self::doNotContactToken  => $this->translator->trans('mautic.page.form.donotcontact'),
                     ]
                 )
             );
@@ -496,11 +495,6 @@ class BuilderSubscriber implements EventSubscriberInterface
             if (false !== strpos($content, self::saveprefsRegex)) {
                 $savePrefs = $this->renderSavePrefs($params);
                 $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
-            }
-
-            if (false !== strpos($content, self::doNotContactToken)) {
-                $doNotContact = $this->renderDoNotContact($params);
-                $content      = str_ireplace(self::doNotContactToken, $doNotContact, $content);
             }
 
             // add form before first block of prefs center
