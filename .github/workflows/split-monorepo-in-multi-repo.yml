@@ -4,7 +4,7 @@ on:
     push:
         # Only trigger for specific branches or changes in specific paths.
         branches:
-            - '*'
+            - '[0-9].*'
         paths:
             - app/**
             - plugins/**
