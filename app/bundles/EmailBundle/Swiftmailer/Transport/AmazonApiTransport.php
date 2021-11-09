@@ -18,7 +18,6 @@ use Aws\Exception\AwsException;
 use Aws\ResultInterface;
 use Aws\SesV2\Exception\SesV2Exception;
 use Aws\SesV2\SesV2Client;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Psr\Log\LoggerInterface;
@@ -68,7 +67,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $concurrency;
 
     /**
-     * @var Aws\CommandInterface | Psr\Http\Message\RequestInterface
+     * @var Aws\CommandInterface|Psr\Http\Message\RequestInterface
      */
     private $handler;
 
@@ -394,6 +393,11 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 if (isset($tokenizedMessage['headers'])) {
                     $headers = $toSendMessage->getHeaders();
                     foreach ($tokenizedMessage['headers'] as $key => $value) {
+                        if ('List-Unsubscribe' === $key) {
+                            $listUnsubscribe = array_map('trim', explode(',', $value));
+                            $listUnsubscribe = array_filter($listUnsubscribe, fn ($el) => strpos($el, $mailData['hashId']));
+                            $value           = implode(',', $listUnsubscribe);
+                        }
                         $headers->addTextHeader($key, $value);
                     }
                 }
