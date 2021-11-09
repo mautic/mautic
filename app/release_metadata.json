@@ -1,6 +1,6 @@
 {
-  "version": "4.0.0",
-  "stability": "stable",
+  "version": "4.0.2-rc",
+  "stability": "rc",
   "minimum_php_version": "7.4.0",
   "maximum_php_version": "8.0.99",
   "show_php_version_warning_if_under": "7.4.0",
