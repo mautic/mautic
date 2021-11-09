@@ -11,8 +11,6 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
-
 /**
  * Class SlotImageType.
  */

@@ -66,10 +66,11 @@ class PageRepository extends CommonRepository
      * @param bool   $topLevel
      * @param array  $ignoreIds
      * @param array  $extraColumns
+     * @param bool   $publishedOnly
      *
      * @return array
      */
-    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [])
+    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [], $publishedOnly = false)
     {
         $q = $this->createQueryBuilder('p');
         $q->select(sprintf('partial p.{id, title, language, alias %s}', empty($extraColumns) ? '' : ','.implode(',', $extraColumns)));
@@ -95,6 +96,11 @@ class PageRepository extends CommonRepository
             $q->andWhere($q->expr()->notIn('p.id', ':pageIds'))
                 ->setParameter('pageIds', $ignoreIds);
         }
+
+        if ($publishedOnly) {
+            $q->andWhere($q->expr()->eq('p.isPublished', 1));
+        }
+
         $q->orderBy('p.title');
 
         if (!empty($limit)) {

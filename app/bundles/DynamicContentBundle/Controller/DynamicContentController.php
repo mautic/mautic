@@ -234,7 +234,7 @@ class DynamicContentController extends FormController
      * @param            $objectId
      * @param bool|false $ignorePost
      *
-     * @return array | JsonResponse | RedirectResponse | Response
+     * @return array|JsonResponse|RedirectResponse|Response
      */
     public function editAction($objectId, $ignorePost = false)
     {
