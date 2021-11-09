@@ -17,6 +17,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     /**
      * @dataProvider valueProvider
      */
@@ -74,7 +76,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $form['mauticform[email]']->setValue('testing@ampersand.select');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         // Create some necessary entities.
         $campaignEvent = new Event();
@@ -135,5 +137,16 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             'unicorn',
             false,
         ];
+    }
+
+    protected function tearDown(): void
+    {
+        $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
+
+        parent::tearDown();
+
+        if ($this->connection->getSchemaManager()->tablesExist("{$tablePrefix}form_results_1_test_form")) {
+            $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_test_form");
+        }
     }
 }
