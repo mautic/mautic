@@ -6,11 +6,13 @@ on:
       - '[0-9].*'
   pull_request:
   schedule:
-    # Run every day at 10 AM UTC to discover potential issues with dependencies like PHP updates etc.
-    - cron: '0 10 * * *'
+    # Run every day at 10:45 AM UTC to discover potential issues with dependencies like PHP updates etc.
+    - cron: '45 10 * * *'
 
 jobs:
   phpunit:
+    # We don't want the scheduled jobs to run on forks of Mautic
+    if: (github.event_name == 'schedule' && github.repository_owner == 'mautic') || (github.event_name != 'schedule')
     runs-on: ubuntu-latest
 
     strategy:
@@ -115,6 +117,8 @@ jobs:
         path: ./var/logs/*
 
   misc:
+    # We don't want the scheduled jobs to run on forks of Mautic
+    if: (github.event_name == 'schedule' && github.repository_owner == 'mautic') || (github.event_name != 'schedule')
     runs-on: ubuntu-latest
 
     strategy:
