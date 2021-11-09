@@ -446,6 +446,9 @@ class Webhook extends FormEntity
         return $this->logs;
     }
 
+    /**
+     * @return Collection<int,self>
+     */
     public function getLimitedLogs(): Collection
     {
         $criteria = Criteria::create()

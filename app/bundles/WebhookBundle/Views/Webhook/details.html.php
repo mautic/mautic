@@ -11,7 +11,7 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'mauticWebhook');
 
-/* @var \Mautic\WebhookBundle\Entity\Webhook $item */
+/** @var \Mautic\WebhookBundle\Entity\Webhook $item */
 $view['slots']->set('headerTitle', $item->getName());
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
