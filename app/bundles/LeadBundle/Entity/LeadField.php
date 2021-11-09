@@ -266,13 +266,8 @@ class LeadField extends FormEntity
                 [
                     'defaultValue',
                     'isRequired',
-                    'isFixed',
-                    'isListable',
-                    'isVisible',
-                    'isVisible',
-                    'isShortVisible',
-                    'isUniqueIdentifier',
                     'isPubliclyUpdatable',
+                    'isUniqueIdentifier',
                     'properties',
                 ]
             )

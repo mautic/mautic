@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\LeadBundle\Templating\Helper\DefaultAvatarHelper;
 use Symfony\Component\HttpFoundation\RequestStack;

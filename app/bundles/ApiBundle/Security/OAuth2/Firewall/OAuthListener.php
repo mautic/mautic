@@ -11,6 +11,8 @@
 
 namespace Mautic\ApiBundle\Security\OAuth2\Firewall;
 
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+
 /**
  * Class OAuthListener.
  */

@@ -28,7 +28,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class AssetType extends AbstractType
 {
@@ -156,14 +155,7 @@ class AssetType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.asset.asset.form.language.help',
             ],
-            'required'    => true,
-            'constraints' => [
-                new NotBlank(
-                    [
-                        'message' => 'mautic.core.value.required',
-                    ]
-                ),
-            ],
+            'required' => false,
         ]);
 
         $builder->add('isPublished', YesNoButtonGroupType::class);

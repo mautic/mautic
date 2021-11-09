@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -17,6 +18,7 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RouterInterface;
 

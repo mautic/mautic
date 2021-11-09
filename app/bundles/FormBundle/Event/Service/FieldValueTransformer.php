@@ -13,7 +13,6 @@ namespace Mautic\FormBundle\Event\Service;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\SubmissionEvent;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class FieldValueTransformer
@@ -66,7 +65,7 @@ class FieldValueTransformer
                             'submissionId' => $submissionEvent->getSubmission()->getId(),
                             'field'        => $field->getAlias(),
                         ],
-                        UrlGeneratorInterface::ABSOLUTE_URL
+                        true
                     );
 
                     $tokenAlias = "{formfield={$field->getAlias()}}";
@@ -86,7 +85,7 @@ class FieldValueTransformer
 
         $submissionEvent->setTokens($tokens);
         $submissionEvent->setContactFieldMatches($contactFieldMatches);
-        $this->isTransformed = true;
+        $this->isIsTransformed();
     }
 
     /**

@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServiceInterface;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContactTracker

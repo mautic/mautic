@@ -13,6 +13,7 @@ namespace Mautic\FormBundle\EventListener;
 
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;
+use Mautic\CoreBundle\Form\Type\TelType;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Event as Events;

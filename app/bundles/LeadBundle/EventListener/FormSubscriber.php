@@ -170,8 +170,6 @@ class FormSubscriber implements EventSubscriberInterface
         $contact->addPointsChangeLog($pointsChangeLog);
 
         $this->leadModel->saveEntity($contact, false);
-
-        $event->getSubmission()->getLead()->setPoints($contact->getPoints());
     }
 
     public function onFormSubmitActionChangeList(SubmissionEvent $event): void

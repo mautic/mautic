@@ -322,12 +322,6 @@ return [
                     'translator',
                 ],
             ],
-            'mautic.form.type.slot.gatedvideo' => [
-                'class'     => Mautic\CoreBundle\Form\Type\GatedVideoType::class,
-                'arguments' => [
-                    'mautic.form.repository.form',
-                ],
-            ],
             'mautic.form.type.slot.segmentlist' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotSegmentListType',
                 'arguments' => [

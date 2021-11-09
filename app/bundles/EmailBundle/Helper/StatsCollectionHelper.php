@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Helper;
 
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\EmailBundle\Stats\Helper\BouncedHelper;
 use Mautic\EmailBundle\Stats\Helper\ClickedHelper;

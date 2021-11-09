@@ -11,6 +11,7 @@
 
 namespace Mautic\ApiBundle\Form\Validator\Constraints;
 
+use Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator;
 use Symfony\Component\Validator\Constraint;
 
 class OAuthCallback extends Constraint

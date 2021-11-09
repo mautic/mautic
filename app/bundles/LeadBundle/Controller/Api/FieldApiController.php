@@ -13,7 +13,6 @@ namespace Mautic\LeadBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -51,16 +50,6 @@ class FieldApiController extends CommonApiController
         ];
 
         parent::initialize($event);
-    }
-
-    protected function saveEntity($entity, int $statusCode): int
-    {
-        try {
-            return parent::saveEntity($entity, $statusCode);
-        } catch (AbortColumnCreateException $exception) {
-            // Field has been queued
-            return Response::HTTP_ACCEPTED;
-        }
     }
 
     /**

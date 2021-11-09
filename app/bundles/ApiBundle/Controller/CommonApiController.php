@@ -1118,11 +1118,10 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
                 return $this->returnError($e->getMessage(), $e->getCode());
             }
 
-            $statusCode = $this->saveEntity($entity, $statusCode);
-
+            $this->model->saveEntity($entity);
             $headers = [];
             //return the newly created entities location if applicable
-            if (in_array($statusCode, [Response::HTTP_CREATED, Response::HTTP_ACCEPTED])) {
+            if (Response::HTTP_CREATED === $statusCode) {
                 $route = (null !== $this->get('router')->getRouteCollection()->get('mautic_api_'.$this->entityNameMulti.'_getone'))
                     ? 'mautic_api_'.$this->entityNameMulti.'_getone' : 'mautic_api_get'.$this->entityNameOne;
                 $headers['Location'] = $this->generateUrl(
@@ -1164,13 +1163,6 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
         }
 
         return $this->handleView($view);
-    }
-
-    protected function saveEntity($entity, int $statusCode): int
-    {
-        $this->model->saveEntity($entity);
-
-        return $statusCode;
     }
 
     /**

@@ -43,6 +43,7 @@ class SubmissionModelTest extends FormTestAbstract
         $formModel->setFields($form, $fields);
 
         $submissionModel = $this->getSubmissionModel();
+        $this->assertFalse($submissionModel->saveSubmission($post, $server, $form, $request));
         /** @var SubmissionEvent $submissionEvent */
         $submissionEvent = $submissionModel->saveSubmission($post, $server, $form, $request, true)['submission'];
         $this->assertInstanceOf(SubmissionEvent::class, $submissionEvent);
@@ -55,8 +56,6 @@ class SubmissionModelTest extends FormTestAbstract
         $token              = '{formfield='.$alias.'}';
         $tokens[$token]     = $formData[$alias];
         $this->assertNotEquals($tokens[$token], $submissionEvent->getTokens()[$token]);
-
-        $this->assertFalse($submissionModel->saveSubmission($post, $server, $form, $request));
     }
 
     public function testNormalizeValues()
