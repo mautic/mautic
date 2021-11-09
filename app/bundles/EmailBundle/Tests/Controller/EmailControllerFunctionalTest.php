@@ -159,6 +159,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         // Create a segment
         $segment = new LeadList();
         $segment->setName('Test Segment A');
+        $segment->setPublicName('Test Segment A');
         $segment->setAlias('test-segment-a');
 
         // Create email template of type "list" and attach the segment to it
@@ -184,7 +185,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = $this->container->getParameter('mautic.db_table_prefix');
+        $prefix      = self::$container->getParameter('mautic.db_table_prefix');
 
         $pendingCountQuery = array_filter(
             $queries['default'],
