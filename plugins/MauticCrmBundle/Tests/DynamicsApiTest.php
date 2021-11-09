@@ -49,5 +49,8 @@ class DynamicsApiTest extends AbstractIntegrationTestCase
     public function testIntegration()
     {
         $this->assertSame('Dynamics', $this->integration->getName());
+        $this->assertSame(['push_lead', 'get_leads', 'push_leads'], $this->integration->getSupportedFeatures());
+        $this->assertSame('oauth2', $this->integration->getAuthenticationType());
+        $this->assertSame('modifiedon ge 2021-11-09T11:27:12Z', $this->integration->getFilterDateUTC('Tue Nov  9 12:27:12 CET 2021'));
     }
 }

@@ -482,6 +482,17 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * Convert to UTC date for API CALL.
+     */
+    public function getFilterDateUTC($paramDate)
+    {
+        $startDate = new DateTime($paramDate);
+        $startDate->setTimezone(new DateTimeZone('UTC'));
+
+        return sprintf('modifiedon ge %sZ', $startDate->format('Y-m-d\TH:i:s'));
+    }
+
+    /**
      * @param array $params
      *
      * @return int|null
@@ -507,9 +518,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$MAX_RECORDS;
                 $oparams['$select']                               = implode(',', $mappedData);
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
-                    $startDate = new DateTime($params['start']);
-                    $startDate->setTimezone(new DateTimeZone('UTC'));
-                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', $startDate->format('Y-m-d\TH:i:s'));
+                    $oparams['$filter'] = $this->getFilterDateUTC($params['start']);
                 }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
