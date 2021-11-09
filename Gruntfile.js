@@ -8,9 +8,6 @@ module.exports = function (grunt) {
     // Time how long tasks take. Can help when optimizing build times
     require('time-grunt')(grunt);
 
-    //grunt.loadNpmTasks('grunt-remove');
-    require('grunt-remove')(grunt);
-
     // Define the configuration for all the tasks
     grunt.initConfig({
 
@@ -38,16 +35,6 @@ module.exports = function (grunt) {
                 rename: function (dest, src) {
                     return dest + src.replace('.less', '.css')
                 },
-                dest: ''
-            }
-        },
-
-        // Remove prod's css files to force recompilation
-        remove: {
-            default_options: {
-                trace: true,
-                fileList: ['<%= mautic.rootAssets %>/app.css', '<%= mautic.rootAssets %>/libraries.css'],
-                tasks: ['remove'],
                 dest: ''
             }
         }
