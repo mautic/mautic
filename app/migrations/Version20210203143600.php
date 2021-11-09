@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 final class Version20210203143600 extends AbstractMauticMigration
 {
     /**
-     * @throws SkipMigrationException
+     * @throws SkipMigration
      */
     public function preUp(Schema $schema): void
     {

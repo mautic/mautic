@@ -568,7 +568,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Set footerScript.
      *
-     * @param string $headScript
+     * @param string $footerScript
      *
      * @return Page
      */

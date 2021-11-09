@@ -63,6 +63,8 @@ class PageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test setHeadScript and getHeadScript.
+     *
+     * @return void
      */
     public function testSetHeadScript()
     {
@@ -75,6 +77,8 @@ class PageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test setFooterScript and getFooterScript.
+     *
+     * @return void
      */
     public function testSetFooterScript()
     {
