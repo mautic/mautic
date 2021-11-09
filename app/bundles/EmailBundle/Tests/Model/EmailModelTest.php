@@ -27,11 +27,13 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -798,13 +800,20 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([0.0, 20.0, 50.0, 30.0], $chartData['datasets'][0]['data']);
     }
 
-    public function testIsUpdatingTranslationChildren()
+    public function testIsUpdatingTranslationChildren(): void
     {
-        $email       = new Email();
-        $parentEmail = new Email();
+        $email = new Email();
+        $email->setEmailType('list');
+        $email->addTranslationChild($child = new Email());
         $userHelper  = $this->createMock(UserHelper::class);
         $this->emailModel->setUserHelper($userHelper);
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher = new EventDispatcher();
+        $listener = function (EmailEvent $event) use ($child) {
+            $isChild = $event->getEmail() === $child;
+            $this->assertSame($isChild, $this->emailModel->isUpdatingTranslationChildren());
+        };
+        $dispatcher->addListener(EmailEvents::EMAIL_PRE_SAVE, $listener);
+        $dispatcher->addListener(EmailEvents::EMAIL_POST_SAVE, $listener);
         $this->emailModel->setDispatcher($dispatcher);
         $emailRepository = $this->createMock(EmailRepository::class);
         $this->entityManager->method('getRepository')->willReturn($emailRepository);
