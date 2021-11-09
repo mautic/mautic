@@ -6,6 +6,10 @@
 !.ddev
 !.php-cs-fixer.php
 .ddev/mautic-preference
+/.ddev/docker-compose.host-docker-internal.yaml
+!.gitpod.Dockerfile
+!.gitpod.yml
+!.ddev/commands/web/dd
 .php_cs.cache
 /.env
 /composer.phar
