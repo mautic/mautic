@@ -52,7 +52,7 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $em             = $this->getContainer()->get('doctrine')->getManager();
+        $em             = $this->getContainer()->get('doctrine')->getEntityManager();
         $ipAddressRepo  = $em->getRepository('MauticCoreBundle:IpAddress');
 
         try {
