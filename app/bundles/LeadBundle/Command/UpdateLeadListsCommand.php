@@ -20,7 +20,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateLeadListsCommand extends ModeratedCommand
 {
-
     protected function configure()
     {
         $this
@@ -71,7 +70,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $batch                 = $input->getOption('batch-limit');
         $max                   = $input->getOption('max-contacts');
         $enableTimeMeasurement = (bool) $input->getOption('timing');
-        $output         = ($input->getOption('quiet')) ? new NullOutput() : $output;
+        $output                = ($input->getOption('quiet')) ? new NullOutput() : $output;
 
         if (!$this->checkRunStatus($input, $output, $id)) {
             return 0;
