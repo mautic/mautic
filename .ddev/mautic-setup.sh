@@ -1,15 +1,9 @@
 #!/bin/bash
 
 setup_mautic() {
-    if [ -z "${GITPOD_WORKSPACE_URL}" ]; then
-        MAUTIC_URL="https://${DDEV_HOSTNAME}"
-        PHPMYADMIN_URL="https://${DDEV_HOSTNAME}:8037"
-        MAILHOG_URL="https://${DDEV_HOSTNAME}:8026"
-    else
-        MAUTIC_URL="$(gp url 8080)"
-        PHPMYADMIN_URL="$(gp url 8036)"
-        MAILHOG_URL="$(gp url 8025)"
-    fi
+    [ -z "${MAUTIC_URL}" ] && MAUTIC_URL="https://${DDEV_HOSTNAME}"
+    [ -z "${PHPMYADMIN_URL}" ] && PHPMYADMIN_URL="https://${DDEV_HOSTNAME}:8037"
+    [ -z "${MAILHOG_URL}" ] && MAILHOG_URL="https://${DDEV_HOSTNAME}:8026"
 
     printf "Installing Mautic Composer dependencies...\n"
     composer install
