@@ -79,7 +79,7 @@ $view['slots']->set(
                                 ['entity' => $list]
                             ); ?>
                             <tr>
-                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.lead.leads'); ?></span></td>
+                                <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans('mautic.lead.leads'); ?></span></td>
                                 <td><?php echo $segmentCount; ?></td>
                             </tr>
                             </tbody>
