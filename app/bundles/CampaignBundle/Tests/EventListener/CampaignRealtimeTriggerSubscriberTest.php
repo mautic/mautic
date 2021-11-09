@@ -38,7 +38,7 @@ final class CampaignRealtimeTriggerSubscriberTest extends TestCase
     /**
      * @dataProvider campaignRealtimeProvider
      */
-    public function testOnCampaignLeadChangeRealtimeTrigger(bool $isTriggerRealtime, InvokedCount $invokedCount)
+    public function testOnCampaignLeadChangeRealtimeTrigger(bool $isTriggerRealtime, InvokedCount $invokedCount): void
     {
         $campaignRealtimeTriggerSubscriber = new CampaignRealtimeTriggerSubscriber($this->kickoffExecutioner);
 
@@ -52,9 +52,9 @@ final class CampaignRealtimeTriggerSubscriberTest extends TestCase
         $campaignRealtimeTriggerSubscriber->onCampaignLeadChange($event);
     }
 
-    public function campaignRealtimeProvider(): iterable
+    public function campaignRealtimeProvider(): \Generator
     {
-        yield[true, self::once()];
-        yield[false, self::never()];
+        yield [true, self::once()];
+        yield [false, self::never()];
     }
 }
