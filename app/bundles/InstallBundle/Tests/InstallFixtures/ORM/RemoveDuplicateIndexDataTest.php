@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Mautic\InstallBundle\Tests\InstallFixtures\ORM;
 
 use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\Schema\SchemaException as DoctrineSchemaException;
-use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\InstallFixtures\ORM\RemoveDuplicateIndexData;
 use PHPUnit\Framework\Assert;

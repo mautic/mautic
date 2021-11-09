@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Doctrine\Provider;
 
 use Doctrine\DBAL\Connection;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 final class VersionProvider implements VersionProviderInterface
 {
