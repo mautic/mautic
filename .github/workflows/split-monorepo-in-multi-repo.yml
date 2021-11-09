@@ -25,6 +25,7 @@ on:
 
 jobs:
     sync_commits:
+        if: github.repository_owner == 'mautic'
         runs-on: ubuntu-latest
         name: Sync commits
         steps:
