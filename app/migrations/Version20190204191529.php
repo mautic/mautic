@@ -20,8 +20,6 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 class Version20190204191529 extends AbstractMauticMigration
 {
     /**
-     * @param Schema $schema
-     *
      * @throws SkipMigration
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
@@ -32,9 +30,6 @@ class Version20190204191529 extends AbstractMauticMigration
         }
     }
 
-    /**
-     * @param Schema $schema
-     */
     public function up(Schema $schema): void
     {
         $this->addSql('ALTER TABLE '.$this->prefix.'campaigns ADD trigger_realtime TINYINT(1) NOT NULL');

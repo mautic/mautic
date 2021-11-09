@@ -26,8 +26,6 @@ class CampaignRealtimeTriggerSubscriber implements EventSubscriberInterface
 
     /**
      * CampaignRealtimeTriggerSubscriber constructor.
-     *
-     * @param KickoffExecutioner $kickoffExecutioner
      */
     public function __construct(KickoffExecutioner $kickoffExecutioner)
     {
@@ -45,9 +43,6 @@ class CampaignRealtimeTriggerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignLeadChangeEvent $event
-     */
     public function onCampaignLeadChange(CampaignLeadChangeEvent $event)
     {
         if ($event->getCampaign()->isTriggerRealtime() && $event->wasAdded()) {
