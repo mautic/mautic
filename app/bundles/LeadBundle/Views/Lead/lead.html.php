@@ -216,7 +216,7 @@ $view['slots']->set(
                                         <tbody>
                                         <?php foreach ($fields[$group] as $field): ?>
                                             <tr>
-                                                <td width="20%"><span class="fw-b"><?php echo $view->escape($field['label']); ?></span>
+                                                <td width="20%"><span class="fw-b textTitle"><?php echo $view->escape($field['label']); ?></span>
                                                 </td>
                                                 <td>
                                                     <?php if ('core' == $group && 'country' == $field['alias'] && !empty($flag)): ?>

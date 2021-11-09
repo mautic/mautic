@@ -14,7 +14,6 @@ namespace Mautic\ApiBundle\Entity\oAuth2;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\Client as BaseClient;
-use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
