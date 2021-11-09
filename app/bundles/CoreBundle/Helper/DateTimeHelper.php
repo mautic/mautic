@@ -57,7 +57,7 @@ class DateTimeHelper
      * Sets date/time.
      *
      * @param \DateTimeInterface|string $datetime
-     * @param string                    $fromFormat
+     * @param string|null               $fromFormat
      * @param string                    $timezone
      */
     public function setDateTime($datetime = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'local')

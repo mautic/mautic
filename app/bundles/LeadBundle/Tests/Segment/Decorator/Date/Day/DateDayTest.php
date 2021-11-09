@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
 class DateDayTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetParameterValue()
+    public function testGetParameterValue(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);

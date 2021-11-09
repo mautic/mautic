@@ -20,7 +20,7 @@ abstract class DateDayAbstract extends DateOptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
+    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper): void
     {
     }
 

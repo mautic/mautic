@@ -19,7 +19,7 @@ class DateMonth extends DateMonthAbstract
     /**
      * {@inheritdoc}
      */
-    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
+    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper): void
     {
         $dateTimeHelper->setDateTime('midnight first day of this month', null);
     }
