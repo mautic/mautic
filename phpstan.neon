@@ -1,5 +1,17 @@
+includes:
+	- phpstan-baseline.neon
+	- vendor/phpstan/phpstan/conf/bleedingEdge.neon
+
 parameters:
-	level: 1
+	level: 6
+	reportUnmatchedIgnoredErrors: false
+	parallel:
+		maximumNumberOfProcesses: 1
+		processTimeout: 1000.0
+	paths:
+		- app/bundles
+		- app/migrations
+		- plugins
 	excludes_analyse:
 		- *.html.php
 		- *.js.php
@@ -18,11 +30,10 @@ parameters:
 		- app/bundles/CoreBundle/Configurator/Configurator.php
 	ignoreErrors:
 		- '#Cannot unset offset#'
-		- '#Undefined variable: \$container#'
 		- '#Undefined variable: \$parameters#'
-		- '#Call to an undefined static method Mautic\\IntegrationsBundle\\Bundle\\AbstractPluginBundle::installAllTablesIfMissing\(\).#'
 		- '#Constant MAUTIC_TABLE_PREFIX not found.#'
 		- '#Constant MAUTIC_ENV not found.#'
 		- '#Constant MAUTIC_VERSION not found.#'
 		- '/Variable \$\w+ might not be defined\./'
 		- '/Variable \$paths in isset\(\) is never defined\./'
+		- '#Call to an undefined static method static\(Mautic\\IntegrationsBundle\\Bundle\\AbstractPluginBundle\)::installAllTablesIfMissing\(\).#'
