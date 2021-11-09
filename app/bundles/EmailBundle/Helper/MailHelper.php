@@ -76,16 +76,6 @@ class MailHelper
     /**
      * @var string
      */
-    protected $replyTo;
-
-    /**
-     * @var string
-     */
-    protected $systemReplyTo;
-
-    /**
-     * @var string
-     */
     protected $returnPath;
 
     /**
@@ -262,13 +252,11 @@ class MailHelper
             $this->logError($e);
         }
 
-        $systemFromEmail    = $factory->getParameter('mailer_from_email');
-        $systemReplyToEmail = $factory->getParameter('mailer_reply_to_email');
-        $systemFromName     = $this->cleanName(
+        $systemFromEmail  = $factory->getParameter('mailer_from_email');
+        $systemFromName   = $this->cleanName(
             $factory->getParameter('mailer_from_name')
         );
         $this->setDefaultFrom($from, [$systemFromEmail => $systemFromName]);
-        $this->setDefaultReplyTo($systemReplyToEmail, $this->from);
 
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
@@ -367,9 +355,6 @@ class MailHelper
             }
         } // from is set in flushQueue
 
-        if (!empty($this->replyTo)) {
-            $this->setReplyTo($this->replyTo);
-        }
         // Set system return path if applicable
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
             $this->message->setReturnPath($bounceEmail);
@@ -687,7 +672,6 @@ class MailHelper
             $this->appendTrackingPixel = false;
             $this->queueEnabled        = false;
             $this->from                = $this->systemFrom;
-            $this->replyTo             = $this->systemReplyTo;
             $this->headers             = [];
             [];
             $this->source              = [];
@@ -1389,12 +1373,9 @@ class MailHelper
             $this->from = $this->systemFrom;
         }
 
-        $this->replyTo = $email->getReplyToAddress();
-        if (empty($this->replyTo)) {
-            $this->replyTo = $this->systemReplyTo;
-        }
-        if (!empty($this->replyTo)) {
-            $addresses = explode(',', $this->replyTo);
+        $replyTo = $email->getReplyToAddress();
+        if (!empty($replyTo)) {
+            $addresses = explode(',', $replyTo);
 
             // Only a single email is supported
             $this->setReplyTo($addresses[0]);
@@ -2207,22 +2188,5 @@ class MailHelper
 
         $this->systemFrom = $overrideFrom ?: $systemFrom;
         $this->from       = $this->systemFrom;
-    }
-
-    /**
-     * @param $systemReplyToEmail
-     * @param $systemFromEmail
-     */
-    private function setDefaultReplyTo($systemReplyToEmail =null, $systemFromEmail = null)
-    {
-        $fromEmail = null;
-        if (is_array($systemFromEmail)) {
-            $fromEmail    = key($systemFromEmail);
-        } elseif (!empty($systemFromEmail)) {
-            $fromEmail = $systemFromEmail;
-        }
-
-        $this->systemReplyTo = $systemReplyToEmail ?: $fromEmail;
-        $this->replyTo       = $this->systemReplyTo;
     }
 }
