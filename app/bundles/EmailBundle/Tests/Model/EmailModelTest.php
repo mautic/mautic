@@ -292,11 +292,11 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->mailHelper->method('createEmailStat')
             ->will($this->returnCallback(
                 function () {
-                $stat = new Stat();
-                $stat->setEmail($this->emailEntity);
+                    $stat = new Stat();
+                    $stat->setEmail($this->emailEntity);
 
-                return $stat;
-            }
+                    return $stat;
+                }
             ));
 
         $variantA = $this->createMock(Email::class);
@@ -430,11 +430,11 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->mailHelper->method('createEmailStat')
             ->will($this->returnCallback(
                 function () {
-                $stat = new Stat();
-                $stat->setEmail($this->emailEntity);
+                    $stat = new Stat();
+                    $stat->setEmail($this->emailEntity);
 
-                return $stat;
-            }
+                    return $stat;
+                }
             ));
 
         $variantA = $this->createMock(Email::class);
