@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Event\AuthenticationContentEvent;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Templating\Helper\Helper;
