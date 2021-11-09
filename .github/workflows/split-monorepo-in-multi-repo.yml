@@ -4,7 +4,7 @@ on:
     push:
         # Only trigger for specific branches or changes in specific paths.
         branches:
-            - '*'
+            - '[0-9].*'
         paths:
             - app/**
             - plugins/**
@@ -25,6 +25,7 @@ on:
 
 jobs:
     sync_commits:
+        if: github.repository_owner == 'mautic'
         runs-on: ubuntu-latest
         name: Sync commits
         steps:
