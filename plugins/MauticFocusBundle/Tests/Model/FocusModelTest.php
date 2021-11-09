@@ -27,22 +27,22 @@ use Symfony\Component\Templating\DelegatingEngine;
 class FocusModelTest extends TestCase
 {
     /**
-     * @var ContactTracker|mixed|MockObject
+     * @var ContactTracker|MockObject
      */
     private $contactTracker;
 
     /**
-     * @var mixed|MockObject|EventDispatcherInterface
+     * @var MockObject|EventDispatcherInterface
      */
     private $dispatcher;
 
     /**
-     * @var FormModel|mixed|MockObject
+     * @var FormModel|MockObject
      */
     private $formModel;
 
     /**
-     * @var FieldModel|mixed|MockObject
+     * @var FieldModel|MockObject
      */
     private $leadFieldModel;
 
