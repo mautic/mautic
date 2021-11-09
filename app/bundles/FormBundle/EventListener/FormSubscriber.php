@@ -14,7 +14,6 @@ namespace Mautic\FormBundle\EventListener;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
-use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
