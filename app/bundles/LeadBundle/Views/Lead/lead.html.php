@@ -349,7 +349,7 @@ $view['slots']->set(
                         </a>
                     </li>
                 <?php endif; ?>
-                
+
                 <?php echo $view['content']->getCustomContent('tabs', $mauticTemplateVars); ?>
             </ul>
             <!--/ tabs controls -->
@@ -419,7 +419,7 @@ $view['slots']->set(
             <!-- custom content -->
             <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>
             <!-- end: custom content -->
-            
+
             <!-- #place-container -->
             <?php if ($places): ?>
                 <div class="tab-pane fade bdr-w-0" id="place-container">
@@ -584,18 +584,35 @@ $view['slots']->set(
             <?php foreach ($companies as $key => $company): ?>
             <h5 class="pull-left mt-xs mr-xs">
                 <span class="label label-success">
-                    <i id="company-<?php echo $company['id']; ?>" 
-                        class="fa fa-check <?php echo (1 == $company['is_primary']) ? 'primary' : ''; ?>" 
-                        onclick="Mautic.setAsPrimaryCompany(<?php echo $company['id']; ?>, <?php echo $lead->getId(); ?>);" 
+                    <i id="company-<?php echo $company['id']; ?>"
+                        class="fa fa-check <?php echo (1 == $company['is_primary']) ? 'primary' : ''; ?>"
+                        onclick="Mautic.setAsPrimaryCompany(<?php echo $company['id']; ?>, <?php echo $lead->getId(); ?>);"
                         title="<?php echo $view['translator']->trans('mautic.lead.company.set.primary'); ?>">
                     </i>
-                    <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'view', 'objectId' => $company['id']]); ?>" style="color: white;">
+                    <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'view', 'objectId' => $company['id']]); ?>" data-toggle="ajax" style="color: white;">
                         <?php echo $view->escape($company['companyname']); ?>
                     </a>
                 </span>
             </h5>
             <?php endforeach; ?>
             <div class="clearfix"></div>
+        </div>
+        <?php if (isset($lists[$lead->getId()])): ?>
+          <div class="pa-sm panel-segments">
+            <div class="panel-title">
+              <?php echo $view['translator']->trans('mautic.lead.lead.lists'); ?>
+            </div>
+            <?php foreach ($lists[$lead->getId()] as $key => $list): ?>
+              <h5 class="pull-left mt-xs mr-xs">
+                    <span class="label label-success">
+                        <a href="<?php echo $view['router']->path('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list['id']]); ?>" data-toggle="ajax" style="color: white;">
+                            <?php echo $view->escape($list['name']); ?>
+                        </a>
+                    </span>
+              </h5>
+            <?php endforeach; ?>
+          <?php endif; ?>
+          <div class="clearfix"></div>
         </div>
     </div>
     <!--/ right section -->
