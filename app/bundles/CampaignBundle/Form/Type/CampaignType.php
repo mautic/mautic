@@ -69,7 +69,7 @@ class CampaignType extends AbstractType
         );
 
         $builder->add('triggerRealtime',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.campaign.trigger_realtime',
                 'attr'  => [
