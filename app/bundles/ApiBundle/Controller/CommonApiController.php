@@ -765,7 +765,6 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
 
     /**
      * @param        $parameters
-     * @param        $errors
      * @param bool   $prepareForSerialization
      * @param string $requestIdColumn
      * @param null   $model
@@ -900,7 +899,6 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before populating the form.
      *
-     * @param        $entity
      * @param        $parameters
      * @param string $action
      *
@@ -927,7 +925,6 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer.
      *
-     * @param        $entity
      * @param string $action
      *
      * @return mixed
@@ -1250,7 +1247,6 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
      * @param       $key
      * @param       $msg
      * @param       $code
-     * @param       $errors
      * @param array $entities
      * @param null  $entity
      */
