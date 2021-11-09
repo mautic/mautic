@@ -155,7 +155,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         }
         $q = $this->optimizeListLeadQuery($q);
 
-        return  $this->loadAndBuildTimeData($q);
+        return $this->loadAndBuildTimeData($q);
     }
 
     /**

@@ -1,5 +1,17 @@
+includes:
+	- phpstan-baseline.neon
+	- vendor/phpstan/phpstan/conf/bleedingEdge.neon
+
 parameters:
-	level: 1
+	level: 6
+	reportUnmatchedIgnoredErrors: false
+	parallel:
+		maximumNumberOfProcesses: 1
+		processTimeout: 1000.0
+	paths:
+		- app/bundles
+		- app/migrations
+		- plugins
 	excludes_analyse:
 		- *.html.php
 		- *.js.php
