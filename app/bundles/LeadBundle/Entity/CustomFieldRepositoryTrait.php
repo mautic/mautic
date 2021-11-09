@@ -62,7 +62,7 @@ trait CustomFieldRepositoryTrait
 
         //get a total count
         $result = $dq->execute()->fetchAll();
-        $total  = ($result) ? $result[0]['count'] : 0;
+        $total  = ($result) ? (int) $result[0]['count'] : 0;
 
         if (!$total) {
             $results = [];
@@ -282,7 +282,6 @@ trait CustomFieldRepositoryTrait
     /**
      * Function to remove non custom field columns from an arrayed lead row.
      *
-     * @param       $r
      * @param array $fixedFields
      */
     protected function removeNonFieldColumns(&$r, $fixedFields = [])

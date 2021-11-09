@@ -1,5 +1,13 @@
+import AssetService from './asset.service';
 import BuilderService from './builder.service';
-// import builder from './builder.service';
+// import grapesjsmautic from 'grapesjs-preset-mautic/src/content.service';
+
+// all css get combined into one builder.css and automatically loaded via js/parcel
+import 'grapesjs/dist/css/grapes.min.css';
+// not compatible with the newsletter preset css, brings the redish color
+// import 'grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css';
+import 'grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.css';
+import './grapesjs-custom.css';
 
 /**
  * Launch builder
@@ -8,22 +16,9 @@ import BuilderService from './builder.service';
  * @param actionName
  */
 function launchBuilderGrapesjs(formName) {
-  // Parse HTML template
-  const parser = new DOMParser();
-  const textareaHtml = mQuery('textarea.builder-html');
-  const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
-  const fullHtml = parser.parseFromString(textareaHtml.val(), 'text/html');
+  const assets = AssetService.getAssets();
 
-  const canvasContent = mQuery('textarea.builder-mjml').val() ? mQuery('textarea.builder-mjml').val() : fullHtml.body.innerHTML;
-
-  const assets = textareaAssets.val() ? JSON.parse(textareaAssets.val()) : [];
-
-  const builder = new BuilderService(
-    canvasContent,
-    assets,
-    textareaAssets.data('upload'),
-    textareaAssets.data('delete')
-  );
+  const builder = new BuilderService(assets);
 
   Mautic.showChangeThemeWarning = true;
 
@@ -100,11 +95,6 @@ function initSelectThemeGrapesjs(parentInitSelectTheme) {
   return childInitSelectTheme;
 }
 
-Mautic.grapesConvertDynamicContentTokenToSlot =
-  BuilderService.grapesConvertDynamicContentTokenToSlot;
-Mautic.grapesConvertDynamicContentSlotsToTokens =
-  BuilderService.grapesConvertDynamicContentSlotsToTokens;
-Mautic.manageDynamicContentTokenToSlot = BuilderService.manageDynamicContentTokenToSlot;
 Mautic.launchBuilder = launchBuilderGrapesjs;
 Mautic.initSelectTheme = initSelectThemeGrapesjs(Mautic.initSelectTheme);
 Mautic.setThemeHtml = setThemeHtml;
