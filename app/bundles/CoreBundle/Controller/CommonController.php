@@ -19,8 +19,6 @@ use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
-use Sonata\Exporter\Source\ArraySourceIterator;
-use Sonata\Exporter\Source\IteratorSourceIterator;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -186,7 +184,7 @@ class CommonController extends Controller implements MauticController
             $args = [
                 'contentTemplate' => $args,
                 'passthroughVars' => [
-                    'mauticContent' => strtolower($this->request->get('bundle')),
+                    'mauticContent' => strtolower(InputHelper::alphanum($this->request->query->get('bundle'))),
                 ],
             ];
         }
@@ -203,7 +201,7 @@ class CommonController extends Controller implements MauticController
             if (isset($args['passthroughVars']['mauticContent'])) {
                 $mauticContent = $args['passthroughVars']['mauticContent'];
             } else {
-                $mauticContent = strtolower($this->request->get('bundle'));
+                $mauticContent = strtolower(InputHelper::alphanum($this->request->query->get('bundle')));
             }
             $args['viewParameters']['mauticContent'] = $mauticContent;
         }
