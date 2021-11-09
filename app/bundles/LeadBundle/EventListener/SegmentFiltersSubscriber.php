@@ -199,14 +199,6 @@ class SegmentFiltersSubscriber implements EventSubscriberInterface
                 ),
                 'object' => 'lead',
             ],
-            'tags' => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
-                'properties' => [
-                    'type' => 'tags',
-                ],
-                'operators' => $this->listModel->getOperatorsForFieldType('multiselect'),
-                'object'    => 'lead',
-            ],
             'device_type' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.device_type'),
                 'properties' => [
