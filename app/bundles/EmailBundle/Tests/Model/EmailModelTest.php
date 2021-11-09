@@ -290,13 +290,14 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue(true));
 
         $this->mailHelper->method('createEmailStat')
-            ->will($this->returnCallback(function () {
+            ->will($this->returnCallback(
+                function () {
                 $stat = new Stat();
                 $stat->setEmail($this->emailEntity);
 
                 return $stat;
             }
-        ));
+            ));
 
         $variantA = $this->createMock(Email::class);
         $variantA->expects($this->any())
@@ -427,7 +428,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailEntity->method('isVariant')->will($this->returnValue(true));
 
         $this->mailHelper->method('createEmailStat')
-            ->will($this->returnCallback(function () {
+            ->will($this->returnCallback(
+                function () {
                 $stat = new Stat();
                 $stat->setEmail($this->emailEntity);
 
