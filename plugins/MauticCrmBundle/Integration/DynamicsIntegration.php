@@ -483,6 +483,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * Convert to UTC date for API CALL.
+     *
+     * @return string
      */
     public function getFilterDateUTC($paramDate)
     {
