@@ -34,6 +34,7 @@
     *   phpstan/phpstan to ^0.12.82
 *   Commands
     * \Mautic\CoreBundle\Command\ModeratedCommand::$lockHandler is now private
+    * \Mautic\InstallBundle\Command\InstallCommand (Mautic's CLI installer) had some bugs fixed and might as well be slightly stricter in some edge cases. Please validate if your CLI installation scripts are still working correctly.
 *   Services
     * `mautic.http.client` has been upgraded from GuzzleHttp 6 to 7. You can now leverage `Psr\Http\Client\ClientInterface` (PSR-18) or `GuzzleHttp\Client` (more convenience methods) in your class constructors! Example:
 
