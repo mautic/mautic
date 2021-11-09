@@ -154,7 +154,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         return $email;
     }
 
-    public function testEmailDetailsPageShouldNotHavePendingCount()
+    public function testEmailDetailsPageShouldNotHavePendingCount(): void
     {
         // Create a segment
         $segment = new LeadList();
@@ -177,7 +177,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         // checking if pending count is removed from details page ui
         $emailDetailsContainer = trim($crawler->filter('#email-details')->filter('tbody')->text());
-        $this->assertNotContains('Pending', $emailDetailsContainer);
+        $this->assertStringNotContainsString('Pending', $emailDetailsContainer);
 
         $profile = $this->client->getProfile();
 
@@ -188,9 +188,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $pendingCountQuery = array_filter(
             $queries['default'],
-            function (array $query) use ($prefix,$segment,$email) {
-                return $query['sql'] === "SELECT count(*) as count FROM {$prefix}leads l WHERE (EXISTS (SELECT null FROM {$prefix}lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN ({$segment->getId()})) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM {$prefix}lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM {$prefix}email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id IN ({$email->getId()})))) AND (NOT EXISTS (SELECT null FROM {$prefix}message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id IN ({$email->getId()})))) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
-            }
+            fn (array $query) => $query['sql'] === "SELECT count(*) as count FROM {$prefix}leads l WHERE (EXISTS (SELECT null FROM {$prefix}lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN ({$segment->getId()})) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM {$prefix}lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM {$prefix}email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id IN ({$email->getId()})))) AND (NOT EXISTS (SELECT null FROM {$prefix}message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id IN ({$email->getId()})))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"
         );
 
         $this->assertCount(0, $pendingCountQuery);
