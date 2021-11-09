@@ -322,7 +322,7 @@ class Submission
     {
         $this->trackingId = $trackingId;
 
-        return  $this;
+        return $this;
     }
 
     /**
