@@ -484,7 +484,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * Convert to UTC date string for API call.
      *
-     * @param array $paramDate
+     * @param string $paramDate
      *
      * @return string
      */
