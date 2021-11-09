@@ -52,7 +52,7 @@ final class CampaignRealtimeTriggerSubscriberTest extends TestCase
         $campaignRealtimeTriggerSubscriber->onCampaignLeadChange($event);
     }
 
-    public function campaignRealtimeProvider(): \Generator
+    public function campaignRealtimeProvider(): iterable
     {
         yield [true, self::once()];
         yield [false, self::never()];
