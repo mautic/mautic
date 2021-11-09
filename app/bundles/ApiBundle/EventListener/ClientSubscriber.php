@@ -13,7 +13,6 @@ namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event as Events;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

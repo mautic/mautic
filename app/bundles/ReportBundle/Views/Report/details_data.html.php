@@ -64,9 +64,12 @@ $graphContent = $view->render(
                             <?php foreach ($columnOrder as $key): ?>
                                 <?php
                                 if (isset($columns[$key])):
+                                    // order by alias if exists, if not then by column name
+                                    $orderBy = $columns[$key]['alias'] ??
+                                        (0 === strpos($key, 'channel.') ? str_replace('.', '_', $key) : $key);
                                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                                         'sessionVar' => 'report.'.$report->getId(),
-                                        'orderBy'    => 0 === strpos($key, 'channel.') ? str_replace('.', '_', $key) : $key,
+                                        'orderBy'    => $orderBy,
                                         'text'       => $columns[$key]['label'],
                                         'class'      => 'col-report-'.$columns[$key]['type'],
                                         'dataToggle' => in_array($columns[$key]['type'], ['date', 'datetime']) ? 'date' : '',
@@ -111,14 +114,8 @@ $graphContent = $view->render(
                                         <td>
                                             <?php $closeLink = false; ?>
                                             <?php if (isset($columns[$key]['link']) && !empty($row[$columns[$key]['alias']])): ?>
-                                        <?php $closeLink = true;
-                                        if (array_key_exists('comp.id', $columns)) {
-                                            $objectAction = 'edit';
-                                        } else {
-                                            $objectAction = 'view';
-                                        }
-                                        ?>
-                                            <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => $objectAction, 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
+                                        <?php $closeLink = true; ?>
+                                            <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => 'view', 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
                                                 <?php endif; ?>
                                                 <?php
                                                 $cellType = $columns[$key]['type'];
