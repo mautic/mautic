@@ -882,7 +882,7 @@ class PageModel extends FormModel
         }
 
         $allQ->resetQueryPart('select')->select('t.id');
-        $allQ->groupBy('t.lead_id');
+        $allQ->groupBy('t.id');
 
         // fetch all group by lead_id
         $q  = $this->em->getConnection()->createQueryBuilder();
