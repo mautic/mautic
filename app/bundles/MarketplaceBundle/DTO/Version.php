@@ -33,8 +33,8 @@ final class Version
             new \DateTimeImmutable($array['time']),
             $array['homepage'],
             $array['support']['issues'] ?? '',
-            (array) $array['require'],
-            (array) $array['keywords']
+            $array['require'] ?? [],
+            $array['keywords'] ?? []
         );
     }
 }
