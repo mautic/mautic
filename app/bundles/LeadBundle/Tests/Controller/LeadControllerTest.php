@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
-use Mautic\CampaignBundle\DataFixtures\ORM\CampaignData;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -123,11 +123,12 @@ class LeadControllerTest extends MauticMysqlTestCase
 
     public function testContactsAreAddedToThenRemovedFromCampaignsInBatch()
     {
-        $this->loadFixtures([CampaignData::class, LoadLeadData::class]);
+        $this->loadFixtures([LoadLeadData::class]);
 
-        $payload = [
+        $campaign = $this->createCampaign();
+        $payload  = [
             'lead_batch' => [
-                'add' => [1],
+                'add' => [$campaign->getId()],
                 'ids' => json_encode([1, 2, 3]),
             ],
         ];
@@ -158,7 +159,7 @@ class LeadControllerTest extends MauticMysqlTestCase
                     'date_last_exited' => null,
                 ],
             ],
-            $this->getMembersForCampaign(1)
+            $this->getMembersForCampaign($campaign->getId())
         );
 
         $response = json_decode($clientResponse->getContent(), true);
@@ -168,7 +169,7 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         $payload = [
             'lead_batch' => [
-                'remove' => [1],
+                'remove' => [$campaign->getId()],
                 'ids'    => json_encode([1, 2, 3]),
             ],
         ];
@@ -359,5 +360,43 @@ class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertStringContainsString('firstname: This field is required.', $clientResponse->getContent());
+    }
+
+    private function createCampaign(): Campaign
+    {
+        $campaign = new Campaign();
+
+        $campaign->setName('Campaign A');
+        $campaign->setCanvasSettings(
+            [
+                'nodes' => [
+                    [
+                        'id'        => '148',
+                        'positionX' => '760',
+                        'positionY' => '155',
+                    ],
+                    [
+                        'id'        => 'lists',
+                        'positionX' => '860',
+                        'positionY' => '50',
+                    ],
+                ],
+                'connections' => [
+                    [
+                        'sourceId' => 'lists',
+                        'targetId' => '148',
+                        'anchors'  => [
+                            'source' => 'leadsource',
+                            'target' => 'top',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        return $campaign;
     }
 }
