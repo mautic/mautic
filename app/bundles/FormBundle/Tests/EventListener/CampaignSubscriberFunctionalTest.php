@@ -24,7 +24,6 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     public function testComparingFormSubmissionValues(string $valueToCompare, string $submittedValue, bool $result): void
     {
-        $this->markTestSkipped('Testing if this test has some effect on other failing tests');
         $formPayload = [
             'name'     => 'Test Form',
             'formType' => 'campaign',

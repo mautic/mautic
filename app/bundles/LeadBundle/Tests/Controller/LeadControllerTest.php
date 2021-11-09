@@ -230,6 +230,10 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
 
+        $clientResponse = $this->client->getResponse();
+
+        Assert::assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+
         /** @var AuditLogRepository $auditLogRepository */
         $auditLogRepository = $this->em->getRepository(AuditLog::class);
 
