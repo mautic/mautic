@@ -105,6 +105,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     const saveprefsRegex    = '{saveprefsbutton}';
     const successmessage    = '{successmessage}';
     const identifierToken   = '{leadidentifier}';
+    const doNotContactToken = '{do_not_contact_text}';
     const dncUrl            = '{dnc_url}';
 
     /**
@@ -199,6 +200,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                         self::saveprefsRegex     => $this->translator->trans('mautic.page.form.saveprefs'),
                         self::successmessage     => $this->translator->trans('mautic.page.form.successmessage'),
                         self::identifierToken    => $this->translator->trans('mautic.page.form.leadidentifier'),
+                        self::doNotContactToken  => $this->translator->trans('mautic.page.form.donotcontact'),
                     ]
                 )
             );
