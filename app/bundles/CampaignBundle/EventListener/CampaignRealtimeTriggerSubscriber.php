@@ -43,7 +43,7 @@ class CampaignRealtimeTriggerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignLeadChange(CampaignLeadChangeEvent $event)
+    public function onCampaignLeadChange(CampaignLeadChangeEvent $event): void
     {
         if ($event->getCampaign()->isTriggerRealtime() && $event->wasAdded()) {
             $leads = $event->getLeads();

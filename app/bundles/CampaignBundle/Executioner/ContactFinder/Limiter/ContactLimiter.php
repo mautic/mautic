@@ -80,7 +80,7 @@ class ContactLimiter
      * @param int|null $campaignLimit
      */
     public function __construct(
-        $batchLimit,
+        $batchLimit = null,
         $contactId = null,
         $minContactId = null,
         $maxContactId = null,
