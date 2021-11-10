@@ -2287,7 +2287,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param                 $leadsToSync
      * @param bool|\Exception $error
      *
      * @return int Number ignored due to being duplicates
