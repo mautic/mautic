@@ -471,7 +471,7 @@ class PageModel extends FormModel
             $lead = $this->leadModel->getContactFromRequest($query);
 
             // company
-            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
+            [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
             if ($leadAdded) {
                 $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             } elseif ($companyEntity instanceof Company) {
@@ -739,8 +739,10 @@ class PageModel extends FormModel
      */
     public function getHitQuery(Request $request, $page = null)
     {
-        // get all post params
-        $query = $request->request->all();
+        $get  = $request->query->all();
+        $post = $request->request->all();
+
+        $query = \array_merge($get, $post);
 
         // Set generated page url
         $query['page_url'] = $this->getPageUrl($request, $page);
@@ -1028,8 +1030,10 @@ class PageModel extends FormModel
         parse_str($urlQuery, $urlQueryArray);
 
         foreach ($urlQueryArray as $key => $value) {
-            $key           = strtolower($key);
-            $query[$key]   = urldecode($value);
+            if (is_string($value)) {
+                $key         = strtolower($key);
+                $query[$key] = urldecode($value);
+            }
         }
 
         return $query;

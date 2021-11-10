@@ -3,16 +3,16 @@ name: Mautic tests and validations
 on:
   push:
     branches:
-      - staging
-      - features
-      - '[0-9]+\.[0-9]+'
+      - '[0-9].*'
   pull_request:
   schedule:
-    # Run every day at 10 AM UTC to discover potential issues with dependencies like PHP updates etc.
-    - cron: '0 10 * * *'
+    # Run every day at 10:45 AM UTC to discover potential issues with dependencies like PHP updates etc.
+    - cron: '45 10 * * *'
 
 jobs:
   phpunit:
+    # We don't want the scheduled jobs to run on forks of Mautic
+    if: (github.event_name == 'schedule' && github.repository_owner == 'mautic') || (github.event_name != 'schedule')
     runs-on: ubuntu-latest
 
     strategy:
@@ -53,6 +53,7 @@ jobs:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
         coverage: pcov
+        ini-values: pcov.directory=., pcov.exclude="~tests|themes|vendor~"
     
     - name: Set SYMFONY_ENV to test
       run: echo "SYMFONY_ENV=test" >> $GITHUB_ENV
@@ -96,7 +97,7 @@ jobs:
 
     - name: Upload coverage report
       if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' }}
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v2
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
@@ -116,17 +117,25 @@ jobs:
         path: ./var/logs/*
 
   misc:
+    # We don't want the scheduled jobs to run on forks of Mautic
+    if: (github.event_name == 'schedule' && github.repository_owner == 'mautic') || (github.event_name != 'schedule')
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'CS Fixer']
+        commands: ['PHPSTAN', 'CS Fixer', 'Rector']
 
     name: ${{ matrix.commands }}
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v6.2
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
@@ -146,8 +155,14 @@ jobs:
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           composer rector -- --dry-run --no-progress-bar
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
-          bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots \
-          --diff $(git diff -- '*.php' --name-only --diff-filter=ACMRTUXB "HEAD~..HEAD")
+          for file in ${{ steps.changed-files.outputs.all_modified_files }}; do
+            if [[ $file == *.php ]]; then
+              cs_fix_files="${cs_fix_files} $file"
+            fi
+          done
+          if [[ $cs_fix_files ]]; then
+            bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --using-cache=no --show-progress=dots --diff $cs_fix_files
+          fi
         else
           echo "Invalid command"
           exit 1
