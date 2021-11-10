@@ -140,7 +140,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="http://twitter.com/j26w"><img src="https://avatars.githubusercontent.com/u/1260184?v=4?s=100" width="100px;" alt=""/><br /><sub><b>j26w</b></sub></a><br /><a href="#userTesting-j26w" title="User Testing">📓</a></td>
-    <td align="center"><a href="https://github.com/sreenia806"><img src="https://avatars.githubusercontent.com/u/2764179?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Sreenivasulu Avula</b></sub></a><br /><a href="#userTesting-sreenia806" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://github.com/sreenia806"><img src="https://avatars.githubusercontent.com/u/2764179?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Sreenivasulu Avula</b></sub></a><br /><a href="#userTesting-sreenia806" title="User Testing">📓</a> <a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Asreenia806" title="Reviewed Pull Requests">👀</a></td>
   </tr>
 </table>
 
