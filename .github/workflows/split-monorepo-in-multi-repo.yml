@@ -58,35 +58,315 @@ jobs:
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
                     config-path: .github/workflows/gitsplit/core-lib.json # Reference the location where you saved your config file
-    sync_plugins_commits:
+    sync_plugin_grapesjs_commits:
         if: github.repository_owner == 'mautic'
         runs-on: ubuntu-latest
-        name: Sync commits from all plugins to mautic/plugin-*
+        name: Sync commits from grapesjs plugin to mautic/plugin-grapesjs-builder
         steps:
             -   uses: actions/checkout@v2
                 with:
                     persist-credentials: false
                     fetch-depth: 0
-
-            # Add a personal access token to the repository secrets. This will allow the splitter action to push the new commits
             -   uses: frankdejonge/use-github-token@1.0.1
                 with:
                     authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
                     user_name: 'Mautic CI'
                     user_email: 'ci@mautic.org'
-
-            # Cache the splitsh executable to speedup future runs
             -   name: Cache splitsh-lite
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
                     key: '${{ runner.os }}-plugins-splitsh-v101'
-
-            # Sync commits and tags for the configured subtree splits
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
-                    config-path: .github/workflows/gitsplit/plugins.json # Reference the location where you saved your config file
+                    config-path: .github/workflows/gitsplit/plugin-grapesjs.json
+    sync_plugin_citrix_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from citrix plugin to mautic/plugin-citrix
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-plugins-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/plugin-citrix.json
+    sync_plugin_clearbit_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from clearbit plugin to mautic/plugin-clearbit
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-plugins-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/plugin-clearbit.json
+    sync_plugin_cloudstorage_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from cloudstorage plugin to mautic/plugin-cloudstorage
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-plugins-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/plugin-cloudstorage.json
+
+    sync_plugin_crm_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from crm plugin to mautic/plugin-crm
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-plugins-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/plugin-crm.json
+
+    sync_plugin_emailmarketing_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from emailmarketing plugin to mautic/plugin-emailmarketing
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-plugins-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/plugin-emailmarketing.json
+
+    sync_plugin_focus_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from focus plugin to mautic/plugin-focus
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-plugins-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/plugin-focus.json
+
+    sync_plugin_fullcontact_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from fullcontact plugin to mautic/plugin-fullcontact
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-plugins-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/plugin-fullcontact.json
+
+    sync_plugin_gmail_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from gmail plugin to mautic/plugin-gmail
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-plugins-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/plugin-gmail.json
+
+    sync_plugin_outlook_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from outlook plugin to mautic/plugin-outlook
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-plugins-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/plugin-outlook.json
+    
+    sync_plugin_social_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from focus plugin to mautic/plugin-social
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-plugins-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/plugin-social.json
+
+    sync_plugin_tagmanager_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from tagmanager plugin to mautic/plugin-tagmanager
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-plugins-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/plugin-tagmanager.json
+
+    sync_plugin_zapier_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from zapier plugin to mautic/zapier-focus
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-plugins-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/plugin-zapier.json
+
     sync_themes_commits:
         if: github.repository_owner == 'mautic'
         runs-on: ubuntu-latest
