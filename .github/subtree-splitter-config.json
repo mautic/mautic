@@ -152,11 +152,6 @@
         },
         {
             "name": "theme-skyline",
-            "directory": "themes/skyline",
-            "target": "git@github.com:mautic/theme-skyline.git"
-        },
-        {
-            "name": "theme-sparse",
             "directory": "themes/sparse",
             "target": "git@github.com:mautic/theme-sparse.git"
         },
