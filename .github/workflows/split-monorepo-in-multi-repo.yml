@@ -58,6 +58,7 @@ jobs:
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
                     config-path: .github/workflows/gitsplit/core-lib.json # Reference the location where you saved your config file
+
     sync_plugin_grapesjs_commits:
         if: github.repository_owner == 'mautic'
         runs-on: ubuntu-latest
@@ -76,11 +77,12 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-plugins-splitsh-v101'
+                    key: '${{ runner.os }}-plugin-grapesjs-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
                     config-path: .github/workflows/gitsplit/plugin-grapesjs.json
+
     sync_plugin_citrix_commits:
         if: github.repository_owner == 'mautic'
         runs-on: ubuntu-latest
@@ -99,11 +101,12 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-plugins-splitsh-v101'
+                    key: '${{ runner.os }}-plugin-citrix-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
                     config-path: .github/workflows/gitsplit/plugin-citrix.json
+
     sync_plugin_clearbit_commits:
         if: github.repository_owner == 'mautic'
         runs-on: ubuntu-latest
@@ -122,11 +125,12 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-plugins-splitsh-v101'
+                    key: '${{ runner.os }}-plugin-clearbit-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
                     config-path: .github/workflows/gitsplit/plugin-clearbit.json
+
     sync_plugin_cloudstorage_commits:
         if: github.repository_owner == 'mautic'
         runs-on: ubuntu-latest
@@ -145,7 +149,7 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-plugins-splitsh-v101'
+                    key: '${{ runner.os }}-plugin-cloudstorage-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
@@ -169,7 +173,7 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-plugins-splitsh-v101'
+                    key: '${{ runner.os }}-plugin-crm-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
@@ -193,7 +197,7 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-plugins-splitsh-v101'
+                    key: '${{ runner.os }}-plugin-emailmarketing-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
@@ -217,7 +221,7 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-plugins-splitsh-v101'
+                    key: '${{ runner.os }}-plugin-focus-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
@@ -241,7 +245,7 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-plugins-splitsh-v101'
+                    key: '${{ runner.os }}-plugin-fullcontact-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
@@ -265,7 +269,7 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-plugins-splitsh-v101'
+                    key: '${{ runner.os }}-plugin-gmail-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
@@ -289,7 +293,7 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-plugins-splitsh-v101'
+                    key: '${{ runner.os }}-plugin-outlook-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
@@ -313,7 +317,7 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-plugins-splitsh-v101'
+                    key: '${{ runner.os }}-plugin-social-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
@@ -337,7 +341,7 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-plugins-splitsh-v101'
+                    key: '${{ runner.os }}-plugin-tagmanager-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
@@ -361,40 +365,201 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-plugins-splitsh-v101'
+                    key: '${{ runner.os }}-plugin-focus-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
                     config-path: .github/workflows/gitsplit/plugin-zapier.json
 
-    sync_themes_commits:
+    sync_theme_aurora_commits:
         if: github.repository_owner == 'mautic'
         runs-on: ubuntu-latest
-        name: Sync commits from all themes to mautic/theme-*
+        name: Sync commits from theme aurora to mautic/theme-aurora
         steps:
             -   uses: actions/checkout@v2
                 with:
                     persist-credentials: false
                     fetch-depth: 0
-
-            # Add a personal access token to the repository secrets. This will allow the splitter action to push the new commits
             -   uses: frankdejonge/use-github-token@1.0.1
                 with:
                     authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
                     user_name: 'Mautic CI'
                     user_email: 'ci@mautic.org'
-
-            # Cache the splitsh executable to speedup future runs
             -   name: Cache splitsh-lite
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-themes-splitsh-v101'
-
-            # Sync commits and tags for the configured subtree splits
+                    key: '${{ runner.os }}-theme-aurora-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
-                    config-path: .github/workflows/gitsplit/themes.json # Reference the location where you saved your config file
+                    config-path: .github/workflows/gitsplit/theme-aurora.json
         
+    sync_theme_blank_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme blank to mautic/theme-blank
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-blank-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-blank.json
+
+    sync_theme_brienz_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme brienz to mautic/theme-brienz
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-brienz-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-brienz.json
+
+    sync_theme_cards_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme cards to mautic/theme-cards
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-cards-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-cards.json
+
+    sync_theme_coffee_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme coffee to mautic/theme-coffee
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-coffee-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-coffee.json
+        
+    sync_theme_confirmme_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme confirmme to mautic/theme-confirmme
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-confirmme-splitsh-v101'
+            -   name: subtree 
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-confirmme.json
+        
+    sync_theme_fresh_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme aurora to mautic/theme-fresh
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-fresh-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-fresh.json
+        
+    sync_theme_goldstar_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme goldstar to mautic/theme-goldstar
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-goldstar-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-goldstar.json
         
