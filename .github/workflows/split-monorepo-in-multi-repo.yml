@@ -17,12 +17,14 @@ on:
         tags:
             - '*'
         branches:
-            - '*'
+            - '[0-9].*'
+            - 'gitsplit-action-debug'
     delete:
         tags:
             - '*'
         branches:
-            - '*'
+            - '[0-9].*'
+            - 'gitsplit-action-debug'
 
 jobs:
     sync_core_lib_commits:
