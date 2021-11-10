@@ -10,6 +10,7 @@ on:
             - app/**
             - plugins/**
             - themes/**
+            - .github # also run when actions are being modified for testing purposes
         # Tag push events should be ignored, they will be handled with the create event below.
         tags-ignore:
             - '*'
