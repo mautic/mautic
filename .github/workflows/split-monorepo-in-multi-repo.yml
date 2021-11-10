@@ -1,4 +1,4 @@
-name: 'Packages Split 2'
+name: 'Split up the monorepo into subrepositories for composer purposes'
 
 on:
     push:
@@ -10,7 +10,8 @@ on:
             - app/**
             - plugins/**
             - themes/**
-            - .github # also run when actions are being modified for testing purposes
+            # also run when actions are being modified for testing purposes.
+            - .github/** 
         # Tag push events should be ignored, they will be handled with the create event below.
         tags-ignore:
             - '*'
