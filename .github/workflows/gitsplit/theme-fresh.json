@@ -1,0 +1,24 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-fresh-center",
+            "directory": "themes/fresh-center",
+            "target": "git@github.com:mautic/theme-fresh-center.git"
+        },
+        {
+            "name": "theme-fresh-fixed",
+            "directory": "themes/fresh-fixed",
+            "target": "git@github.com:mautic/theme-fresh-fixed.git"
+        },
+        {
+            "name": "theme-fresh-left",
+            "directory": "themes/fresh-left",
+            "target": "git@github.com:mautic/theme-fresh-left.git"
+        },
+        {
+            "name": "theme-fresh-wide",
+            "directory": "themes/fresh-wide",
+            "target": "git@github.com:mautic/theme-fresh-wide.git"
+        }
+    ]
+}
