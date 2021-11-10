@@ -610,4 +610,172 @@ jobs:
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
                     config-path: .github/workflows/gitsplit/theme-nature.json
+
+    sync_theme_neopolitan_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme neopolitan to mautic/theme-neopolitan
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-neopolitan-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-neopolitan.json
+        
+    sync_theme_oxygen_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme oxygen to mautic/theme-oxygen
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-oxygen-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-oxygen.json
+
+    sync_theme_paprika_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme paprika to mautic/theme-paprika
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-paprika-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-paprika.json
+        
+    sync_theme_skyline_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme skyline to mautic/theme-skyline
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-skyline-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-skyline.json
+
+    sync_theme_sunday_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme sunday to mautic/theme-sunday
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-sunday-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-sunday.json
+        
+    sync_theme_trulypersonal_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme trulypersonal to mautic/theme-trulypersonal
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-trulypersonal-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-trulypersonal.json
+        
+    sync_theme_vibrant_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme vibrant to mautic/theme-vibrant
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-vibrant-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-vibrant.json
         
