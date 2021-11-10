@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "MauticFullContactBundle",
+            "directory": "plugins/MauticFullContactBundle",
+            "target": "git@github.com:mautic/plugin-fullcontact.git"
+        }
+    ]
+}
