@@ -32,7 +32,7 @@ jobs:
     sync_core_lib_commits:
         if: github.repository_owner == 'mautic'
         runs-on: ubuntu-latest
-        name: Sync commits
+        name: Sync commits from app folder to mautic/core-lib
         steps:
             -   uses: actions/checkout@v2
                 with:
@@ -57,11 +57,11 @@ jobs:
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
-                    config-path: .github/gitsplit/core-lib.json # Reference the location where you saved your config file
+                    config-path: .github/workflows/gitsplit/core-lib.json # Reference the location where you saved your config file
     sync_plugins_commits:
         if: github.repository_owner == 'mautic'
         runs-on: ubuntu-latest
-        name: Sync commits
+        name: Sync commits from all plugins to mautic/plugin-*
         steps:
             -   uses: actions/checkout@v2
                 with:
@@ -86,11 +86,11 @@ jobs:
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
-                    config-path: .github/gitsplit/plugins.json # Reference the location where you saved your config file
+                    config-path: .github/workflows/gitsplit/plugins.json # Reference the location where you saved your config file
     sync_themes_commits:
         if: github.repository_owner == 'mautic'
         runs-on: ubuntu-latest
-        name: Sync commits
+        name: Sync commits from all themes to mautic/theme-*
         steps:
             -   uses: actions/checkout@v2
                 with:
@@ -115,6 +115,6 @@ jobs:
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
-                    config-path: .github/gitsplit/themes.json # Reference the location where you saved your config file
+                    config-path: .github/workflows/gitsplit/themes.json # Reference the location where you saved your config file
         
         
