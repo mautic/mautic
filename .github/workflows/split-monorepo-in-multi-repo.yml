@@ -515,10 +515,10 @@ jobs:
                 with:
                     config-path: .github/workflows/gitsplit/theme-confirmme.json
         
-    sync_theme_fresh_commits:
+    sync_theme_fresh_center_commits:
         if: github.repository_owner == 'mautic'
         runs-on: ubuntu-latest
-        name: Sync commits from theme aurora to mautic/theme-fresh
+        name: Sync commits from theme fresh-center to mautic/theme-fresh-center
         steps:
             -   uses: actions/checkout@v2
                 with:
@@ -533,11 +533,83 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-theme-fresh-splitsh-v101'
+                    key: '${{ runner.os }}-theme-fresh-center-splitsh-v101'
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
-                    config-path: .github/workflows/gitsplit/theme-fresh.json
+                    config-path: .github/workflows/gitsplit/theme-fresh-center.json
+        
+    sync_theme_fresh_fixed_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme fresh-fixed to mautic/theme-fresh-fixed
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-fresh-fixed-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-fresh-fixed.json
+
+    sync_theme_fresh_left_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme fresh-left to mautic/theme-fresh-left
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-fresh-left-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-fresh-left.json
+
+    sync_theme_fresh_wide_commits:
+        if: github.repository_owner == 'mautic'
+        runs-on: ubuntu-latest
+        name: Sync commits from theme fresh-wide to mautic/theme-fresh-wide
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v2
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-theme-fresh-wide-splitsh-v101'
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/theme-fresh-wide.json
         
     sync_theme_goldstar_commits:
         if: github.repository_owner == 'mautic'
