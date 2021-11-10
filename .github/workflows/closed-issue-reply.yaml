@@ -1,0 +1,16 @@
+name: Closed Issue Message
+on:
+  issues:
+    types: [closed]
+jobs:
+  auto_comment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: aws-actions/closed-issue-message@v1
+        with:
+          # These inputs are both required
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          message: |
+            ### ⚠️COMMENT VISIBILITY WARNING⚠️
+            Comments on closed issues are hard for our team to see.
+            If this issue is continuing with the [lastest stable version of Mautic](https://www.mautic.org/mautic-releases), please open a new issue that references this one.
