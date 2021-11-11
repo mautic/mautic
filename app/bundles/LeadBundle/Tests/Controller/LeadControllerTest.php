@@ -224,7 +224,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             [
                 'lead[firstname]' => 'John',
                 'lead[lastname]'  => 'Doe',
-                'lead[email]'     => 'john@doe.com',
+                'lead[email]'     => 'john_23657@doe.com',
                 'lead[companies]' => [$company->getId()],
                 'lead[points]'    => 20,
             ]
@@ -243,15 +243,15 @@ class LeadControllerTest extends MauticMysqlTestCase
         $contactRepository = $this->em->getRepository(Lead::class);
 
         /** @var AuditLog[] $auditLogs */
-        $auditLogs = $auditLogRepository->getAuditLogs($contactRepository->findOneBy(['email' => 'john@doe.com']));
+        $auditLogs = $auditLogRepository->getAuditLogs($contactRepository->findOneBy(['email' => 'john_23657@doe.com']));
 
-        Assert::assertTrue(isset($auditLogs[0]['details']['fields']), $clientResponse->getContent().PHP_EOL.json_encode($auditLogs, JSON_PRETTY_PRINT));
+        Assert::assertTrue(isset($auditLogs[0]['details']['fields']), json_encode($auditLogs, JSON_PRETTY_PRINT));
 
         Assert::assertSame(
             [
                 'firstname' => [null, 'John'],
                 'lastname'  => [null, 'Doe'],
-                'email'     => [null, 'john@doe.com'],
+                'email'     => [null, 'john_23657@doe.com'],
                 'points'    => [0, 20.0],
                 'company'   => ['', 'Doe Corp'],
             ],
