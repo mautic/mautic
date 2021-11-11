@@ -21,7 +21,7 @@ use Symfony\Component\Form\Form;
  */
 class FormBuilderEvent extends Event
 {
-    CONST DYNAMIC_FIELD;
+    const DYNAMIC_FIELD = 'dynamic_field';
     use ComponentValidationTrait;
 
     /**
@@ -188,7 +188,6 @@ class FormBuilderEvent extends Event
     /**
      * Add a field validator.
      *
-     * @param       $key
      * @param array $validator
      *                         $validator = [
      *                         'eventName' => (required) Event name to dispatch to validate the form; it will recieve a ValidationEvent object
