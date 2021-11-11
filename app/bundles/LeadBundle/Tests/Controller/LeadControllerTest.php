@@ -201,7 +201,7 @@ class LeadControllerTest extends MauticMysqlTestCase
                     'date_last_exited' => null,
                 ],
             ],
-            $this->getMembersForCampaign(1)
+            $this->getMembersForCampaign($campaign->getId())
         );
 
         $response = json_decode($clientResponse->getContent(), true);
