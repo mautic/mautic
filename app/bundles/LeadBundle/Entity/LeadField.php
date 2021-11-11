@@ -458,9 +458,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Set properties.
-     *
-     * @param string $properties
+     * @param array $properties
      *
      * @return LeadField
      */
@@ -473,9 +471,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get properties.
-     *
-     * @return array
+     * @return mixed[]
      */
     public function getProperties()
     {

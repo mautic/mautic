@@ -23,7 +23,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    public function testRequiredConditionalFieldIfNotEmpty()
+    public function testRequiredConditionalFieldIfNotEmpty(): void
     {
         // Create the test form via API.
         $payload = [
@@ -123,7 +123,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
-    public function testRequiredConditionalFieldIfAllFieldsEmpty()
+    public function testRequiredConditionalFieldIfAllFieldsEmpty(): void
     {
         // Create the test form via API.
         $payload = [
@@ -222,7 +222,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
-    public function testRequiredConditionalFieldIfRequiredStateShouldKickIn()
+    public function testRequiredConditionalFieldIfRequiredStateShouldKickIn(): void
     {
         // Create the test form via API.
         $payload = [

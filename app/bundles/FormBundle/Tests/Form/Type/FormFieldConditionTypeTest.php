@@ -34,7 +34,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
     private $propertiesAccessor;
 
     /**
-     * @var MockObject|FormBuilderInterface
+     * @var MockObject|FormBuilderInterface<string|FormBuilderInterface
      */
     private $formBuilder;
 

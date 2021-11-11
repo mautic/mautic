@@ -182,9 +182,7 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return bool|FormFieldEvent|void
+     * @return bool|FormFieldEvent|void|null
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -214,7 +212,6 @@ class FieldModel extends CommonFormModel
         if ($this->dispatcher->hasListeners($name)) {
             if (empty($event)) {
                 $event = new FormFieldEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
             }
 
             $this->dispatcher->dispatch($name, $event);

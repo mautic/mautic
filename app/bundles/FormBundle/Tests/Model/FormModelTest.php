@@ -308,7 +308,7 @@ class FormModelTest extends FormTestAbstract
         return $formField;
     }
 
-    public function testGetContactFieldPropertiesListWhenFieldNotFound()
+    public function testGetContactFieldPropertiesListWhenFieldNotFound(): void
     {
         $formModel = $this->getFormModel();
 
@@ -318,7 +318,7 @@ class FormModelTest extends FormTestAbstract
         $this->assertNull($formModel->getContactFieldPropertiesList('alias_a'));
     }
 
-    public function testGetContactFieldPropertiesListWhenFieldFoundButNotList()
+    public function testGetContactFieldPropertiesListWhenFieldFoundButNotList(): void
     {
         $formModel = $this->getFormModel();
         $field     = new LeadField();
@@ -331,7 +331,7 @@ class FormModelTest extends FormTestAbstract
         $this->assertNull($formModel->getContactFieldPropertiesList('alias_a'));
     }
 
-    public function testGetContactFieldPropertiesListWhenSelectFieldFound()
+    public function testGetContactFieldPropertiesListWhenSelectFieldFound(): void
     {
         $formModel = $this->getFormModel();
         $field     = new LeadField();

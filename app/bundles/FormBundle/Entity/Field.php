@@ -11,7 +11,6 @@
 
 namespace Mautic\FormBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -92,7 +91,7 @@ class Field
     private $validation = [];
 
     /**
-     * @var array
+     * @var array<string,mixed>
      */
     private $conditions = [];
 
@@ -917,6 +916,8 @@ class Field
 
     /**
      * Was field displayed.
+     * 
+     * @param mixed[] $data
      *
      * @return bool
      */
@@ -987,7 +988,7 @@ class Field
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
     public function getConditions()
     {
@@ -995,7 +996,7 @@ class Field
     }
 
     /**
-     * @param array $conditions
+     * @param array<string, mixed> $conditions
      *
      * @return Field
      */
@@ -1010,7 +1011,7 @@ class Field
     /**
      * @param string $parent
      *
-     * @return string
+     * @return Field
      */
     public function setParent($parent)
     {
@@ -1028,10 +1029,10 @@ class Field
         return $this->parent;
     }
 
-    private function findParentFieldInForm()
+    private function findParentFieldInForm(): ?Field
     {
         if (!$this->parent) {
-            return;
+            return null;
         }
 
         $fields = $this->getForm()->getFields();
@@ -1040,5 +1041,7 @@ class Field
                 return $field;
             }
         }
+        
+        return null;
     }
 }

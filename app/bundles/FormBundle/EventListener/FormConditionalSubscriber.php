@@ -37,6 +37,9 @@ final class FormConditionalSubscriber implements EventSubscriberInterface
         $this->fieldModel = $fieldModel;
     }
 
+    /**
+     * @return array<string,mixed[]>
+     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -58,7 +61,7 @@ final class FormConditionalSubscriber implements EventSubscriberInterface
             if (false !== strpos((string) $field->getParent(), 'new')) {
                 foreach ($form->getFields() as $parentField) {
                     if ($field->getParent() === $parentField->getSessionId()) {
-                        $field->setParent($parentField->getId());
+                        $field->setParent((string) $parentField->getId());
                         $this->fieldModel->saveEntity($field);
                     }
                 }

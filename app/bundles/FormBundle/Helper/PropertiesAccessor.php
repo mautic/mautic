@@ -28,7 +28,7 @@ class PropertiesAccessor
     }
 
     /**
-     * @return array|mixed
+     * @return array<string,mixed>
      */
     public function getProperties(array $field)
     {
@@ -42,7 +42,9 @@ class PropertiesAccessor
     }
 
     /**
-     * @return array
+     * @param array<int,mixed> $options
+     * 
+     * @return string[]
      */
     public function getChoices($options)
     {
@@ -76,7 +78,9 @@ class PropertiesAccessor
     }
 
     /**
-     * @return array|mixed
+     * @param array<string,mixed> $properties
+     * 
+     * @return mixed[]
      */
     private function getOptionsListFromProperties(array $properties)
     {

@@ -1108,6 +1108,9 @@ class FormModel extends CommonFormModel
         }
     }
 
+    /**
+     * @return mixed[]|null
+     */
     public function getContactFieldPropertiesList(string $contactFieldAlias): ?array
     {
         $contactField = $this->leadFieldModel->getEntityByAlias($contactFieldAlias);

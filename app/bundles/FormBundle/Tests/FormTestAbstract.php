@@ -59,7 +59,7 @@ class FormTestAbstract extends TestCase
 
     protected function setUp(): void
     {
-        $this->mockTrackingId = hash('sha1', uniqid(mt_rand()));
+        $this->mockTrackingId = hash('sha1', uniqid((string) mt_rand()));
     }
 
     /**
@@ -245,10 +245,13 @@ class FormTestAbstract extends TestCase
         return $submissionModel;
     }
 
-    public function getTestFormFields()
+    /**
+     * @return array<string,array<string,mixed>>
+     */
+    public function getTestFormFields(): array
     {
-        $fieldSession          = 'mautic_'.sha1(uniqid(mt_rand(), true));
-        $fieldSession2         = 'mautic_'.sha1(uniqid(mt_rand(), true));
+        $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fieldSession2         = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
         $fields[$fieldSession] = [
             'label'        => 'Email',
             'showLabel'    => 1,

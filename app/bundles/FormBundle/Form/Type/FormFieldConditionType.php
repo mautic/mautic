@@ -40,6 +40,10 @@ class FormFieldConditionType extends AbstractType
         $this->propertiesAccessor  = $propertiesAccessor;
     }
 
+    /**
+     * @param FormBuilderInterface<string|FormBuilderInterface> $builder
+     * @param mixed[]                     $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['values' => 'clean']));
