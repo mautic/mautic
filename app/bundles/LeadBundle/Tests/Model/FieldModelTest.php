@@ -135,7 +135,6 @@ class FieldModelTest extends MauticMysqlTestCase
             "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$this->connection->getDatabase()}' AND TABLE_NAME = '".MAUTIC_TABLE_PREFIX
             ."$table' AND COLUMN_NAME = '$column'"
         );
-        $stmt->execute();
 
         return $stmt->fetchAll();
     }

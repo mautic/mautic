@@ -12,13 +12,10 @@
 
 namespace Mautic\EmailBundle\Tests\Transport;
 
-use Aws\CommandInterface;
-use Aws\Credentials\Credentials;
-use Aws\Exception\AwsException;
 use Aws\MockHandler;
 use Aws\Result;
-use Aws\SesV2\SesV2Client;
-use Joomla\Http\Http;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
@@ -26,18 +23,23 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail
 use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\AmazonApiTransport;
-use Psr\Http\Message\RequestInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|TranslatorInterface
+     */
     private $translator;
+
+    /**
+     * @var MockObject|AmazonCallback
+     */
     private $amazonCallback;
-    private $amazonClient;
     private $amazonMock;
     private $amazonTransport;
     private $logger;
@@ -45,16 +47,16 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
     private $request;
 
     /**
-     * @var Http
+     * @var MockObject|Client
      */
     private $mockHttp;
     /**
-     * @var TransportCallback
+     * @var MockObject|TransportCallback
      */
     private $transportCallback;
 
     /**
-     * @var MauticMessage
+     * @var MockObject|MauticMessage
      */
     private $message;
 
@@ -70,16 +72,11 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
         $this->request            =  $this->createMock(Request::class);
 
         // Mock http connector
-        $this->mockHttp = $this->getMockBuilder(Http::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->transportCallback = $this->getMockBuilder(TransportCallback::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mockHttp          = $this->createMock(Client::class);
+        $this->transportCallback = $this->createMock(TransportCallback::class);
+        $this->amazonMock        = new MockHandler();
 
-        $this->amazonMock         = new MockHandler();
-
-        $this->amazonTransport = new AmazonApiTransport(
+        $this->amazonTransport   = new AmazonApiTransport(
             $this->translator,
             $this->amazonCallback,
             $this->logger
@@ -170,6 +167,132 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $sent);
     }
 
+    public function testGetAmazonMessageBatch()
+    {
+        $emailBody = <<< 'EOD'
+Hi {contactfield=firstname},
+lorem ipsum dolor.   
+     
+{signature}
+
+{unsubscribe_text}
+EOD;
+
+        $recipient1Email = 'johnny.cage@teleworm.us';
+        $recipient2Email = 'noob.saibot@teleworm.us';
+
+        $recipient1Metadata = [
+            'name'        => 'Johnny Cage',
+            'leadId'      => 1,
+            'emailId'     => 1,
+            'emailName'   => 'Test batch email',
+            'hashId'      => '5f86a61cc8084320276637',
+            'hashIdState' => true,
+            'source'      => [
+                'campaign.event',
+                23,
+            ],
+            'tokens' => [
+                '{dynamiccontent="Dynamic Content 1"}' => 'Default Dynamic Content',
+                '{unsubscribe_text}'                   => '<a href="https://mautic.local/email/unsubscribe/5f86a61cc8084320276637">Unsubscribe</a> to no longer receive emails from us.',
+                '{unsubscribe_url}'                    => 'https://mautic.local/email/unsubscribe/5f86a61cc8084320276637',
+                '{webview_text}'                       => '<a href="https://mautic.local/email/view/5f86a61cc8084320276637">Having trouble reading this email? Click here.</a>',
+                '{webview_url}'                        => 'https://mautic.local/email/view/5f86a61cc8084320276637',
+                '{signature}'                          => 'Best regards, Johnny Cage',
+                '{subject}'                            => 'Test batch email',
+                '{contactfield=firstname}'             => 'Johnny',
+                '{contactfield=lastname}'              => 'Cage',
+                '{ownerfield=email}'                   => '',
+                '{ownerfield=firstname}'               => '',
+                '{ownerfield=lastname}'                => '',
+                '{ownerfield=position}'                => '',
+                '{ownerfield=signature}'               => '',
+                '{tracking_pixel}'                     => 'https://mautic.local/email/5f86a61cc8084320276637.gif',
+            ],
+            'utmTags' => [
+                'utmSource'   => 'c_source',
+                'utmMedium'   => 'c_medium',
+                'utmCampaign' => 'c_name',
+                'utmContent'  => 'c_content',
+            ],
+        ];
+        $recipient2Metadata = [
+            'name'        => 'Noob Saibot',
+            'leadId'      => 2,
+            'emailId'     => 1,
+            'emailName'   => 'Test batch email',
+            'hashId'      => '6f86a61cc415555ecf6412',
+            'hashIdState' => true,
+            'source'      => [
+                'campaign.event',
+                23,
+            ],
+            'tokens' => [
+                '{dynamiccontent="Dynamic Content 1"}' => 'Default Dynamic Content',
+                '{unsubscribe_text}'                   => '<a href="https://mautic.local/email/unsubscribe/6f86a61cc415555ecf6412">Unsubscribe</a> to no longer receive emails from us.',
+                '{unsubscribe_url}'                    => 'https://mautic.local/email/unsubscribe/6f86a61cc415555ecf6412',
+                '{webview_text}'                       => '<a href="https://mautic.local/email/view/6f86a61cc415555ecf6412">Having trouble reading this email? Click here.</a>',
+                '{webview_url}'                        => 'https://mautic.local/email/view/6f86a61cc415555ecf6412',
+                '{signature}'                          => 'Best regards, Noob Saibot',
+                '{subject}'                            => 'Test batch email',
+                '{contactfield=firstname}'             => 'Noob',
+                '{contactfield=lastname}'              => 'Saibot',
+                '{ownerfield=email}'                   => '',
+                '{ownerfield=firstname}'               => '',
+                '{ownerfield=lastname}'                => '',
+                '{ownerfield=position}'                => '',
+                '{ownerfield=signature}'               => '',
+                '{tracking_pixel}'                     => 'https://mautic.local/email/6f86a61cc415555ecf6412.gif',
+            ],
+            'utmTags' => [
+                'utmSource'   => 'c_source',
+                'utmMedium'   => 'c_medium',
+                'utmCampaign' => 'c_name',
+                'utmContent'  => 'c_content',
+            ],
+        ];
+
+        $fromEmail = 'shang.tsung@teleworm.us';
+        $fromName  = 'Shang Tsung';
+        $subject   = 'Test batch email';
+
+        $msg = new MauticMessage($subject, $emailBody, 'text/html', 'utf-8');
+        $msg->addMetadata($recipient1Email, $recipient1Metadata);
+        $msg->addMetadata($recipient2Email, $recipient2Metadata);
+        $msg->setFrom($fromEmail, $fromName);
+        $msg->setTo([
+            $recipient1Email => $recipient1Metadata['name'],
+            $recipient2Email => $recipient2Metadata['name'],
+        ]);
+        $msg->setSubject($subject);
+        $msg->setBody($emailBody, 'text/html', 'utf-8');
+
+        // Mautic creates Unsubscribe-List header with for all message recipients, this should be filtered
+        $msg->getHeaders()->addTextHeader('List-Unsubscribe', '<mailto:return+unsubscribe_5f86a61cc8084320276637@teleworm.us>, <mailto:return+unsubscribe_6f86a61cc415555ecf6412@teleworm.us>, <http://mautic.local/email/unsubscribe/5f86a61cc8084320276637>,<http://mautic.local/email/unsubscribe/6f86a61cc415555ecf6412>');
+
+        $amazonMessages = iterator_to_array($this->amazonTransport->getAmazonMessage($msg));
+
+        $this->assertCount(2, $amazonMessages);
+        $this->assertEquals([
+            'ToAddresses'  => ['johnny.cage@teleworm.us'],
+        ], $amazonMessages[0]['Destination']);
+        $this->assertEquals([
+            'ToAddresses'  => ['noob.saibot@teleworm.us'],
+        ], $amazonMessages[1]['Destination']);
+
+        // Test replaced tokens
+        $this->assertStringContainsString('Hi Johnny', $amazonMessages[0]['Content']['Raw']['Data']);
+        $this->assertStringContainsString('Hi Noob', $amazonMessages[1]['Content']['Raw']['Data']);
+
+        // We want to ensure that the hashes of other leads will not be compromised when sending batch emails
+        $this->assertStringNotContainsString('6f86a61cc415555ecf6412', $amazonMessages[0]['Content']['Raw']['Data']);
+        $this->assertStringNotContainsString('5f86a61cc8084320276637', $amazonMessages[1]['Content']['Raw']['Data']);
+
+        // Persist filtered List-Unsubscribe header
+        $this->assertStringContainsString('List-Unsubscribe: <mailto:return+unsubscribe_5f86a61cc8084320276637@teleworm.us>,<http://mautic.local/email/unsubscribe/5f86a61cc8084320276637>', $amazonMessages[0]['Content']['Raw']['Data']);
+        $this->assertStringContainsString('List-Unsubscribe: <mailto:return+unsubscribe_6f86a61cc415555ecf6412@teleworm.us>,<http://mautic.local/email/unsubscribe/6f86a61cc415555ecf6412>', $amazonMessages[1]['Content']['Raw']['Data']);
+    }
+
     public function testprocessInvalidJsonRequest()
     {
         $payload = <<< 'PAYLOAD'
@@ -234,18 +357,14 @@ PAYLOAD;
 PAYLOAD;
 
         $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
-
-        $request = $this->getMockBuilder(Request::class)
-        ->disableOriginalConstructor()
-        ->getMock();
+        $request        = $this->createMock(Request::class);
 
         $request->expects($this->any())
             ->method('getContent')
             ->will($this->returnValue($payload));
 
         // Mock a successful response
-        $mockResponse       = $this->getMockBuilder(Response::class)->getMock();
-        $mockResponse->code = 200;
+        $mockResponse = new Response(200);
 
         $this->mockHttp->expects($this->once())
             ->method('get')
