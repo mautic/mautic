@@ -87,7 +87,7 @@ class MauticSyncDataExchangeTest extends TestCase
         );
     }
 
-    public function testFirstTimeSyncUsesFullObjectBuilder()
+    public function testFirstTimeSyncUsesFullObjectBuilder(): void
     {
         $inputOptionsDAO = new InputOptionsDAO(
             [
@@ -109,7 +109,7 @@ class MauticSyncDataExchangeTest extends TestCase
         $this->mauticSyncDataExchange->getSyncReport($requestDAO);
     }
 
-    public function testSyncingSpecificMauticIdsUseFullObjectBuilder()
+    public function testSyncingSpecificMauticIdsUseFullObjectBuilder(): void
     {
         $inputOptionsDAO = new InputOptionsDAO(
             [
@@ -131,7 +131,7 @@ class MauticSyncDataExchangeTest extends TestCase
         $this->mauticSyncDataExchange->getSyncReport($requestDAO);
     }
 
-    public function testUseOfPartialObjectBuilder()
+    public function testUseOfPartialObjectBuilder(): void
     {
         $inputOptionsDAO = new InputOptionsDAO(
             [
