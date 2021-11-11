@@ -105,4 +105,14 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertSame($tagId, $response['tag']['id'], 'ID of created tag does not match. Possible duplicates.');
     }
+
+    public function testTagCreationWithoutRequiredData()
+    {
+        // Sending an empty payload should return a 500 server error
+        // TODO ensure that the server sends back a 400 status code instead
+        $this->client->request('POST', '/api/tags/new', []);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(500, $clientResponse->getStatusCode());
+    }
 }
