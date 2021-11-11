@@ -446,7 +446,7 @@ class FormModel extends CommonFormModel
      */
     public function getFormHtml(Form $form, $useCache = true)
     {
-        if ($useCache && !$form->usesProgressiveProfiling()) {
+        if ($form->useCache($useCache)) {
             $cachedHtml = $form->getCachedHtml();
         }
 

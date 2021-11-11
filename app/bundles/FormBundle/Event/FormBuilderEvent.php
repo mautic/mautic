@@ -21,6 +21,7 @@ use Symfony\Component\Form\Form;
  */
 class FormBuilderEvent extends Event
 {
+    CONST DYNAMIC_FIELD;
     use ComponentValidationTrait;
 
     /**

@@ -18,6 +18,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\FormBundle\Event\FormBuilderEvent;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -852,6 +853,21 @@ class Form extends FormEntity
         );
 
         return (empty($name)) ? 'form-'.$this->id : $name;
+    }
+
+    public function useCache(bool $useCache): bool
+    {
+        if (!$this->usesProgressiveProfiling()) {
+            return false;
+        }
+
+        foreach ($this->getFields() as $field) {
+            if ($field->getCustomParameters()[FormBuilderEvent::DYNAMIC_FIELD] ?? false) {
+                return false;
+            }
+        }
+
+        return $useCache;
     }
 
     /**
