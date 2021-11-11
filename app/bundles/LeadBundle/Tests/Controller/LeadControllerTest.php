@@ -4,14 +4,12 @@ namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
-use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -236,16 +234,13 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         Assert::assertTrue($clientResponse->isOk(), $clientResponse->getContent());
 
-        /** @var AuditLogRepository $auditLogRepository */
-        $auditLogRepository = $this->em->getRepository(AuditLog::class);
+        /** @var Lead $contact */
+        $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'john_23657@doe.com']);
 
-        /** @var LeadRepository $contactRepository */
-        $contactRepository = $this->em->getRepository(Lead::class);
+        /** @var AuditLog $auditLog */
+        $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy(['object' => 'lead', 'objectId' => $contact, 'userId' => 1]);
 
-        /** @var AuditLog[] $auditLogs */
-        $auditLogs = $auditLogRepository->getAuditLogs($contactRepository->findOneBy(['email' => 'john_23657@doe.com']));
-
-        Assert::assertTrue(isset($auditLogs[0]['details']['fields']), json_encode($auditLogs, JSON_PRETTY_PRINT));
+        Assert::assertTrue(isset($auditLog->getDetails()['fields']), json_encode($auditLog, JSON_PRETTY_PRINT));
 
         Assert::assertSame(
             [
@@ -255,7 +250,7 @@ class LeadControllerTest extends MauticMysqlTestCase
                 'points'    => [0, 20.0],
                 'company'   => ['', 'Doe Corp'],
             ],
-            $auditLogs[0]['details']['fields']
+            $auditLog->getDetails()['fields']
         );
     }
 
