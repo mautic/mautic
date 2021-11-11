@@ -121,15 +121,16 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertEquals(0, $leadListsTableRows->count());
     }
 
-    public function testContactsAreAddedToThenRemovedFromCampaignsInBatch()
+    public function testContactsAreAddedToThenRemovedFromCampaignsInBatch(): void
     {
-        $this->loadFixtures([LoadLeadData::class]);
-
+        $contactA = $this->createContact('contact@a.email');
+        $contactB = $this->createContact('contact@b.email');
+        $contactC = $this->createContact('contact@c.email');
         $campaign = $this->createCampaign();
         $payload  = [
             'lead_batch' => [
                 'add' => [$campaign->getId()],
-                'ids' => json_encode([1, 2, 3]),
+                'ids' => json_encode([$contactA->getId(), $contactB->getId(), $contactC->getId()]),
             ],
         ];
 
@@ -141,19 +142,19 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertSame(
             [
                 [
-                    'lead_id'          => '1',
+                    'lead_id'          => (string) $contactA->getId(),
                     'manually_added'   => '1',
                     'manually_removed' => '0',
                     'date_last_exited' => null,
                 ],
                 [
-                    'lead_id'          => '2',
+                    'lead_id'          => (string) $contactB->getId(),
                     'manually_added'   => '1',
                     'manually_removed' => '0',
                     'date_last_exited' => null,
                 ],
                 [
-                    'lead_id'          => '3',
+                    'lead_id'          => (string) $contactC->getId(),
                     'manually_added'   => '1',
                     'manually_removed' => '0',
                     'date_last_exited' => null,
@@ -170,7 +171,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $payload = [
             'lead_batch' => [
                 'remove' => [$campaign->getId()],
-                'ids'    => json_encode([1, 2, 3]),
+                'ids'    => json_encode([$contactA->getId(), $contactB->getId(), $contactC->getId()]),
             ],
         ];
 
@@ -182,19 +183,19 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertSame(
             [
                 [
-                    'lead_id'          => '1',
+                    'lead_id'          => (string) $contactA->getId(),
                     'manually_added'   => '0',
                     'manually_removed' => '1',
                     'date_last_exited' => null,
                 ],
                 [
-                    'lead_id'          => '2',
+                    'lead_id'          => (string) $contactB->getId(),
                     'manually_added'   => '0',
                     'manually_removed' => '1',
                     'date_last_exited' => null,
                 ],
                 [
-                    'lead_id'          => '3',
+                    'lead_id'          => (string) $contactC->getId(),
                     'manually_added'   => '0',
                     'manually_removed' => '1',
                     'date_last_exited' => null,
@@ -262,7 +263,7 @@ class LeadControllerTest extends MauticMysqlTestCase
      * Only tests if an actual CSV file is returned and if the content size isn't suspiciously small.
      * We do more in-depth tests in \Mautic\CoreBundle\Tests\Unit\Helper\ExportHelperTest.
      */
-    public function testCsvIsExportedCorrectly()
+    public function testCsvIsExportedCorrectly(): void
     {
         $this->loadFixtures([LoadLeadData::class]);
 
@@ -282,7 +283,7 @@ class LeadControllerTest extends MauticMysqlTestCase
      * Only tests if an actual Excel file is returned and if the content size isn't suspiciously small.
      * We do more in-depth tests in \Mautic\CoreBundle\Tests\Unit\Helper\ExportHelperTest.
      */
-    public function testExcelIsExportedCorrectly()
+    public function testExcelIsExportedCorrectly(): void
     {
         $this->loadFixtures([LoadLeadData::class]);
 
@@ -305,7 +306,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where("cl.campaign_id = {$campaignId}")
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
     }
 
     private function getLeadLists(): array
@@ -314,7 +315,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->select('ll.id', 'll.name', 'll.category_id')
             ->from('lead_lists', 'll')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
     }
 
     /**
@@ -328,7 +329,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
     }
 
-    public function testAddContactsErrorMessage()
+    public function testAddContactsErrorMessage(): void
     {
         /** @var FieldModel $fieldModel */
         $fieldModel     = self::getContainer()->get('mautic.lead.model.field');
@@ -347,6 +348,17 @@ class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertStringContainsString('firstname: This field is required.', $clientResponse->getContent());
+    }
+
+    private function createContact(string $email): Lead
+    {
+        $lead = new Lead();
+        $lead->setEmail($email);
+
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        return $lead;
     }
 
     private function createCampaign(): Campaign
