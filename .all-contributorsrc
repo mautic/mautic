@@ -504,7 +504,7 @@
       "profile": "http://theodorosploumis.com/en",
       "contributions": [
         "code"
-         ]
+      ]
     },
     {
       "login": "sreenia806",
@@ -514,6 +514,15 @@
       "contributions": [
         "userTesting",
         "review"
+      ]
+    },
+    {
+      "login": "mlahlouh",
+      "name": "Mohammad Lahlouh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7312050?v=4",
+      "profile": "https://www.linkedin.com/in/mohammadlahlouh/",
+      "contributions": [
+        "userTesting"
       ]
     }
   ],
