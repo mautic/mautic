@@ -524,6 +524,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "ArnaudSau",
+      "name": "ArnaudSau",
+      "avatar_url": "https://avatars.githubusercontent.com/u/50580844?v=4",
+      "profile": "https://github.com/ArnaudSau",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
