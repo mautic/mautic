@@ -8,6 +8,9 @@ use Symfony\Component\DomCrawler\Crawler;
 
 trait CampaignControllerTrait
 {
+    /**
+     * @param array<string,mixed> $formValues
+     */
     private function refreshAndSubmitForm(Campaign $campaign, int $expectedVersion, array $formValues = []): void
     {
         $crawler = $this->refreshPage($campaign);
@@ -23,6 +26,9 @@ trait CampaignControllerTrait
         return $crawler;
     }
 
+    /**
+     * @param array<string,mixed> $formValues
+     */
     private function submitForm(Crawler $crawler, Campaign $campaign, int $expectedVersion, array $formValues = []): Crawler
     {
         $form = $crawler->selectButton('Apply')->form();
