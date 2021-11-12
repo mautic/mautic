@@ -203,14 +203,6 @@ if (!$isEmbedded) {
                                 </tr>
                             <?php endif; ?>
 
-                            <?php if (!empty($pending)): ?>
-                            <tr>
-                                <td width="20%">
-                                    <span class="fw-b"><?php echo $view['translator']->trans('mautic.email.stat.pending'); ?></span>
-                                </td>
-                                <td><?php echo $pending; ?></td>
-                            </tr>
-                            <?php endif; ?>
                             <tr>
                                 <td width="20%">
                                     <span class="fw-b"><?php echo $view['translator']->trans('mautic.email.stat.sent'); ?></span>
