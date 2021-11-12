@@ -180,6 +180,12 @@ class CampaignEventLeadFieldValueType extends AbstractType
                 // If user selects the operator as include or exclude then the
                 // `value` field should be accepting multiple values.
                 if (in_array($operator, ['in', '!in'])) {
+                    // Transform the non array values to the array and set
+                    // the form data.
+                    if (!is_array($data['value'])) {
+                        $data['value'] = [$data['value']];
+                        $e->setData($data);
+                    }
                     $options['multiple'] = true;
                 }
 
