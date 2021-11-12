@@ -12,61 +12,62 @@ use Mautic\LeadBundle\Entity\LeadList;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-final class CampaignEditFieldValueConditionTest extends MauticMysqlTestCase
+final class CampaignBuilderEditFieldValueConditionTest extends MauticMysqlTestCase
 {
     use CampaignControllerTrait;
 
     public function testCampaignBuilderFormForFieldValueConditionForInOperator(): void
     {
-        $campaign = $this->setupCampaignWithCondition();
+        $campaign = $this->setupCampaignWithLeadList();
         $version  = $campaign->getVersion();
 
-        $conditionEvent = new Event();
-        $conditionEvent->setCampaign($campaign);
-        $conditionEvent->setName('Send Email 1');
-        $conditionEvent->setType('lead.field_value');
-        $conditionEvent->setEventType('condition');
-        $conditionEvent->setProperties([
+        $campaignCondition = new Event();
+        $campaignCondition->setCampaign($campaign);
+        $campaignCondition->setName('Check for country');
+        $campaignCondition->setType('lead.field_value');
+        $campaignCondition->setEventType('condition');
+        $campaignCondition->setProperties([
             'field'     => 'country',
             'operator'  => 'in',
             'value'     => 'Afghanistan',
         ]);
-        $this->em->persist($conditionEvent);
+        $this->em->persist($campaignCondition);
 
-        $campaignEvent = new Event();
-        $campaignEvent->setCampaign($campaign);
-        $campaignEvent->setParent($conditionEvent);
-        $campaignEvent->setName('Send Email 1');
-        $campaignEvent->setType('email.send');
-        $campaignEvent->setEventType('action');
-        $campaignEvent->setProperties([]);
-        $this->em->persist($campaignEvent);
+        $campaignAction = new Event();
+        $campaignAction->setCampaign($campaign);
+        $campaignAction->setParent($campaignCondition);
+        $campaignAction->setName('Send Email 1');
+        $campaignAction->setType('email.send');
+        $campaignAction->setEventType('action');
+        $campaignAction->setProperties([]);
+        $this->em->persist($campaignAction);
 
         $this->em->flush();
         $this->em->clear();
 
-        $conditionArray = $conditionEvent->convertToArray();
+        $conditionArray = $campaignCondition->convertToArray();
         unset($conditionArray['campaign'], $conditionArray['children'], $conditionArray['log'], $conditionArray['changes']);
 
-        $campaignArray = $campaignEvent->convertToArray();
+        $campaignArray = $campaignAction->convertToArray();
         unset($campaignArray['campaign'], $campaignArray['children'], $campaignArray['log'], $campaignArray['changes'], $campaignArray['parent']);
+
         $modifiedEvents = [
-            $conditionEvent->getId()    => $conditionArray,
-            $campaignEvent->getId()     => $campaignArray,
+            $campaignCondition->getId() => $conditionArray,
+            $campaignAction->getId()    => $campaignArray,
         ];
 
         $payload                                    = [
             'modifiedEvents' => json_encode($modifiedEvents),
         ];
 
-        $this->client->request(Request::METHOD_POST, sprintf('/s/campaigns/events/edit/%s', $conditionEvent->getId()), $payload, [], $this->createAjaxHeaders());
+        $this->client->request(Request::METHOD_POST, sprintf('/s/campaigns/events/edit/%s', $campaignCondition->getId()), $payload, [], $this->createAjaxHeaders());
         Assert::assertTrue($this->client->getResponse()->isOk());
 
         // version should be incremented as campaign's "modified by user" is updated
         $this->refreshAndSubmitForm($campaign, ++$version);
     }
 
-    private function setupCampaignWithCondition(): Campaign
+    private function setupCampaignWithLeadList(): Campaign
     {
         $leadList = new LeadList();
         $leadList->setName('Test list');
