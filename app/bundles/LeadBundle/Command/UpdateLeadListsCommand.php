@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateLeadListsCommand extends ModeratedCommand
@@ -69,6 +70,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $batch                 = $input->getOption('batch-limit');
         $max                   = $input->getOption('max-contacts');
         $enableTimeMeasurement = (bool) $input->getOption('timing');
+        $output                = ($input->getOption('quiet')) ? new NullOutput() : $output;
 
         if (!$this->checkRunStatus($input, $output, $id)) {
             return 0;
