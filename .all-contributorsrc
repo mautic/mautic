@@ -496,6 +496,16 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "sreenia806",
+      "name": "Sreenivasulu Avula",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2764179?v=4",
+      "profile": "https://github.com/sreenia806",
+      "contributions": [
+        "userTesting",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
