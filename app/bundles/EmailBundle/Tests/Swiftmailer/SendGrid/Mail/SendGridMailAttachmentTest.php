@@ -17,7 +17,7 @@ use SendGrid\Mail;
 
 class SendGridMailAttachmentTest extends \PHPUnit\Framework\TestCase
 {
-    public function testNotMauticMessageWithAttachment()
+    public function testNotMauticMessageWithAttachment(): void
     {
         $sendGridMailAttachment = new SendGridMailAttachment();
 
@@ -25,7 +25,7 @@ class SendGridMailAttachmentTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $message->expects($this->exactly('2'))->method('getChildren')->will($this->onConsecutiveCalls([
+        $message->expects($this->exactly(2))->method('getChildren')->will($this->onConsecutiveCalls([
             new \Swift_Attachment('This is the plain text attachment.', 'hello.txt', 'text/plain'),
         ], [
             new \Swift_Attachment('This is the plain text attachment.', 'hello.txt', 'text/plain'),
@@ -41,7 +41,7 @@ class SendGridMailAttachmentTest extends \PHPUnit\Framework\TestCase
         $sendGridMailAttachment->addAttachmentsToMail($mail, $message);
     }
 
-    public function testNotMauticMessageWithoutAttachment()
+    public function testNotMauticMessageWithoutAttachment(): void
     {
         $sendGridMailAttachment = new SendGridMailAttachment();
 
