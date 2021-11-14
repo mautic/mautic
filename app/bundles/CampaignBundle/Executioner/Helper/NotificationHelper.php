@@ -65,7 +65,7 @@ class NotificationHelper
     public function notifyOfFailure(Lead $contact, Event $event)
     {
         $user = $this->getUser($contact, $event);
-        if (!$user->getId()) {
+        if (!$user || !$user->getId()) {
             return;
         }
 
@@ -95,7 +95,7 @@ class NotificationHelper
          */
         $user = $this->getUser(new Lead(), $event);
 
-        if (!$user->getId()) {
+        if (!$user || !$user->getId()) {
             return;
         }
 
@@ -157,7 +157,7 @@ class NotificationHelper
     }
 
     /**
-     * @return User
+     * @return User|null
      */
     private function getUser(Lead $contact, Event $event)
     {

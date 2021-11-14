@@ -154,7 +154,7 @@ class UserModel extends FormModel
     }
 
     /**
-     * @return User
+     * @return User|null
      */
     public function getSystemAdministrator()
     {
