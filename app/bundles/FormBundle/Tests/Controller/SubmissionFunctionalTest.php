@@ -91,13 +91,17 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
 
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
         /** @var SubmissionRepository $submissionRepository */
         $submissionRepository = $this->em->getRepository(Submission::class);
 
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $formId]);
 
-        Assert::assertCount(1, $submissions);
+        Assert::assertCount(1, $submissions, print_r($submissions, true));
 
         /** @var Submission $submission */
         $submission = $submissions[0];
