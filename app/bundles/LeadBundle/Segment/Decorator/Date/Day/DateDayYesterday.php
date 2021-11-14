@@ -18,7 +18,7 @@ class DateDayYesterday extends DateDayAbstract
     /**
      * {@inheritdoc}
      */
-    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
+    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper): void
     {
         $dateTimeHelper->modify('-1 day');
     }
