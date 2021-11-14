@@ -27,7 +27,7 @@ class TokenReplacementEvent extends CommonEvent
     protected $content;
 
     /**
-     * @var Lead
+     * @var Lead|mixed[]|null
      */
     protected $lead;
 
@@ -50,7 +50,7 @@ class TokenReplacementEvent extends CommonEvent
 
     /**
      * @param CommonEntity|string|null $content
-     * @param Lead|null                $lead
+     * @param Lead|mixed[]|null        $lead
      * @param mixed                    $passthrough
      */
     public function __construct($content, $lead = null, array $clickthrough = [], $passthrough = null)
@@ -82,7 +82,7 @@ class TokenReplacementEvent extends CommonEvent
     }
 
     /**
-     * @return Lead
+     * @return Lead|mixed[]|null
      */
     public function getLead()
     {
@@ -90,7 +90,7 @@ class TokenReplacementEvent extends CommonEvent
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getClickthrough()
     {
@@ -106,7 +106,7 @@ class TokenReplacementEvent extends CommonEvent
     }
 
     /**
-     * @param array $clickthrough
+     * @param mixed[] $clickthrough
      */
     public function setClickthrough($clickthrough)
     {

@@ -42,6 +42,9 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
         $this->customFieldValidator = $customFieldValidator;
     }
 
+    /**
+     * @return void
+     */
     public function validate($csv, Constraint $constraint)
     {
         if (!$constraint instanceof EmailOrEmailTokenList) {

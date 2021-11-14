@@ -81,7 +81,7 @@ class SendEmailToUser
     }
 
     /**
-     * @param string[] $tokens
+     * @param string[] $emailAddressesOrTokens
      * 
      * @return string[]
      */

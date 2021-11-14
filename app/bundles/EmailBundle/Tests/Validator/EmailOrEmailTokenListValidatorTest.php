@@ -30,7 +30,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
 {
     /**
      * @dataProvider provider
-     * 
+     *
      * @param mixed $value
      */
     public function testNoEmailsProvided($value, callable $getFieldMocker, callable $violationResult): void
@@ -46,7 +46,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
 
             /**
              * @param mixed[] $parameters
-             * 
+             *
              * @return void
              */
             public function addViolation($message, array $parameters = [])
@@ -89,6 +89,11 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
                 $this->getFieldMocker = $getFieldMocker;
             }
 
+            /**
+             * @param string      $alias
+             * @param string|null $categoryAlias
+             * @param string|null $lang
+             */
             public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
             {
                 return ($this->getFieldMocker)($alias);
@@ -102,9 +107,12 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
 
         $emaiOrEmailTokenListValidator->initialize($context);
 
-        Assert::assertNull($emaiOrEmailTokenListValidator->validate($value, new EmailOrEmailTokenList()));
+        $emaiOrEmailTokenListValidator->validate($value, new EmailOrEmailTokenList());
     }
 
+    /**
+     * @return \Generator<mixed[]>
+     */
     public function provider(): \Generator
     {
         // Test null value.

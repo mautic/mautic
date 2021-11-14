@@ -44,6 +44,9 @@ class EmailSubscriberTest extends TestCase
         Assert::assertSame($expected, $event->getContent());
     }
 
+    /**
+     * @return \Generator<string[]>
+     */
     public function onEmailAddressReplacementProvider(): \Generator
     {
         yield ['{contactfield=unicorn}', ''];
