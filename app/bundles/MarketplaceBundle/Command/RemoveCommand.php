@@ -31,11 +31,11 @@ class RemoveCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Removing ' . $input->getArgument('package') . ', this might take a while...');
+        $output->writeln('Removing '.$input->getArgument('package').', this might take a while...');
 
         // TODO check if the given package name is of type mautic-plugin
         $this->composer->remove($input->getArgument('package'));
 
-        $output->writeln($input->getArgument('package') . ' has successfully been removed.');
+        $output->writeln($input->getArgument('package').' has successfully been removed.');
     }
 }

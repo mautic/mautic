@@ -11,13 +11,13 @@ class PluginCollector
 {
     private Connection $connection;
 
-    private int $total = 0;
+    private int $total                 = 0;
     private array $allowListedPackages = [];
 
     public function __construct(Connection $connection)
     {
-        $this->connection = $connection;
-        $this->allowListedPackages = json_decode(file_get_contents(__DIR__ . '/tempAllowList.json'), true);
+        $this->connection          = $connection;
+        $this->allowListedPackages = json_decode(file_get_contents(__DIR__.'/tempAllowList.json'), true);
     }
 
     public function collectPackages(int $page = 1, int $limit, string $query = ''): PackageCollection
@@ -43,13 +43,14 @@ class PluginCollector
      * allowlisted. This function only gets allowlisted packages from Packagist. Their API doesn't
      * support querying multiple packages at once, so we simply do a foreach loop.
      */
-    private function getAllowlistedPackages(int $page = 1, int $limit, string $query = ''): array {
-        $total = count($this->allowListedPackages);
+    private function getAllowlistedPackages(int $page = 1, int $limit, string $query = ''): array
+    {
+        $total   = count($this->allowListedPackages);
         $results = [];
 
         $chunks = array_chunk($this->allowListedPackages, $limit);
         // Array keys start at 0 but page numbers start at 1
-        $pageChunk = $page - 1; 
+        $pageChunk = $page - 1;
 
         foreach ($chunks[$pageChunk] as $packageName) {
             if (count($results) >= $limit) {
@@ -64,8 +65,8 @@ class PluginCollector
         }
 
         return [
-            'total' => $total,
-            'results' => $results
+            'total'   => $total,
+            'results' => $results,
         ];
     }
 }

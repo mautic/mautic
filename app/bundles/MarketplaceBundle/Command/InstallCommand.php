@@ -31,11 +31,11 @@ class InstallCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Installing ' . $input->getArgument('package') . ', this might take a while...');
+        $output->writeln('Installing '.$input->getArgument('package').', this might take a while...');
 
         // TODO check if the given package name is of type mautic-plugin
         $this->composer->install($input->getArgument('package'));
 
-        $output->writeln('All done! ' . $input->getArgument('package') . ' has successfully been installed.');
+        $output->writeln('All done! '.$input->getArgument('package').' has successfully been installed.');
     }
 }

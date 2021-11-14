@@ -27,7 +27,7 @@ try {
 </div>
 <div style="display: none" class="text-center" id="marketplace-removal-success">
     <p>Successfully removed <strong><?php echo $packageDetail->packageBase->getHumanPackageName(); ?></strong>!</p>
-    <p><a class="btn btn-primary" href="<?php echo $view['router']->path(RouteProvider::ROUTE_LIST) ?>">Back to marketplace overview</a></p>
+    <p><a class="btn btn-primary" href="<?php echo $view['router']->path(RouteProvider::ROUTE_LIST); ?>">Back to marketplace overview</a></p>
 </div>
 
 <script>
