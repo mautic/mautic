@@ -37,5 +37,8 @@ class InstallCommand extends Command
         $this->composer->install($input->getArgument('package'));
 
         $output->writeln('All done! '.$input->getArgument('package').' has successfully been installed.');
+
+        // TODO return actual status code
+        return 0;
     }
 }

@@ -109,6 +109,9 @@ class Composer
         return \Composer\InstalledVersions::isInstalled($packageName);
     }
 
+    /**
+     * @param array<string,mixed> $input
+     */
     private function runCommand(array $input): ConsoleOutputModel
     {
         $arrayInput = new ArrayInput(array_merge(

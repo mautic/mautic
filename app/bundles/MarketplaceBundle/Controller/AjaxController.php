@@ -29,7 +29,7 @@ class AjaxController extends CommonAjaxController
 
         if (empty($data['vendor']) || empty($data['package'])) {
             return $this->sendJsonResponse([
-                'error' => $translator->trans('test') || 'ERROR',
+                'error' => $translator->trans('test'),
             ], 400);
         }
 
@@ -81,7 +81,7 @@ class AjaxController extends CommonAjaxController
 
         if (empty($data['vendor']) || empty($data['package'])) {
             return $this->sendJsonResponse([
-                'error' => $translator->trans('test') || 'ERROR',
+                'error' => $translator->trans('test'),
             ], 400);
         }
 

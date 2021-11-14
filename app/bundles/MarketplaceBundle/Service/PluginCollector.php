@@ -12,6 +12,9 @@ class PluginCollector
     private Connection $connection;
 
     private int $total                 = 0;
+    /**
+     * @var array<string>
+     */
     private array $allowListedPackages = [];
 
     public function __construct(Connection $connection)
@@ -42,6 +45,8 @@ class PluginCollector
      * During the Marketplace beta period, we only want to show packages that are explicitly
      * allowlisted. This function only gets allowlisted packages from Packagist. Their API doesn't
      * support querying multiple packages at once, so we simply do a foreach loop.
+     *
+     * @return array<string,mixed>
      */
     private function getAllowlistedPackages(int $page = 1, int $limit, string $query = ''): array
     {

@@ -37,5 +37,8 @@ class RemoveCommand extends Command
         $this->composer->remove($input->getArgument('package'));
 
         $output->writeln($input->getArgument('package').' has successfully been removed.');
+
+        // TODO return actual status code
+        return 0;
     }
 }
