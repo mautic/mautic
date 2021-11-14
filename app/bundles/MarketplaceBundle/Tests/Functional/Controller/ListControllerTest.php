@@ -14,7 +14,7 @@ use PHPUnit\Framework\Assert;
 
 final class ListControllerTest extends MauticMysqlTestCase
 {
-    public function testMakretplaceListTable(): void
+    public function testMarketplaceListTable(): void
     {
         $requests     = [];
         $history      = Middleware::history($requests);

@@ -143,7 +143,10 @@ return [
         'other' => [
             'marketplace.service.plugin_collector' => [
                 'class'     => \Mautic\MarketplaceBundle\Service\PluginCollector::class,
-                'arguments' => ['marketplace.api.connection'],
+                'arguments' => [
+                    'marketplace.api.connection',
+                    'marketplace.service.config',
+                ],
             ],
             'marketplace.service.route_provider' => [
                 'class'     => \Mautic\MarketplaceBundle\Service\RouteProvider::class,
@@ -151,7 +154,11 @@ return [
             ],
             'marketplace.service.config' => [
                 'class'     => \Mautic\MarketplaceBundle\Service\Config::class,
-                'arguments' => ['mautic.helper.core_parameters'],
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.http.client',
+                    'mautic.cache.provider',
+                ],
             ],
             'marketplace.service.composer' => [
                 'class'     => \Mautic\MarketplaceBundle\Service\Composer::class,
@@ -162,7 +169,10 @@ return [
             ],
         ],
     ],
+    // NOTE: when adding new parameters here, please add them to the developer documentation as well:
     'parameters' => [
-        Config::MARKETPLACE_ENABLED => true,
+        Config::MARKETPLACE_ENABLED                     => true,
+        Config::MARKETPLACE_ALLOWLIST_URL               => 'https://raw.githubusercontent.com/mautic/marketplace-allowlist/main/allowlist.json',
+        Config::MARKETPLACE_ALLOWLIST_CACHE_TTL_SECONDS => 3600,
     ],
 ];

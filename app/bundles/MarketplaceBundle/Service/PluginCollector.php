@@ -4,29 +4,36 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Service;
 
+use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\MarketplaceBundle\Api\Connection;
 use Mautic\MarketplaceBundle\Collection\PackageCollection;
+use Mautic\MarketplaceBundle\DTO\AllowlistEntry;
 
 class PluginCollector
 {
     private Connection $connection;
+    private Config $config;
 
-    private int $total                 = 0;
     /**
-     * @var array<string>
+     * @var AllowlistEntry[]
      */
-    private array $allowListedPackages = [];
+    private array $allowlistedPackages = [];
 
-    public function __construct(Connection $connection)
+    private int $total = 0;
+
+    public function __construct(Connection $connection, Config $config)
     {
-        $this->connection          = $connection;
-        $this->allowListedPackages = json_decode(file_get_contents(__DIR__.'/tempAllowList.json'), true);
+        $this->connection = $connection;
+        $this->config     = $config;
     }
 
     public function collectPackages(int $page = 1, int $limit, string $query = ''): PackageCollection
     {
-        if (count($this->allowListedPackages) > 0) {
-            $payload = $this->getAllowlistedPackages($page, $limit, $query);
+        $allowlist = $this->config->getAllowList();
+
+        if (!empty($allowlist)) {
+            $this->allowlistedPackages = $this->filterAllowlistedPackagesForCurrentMauticVersion($allowlist->entries);
+            $payload                   = $this->getAllowlistedPackages($page, $limit, $query);
         } else {
             $payload = $this->connection->getPlugins($page, $limit, $query);
         }
@@ -42,6 +49,36 @@ class PluginCollector
     }
 
     /**
+     * @param AllowlistEntry[] $entries
+     *
+     * @return AllowlistEntry[]
+     */
+    private function filterAllowlistedPackagesForCurrentMauticVersion(array $entries): array
+    {
+        $mauticVersion = ThisRelease::getMetadata()->getVersion();
+
+        return array_filter($entries, function (AllowlistEntry $entry) use ($mauticVersion) {
+            $shouldReturn = true;
+
+            if (
+                !empty($entry->minimumMauticVersion) &&
+                !version_compare($mauticVersion, $entry->minimumMauticVersion, '>=')
+            ) {
+                $shouldReturn = false;
+            }
+
+            if (
+                !empty($entry->maximumMauticVersion) &&
+                !version_compare($mauticVersion, $entry->maximumMauticVersion, '<=')
+            ) {
+                $shouldReturn = false;
+            }
+
+            return $shouldReturn;
+        });
+    }
+
+    /**
      * During the Marketplace beta period, we only want to show packages that are explicitly
      * allowlisted. This function only gets allowlisted packages from Packagist. Their API doesn't
      * support querying multiple packages at once, so we simply do a foreach loop.
@@ -50,19 +87,27 @@ class PluginCollector
      */
     private function getAllowlistedPackages(int $page = 1, int $limit, string $query = ''): array
     {
-        $total   = count($this->allowListedPackages);
+        $total   = count($this->allowlistedPackages);
         $results = [];
 
-        $chunks = array_chunk($this->allowListedPackages, $limit);
+        if (0 === $total) {
+            return [
+                'total'   => 0,
+                'results' => [],
+            ];
+        }
+
+        /** @var array<int,AllowlistEntry[]> */
+        $chunks = array_chunk($this->allowlistedPackages, $limit);
         // Array keys start at 0 but page numbers start at 1
         $pageChunk = $page - 1;
 
-        foreach ($chunks[$pageChunk] as $packageName) {
+        foreach ($chunks[$pageChunk] as $entry) {
             if (count($results) >= $limit) {
                 continue;
             }
 
-            $payload = $this->connection->getPlugins(1, 1, $packageName);
+            $payload = $this->connection->getPlugins(1, 1, $entry->package);
 
             if (!empty($payload['results'])) {
                 $results[] = $payload['results'][0];
