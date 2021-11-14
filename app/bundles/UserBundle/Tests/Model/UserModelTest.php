@@ -16,7 +16,6 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Model\UserModel;
-use Mautic\UserBundle\Model\UserToken\UserTokenService;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
