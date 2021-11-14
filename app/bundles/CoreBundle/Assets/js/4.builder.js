@@ -219,7 +219,7 @@ Mautic.formatCode = function() {
  */
 Mautic.openMediaManager = function() {
     Mautic.openServerBrowser(
-        mauticBasePath + (mauticEnv === 'dev' ? '/index_dev.php' : '') + '/elfinder',
+        mauticBasePath + (typeof mauticEnv !== 'undefined' &&  mauticEnv === 'dev' ? '/index_dev.php' : '') + '/elfinder',
         screen.width * 0.7,
         screen.height * 0.7
     );
