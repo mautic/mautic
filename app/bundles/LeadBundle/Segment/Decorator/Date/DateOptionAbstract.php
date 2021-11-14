@@ -37,6 +37,8 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
     /**
      * This function is responsible for setting date. $this->dateTimeHelper holds date with midnight today.
      * Eg. +1 day for "tomorrow", -1 for yesterday etc.
+     *
+     * @return void
      */
     abstract protected function modifyBaseDate(DateTimeHelper $dateTimeHelper);
 
