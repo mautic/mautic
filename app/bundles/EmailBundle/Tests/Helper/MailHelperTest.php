@@ -422,12 +422,12 @@ class MailHelperTest extends TestCase
         $email       = new Email();
 
         $mailer->setEmail($email);
-        $replyTo = key($mailer->message->getReplyTo());
+        $replyTo = key((array) $mailer->message->getReplyTo());
         $this->assertEquals('nobody@nowhere.com', $replyTo);
 
         $email->setReplyToAddress('replytooverride@nowhere.com');
         $mailer->setEmail($email);
-        $replyTo = key($mailer->message->getReplyTo());
+        $replyTo = key((array) $mailer->message->getReplyTo());
         $this->assertEquals('replytooverride@nowhere.com', $replyTo);
     }
 
@@ -442,7 +442,7 @@ class MailHelperTest extends TestCase
         // From address is set
         $email->setFromAddress('from@nowhere.com');
         $mailer->setEmail($email);
-        $replyTo = key($mailer->message->getReplyTo());
+        $replyTo = key((array) $mailer->message->getReplyTo());
         // Expect from address in reply to
         $this->assertEquals('from@nowhere.com', $replyTo);
     }
