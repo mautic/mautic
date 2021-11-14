@@ -48,9 +48,6 @@ class NotificationHelper
      */
     private $coreParametersHelper;
 
-    /**
-     * NotificationHelper constructor.
-     */
     public function __construct(
         UserModel $userModel,
         NotificationModel $notificationModel,
@@ -68,7 +65,7 @@ class NotificationHelper
     public function notifyOfFailure(Lead $contact, Event $event)
     {
         $user = $this->getUser($contact, $event);
-        if (!$user || !$user->getId()) {
+        if (!$user->getId()) {
             return;
         }
 
@@ -98,7 +95,7 @@ class NotificationHelper
          */
         $user = $this->getUser(new Lead(), $event);
 
-        if (!$user || !$user->getId()) {
+        if (!$user->getId()) {
             return;
         }
 

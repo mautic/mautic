@@ -318,6 +318,9 @@ class UserModel extends FormModel
         $mailer->send();
     }
 
+    /**
+     * @param string[] $emailAddresses
+     */
     public function sendMailToEmailAddresses(array $emailAddresses, string $subject, string $content): void
     {
         $mailer  = $this->prepareEMail($subject, $content);

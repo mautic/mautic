@@ -21,7 +21,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
-     * @return array
+     * @return array<string,array<int,string|int>>
      */
     public static function getSubscribedEvents()
     {
@@ -30,7 +30,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addForm([
             'bundle'     => 'NotificationBundle',

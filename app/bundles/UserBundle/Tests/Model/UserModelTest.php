@@ -19,6 +19,7 @@ use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\Model\UserToken\UserTokenService;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -26,48 +27,45 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class UserModelTest extends TestCase
 {
-    /**
-     * @var UserModel
-     */
-    private $userModel;
+    private UserModel $userModel;
 
     /**
-     * @var MailHelper
+     * @var MockObject&MailHelper
      */
     private $mailHelper;
 
     /**
-     * @var EntityManager
+     * @var MockObject&EntityManager
      */
     private $entityManager;
 
     /**
-     * @var Router
+     * @var MockObject&Router
      */
     private $router;
 
     /**
-     * @var TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private $translator;
 
     /**
-     * @var User
+     * @var MockObject&User
      */
     private $user;
 
     /**
-     * @var UserToken
+     * @var MockObject&UserToken
      */
     private $userToken;
 
     /**
-     * @var UserTokenService
+     * @var MockObject&UserTokenServiceInterface
      */
     private $userTokenService;
 
     /**
-     * @var Logger
+     * @var MockObject&Logger
      */
     private $logger;
 
@@ -163,10 +161,8 @@ class UserModelTest extends TestCase
         $this->mailHelper->expects($this->once())
             ->method('send');
 
-        $this->assertSame(
-            null, // Means no erros.
-            $this->userModel->emailUser($this->user, $subject, $content)
-        );
+        // Means no erros.
+        $this->userModel->emailUser($this->user, $subject, $content);
     }
 
     public function testSendMailToEmailAddresses(): void
@@ -187,9 +183,7 @@ class UserModelTest extends TestCase
         $this->mailHelper->expects($this->once())
             ->method('send');
 
-        $this->assertSame(
-            null, // Means no erros.
-            $this->userModel->sendMailToEmailAddresses($toMails, $subject, $content)
-        );
+        // Means no erros.
+        $this->userModel->sendMailToEmailAddresses($toMails, $subject, $content);
     }
 }
