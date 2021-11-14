@@ -916,7 +916,7 @@ class Field
 
     /**
      * Was field displayed.
-     * 
+     *
      * @param mixed[] $data
      *
      * @return bool
@@ -1041,7 +1041,7 @@ class Field
                 return $field;
             }
         }
-        
+
         return null;
     }
 }

@@ -42,7 +42,7 @@ class FormFieldConditionType extends AbstractType
 
     /**
      * @param FormBuilderInterface<string|FormBuilderInterface> $builder
-     * @param mixed[]                     $options
+     * @param mixed[]                                           $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
