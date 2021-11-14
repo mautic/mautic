@@ -101,7 +101,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $formId]);
 
-        Assert::assertCount(1, $submissions, print_r($submissions, true));
+        Assert::assertCount(1, $submissions);
 
         /** @var Submission $submission */
         $submission = $submissions[0];
@@ -317,5 +317,16 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+    }
+
+    protected function tearDown(): void
+    {
+        $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
+
+        parent::tearDown();
+
+        if ($this->connection->getSchemaManager()->tablesExist("{$tablePrefix}form_results_1_submission")) {
+            $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_submission");
+        }
     }
 }

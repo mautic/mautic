@@ -97,7 +97,7 @@ class CustomFieldValueHelper
                 return $value;
             }
             foreach ($list as $property) {
-                if ($property['value'] == $value) {
+                if (isset($property['value']) && $property['value'] == $value) {
                     $value = $property['label'];
                 }
             }
