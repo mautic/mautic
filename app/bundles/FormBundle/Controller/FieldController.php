@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
@@ -24,12 +25,12 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 class FieldController extends CommonFormController
 {
     /**
-     * @var FormModel
+     * @var FormModel|AbstractCommonModel
      */
     private $formModel;
 
     /**
-     * @var FieldModel
+     * @var FieldModel|AbstractCommonModel
      */
     private $formFieldModel;
 

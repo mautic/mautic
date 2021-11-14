@@ -37,3 +37,6 @@ parameters:
 		- '/Variable \$\w+ might not be defined\./'
 		- '/Variable \$paths in isset\(\) is never defined\./'
 		- '#Call to an undefined static method static\(Mautic\\IntegrationsBundle\\Bundle\\AbstractPluginBundle\)::installAllTablesIfMissing\(\).#'
+		# Following 2 ignores are there due to https://symfony.com/blog/new-in-symfony-4-3-simpler-event-dispatching
+		- '#Method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) invoked with 2 parameters, 1 required\.#'
+		- '#Parameter \#1 \$event of method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) expects object, string given\.#'

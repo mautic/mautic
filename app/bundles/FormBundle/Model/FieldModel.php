@@ -21,9 +21,6 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class FieldModel.
- */
 class FieldModel extends CommonFormModel
 {
     /**
@@ -36,9 +33,6 @@ class FieldModel extends CommonFormModel
      */
     protected $leadFieldModel;
 
-    /**
-     * FieldModel constructor.
-     */
     public function __construct(LeadFieldModel $leadFieldModel)
     {
         $this->leadFieldModel = $leadFieldModel;
@@ -182,9 +176,9 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * @return bool|FormFieldEvent|void|null
+     * @return FormFieldEvent|Event|void|null
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {

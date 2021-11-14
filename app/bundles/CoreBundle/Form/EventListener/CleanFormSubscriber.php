@@ -17,17 +17,17 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 /**
- * Clean data before persisting to DB
+ * Clean data before persisting to DB.
  */
 class CleanFormSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var string|array
+     * @var string|mixed[]
      */
     private $masks;
 
     /**
-     * @param string|array $masks
+     * @param string|mixed[] $masks
      */
     public function __construct($masks = 'clean')
     {
