@@ -15,6 +15,7 @@ namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -90,8 +91,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
 
+        /** @var SubmissionRepository $submissionRepository */
+        $submissionRepository = $this->em->getRepository(Submission::class);
+
         // Ensure the submission was created properly.
-        $submissions = $this->em->getRepository(Submission::class)->findAll();
+        $submissions = $submissionRepository->findBy(['form' => $formId]);
 
         Assert::assertCount(1, $submissions);
 
