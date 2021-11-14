@@ -30,6 +30,11 @@ class BarStringTransformer implements DataTransformerInterface
         return implode('|', $array);
     }
 
+    /**
+     * @param mixed $string
+     *
+     * @return string[]
+     */
     public function reverseTransform($string): array
     {
         if (!is_string($string)) {

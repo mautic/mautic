@@ -22,7 +22,7 @@ class TokenReplacementEvent extends CommonEvent
     protected $entity;
 
     /**
-     * @var string
+     * @var CommonEntity|string|null
      */
     protected $content;
 
@@ -49,9 +49,9 @@ class TokenReplacementEvent extends CommonEvent
     protected $passthrough;
 
     /**
-     * @param CommonEntity|string $content
-     * @param Lead|null           $lead
-     * @param mixed               $passthrough
+     * @param CommonEntity|string|null $content
+     * @param Lead|null                $lead
+     * @param mixed                    $passthrough
      */
     public function __construct($content, $lead = null, array $clickthrough = [], $passthrough = null)
     {
@@ -66,7 +66,7 @@ class TokenReplacementEvent extends CommonEvent
     }
 
     /**
-     * @return string
+     * @return CommonEntity|string|null
      */
     public function getContent()
     {
@@ -74,7 +74,7 @@ class TokenReplacementEvent extends CommonEvent
     }
 
     /**
-     * @param string $content
+     * @param CommonEntity|string|null $content
      */
     public function setContent($content)
     {

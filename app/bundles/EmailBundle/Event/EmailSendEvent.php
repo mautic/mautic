@@ -50,7 +50,7 @@ class EmailSendEvent extends CommonEvent
     private $idHash;
 
     /**
-     * @var Lead|array|null
+     * @var Lead|mixed[]|null
      */
     private $lead;
 

@@ -21,13 +21,18 @@ final class BarStringTransformerTest extends TestCase
 {
     /**
      * @dataProvider transformProvider
+     * 
+     * @param mixed $value
      */
-    public function testTransform($value, $expected): void
+    public function testTransform($value, string $expected): void
     {
         $transformer = new BarStringTransformer();
         Assert::assertSame($expected, $transformer->transform($value));
     }
 
+    /**
+     * @return \Generator<array<mixed>>
+     */
     public function transformProvider(): \Generator
     {
         yield [null, ''];
@@ -42,13 +47,19 @@ final class BarStringTransformerTest extends TestCase
 
     /**
      * @dataProvider reverseTransformProvider
+     * 
+     * @param mixed $value
+     * @param string[] $expected
      */
-    public function testReverseTransform($value, $expected): void
+    public function testReverseTransform($value, array $expected): void
     {
         $transformer = new BarStringTransformer();
         Assert::assertSame($expected, $transformer->reverseTransform($value));
     }
 
+    /**
+     * @return \Generator<array<mixed>>
+     */
     public function reverseTransformProvider(): \Generator
     {
         yield [null, []];

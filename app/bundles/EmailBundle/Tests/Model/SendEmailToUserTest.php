@@ -126,13 +126,19 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
             ->with(33)
             ->willReturn($email);
 
-        $emailSendEvent                       = new class() extends EmailSendEvent {
-            public $getTokenMethodCallCounter = 0;
+        $emailSendEvent = new class() extends EmailSendEvent {
+
+            public int $getTokenMethodCallCounter = 0;
 
             public function __construct()
             {
             }
 
+            /**
+             * @param bool $includeGlobal
+             * 
+             * @return string[]
+             */
             public function getTokens($includeGlobal = true)
             {
                 ++$this->getTokenMethodCallCounter;

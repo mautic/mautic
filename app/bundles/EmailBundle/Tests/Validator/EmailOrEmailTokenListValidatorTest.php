@@ -30,8 +30,10 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
 {
     /**
      * @dataProvider provider
+     * 
+     * @param mixed $value
      */
-    public function testNoEmailsProvided($value, callable $getFieldMocker, callable $violationResult)
+    public function testNoEmailsProvided($value, callable $getFieldMocker, callable $violationResult): void
     {
         $context = new class($violationResult) extends ExecutionContext {
             /** @var callable */
@@ -42,6 +44,11 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
                 $this->violationResult = $violationResult;
             }
 
+            /**
+             * @param mixed[] $parameters
+             * 
+             * @return void
+             */
             public function addViolation($message, array $parameters = [])
             {
                 ($this->violationResult)($message, $parameters);
@@ -53,6 +60,9 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             {
             }
 
+            /**
+             * @param mixed[] $parameters
+             */
             public function trans($id, array $parameters = [], $domain = null, $locale = null)
             {
                 return $id;

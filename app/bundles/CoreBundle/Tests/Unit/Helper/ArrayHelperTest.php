@@ -16,7 +16,7 @@ use PHPUnit\Framework\Assert;
 
 class ArrayHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetValue()
+    public function testGetValue(): void
     {
         $origin = ['one', 'two' => 'three'];
 
@@ -26,7 +26,7 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('default', ArrayHelper::getValue('five', $origin, 'default'));
     }
 
-    public function testPickValue()
+    public function testPickValue(): void
     {
         $origin = ['one', 'two' => 'three', 'four' => null];
 
@@ -40,7 +40,7 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $origin);
     }
 
-    public function testSelect()
+    public function testSelect(): void
     {
         $origin = ['one', 'two' => 'three', 'four' => 'five'];
 
@@ -51,12 +51,18 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider removeEmptyValuesProvider
+     * 
+     * @param mixed[] $value
+     * @param mixed[] $expected
      */
-    public function testRemoveEmptyValues($value, $expected): void
+    public function testRemoveEmptyValues(array $value, array $expected): void
     {
         Assert::assertSame($expected, ArrayHelper::removeEmptyValues($value));
     }
 
+    /**
+     * @return \Generator<mixed[]>
+     */
     public function removeEmptyValuesProvider(): \Generator
     {
         $object = new \StdClass();

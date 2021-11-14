@@ -80,6 +80,11 @@ class SendEmailToUser
         }
     }
 
+    /**
+     * @param string[] $tokens
+     * 
+     * @return string[]
+     */
     private function replaceTokens(array $emailAddressesOrTokens, Lead $lead): array
     {
         return array_map($this->makeTokenReplacerCallback($lead), $emailAddressesOrTokens);
