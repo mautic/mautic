@@ -320,9 +320,8 @@ class Interval implements ScheduleModeInterface
 
                 // Get now in the contacts timezone then add the number of days from now and the original execution date
                 $groupExecutionDate = clone $compareFromDateTime;
-                $groupExecutionDate->setTimezone($contactTimezone);
-
                 $groupExecutionDate->add($diff);
+                $groupExecutionDate->setTimezone($contactTimezone);
             } catch (\Exception $exception) {
                 // Timezone is not recognized so use the default
                 $this->logger->debug(
@@ -333,8 +332,8 @@ class Interval implements ScheduleModeInterface
 
         if (!isset($groupExecutionDate)) {
             $groupExecutionDate = clone $compareFromDateTime;
-            $groupExecutionDate->setTimezone($this->getDefaultTimezone());
             $groupExecutionDate->add($diff);
+            $groupExecutionDate->setTimezone($this->getDefaultTimezone());
         }
 
         // Is the time between the start and end hours?
