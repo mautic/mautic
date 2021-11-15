@@ -84,12 +84,12 @@ class IntegrationSubscriber implements EventSubscriberInterface
      */
     public function onResponse(PluginIntegrationRequestEvent $event)
     {
-        $response = $event->getResponse();
-        $headers  = var_export($response->getHeaders(), true);
-        $name     = strtoupper($event->getIntegrationName());
+        $response    = $event->getResponse();
+        $headers     = var_export($response->getHeaders(), true);
+        $name        = strtoupper($event->getIntegrationName());
         $contentType = isset($response->getHeaders()['Content-Type']) ? $response->getHeaders()['Content-Type'] : false;
         if (is_array($contentType)) {
-                $contentType = $response->getHeaders()['Content-Type'][0];
+            $contentType = $response->getHeaders()['Content-Type'][0];
         }
 
         $isJson   = $contentType && preg_match('/application\/json/', $contentType);
