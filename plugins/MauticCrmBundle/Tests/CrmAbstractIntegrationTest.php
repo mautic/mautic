@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\EmailBundle\Helper\EmailValidator;
+use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
@@ -71,10 +72,15 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $companyDeduper = $this->createMock(CompanyDeduper::class);
+
         $companyModel = $this->getMockBuilder(CompanyModel::class)
             ->setMethodsExcept(['setFieldValues'])
-            ->setConstructorArgs([$this->fieldModel, $this->session, $emailValidator])
+            ->setConstructorArgs([$this->fieldModel, $this->session, $emailValidator, $companyDeduper])
             ->getMock();
+        $companyModel->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([]);
         $companyModel->expects($this->once())
             ->method('organizeFieldsByGroup')
             ->willReturn([
@@ -125,5 +131,34 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
         $this->assertEquals('Some Business', $company->getName());
         $this->assertEquals('Some Business', $company->getFieldValue('custom_company_name'));
         $this->assertEquals('some value', $company->getFieldValue('some_custom_field'));
+    }
+
+    public function testLimitString()
+    {
+        $integration = $this->getMockBuilder(StubIntegration::class)
+            ->disableOriginalConstructor()
+            ->setMethodsExcept(['limitString'])
+            ->getMock();
+
+        $methodLimitString = new \ReflectionMethod(StubIntegration::class, 'limitString');
+        $methodLimitString->setAccessible(true);
+
+        $string = 'SomeRandomString';
+
+        $result = $methodLimitString->invokeArgs($integration, [str_repeat($string, 100), 'text']);
+        $this->assertSame(strlen($result), 255);
+
+        $result = $methodLimitString->invokeArgs($integration, [$string, 'text']);
+        $this->assertSame(strlen($result), strlen($string));
+        $this->assertSame($result, $string);
+
+        $result = $methodLimitString->invokeArgs($integration, [true, 'text']);
+        $this->assertSame($result, true);
+
+        $result = $methodLimitString->invokeArgs($integration, [false, 'text']);
+        $this->assertSame($result, false);
+
+        $result = $methodLimitString->invokeArgs($integration, [[1, 2, 3]]);
+        $this->assertSame($result, [1, 2, 3]);
     }
 }

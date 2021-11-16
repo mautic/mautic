@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -11,17 +13,27 @@
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\DetermineWinnerSubscriber;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|EntityManagerInterface
+     */
     private $em;
+
+    /**
+     * @var MockObject|TranslatorInterface
+     */
     private $translator;
 
     /**
@@ -33,7 +45,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->em         = $this->createMock(EntityManager::class);
+        $this->em         = $this->createMock(EntityManagerInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->subscriber = new DetermineWinnerSubscriber($this->em, $this->translator);
     }
@@ -150,13 +162,9 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
                 'opened'
             );
 
-        $this->em->expects($this->at(0))
-            ->method('getRepository')
-            ->willReturn($pageRepoMock);
-
-        $this->em->expects($this->at(1))
-            ->method('getRepository')
-            ->willReturn($emailRepoMock);
+        $this->em->method('getRepository')
+            ->withConsecutive([Hit::class], [Stat::class])
+            ->willReturnOnConsecutiveCalls($pageRepoMock, $emailRepoMock);
 
         $parentMock->expects($this->once())
             ->method('getRelatedEntityIds')
