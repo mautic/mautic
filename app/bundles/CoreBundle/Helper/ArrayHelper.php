@@ -79,9 +79,9 @@ class ArrayHelper
 
     /**
      * Removes null and empty string values from the array.
-     * 
+     *
      * @param mixed[] $array
-     * 
+     *
      * @return mixed[]
      */
     public static function removeEmptyValues(array $array): array

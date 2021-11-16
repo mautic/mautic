@@ -51,7 +51,7 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider removeEmptyValuesProvider
-     * 
+     *
      * @param mixed[] $value
      * @param mixed[] $expected
      */

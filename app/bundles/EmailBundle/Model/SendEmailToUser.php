@@ -82,7 +82,7 @@ class SendEmailToUser
 
     /**
      * @param string[] $emailAddressesOrTokens
-     * 
+     *
      * @return string[]
      */
     private function replaceTokens(array $emailAddressesOrTokens, Lead $lead): array
