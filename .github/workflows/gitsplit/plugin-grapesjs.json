@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "GrapesJsBuilderBundle",
+            "directory": "plugins/GrapesJsBuilderBundle",
+            "target": "git@github.com:mautic/plugin-grapesjs-builder.git"
+        }
+    ]
+}

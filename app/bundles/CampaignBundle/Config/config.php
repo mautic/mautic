@@ -489,6 +489,7 @@ return [
                     'mautic.core.model.notification',
                     'translator',
                     'router',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             // @deprecated 2.13.0 for BC support; to be removed in 3.0
