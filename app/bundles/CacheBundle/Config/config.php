@@ -19,6 +19,12 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
+            \Mautic\CacheBundle\EventListener\UserSubscriber::class => [
+                'class'     => \Mautic\CacheBundle\EventListener\UserSubscriber::class,
+                'arguments' => [
+                    'security.csrf.token_storage',
+                ],
+            ],
         ],
         'other'     => [
             'mautic.cache.adapter.filesystem' => [
