@@ -278,9 +278,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set createdBy.
-     *
-     * @param User $createdBy
+     * @param User|int|null $createdBy
      *
      * @return $this
      */
