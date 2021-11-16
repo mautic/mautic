@@ -62,7 +62,6 @@ class MenuHelper
     /**
      * Converts menu config into something KNP menus expects.
      *
-     * @param        $items
      * @param int    $depth
      * @param int    $defaultPriority
      * @param string $type
