@@ -14,7 +14,7 @@ namespace Mautic\LeadBundle\Segment;
 class OperatorOptions
 {
     /**
-     * @var array<string,array<string,string>>
+     * @var array<string,array<string,string|bool>>
      */
     private static $operatorOptions = [
         '=' => [
