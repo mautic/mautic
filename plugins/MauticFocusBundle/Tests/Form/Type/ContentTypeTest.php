@@ -29,7 +29,7 @@ class ContentTypeTest extends TestCase
         $this->formBuilder = $this->createMock(FormBuilderInterface::class);
     }
 
-    public function testBuilderForm()
+    public function testBuilderForm(): void
     {
         $this->formBuilder->expects(self::exactly(7))->method('add')->willReturnSelf();
         $options     = [];
