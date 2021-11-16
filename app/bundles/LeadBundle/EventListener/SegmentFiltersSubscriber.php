@@ -566,7 +566,7 @@ class SegmentFiltersSubscriber implements EventSubscriberInterface
         return $choices;
     }
 
-    private function setIncludeExcludeOperatorsToTextFilters(LeadListFiltersChoicesEvent $event)
+    private function setIncludeExcludeOperatorsToTextFilters(LeadListFiltersChoicesEvent $event): void
     {
         $choices = $event->getChoices();
 
