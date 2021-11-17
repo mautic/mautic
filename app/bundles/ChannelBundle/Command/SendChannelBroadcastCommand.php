@@ -62,7 +62,7 @@ EOT
                     ),
                     new InputOption(
                         'batch', 'b', InputOption::VALUE_OPTIONAL,
-                        'Limit how many messages to send at once.'
+                        'Send all emails in batch batch mode. Batch limit set with --limit parameter.'
                     ),
                 ]
             );
