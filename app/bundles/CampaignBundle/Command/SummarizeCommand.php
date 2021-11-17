@@ -55,7 +55,7 @@ class SummarizeCommand extends ModeratedCommand
                 '-l',
                 InputOption::VALUE_OPTIONAL,
                 'Number of hours to process per batch. 1 hour is default value.',
-                1
+                '1'
             )
             ->addOption(
                 '--max-hours',

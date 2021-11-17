@@ -29,9 +29,9 @@ trait EntityContactsTrait
      * @param string|null             $contactColumnName  Column of the contact in the join table
      * @param array|null              $routeParameters
      * @param string|null             $paginationTarget   DOM selector for injecting new content when pagination is used
-     * @param null                    $orderBy            optional OrderBy column, to be used to increase performance with joins
-     * @param null                    $orderByDir         optional $orderBy direction, to be used to increase performance with joins
-     * @param int                     $count              optional $count if already known to avoid an extra query
+     * @param string|null             $orderBy            optional OrderBy column, to be used to increase performance with joins
+     * @param string|null             $orderByDir         optional $orderBy direction, to be used to increase performance with joins
+     * @param int|null                $count              optional $count if already known to avoid an extra query
      * @param \DateTimeInterface|null $dateFrom           optionally limit to leads added between From and To dates
      * @param \DateTimeInterface|null $dateTo             optionally limit to leads added between From and To dates
      *
