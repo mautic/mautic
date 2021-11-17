@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -104,7 +105,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * Deletes a group of entities.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse
      */
     public function batchDeleteAction()
     {
@@ -116,7 +117,7 @@ class CampaignController extends AbstractStandardFormController
      *
      * @param $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function cloneAction($objectId)
     {
@@ -124,16 +125,15 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param      $objectId
-     * @param int  $page
-     * @param null $count
+     * @param string|int $objectId
+     * @param int        $page
+     * @param int|null   $count
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function contactsAction($objectId, $page = 1, $count = null, \DateTimeInterface $dateFrom = null, \DateTimeInterface $dateTo = null)
     {
-        /** @var Session */
-        $session= $this->get('session');
+        $session = $this->get('session');
         $session->set('mautic.campaign.contact.page', $page);
 
         return $this->generateContactsGrid(
@@ -162,7 +162,7 @@ class CampaignController extends AbstractStandardFormController
      *
      * @param $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse
      */
     public function deleteAction($objectId)
     {
@@ -173,7 +173,7 @@ class CampaignController extends AbstractStandardFormController
      * @param      $objectId
      * @param bool $ignorePost
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function editAction($objectId, $ignorePost = false)
     {
@@ -193,7 +193,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * Generates new form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function newAction()
     {
@@ -870,6 +870,8 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
+     * @return array<string, array<int|string, array<int|string, int|string>>>
+     *
      * @throws CacheException
      */
     private function processCampaignLogCounts(int $id, ?\DateTimeImmutable $dateFrom, ?\DateTimeImmutable $dateToPlusOne): array
@@ -892,6 +894,11 @@ class CampaignController extends AbstractStandardFormController
         ];
     }
 
+    /**
+     * @param array<int, array<int|string, int|string>>        $events
+     * @param array<int|string, array<int|string, int|string>> $campaignLogCounts
+     * @param array<int|string, array<int|string, int|string>> $campaignLogCountsProcessed
+     */
     private function processCampaignEvents(
         array &$events,
         int $leadCount,
@@ -923,6 +930,11 @@ class CampaignController extends AbstractStandardFormController
         }
     }
 
+    /**
+     * @param array<int, array<int|string, int|string>> $events
+     *
+     * @return array<string, array<int, array<int|string, int|string>>>
+     */
     private function processCampaignEventsFromParentCondition(array &$events): array
     {
         $sortedEvents = [
@@ -953,6 +965,11 @@ class CampaignController extends AbstractStandardFormController
         return $sortedEvents;
     }
 
+    /**
+     * @param array<int, array<int, string>> $campaignLogCounts
+     *
+     * @return array<int, array<int, string>>
+     */
     private function getCampaignLogCountsProcessed(array &$campaignLogCounts): array
     {
         $campaignLogCountsProcessed = [];
