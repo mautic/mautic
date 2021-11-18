@@ -152,7 +152,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $id             = $input->getOption('campaign-id');
-        $batchLimit     = $input->getOption('batch-limit');
+        $batchLimit     = $input->getOption('batch-limit') ? (int) $input->getOption('batch-limit') : null;
         $contactMinId   = $input->getOption('min-contact-id');
         $contactMaxId   = $input->getOption('max-contact-id');
         $contactId      = $input->getOption('contact-id');

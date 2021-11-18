@@ -229,7 +229,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         $this->scheduleOnly = $input->getOption('scheduled-only');
         $this->inactiveOnly = $input->getOption('inactive-only');
 
-        $batchLimit    = $input->getOption('batch-limit');
+        $batchLimit    = $input->getOption('batch-limit') ? (int) $input->getOption('batch-limit') : null;
         $campaignLimit = $input->getOption('campaign-limit');
         $contactMinId  = $input->getOption('min-contact-id');
         $contactMaxId  = $input->getOption('max-contact-id');
