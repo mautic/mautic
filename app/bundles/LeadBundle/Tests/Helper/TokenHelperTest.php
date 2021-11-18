@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use ReflectionProperty;
 
@@ -21,6 +22,8 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
         'lastname'  => 'Smith',
         'country'   => '',
         'date'      => '2000-05-05 12:45:50',
+        'select'    => 'first',
+        'bool'      => 1,
         'companies' => [
             [
                 'companyzip' => '77008',
@@ -35,6 +38,19 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
         $reflectionProperty->setValue([
             'date_format_dateonly' => 'F j, Y',
             'date_format_timeonly' => 'g:i a',
+        ]);
+
+        $reflectionProperty = new ReflectionProperty(LeadRepository::class, 'initiateFields');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue([
+            'select' => [
+                'type'      => 'select',
+                'properties'=> 'a:1:{s:4:"list";a:2:{i:0;a:2:{s:5:"label";s:12:"First option";s:5:"value";s:5:"first";}i:1;a:2:{s:5:"label";s:13:"Second option";s:5:"value";s:6:"second";}}}',
+            ],
+            'bool' => [
+                'type'      => 'boolean',
+                'properties'=> 'a:2:{s:2:"no";s:2:"No";s:3:"yes";s:3:"Yes";}',
+            ],
         ]);
 
         parent::setUp();
@@ -52,7 +68,6 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
-
         $token = '{contactfield=country}';
 
         $tokenList = TokenHelper::findLeadTokens($token, $lead);
@@ -209,5 +224,31 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
         $token     = '{contactfield=date|time}';
         $tokenList = TokenHelper::findLeadTokens($token, $lead);
         $this->assertEmpty($tokenList[$token]);
+    }
+
+    /**
+     * @dataProvider dataLabelProvider
+     *
+     * @param string|int $result
+     */
+    public function testLabelFormatForSelect(string $token, $result): void
+    {
+        $lead         = $this->lead;
+        $tokenList    = TokenHelper::findLeadTokens($token, $lead);
+        $this->assertEquals($result, $tokenList[$token]);
+    }
+
+    /**
+     * @return array<int, array<int, int|string>>
+     */
+    public function dataLabelProvider(): array
+    {
+        return
+            [
+                ['{contactfield=select}', 'first'],
+                ['{contactfield=select|label}', 'First option'],
+                ['{contactfield=bool}', 1],
+                ['{contactfield=bool|label}', 'Yes'],
+            ];
     }
 }
