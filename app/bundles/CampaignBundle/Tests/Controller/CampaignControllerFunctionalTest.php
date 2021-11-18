@@ -158,6 +158,9 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         return $this->processTotalContactStats($datasets);
     }
 
+    /**
+     * @param array<string, array<int|string>> $datasets
+     */
     private function processTotalContactStats(array $datasets): int
     {
         $totalContacts = 0;
@@ -185,6 +188,9 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         return $this->client->request(Request::METHOD_POST, '/s/campaigns/view/'.$campaignId, $parameters);
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function getActionCounts(int $campaignId): array
     {
         $crawler        = $this->getCrawlers($campaignId);

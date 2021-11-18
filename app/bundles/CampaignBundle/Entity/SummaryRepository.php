@@ -30,6 +30,9 @@ class SummaryRepository extends CommonRepository
         return 's';
     }
 
+    /**
+     * @return array<int|string, array<int|string, int|string>>
+     */
     public function getCampaignLogCounts(
         int $campaignId,
         DateTimeInterface $dateFrom = null,

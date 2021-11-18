@@ -26,6 +26,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SummaryModel extends AbstractCommonModel
 {
+    /**
+     * @var array
+     */
     private $logData = [];
 
     /**
@@ -99,7 +102,7 @@ class SummaryModel extends AbstractCommonModel
         $startedAt = new DateTime();
         $output->writeln('<comment>Started at: '.$startedAt->format('Y-m-d H:i:s').'</comment>');
 
-        if ($end && $end <= $start) {
+        if ($end <= $start) {
             $hours = ($end->diff($start)->days * 24) + $end->diff($start)->h;
 
             if ($maxHours && $hours > $maxHours) {
