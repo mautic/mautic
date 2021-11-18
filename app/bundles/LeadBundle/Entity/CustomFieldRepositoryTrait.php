@@ -35,7 +35,7 @@ trait CustomFieldRepositoryTrait
     private static $initiateFields = [];
 
     /**
-     * @return mixed
+     * @return array
      */
     public static function getInitiateFields()
     {
@@ -416,7 +416,7 @@ trait CustomFieldRepositoryTrait
                 ->setParameter('object', $object);
         }
 
-        return $fq->execute()->fetchAll() ?? [];
+        return $fq->execute()->fetchAll() ?: [];
     }
 
     /**
@@ -452,7 +452,7 @@ trait CustomFieldRepositoryTrait
         // Inherit and use if required
     }
 
-    public function setInitiateFields()
+    public function setInitiateFields(): void
     {
         $fields = [];
         foreach ($this->getFieldList() as $field) {
