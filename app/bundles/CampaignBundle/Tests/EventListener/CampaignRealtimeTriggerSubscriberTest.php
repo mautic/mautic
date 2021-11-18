@@ -52,9 +52,15 @@ final class CampaignRealtimeTriggerSubscriberTest extends TestCase
         $campaignRealtimeTriggerSubscriber->onCampaignLeadChange($event);
     }
 
-    public function campaignRealtimeProvider(): iterable
+    /**
+     * @return array<array<int,
+    bool|\PHPUnit\Framework\MockObject\Rule\InvokedCount>>
+     */
+    public function campaignRealtimeProvider(): array
     {
-        yield [true, self::once()];
-        yield [false, self::never()];
+        return [
+            [true, self::once()],
+            [false, self::never()],
+        ];
     }
 }
