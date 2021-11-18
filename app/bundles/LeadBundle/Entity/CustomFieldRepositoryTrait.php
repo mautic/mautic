@@ -30,6 +30,19 @@ trait CustomFieldRepositoryTrait
     protected $uniqueIdentifiersOperator;
 
     /**
+     * @var array
+     */
+    private static $initiateFields = [];
+
+    /**
+     * @return mixed
+     */
+    public static function getInitiateFields()
+    {
+        return self::$initiateFields;
+    }
+
+    /**
      * @param      $object
      * @param      $args
      * @param null $resultsCallback
@@ -365,17 +378,7 @@ trait CustomFieldRepositoryTrait
     public function getCustomFieldList($object)
     {
         if (empty($this->customFieldList)) {
-            //Get the list of custom fields
-            $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
-                ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
-                ->where('f.is_published = :published')
-                ->andWhere($fq->expr()->eq('object', ':object'))
-                ->setParameter('published', true, 'boolean')
-                ->setParameter('object', $object)
-                ->addOrderBy('f.field_order', 'asc');
-            $results = $fq->execute()->fetchAll();
-
+            $results     = $this->getFieldList($object);
             $fields      = [];
             $fixedFields = [];
             foreach ($results as $r) {
@@ -391,6 +394,29 @@ trait CustomFieldRepositoryTrait
         }
 
         return $this->customFieldList;
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function getFieldList(string $object = null): array
+    {
+        //Get the list of custom fields
+        $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $fq->select(
+            'f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value'
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+            ->where('f.is_published = :published')
+            ->setParameter('published', true, 'boolean')
+            ->addOrderBy('f.field_order', 'asc');
+
+        if (null !== $object) {
+            $fq->andWhere($fq->expr()->eq('object', ':object'))
+                ->setParameter('object', $object);
+        }
+
+        return $fq->execute()->fetchAll() ?? [];
     }
 
     /**
@@ -424,6 +450,15 @@ trait CustomFieldRepositoryTrait
     protected function postSaveEntity($entity)
     {
         // Inherit and use if required
+    }
+
+    public function setInitiateFields()
+    {
+        $fields = [];
+        foreach ($this->getFieldList() as $field) {
+            $fields[$field['alias']] = $field;
+        }
+        self::$initiateFields = $fields;
     }
 
     public function setUniqueIdentifiersOperator(string $uniqueIdentifiersOperator): void

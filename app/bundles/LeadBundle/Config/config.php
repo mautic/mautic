@@ -959,6 +959,7 @@ return [
                     'setUniqueIdentifiersOperator' => [
                         '%mautic.contact_unique_identifiers_operator%',
                     ],
+                    'setInitiateFields' => [],
                 ],
             ],
             'mautic.lead.repository.frequency_rule' => [

@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
+use Mautic\LeadBundle\Entity\LeadRepository;
 
 /**
  * Class TokenHelper.
@@ -94,9 +95,11 @@ class TokenHelper
         } elseif (isset($lead['companies'][0][$alias])) {
             $value = $lead['companies'][0][$alias];
         }
-
         if ('' !== $value) {
             switch ($defaultValue) {
+                case 'label':
+                    $value = self::getNormalizeValue($alias, $value);
+                    break;
                 case 'true':
                     $value = urlencode($value);
                     break;
@@ -124,7 +127,7 @@ class TokenHelper
                     break;
             }
         }
-        if (in_array($defaultValue, ['true', 'date', 'time', 'datetime'])) {
+        if (in_array($defaultValue, ['true', 'date', 'time', 'datetime', 'label'])) {
             return $value;
         } else {
             return '' !== $value ? $value : $defaultValue;
@@ -170,5 +173,18 @@ class TokenHelper
         }
 
         return self::$parameters[$parameter];
+    }
+
+    /**
+     * @param $alias
+     * @param $value
+     *
+     * @return mixed|string
+     */
+    private static function getNormalizeValue($alias, $value)
+    {
+        $field = array_merge(LeadRepository::getInitiateFields()[$alias], ['value' => $value]);
+
+        return CustomFieldValueHelper::normalizeValue($field);
     }
 }

@@ -52,7 +52,7 @@ class CustomFieldValueHelper
     /**
      * @return mixed
      */
-    private static function normalizeValue(array $field)
+    public static function normalizeValue(array $field)
     {
         $value      = ArrayHelper::getValue('value', $field, '');
         $type       = ArrayHelper::getValue('type', $field);
