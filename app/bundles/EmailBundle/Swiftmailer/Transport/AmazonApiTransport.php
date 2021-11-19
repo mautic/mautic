@@ -446,7 +446,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     /**
      * Set plain text to a message.
      */
-    private function setPlainTextToMessage(\Swift_Mime_SimpleMessage $message, $text)
+    private function setPlainTextToMessage(\Swift_Mime_SimpleMessage $message, $text) : void
     {
         $children = (array) $message->getChildren();
 
