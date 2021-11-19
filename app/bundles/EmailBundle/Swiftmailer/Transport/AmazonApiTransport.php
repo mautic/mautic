@@ -162,9 +162,9 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         AmazonCallback $amazonCallback,
         LoggerInterface $logger
     ) {
-        $this->amazonCallback    = $amazonCallback;
-        $this->translator        = $translator;
-        $this->logger            = $logger;
+        $this->amazonCallback = $amazonCallback;
+        $this->translator = $translator;
+        $this->logger = $logger;
     }
 
     public function start()
@@ -173,15 +173,15 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             $this->throwException($this->translator->trans('mautic.email.api_key_required', [], 'validators'));
         }
 
-        $this->amazonClient  = $this->createAmazonClient();
+        $this->amazonClient = $this->createAmazonClient();
 
-        $account             = $this->amazonClient->getAccount();
+        $account = $this->amazonClient->getAccount();
 
-        if (!$account->get('SendingEnabled')) {
+        if (! $account->get('SendingEnabled')) {
             $this->throwException($this->translator->trans('mautic.email.ses.enabled'));
         }
 
-        if (!$account->get('ProductionAccessEnabled')) {
+        if (! $account->get('ProductionAccessEnabled')) {
             $this->throwException($this->translator->trans('mautic.email.ses.sandbox'));
         }
 
@@ -192,14 +192,14 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             throw new \Exception('Your AWS SES quota is currently exceeded');
         }
 
-        $this->concurrency   = floor($account->get('SendQuota')['MaxSendRate']);
+        $this->concurrency = floor($account->get('SendQuota')['MaxSendRate']);
 
         $this->started = true;
     }
 
     public function createAmazonClient()
     {
-        $config  = [
+        $config = [
             'version'     => '2019-09-27',
             'region'      => $this->region,
             'credentials' => new Credentials(
@@ -234,7 +234,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
      */
     public function send(\Swift_Mime_SimpleMessage $toSendMessage, &$failedRecipients = null)
     {
-        $this->message    = $toSendMessage;
+        $this->message = $toSendMessage;
         $failedRecipients = (array) $failedRecipients;
 
         if ($evt = $this->getDispatcher()->createSendEvent($this, $toSendMessage)) {
@@ -262,7 +262,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                     }
                 },
                 'rejected' => function (AwsException $reason, $iteratorId) use ($evt) {
-                    dd($reason);
                     $failedRecipients = [];
                     $this->triggerSendError($evt, $failedRecipients, $reason->getAwsErrorMessage());
                 },
@@ -307,7 +306,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
      */
     public function getAmazonMessage(\Swift_Mime_SimpleMessage $message)
     {
-        /**
+        /*
          * Three ways to send the email
          * Simple:  A standard email message. When you create this type of message, you specify the sender, the recipient, and the message body, and Amazon SES assembles the message for you.
          * Raw : A raw, MIME-formatted email message. When you send this type of email, you have to specify all of the message headers, as well as the message body. You can use this message type to send messages that contain attachments. The message that you specify has to be a valid MIME message.
@@ -319,12 +318,12 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
          * Since we are using SES RAW method, we need to create a seperate message each time we send out an email
          * In case SES changes their API this is the only function that needs to be changed to accomrdate sending a template
          */
-        $this->message    = $message;
-        $metadata         = $this->getMetadata();
-        $emailBody        = $this->message->getBody();
-        $emailSubject     = $this->message->getSubject();
-        $emailText        = PlainTextMessageHelper::getPlainTextFromMessage($message);
-        $sesArray         = [];
+        $this->message = $message;
+        $metadata = $this->getMetadata();
+        $emailBody = $this->message->getBody();
+        $emailSubject = $this->message->getSubject();
+        $emailText = PlainTextMessageHelper::getPlainTextFromMessage($message);
+        $sesArray = [];
 
         if (empty($metadata)) {
             /**
@@ -332,29 +331,29 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
              * in the $message object
              * just construct the $sesArray.
              */
-            $from      = $message->getFrom();
+            $from = $message->getFrom();
             $fromEmail = current(array_keys($from));
-            $fromName  = $from[$fromEmail];
+            $fromName = $from[$fromEmail];
 
-            $sesArray['FromEmailAddress'] =  (!empty($fromName)) ? '"'.mb_encode_mimeheader($fromName).'" <'.$fromEmail.'>' : $fromEmail;
-            $to                           = $message->getTo();
-            if (!empty($to)) {
+            $sesArray['FromEmailAddress'] = (! empty($fromName)) ? mb_encode_mimeheader($fromName).' <'.$fromEmail.'>' : $fromEmail;
+            $to = $message->getTo();
+            if (! empty($to)) {
                 $sesArray['Destination']['ToAddresses'] = array_keys($to);
             }
 
             $cc = $message->getCc();
-            if (!empty($cc)) {
+            if (! empty($cc)) {
                 $sesArray['Destination']['CcAddresses'] = array_keys($cc);
             }
             $bcc = $message->getBcc();
-            if (!empty($bcc)) {
+            if (! empty($bcc)) {
                 $sesArray['Destination']['BccAddresses'] = array_keys($bcc);
             }
             $replyTo = $message->getReplyTo();
-            if (!empty($replyTo)) {
+            if (! empty($replyTo)) {
                 $sesArray['ReplyToAddresses'] = [key($replyTo)];
             }
-            $headers            = $message->getHeaders();
+            $headers = $message->getHeaders();
             if ($headers->has('X-SES-CONFIGURATION-SET')) {
                 $sesArray['ConfigurationSetName'] = $headers->get('X-SES-CONFIGURATION-SET');
             }
@@ -365,21 +364,21 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             /**
              * This is a message with tokens.
              */
-            $mauticTokens  = [];
-            $metadataSet   = reset($metadata);
-            $tokens        = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
-            $mauticTokens  = array_keys($tokens);
+            $mauticTokens = [];
+            $metadataSet = reset($metadata);
+            $tokens = (! empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
+            $mauticTokens = array_keys($tokens);
             foreach ($metadata as $recipient => $mailData) {
                 // Reset the parts of the email that has tokens
                 $this->message->setSubject($emailSubject);
                 $this->message->setBody($emailBody);
                 $this->setPlainTextToMessage($this->message, $emailText);
                 // Convert the message to array to get the values
-                $tokenizedMessage                                = $this->messageToArray($mauticTokens, $mailData['tokens'], false);
-                $toSendMessage                                   = (new \Swift_Message());
+                $tokenizedMessage = $this->messageToArray($mauticTokens, $mailData['tokens'], false);
+                $toSendMessage = (new \Swift_Message());
                 $toSendMessage->setSubject($tokenizedMessage['subject']);
                 $toSendMessage->setFrom([$tokenizedMessage['from']['email'] => $tokenizedMessage['from']['name']]);
-                $sesArray['FromEmailAddress'] =  (!empty($tokenizedMessage['from']['name'])) ? '"'.mb_encode_mimeheader($tokenizedMessage['from']['name']).'" <'.$tokenizedMessage['from']['email'].'>' : $tokenizedMessage['from']['email'];
+                $sesArray['FromEmailAddress'] = (! empty($tokenizedMessage['from']['name'])) ? mb_encode_mimeheader($tokenizedMessage['from']['name']).' <'.$tokenizedMessage['from']['email'].'>' : $tokenizedMessage['from']['email'];
                 $toSendMessage->setTo([$recipient]);
                 $sesArray['Destination']['ToAddresses'] = [$recipient];
                 if (isset($tokenizedMessage['text']) && strlen($tokenizedMessage['text']) > 0) {
@@ -395,7 +394,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                         if ('List-Unsubscribe' === $key) {
                             $listUnsubscribe = array_map('trim', explode(',', $value));
                             $listUnsubscribe = array_filter($listUnsubscribe, fn ($el) => strpos($el, $mailData['hashId']));
-                            $value           = implode(',', $listUnsubscribe);
+                            $value = implode(',', $listUnsubscribe);
                         }
                         $headers->addTextHeader($key, $value);
                     }
@@ -473,8 +472,8 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     public function getBatchRecipientCount(\Swift_Message $toSendMessage, $toBeAdded = 1, $type = 'to'): int
     {
         // These getters could return null
-        $toCount  = $toSendMessage->getTo() ? count($toSendMessage->getTo()) : 0;
-        $ccCount  = $toSendMessage->getCc() ? count($toSendMessage->getCc()) : 0;
+        $toCount = $toSendMessage->getTo() ? count($toSendMessage->getTo()) : 0;
+        $ccCount = $toSendMessage->getCc() ? count($toSendMessage->getCc()) : 0;
         $bccCount = $toSendMessage->getBcc() ? count($toSendMessage->getBcc()) : 0;
 
         return $toCount + $ccCount + $bccCount + $toBeAdded;

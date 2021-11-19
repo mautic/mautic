@@ -40,16 +40,22 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|AmazonCallback
      */
     private $amazonCallback;
+
     private $amazonMock;
+
     private $amazonTransport;
+
     private $logger;
+
     private $headers;
+
     private $request;
 
     /**
      * @var MockObject|Client
      */
     private $mockHttp;
+
     /**
      * @var MockObject|TransportCallback
      */
@@ -64,19 +70,19 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator         = $this->createMock(TranslatorInterface::class);
-        $this->amazonCallback     = $this->createMock(AmazonCallback::class);
-        $this->logger             = $this->createMock(LoggerInterface::class);
-        $this->message            = $this->createMock(MauticMessage::class);
-        $this->headers            = $this->createMock(\Swift_Mime_SimpleHeaderSet::class);
-        $this->request            =  $this->createMock(Request::class);
+        $this->translator     = $this->createMock(TranslatorInterface::class);
+        $this->amazonCallback = $this->createMock(AmazonCallback::class);
+        $this->logger         = $this->createMock(LoggerInterface::class);
+        $this->message        = $this->createMock(MauticMessage::class);
+        $this->headers        = $this->createMock(\Swift_Mime_SimpleHeaderSet::class);
+        $this->request        = $this->createMock(Request::class);
 
         // Mock http connector
         $this->mockHttp          = $this->createMock(Client::class);
         $this->transportCallback = $this->createMock(TransportCallback::class);
         $this->amazonMock        = new MockHandler();
 
-        $this->amazonTransport   = new AmazonApiTransport(
+        $this->amazonTransport = new AmazonApiTransport(
             $this->translator,
             $this->amazonCallback,
             $this->logger
@@ -143,7 +149,7 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
         $this->message->method('toString')->willReturn('test');
     }
 
-    public function testAmazonStartInvalidAPIKeys()
+    public function testAmazonStartInvalidAPIKeys(): void
     {
         $this->amazonTransport->setRegion('');
         $this->amazonTransport->setUsername('');
@@ -153,7 +159,7 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
         $this->amazonTransport->start();
     }
 
-    public function testAmazonStartSendingDisabled()
+    public function testAmazonStartSendingDisabled(): void
     {
         $this->amazonMock->append(new Result(['SendingEnabled' => false]));
         $this->expectException(\Swift_TransportException::class);
@@ -161,7 +167,7 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
         $this->amazonTransport->start();
     }
 
-    public function testAmazonStartProductionDisabled()
+    public function testAmazonStartProductionDisabled(): void
     {
         $this->amazonMock->append(new Result(['SendingEnabled' => true, 'ProductionAccessEnabled' => false]));
         $this->expectException(\Swift_TransportException::class);
