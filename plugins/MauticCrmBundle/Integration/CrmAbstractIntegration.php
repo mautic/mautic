@@ -352,9 +352,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * Create or update existing Mautic lead from the integration's profile data.
      *
-     * @param mixed       $data        Profile data from integration
-     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
-     * @param array|null  $socialCache
+     * @param mixed      $data        Profile data from integration
+     * @param bool|true  $persist     Set to false to not persist lead to the database in this method
+     * @param array|null $socialCache
      * @param mixed||null $identifiers
      * @param string|null $object
      *
@@ -385,11 +385,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $leadFieldTypes      = $this->fieldModel->getFieldListWithProperties();
 
         foreach ($matchedFields as $leadField => $value) {
+            $fieldType                 = $leadFieldTypes[$leadField]['type'] ?? '';
+            $value                     = $this->checkDateTime($value, $fieldType);
             if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
                 $uniqueLeadFieldData[$leadField] = $value;
             }
 
-            $fieldType                 = isset($leadFieldTypes[$leadField]['type']) ? $leadFieldTypes[$leadField]['type'] : '';
             $matchedFields[$leadField] = $this->limitString($value, $fieldType);
         }
 
@@ -673,6 +674,35 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         // "False" has to be converted to 0 instead.
         if (('text' == $fieldType) && !is_bool($value)) {
             return substr($value, 0, 255);
+        }
+
+        return $value;
+    }
+
+    /**
+     * check date time.
+     *
+     * @param mixed  $value
+     * @param string $fieldType
+     *
+     * @return mixed
+     */
+    protected function checkDateTime($value, $fieldType = '')
+    {
+        if (is_numeric($value)) {
+            $dateFormat = [
+                'datetime' => 'Y-m-d H:i:s',
+                'date'     => 'Y-m-d',
+                'time'     => 'H:i:s',
+            ];
+            if (isset($dateFormat[$fieldType])) {
+                // check if timestamp is millisecond, convert to seconds
+                if ($value > strtotime('+10 year')) {
+                    $value /= 1000;
+                }
+
+                return date($dateFormat[$fieldType], $value);
+            }
         }
 
         return $value;
