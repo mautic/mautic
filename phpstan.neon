@@ -36,6 +36,7 @@ parameters:
 		- '#Constant MAUTIC_VERSION not found.#'
 		- '/Variable \$\w+ might not be defined\./'
 		- '/Variable \$paths in isset\(\) is never defined\./'
+		- '#Property Mautic\\LeadBundle\\EventListener\\SegmentFiltersSubscriber::\$translator \(Symfony\\Component\\Translation\\TranslatorInterface\) in isset\(\) is not nullable\.#' # this is antipatern, should be refactored.
 		- '#Call to an undefined static method static\(Mautic\\IntegrationsBundle\\Bundle\\AbstractPluginBundle\)::installAllTablesIfMissing\(\).#'
 		# Following 2 ignores are there due to https://symfony.com/blog/new-in-symfony-4-3-simpler-event-dispatching
 		- '#Method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) invoked with 2 parameters, 1 required\.#'
