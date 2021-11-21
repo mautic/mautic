@@ -168,8 +168,9 @@ return [
             'marketplace.service.allowlist' => [
                 'class'     => \Mautic\MarketplaceBundle\Service\Allowlist::class,
                 'arguments' => [
-                    'mautic.http.client',
+                    'marketplace.service.config',
                     'mautic.cache.provider',
+                    'mautic.http.client',
                 ],
             ],
         ],
