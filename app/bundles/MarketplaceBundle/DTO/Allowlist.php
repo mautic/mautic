@@ -25,7 +25,7 @@ final class Allowlist
     public static function fromArray(array $array): Allowlist
     {
         return new self(
-            array_map(fn (array $item) => AllowlistEntry::fromArray($item), $array['allowlist']),
+            array_map(fn (array $item) => AllowlistEntry::fromArray($item), $array['allowlist'] ?? []),
         );
     }
 }
