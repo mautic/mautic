@@ -145,7 +145,7 @@ return [
                 'class'     => \Mautic\MarketplaceBundle\Service\PluginCollector::class,
                 'arguments' => [
                     'marketplace.api.connection',
-                    'marketplace.service.config',
+                    'marketplace.service.allowlist',
                 ],
             ],
             'marketplace.service.route_provider' => [
@@ -156,8 +156,6 @@ return [
                 'class'     => \Mautic\MarketplaceBundle\Service\Config::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.http.client',
-                    'mautic.cache.provider',
                 ],
             ],
             'marketplace.service.composer' => [
@@ -165,6 +163,13 @@ return [
                 'arguments' => [
                     'kernel',
                     'monolog.logger.mautic',
+                ],
+            ],
+            'marketplace.service.allowlist' => [
+                'class'     => \Mautic\MarketplaceBundle\Service\Allowlist::class,
+                'arguments' => [
+                    'mautic.http.client',
+                    'mautic.cache.provider',
                 ],
             ],
         ],

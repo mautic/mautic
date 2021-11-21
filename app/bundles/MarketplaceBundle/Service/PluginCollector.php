@@ -12,7 +12,7 @@ use Mautic\MarketplaceBundle\DTO\AllowlistEntry;
 class PluginCollector
 {
     private Connection $connection;
-    private Config $config;
+    private Allowlist $allowlist;
 
     /**
      * @var AllowlistEntry[]
@@ -21,15 +21,15 @@ class PluginCollector
 
     private int $total = 0;
 
-    public function __construct(Connection $connection, Config $config)
+    public function __construct(Connection $connection, Allowlist $allowlist)
     {
         $this->connection = $connection;
-        $this->config     = $config;
+        $this->allowlist  = $allowlist;
     }
 
     public function collectPackages(int $page = 1, int $limit, string $query = ''): PackageCollection
     {
-        $allowlist = $this->config->getAllowList();
+        $allowlist = $this->allowlist->getAllowList();
 
         if (!empty($allowlist)) {
             $this->allowlistedPackages = $this->filterAllowlistedPackagesForCurrentMauticVersion($allowlist->entries);
