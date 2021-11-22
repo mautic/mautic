@@ -28,15 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class FormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EmailModel|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $emailModel;
-
-    /**
-     * @var LeadModel|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $leadModel;
+    const REFERER_WITH_UTM = 'https://domain.tld?utm_campaign=test&utm_source=test';
 
     /**
      * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject
@@ -44,9 +36,21 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
     private $contactTracker;
 
     /**
+     * @var EmailModel|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $emailModel;
+
+    /**
      * @var IpLookupHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $ipLookupHelper;
+
+    /**
+     * @var LeadModel|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $leadModel;
+
+    private Submission $submission;
 
     protected function setUp(): void
     {
@@ -54,6 +58,66 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadModel      = $this->createMock(LeadModel::class);
         $this->contactTracker = $this->createMock(ContactTracker::class);
         $this->ipLookupHelper = $this->createMock(IpLookupHelper::class);
+
+        $submission           = new Submission();
+        $submission->setForm(new Form());
+        $submission->setLead(new Lead());
+
+        $this->submission = $submission;
+    }
+
+    public function testOnFormSubmitActionAddUtmTagsNever(): void
+    {
+        $request = new Request();
+
+        $this->leadModel->expects($this->never())->method('getUtmTagRepository');
+        $this->leadModel->expects($this->never())->method('setUtmTags');
+
+        $this->triggeFormSubmitActionAddUtmTags($request);
+    }
+
+    public function testOnFormSubmitActionAddUtmTagsReferer(): void
+    {
+        $request = new Request([], [], [], [], [], ['HTTP_REFERER' => self::REFERER_WITH_UTM]);
+
+        $this->leadModel->expects($this->once())->method('getUtmTagRepository')->willReturn(new class() {
+            public function saveEntity(): void
+            {
+            }
+        });
+        $this->leadModel->expects($this->once())->method('setUtmTags');
+
+        $this->triggeFormSubmitActionAddUtmTags($request);
+    }
+
+    public function testOnFormSubmitActionAddUtmTagsRequest(): void
+    {
+        $request = new Request([], [], [], [], [], ['QUERY_STRING' => 'utm_campaign=test&utm_source=test']);
+
+        $this->leadModel->expects($this->once())->method('getUtmTagRepository')->willReturn(new class() {
+            public function saveEntity(): void
+            {
+            }
+        });
+        $this->leadModel->expects($this->once())->method('setUtmTags');
+
+        $this->triggeFormSubmitActionAddUtmTags($request);
+    }
+
+    public function testOnFormSubmitActionAddUtmTagsSubmission(): void
+    {
+        $request = new Request();
+
+        $this->leadModel->expects($this->once())->method('getUtmTagRepository')->willReturn(new class() {
+            public function saveEntity(): void
+            {
+            }
+        });
+        $this->leadModel->expects($this->once())->method('setUtmTags');
+
+        $this->submission->setReferer(self::REFERER_WITH_UTM);
+
+        $this->triggeFormSubmitActionAddUtmTags($request);
     }
 
     public function testOnFormSubmitActionChangePoints()
@@ -87,5 +151,27 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $formSubscriber->onFormSubmitActionChangePoints($submissionEvent);
 
         $this->assertEquals(1, $submissionEvent->getSubmission()->getLead()->getPoints());
+    }
+
+    protected function triggeFormSubmitActionAddUtmTags(Request $request): void
+    {
+        $this->contactTracker->method('getContact')->willReturn(new Lead());
+
+        $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress());
+
+        $formSubscriber = new FormSubscriber(
+            $this->emailModel,
+            $this->leadModel,
+            $this->contactTracker,
+            $this->ipLookupHelper
+        );
+
+        $submissionEvent = new SubmissionEvent($this->submission, [], [], $request);
+
+        $action = new Action();
+        $action->setType('lead.addutmtags');
+        $submissionEvent->setAction($action);
+
+        $formSubscriber->onFormSubmitActionAddUtmTags($submissionEvent);
     }
 }
