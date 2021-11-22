@@ -343,7 +343,7 @@ class ReportType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                 'class'                => 'form-control',
-                'data-report-schedule' => 'scheduleFormat',
+                'data-report-schedule-format' => 'scheduleFormat',
                 ],
                 'choices'  => ['csv' => 'csv', 'xlsx' => 'xlsx'],
                 'required' => false,
@@ -357,8 +357,8 @@ class ReportType extends AbstractType
                 'label'      => 'mautic.report.schedule.scheduleTimezone',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                'class'                => 'form-control',
-                'data-report-schedule' => 'scheduleTimezone',
+                          'class'                => 'form-control',
+                          'data-report-schedule-format' => 'scheduleTimezone',
                 ],
                 'required' => false,
                 ]
@@ -371,8 +371,8 @@ class ReportType extends AbstractType
                 'label'      => 'mautic.report.schedule.scheduleTime',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                'class'                => 'form-control',
-                'data-report-schedule' => 'scheduleTime',
+                        'class'                => 'form-control',
+                        'data-report-schedule' => 'scheduleTime',
                 ],
                 'required' => false,
                 ]

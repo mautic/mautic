@@ -71,6 +71,11 @@ Mautic.scheduleDisplay = function ($isScheduled, $unitTypeId, $scheduleDay, $sch
     } else {
         mQuery('#scheduleDay label').show();
     }
+    if(unitVal === 'NOW') {
+        mQuery('#scheduleTimePart').hide();
+    } else {
+        mQuery('#scheduleTimePart').show();
+    }
     if($isScheduled.length) {
         Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
     }

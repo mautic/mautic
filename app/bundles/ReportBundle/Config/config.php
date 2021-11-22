@@ -181,6 +181,7 @@ return [
                     'mautic.report.helper.report',
                     'mautic.report.model.csv_exporter',
                     'mautic.report.model.excel_exporter',
+                    'mautic.helper.user',
                 ],
             ],
             'mautic.report.model.csv_exporter' => [
