@@ -245,6 +245,10 @@ class FormSubscriber implements EventSubscriberInterface
         $utmSource   = $queryArray['utm_source'] ?? $queryReferer['utm_source'] ?? $queryInternalReferer['utm_source'] ?? null;
         $utmTerm     = $queryArray['utm_term'] ?? $queryReferer['utm_term'] ?? $queryInternalReferer['utm_term'] ?? null;
 
+        if (null === $utmContent && null === $utmMedium && null === $utmSource && null === $utmTerm) {
+            return;
+        }
+
         $utmValues = new UtmTag();
         $utmValues->setLead($contact);
         $utmValues->setQuery($event->getRequest()->query->all());
