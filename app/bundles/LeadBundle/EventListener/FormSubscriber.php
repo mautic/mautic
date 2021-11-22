@@ -224,7 +224,7 @@ class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $queryReferer = $queryArray = [];
+        $queryInternalReferer = $queryReferer = $queryArray = [];
 
         parse_str($event->getRequest()->server->get('QUERY_STRING'), $queryArray);
         $refererURL       = $event->getRequest()->server->get('HTTP_REFERER');
@@ -234,6 +234,17 @@ class FormSubscriber implements EventSubscriberInterface
             parse_str($refererParsedUrl['query'], $queryReferer);
         }
 
+        $internalRefererParsedUrl = parse_url($event->getSubmission()->getReferer());
+        if (isset($internalRefererParsedUrl['query'])) {
+            parse_str($internalRefererParsedUrl['query'], $queryInternalReferer);
+        }
+
+        $utmCampaign = $queryArray['utm_campaign'] ?? $queryReferer['utm_campaign'] ?? $queryInternalReferer['utm_campaign'] ?? null;
+        $utmContent  = $queryArray['utm_content'] ?? $queryReferer['utm_content'] ?? $queryInternalReferer['utm_content'] ?? null;
+        $utmMedium   = $queryArray['utm_medium'] ?? $queryReferer['utm_medium'] ?? $queryInternalReferer['utm_medium'] ?? null;
+        $utmSource   = $queryArray['utm_source'] ?? $queryReferer['utm_source'] ?? $queryInternalReferer['utm_source'] ?? null;
+        $utmTerm     = $queryArray['utm_term'] ?? $queryReferer['utm_term'] ?? $queryInternalReferer['utm_term'] ?? null;
+
         $utmValues = new UtmTag();
         $utmValues->setLead($contact);
         $utmValues->setQuery($event->getRequest()->query->all());
@@ -242,11 +253,11 @@ class FormSubscriber implements EventSubscriberInterface
         $utmValues->setDateAdded(new \Datetime());
         $utmValues->setRemoteHost($refererParsedUrl['host'] ?? null);
         $utmValues->setUserAgent($event->getRequest()->server->get('HTTP_USER_AGENT') ?? null);
-        $utmValues->setUtmCampaign($queryArray['utm_campaign'] ?? $queryReferer['utm_campaign'] ?? null);
-        $utmValues->setUtmContent($queryArray['utm_content'] ?? $queryReferer['utm_content'] ?? null);
-        $utmValues->setUtmMedium($queryArray['utm_medium'] ?? $queryReferer['utm_medium'] ?? null);
-        $utmValues->setUtmSource($queryArray['utm_source'] ?? $queryReferer['utm_source'] ?? null);
-        $utmValues->setUtmTerm($queryArray['utm_term'] ?? $queryReferer['utm_term'] ?? null);
+        $utmValues->setUtmCampaign($utmCampaign);
+        $utmValues->setUtmContent($utmContent);
+        $utmValues->setUtmMedium($utmMedium);
+        $utmValues->setUtmSource($utmSource);
+        $utmValues->setUtmTerm($utmTerm);
 
         $this->leadModel->getUtmTagRepository()->saveEntity($utmValues);
         $this->leadModel->setUtmTags($utmValues->getLead(), $utmValues);
