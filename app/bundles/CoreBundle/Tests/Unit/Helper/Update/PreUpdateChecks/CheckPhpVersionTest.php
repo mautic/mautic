@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 
 class CheckPhpVersionTest extends AbstractMauticTestCase
 {
-    public function testPhpVersionOk()
+    public function testPhpVersionOk(): void
     {
         $releaseMetadata = [
             'version'                           => '10.0.1',

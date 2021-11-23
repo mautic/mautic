@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 
 class CheckDatabaseDriverAndVersionTest extends AbstractMauticTestCase
 {
-    public function testDatabaseDriverAndVersionOk()
+    public function testDatabaseDriverAndVersionOk(): void
     {
         $releaseMetadata = [
             'version'                           => '10.0.1',
@@ -30,7 +30,7 @@ class CheckDatabaseDriverAndVersionTest extends AbstractMauticTestCase
         $this->assertSame(true, $result->success);
     }
 
-    public function testDatabaseDriverAndVersionTooLow()
+    public function testDatabaseDriverAndVersionTooLow(): void
     {
         $releaseMetadata = [
             'version'                           => '10.0.1',

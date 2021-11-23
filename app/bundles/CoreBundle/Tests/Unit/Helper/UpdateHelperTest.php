@@ -113,7 +113,7 @@ class UpdateHelperTest extends TestCase
         @unlink(__DIR__.'/resource/update/tmp/lastUpdateCheck.txt');
     }
 
-    public function testUpdatePackageFetchedAndSaved()
+    public function testUpdatePackageFetchedAndSaved(): void
     {
         $this->response->expects($this->once())
             ->method('getStatusCode')
@@ -137,7 +137,7 @@ class UpdateHelperTest extends TestCase
         @unlink($updatePackage);
     }
 
-    public function testConnectionErrorReturnsError()
+    public function testConnectionErrorReturnsError(): void
     {
         $this->response->expects($this->exactly(2))
             ->method('getStatusCode')
@@ -156,7 +156,7 @@ class UpdateHelperTest extends TestCase
         $this->assertEquals('mautic.core.updater.error.fetching.package', $result['message']);
     }
 
-    public function testCacheIsRefreshedIfStabilityMismatches()
+    public function testCacheIsRefreshedIfStabilityMismatches(): void
     {
         $cache = [
             'error'        => false,
@@ -185,7 +185,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData();
     }
 
-    public function testCacheIsRefreshedIfExpired()
+    public function testCacheIsRefreshedIfExpired(): void
     {
         $cache = [
             'error'        => false,
@@ -214,7 +214,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData();
     }
 
-    public function testCacheIsRefreshedIfForced()
+    public function testCacheIsRefreshedIfForced(): void
     {
         $cache = [
             'error'        => false,
@@ -243,7 +243,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData(true);
     }
 
-    public function testStatsAreSent()
+    public function testStatsAreSent(): void
     {
         $cache = [
             'error'        => false,
@@ -297,7 +297,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData();
     }
 
-    public function testStatsNotSentIfDisabled()
+    public function testStatsNotSentIfDisabled(): void
     {
         $cache = [
             'error'        => false,
@@ -330,7 +330,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData();
     }
 
-    public function testExceptionDoesNotGoUncaughtWhenThrownDuringUpdatingStats()
+    public function testExceptionDoesNotGoUncaughtWhenThrownDuringUpdatingStats(): void
     {
         $cache = [
             'error'        => false,
@@ -380,7 +380,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData();
     }
 
-    public function testRequestExceptionDoesNotGoUncaughtWhenThrownDuringUpdatingStats()
+    public function testRequestExceptionDoesNotGoUncaughtWhenThrownDuringUpdatingStats(): void
     {
         $cache = [
             'error'        => false,
@@ -430,7 +430,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData();
     }
 
-    public function testRequestExceptionWithEmptyResponseDoesNotGoUncaughtWhenThrownDuringUpdatingStats()
+    public function testRequestExceptionWithEmptyResponseDoesNotGoUncaughtWhenThrownDuringUpdatingStats(): void
     {
         $cache = [
             'error'        => false,
@@ -480,7 +480,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData();
     }
 
-    public function testNoErrorIfLatestVersionInstalled()
+    public function testNoErrorIfLatestVersionInstalled(): void
     {
         $cache = [
             'error'        => false,
@@ -529,7 +529,7 @@ class UpdateHelperTest extends TestCase
         $this->assertEquals('mautic.core.updater.running.latest.version', $data['message']);
     }
 
-    public function testErrorIfLatestVersionCouldNotBeDetermined()
+    public function testErrorIfLatestVersionCouldNotBeDetermined(): void
     {
         $cache = [
             'error'        => false,
@@ -576,7 +576,7 @@ class UpdateHelperTest extends TestCase
         $this->assertEquals('mautic.core.updater.error.fetching.updates', $data['message']);
     }
 
-    public function testErrorIfGuzzleException()
+    public function testErrorIfGuzzleException(): void
     {
         $cache = [
             'error'        => false,
@@ -619,7 +619,7 @@ class UpdateHelperTest extends TestCase
         $this->assertEquals('mautic.core.updater.error.fetching.updates', $data['message']);
     }
 
-    public function testErrorForAnyException()
+    public function testErrorForAnyException(): void
     {
         $cache = [
             'error'        => false,
@@ -665,7 +665,7 @@ class UpdateHelperTest extends TestCase
         $this->assertEquals('mautic.core.updater.error.fetching.updates', $data['message']);
     }
 
-    public function testNoErrorIfInAppUpdatesAreDisabled()
+    public function testNoErrorIfInAppUpdatesAreDisabled(): void
     {
         $cache = [
             'error'        => false,
@@ -702,7 +702,7 @@ class UpdateHelperTest extends TestCase
         $this->assertEquals('mautic.core.updater.running.latest.version', $data['message']);
     }
 
-    public function testFailingPreUpdateChecks()
+    public function testFailingPreUpdateChecks(): void
     {
         $this->preparePreUpdateCheckTest();
 
@@ -727,7 +727,7 @@ class UpdateHelperTest extends TestCase
         $this->assertSame(2, count($errors));
     }
 
-    public function testPassingPreUpdateChecks()
+    public function testPassingPreUpdateChecks(): void
     {
         $this->preparePreUpdateCheckTest();
 

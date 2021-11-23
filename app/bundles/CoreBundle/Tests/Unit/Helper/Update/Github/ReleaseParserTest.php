@@ -113,7 +113,6 @@ class ReleaseParserTest extends TestCase
     {
         $this->expectException(LatestVersionSupportedException::class);
 
-        $phpVersion    = '7.4.0';
         $mauticVersion = '2.16.0';
         $stability     = 'stable';
 
@@ -129,14 +128,13 @@ class ReleaseParserTest extends TestCase
             ]
         );
 
-        (new ReleaseParser($client))->getLatestSupportedRelease([['html_url' => 'foo://bar']], $phpVersion, $mauticVersion, $stability);
+        (new ReleaseParser($client))->getLatestSupportedRelease([['html_url' => 'foo://bar']], $mauticVersion, $stability);
     }
 
     public function testLatestVersionSupportedExceptionThrownIfMetadataNotFound()
     {
         $this->expectException(LatestVersionSupportedException::class);
 
-        $phpVersion    = '7.4.0';
         $mauticVersion = '2.16.0';
         $stability     = 'stable';
 
@@ -152,7 +150,7 @@ class ReleaseParserTest extends TestCase
             ]
         );
 
-        (new ReleaseParser($client))->getLatestSupportedRelease([['html_url' => 'foo://bar']], $phpVersion, $mauticVersion, $stability);
+        (new ReleaseParser($client))->getLatestSupportedRelease([['html_url' => 'foo://bar']], $mauticVersion, $stability);
     }
 
     private function getReleases(): array
