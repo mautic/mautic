@@ -333,6 +333,12 @@ class UserModel extends FormModel
 
     /**
      * Send email with credential to the new user.
+     *
+     * @param string $email
+     * @param string $username
+     * @param string $password
+     *
+     * @return void
      */
     public function sendCredentialsEmail($email, $username, $password)
     {

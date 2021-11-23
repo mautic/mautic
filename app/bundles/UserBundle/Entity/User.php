@@ -39,6 +39,8 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
 
     /**
      * Used for generate automatic password to user.
+     *
+     * @var string
      */
     private $automaticPassword;
 
@@ -364,7 +366,7 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     /**
      * Get automatic password.
      *
-     * @return bool
+     * @return string
      */
     public function getAutomaticPassword()
     {
@@ -490,6 +492,8 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
 
     /**
      * Set automatic password.
+     *
+     * @param string $automaticPassword
      *
      * @return User
      */
