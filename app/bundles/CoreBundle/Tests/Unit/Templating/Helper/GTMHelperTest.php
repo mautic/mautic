@@ -12,7 +12,6 @@
 namespace Mautic\CoreBundle\Tests\Unit\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Templating\Helper\GTMHelper;
 
 class GTMHelperTest extends \PHPUnit\Framework\TestCase
 {
