@@ -226,7 +226,7 @@ class CampaignController extends AbstractStandardFormController
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = (1 === $count) ? 1 : ((ceil($count / $limit)) ?: 1) ?: 1;
+            $lastPage = (1 === $count) ? 1 : (((ceil($count / $limit)) ?: 1) ?: 1);
 
             $session->set('mautic.campaign.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_campaign_index', ['page' => $lastPage]);
@@ -289,6 +289,7 @@ class CampaignController extends AbstractStandardFormController
      */
     public function newAction()
     {
+        /** @var CampaignModel $model */
         $model    = $this->getModel('campaign');
         $campaign = $model->getEntity();
 
@@ -488,9 +489,9 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param      $entity
-     * @param      $action
-     * @param null $persistConnections
+     * @param object    $entity
+     * @param string    $action
+     * @param bool|null $persistConnections
      */
     protected function afterEntitySave($entity, Form $form, $action, $persistConnections = null)
     {
