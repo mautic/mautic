@@ -132,8 +132,7 @@ class UserController extends FormController
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $sendEmail         = false;
                 if ($automaticPassword) {
-                    $submittedPassword = uniqid();
-                    $sendEmail         = true;
+                    $sendEmail = true;
                 }
 
                 $encoder  = $this->get('security.password_encoder');
