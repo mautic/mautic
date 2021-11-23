@@ -25,6 +25,9 @@ class GTMHelperTest extends \PHPUnit\Framework\TestCase
         $this->parametersHelper = $this->createMock(CoreParametersHelper::class);
     }
 
+    /**
+     * @return void
+     */
     public function testGetCodeAndHasLandingEnabledEmpty()
     {
         $expected = [
@@ -38,6 +41,9 @@ class GTMHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(false, $helper->hasLandingPageEnabled());
     }
 
+    /**
+     * @return void
+     */
     public function testGetCodeAndHasLandingEnabled()
     {
         $this->parametersHelper->expects($this->at(0))
@@ -52,12 +58,18 @@ class GTMHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(true, $helper->hasLandingPageEnabled());
     }
 
+    /**
+     * @return void
+     */
     public function testGetName()
     {
         $helper = new \Mautic\CoreBundle\Templating\Helper\GTMHelper($this->parametersHelper);
         $this->assertSame('google_tag_manager', $helper->getName());
     }
 
+    /**
+     * @return void
+     */
     public function testGetBodyGTMCodeWithCorrectCode()
     {
         $code = 'gtm_id';
@@ -73,6 +85,9 @@ class GTMHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($js, $helper->getBodyGTMCode());
     }
 
+    /**
+     * @return void
+     */
     public function testGetBodyGTMCodeWithWrongCode()
     {
         $correctCode = 'gtm_id';
@@ -89,6 +104,9 @@ class GTMHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEquals($js, $helper->getBodyGTMCode());
     }
 
+    /**
+     * @return void
+     */
     public function testGetBodyGTMCodeWithEmptyCode()
     {
         $helper = new \Mautic\CoreBundle\Templating\Helper\GTMHelper($this->parametersHelper);
@@ -96,6 +114,9 @@ class GTMHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('', $helper->getBodyGTMCode());
     }
 
+    /**
+     * @return void
+     */
     public function testGetHeadGTMCodeWithCorrectCode()
     {
         $code = 'gtm_id';
@@ -115,6 +136,9 @@ class GTMHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($js, $helper->getHeadGTMCode());
     }
 
+    /**
+     * @return void
+     */
     public function testGetHeadGTMCodeWithWrongCode()
     {
         $correctCode = 'gtm_id';
@@ -135,6 +159,9 @@ class GTMHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEquals($js, $helper->getHeadGTMCode());
     }
 
+    /**
+     * @return void
+     */
     public function testGetHeadGTMCodeWithEmptyCode()
     {
         $helper = new \Mautic\CoreBundle\Templating\Helper\GTMHelper($this->parametersHelper);
