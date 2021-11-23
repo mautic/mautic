@@ -130,10 +130,6 @@ class UserController extends FormController
                 $formUser          = $this->request->request->get('user', []);
                 $automaticPassword = $formUser['automaticPassword'];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-                $sendEmail         = false;
-                if ($automaticPassword) {
-                    $sendEmail = true;
-                }
 
                 $encoder  = $this->get('security.password_encoder');
                 $password = $model->checkNewPassword($user, $encoder, $submittedPassword);
@@ -168,7 +164,9 @@ class UserController extends FormController
                             $this->addFlash($message, $messageVars);
                         }
                     }
-                    $model->sendCredentialsEmail($formUser['email'], $formUser['username'], $submittedPassword);
+                    if ($automaticPassword) {
+                        $model->sendCredentialsEmail($formUser['email'], $formUser['username'], $submittedPassword);
+                    }
                     $this->addFlash('mautic.core.notice.created', [
                         '%name%'      => $user->getName(),
                         '%menu_link%' => 'mautic_user_index',
