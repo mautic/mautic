@@ -60,6 +60,10 @@ class ListType extends AbstractType
     private $assetChoices        = [];
     private $localeChoices       = [];
     private $categoriesChoices   = [];
+
+    /**
+     * @var array<string>
+     */
     private $formsChoices        = [];
 
     public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel, UserHelper $userHelper, CampaignModel $campaignModel, AssetModel $assetModel, FormModel $formModel)

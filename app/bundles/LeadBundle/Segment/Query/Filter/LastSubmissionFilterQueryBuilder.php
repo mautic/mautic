@@ -10,9 +10,6 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
-use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-
 /**
  * Class LastSubmissionFilterQueryBuilder.
  */
@@ -24,6 +21,13 @@ class LastSubmissionFilterQueryBuilder extends ForeignValueFilterQueryBuilder
         return 'mautic.lead.query.builder.foreign.value.lastsubmission';
     }
 
+    /**
+     * @param object $subQueryBuilder
+     * @param object $filter
+     * @param string $tableAlias
+     *
+     * @return void
+     */
     protected function selectQuery($subQueryBuilder, $filter, $tableAlias)
     {
         $subQueryBuilder

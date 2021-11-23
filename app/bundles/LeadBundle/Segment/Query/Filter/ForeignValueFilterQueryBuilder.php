@@ -24,6 +24,13 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
         return 'mautic.lead.query.builder.foreign.value';
     }
 
+    /**
+     * @param object $subQueryBuilder
+     * @param object $filter
+     * @param string $tableAlias
+     *
+     * @return void
+     */
     protected function selectQuery($subQueryBuilder, $filter, $tableAlias)
     {
         $subQueryBuilder
