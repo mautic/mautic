@@ -1014,11 +1014,11 @@ class PageController extends FormController
      * @param int $objectId
      * @param int $page
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function resultsAction($objectId, $page = 1)
     {
-        /** @var PageModel $pageModel */
+        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
         $pageModel    = $this->getModel('page.page');
         $activePage   = $pageModel->getEntity($objectId);
         $session      = $this->get('session');
@@ -1073,6 +1073,7 @@ class PageController extends FormController
         $orderByDir = $session->get('mautic.pageresult.'.$objectId.'.orderbydir', 'DESC');
         $filters    = $session->get('mautic.pageresult.'.$objectId.'.filters', []);
 
+        /** @var \Mautic\FormBundle\Model\SubmissionModel $model */
         $model = $this->getModel('form.submission');
 
         if ($this->request->query->has('result')) {
@@ -1100,7 +1101,7 @@ class PageController extends FormController
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
+            $lastPage = (1 === $count) ? 1 : (((ceil($count / $limit)) ?: 1) ?: 1);
             $session->set('mautic.pageresult.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_page_results', ['objectId' => $objectId, 'page' => $lastPage]);
 
@@ -1155,7 +1156,7 @@ class PageController extends FormController
      * @param int    $objectId
      * @param string $format
      *
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse|\Symfony\Component\HttpFoundation\Response
      *
      * @throws \Exception
      */

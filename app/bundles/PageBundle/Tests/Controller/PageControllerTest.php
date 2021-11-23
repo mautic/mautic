@@ -16,6 +16,10 @@ class PageControllerTest extends MauticMysqlTestCase
      * @var string
      */
     private $prefix;
+
+    /**
+     * @var int
+     */
     private $id;
 
     /**
@@ -31,7 +35,6 @@ class PageControllerTest extends MauticMysqlTestCase
             'template' => 'blank',
         ];
 
-        /** @var PageModel $model */
         $model = self::$container->get('mautic.page.model.page');
         $page  = new Page();
         $page->setTitle($pageData['title'])
@@ -212,6 +215,8 @@ class PageControllerTest extends MauticMysqlTestCase
 
     /**
      * Only tests if an actual CSV file is returned.
+     *
+     * @return void
      */
     public function testCsvIsExportedCorrectly()
     {
@@ -230,6 +235,8 @@ class PageControllerTest extends MauticMysqlTestCase
 
     /**
      * Only tests if an actual Excel file is returned.
+     *
+     * @return void
      */
     public function testExcelIsExportedCorrectly()
     {
@@ -248,6 +255,8 @@ class PageControllerTest extends MauticMysqlTestCase
 
     /**
      * Only tests if an actual HTML file is returned.
+     *
+     * @return void
      */
     public function testHTMLIsExportedCorrectly()
     {

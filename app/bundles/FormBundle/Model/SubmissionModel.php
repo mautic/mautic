@@ -492,7 +492,9 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
+     * @param array<string, mixed> $args
+     *
+     * @return array<mixed>
      */
     public function getEntitiesByPage(array $args = [])
     {
@@ -670,9 +672,9 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @param $format
-     * @param $page
-     * @param $queryArgs
+     * @param string               $format
+     * @param object               $page
+     * @param array<string, mixed> $queryArgs
      *
      * @return StreamedResponse|Response
      *
