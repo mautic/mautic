@@ -370,6 +370,7 @@ class InstallService
     public function installDatabaseFixtures(ContainerInterface $container): void
     {
         $paths  = [dirname(__DIR__).'/InstallFixtures/ORM'];
+        /** @phpstan-ignore-next-line */
         $loader = new ContainerAwareLoader($container);
 
         foreach ($paths as $path) {

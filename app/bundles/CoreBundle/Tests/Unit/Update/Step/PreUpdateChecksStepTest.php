@@ -35,7 +35,7 @@ class PreUpdateChecksStepTest extends AbstractStepTest
         $this->step = new PreUpdateChecksStep($this->translator, $this->updateHelper);
     }
 
-    public function testUpdateFailedExceptionIfPreUpdateChecksFailed()
+    public function testUpdateFailedExceptionIfPreUpdateChecksFailed(): void
     {
         $this->updateHelper->expects($this->once())
             ->method('runPreUpdateChecks')
@@ -54,7 +54,7 @@ class PreUpdateChecksStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
-    public function testNoExceptionIfPreUpdateChecksPassed()
+    public function testNoExceptionIfPreUpdateChecksPassed(): void
     {
         $this->updateHelper->expects($this->once())
             ->method('runPreUpdateChecks')

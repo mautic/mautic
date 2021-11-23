@@ -196,7 +196,7 @@ class SchemaHelper
         return true;
     }
 
-    public function validateDatabaseVersion()
+    public function validateDatabaseVersion(): void
     {
         // Version strings are in the format 10.3.30-MariaDB-1:10.3.30+maria~focal-log
         $version  = $this->db->executeQuery('SELECT VERSION()')->fetchOne();
