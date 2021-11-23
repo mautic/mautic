@@ -20,7 +20,7 @@ class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 
     protected function beforeTearDown(): void
     {
-        $pathsHelper = $this->container->get('mautic.helper.paths');
+        $pathsHelper = self::$container->get('mautic.helper.paths');
         $folderPath  = "{$pathsHelper->getImagePath()}/{$this->folderName}";
 
         if (is_dir($folderPath)) {
@@ -30,12 +30,15 @@ class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 
     public function testElfinderCreateFolderPermissions(): void
     {
-        $elFinderLoader = new class($this->container) extends ElFinderLoader {
+        $elFinderLoader = new class(self::$container) extends ElFinderLoader {
             public function __construct(ContainerInterface $container)
             {
                 parent::__construct($container->get('fm_elfinder.configurator'));
             }
 
+            /**
+             * @return array<mixed>
+             */
             public function load(Request $request)
             {
                 $connector = new ElFinderConnector($this->bridge);
@@ -44,17 +47,19 @@ class LocalFileAdapterServiceTest extends MauticMysqlTestCase
             }
         };
 
-        $this->container->set('fm_elfinder.loader', $elFinderLoader);
+        self::$container->set('fm_elfinder.loader', $elFinderLoader);
 
         $this->folderName = (string) time();
         $this->loginUser('admin');
         $this->client->request(
             Request::METHOD_POST,
-            "efconnect?cmd=mkdir&name={$this->folderName}&target=fls1_Lw"
+            "efconnect?cmd=mkdir&name=$this->folderName&target=fls1_Lw"
         );
+        $response = $this->client->getResponse();
+        self::assertSame(200, $response->getStatusCode());
         /** @var PathsHelper $pathsHelper */
-        $pathsHelper = $this->container->get('mautic.helper.paths');
-        $folderPath  = "{$pathsHelper->getImagePath()}/{$this->folderName}";
+        $pathsHelper = self::$container->get('mautic.helper.paths');
+        $folderPath  = "{$pathsHelper->getImagePath()}/$this->folderName";
         self::assertDirectoryExists($folderPath);
         self::assertSame('777', substr(sprintf('%o', fileperms($folderPath)), -3));
     }
