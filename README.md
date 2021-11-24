@@ -48,7 +48,7 @@ The GitHub version is recommended for both development and testing. The producti
 *Also note that source code outside of a [tagged release][tagged-release] should be considered ‘alpha’. It may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*
 
 ### How to install Mautic
-You must already have [Composer v1][composer-v1] available on your computer because this is a development release and you'll need Composer to download the vendor packages. Note that Composer v2 is not yet supported.
+You must already have [Composer][composer] available on your computer because this is a development release and you'll need Composer to download the vendor packages.
 
 Also note that if you have DDEV installed, you can run 'ddev config' followed by 'ddev start'. This will kick off the Mautic first-run process which will automatically install dependencies and configure Mautic for use. ✨ 🚀 Read more [here][ddev-mautic]
 
@@ -165,7 +165,7 @@ This project follows the [all-contributors][all-contributors] specification. Con
 [t1-issues]: <https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AT1>
 [download-mautic]: <https://www.mautic.org/download>
 [tagged-release]: <https://github.com/mautic/mautic/releases>
-[composer-v1]: <http://getcomposer.org/>
+[composer]: <http://getcomposer.org/>
 [download-zip]: <https://github.com/mautic/mautic/archive/refs/heads/features.zip>
 [ddev-mautic]: <https://kb.mautic.org/knowledgebase/development/how-to-install-mautic-using-ddev>
 [troubleshooting]: <https://docs.mautic.org/en/troubleshooting>
