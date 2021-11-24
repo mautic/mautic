@@ -8,6 +8,9 @@ use League\Flysystem\Adapter\Local;
 
 class LocalFileAdapterService extends Local
 {
+    /**
+     * @var array<string, array<string, int>>
+     */
     protected static $permissions = [
         'file' => [
             'public'  => 0666,
