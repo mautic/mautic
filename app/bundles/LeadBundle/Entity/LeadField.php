@@ -363,7 +363,7 @@ class LeadField extends FormEntity
     /**
      * Set defaultValue.
      *
-     * @param string $defaultValue
+     * @param string|array<string> $defaultValue
      *
      * @return LeadField
      */
