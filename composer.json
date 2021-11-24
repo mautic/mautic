@@ -98,7 +98,7 @@
       "@remove-git-submodules"
     ],
     "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
-    "phpstan": "bin/phpstan analyse app/bundles app/migrations plugins",
+    "phpstan": "php -d memory_limit=4G bin/phpstan analyse",
     "cs": "bin/php-cs-fixer fix -v --dry-run --diff",
     "fixcs": "bin/php-cs-fixer fix -v",
     "rector": "bin/rector process",
