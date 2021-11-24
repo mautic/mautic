@@ -90,7 +90,6 @@ $defaultTimezoneTemplate = $view['form']->widget($form['default_template_timezon
                             break;
                         case 'select':
                             case 'multiselect':
-
                             echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
                                 'form'           => $form['properties'],
                                 'selectTemplate' => $selectTemplate,
