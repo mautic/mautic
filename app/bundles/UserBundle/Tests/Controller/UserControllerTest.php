@@ -14,7 +14,6 @@ class UserControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/s/users/new/');
         $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 }
