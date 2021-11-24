@@ -273,6 +273,10 @@ class SubmissionModel extends CommonFormModel
                 }
             }
 
+            if (!$f->showForConditionalField($post)) {
+                continue;
+            }
+
             if ('' === $value && $f->isRequired()) {
                 //field is required, but hidden from form because of 'ShowWhenValueExists'
                 if (false === $f->getShowWhenValueExists() && !isset($post[$alias])) {
