@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
@@ -15,6 +16,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testRoleUpdateByApiGivesErrorResponseIfUserDoesNotExist(): void
     {
+        // Assuming user with id 99999 does not exist
         $this->client->request(Request::METHOD_PATCH, '/api/users/99999/edit', ['role' => 1]);
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_NOT_FOUND, $clientResponse->getStatusCode());
@@ -23,6 +25,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testRoleUpdateByApiGivesErrorResponseIfRoleDoesNotExist(): void
     {
+        // Assuming role with id 99999 does not exist
         $this->client->request(Request::METHOD_PATCH, '/api/users/1/edit', ['role' => 99999]);
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
@@ -31,6 +34,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testRoleUpdateByApiGivesErrorResponseWithInvalidRequestFormat(): void
     {
+        // Correct request format is ['role' => 2]
         $this->client->request(Request::METHOD_PATCH, '/api/users/1/edit', ['role' => ['id' => 2]]);
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
@@ -39,8 +43,10 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testRoleUpdateByApiGivesErrorResponseIfUserDoesNotHaveValidPermissionToUpdate(): void
     {
-        // Create non-admin role with non-user edit permissions
-        $role = $this->createRole(['lead:leads' => ['viewown']]);
+        // Create non-admin role
+        $role = $this->createRole();
+        // Create permissions for the role
+        $this->createPermission('lead:leads:viewown', $role, 1024);
         // Create non-admin user
         $user = $this->createUser($role);
         $this->em->flush();
@@ -63,8 +69,8 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testRoleUpdateByApiThroughAdminUserGivesSuccessResponse(): void
     {
         // Create admin role
-        $role = $this->createRole([], true);
-        // Create non-admin user
+        $role = $this->createRole(true);
+        // Create admin user
         $user = $this->createUser($role);
         $this->em->flush();
         $this->em->clear();
@@ -80,18 +86,46 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('"username":"'.$user->getUsername().'"', $clientResponse->getContent());
     }
 
-    /**
-     * @param array<string, array<string>> $permission
-     */
-    private function createRole(array $permission, bool $isAdmin = false): Role
+    public function testRoleUpdateByApiThroughNonAdminUserGivesSuccessResponse(): void
+    {
+        // Create non-admin role
+        $role = $this->createRole();
+        // Create permissions to update user for the role
+        $this->createPermission('user:users:edit', $role, 52);
+        // Create non-admin user
+        $user = $this->createUser($role);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->loginUser($user->getUsername());
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
+
+        $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
+        $clientResponse = $this->client->getResponse();
+        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        Assert::assertStringContainsString('"username":"'.$user->getUsername().'"', $clientResponse->getContent());
+    }
+
+    private function createRole(bool $isAdmin = false): Role
     {
         $role = new Role();
         $role->setName('Role');
         $role->setIsAdmin($isAdmin);
-        $role->setRawPermissions($permission);
         $this->em->persist($role);
 
         return $role;
+    }
+
+    private function createPermission(string $rawPermission, Role $role, int $bitwise): void
+    {
+        $parts      = explode(':', $rawPermission);
+        $permission = new Permission();
+        $permission->setBundle($parts[0]);
+        $permission->setName($parts[1]);
+        $permission->setRole($role);
+        $permission->setBitwise($bitwise);
+        $this->em->persist($permission);
     }
 
     private function createUser(Role $role): User
