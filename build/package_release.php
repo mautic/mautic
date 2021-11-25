@@ -156,7 +156,7 @@ echo "Packaging Mautic Full Installation\n";
 system('zip -qr ../packages/'.$appVersion.'.zip . -x@../exclude_files.txt -x@../exclude_files_full.txt');
 
 echo "Packaging Mautic Update Package\n";
-system('zip -qr ../packages/'.$appVersion.'-update.zip -x@../exclude_files.txt -@ < modified_files.txt');
+system('zip -qr ../packages/'.$appVersion.'-update.zip -x@../exclude_files.txt -x@../exclude_files_update.txt -@ < modified_files.txt');
 
 // Write output to file (so that the CI pipeline can add it to the release notes), then output to console
 system('cd ../packages && openssl sha1 '.$appVersion.'.zip > build-sha1-all');

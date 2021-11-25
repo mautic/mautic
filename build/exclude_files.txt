@@ -33,6 +33,7 @@ node_modules/*
 package-lock.json
 package.json
 phpstan.neon
+phpstan-baseline.neon
 rector.php
 tests/*
 vendor/babdev/*
