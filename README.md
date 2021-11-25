@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-54-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-55-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -144,6 +144,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/sreenia806"><img src="https://avatars.githubusercontent.com/u/2764179?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Sreenivasulu Avula</b></sub></a><br /><a href="#userTesting-sreenia806" title="User Testing">📓</a> <a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Asreenia806" title="Reviewed Pull Requests">👀</a></td>
     <td align="center"><a href="https://www.linkedin.com/in/mohammadlahlouh/"><img src="https://avatars.githubusercontent.com/u/7312050?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mohammad Lahlouh</b></sub></a><br /><a href="#userTesting-mlahlouh" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/ArnaudSau"><img src="https://avatars.githubusercontent.com/u/50580844?v=4?s=100" width="100px;" alt=""/><br /><sub><b>ArnaudSau</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=ArnaudSau" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/bell87"><img src="https://avatars.githubusercontent.com/u/5338785?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Andrew Bell</b></sub></a><br /><a href="#userTesting-bell87" title="User Testing">📓</a></td>
   </tr>
 </table>
 
