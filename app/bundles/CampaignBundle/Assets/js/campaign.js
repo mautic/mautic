@@ -2065,5 +2065,58 @@ Mautic.highlightJumpTarget = function(event, el) {
     }
 };
 
+Mautic.showCampaignConfirmation = function (el) {
+    if (mQuery(el).prop('checked')) {
+        if (mQuery(el).val() === "0") {
+            var message = mQuery(el).data('message');
+            var confirmText = mQuery(el).data('confirm-text');
+            var cancelText = mQuery(el).data('cancel-text');
+            var cancelCallback = mQuery(el).data('cancel-callback');
 
+            var confirmContainer = mQuery("<div />").attr({"class": "modal fade confirmation-modal"});
+            var confirmDialogDiv = mQuery("<div />").attr({"class": "modal-dialog"});
+            var confirmContentDiv = mQuery("<div />").attr({"class": "modal-content"});
+            var confirmFooterDiv = mQuery("<div />").attr({"class": "modal-body text-center"});
+            var confirmHeaderDiv = mQuery("<div />").attr({"class": "modal-header"});
+            confirmHeaderDiv.append(mQuery('<h4 />').attr({"class": "modal-title"}).text(message));
+            var confirmButton = mQuery('<button type="button" />')
+                .addClass("btn btn-danger")
+                .css("marginRight", "5px")
+                .css("marginLeft", "5px")
+                .click(function () {
+                    Mautic.dismissConfirmation();
+                })
+                .html(confirmText);
+            var cancelButton = mQuery('<button type="button" />')
+                .addClass("btn btn-primary")
+                .click(function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    mQuery(el).prop('checked', false);
+                    mQuery(el).parent().toggleClass('active');
+                    // Undo to the click, i.e. choose Yes and make it default correct the form value as well.
+                    if (cancelCallback && typeof Mautic[cancelCallback] === "function") {
+                        window["Mautic"][cancelCallback].apply('window', []);
+                    } else {
+                        Mautic.dismissConfirmation();
+                    }
+                })
+                .html(cancelText);
 
+            confirmFooterDiv.append(confirmButton);
+            confirmFooterDiv.append(cancelButton);
+
+            confirmContentDiv.append(confirmHeaderDiv);
+            confirmContentDiv.append(confirmFooterDiv);
+
+            confirmContainer.append(confirmDialogDiv.append(confirmContentDiv));
+            mQuery('body').append(confirmContainer);
+
+            mQuery('.confirmation-modal').on('hidden.bs.modal', function () {
+                mQuery(this).remove();
+            });
+
+            mQuery('.confirmation-modal').modal('show');
+        }
+    }
+};
