@@ -213,6 +213,7 @@ return [
                     'mautic.form.model.form',
                     'mautic.form.model.submission',
                     'mautic.campaign.executioner.realtime',
+                    'mautic.helper.form.field_helper',
                 ],
             ],
             'mautic.form.leadbundle.subscriber' => [
