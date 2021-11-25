@@ -106,9 +106,9 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->client->expects($this->once())
             ->method('request')
             ->with('post', 'https://mautic.org', [
-                \GuzzleHttp\RequestOptions::FORM_PARAMS    => ['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2'],
-                \GuzzleHttp\RequestOptions::HEADERS        => ['test' => 'tee', 'company' => 'Mautic'],
-                \GuzzleHttp\RequestOptions::TIMEOUT        => 10,
+                \GuzzleHttp\RequestOptions::FORM_PARAMS => ['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2'],
+                \GuzzleHttp\RequestOptions::HEADERS     => ['test' => 'tee', 'company' => 'Mautic'],
+                \GuzzleHttp\RequestOptions::TIMEOUT     => 10,
             ])
             ->willReturn(new Response(200));
 
