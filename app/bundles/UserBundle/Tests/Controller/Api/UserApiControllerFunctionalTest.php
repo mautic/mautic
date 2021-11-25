@@ -15,21 +15,15 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testRoleUpdateByApiGivesErrorResponseIfUserDoesNotExist(): void
     {
-        $parameters = [
-            'role' => 1,
-        ];
-        $this->client->request(Request::METHOD_PATCH, '/api/users/99999/edit', $parameters);
+        $this->client->request(Request::METHOD_PATCH, '/api/users/99999/edit', ['role' => 1]);
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_NOT_FOUND, $clientResponse->getStatusCode());
-        Assert::assertStringContainsString('Item was not found.', $clientResponse->getContent());
+        Assert::assertStringContainsString('"message":"Item was not found."', $clientResponse->getContent());
     }
 
     public function testRoleUpdateByApiGivesErrorResponseIfRoleDoesNotExist(): void
     {
-        $parameters = [
-            'role' => 99999,
-        ];
-        $this->client->request(Request::METHOD_PATCH, '/api/users/1/edit', $parameters);
+        $this->client->request(Request::METHOD_PATCH, '/api/users/1/edit', ['role' => 99999]);
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
         Assert::assertStringContainsString('"message":"role: This value is not valid."', $clientResponse->getContent());
@@ -37,29 +31,50 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testRoleUpdateByApiGivesErrorResponseWithInvalidRequestFormat(): void
     {
-        $parameters = [
-            'role' => [
-                'id' => 2,
-            ],
-        ];
-        $this->client->request(Request::METHOD_PATCH, '/api/users/1/edit', $parameters);
+        $this->client->request(Request::METHOD_PATCH, '/api/users/1/edit', ['role' => ['id' => 2]]);
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
         Assert::assertStringContainsString('"message":"role: This value is not valid."', $clientResponse->getContent());
     }
 
-    public function testRoleUpdateByApiGivesSuccessResponse(): void
+    public function testRoleUpdateByApiGivesErrorResponseIfUserDoesNotHaveValidPermissionToUpdate(): void
     {
-        // Create non-admin role with non-api permissions
-        $role = $this->createRole(['user:users' => ['edit']]);
+        // Create non-admin role with non-user edit permissions
+        $role = $this->createRole(['lead:leads' => ['viewown']]);
         // Create non-admin user
-        $user = $this->createAdmin($role);
+        $user = $this->createUser($role);
         $this->em->flush();
         $this->em->clear();
 
-        $parameters = ['role' => $role->getId()];
+        // Login newly created non-admin user
         $this->loginUser($user->getUsername());
-        $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", $parameters);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
+
+        $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
+        $clientResponse = $this->client->getResponse();
+        Assert::assertSame(Response::HTTP_FORBIDDEN, $clientResponse->getStatusCode());
+        Assert::assertStringContainsString(
+            '"message":"You do not have access to the requested area\/action."',
+            $clientResponse->getContent()
+        );
+    }
+
+    public function testRoleUpdateByApiThroughAdminUserGivesSuccessResponse(): void
+    {
+        // Create admin role
+        $role = $this->createRole([], true);
+        // Create non-admin user
+        $user = $this->createUser($role);
+        $this->em->flush();
+        $this->em->clear();
+
+        // Login newly created admin user
+        $this->loginUser($user->getUsername());
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
+
+        $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
         Assert::assertStringContainsString('"username":"'.$user->getUsername().'"', $clientResponse->getContent());
@@ -79,14 +94,15 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         return $role;
     }
 
-    private function createAdmin(Role $role): User
+    private function createUser(Role $role): User
     {
         $user = new User();
         $user->setFirstName('John');
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $user->setPassword('Ax417Rl$v&');
+        $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
+        $user->setPassword($encoder->encodePassword('mautic', null));
         $user->setRole($role);
         $this->em->persist($user);
 
