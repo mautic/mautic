@@ -86,7 +86,7 @@ if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) 
                     </td>
                     <td class="package-name">
                         <div>
-                            <a href="<?php echo $view['router']->path(
+                            <a data-toggle="ajax" href="<?php echo $view['router']->path(
                                     RouteProvider::ROUTE_DETAIL,
                                     [
                                         'vendor'  => $view->escape($item->getVendorName()),
