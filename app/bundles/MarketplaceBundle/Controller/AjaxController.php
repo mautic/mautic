@@ -55,10 +55,14 @@ class AjaxController extends CommonAjaxController
             '--env'   => $env,
         ]);
 
-        $output = new BufferedOutput();
-        $application->run($input, $output);
+        $output   = new BufferedOutput();
+        $exitCode = $application->run($input, $output);
 
-        //$content = $output->fetch();
+        if (0 !== $exitCode) {
+            return $this->sendJsonResponse([
+                'error' => 'Mautic\'s cache couldn\'t be cleared. Error details: '.$output->fetch(),
+            ], 500);
+        }
 
         /** @var ReloadFacade */
         $reloadFacade = $this->get('mautic.plugin.facade.reload');
@@ -113,10 +117,14 @@ class AjaxController extends CommonAjaxController
             '--env'   => $env,
         ]);
 
-        $output = new BufferedOutput();
-        $application->run($input, $output);
+        $output   = new BufferedOutput();
+        $exitCode = $application->run($input, $output);
 
-        //$content = $output->fetch();
+        if (0 !== $exitCode) {
+            return $this->sendJsonResponse([
+                'error' => 'Mautic\'s cache couldn\'t be cleared. Error details: '.$output->fetch(),
+            ], 500);
+        }
 
         return $this->sendJsonResponse([
             'success' => true,
