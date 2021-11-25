@@ -108,15 +108,17 @@ class CampaignHelper
             case 'post':
             case 'put':
             case 'patch':
-                $headers = array_change_key_case($headers);
-                if (array_key_exists('content-type', $headers) && 'application/json' == strtolower($headers['content-type'])) {
-                    $payload                 = json_encode($payload);
-                }
-                $response = $this->client->request($method, $url, [
-                    \GuzzleHttp\RequestOptions::FORM_PARAMS => $payload,
+                $headers  = array_change_key_case($headers);
+                $options  = [
                     \GuzzleHttp\RequestOptions::HEADERS     => $headers,
                     \GuzzleHttp\RequestOptions::TIMEOUT     => $timeout,
-                ]);
+                ];
+                if (array_key_exists('content-type', $headers) && 'application/json' == strtolower($headers['content-type'])) {
+                    $options[\GuzzleHttp\RequestOptions::BODY] = json_encode($payload);
+                } else {
+                    $options[\GuzzleHttp\RequestOptions::FORM_PARAMS] = $payload;
+                }
+            $response = $this->client->request($method, $url, $options);
                 break;
             case 'delete':
                 $response = $this->client->delete($url, [
