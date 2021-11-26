@@ -2076,7 +2076,7 @@ Mautic.showCampaignConfirmation = function (el) {
 };
 
 /**
- * Cancel Callback to trigger the yes button and dismiss the confirmation window.
+ * Cancel Callback to trigger the yes button and dismiss the confirmation modal.
  */
 Mautic.setPublishedButtonToYes = function (el) {
     // Dismiss the confirmation
@@ -2090,6 +2090,9 @@ Mautic.setPublishedButtonToYes = function (el) {
     }
 };
 
+/**
+ * Onclick Callback to show the confirmation modal during toggling campaign status.
+ */
 Mautic.confirmationCampaignPublishStatus = function (el) {
     let element = mQuery(el);
 
@@ -2103,6 +2106,9 @@ Mautic.confirmationCampaignPublishStatus = function (el) {
     }
 }
 
+/**
+ * Confirm Callback to toggling campaign status if user chooses Yes.
+ */
 Mautic.confirmCallbackCampaignPublishStatus = function (action, el) {
     let element = mQuery(el);
 
