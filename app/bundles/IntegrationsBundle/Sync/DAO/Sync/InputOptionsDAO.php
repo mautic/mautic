@@ -125,12 +125,12 @@ class InputOptionsDAO
         return $this->integrationObjectIds;
     }
 
-    public function getStartDateTime(): ?\DateTimeInterface
+    public function getStartDateTime(): ?DateTimeInterface
     {
         return $this->startDateTime;
     }
 
-    public function getEndDateTime(): ?\DateTimeInterface
+    public function getEndDateTime(): ?DateTimeInterface
     {
         return $this->endDateTime;
     }
