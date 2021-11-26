@@ -22,9 +22,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class LeadField.
- */
 class LeadField extends FormEntity
 {
     /**
@@ -458,9 +455,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Set properties.
-     *
-     * @param string $properties
+     * @param mixed[] $properties
      *
      * @return LeadField
      */
@@ -473,9 +468,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get properties.
-     *
-     * @return array
+     * @return mixed[]
      */
     public function getProperties()
     {
