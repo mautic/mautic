@@ -99,9 +99,9 @@ class CampaignType extends AbstractType
                 'data-toggle'           => 'confirmation',
                 'data-message'          => $this->translator->trans('mautic.campaign.form.confirmation.message'),
                 'data-confirm-text'     => $this->translator->trans('mautic.campaign.form.confirmation.confirm_text'),
-                'data-confirm-callback' => 'executeAction',
+                'data-confirm-callback' => 'dismissConfirmation',
                 'data-cancel-text'      => $this->translator->trans('mautic.campaign.form.confirmation.cancel_text'),
-                'data-cancel-callback'  => 'dismissConfirmation()',
+                'data-cancel-callback'  => 'setPublishedButtonToYes',
                 'class'                 => 'btn btn-default',
             ],
         ]);
