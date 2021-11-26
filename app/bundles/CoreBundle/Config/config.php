@@ -1223,7 +1223,7 @@ return [
         'update_stability'                => 'stable',
         'cookie_path'                     => '/',
         'cookie_domain'                   => '',
-        'cookie_secure'                   => null,
+        'cookie_secure'                   => true,
         'cookie_httponly'                 => false,
         'do_not_track_ips'                => [],
         'do_not_track_bots'               => [
