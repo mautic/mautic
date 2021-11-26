@@ -131,8 +131,17 @@ if ('index' == $tmpl) {
                             <?php echo $view->render(
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 [
-                                    'item'  => $item,
-                                    'model' => 'campaign',
+                                    'item'          => $item,
+                                    'model'         => 'campaign',
+                                    'attributes'    => [
+                                        'data-onclick'          => 'Mautic.confirmationCampaignPublishStatus(mQuery(this));',
+                                        'data-toggle'           => 'confirmation',
+                                        'data-confirm-callback' => 'confirmCallbackCampaignPublishStatus',
+                                        'data-cancel-callback'  => 'dismissConfirmation',
+                                        'data-message'          => $view['translator']->trans('mautic.campaign.form.confirmation.message'),
+                                        'data-confirm-text'     => $view['translator']->trans('mautic.campaign.form.confirmation.confirm_text'),
+                                        'data-cancel-text'      => $view['translator']->trans('mautic.campaign.form.confirmation.cancel_text'),
+                                    ],
                                 ]
                             ); ?>
                             <a href="<?php echo $view['router']->path(

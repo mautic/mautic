@@ -2089,3 +2089,32 @@ Mautic.setPublishedButtonToYes = function (el) {
         mQuery('#' + yesButtonId).trigger('click');
     }
 };
+
+Mautic.confirmationCampaignPublishStatus = function (el) {
+    let element = mQuery(el);
+
+    // Add the confirmation modal, if current status is published
+    if (element.data('status') === 'published') {
+        Mautic.showConfirmation(element);
+    }
+    else {
+        // Otherwise just change the status.
+        Mautic.confirmCallbackCampaignPublishStatus('', el);
+    }
+}
+
+Mautic.confirmCallbackCampaignPublishStatus = function (action, el) {
+    let element = mQuery(el);
+
+    let idClass = element.data('id-class');
+    let model = element.data('model');
+    let itemId = element.data('item-id');
+    let query = element.data('query');
+    let backdrop = element.data('backdrop');
+
+    // Toggles published status of an campaign
+    Mautic.togglePublishStatus(event, idClass, model, itemId, query, backdrop);
+
+    // Dismiss the confirmation
+    Mautic.dismissConfirmation();
+}

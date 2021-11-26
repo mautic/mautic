@@ -67,6 +67,31 @@ if (!empty($disableToggle)) {
 
 $clickAction = (isset($disableToggle) && true === $disableToggle) ? ' disabled' : ' has-click-event';
 $idClass     = str_replace('.', '-', $model).'-publish-icon'.$item->getId().md5($query);
+
+$backdropFlag = (isset($backdrop)) ? 'true' : 'false';
+
+$onclick = "Mautic.togglePublishStatus(event, '.{$idClass}', '{$model}', '{$item->getId()}', '{$query}', {$backdropFlag})";
+
+// Get the attributes if set.
+$attributes = $attributes ?? [];
+
+$additionalAttrs = '';
+if (!empty($attributes)) {
+    $onclick = $attributes['data-onclick'] ?? '';
+    unset($attributes['data-onclick']);
+
+    $attributes['data-id-class']    = '.'.$idClass;
+    $attributes['data-model']       = $model;
+    $attributes['data-item-id']     = $item->getId();
+    $attributes['data-query']       = $query;
+    $attributes['data-backdrop']    = $backdropFlag;
+
+    $additionalAttrs = implode(' ', array_map(
+        function ($v, $k) { return sprintf("%s='%s'", $k, $v); },
+        $attributes,
+        array_keys($attributes)
+    ));
+}
 ?>
 
-<i class="fa fa-fw <?php echo $size.' '.$icon.$clickAction.' '.$idClass; ?>" data-toggle="tooltip" data-container="body" data-placement="right" data-status="<?php echo $status; ?>" title="<?php echo $text; ?>"<?php if (empty($disableToggle)): ?> onclick="Mautic.togglePublishStatus(event, '.<?php echo $idClass; ?>', '<?php echo $model; ?>', '<?php echo $item->getId(); ?>', '<?php echo $query; ?>', <?php echo (isset($backdrop)) ? 'true' : 'false'; ?>);"<?php endif; ?>></i>
+<i class="fa fa-fw <?php echo $size.' '.$icon.$clickAction.' '.$idClass; ?>" data-toggle="tooltip" data-container="body" data-placement="right" data-status="<?php echo $status; ?>" title="<?php echo $text; ?>" <?php echo $additionalAttrs; ?> <?php if (empty($disableToggle)): ?> onclick="<?php echo $onclick; ?>"<?php endif; ?>></i>
