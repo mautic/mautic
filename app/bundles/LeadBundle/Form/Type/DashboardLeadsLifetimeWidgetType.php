@@ -12,20 +12,15 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\ListModel;
-use Recurr\Transformer\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DashboardLeadsLifetimeWidgetType extends AbstractType
 {
-    /**
-     * @var ListModel
-     */
     private $segmentModel;
 
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
 
     public function __construct(ListModel $segmentModel, TranslatorInterface $translator)
@@ -43,7 +38,7 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
             $segments[$list['name']] = $list['id'];
         }
 
-        $builder->add('flag', 'choice', [
+        $builder->add('flag', ChoiceType::class, [
                 'label'             => 'mautic.lead.list.filter',
                 'multiple'          => true,
                 'choices'           => $segments,

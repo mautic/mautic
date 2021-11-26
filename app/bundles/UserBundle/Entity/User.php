@@ -100,14 +100,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     private $lastActive;
 
     /**
-     * @var string
-     */
-    private $onlineStatus = 'offline';
-
-    /**
      * Stores active role permissions.
-     *
-     * @var
      */
     private $activePermissions;
 
@@ -193,11 +186,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
 
         $builder->createField('lastActive', 'datetime')
             ->columnName('last_active')
-            ->nullable()
-            ->build();
-
-        $builder->createField('onlineStatus', 'string')
-            ->columnName('online_status')
             ->nullable()
             ->build();
 
@@ -314,7 +302,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
                     'locale',
                     'lastLogin',
                     'lastActive',
-                    'onlineStatus',
                     'signature',
                 ]
             )
@@ -801,22 +788,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
             $lastActive = new \DateTime();
         }
         $this->lastActive = $lastActive;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getOnlineStatus()
-    {
-        return $this->onlineStatus;
-    }
-
-    /**
-     * @param mixed $status
-     */
-    public function setOnlineStatus($status)
-    {
-        $this->onlineStatus = $status;
     }
 
     /**

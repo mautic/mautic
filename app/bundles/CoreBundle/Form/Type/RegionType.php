@@ -23,14 +23,18 @@ class RegionType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'choices_as_values' => true,
-            'choices'           => FormFieldHelper::getRegionChoices(),
-            'label_attr'        => ['class' => 'control-label'],
-            'attr'              => ['class' => 'form-control'],
-            'multiple'          => false,
-            'expanded'          => false,
-        ]);
+        $resolver->setDefaults(
+            [
+                'choices'           => FormFieldHelper::getRegionChoices(),
+                'choice_value'      => function ($state) {
+                    return $state;
+                },
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control'],
+                'multiple'          => false,
+                'expanded'          => false,
+            ]
+        );
     }
 
     /**

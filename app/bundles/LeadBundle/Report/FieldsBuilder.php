@@ -87,10 +87,15 @@ class FieldsBuilder
         ];
 
         $ownerPrefix           = $prefix.'owner_id';
+        $ownersList            = [];
+        $owners                = $this->userModel->getUserList('', 0);
+        foreach ($owners as $owner) {
+            $ownersList[$owner['id']] = sprintf('%s %s', $owner['firstName'], $owner['lastName']);
+        }
         $filters[$ownerPrefix] = [
             'label' => 'mautic.lead.list.filter.owner',
             'type'  => 'select',
-            'list'  => $this->userModel->getUserList('', 0),
+            'list'  => $ownersList,
         ];
 
         return $filters;

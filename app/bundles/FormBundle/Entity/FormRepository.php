@@ -107,6 +107,7 @@ class FormRepository extends CommonRepository
 
         switch ($command) {
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
+            case $this->translator->trans('mautic.form.form.searchcommand.isexpired', [], null, 'en_US'):
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('f.isPublished', ":$unique"),
                     $q->expr()->isNotNull('f.publishDown'),
@@ -116,6 +117,7 @@ class FormRepository extends CommonRepository
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.ispending'):
+            case $this->translator->trans('mautic.form.form.searchcommand.ispending', [], null, 'en_US'):
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('f.isPublished', ":$unique"),
                     $q->expr()->isNotNull('f.publishUp'),
@@ -125,6 +127,7 @@ class FormRepository extends CommonRepository
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.hasresults'):
+            case $this->translator->trans('mautic.form.form.searchcommand.hasresults', [], null, 'en_US'):
                 $sq       = $this->getEntityManager()->createQueryBuilder();
                 $subquery = $sq->select('count(s.id)')
                     ->from('MauticFormBundle:Submission', 's')
@@ -139,6 +142,7 @@ class FormRepository extends CommonRepository
                 $expr = $q->expr()->gt(sprintf('(%s)', $subquery), 1);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
                 $expr            = $q->expr()->like('f.name', ':'.$unique);
                 $returnParameter = true;
                 break;

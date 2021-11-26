@@ -150,19 +150,6 @@ class IcontactIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * Returns settings for the integration form.
-     *
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => false,
-            'requires_authorization' => true,
-        ];
-    }
-
-    /**
      * @return array
      */
     public function getAvailableLeadFields($settings = [])

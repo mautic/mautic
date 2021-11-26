@@ -200,4 +200,29 @@ class StageRepository extends CommonRepository
 
         return null;
     }
+
+    /**
+     * @param string|int $value
+     *
+     * @return array
+     */
+    public function findByIdOrName($value)
+    {
+        $qb = $this->_em->createQueryBuilder()
+            ->select('s')
+            ->from(Stage::class, 's');
+
+        if (is_numeric($value)) {
+            // This is numeric value so check id and name
+            $qb->where('s.id = :value');
+        } else {
+            // This is string, no need to check IDs
+            $qb->where('s.name = :value');
+        }
+
+        return $qb
+            ->setParameter('value', $value)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

@@ -16,6 +16,7 @@ namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\IntegrationEvents;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
@@ -223,7 +224,8 @@ class PartialObjectReportBuilder
                         $field,
                         $incompleteObject,
                         $requestObjectDAO,
-                        $this->syncReport->getIntegration()
+                        $this->syncReport->getIntegration(),
+                        FieldDAO::FIELD_UNCHANGED
                     );
                     $reportObjectDAO->addField($reportFieldDAO);
                 } catch (FieldNotFoundException $exception) {

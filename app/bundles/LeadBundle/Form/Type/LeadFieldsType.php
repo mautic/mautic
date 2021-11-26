@@ -32,8 +32,8 @@ class LeadFieldsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'choices'           => function (Options $options) {
-                $fieldList = array_flip($this->fieldModel->getFieldList());
+            'choices' => function (Options $options) {
+                $fieldList = $this->flipSubarrays($this->fieldModel->getFieldList());
                 if ($options['with_tags']) {
                     $fieldList['Core']['mautic.lead.field.tags'] = 'tags';
                 }
@@ -50,11 +50,11 @@ class LeadFieldsType extends AbstractType
 
                 return $fieldList;
             },
-            'global_only'           => false,
-            'required'              => false,
-            'with_company_fields'   => false,
-            'with_tags'             => false,
-            'with_utm'              => false,
+            'global_only'         => false,
+            'required'            => false,
+            'with_company_fields' => false,
+            'with_tags'           => false,
+            'with_utm'            => false,
         ]);
     }
 
@@ -72,5 +72,15 @@ class LeadFieldsType extends AbstractType
     public function getBlockPrefix()
     {
         return 'leadfields_choices';
+    }
+
+    private function flipSubarrays(array $masterArrays): array
+    {
+        return array_map(
+            function (array $subArray) {
+                return array_flip($subArray);
+            },
+            $masterArrays
+        );
     }
 }

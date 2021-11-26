@@ -14,9 +14,6 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class LeadChangeEvent.
- */
 class LeadChangeEvent extends Event
 {
     /**
@@ -24,9 +21,6 @@ class LeadChangeEvent extends Event
      */
     private $oldLead;
 
-    /**
-     * @var
-     */
     private $oldTrackingId;
 
     /**
@@ -34,9 +28,6 @@ class LeadChangeEvent extends Event
      */
     private $newLead;
 
-    /**
-     * @var
-     */
     private $newTrackingId;
 
     /**

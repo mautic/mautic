@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class RedirectModelTest extends PageTestAbstract
 {
-    public function testCreateRedirectEntity_WhenCalled_ReturnsRedirect()
+    public function testCreateRedirectEntityWhenCalledReturnsRedirect()
     {
         $redirectModel = $this->getRedirectModel();
         $entity        = $redirectModel->createRedirectEntity('http://some-url.com');
@@ -30,7 +30,7 @@ class RedirectModelTest extends PageTestAbstract
         $this->assertInstanceOf(Redirect::class, $entity);
     }
 
-    public function testGenerateRedirectUrl_WhenCalled_ReturnsValidUrl()
+    public function testGenerateRedirectUrlWhenCalledReturnsValidUrl()
     {
         $redirect = new Redirect();
         $redirect->setUrl('http://some-url.com');
@@ -39,7 +39,7 @@ class RedirectModelTest extends PageTestAbstract
         $redirectModel = $this->getRedirectModel();
         $url           = $redirectModel->generateRedirectUrl($redirect);
 
-        $this->assertContains($url, 'http://some-url.com');
+        $this->assertStringContainsString($url, 'http://some-url.com');
     }
 
     public function testRedirectGenerationEvent()

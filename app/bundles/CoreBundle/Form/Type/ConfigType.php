@@ -22,7 +22,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
@@ -34,9 +33,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class ConfigType.
- */
 class ConfigType extends AbstractType
 {
     /**
@@ -55,7 +51,7 @@ class ConfigType extends AbstractType
     private $supportedLanguages;
 
     /**
-     * @var
+     * @var IpLookupFactory
      */
     private $ipLookupFactory;
 
@@ -122,6 +118,22 @@ class ConfigType extends AbstractType
                 'multiple'    => false,
                 'placeholder' => '',
                 'required'    => false,
+            ]
+        );
+
+        $builder->add(
+            '404_page',
+            PageListType::class,
+            [
+                'label'         => 'mautic.core.config.form.404_page',
+                'label_attr'    => ['class' => 'control-label'],
+                'attr'          => [
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.core.config.form.404_page.tooltip',
+                ],
+                'multiple'       => false,
+                'placeholder'    => '',
+                'published_only' => true,
             ]
         );
 
@@ -570,6 +582,19 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
             );
+
+        $builder->add(
+          'transliterate_page_title',
+          YesNoButtonGroupType::class,
+          [
+            'label' => 'mautic.core.config.form.transliterate.page.title',
+            'data'  => (array_key_exists('transliterate_page_title', $options['data']) && !empty($options['data']['transliterate_page_title'])),
+            'attr'  => [
+              'class'   => 'form-control',
+              'tooltip' => 'mautic.core.config.form.transliterate.page.title.tooltip',
+            ],
+          ]
+        );
 
         $builder->add(
             'cors_restrict_domains',

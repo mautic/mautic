@@ -43,9 +43,6 @@ class PointSubscriber implements EventSubscriberInterface
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [
@@ -115,12 +112,13 @@ class PointSubscriber implements EventSubscriberInterface
      */
     public function onEmailSend(EmailSendEvent $event)
     {
-        if ($leadArray = $event->getLead()) {
+        $leadArray = $event->getLead();
+        if ($leadArray && is_array($leadArray) && !empty($leadArray['id'])) {
             $lead = $this->entityManager->getReference(Lead::class, $leadArray['id']);
         } else {
             return;
         }
 
-        $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead);
+        $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead, true);
     }
 }

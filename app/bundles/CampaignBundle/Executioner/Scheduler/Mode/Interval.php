@@ -159,6 +159,11 @@ class Interval implements ScheduleModeInterface
             return false;
         }
 
+        // Restrict just for daily scheduling
+        if (!in_array($event->getTriggerIntervalUnit(), ['d', 'm', 'y'])) {
+            return false;
+        }
+
         if (
             null === $event->getTriggerHour() &&
             (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour()) &&

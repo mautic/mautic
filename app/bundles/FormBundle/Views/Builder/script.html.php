@@ -29,5 +29,7 @@ $scriptSrc = str_replace('/index_dev.php', '', $scriptSrc);
         var MauticLang   = {
             'submittingMessage': "<?php echo $view['translator']->trans('mautic.form.submission.pleasewait'); ?>"
         }
+    }else if (typeof MauticSDK != 'undefined') {
+        MauticSDK.onLoad();
     }
 </script>

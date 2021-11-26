@@ -17,13 +17,10 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 
-/**
- * Class LeadEventLog.
- */
 class LeadEventLog implements ChannelInterface
 {
     /**
-     * @var
+     * @var int|null
      */
     private $id;
 
@@ -83,13 +80,10 @@ class LeadEventLog implements ChannelInterface
     private $channel;
 
     /**
-     * @var
+     * @var int
      */
     private $channelId;
 
-    /**
-     * @var
-     */
     private $previousScheduledState;
 
     /**
@@ -101,6 +95,13 @@ class LeadEventLog implements ChannelInterface
      * @var FailedLeadEventLog
      */
     private $failedLog;
+
+    /**
+     * Subscribers can fail log with custom reschedule interval.
+     *
+     * @var \DateInterval|null
+     */
+    private $rescheduleInterval;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
@@ -115,6 +116,7 @@ class LeadEventLog implements ChannelInterface
             ->addIndex(['channel', 'channel_id', 'lead_id'], 'campaign_log_channel')
             ->addIndex(['campaign_id', 'event_id', 'date_triggered'], 'campaign_actions')
             ->addIndex(['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], 'campaign_stats')
+            ->addIndex(['trigger_date'], 'campaign_trigger_date_order')
             ->addUniqueConstraint(['event_id', 'lead_id', 'rotation'], 'campaign_rotation');
 
         $builder->addBigIntIdField();
@@ -215,7 +217,7 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getId()
     {
@@ -550,5 +552,15 @@ class LeadEventLog implements ChannelInterface
     public function isSuccess()
     {
         return !$this->isFailed();
+    }
+
+    public function setRescheduleInterval(?\DateInterval $interval): void
+    {
+        $this->rescheduleInterval = $interval;
+    }
+
+    public function getRescheduleInterval(): ?\DateInterval
+    {
+        return $this->rescheduleInterval;
     }
 }

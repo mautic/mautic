@@ -21,10 +21,7 @@ use Symfony\Component\Form\FormBuilder;
  */
 class OneSignalIntegration extends AbstractIntegration
 {
-    /**
-     * @var bool
-     */
-    protected $coreIntegration = true;
+    protected bool $coreIntegration = true;
 
     /**
      * {@inheritdoc}
@@ -71,17 +68,6 @@ class OneSignalIntegration extends AbstractIntegration
             'safari_web_id' => 'mautic.notification.config.form.notification.safari_web_id',
             'rest_api_key'  => 'mautic.notification.config.form.notification.rest_api_key',
             'gcm_sender_id' => 'mautic.notification.config.form.notification.gcm_sender_id',
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => false,
-            'requires_authorization' => false,
         ];
     }
 

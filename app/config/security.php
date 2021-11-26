@@ -55,27 +55,9 @@ $firewalls = [
         ],
         'anonymous' => true,
     ],
-    'oauth1_request_token' => [
-        'pattern'  => '^/oauth/v1/request_token',
-        'security' => false,
-    ],
-    'oauth1_access_token' => [
-        'pattern'  => '^/oauth/v1/access_token',
-        'security' => false,
-    ],
-    'oauth1_area' => [
-        'pattern'    => '^/oauth/v1/authorize',
-        'form_login' => [
-            'provider'   => 'user_provider',
-            'check_path' => '/oauth/v1/authorize_login_check',
-            'login_path' => '/oauth/v1/authorize_login',
-        ],
-        'anonymous' => true,
-    ],
     'api' => [
         'pattern'            => '^/api',
         'fos_oauth'          => true,
-        'bazinga_oauth'      => true,
         'mautic_plugin_auth' => true,
         'stateless'          => true,
         'http_basic'         => true,
@@ -110,12 +92,11 @@ $firewalls = [
         ],
         'remember_me' => [
             'secret'   => '%mautic.rememberme_key%',
-            'lifetime' => '%mautic.rememberme_lifetime%',
+            'lifetime' => (int) $container->getParameter('mautic.rememberme_lifetime'),
             'path'     => '%mautic.rememberme_path%',
             'domain'   => '%mautic.rememberme_domain%',
         ],
         'fos_oauth'     => true,
-        'bazinga_oauth' => true,
         'context'       => 'mautic',
     ],
     'public' => [

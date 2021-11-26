@@ -298,7 +298,8 @@ document.addEventListener('mauticPageEventDelivered', function(e) {
 * Check if a DOM tracking pixel is present
 */
 MauticJS.checkForTrackingPixel = function() {
-    if (!/in/.test(document.readyState)) {
+    if (document.readyState !== 'complete') {
+        // Periodically call self until the DOM is completely loaded
         setTimeout(function(){MauticJS.checkForTrackingPixel()}, 9)
     } else {
         // Only fetch once a tracking pixel has been loaded
@@ -392,6 +393,12 @@ if (typeof window[window.MauticTrackingObject] !== 'undefined') {
         return matches; 
     }
 }
+
+MauticJS.ensureEventContext = function(event, context0, context1) { 
+    return (typeof(event.detail) !== 'undefined'
+        && event.detail[0] === context0
+        && event.detail[1] === context1);
+};
 JS;
         $event->appendJs($js, 'Mautic Core');
     }

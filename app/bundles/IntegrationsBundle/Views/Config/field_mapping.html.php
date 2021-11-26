@@ -12,7 +12,7 @@
 ?>
 <?php echo $view['form']->row($form['filter-totalFieldCount']); ?>
 <?php foreach ($form as $fieldName => $fieldForm): ?>
-<?php if (!in_array($fieldName, ['filter-keyword', 'filter-totalFieldCount'])): ?>
+<?php if (isset($fieldForm['mappedField'])): ?>
     <div class="row">
         <div class="col-sm-12"><?php echo $view['form']->label($fieldForm); ?></div>
     </div>

@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 
 class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');

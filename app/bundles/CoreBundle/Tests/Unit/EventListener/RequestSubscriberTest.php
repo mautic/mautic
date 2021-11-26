@@ -38,7 +38,7 @@ class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $getResponseEventMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $aCsrfTokenId    = 45;
         $aCsrfTokenValue = 'csrf-token-value';

@@ -48,9 +48,6 @@ class UtmTag
      */
     private $remoteHost;
 
-    /**
-     * @var
-     */
     private $url;
 
     /**

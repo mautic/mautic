@@ -14,11 +14,11 @@ namespace Mautic\CoreBundle\Templating\Helper;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\InstallBundle\Install\InstallService;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Asset\Packages;
 
-/**
- * Class AssetsHelper.
- */
 class AssetsHelper
 {
     /**
@@ -37,7 +37,7 @@ class AssetsHelper
     protected $assetHelper;
 
     /**
-     * @var
+     * @var string
      */
     protected $context = self::CONTEXT_APP;
 
@@ -49,7 +49,7 @@ class AssetsHelper
     ];
 
     /**
-     * @var
+     * @var string|null
      */
     protected $version;
 
@@ -59,7 +59,7 @@ class AssetsHelper
     protected $packages;
 
     /**
-     * @var
+     * @var string
      */
     protected $siteUrl;
 
@@ -68,9 +68,9 @@ class AssetsHelper
      */
     protected $pathsHelper;
 
-    /**
-     * AssetsHelper constructor.
-     */
+    protected BuilderIntegrationsHelper $builderIntegrationsHelper;
+    protected InstallService $installService;
+
     public function __construct(Packages $packages)
     {
         $this->packages = $packages;
@@ -97,14 +97,19 @@ class AssetsHelper
         return $prefix;
     }
 
+    public function getImagesPath($absolute = false)
+    {
+        return $this->pathsHelper->getSystemPath('images', $absolute);
+    }
+
     /**
      * Set asset url path.
      *
-     * @param string     $path
-     * @param null       $packageName
-     * @param null       $version
-     * @param bool|false $absolute
-     * @param bool|false $ignorePrefix
+     * @param string      $path
+     * @param string|null $packageName
+     * @param string|null $version
+     * @param bool|false  $absolute
+     * @param bool|false  $ignorePrefix
      *
      * @return string
      */
@@ -121,7 +126,8 @@ class AssetsHelper
             $path        = $assetPrefix.$path;
         }
 
-        $url = $this->packages->getUrl($path, $packageName, $version);
+        $path = $this->appendVersion($path, $version);
+        $url  = $this->packages->getUrl($path, $packageName);
 
         if ($absolute) {
             $url = $this->getBaseUrl().'/'.$path;
@@ -447,13 +453,29 @@ class AssetsHelper
         $assets = $this->assetHelper->getAssets();
 
         if ($includeEditor) {
-            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts());
+            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts(), $this->getCKEditorScripts());
         }
 
         if (isset($assets['js'])) {
             foreach ($assets['js'] as $url) {
                 echo '<script src="'.$this->getUrl($url).'" data-source="mautic"></script>'."\n";
             }
+        }
+
+        if ($this->installService->checkIfInstalled()) {
+            /**
+             * We want to enable JS consumers to simply query Mautic.getActiveBuilderName() so they can add logic based on the active builder.
+             * The $builderName variable is passed to the template so we can get that info on the JS-side.
+             */
+            try {
+                $builder     = $this->builderIntegrationsHelper->getBuilder('email');
+                $builderName = $builder->getName();
+            } catch (IntegrationNotFoundException $exception) {
+                // Assume legacy builder
+                $builderName = 'legacy';
+            }
+
+            echo '<script>Mautic.getActiveBuilderName = function() { return \''.$builderName.'\'; }</script>'."\n";
         }
     }
 
@@ -470,7 +492,7 @@ class AssetsHelper
         $assets = $this->assetHelper->getAssets();
 
         if ($includeEditor) {
-            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts());
+            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts(), $this->getCKEditorScripts());
         }
 
         if ($render) {
@@ -485,6 +507,16 @@ class AssetsHelper
         }
 
         return $assets['js'];
+    }
+
+    private function getCKEditorScripts(): array
+    {
+        $base    = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/';
+
+        return [
+            $base.'ckeditor.js?v'.$this->version,
+            $base.'adapters/jquery.js?v'.$this->version,
+        ];
     }
 
     /**
@@ -538,7 +570,7 @@ class AssetsHelper
      */
     public function includeScript($assetFilePath, $onLoadCallback = '', $alreadyLoadedCallback = '')
     {
-        return  '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '$onLoadCallback', '$alreadyLoadedCallback');</script>";
+        return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '$onLoadCallback', '$alreadyLoadedCallback');</script>";
     }
 
     /**
@@ -550,7 +582,7 @@ class AssetsHelper
      */
     public function includeStylesheet($assetFilePath)
     {
-        return  '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadStylesheet(\''.$this->getUrl($assetFilePath).'\');</script>';
+        return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadStylesheet(\''.$this->getUrl($assetFilePath).'\');</script>';
     }
 
     /**
@@ -721,6 +753,16 @@ class AssetsHelper
         $this->version = substr(hash('sha1', $secretKey.$version), 0, 8);
     }
 
+    public function setBuilderIntegrationsHelper(BuilderIntegrationsHelper $builderIntegrationsHelper)
+    {
+        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
+    }
+
+    public function setInstallService(InstallService $installService)
+    {
+        $this->installService = $installService;
+    }
+
     /**
      * @param $string
      *
@@ -729,5 +771,31 @@ class AssetsHelper
     private function escape($string)
     {
         return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
+    }
+
+    /**
+     * Appends the version to the path if is not present.
+     */
+    private function appendVersion(string $path, string $version = null): string
+    {
+        $version = $version ?: $this->version;
+
+        if (!$version) {
+            // no version is set
+            return $path;
+        }
+
+        $versionArgument   = 'v'.$version;
+        $querySeparator    = '?';
+        $argumentSeparator = '&amp;';
+        $query             = explode($querySeparator, $path)[1] ?? '';
+        parse_str(str_replace($argumentSeparator, '&', $query), $arguments);
+
+        if (isset($arguments[$versionArgument])) {
+            // path already contains the version
+            return $path;
+        }
+
+        return rtrim($path, $querySeparator).($query ? $argumentSeparator : $querySeparator).$versionArgument;
     }
 }

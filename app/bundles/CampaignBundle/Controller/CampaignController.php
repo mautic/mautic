@@ -70,9 +70,6 @@ class CampaignController extends AbstractStandardFormController
      */
     protected $modifiedEvents = [];
 
-    /**
-     * @var
-     */
     protected $sessionId;
 
     /**

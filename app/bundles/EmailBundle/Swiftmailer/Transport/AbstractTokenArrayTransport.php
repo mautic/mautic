@@ -16,9 +16,6 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 
-/**
- * Class AbstractTokenArrayTransport.
- */
 abstract class AbstractTokenArrayTransport implements TokenTransportInterface
 {
     /**
@@ -27,7 +24,7 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
     protected $message;
 
     /**
-     * @var
+     * @var \Swift_Events_SimpleEventDispatcher|null
      */
     private $dispatcher;
 

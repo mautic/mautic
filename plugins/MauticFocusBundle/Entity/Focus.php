@@ -54,9 +54,6 @@ class Focus extends FormEntity
      */
     private $name;
 
-    /**
-     * @var
-     */
     private $category;
 
     /**
@@ -84,9 +81,6 @@ class Focus extends FormEntity
      */
     private $publishDown;
 
-    /**
-     * @var array()
-     */
     private $properties = [];
 
     /**

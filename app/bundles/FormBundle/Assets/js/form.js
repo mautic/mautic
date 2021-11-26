@@ -149,7 +149,7 @@ Mautic.updateFormFieldValues = function (field) {
             .attr('value', valueFieldAttrs['value']);
         mQuery.each(options[fieldValue], function(key, optionVal) {
             var option = mQuery("<option></option>")
-                .attr('value', optionVal)
+                .attr('value', key)
                 .text(optionVal);
             newValueField.append(option);
         });

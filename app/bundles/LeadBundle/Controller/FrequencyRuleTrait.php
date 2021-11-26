@@ -19,14 +19,8 @@ use Symfony\Component\Form\Form;
 
 trait FrequencyRuleTrait
 {
-    /**
-     * @var
-     */
     protected $leadLists;
 
-    /**
-     * @var
-     */
     protected $dncChannels;
 
     /**
@@ -86,7 +80,7 @@ trait FrequencyRuleTrait
                 'public_view'              => $isPublic,
                 'preference_center_only'   => $isPreferenceCenter,
                 'allow_extra_fields'       => true,
-        ]
+            ]
         );
 
         $method = $this->request->getMethod();
@@ -180,7 +174,10 @@ trait FrequencyRuleTrait
         if (isset($this->request->request->get('lead_contact_frequency_rules')['lead_channels'])) {
             foreach ($formData['lead_channels']['subscribed_channels'] as $contactChannel) {
                 if (!isset($leadChannels[$contactChannel])) {
-                    $dncModel->removeDncForContact($lead->getId(), $contactChannel);
+                    $contactable = $dncModel->isContactable($lead, $contactChannel);
+                    if (DoNotContact::UNSUBSCRIBED == $contactable || DoNotContact::MANUAL == $contactable) {
+                        $dncModel->removeDncForContact($lead->getId(), $contactChannel);
+                    }
                 }
             }
             $dncChannels = array_diff($allChannels, $formData['lead_channels']['subscribed_channels']);

@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
@@ -55,26 +55,32 @@ class FocusModel extends FormModel
     protected $templating;
 
     /**
-     * @var
-     */
-    protected $leadModel;
-
-    /**
      * @var FieldModel
      */
     protected $leadFieldModel;
 
     /**
+     * @var ContactTracker
+     */
+    protected $contactTracker;
+
+    /**
      * FocusModel constructor.
      */
-    public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating, EventDispatcherInterface $dispatcher, LeadModel $leadModel, FieldModel $leadFieldModel)
-    {
+    public function __construct(
+        \Mautic\FormBundle\Model\FormModel $formModel,
+        TrackableModel $trackableModel,
+        TemplatingHelper $templating,
+        EventDispatcherInterface $dispatcher,
+        FieldModel $leadFieldModel,
+        ContactTracker $contactTracker
+    ) {
         $this->formModel      = $formModel;
         $this->trackableModel = $trackableModel;
         $this->templating     = $templating;
         $this->dispatcher     = $dispatcher;
-        $this->leadModel      = $leadModel;
         $this->leadFieldModel = $leadFieldModel;
+        $this->contactTracker = $contactTracker;
     }
 
     /**
@@ -218,7 +224,7 @@ class FocusModel extends FormModel
         }
 
         // Replace tokens to ensure clickthroughs, lead tokens etc are appropriate
-        $lead       = $this->leadModel->getCurrentLead();
+        $lead       = $this->contactTracker->getContact();
         $tokenEvent = new TokenReplacementEvent($cached['focus'], $lead, ['focus_id' => $focus->getId()]);
         $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
         $focusContent = $tokenEvent->getContent();
@@ -241,7 +247,7 @@ class FocusModel extends FormModel
      */
     public function getContent(array $focus, $isPreview = false, $url = '#')
     {
-        $form = (!empty($focus['form'])) ? $this->formModel->getEntity($focus['form']) : null;
+        $form = (!empty($focus['form']) && 'form' === $focus['type']) ? $this->formModel->getEntity($focus['form']) : null;
 
         if (isset($focus['html_mode'])) {
             $htmlMode = $focus['html_mode'];
@@ -262,15 +268,20 @@ class FocusModel extends FormModel
         );
 
         // Form has to be generated outside of the content or else the form src will be converted to clickables
-        $formContent = (!empty($form)) ? $this->templating->getTemplating()->render(
+        $fields             = $form ? $form->getFields()->toArray() : [];
+        [$pages, $lastPage] = $this->formModel->getPages($fields);
+        $formContent        = (!empty($form)) ? $this->templating->getTemplating()->render(
             'MauticFocusBundle:Builder:form.html.php',
             [
-                'form'          => $form,
-                'style'         => $focus['style'],
-                'focusId'       => $focus['id'],
-                'preview'       => $isPreview,
-                'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
-                'companyFields' => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'form'           => $form,
+                'pages'          => $pages,
+                'lastPage'       => $lastPage,
+                'style'          => $focus['style'],
+                'focusId'        => $focus['id'],
+                'preview'        => $isPreview,
+                'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
+                'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'viewOnlyFields' => $this->formModel->getCustomComponents()['viewOnlyFields'],
             ]
         ) : '';
 

@@ -68,7 +68,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         }
 
         if (false === file_exists($cacheDirectory)) {
-            mkdir($cacheDirectory, 0755, true);
+            mkdir($cacheDirectory, 0777, true);
         }
 
         $data  = [];

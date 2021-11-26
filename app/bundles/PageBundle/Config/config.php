@@ -294,6 +294,8 @@ return [
                     'mautic.queue.service',
                     'mautic.lead.model.company',
                     'mautic.tracker.device',
+                    'mautic.tracker.contact',
+                    'mautic.helper.core_parameters',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [
@@ -317,8 +319,8 @@ return [
             'mautic.page.model.video' => [
                 'class'     => 'Mautic\PageBundle\Model\VideoModel',
                 'arguments' => [
-                    'mautic.lead.model.lead',
                     'mautic.helper.ip_lookup',
+                    'mautic.tracker.contact',
                 ],
             ],
         ],
@@ -370,10 +372,10 @@ return [
             'mautic.page.helper.tracking' => [
                 'class'     => 'Mautic\PageBundle\Helper\TrackingHelper',
                 'arguments' => [
-                    'mautic.lead.model.lead',
                     'session',
                     'mautic.helper.core_parameters',
                     'request_stack',
+                    'mautic.tracker.contact',
                 ],
             ],
         ],
@@ -381,7 +383,7 @@ return [
 
     'parameters' => [
         'cat_in_page_url'       => false,
-        'google_analytics'      => false,
+        'google_analytics'      => null,
         'track_contact_by_ip'   => false,
         'track_by_tracking_url' => false,
         'redirect_list_types'   => [

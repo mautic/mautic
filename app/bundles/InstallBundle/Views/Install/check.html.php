@@ -8,6 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
+
 if ('index' == $tmpl) {
     $view->extend('MauticInstallBundle:Install:content.html.php');
 }
@@ -87,6 +90,9 @@ if ('index' == $tmpl) {
                                 <?php break;
                             case 'mautic.install.php.version.has.only.security.support': ?>
                                 <li class="list-group-item"><?php echo $view['translator']->trans($message, ['%phpversion%' => PHP_VERSION]); ?></li>
+                                <?php break;
+                            case 'mautic.install.memory.limit': ?>
+                                <li class="list-group-item"><?php echo $view['translator']->trans($message, ['%min_memory_limit%' => CheckStep::$memory_limit]); ?></li>
                                 <?php break;
                             default: ?>
                                 <li class="list-group-item"><?php echo $view['translator']->trans($message); ?></li>

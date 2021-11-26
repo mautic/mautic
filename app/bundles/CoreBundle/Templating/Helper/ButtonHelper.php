@@ -19,9 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class ButtonHelper.
- */
 class ButtonHelper extends Helper
 {
     /**
@@ -67,7 +64,7 @@ class ButtonHelper extends Helper
     /**
      * Location of the buttons.
      *
-     * @var
+     * @var string
      */
     private $location;
 
@@ -87,22 +84,22 @@ class ButtonHelper extends Helper
     private $dispatcher;
 
     /**
-     * @var
+     * @var string|null
      */
     private $wrapOpeningTag;
 
     /**
-     * @var
+     * @var string|null
      */
     private $wrapClosingTag;
 
     /**
-     * @var
+     * @var string
      */
     private $groupType = self::TYPE_GROUP;
 
     /**
-     * @var
+     * @var string|null
      */
     private $menuLink;
 
@@ -126,19 +123,13 @@ class ButtonHelper extends Helper
      */
     private $request;
 
-    /**
-     * @var
-     */
     private $item;
 
     /**
-     * @var
+     * @var int
      */
     private $listMarker = 3;
 
-    /**
-     * ButtonHelper constructor.
-     */
     public function __construct(EngineInterface $templating, TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
         $this->templating = $templating;

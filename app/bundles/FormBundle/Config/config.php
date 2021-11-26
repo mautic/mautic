@@ -213,6 +213,7 @@ return [
                     'mautic.form.model.form',
                     'mautic.form.model.submission',
                     'mautic.campaign.executioner.realtime',
+                    'mautic.helper.form.field_helper',
                 ],
             ],
             'mautic.form.leadbundle.subscriber' => [
@@ -363,10 +364,10 @@ return [
                     'mautic.helper.theme',
                     'mautic.form.model.action',
                     'mautic.form.model.field',
-                    'mautic.lead.model.lead',
                     'mautic.helper.form.field_helper',
                     'mautic.lead.model.field',
                     'mautic.form.helper.form_uploader',
+                    'mautic.tracker.contact',
                     'mautic.schema.helper.column',
                     'mautic.schema.helper.table',
                 ],
@@ -389,6 +390,7 @@ return [
                     'mautic.lead.service.device_tracking_service',
                     'mautic.form.service.field.value.transformer',
                     'mautic.helper.template.date',
+                    'mautic.tracker.contact',
                 ],
             ],
             'mautic.form.model.submission_result_loader' => [

@@ -51,6 +51,10 @@ Mautic.reportOnLoad = function (container) {
         Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
     });
     Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+
+    jQuery(document).ajaxComplete(function(){
+        Mautic.ajaxifyForm('daterange');
+    });
 };
 
 Mautic.scheduleDisplay = function ($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency) {
@@ -368,7 +372,7 @@ Mautic.getHighestIndex = function (selector) {
     var selectorChildren = mQuery('#' + selector + ' > div');
 
     selectorChildren.each(function() {
-        var index = mQuery(this).attr('id').split('_')[2];
+        var index = parseInt(mQuery(this).attr('id').split('_')[2]);
         highestIndex = (index > highestIndex) ? index : highestIndex;
     });
 

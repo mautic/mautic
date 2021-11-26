@@ -238,7 +238,7 @@ class EventController extends CommonFormController
                 'anchorEventType' => $campaignEvent['anchorEventType'] ?? '',
             ]);
         } else {
-            if (!isset($event['anchor'])) {
+            if (!isset($event['anchor']) && !empty($event['decisionPath'])) {
                 // Used to generate label
                 $event['anchor'] = $event['decisionPath'];
             }
@@ -259,6 +259,7 @@ class EventController extends CommonFormController
          * AJAX request, or we are not granted campaign edit/create, deny access.
          */
         if (empty($event)
+            || empty($event['eventType'])
             || !in_array($event['eventType'], $this->supportedEventTypes)
             || !isset($event['type'])
             || !$this->request->isXmlHttpRequest()

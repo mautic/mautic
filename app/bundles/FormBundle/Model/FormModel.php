@@ -30,7 +30,7 @@ use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -41,9 +41,9 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class FormModel extends CommonFormModel
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @var TemplatingHelper
@@ -66,11 +66,6 @@ class FormModel extends CommonFormModel
     protected $formFieldModel;
 
     /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
      * @var FormFieldHelper
      */
     protected $fieldHelper;
@@ -84,6 +79,11 @@ class FormModel extends CommonFormModel
      * @var FormUploader
      */
     private $formUploader;
+
+    /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
 
     /**
      * @var ColumnSchemaHelper
@@ -104,24 +104,24 @@ class FormModel extends CommonFormModel
         ThemeHelper $themeHelper,
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
-        LeadModel $leadModel,
         FormFieldHelper $fieldHelper,
         LeadFieldModel $leadFieldModel,
         FormUploader $formUploader,
+        ContactTracker $contactTracker,
         ColumnSchemaHelper $columnSchemaHelper,
         TableSchemaHelper $tableSchemaHelper
     ) {
-        $this->request             = $requestStack->getCurrentRequest();
-        $this->templatingHelper    = $templatingHelper;
-        $this->themeHelper         = $themeHelper;
-        $this->formActionModel     = $formActionModel;
-        $this->formFieldModel      = $formFieldModel;
-        $this->leadModel           = $leadModel;
-        $this->fieldHelper         = $fieldHelper;
-        $this->leadFieldModel      = $leadFieldModel;
-        $this->formUploader        = $formUploader;
-        $this->columnSchemaHelper  = $columnSchemaHelper;
-        $this->tableSchemaHelper   = $tableSchemaHelper;
+        $this->requestStack           = $requestStack;
+        $this->templatingHelper       = $templatingHelper;
+        $this->themeHelper            = $themeHelper;
+        $this->formActionModel        = $formActionModel;
+        $this->formFieldModel         = $formFieldModel;
+        $this->fieldHelper            = $fieldHelper;
+        $this->leadFieldModel         = $leadFieldModel;
+        $this->formUploader           = $formUploader;
+        $this->contactTracker         = $contactTracker;
+        $this->columnSchemaHelper     = $columnSchemaHelper;
+        $this->tableSchemaHelper      = $tableSchemaHelper;
     }
 
     /**
@@ -492,7 +492,7 @@ class FormModel extends CommonFormModel
         //generate cached HTML
         $theme       = $entity->getTemplate();
         $submissions = null;
-        $lead        = ($this->request) ? $this->leadModel->getCurrentLead() : null;
+        $lead        = ($this->requestStack->getCurrentRequest()) ? $this->contactTracker->getContact() : null;
         $style       = '';
 
         if (!empty($theme)) {
@@ -521,6 +521,40 @@ class FormModel extends CommonFormModel
             return ($a->getOrder() < $b->getOrder()) ? -1 : 1;
         });
 
+        [$pages, $lastPage] = $this->getPages($fields);
+        $html               = $this->templatingHelper->getTemplating()->render(
+            $theme.'MauticFormBundle:Builder:form.html.php',
+            [
+                'fieldSettings'  => $this->getCustomComponents()['fields'],
+                'viewOnlyFields' => $this->getCustomComponents()['viewOnlyFields'],
+                'fields'         => $fields,
+                'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
+                'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'form'           => $entity,
+                'theme'          => $theme,
+                'submissions'    => $submissions,
+                'lead'           => $lead,
+                'formPages'      => $pages,
+                'lastFormPage'   => $lastPage,
+                'style'          => $style,
+                'inBuilder'      => false,
+            ]
+        );
+
+        if (!$entity->usesProgressiveProfiling()) {
+            $entity->setCachedHtml($html);
+
+            if ($persist) {
+                //bypass model function as events aren't needed for this
+                $this->getRepository()->saveEntity($entity);
+            }
+        }
+
+        return $html;
+    }
+
+    public function getPages(array $fields): array
+    {
         $pages = ['open' => [], 'close' => []];
 
         $openFieldId  =
@@ -560,34 +594,7 @@ class FormModel extends CommonFormModel
             }
         }
 
-        $html = $this->templatingHelper->getTemplating()->render(
-            $theme.'MauticFormBundle:Builder:form.html.php',
-            [
-                'fieldSettings' => $this->getCustomComponents()['fields'],
-                'fields'        => $fields,
-                'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
-                'companyFields' => $this->leadFieldModel->getFieldListWithProperties('company'),
-                'form'          => $entity,
-                'theme'         => $theme,
-                'submissions'   => $submissions,
-                'lead'          => $lead,
-                'formPages'     => $pages,
-                'lastFormPage'  => $lastPage,
-                'style'         => $style,
-                'inBuilder'     => false,
-            ]
-        );
-
-        if (!$entity->usesProgressiveProfiling()) {
-            $entity->setCachedHtml($html);
-
-            if ($persist) {
-                //bypass model function as events aren't needed for this
-                $this->getRepository()->saveEntity($entity);
-            }
-        }
-
-        return $html;
+        return [$pages, $lastPage];
     }
 
     /**
@@ -682,7 +689,7 @@ class FormModel extends CommonFormModel
         ];
         $ignoreTypes = $this->getCustomComponents()['viewOnlyFields'];
         foreach ($fields as $f) {
-            if (!in_array($f->getType(), $ignoreTypes) && false !== $f->getSaveResult()) {
+            if (!in_array($f->getType(), $ignoreTypes)) {
                 $columns[] = [
                     'name'    => $f->getAlias(),
                     'type'    => 'text',
@@ -798,13 +805,14 @@ class FormModel extends CommonFormModel
     public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
         $formName = $form->generateFormName();
+        $request  = $this->requestStack->getCurrentRequest();
 
         $fields = $form->getFields()->toArray();
         /** @var \Mautic\FormBundle\Entity\Field $f */
         foreach ($fields as $f) {
             $alias = $f->getAlias();
-            if ($this->request->query->has($alias)) {
-                $value = $this->request->query->get($alias);
+            if ($request->query->has($alias)) {
+                $value = $request->query->get($alias);
 
                 $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
             }
@@ -836,7 +844,7 @@ class FormModel extends CommonFormModel
             return;
         }
 
-        $lead = $this->leadModel->getCurrentLead();
+        $lead = $this->contactTracker->getContact();
         if (!$lead instanceof Lead) {
             return;
         }
@@ -1116,7 +1124,26 @@ class FormModel extends CommonFormModel
 
         if (!empty($list)) {
             $formFieldProps['list'] = ['list' => $list];
+            if (array_key_exists('optionlist', $formFieldProps)) {
+                $formFieldProps['optionlist'] = ['list' => $list];
+            }
             $formField->setProperties($formFieldProps);
         }
+    }
+
+    /**
+     * @param string $fieldAlias
+     *
+     * @return Field|null
+     */
+    public function findFormFieldByAlias(Form $form, $fieldAlias)
+    {
+        foreach ($form->getFields() as $field) {
+            if ($field->getAlias() === $fieldAlias) {
+                return $field;
+            }
+        }
+
+        return null;
     }
 }

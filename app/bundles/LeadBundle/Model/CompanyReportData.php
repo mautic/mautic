@@ -88,6 +88,10 @@ class CompanyReportData
                 'label' => 'mautic.lead.report.company.is_primary',
                 'type'  => 'bool',
             ],
+            'companies_lead.date_added' => [
+                'label' => 'mautic.lead.report.company.date_added',
+                'type'  => 'datetime',
+            ],
         ];
     }
 

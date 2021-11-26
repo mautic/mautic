@@ -38,7 +38,7 @@ class CookieHelper
 
         $this->request = $requestStack->getCurrentRequest();
         if (('' === $this->secure || null === $this->secure) && $this->request) {
-            $this->secure = filter_var($requestStack->getCurrentRequest()->server->get('HTTPS', false), FILTER_VALIDATE_BOOLEAN);
+            $this->secure = $requestStack->getCurrentRequest()->isSecure();
         }
     }
 
@@ -117,6 +117,6 @@ class CookieHelper
      */
     public function deleteCookie($name, $path = null, $domain = null, $secure = null, $httponly = null)
     {
-        $this->setCookie($name, '', time() - 3600, $path, $domain, $secure, $httponly);
+        $this->setCookie($name, '', -86400, $path, $domain, $secure, $httponly);
     }
 }

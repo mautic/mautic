@@ -38,15 +38,18 @@ use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
+use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -132,6 +135,11 @@ class SubmissionModel extends CommonFormModel
      */
     private $dateHelper;
 
+    /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         TemplatingHelper $templatingHelper,
@@ -147,7 +155,8 @@ class SubmissionModel extends CommonFormModel
         FormUploader $formUploader,
         DeviceTrackingServiceInterface $deviceTrackingService,
         FieldValueTransformer $fieldValueTransformer,
-        DateHelper $dateHelper
+        DateHelper $dateHelper,
+        ContactTracker $contactTracker
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->templatingHelper       = $templatingHelper;
@@ -164,6 +173,7 @@ class SubmissionModel extends CommonFormModel
         $this->deviceTrackingService  = $deviceTrackingService;
         $this->fieldValueTransformer  = $fieldValueTransformer;
         $this->dateHelper             = $dateHelper;
+        $this->contactTracker         = $contactTracker;
     }
 
     /**
@@ -334,12 +344,12 @@ class SubmissionModel extends CommonFormModel
                 $leadFieldMatches[$leadField] = $leadValue;
             }
 
+            $tokens["{formfield={$alias}}"] = $this->normalizeValue($value, $f);
+
             //convert array from checkbox groups and multiple selects
             if (is_array($value)) {
                 $value = implode(', ', $value);
             }
-
-            $tokens["{formfield={$alias}}"] = $value;
 
             //save the result
             if (false !== $f->getSaveResult()) {
@@ -356,14 +366,17 @@ class SubmissionModel extends CommonFormModel
             ->setResults($results)
             ->setContactFieldMatches($leadFieldMatches);
 
-        $lead = $this->leadModel->getCurrentLead();
+        $lead = $this->contactTracker->getContact();
 
         // Remove validation errors if the field is not visible
         if ($lead && $form->usesProgressiveProfiling()) {
             $leadSubmissions = $this->formModel->getLeadSubmissions($form, $lead->getId());
 
+            $displayManager = new DisplayManager($form, $this->formModel->getCustomComponents()['viewOnlyFields']);
             foreach ($fields as $field) {
-                if (isset($validationErrors[$field->getAlias()]) && !$field->showForContact($leadSubmissions, $lead, $form)) {
+                if ($field->showForContact($leadSubmissions, $lead, $form, $displayManager)) {
+                    $displayManager->increaseDisplayedFields($field);
+                } elseif (isset($validationErrors[$field->getAlias()])) {
                     unset($validationErrors[$field->getAlias()]);
                 }
             }
@@ -753,7 +766,8 @@ class SubmissionModel extends CommonFormModel
     protected function executeFormActions(SubmissionEvent $event): void
     {
         $actions          = $event->getSubmission()->getForm()->getActions();
-        $availableActions = $this->formModel->getCustomComponents()['actions'];
+        $customComponents = $this->formModel->getCustomComponents();
+        $availableActions = $customComponents['actions'] ?? [];
 
         $actions->filter(function (Action $action) use ($availableActions) {
             return array_key_exists($action->getType(), $availableActions);
@@ -781,7 +795,7 @@ class SubmissionModel extends CommonFormModel
 
         if (!$inKioskMode) {
             // Default to currently tracked lead
-            if ($currentLead = $this->leadModel->getCurrentLead()) {
+            if ($currentLead = $this->contactTracker->getContact()) {
                 $lead          = $currentLead;
                 $leadId        = $lead->getId();
                 $currentFields = $lead->getProfileFields();
@@ -854,7 +868,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Get data for the form submission
-        list($data, $uniqueFieldsWithData) = $getData($leadFieldMatches);
+        [$data, $uniqueFieldsWithData] = $getData($leadFieldMatches);
         $this->logger->debug('FORM: Unique fields submitted include '.implode(', ', $uniqueFieldsWithData));
 
         // Check for duplicate lead
@@ -874,11 +888,11 @@ class SubmissionModel extends CommonFormModel
             $this->logger->debug('FORM: Testing contact ID# '.$foundLead->getId().' for conflicts');
 
             // Check for a conflict with the currently tracked lead
-            $foundLeadFields = $this->leadModel->flattenFields($foundLead->getFields());
+            $foundLeadFields = $foundLead->getProfileFields();
 
             // Get unique identifier fields for the found lead then compare with the lead currently tracked
             $uniqueFieldsFound             = $getData($foundLeadFields, true);
-            list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
+            [$hasConflict, $conflicts]     = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
 
             if ($inKioskMode || $hasConflict || !$lead->getId()) {
                 // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
@@ -903,7 +917,7 @@ class SubmissionModel extends CommonFormModel
 
         if (!$inKioskMode) {
             // Check for conflicts with the submitted data and the currently tracked lead
-            list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
+            [$hasConflict, $conflicts] = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
 
             $this->logger->debug(
                 'FORM: Current unique contact fields '.implode(', ', array_keys($uniqueFieldsCurrent)).' = '.implode(', ', $uniqueFieldsCurrent)
@@ -959,15 +973,15 @@ class SubmissionModel extends CommonFormModel
 
         if (!$inKioskMode) {
             // Set the current lead which will generate tracking cookies
-            $this->leadModel->setCurrentLead($lead);
+            $this->contactTracker->setTrackedContact($lead);
         } else {
             // Set system current lead which will still allow execution of events without generating tracking cookies
-            $this->leadModel->setSystemCurrentLead($lead);
+            $this->contactTracker->setSystemContact($lead);
         }
 
         $companyFieldMatches = $getCompanyData($leadFieldMatches);
         if (!empty($companyFieldMatches)) {
-            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
+            [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
             if ($leadAdded) {
                 $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             } elseif ($companyEntity instanceof Company) {
@@ -1019,5 +1033,19 @@ class SubmissionModel extends CommonFormModel
         }
 
         return true;
+    }
+
+    private function normalizeValue($value, Field $f): string
+    {
+        $value = !is_array($value) ? [$value] : $value;
+
+        // select and multiselect normalization
+        if ($properties = $f->getProperties()['list'] ?? null) {
+            foreach ($value as $key => $item) {
+                $value[$key] = CustomFieldValueHelper::setValueFromPropertiesList($properties, $item);
+            }
+        }
+
+        return implode(', ', $value);
     }
 }

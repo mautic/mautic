@@ -157,9 +157,11 @@ class EventLogModel extends AbstractCommonModel
                     );
                     break;
                 case 'ipAddress':
-                    $log->setIpAddress(
-                        $this->ipLookupHelper->getIpAddress($value)
-                    );
+                    if (!defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED')) {
+                        $log->setIpAddress(
+                            $this->ipLookupHelper->getIpAddress($value)
+                        );
+                    }
                     break;
                 case 'metadata':
                     $metadata = $log->getMetadata();

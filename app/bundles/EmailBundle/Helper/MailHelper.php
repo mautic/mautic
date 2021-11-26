@@ -19,8 +19,10 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Exception\PartialEmailSendFailure;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -40,14 +42,8 @@ class MailHelper
      */
     protected $factory;
 
-    /**
-     * @var
-     */
     protected $mailer;
 
-    /**
-     * @var
-     */
     protected $transport;
 
     /**
@@ -75,9 +71,6 @@ class MailHelper
      */
     protected $from;
 
-    /**
-     * @var
-     */
     protected $systemFrom;
 
     /**
@@ -216,13 +209,6 @@ class MailHelper
     protected $fatal = false;
 
     /**
-     * Flag whether to use only the globally set From email and name or whether to switch to mailer is owner.
-     *
-     * @var bool
-     */
-    protected $useGlobalFrom = false;
-
-    /**
      * Large batch mail sends may result on timeouts with SMTP servers. This will will keep track of the number of sends and restart the connection once met.
      *
      * @var int
@@ -249,9 +235,10 @@ class MailHelper
     private $copies = [];
 
     /**
-     * @param      $mailer
-     * @param null $from
+     * @var array
      */
+    private $embedImagesReplaces = [];
+
     public function __construct(MauticFactory $factory, \Swift_Mailer $mailer, $from = null)
     {
         $this->factory   = $factory;
@@ -274,7 +261,10 @@ class MailHelper
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
         // Check if batching is supported by the transport
-        if ('memory' == $this->factory->getParameter('mailer_spool_type') && $this->transport instanceof TokenTransportInterface) {
+        if (
+            ('memory' == $this->factory->getParameter('mailer_spool_type') && $this->transport instanceof TokenTransportInterface)
+            || ($this->transport instanceof SpoolTransport && $this->transport->supportsTokenization())
+        ) {
             $this->tokenizationEnabled = true;
         }
 
@@ -314,7 +304,7 @@ class MailHelper
             return $this->getMailer($cleanSlate);
         }
 
-        $transport  = $this->factory->get('swiftmailer.transport.real');
+        $transport  = $this->factory->get('swiftmailer.mailer.default.transport.real');
         $mailer     = new \Swift_Mailer($transport);
         $mailHelper = new self($this->factory, $mailer, $this->from);
 
@@ -326,18 +316,17 @@ class MailHelper
      *
      * @param bool $dispatchSendEvent
      * @param bool $isQueueFlush      (a tokenized/batch send via API such as Mandrill)
-     * @param bool $useOwnerAsMailer
      *
      * @return bool
      */
-    public function send($dispatchSendEvent = false, $isQueueFlush = false, $useOwnerAsMailer = true)
+    public function send($dispatchSendEvent = false, $isQueueFlush = false)
     {
         if ($this->tokenizationEnabled && !empty($this->queuedRecipients) && !$isQueueFlush) {
             // This transport uses tokenization and queue()/flushQueue() was not used therefore use them in order
             // properly populate metadata for this transport
 
             if ($result = $this->queue($dispatchSendEvent)) {
-                $result = $this->flushQueue(['To', 'Cc', 'Bcc'], $useOwnerAsMailer);
+                $result = $this->flushQueue(['To', 'Cc', 'Bcc']);
             }
 
             return $result;
@@ -346,15 +335,23 @@ class MailHelper
         // Set from email
         $ownerSignature = false;
         if (!$isQueueFlush) {
-            if ($useOwnerAsMailer) {
-                if ($owner = $this->getContactOwner($this->lead)) {
-                    $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name'], null);
-                    $ownerSignature = $this->getContactOwnerSignature($owner);
+            $emailToSend    = $this->getEmail();
+            if (!empty($emailToSend)) {
+                if ($emailToSend->getUseOwnerAsMailer()) {
+                    $owner = $this->getContactOwner($this->lead);
+                    if (!empty($owner)) {
+                        $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
+                        $ownerSignature = $this->getContactOwnerSignature($owner);
+                    } else {
+                        $this->setFrom($this->systemFrom, null);
+                    }
+                } elseif (!empty($emailToSend->getFromAddress())) {
+                    $this->setFrom($emailToSend->getFromAddress(), $emailToSend->getFromName());
                 } else {
-                    $this->setFrom($this->from, null, null);
+                    $this->setFrom($this->from, null);
                 }
-            } elseif (!$from = $this->message->getFrom()) {
-                $this->setFrom($this->from, null, null);
+            } else {
+                $this->setFrom($this->from, null);
             }
         } // from is set in flushQueue
 
@@ -431,16 +428,20 @@ class MailHelper
 
                 $failures = null;
 
-                if ($this->factory->getParameter('mailer_convert_embed_images')) {
-                    $convertedContent = $this->convertEmbedImages($this->message->getBody());
-                    $this->message->setBody($convertedContent);
-                }
-
                 $this->mailer->send($this->message, $failures);
 
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
                     $this->logError('Sending failed for one or more recipients');
+                }
+
+                // Clear the log so that previous output is not associated with new errors
+                $this->logger->clear();
+            } catch (PartialEmailSendFailure $exception) {
+                // Don't fail the entire message
+                if (!empty($failures)) {
+                    $this->errors['failures'] = $failures;
+                    $this->logError($exception->getMessage());
                 }
 
                 // Clear the log so that previous output is not associated with new errors
@@ -571,12 +572,11 @@ class MailHelper
     /**
      * Send batched mail to mailer.
      *
-     * @param array $resetEmailTypes  Array of email types to clear after flusing the queue
-     * @param bool  $useOwnerAsMailer
+     * @param array $resetEmailTypes Array of email types to clear after flusing the queue
      *
      * @return bool
      */
-    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'], $useOwnerAsMailer = true)
+    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'])
     {
         // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
         $flushed = empty($this->fatal);
@@ -592,10 +592,18 @@ class MailHelper
 
                 $this->errors = [];
 
-                if (!$this->useGlobalFrom && $useOwnerAsMailer && 'default' !== $fromKey) {
-                    $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name'], null);
+                $email = $this->getEmail();
+
+                if (!empty($email)) {
+                    if ($email->getUseOwnerAsMailer() && 'default' !== $fromKey) {
+                        $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name']);
+                    } elseif (!empty($email->getFromAddress())) {
+                        $this->setFrom($email->getFromAddress(), $email->getFromName());
+                    } else {
+                        $this->setFrom($this->systemFrom, null);
+                    }
                 } else {
-                    $this->setFrom($this->from, null, null);
+                    $this->setFrom($this->from, null);
                 }
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
@@ -656,7 +664,6 @@ class MailHelper
         $this->internalSend     = false;
         $this->fatal            = false;
         $this->idHashState      = true;
-        $this->useGlobalFrom    = false;
         $this->checkIfTransportNeedsRestart(true);
 
         $this->logger->clear();
@@ -750,7 +757,7 @@ class MailHelper
         /** @var \Swift_Mime_SimpleMimeEntity $child */
         foreach ($children as $child) {
             $childType  = $child->getContentType();
-            list($type) = sscanf($childType, '%[^/]/%s');
+            [$type]     = sscanf($childType, '%[^/]/%s');
 
             if ('text' == $type) {
                 $childBody = $child->getBody();
@@ -954,6 +961,10 @@ class MailHelper
      */
     public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
     {
+        if ($this->factory->getParameter('mailer_convert_embed_images')) {
+            $content = $this->convertEmbedImages($content);
+        }
+
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
@@ -982,14 +993,14 @@ class MailHelper
     private function convertEmbedImages($content)
     {
         $matches = [];
+        $content = strtr($content, $this->embedImagesReplaces);
         if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
-            $replaces = [];
             foreach ($matches[1] as $match) {
-                if (false === strpos($match, 'cid:')) {
-                    $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                if (false === strpos($match, 'cid:') && false === strpos($match, '{tracking_pixel}') && !array_key_exists($match, $this->embedImagesReplaces)) {
+                    $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
                 }
             }
-            $content = strtr($content, $replaces);
+            $content = strtr($content, $this->embedImagesReplaces);
         }
 
         return $content;
@@ -1230,25 +1241,15 @@ class MailHelper
      *
      * @param string|array $fromEmail
      * @param string       $fromName
-     * @param bool|null    $isGlobal
      */
-    public function setFrom($fromEmail, $fromName = null, $isGlobal = true)
+    public function setFrom($fromEmail, $fromName = null)
     {
         $fromName = $this->cleanName($fromName);
 
-        if (null !== $isGlobal) {
-            if ($isGlobal) {
-                if (is_array($fromEmail)) {
-                    $this->from = $fromEmail;
-                } else {
-                    $this->from = [$fromEmail => $fromName];
-                }
-            } else {
-                // Reset the default to the system from
-                $this->from = $this->systemFrom;
-            }
-
-            $this->useGlobalFrom = $isGlobal;
+        if (is_array($fromEmail)) {
+            $this->from = $fromEmail;
+        } else {
+            $this->from = [$fromEmail => $fromName];
         }
 
         try {
@@ -1366,7 +1367,7 @@ class MailHelper
                 $fromEmail = key($this->from);
             }
 
-            $this->setFrom($fromEmail, $fromName, null);
+            $this->setFrom($fromEmail, $fromName);
             $this->from = [$fromEmail => $fromName];
         } else {
             $this->from = $this->systemFrom;
@@ -1875,7 +1876,8 @@ class MailHelper
             $copy        = $emailModel->getCopyRepository()->findByHash($hash);
             $copyCreated = false;
             if (null === $copy) {
-                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $this->body['content'])) {
+                $contentToPersist = strtr($this->body['content'], array_flip($this->embedImagesReplaces));
+                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $contentToPersist)) {
                     // Try one more time to find the ID in case there was overlap when creating
                     $copy = $emailModel->getCopyRepository()->findByHash($hash);
                 } else {
@@ -1936,7 +1938,7 @@ class MailHelper
 
         if ($settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
             // Append the bounce notation
-            list($email, $domain) = explode('@', $settings['address']);
+            [$email, $domain] = explode('@', $settings['address']);
             $email .= '+bounce';
             if ($idHash || $this->idHash) {
                 $email .= '_'.($idHash ?: $this->idHash);
@@ -1960,7 +1962,7 @@ class MailHelper
 
         if ($settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
             // Append the bounce notation
-            list($email, $domain) = explode('@', $settings['address']);
+            [$email, $domain] = explode('@', $settings['address']);
             $email .= '+unsubscribe';
             if ($idHash || $this->idHash) {
                 $email .= '_'.($idHash ?: $this->idHash);
@@ -2049,15 +2051,19 @@ class MailHelper
     protected function getContactOwner(&$contact)
     {
         $owner = false;
+        $email = $this->getEmail();
 
-        if ($this->factory->getParameter('mailer_is_owner') && is_array($contact) && isset($contact['id'])) {
-            if (!isset($contact['owner_id'])) {
-                $contact['owner_id'] = 0;
-            } elseif (isset($contact['owner_id'])) {
-                if (isset(self::$leadOwners[$contact['owner_id']])) {
-                    $owner = self::$leadOwners[$contact['owner_id']];
-                } elseif ($owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($contact['owner_id'])) {
-                    self::$leadOwners[$owner['id']] = $owner;
+        if (!empty($email)) {
+            if ($email->getUseOwnerAsMailer() && is_array($contact) && isset($contact['id'])) {
+                if (!isset($contact['owner_id'])) {
+                    $contact['owner_id'] = 0;
+                } elseif (isset($contact['owner_id'])) {
+                    $leadModel = $this->factory->getModel('lead');
+                    if (isset(self::$leadOwners[$contact['owner_id']])) {
+                        $owner = self::$leadOwners[$contact['owner_id']];
+                    } elseif ($owner = $leadModel->getRepository()->getLeadOwner($contact['owner_id'])) {
+                        self::$leadOwners[$owner['id']] = $owner;
+                    }
                 }
             }
         }

@@ -35,7 +35,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
      */
     private $entityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
 

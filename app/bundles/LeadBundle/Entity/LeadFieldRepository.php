@@ -14,9 +14,6 @@ namespace Mautic\LeadBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 
-/**
- * LeadFieldRepository.
- */
 class LeadFieldRepository extends CommonRepository
 {
     /**
@@ -47,9 +44,11 @@ class LeadFieldRepository extends CommonRepository
                 ->setParameter(':true', true, 'boolean');
         }
 
-        $q->andWhere(
-            $q->expr()->eq('l.object', ':object')
-        )->setParameter('object', $object);
+        if ($object) {
+            $q->andWhere(
+                $q->expr()->eq('l.object', ':object')
+            )->setParameter('object', $object);
+        }
 
         $results = $q->execute()->fetchAll();
         $aliases = [];
@@ -242,7 +241,7 @@ class LeadFieldRepository extends CommonRepository
                 );
 
                 $expr->add(
-                    'l.'.$field." $operator '\\\\|?$value\\\\|?'"
+                    $property." $operator '\\\\|?$value\\\\|?'"
                 );
 
                 $q->where($expr)
@@ -307,13 +306,14 @@ class LeadFieldRepository extends CommonRepository
      */
     public function compareDateValue($lead, $field, $value)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q        = $this->_em->getConnection()->createQueryBuilder();
+        $property = $this->getPropertyByField($field, $q);
         $q->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead'),
-                    $q->expr()->eq('l.'.$field, ':value')
+                    $q->expr()->eq($property, ':value')
                 )
             )
             ->setParameter('lead', (int) $lead)
@@ -353,6 +353,16 @@ class LeadFieldRepository extends CommonRepository
         $result = $q->execute()->fetch();
 
         return !empty($result['id']);
+    }
+
+    public function getFieldThatIsMissingColumn(): ?LeadField
+    {
+        $qb = $this->createQueryBuilder($this->getTableAlias());
+        $qb->where($qb->expr()->eq("{$this->getTableAlias()}.columnIsNotCreated", 1));
+        $qb->orderBy("{$this->getTableAlias()}.dateAdded", 'ASC');
+        $qb->getMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**

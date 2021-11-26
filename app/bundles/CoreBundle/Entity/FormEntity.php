@@ -80,7 +80,7 @@ class FormEntity extends CommonEntity
     protected $new = false;
 
     /**
-     * @var
+     * @var int|null
      */
     public $deletedId;
 

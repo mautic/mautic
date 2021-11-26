@@ -212,6 +212,7 @@ class FormApiController extends CommonApiController
 
         // Add actions from the request
         if (!empty($parameters['actions']) && is_array($parameters['actions'])) {
+            $actions = [];
             foreach ($parameters['actions'] as &$actionParams) {
                 if (empty($actionParams['id'])) {
                     $actionParams['id'] = 'new'.hash('sha1', uniqid(mt_rand()));
@@ -232,12 +233,13 @@ class FormApiController extends CommonApiController
 
                     return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
                 }
+                $actions[] = $actionForm->getNormData();
             }
 
             // Save the form first and new actions so that new fields are available to actions.
             // Using the repository function to not trigger the listeners twice.
             $this->model->getRepository()->saveEntity($entity);
-            $this->model->setActions($entity, $parameters['actions']);
+            $this->model->setActions($entity, $actions);
         }
 
         // Remove actions which weren't in the PUT request

@@ -90,17 +90,6 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => true,
-            'requires_authorization' => true,
-        ];
-    }
-
-    /**
      * @return string
      */
     public function getApiUrl()
@@ -136,6 +125,20 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
         $keys = $this->getKeys();
 
         return $keys[$this->getAuthTokenKey()];
+    }
+
+    /**
+     * @param bool $inAuthorization
+     *
+     * @return string|null
+     */
+    public function getBearerToken($inAuthorization = false)
+    {
+        if (!$inAuthorization && isset($this->keys[$this->getAuthTokenKey()])) {
+            return $this->keys[$this->getAuthTokenKey()];
+        }
+
+        return null;
     }
 
     /**

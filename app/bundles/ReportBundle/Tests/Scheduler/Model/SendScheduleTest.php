@@ -14,133 +14,214 @@ namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
+use Mautic\ReportBundle\Exception\FileTooBigException;
+use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SendScheduleTest extends \PHPUnit\Framework\TestCase
 {
-    public function testSendScheduleWithFile()
+    /**
+     * @var Report
+     */
+    private $report;
+
+    /**
+     * @var Scheduler
+     */
+    private $scheduler;
+
+    /**
+     * @var SendSchedule
+     */
+    private $sendSchedule;
+
+    /**
+     * @var MockObject|MailHelper
+     */
+    private $mailHelperMock;
+
+    /**
+     * @var MockObject|MessageSchedule
+     */
+    private $messageSchedule;
+
+    /**
+     * @var MockObject|FileHandler
+     */
+    private $fileHandler;
+
+    protected function setUp(): void
     {
-        $report = new Report();
-        $report->setToAddress('john@doe.com, doe@john.com');
-        $scheduler = new Scheduler($report, new \DateTime());
+        parent::setUp();
 
-        $mailHelperMock = $this->getMockBuilder(MailHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->report          = new Report();
+        $this->scheduler       = new Scheduler($this->report, new \DateTime());
+        $this->mailHelperMock  = $this->createMock(MailHelper::class);
+        $this->messageSchedule = $this->createMock(MessageSchedule::class);
+        $this->fileHandler     = $this->createMock(FileHandler::class);
 
-        $mailHelperMock->expects($this->once())
+        $this->mailHelperMock->expects($this->once())
             ->method('getMailer')
-            ->with()
-            ->willReturn($mailHelperMock);
+            ->willReturnSelf();
 
-        $messageSchedule = $this->getMockBuilder(MessageSchedule::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->sendSchedule = new SendSchedule(
+            $this->mailHelperMock,
+            $this->messageSchedule,
+            $this->fileHandler
+        );
+    }
 
-        $messageSchedule->expects($this->once())
+    public function testSendScheduleWithCsvFile()
+    {
+        $this->report->setToAddress('john@doe.com, doe@john.com');
+
+        $this->messageSchedule->expects($this->once())
             ->method('getSubject')
-            ->with($report)
+            ->with($this->report)
             ->willReturn('Subject');
 
-        $messageSchedule->expects($this->once())
-            ->method('getMessage')
-            ->with($report, 'path-to-a-file')
+        $this->messageSchedule->expects($this->once())
+            ->method('getMessageForAttachedFile')
+            ->with($this->report)
             ->willReturn('Message');
 
-        $messageSchedule->expects($this->once())
-            ->method('fileCouldBeSend')
-            ->with('path-to-a-file')
-            ->willReturn(true);
+        $this->fileHandler->expects($this->once())
+            ->method('fileCanBeAttached')
+            ->with('/path/to/report.csv');
 
-        $mailHelperMock->expects($this->once())
+        $this->mailHelperMock->expects($this->once())
             ->method('setTo')
             ->with(['john@doe.com', 'doe@john.com']);
 
-        $mailHelperMock->expects($this->once())
+        $this->mailHelperMock->expects($this->once())
             ->method('setSubject')
             ->with('Subject');
 
-        $mailHelperMock->expects($this->once())
+        $this->mailHelperMock->expects($this->once())
             ->method('setBody')
             ->with('Message');
 
-        $mailHelperMock->expects($this->once())
+        $this->mailHelperMock->expects($this->once())
             ->method('parsePlainText')
             ->with('Message');
 
-        $mailHelperMock->expects($this->once())
+        $this->mailHelperMock->expects($this->once())
             ->method('attachFile')
-            ->with('path-to-a-file');
+            ->with('/path/to/report.csv', 'report.csv', 'text/csv');
 
-        $mailHelperMock->expects($this->once())
+        $this->mailHelperMock->expects($this->once())
             ->method('send')
             ->with(true);
 
-        $sendSchedule = new SendSchedule($mailHelperMock, $messageSchedule);
+        $this->sendSchedule->send($this->scheduler, '/path/to/report.csv');
+    }
 
-        $sendSchedule->send($scheduler, 'path-to-a-file');
+    public function testSendScheduleWithZipFile()
+    {
+        $this->report->setToAddress('john@doe.com, doe@john.com');
+
+        $this->messageSchedule->expects($this->once())
+            ->method('getSubject')
+            ->with($this->report)
+            ->willReturn('Subject');
+
+        $this->messageSchedule->expects($this->once())
+            ->method('getMessageForAttachedFile')
+            ->with($this->report)
+            ->willReturn('Message');
+
+        $this->fileHandler->expects($this->exactly(2))
+            ->method('fileCanBeAttached')
+            ->withConsecutive(
+                ['/path/to/report.csv'],
+                ['/path/to/report.zip']
+            )
+            ->will($this->onConsecutiveCalls(
+                $this->throwException(new FileTooBigException()),
+                null
+            ));
+
+        $this->fileHandler->expects($this->once())
+            ->method('zipIt')
+            ->with('/path/to/report.csv')
+            ->willReturn('/path/to/report.zip');
+
+        $this->mailHelperMock->expects($this->once())
+            ->method('setTo')
+            ->with(['john@doe.com', 'doe@john.com']);
+
+        $this->mailHelperMock->expects($this->once())
+            ->method('setSubject')
+            ->with('Subject');
+
+        $this->mailHelperMock->expects($this->once())
+            ->method('setBody')
+            ->with('Message');
+
+        $this->mailHelperMock->expects($this->once())
+            ->method('parsePlainText')
+            ->with('Message');
+
+        $this->mailHelperMock->expects($this->once())
+            ->method('attachFile')
+            ->with('/path/to/report.zip', 'report.zip', 'application/zip');
+
+        $this->mailHelperMock->expects($this->once())
+            ->method('send')
+            ->with(true);
+
+        $this->sendSchedule->send($this->scheduler, '/path/to/report.csv');
     }
 
     public function testSendScheduleWithoutFile()
     {
-        $report = new Report();
-        $report->setToAddress('john@doe.com, doe@john.com');
-        $scheduler = new Scheduler($report, new \DateTime());
+        $this->report->setToAddress('john@doe.com, doe@john.com');
 
-        $mailHelperMock = $this->getMockBuilder(MailHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mailHelperMock->expects($this->once())
-            ->method('getMailer')
-            ->with()
-            ->willReturn($mailHelperMock);
-
-        $messageSchedule = $this->getMockBuilder(MessageSchedule::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $messageSchedule->expects($this->once())
+        $this->messageSchedule->expects($this->once())
             ->method('getSubject')
-            ->with($report)
+            ->with($this->report)
             ->willReturn('Subject');
 
-        $messageSchedule->expects($this->once())
-            ->method('getMessage')
-            ->with($report, 'path-to-a-file')
+        $this->messageSchedule->expects($this->once())
+            ->method('getMessageForLinkedFile')
+            ->with($this->report)
             ->willReturn('Message');
 
-        $messageSchedule->expects($this->once())
-            ->method('fileCouldBeSend')
+        $this->fileHandler->expects($this->once())
+            ->method('zipIt')
             ->with('path-to-a-file')
-            ->willReturn(false);
+            ->willReturn('path-to-a-zip-file');
 
-        $mailHelperMock->expects($this->once())
+        $this->fileHandler->expects($this->exactly(2))
+            ->method('fileCanBeAttached')
+            ->withConsecutive(['path-to-a-file'], ['path-to-a-zip-file'])
+            ->will($this->throwException(new FileTooBigException()));
+
+        $this->mailHelperMock->expects($this->once())
             ->method('setTo')
             ->with(['john@doe.com', 'doe@john.com']);
 
-        $mailHelperMock->expects($this->once())
+        $this->mailHelperMock->expects($this->once())
             ->method('setSubject')
             ->with('Subject');
 
-        $mailHelperMock->expects($this->once())
+        $this->mailHelperMock->expects($this->once())
             ->method('setBody')
             ->with('Message');
 
-        $mailHelperMock->expects($this->once())
+        $this->mailHelperMock->expects($this->once())
             ->method('parsePlainText')
             ->with('Message');
 
-        $mailHelperMock->expects($this->never())
+        $this->mailHelperMock->expects($this->never())
             ->method('attachFile');
 
-        $mailHelperMock->expects($this->once())
+        $this->mailHelperMock->expects($this->once())
             ->method('send')
             ->with(true);
 
-        $sendSchedule = new SendSchedule($mailHelperMock, $messageSchedule);
-
-        $sendSchedule->send($scheduler, 'path-to-a-file');
+        $this->sendSchedule->send($this->scheduler, 'path-to-a-file');
     }
 }

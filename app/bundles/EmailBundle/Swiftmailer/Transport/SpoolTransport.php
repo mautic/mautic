@@ -64,4 +64,19 @@ class SpoolTransport extends \Swift_Transport_SpoolTransport
 
         return $count;
     }
+
+    public function supportsTokenization(): bool
+    {
+        return $this->spool->isTokenizationEnabled();
+    }
+
+    public function getMaxBatchLimit()
+    {
+        return $this->spool->getRealTransport()->getMaxBatchLimit();
+    }
+
+    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
+    {
+        return $this->spool->getRealTransport()->getBatchRecipientCount($message, $toBeAdded, $type);
+    }
 }

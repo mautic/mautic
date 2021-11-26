@@ -134,7 +134,6 @@ class Tweet extends FormEntity
 
         $builder->setTable('tweets')
             ->setCustomRepositoryClass(TweetRepository::class)
-            ->addIndex(['text'], 'tweet_text_index')
             ->addIndex(['sent_count'], 'sent_count_index')
             ->addIndex(['favorite_count'], 'favorite_count_index')
             ->addIndex(['retweet_count'], 'retweet_count_index');

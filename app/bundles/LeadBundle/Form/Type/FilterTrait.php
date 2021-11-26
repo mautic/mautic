@@ -47,12 +47,13 @@ trait FilterTrait
         $data        = $event->getData();
         $form        = $event->getForm();
         $options     = $form->getConfig()->getOptions();
-        $fieldType   = $data['type'];
-        $fieldName   = $data['field'];
+        $fieldType   = isset($data['type']) ? $data['type'] : '';
+        $fieldName   = isset($data['field']) ? $data['field'] : '';
         $type        = TextType::class;
         $attr        = ['class' => 'form-control'];
         $displayType = HiddenType::class;
         $displayAttr = [];
+        $operator    = isset($data['operator']) ? $data['operator'] : '';
 
         $field = [];
 
@@ -205,7 +206,7 @@ trait FilterTrait
                 $type                                       = ChoiceType::class;
                 $customOptions['choices']                   = $options[$choiceKey];
                 $customOptions['choice_translation_domain'] = false;
-                $customOptions['multiple']                  = (in_array($data['operator'], ['in', '!in']));
+                $customOptions['multiple']                  = (in_array($operator, ['in', '!in']));
 
                 if ($customOptions['multiple']) {
                     array_unshift($customOptions['choices'], ['' => '']);
@@ -254,7 +255,7 @@ trait FilterTrait
                     ]
                 );
 
-                if (in_array($data['operator'], ['in', '!in'])) {
+                if (in_array($operator, ['in', '!in'])) {
                     $customOptions['multiple'] = true;
                     if (!isset($data['filter'])) {
                         $data['filter'] = [];
@@ -293,7 +294,7 @@ trait FilterTrait
                         $attr,
                         [
                             'data-toggle' => 'field-lookup',
-                            'data-target' => $data['field'],
+                            'data-target' => isset($data['field']) ? $data['field'] : '',
                             'data-action' => 'lead:fieldList',
                             'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
                         ]
@@ -308,16 +309,16 @@ trait FilterTrait
         }
 
         $customOptions['constraints'] = [];
-        if (in_array($data['operator'], ['empty', '!empty'])) {
+        if (in_array($operator, ['empty', '!empty'])) {
             $attr['disabled'] = 'disabled';
-        } elseif ($data['operator']) {
+        } elseif ($operator) {
             $customOptions['constraints'][] = new NotBlank(
                 [
                     'message' => 'mautic.core.value.required',
                 ]
             );
 
-            if (in_array($data['operator'], ['regexp', '!regexp']) && $this->connection) {
+            if (in_array($operator, ['regexp', '!regexp']) && $this->connection) {
                 // Let's add a custom valdiator to test the regex
                 $customOptions['constraints'][] =
                     new Callback(
@@ -340,7 +341,7 @@ trait FilterTrait
         }
 
         // @todo implement in UI
-        if (in_array($data['operator'], ['between', '!between'])) {
+        if (in_array($operator, ['between', '!between'])) {
             $form->add(
                 'filter',
                 CollectionType::class,

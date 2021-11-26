@@ -26,9 +26,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Page.
- */
 class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface
 {
     use TranslationEntityTrait;
@@ -126,8 +123,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     /**
      * Used to identify the page for the builder.
-     *
-     * @var
      */
     private $sessionId;
 
@@ -602,24 +597,21 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set isPreferenceCenter.
-     *
-     * @param bool $isPreferenceCenter
+     * @param bool|null $isPreferenceCenter
      *
      * @return Page
      */
     public function setIsPreferenceCenter($isPreferenceCenter)
     {
-        $this->isChanged('isPreferenceCenter', $isPreferenceCenter);
-        $this->isPreferenceCenter = $isPreferenceCenter;
+        $sanitizedValue = null === $isPreferenceCenter ? null : (bool) $isPreferenceCenter;
+        $this->isChanged('isPreferenceCenter', $sanitizedValue);
+        $this->isPreferenceCenter = $sanitizedValue;
 
         return $this;
     }
 
     /**
-     * Get isPreferenceCenter.
-     *
-     * @return bool
+     * @return bool|null
      */
     public function getIsPreferenceCenter()
     {
@@ -627,20 +619,17 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set noIndex.
-     *
-     * @param bool $noIndex
+     * @param bool|null $noIndex
      */
     public function setNoIndex($noIndex)
     {
-        $this->isChanged('noIndex', $noIndex);
-        $this->noIndex = $noIndex;
+        $sanitizedValue = null === $noIndex ? null : (bool) $noIndex;
+        $this->isChanged('noIndex', $sanitizedValue);
+        $this->noIndex = $sanitizedValue;
     }
 
     /**
-     * Get noIndex.
-     *
-     * @return bool
+     * @return bool|null
      */
     public function getNoIndex()
     {

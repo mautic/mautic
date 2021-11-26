@@ -258,7 +258,7 @@ class SalesforceApi extends CrmApi
                     $body = [
                         $namespace.'ActivityDate__c' => $record['dateAdded']->format('c'),
                         $namespace.'Description__c'  => $record['description'],
-                        'Name'                       => $record['name'],
+                        'Name'                       => substr($record['name'], 0, 80),
                         $namespace.'Mautic_url__c'   => $records['leadUrl'],
                         $namespace.'ReferenceId__c'  => $record['id'].'-'.$sfId,
                     ];
@@ -603,11 +603,11 @@ class SalesforceApi extends CrmApi
         // Remember that PHP uses \ as an escape. Therefore, to replace a single backslash with 2, must use 2 and 4
         $value = str_replace('\\', '\\\\', $value);
 
-        // Escape single quotes
-        $value = str_replace("'", "\'", $value);
-
         // Apply general formatting/cleanup
         $value = $this->integration->cleanPushData($value);
+
+        // Escape single quotes
+        $value = str_replace("'", "\'", $value);
 
         return $value;
     }

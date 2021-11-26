@@ -68,6 +68,11 @@ class EventLogger
     private $contactRotations = [];
 
     /**
+     * @var int
+     */
+    private $lastUsedCampaignIdToFetchRotation;
+
+    /**
      * EventLogger constructor.
      *
      * @param IpLookupHelper         $ipLookupHelper
@@ -116,7 +121,9 @@ class EventLogger
     {
         $log = new LeadEventLog();
 
-        $log->setIpAddress($this->ipLookupHelper->getIpAddress());
+        if (!defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED')) {
+            $log->setIpAddress($this->ipLookupHelper->getIpAddress());
+        }
 
         $log->setEvent($event);
         $log->setCampaign($event->getCampaign());
@@ -138,7 +145,7 @@ class EventLogger
             $this->hydrateContactRotationsForNewLogs([$contact->getId()], $event->getCampaign()->getId());
         }
         // A new contact added with master/slave db may still not have a discernible rotation.
-        if (isset($this->contactRotations[$contact->getId()])) {
+        if (isset($this->contactRotations[$contact->getId()]) && ($this->lastUsedCampaignIdToFetchRotation === $event->getCampaign()->getId())) {
             $log->setRotation($this->contactRotations[$contact->getId()]);
         }
 
@@ -284,6 +291,7 @@ class EventLogger
     {
         $rotations              = $this->leadRepository->getContactRotations($contactIds, $campaignId);
         $this->contactRotations = array_replace($this->contactRotations, $rotations);
+        $this->lastUsedCampaignIdToFetchRotation = $campaignId;
     }
 
     private function persistPendingAndInsertIntoLogStack()

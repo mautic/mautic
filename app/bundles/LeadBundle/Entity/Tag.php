@@ -31,10 +31,11 @@ class Tag
 
     /**
      * @param string $tag
+     * @param bool   $clean
      */
-    public function __construct($tag = null)
+    public function __construct($tag = null, $clean = true)
     {
-        $this->tag = $this->validateTag($tag);
+        $this->tag = $clean ? $this->validateTag($tag) : $tag;
     }
 
     public static function loadMetadata(ClassMetadata $metadata)
@@ -95,6 +96,6 @@ class Tag
      */
     protected function validateTag($tag)
     {
-        return InputHelper::clean($tag);
+        return InputHelper::clean(trim($tag));
     }
 }

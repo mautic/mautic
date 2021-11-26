@@ -158,10 +158,10 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
     if (empty($parseList)) {
         if (isset($list)) {
             $parseList = $list;
-        } elseif (!empty($properties['list'])) {
-            $parseList = $properties['list'];
         } elseif (!empty($properties['optionlist'])) {
             $parseList = $properties['optionlist'];
+        } elseif (!empty($properties['list'])) {
+            $parseList = $properties['list'];
         }
 
         if (isset($parseList['list'])) {

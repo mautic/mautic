@@ -17,7 +17,6 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignConditionSubscriber implements EventSubscriberInterface
@@ -58,7 +57,7 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
     {
         try {
-            $this->validator->validate($event->getLead()->getEmail());
+            $this->validator->validate($event->getLead()->getEmail(), true);
         } catch (InvalidEmailException $exception) {
             return $event->setResult(false);
         }

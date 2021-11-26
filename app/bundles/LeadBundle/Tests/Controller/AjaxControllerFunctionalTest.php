@@ -13,45 +13,41 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
-use Doctrine\DBAL\Connection;
-use Mautic\CampaignBundle\Tests\DataFixtures\Orm\CampaignData;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
-use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
-use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
-use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
-use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->connection = $this->container->get('doctrine.dbal.default_connection');
-
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
     }
 
-    public function testToggleLeadCampaignAction()
+    protected function beforeBeginTransaction(): void
     {
-        $this->loadFixtures([LeadFieldData::class, RoleData::class, LoadRoleData::class, LoadUserData::class, CampaignData::class, LoadLeadData::class]);
+        $this->resetAutoincrement([
+            'leads',
+            'campaigns',
+        ]);
+    }
+
+    public function testToggleLeadCampaignAction(): void
+    {
+        $campaign = $this->createCampaign();
+        $contact  = $this->createContact('blabla@contact.email');
 
         // Ensure there is no member for campaign 1 yet.
-        $this->assertSame([], $this->getMembersForCampaign(1));
+        $this->assertSame([], $this->getMembersForCampaign($campaign->getId()));
 
         // Create the member now.
         $payload = [
             'action'         => 'lead:toggleLeadCampaign',
-            'leadId'         => 1,
-            'campaignId'     => 1,
+            'leadId'         => $contact->getId(),
+            'campaignId'     => $campaign->getId(),
             'campaignAction' => 'add',
         ];
 
@@ -59,18 +55,19 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        // Ensure the contact 1 is a campaign 1 member now.
-        $this->assertSame([['lead_id' => '1', 'manually_added' => '1', 'manually_removed' => '0']], $this->getMembersForCampaign(1));
+        $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
 
-        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        // Ensure the contact 1 is a campaign 1 member now.
+        $this->assertSame([['lead_id' => (string) $contact->getId(), 'manually_added' => '1', 'manually_removed' => '0']], $this->getMembersForCampaign($campaign->getId()));
+
         $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
 
         // Let's remove the member now.
         $payload = [
             'action'         => 'lead:toggleLeadCampaign',
-            'leadId'         => 1,
-            'campaignId'     => 1,
+            'leadId'         => $contact->getId(),
+            'campaignId'     => $campaign->getId(),
             'campaignAction' => 'remove',
         ];
 
@@ -79,9 +76,9 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         // Ensure the contact 1 was removed as a member of campaign 1 member now.
-        $this->assertSame([['lead_id' => '1', 'manually_added' => '0', 'manually_removed' => '1']], $this->getMembersForCampaign(1));
+        $this->assertSame([['lead_id' => (string) $contact->getId(), 'manually_added' => '0', 'manually_removed' => '1']], $this->getMembersForCampaign($campaign->getId()));
 
-        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
         $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
     }
@@ -93,6 +90,55 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where("cl.campaign_id = {$campaignId}")
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
+    }
+
+    private function createContact(string $email): Lead
+    {
+        $lead = new Lead();
+        $lead->setEmail($email);
+
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        return $lead;
+    }
+
+    private function createCampaign(): Campaign
+    {
+        $campaign = new Campaign();
+
+        $campaign->setName('Campaign A');
+        $campaign->setCanvasSettings(
+            [
+                'nodes' => [
+                    [
+                        'id'        => '148',
+                        'positionX' => '760',
+                        'positionY' => '155',
+                    ],
+                    [
+                        'id'        => 'lists',
+                        'positionX' => '860',
+                        'positionY' => '50',
+                    ],
+                ],
+                'connections' => [
+                    [
+                        'sourceId' => 'lists',
+                        'targetId' => '148',
+                        'anchors'  => [
+                            'source' => 'leadsource',
+                            'target' => 'top',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        return $campaign;
     }
 }

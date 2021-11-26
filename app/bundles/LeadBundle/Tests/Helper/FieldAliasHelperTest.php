@@ -22,13 +22,13 @@ class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
     private $fieldRepository;
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->fieldRepository = $this->createMock(LeadFieldRepository::class);
         $this->fieldModel      = $this->getMockBuilder(FieldModel::class)
-            ->setMethods(['cleanAlias', 'getRepository'])
+            ->onlyMethods(['cleanAlias', 'getRepository'])
             ->disableOriginalConstructor()
             ->getMock();
 

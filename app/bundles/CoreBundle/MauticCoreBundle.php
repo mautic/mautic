@@ -27,5 +27,6 @@ class MauticCoreBundle extends Bundle
         $container->addCompilerPass(new Compiler\TranslationsPass());
         $container->addCompilerPass(new Compiler\ModelPass());
         $container->addCompilerPass(new Compiler\UpdateStepPass());
+        $container->addCompilerPass(new Compiler\PermissionsPass());
     }
 }

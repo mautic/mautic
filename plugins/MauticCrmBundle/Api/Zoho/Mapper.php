@@ -30,9 +30,6 @@ class Mapper
      */
     private $mappedFields = [];
 
-    /**
-     * @var
-     */
     private $object;
 
     /**

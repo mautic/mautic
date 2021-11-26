@@ -1870,8 +1870,8 @@
       if (editor.opts.imageOutputSize) {
         var imgs;
 
-        editor.events.on('html.beforeGet', function () {
-          imgs = editor.el.querySelectorAll('img')
+        editor.events.on(editor.el.tagName == 'IMG' ? 'image.loaded image.resizeEnd' : 'html.beforeGet', function () {
+          imgs = editor.el.tagName == 'IMG' ? [editor.el] : editor.el.querySelectorAll('img')
           for (var i = 0; i < imgs.length; i++) {
             var width = imgs[i].style.width || $(imgs[i]).width();
             var height = imgs[i].style.height || $(imgs[i]).height();

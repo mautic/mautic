@@ -12,13 +12,11 @@
 namespace Mautic\StageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\StageBundle\Entity\Stage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class StageController.
- */
 class StageController extends AbstractFormController
 {
     /**
@@ -46,24 +44,17 @@ class StageController extends AbstractFormController
 
         $this->setListFilters();
 
-        //set limits
-        $limit = $this->get('session')->get(
-            'mautic.stage.limit',
-            $this->coreParametersHelper->get('default_pagelimit')
-        );
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make('mautic.stage', $page);
 
-        $search = $this->request->get('search', $this->get('session')->get('mautic.stage.filter', ''));
-        $this->get('session')->set('mautic.stage.filter', $search);
-
+        $limit      = $pageHelper->getLimit();
+        $start      = $pageHelper->getStart();
+        $search     = $this->request->get('search', $this->get('session')->get('mautic.stage.filter', ''));
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $this->get('session')->get('mautic.stage.orderby', 's.name');
         $orderByDir = $this->get('session')->get('mautic.stage.orderbydir', 'ASC');
-
-        $stages = $this->getModel('stage')->getEntities(
+        $stages     = $this->getModel('stage')->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -73,11 +64,13 @@ class StageController extends AbstractFormController
             ]
         );
 
+        $this->get('session')->set('mautic.stage.filter', $search);
+
         $count = count($stages);
         if ($count && $count < ($start + 1)) {
-            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.stage.page', $lastPage);
+            $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_stage_index', ['page' => $lastPage]);
+            $pageHelper->rememberPage($lastPage);
 
             return $this->postActionRedirect(
                 [
@@ -92,10 +85,7 @@ class StageController extends AbstractFormController
             );
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.stage.page', $page);
-
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $pageHelper->rememberPage($page);
 
         //get the list of actions
         $actions = $this->getModel('stage')->getStageActions();
@@ -109,7 +99,7 @@ class StageController extends AbstractFormController
                     'page'        => $page,
                     'limit'       => $limit,
                     'permissions' => $permissions,
-                    'tmpl'        => $tmpl,
+                    'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 ],
                 'contentTemplate' => 'MauticStageBundle:Stage:list.html.php',
                 'passthroughVars' => [

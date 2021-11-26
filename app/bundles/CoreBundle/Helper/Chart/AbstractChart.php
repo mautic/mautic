@@ -13,11 +13,10 @@ namespace Mautic\CoreBundle\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\ColorHelper;
 
-/**
- * Class AbstractChart.
- */
 abstract class AbstractChart
 {
+    use DateRangeUnitTrait;
+
     /**
      * Datasets of the chart.
      *
@@ -49,7 +48,7 @@ abstract class AbstractChart
     /**
      * Timezone data is requested to be in.
      *
-     * @var
+     * @var \DateTimeZone
      */
     protected $timezone;
 
@@ -93,8 +92,8 @@ abstract class AbstractChart
         if (!$unit) {
             $unit = $this->unit;
         }
-        $isTime  = in_array($unit, ['H', 'i', 's']) ? 'T' : '';
-        $toUpper = ['d', 'i'];
+
+        $isTime = in_array($unit, ['H', 'i', 's']) ? 'T' : '';
 
         if ('i' == $unit) {
             $unit = 'M';
@@ -130,6 +129,7 @@ abstract class AbstractChart
      */
     public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
     {
+        $this->timezone = $dateFrom->getTimezone();
         $this->dateFrom = clone $dateFrom;
         $this->dateTo   = clone $dateTo;
 
@@ -139,14 +139,17 @@ abstract class AbstractChart
         }
 
         // If today, adjust dateTo to be end of today if unit is not time based or to the current hour if it is
-        $now = new \DateTime();
-        if ($now->format('Y-m-d') == $this->dateTo->format('Y-m-d') && !$this->isTimeUnit) {
-            $this->dateTo = $now;
-        } elseif (!$this->isTimeUnit) {
+        if (!$this->isTimeUnit) {
             $this->dateTo->setTime(23, 59, 59);
+
+            return;
         }
 
-        $this->timezone = $dateFrom->getTimezone();
+        // If time aware and the to date is today, set the stats to the current hour to avoid empty future hours in graphs
+        $now = new \DateTime();
+        if ($now->format('Y-m-d') === $this->dateTo->format('Y-m-d')) {
+            $this->dateTo = $now;
+        }
     }
 
     /**
@@ -205,46 +208,6 @@ abstract class AbstractChart
         }
 
         return $amount;
-    }
-
-    /**
-     * Returns appropriate time unit from a date range so the line/bar charts won't be too full/empty.
-     *
-     * @param $dateFrom
-     * @param $dateTo
-     *
-     * @return string
-     */
-    public function getTimeUnitFromDateRange($dateFrom, $dateTo)
-    {
-        $dayDiff = $dateTo->diff($dateFrom)->format('%a');
-        $unit    = 'd';
-
-        if ($dayDiff <= 1) {
-            $unit = 'H';
-
-            $sameDay    = $dateTo->format('d') == $dateFrom->format('d') ? 1 : 0;
-            $hourDiff   = $dateTo->diff($dateFrom)->format('%h');
-            $minuteDiff = $dateTo->diff($dateFrom)->format('%i');
-            if ($sameDay && !intval($hourDiff) && intval($minuteDiff)) {
-                $unit = 'i';
-            }
-            $secondDiff = $dateTo->diff($dateFrom)->format('%s');
-            if (!intval($minuteDiff) && intval($secondDiff)) {
-                $unit = 'i';
-            }
-        }
-        if ($dayDiff > 31) {
-            $unit = 'W';
-        }
-        if ($dayDiff > 100) {
-            $unit = 'm';
-        }
-        if ($dayDiff > 1000) {
-            $unit = 'Y';
-        }
-
-        return $unit;
     }
 
     /**

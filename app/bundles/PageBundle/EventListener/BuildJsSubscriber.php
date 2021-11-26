@@ -169,6 +169,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
                 var params = {
                     page_title: d.title,
                     page_language: n.language,
+                    preferred_locale: (n.language).replace('-', '_'),
                     page_referrer: (d.referrer) ? d.referrer.split('/')[2] : '',
                     page_url: l.href,
                     counter: m.pageViewCounter,
@@ -177,6 +178,10 @@ class BuildJsSubscriber implements EventSubscriberInterface
                     platform: m.getOs(),
                     do_not_track: navigator.doNotTrack == 1
                 };
+                
+                if (window.Intl && window.Intl.DateTimeFormat) {
+                    params.timezone =  new window.Intl.DateTimeFormat().resolvedOptions().timeZone;
+                }
                 
                 params = MauticJS.appendTrackedContact(params);
                 
@@ -199,7 +204,9 @@ class BuildJsSubscriber implements EventSubscriberInterface
 
     // Process pageviews after new are added
     document.addEventListener('eventAddedToMauticQueue', function(e) {
-        m.sendPageview(e.detail);
+      if (MauticJS.ensureEventContext(e, 'send', 'pageview')) {
+          m.sendPageview(e.detail);
+      }
     });
 })(MauticJS, location, navigator, document);
 JS;
@@ -350,16 +357,9 @@ MauticJS.processGatedVideos = function (videoElements) {
     };
     
     MauticJS.iterateCollection(videoElements)(function(node, i){
-        var playerFeatures = [];
-        var source   = node.getElementsByTagName('source')[0];
-        
-        if (source.type === 'video/mp4') {
-            node.dataset.mp4 = true;
-            playerFeatures = ['playpause','progress','current','duration','volume','fullscreen'];
-        }
-
-        if (!node.id) {
-            node.id = 'mautic-player-' + i;
+        // If we don't have a formId, and it's not explicitly set as a Mautic controlled video, return.
+        if (!node.dataset.formId && !node.dataset.mauticVideo) {
+            return;
         }
 
         mediaPlayers[i] = [];
@@ -373,9 +373,15 @@ MauticJS.processGatedVideos = function (videoElements) {
             mediaPlayers[i].formHtml = '';
         }
 
-        // If we don't have a formId, and it's not explicitly set as a Mautic controlled video, return.
-        if (!node.dataset.formId && !node.dataset.mauticVideo) {
-            return;
+        var playerFeatures = [];
+        var source = node.getElementsByTagName('source')[0];
+        if (source && source.type && source.type === 'video/mp4') {
+            node.dataset.mp4 = true;
+            playerFeatures = ['playpause','progress','current','duration','volume','fullscreen'];
+        }
+
+        if (!node.id) {
+            node.id = 'mautic-player-' + i;
         }
         
         mediaPlayers[i].player = new MediaElementPlayer('#' + node.id, {features: playerFeatures, alwaysShowControls: true, enableKeyboard: false, success: function (mediaElement, domElement) {

@@ -137,17 +137,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @return array
      */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => true,
-            'requires_authorization' => true,
-        ];
-    }
-
-    /**
-     * @return array
-     */
     public function getSupportedFeatures()
     {
         return ['push_lead', 'get_leads', 'push_leads'];
@@ -473,7 +462,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @param array  $params
      * @param string $query
-     * @param        $executed
      * @param array  $result
      * @param string $object
      *

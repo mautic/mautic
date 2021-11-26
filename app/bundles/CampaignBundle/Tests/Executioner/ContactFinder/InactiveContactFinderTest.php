@@ -33,7 +33,7 @@ class InactiveContactFinderTest extends \PHPUnit\Framework\TestCase
      */
     private $campaignLeadRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->leadRepository         = $this->createMock(LeadRepository::class);
         $this->campaignLeadRepository = $this->createMock(CampaignLeadRepository::class);

@@ -45,69 +45,30 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     private $id;
 
-    /**
-     * @var
-     */
     private $title;
 
-    /**
-     * @var
-     */
     private $firstname;
 
-    /**
-     * @var
-     */
     private $lastname;
 
-    /**
-     * @var
-     */
     private $company;
 
-    /**
-     * @var
-     */
     private $position;
 
-    /**
-     * @var
-     */
     private $email;
 
-    /**
-     * @var
-     */
     private $phone;
 
-    /**
-     * @var
-     */
     private $mobile;
 
-    /**
-     * @var
-     */
     private $address1;
 
-    /**
-     * @var
-     */
     private $address2;
 
-    /**
-     * @var
-     */
     private $city;
 
-    /**
-     * @var
-     */
     private $state;
 
-    /**
-     * @var
-     */
     private $zipcode;
 
     /**
@@ -115,9 +76,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     private $timezone;
 
-    /**
-     * @var
-     */
     private $country;
 
     /**
@@ -203,8 +161,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $manipulator;
 
     /**
-     * Sets if the IP was just created by LeadModel::getCurrentLead().
-     *
      * @var bool
      */
     private $newlyCreated = false;
@@ -254,9 +210,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     private $frequencyRules;
 
-    /**
-     * @var
-     */
     private $primaryCompany;
 
     /**
@@ -765,7 +718,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function getSecondaryIdentifier()
     {
-        if (!$this->getCompany()) {
+        if ($this->getCompany()) {
             return $this->getCompany();
         }
 

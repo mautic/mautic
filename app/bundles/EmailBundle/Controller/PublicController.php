@@ -172,7 +172,7 @@ class PublicController extends CommonFormController
 
             if ($lead = $stat->getLead()) {
                 // Set the lead as current lead
-                $leadModel->setCurrentLead($lead);
+                $this->get('mautic.tracker.contact')->setTrackedContact($lead);
 
                 // Set lead lang
                 if ($lead->getPreferredLocale()) {
@@ -335,7 +335,7 @@ class PublicController extends CommonFormController
                 // Set the lead as current lead
                 /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
                 $leadModel = $this->getModel('lead');
-                $leadModel->setCurrentLead($lead);
+                $this->get('mautic.tracker.contact')->setTrackedContact($lead);
 
                 // Set lead lang
                 if ($lead->getPreferredLocale()) {
@@ -416,7 +416,7 @@ class PublicController extends CommonFormController
     {
         ignore_user_abort(true);
 
-        $realTransport = $this->container->get('swiftmailer.transport.real');
+        $realTransport = $this->container->get('swiftmailer.mailer.default.transport.real');
 
         if (!$realTransport instanceof CallbackTransportInterface || $realTransport->getCallbackPath() !== $transport) {
             return $this->notFound();

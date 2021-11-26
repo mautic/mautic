@@ -12,15 +12,10 @@
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
+use Psr\Http\Message\ResponseInterface;
 
-/**
- * Class PluginIntegrationRequestEvent.
- */
 class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * @var
-     */
     private $url;
 
     /**
@@ -28,9 +23,6 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
      */
     private $parameters;
 
-    /**
-     * @var
-     */
     private $headers;
 
     /**
@@ -48,9 +40,6 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
      */
     private $authType;
 
-    /**
-     * @var
-     */
     private $response;
 
     public function __construct(UnifiedIntegrationInterface $integration, $url, $parameters, $headers, $method, $settings, $authType)
@@ -109,18 +98,12 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->authType;
     }
 
-    /**
-     * @param $response
-     */
-    public function setResponse($response)
+    public function setResponse(ResponseInterface $response)
     {
         $this->response = $response;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getResponse()
+    public function getResponse(): ResponseInterface
     {
         return $this->response;
     }

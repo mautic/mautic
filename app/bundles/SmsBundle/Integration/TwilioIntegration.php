@@ -22,10 +22,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
  */
 class TwilioIntegration extends AbstractIntegration
 {
-    /**
-     * @var bool
-     */
-    protected $coreIntegration = true;
+    protected bool $coreIntegration = true;
 
     /**
      * {@inheritdoc}
@@ -57,17 +54,6 @@ class TwilioIntegration extends AbstractIntegration
         return [
             'username' => 'mautic.sms.config.form.sms.username',
             'password' => 'mautic.sms.config.form.sms.password',
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => false,
-            'requires_authorization' => false,
         ];
     }
 

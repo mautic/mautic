@@ -42,7 +42,7 @@ abstract class AbstractFormFieldHelper
     const FORMAT_ARRAY = 'array';
 
     /**
-     * @var
+     * @var string
      */
     protected $translationKeyPrefix;
 

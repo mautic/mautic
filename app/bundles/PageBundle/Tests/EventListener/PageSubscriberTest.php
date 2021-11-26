@@ -28,13 +28,13 @@ use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
 use Monolog\Logger;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageSubscriberTest extends WebTestCase
+class PageSubscriberTest extends TestCase
 {
-    public function testGetTokens_WhenCalled_ReturnsValidTokens()
+    public function testGetTokensWhenCalledReturnsValidTokens()
     {
         $translator       = $this->createMock(Translator::class);
         $pageBuilderEvent = new PageBuilderEvent($translator);
@@ -44,7 +44,7 @@ class PageSubscriberTest extends WebTestCase
         $this->assertEquals($tokens['{token_test}'], 'TOKEN VALUE');
     }
 
-    public function testOnPageHit_WhenCalled_AcknowledgesHit()
+    public function testOnPageHitWhenCalledAcknowledgesHit()
     {
         $dispatcher = new EventDispatcher();
         $subscriber = $this->getPageSubscriber();
@@ -59,7 +59,7 @@ class PageSubscriberTest extends WebTestCase
         $this->assertEquals($event->getResult(), QueueConsumerResults::ACKNOWLEDGE);
     }
 
-    public function testOnPageHit_WhenCalled_RejectsBadHit()
+    public function testOnPageHitWhenCalledRejectsBadHit()
     {
         $dispatcher = new EventDispatcher();
         $subscriber = $this->getPageSubscriber();

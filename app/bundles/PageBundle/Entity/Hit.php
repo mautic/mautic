@@ -93,14 +93,8 @@ class Hit
      */
     private $code;
 
-    /**
-     * @var
-     */
     private $referer;
 
-    /**
-     * @var
-     */
     private $url;
 
     /**

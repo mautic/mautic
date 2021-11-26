@@ -23,7 +23,7 @@ class EntityDescriptorStoreTest extends TestCase
      */
     private $coreParametersHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
     }

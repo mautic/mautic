@@ -30,7 +30,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
      */
     private $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contactHelper = $this->createMock(ContactHelper::class);
         $this->configuration = $this->createMock(Configuration::class);

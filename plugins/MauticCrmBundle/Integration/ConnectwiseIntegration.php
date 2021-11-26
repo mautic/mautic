@@ -142,17 +142,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => false,
-            'requires_authorization' => true,
-        ];
-    }
-
-    /**
      * @return bool
      */
     public function authCallback($settings = [], $parameters = [])

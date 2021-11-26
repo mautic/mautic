@@ -42,9 +42,9 @@ class PublicController extends FormController
                 } else {
                     try {
                         $model->sendResetEmail($user);
-                        $this->addFlash('mautic.user.user.notice.passwordreset', [], 'notice', null, false);
+                        $this->addFlash('mautic.user.user.notice.passwordreset');
                     } catch (\Exception $exception) {
-                        $this->addFlash('mautic.user.user.notice.passwordreset.error', [], 'error', null, false);
+                        $this->addFlash('mautic.user.user.notice.passwordreset.error', [], 'error');
                     }
 
                     return $this->redirect($this->generateUrl('login'));
@@ -90,14 +90,14 @@ class PublicController extends FormController
                 } else {
                     if ($this->request->getSession()->has('resetToken')) {
                         $resetToken = $this->request->getSession()->get('resetToken');
-                        $encoder    = $this->get('security.encoder_factory')->getEncoder($user);
+                        $encoder    = $this->get('security.password_encoder');
 
                         if ($model->confirmResetToken($user, $resetToken)) {
                             $encodedPassword = $model->checkNewPassword($user, $encoder, $data['plainPassword']);
                             $user->setPassword($encodedPassword);
                             $model->saveEntity($user);
 
-                            $this->addFlash('mautic.user.user.notice.passwordreset.success', [], 'notice', null, false);
+                            $this->addFlash('mautic.user.user.notice.passwordreset.success');
 
                             $this->request->getSession()->remove('resetToken');
 
@@ -114,7 +114,7 @@ class PublicController extends FormController
                             ],
                         ]);
                     } else {
-                        $this->addFlash('mautic.user.user.notice.passwordreset.missingtoken', [], 'notice', null, false);
+                        $this->addFlash('mautic.user.user.notice.passwordreset.missingtoken');
 
                         return $this->redirect($this->generateUrl('mautic_user_passwordresetconfirm'));
                     }

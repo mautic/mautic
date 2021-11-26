@@ -676,7 +676,7 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
                     .attr('autocomplete', operatorFieldAttrs['autocomplete'])
                     .attr('value', operatorFieldAttrs['value'])
                     .attr('onchange', 'Mautic.updateLeadFieldValues(this)');
-                mQuery.each(response.operators, function(optionKey, optionVal) {
+                mQuery.each(response.operators, function(optionVal, optionKey) {
                     newOperatorField.append(Mautic.createOption(optionKey, optionVal));
                 });
                 newOperatorField.val(operatorField.val());

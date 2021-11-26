@@ -33,13 +33,16 @@ class CompanyTest extends PipedriveTest
 
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
-        $c            = $this->em->getRepository(Company::class)->find(1);
+        $companies    = $this->em->getRepository(Company::class)->findAll();
+
+        $this->assertCount(1, $companies);
+        $company = reset($companies);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertEquals($responseData['status'], 'ok');
-        $this->assertEquals($c->getName(), 'Changed Company Name New');
-        $this->assertEquals($c->getAddress1(), 'Madrit, Spain');
-        $this->assertEquals(count($this->em->getRepository(Company::class)->findAll()), 1);
+        $this->assertEquals('ok', $responseData['status']);
+        $this->assertEquals('Changed Company Name New', $company->getName());
+        $this->assertEquals('Madrit, Spain', $company->getAddress1());
+        $this->assertEquals(1, count($this->em->getRepository(Company::class)->findAll()));
     }
 
     public function testUpdateCompanyOwner()
@@ -70,15 +73,17 @@ class CompanyTest extends PipedriveTest
 
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
-        $c            = $this->em->getRepository(Company::class)->find(1);
+        $companies    = $this->em->getRepository(Company::class)->findAll();
+
+        $this->assertCount(1, $companies);
+        $company = reset($companies);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertEquals($responseData['status'], 'ok');
-        $this->assertEquals($responseData['status'], 'ok');
-        $this->assertEquals($c->getName(), 'Changed Company Name New');
-        $this->assertEquals($c->getAddress1(), 'Madrit, Spain');
-        $this->assertEquals($c->getOwner()->getEmail(), $newOwner->getEmail());
-        $this->assertEquals(count($this->em->getRepository(Company::class)->findAll()), 1);
+        $this->assertEquals('ok', $responseData['status']);
+        $this->assertEquals('Changed Company Name New', $company->getName());
+        $this->assertEquals('Madrit, Spain', $company->getAddress1());
+        $this->assertEquals($newOwner->getEmail(), $company->getOwner()->getEmail());
+        $this->assertEquals(1, count($this->em->getRepository(Company::class)->findAll()));
     }
 
     public function testUpdateCompany()
@@ -100,13 +105,16 @@ class CompanyTest extends PipedriveTest
 
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
-        $c            = $this->em->getRepository(Company::class)->find(1);
+        $companies    = $this->em->getRepository(Company::class)->findAll();
+
+        $this->assertCount(1, $companies);
+        $company = reset($companies);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertEquals($responseData['status'], 'ok');
-        $this->assertEquals($c->getName(), 'Changed Company Name New');
-        $this->assertEquals($c->getAddress1(), 'Madrit, Spain');
-        $this->assertEquals(count($this->em->getRepository(Company::class)->findAll()), 1);
+        $this->assertEquals('ok', $responseData['status']);
+        $this->assertEquals('Changed Company Name New', $company->getName());
+        $this->assertEquals('Madrit, Spain', $company->getAddress1());
+        $this->assertEquals(1, count($this->em->getRepository(Company::class)->findAll()));
     }
 
     public function testDeleteCompany()
@@ -124,7 +132,8 @@ class CompanyTest extends PipedriveTest
         $data    = json_decode($json, true);
         $this->createCompanyIntegrationEntity($data['previous']['id'], $company->getId());
 
-        $this->assertEquals(count($this->em->getRepository(Company::class)->findAll()), 1);
+        $companyRepository = $this->em->getRepository(Company::class);
+        $this->assertEquals(1, count($companyRepository->findAll()));
 
         $this->makeRequest('POST', $json);
 
@@ -132,7 +141,7 @@ class CompanyTest extends PipedriveTest
         $responseData = json_decode($response->getContent(), true);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertEquals($responseData['status'], 'ok');
-        $this->assertEquals(count($this->em->getRepository(Company::class)->findAll()), 0);
+        $this->assertEquals('ok', $responseData['status']);
+        $this->assertEquals(0, count($companyRepository->findAll()));
     }
 }

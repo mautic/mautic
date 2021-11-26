@@ -14,7 +14,7 @@ namespace Mautic\PageBundle\Model;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\VideoHit;
 use Mautic\PageBundle\Event\VideoHitEvent;
 use Mautic\PageBundle\PageEvents;
@@ -26,22 +26,24 @@ use Symfony\Component\HttpFoundation\Request;
 class VideoModel extends FormModel
 {
     /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
      * @var IpLookupHelper
      */
     protected $ipLookupHelper;
 
     /**
+     * @var ContactTracker
+     */
+    protected $contactTracker;
+
+    /**
      * VideoModel constructor.
      */
-    public function __construct(LeadModel $leadModel, IpLookupHelper $ipLookupHelper)
-    {
-        $this->leadModel      = $leadModel;
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        ContactTracker $contactTracker
+    ) {
         $this->ipLookupHelper = $ipLookupHelper;
+        $this->contactTracker = $contactTracker;
     }
 
     /**
@@ -92,7 +94,7 @@ class VideoModel extends FormModel
             //return;
         }
 
-        $lead = $this->leadModel->getCurrentLead();
+        $lead = $this->contactTracker->getContact();
         $guid = $request->get('guid');
 
         $hit = ($lead) ? $this->getHitForLeadByGuid($lead, $guid) : new VideoHit();

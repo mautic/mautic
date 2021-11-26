@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Entity\PointRepository;
@@ -54,12 +55,23 @@ class PointModel extends CommonFormModel
      */
     protected $mauticFactory;
 
-    public function __construct(Session $session, IpLookupHelper $ipLookupHelper, LeadModel $leadModel, MauticFactory $mauticFactory)
-    {
+    /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
+    public function __construct(
+        Session $session,
+        IpLookupHelper $ipLookupHelper,
+        LeadModel $leadModel,
+        MauticFactory $mauticFactory,
+        ContactTracker $contactTracker
+    ) {
         $this->session            = $session;
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->leadModel          = $leadModel;
         $this->mauticFactory      = $mauticFactory;
+        $this->contactTracker     = $contactTracker;
     }
 
     /**
@@ -184,14 +196,17 @@ class PointModel extends CommonFormModel
      * Triggers a specific point change.
      *
      * @param       $type
-     * @param mixed $eventDetails passthrough from function triggering action to the callback function
-     * @param mixed $typeId       Something unique to the triggering event to prevent  unnecessary duplicate calls
+     * @param mixed $eventDetails     passthrough from function triggering action to the callback function
+     * @param mixed $typeId           Something unique to the triggering event to prevent  unnecessary duplicate calls
      * @param Lead  $lead
+     * @param bool  $allowUserRequest
+     *
+     * @throws \ReflectionException
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
+    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null, $allowUserRequest = false)
     {
-        //only trigger actions for anonymous users
-        if (!$this->security->isAnonymous()) {
+        //only trigger actions for not logged Mautic users
+        if (!$this->security->isAnonymous() && !$allowUserRequest) {
             return;
         }
 
@@ -212,7 +227,7 @@ class PointModel extends CommonFormModel
         $ipAddress       = $this->ipLookupHelper->getIpAddress();
 
         if (null === $lead) {
-            $lead = $this->leadModel->getCurrentLead();
+            $lead = $this->contactTracker->getContact();
 
             if (null === $lead || !$lead->getId()) {
                 return;

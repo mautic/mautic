@@ -33,9 +33,6 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
      */
     protected $allowedIps;
 
-    /**
-     * CatchExceptionMiddleware constructor.
-     */
     public function __construct(HttpKernelInterface $app)
     {
         $this->app        = $app;
@@ -46,8 +43,8 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
             $this->allowedIps = array_merge($this->allowedIps, $parameters['dev_hosts']);
         }
 
-        if (isset($_SERVER['MAUTIC_DEV_HOSTS'])) {
-            $localIps         = explode(' ', $_SERVER['MAUTIC_DEV_HOSTS']);
+        if (isset($_SERVER['MAUTIC_CUSTOM_DEV_HOSTS'])) {
+            $localIps         = json_decode($_SERVER['MAUTIC_CUSTOM_DEV_HOSTS'], true);
             $this->allowedIps = array_merge($this->allowedIps, $localIps);
         }
     }
@@ -60,7 +57,7 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
-        if (in_array($request->getClientIp(), $this->allowedIps)) {
+        if (in_array($request->getClientIp(), $this->allowedIps) || false !== getenv('DDEV_TLD')) {
             return $this->app->handle($request, $type, $catch);
         }
 

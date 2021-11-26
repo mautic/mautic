@@ -17,14 +17,14 @@
                 <label class="control-label"><?php echo isset($label_text) ? $label_text : $view['translator']->trans('mautic.lead.form.list'); ?></label>
             </div>
             <?php
-            $segmentNumber = count($form['lead_lists']->vars['choices']);
-            for ($i = ($segmentNumber - 1); $i >= 0; --$i) : ?>
-                <div id="segment-<?php echo $i; ?>" class="text-left">
-                    <?php echo $view['form']->widget($form['lead_lists'][$i]); ?>
-                    <?php echo $view['form']->label($form['lead_lists'][$i]); ?>
+            foreach ($form['lead_lists'] as $key => $leadList) {
+                ?>
+                <div id="segment-<?php echo $key; ?>" class="text-left">
+                    <?php echo $view['form']->widget($leadList); ?>
+                    <?php echo $view['form']->label($leadList); ?>
                 </div>
                 <?php
-            endfor;
+            }
             unset($form['lead_lists']);
             ?>
         </div>

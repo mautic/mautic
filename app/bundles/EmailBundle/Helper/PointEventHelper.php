@@ -64,8 +64,7 @@ class PointEventHelper
             $leadFields = $lead->getFields();
             if (isset($leadFields['core']['email']['value']) && $leadFields['core']['email']['value']) {
                 /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-                $leadModel             = $factory->getModel('lead');
-                $leadCredentials       = $leadModel->flattenFields($leadFields);
+                $leadCredentials       = $lead->getProfileFields();
                 $leadCredentials['id'] = $lead->getId();
 
                 $options   = ['source' => ['trigger', $event['id']]];

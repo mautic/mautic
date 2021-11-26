@@ -62,31 +62,33 @@ $activeTab = $activeTab ?: 'details-container';
     <!-- Enabled\Auth -->
     <div class="tab-pane fade <?php if ('details-container' == $activeTab): echo 'in active'; endif; ?> bdr-w-0" id="details-container">
         <?php echo $view['form']->row($form['isPublished']); ?>
+        <?php if ($integrationObject instanceof \Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthInterface): ?>
         <hr />
         <?php echo $view['form']->row($form['apiKeys']); ?>
-        <?php if ($useAuthorizationUrl): ?>
-        <div class="alert alert-warning">
-            <?php echo $view['translator']->trans($integrationObject->getCallbackHelpMessageTranslationKey()); ?>
-        </div>
-        <?php if ($callbackUrl): ?>
-        <div class="well well-sm">
-            <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br/>
-            <input type="text" name="callback_url" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $view->escape($callbackUrl); ?>" class="form-control"/>
-        </div>
-        <?php endif; ?>
-        <div class="row">
-            <div class="col-xs-12 text-center">
-                <input type="hidden" id="integration_details_in_auth" name="integration_details[in_auth]" autocomplete="false">
-                <button type="button" id="integration_details_authButton" name="integration_details[authButton]" class="btn btn-success btn-lg" onclick="Mautic.authorizeIntegration()">
-                    <i class="fa fa-key "></i>
-                    <?php if ($integrationObject->isAuthorized()): ?>
-                        <?php echo $view['translator']->trans('mautic.integration.form.reauthorize'); ?>
-                    <?php else: ?>
-                        <?php echo $view['translator']->trans('mautic.integration.form.authorize'); ?>
-                    <?php endif; ?>
-                </button>
+            <?php if ($useAuthorizationUrl): ?>
+            <div class="alert alert-warning">
+                <?php echo $view['translator']->trans($integrationObject->getCallbackHelpMessageTranslationKey()); ?>
             </div>
-        </div>
+            <?php if ($callbackUrl): ?>
+            <div class="well well-sm">
+                <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br/>
+                <input type="text" name="callback_url" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $view->escape($callbackUrl); ?>" class="form-control"/>
+            </div>
+            <?php endif; ?>
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <input type="hidden" id="integration_details_in_auth" name="integration_details[in_auth]" autocomplete="false">
+                    <button type="button" id="integration_details_authButton" name="integration_details[authButton]" class="btn btn-success btn-lg" onclick="Mautic.authorizeIntegration()">
+                        <i class="fa fa-key "></i>
+                        <?php if ($integrationObject->isAuthorized()): ?>
+                            <?php echo $view['translator']->trans('mautic.integration.form.reauthorize'); ?>
+                        <?php else: ?>
+                            <?php echo $view['translator']->trans('mautic.integration.form.authorize'); ?>
+                        <?php endif; ?>
+                    </button>
+                </div>
+            </div>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
     <!-- Enabled\Auth -->

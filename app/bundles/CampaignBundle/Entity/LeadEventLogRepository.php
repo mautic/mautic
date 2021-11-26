@@ -196,10 +196,6 @@ class LeadEventLogRepository extends CommonRepository
 
         $query->orderBy('ll.trigger_date');
 
-        if (!empty($ipIds)) {
-            $query->orWhere('ll.ip_address IN ('.implode(',', $ipIds).')');
-        }
-
         if (empty($options['canViewOthers']) && isset($this->currentUser)) {
             $query->andWhere('c.created_by = :userId')
                 ->setParameter('userId', $this->currentUser->getId());
@@ -398,7 +394,7 @@ class LeadEventLogRepository extends CommonRepository
         $q->select('o, e, c')
             ->indexBy('o', 'o.id')
             ->innerJoin('o.event', 'e')
-            ->innerJoin('o.campaign', 'c')
+            ->innerJoin('e.campaign', 'c')
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('IDENTITY(o.event)', ':eventId'),
@@ -439,7 +435,7 @@ class LeadEventLogRepository extends CommonRepository
         $q->select('o, e, c')
             ->indexBy('o', 'o.id')
             ->innerJoin('o.event', 'e')
-            ->innerJoin('o.campaign', 'c')
+            ->innerJoin('e.campaign', 'c')
             ->where(
                 $q->expr()->andX(
                     $q->expr()->in('o.id', $ids),
@@ -476,7 +472,7 @@ class LeadEventLogRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'l')
             ->join('l', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'l.campaign_id = c.id')
             ->where($expr)
-            ->setParameter('campaignId', $campaignId)
+            ->setParameter('campaignId', (int) $campaignId)
             ->setParameter('now', $now->format('Y-m-d H:i:s'))
             ->setParameter('true', true, \PDO::PARAM_BOOL)
             ->groupBy('l.event_id')
@@ -500,12 +496,11 @@ class LeadEventLogRepository extends CommonRepository
     public function getDatesExecuted($eventId, array $contactIds)
     {
         $qb = $this->getSlaveConnection()->createQueryBuilder();
-        $qb->select('log.lead_id, log.date_triggered')
+        $qb->select('log.lead_id, log.date_triggered, log.is_scheduled')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('log.event_id', $eventId),
-                    $qb->expr()->eq('log.is_scheduled', 0),
                     $qb->expr()->in('log.lead_id', $contactIds)
                 )
             );
@@ -515,6 +510,9 @@ class LeadEventLogRepository extends CommonRepository
         $dates = [];
         foreach ($results as $result) {
             $dates[$result['lead_id']] = new \DateTime($result['date_triggered'], new \DateTimeZone('UTC'));
+            if (1 === (int) $result['is_scheduled']) {
+                unset($dates[$result['lead_id']]);
+            }
         }
 
         return $dates;
@@ -637,5 +635,20 @@ SQL;
                 ]
             )
             ->execute();
+    }
+
+    /**
+     * Removes logs by event_id.
+     * It uses batch processing for removing
+     * large quantities of records.
+     *
+     * @param int $eventId
+     */
+    public function removeEventLogs($eventId)
+    {
+        $conn = $this->_em->getConnection();
+        $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', [
+            'event_id' => (int) $eventId,
+        ]);
     }
 }

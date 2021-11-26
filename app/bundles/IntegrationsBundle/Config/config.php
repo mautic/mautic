@@ -56,6 +56,7 @@ return [
                 'class'     => \Mautic\IntegrationsBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.repository.field_change',
+                    'mautic.integrations.repository.object_mapping',
                     'mautic.integrations.helper.variable_expresser',
                     'mautic.integrations.helper.sync_integrations',
                 ],
@@ -172,6 +173,12 @@ return [
             ],
             'mautic.integrations.helper.config_integrations' => [
                 'class'     => \Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper::class,
+                'arguments' => [
+                    'mautic.integrations.helper',
+                ],
+            ],
+            'mautic.integrations.helper.builder_integrations' => [
+                'class'     => \Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper::class,
                 'arguments' => [
                     'mautic.integrations.helper',
                 ],

@@ -30,7 +30,7 @@ class FileLogHandlerTest extends TestCase
      */
     private $formatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->formatter            = $this->createMock(FormatterInterface::class);

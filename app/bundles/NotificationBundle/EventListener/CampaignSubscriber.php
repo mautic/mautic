@@ -16,7 +16,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\Form\Type\MobileNotificationSendType;
@@ -29,43 +29,24 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
-     * @var NotificationModel
-     */
-    private $notificationModel;
-
-    /**
-     * @var AbstractNotificationApi
-     */
-    private $notificationApi;
-
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private NotificationModel $notificationModel;
+    private AbstractNotificationApi $notificationApi;
+    private IntegrationHelper $integrationHelper;
+    private EventDispatcherInterface $dispatcher;
+    private DoNotContactModel $doNotContact;
 
     public function __construct(
         IntegrationHelper $integrationHelper,
-        LeadModel $leadModel,
         NotificationModel $notificationModel,
         AbstractNotificationApi $notificationApi,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        DoNotContactModel $doNotContact
     ) {
         $this->integrationHelper = $integrationHelper;
-        $this->leadModel         = $leadModel;
         $this->notificationModel = $notificationModel;
         $this->notificationApi   = $notificationApi;
         $this->dispatcher        = $dispatcher;
+        $this->doNotContact      = $doNotContact;
     }
 
     /**
@@ -129,7 +110,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $lead = $event->getLead();
 
-        if (DoNotContact::IS_CONTACTABLE !== $this->leadModel->isContactable($lead, 'notification')) {
+        if (DoNotContact::IS_CONTACTABLE !== $this->doNotContact->isContactable($lead, 'notification')) {
             return $event->setFailed('mautic.notification.campaign.failed.not_contactable');
         }
 

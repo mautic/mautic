@@ -13,7 +13,6 @@ namespace Mautic\EmailBundle\Model;
 
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
@@ -72,7 +71,7 @@ class SendEmailToContact
     private $emailSentCounts = [];
 
     /**
-     * @var
+     * @var array|null
      */
     private $emailEntityErrors;
 
@@ -288,8 +287,8 @@ class SendEmailToContact
     }
 
     /**
-     * @param bool   $hasBadEmail
-     * @param string $errorMessages
+     * @param bool  $hasBadEmail
+     * @param array $errorMessages
      *
      * @throws FailedToSendToContactException
      */
@@ -298,6 +297,8 @@ class SendEmailToContact
         if (null === $errorMessages) {
             // Clear the errors so it doesn't stop the next send
             $errorMessages = implode('; ', (array) $this->mailer->getErrors());
+        } elseif (is_array($errorMessages)) {
+            $errorMessages = implode('; ', $errorMessages);
         }
 
         $this->errorMessages[$this->contact['id']]  = $errorMessages;
@@ -426,10 +427,10 @@ class SendEmailToContact
         // Dispatch the event to generate the tokens
         $this->mailer->dispatchSendEvent();
 
-        // Create the stat to ensure it is availble for emails sent
+        // Create the stat to ensure it is available for emails sent
         $this->createContactStatEntry($this->contact['email']);
 
         // Now send but don't redispatch the event
-        return $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
+        return $this->mailer->queue(false, MailHelper::QUEUE_RETURN_ERRORS);
     }
 }

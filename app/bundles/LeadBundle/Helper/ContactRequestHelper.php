@@ -53,9 +53,9 @@ class ContactRequestHelper
     private $contactTracker;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
+     * @var RequestStack
      */
-    private $request;
+    private $requestStack;
 
     /**
      * @var Logger
@@ -90,7 +90,7 @@ class ContactRequestHelper
         $this->contactTracker       = $contactTracker;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
-        $this->request              = $requestStack->getCurrentRequest();
+        $this->requestStack         = $requestStack;
         $this->logger               = $logger;
         $this->eventDispatcher      = $eventDispatcher;
     }
@@ -100,8 +100,6 @@ class ContactRequestHelper
      */
     public function getContactFromQuery(array $queryFields = [])
     {
-        $this->trackedContact = $this->contactTracker->getContact();
-
         unset($queryFields['page_url']); // This is set now automatically by PageModel
         $this->queryFields    = $queryFields;
 
@@ -110,6 +108,10 @@ class ContactRequestHelper
             $this->trackedContact = $foundContact;
             $this->contactTracker->setTrackedContact($this->trackedContact);
         } catch (ContactNotFoundException $exception) {
+        }
+
+        if (!$this->trackedContact) {
+            $this->trackedContact = $this->contactTracker->getContact();
         }
 
         if (!$this->trackedContact) {
@@ -131,7 +133,7 @@ class ContactRequestHelper
         // Check for a lead requested through clickthrough query parameter
         if (isset($this->queryFields['ct'])) {
             $clickthrough = (is_array($this->queryFields['ct'])) ? $this->queryFields['ct'] : ClickthroughHelper::decodeArrayFromUrl($this->queryFields['ct']);
-        } elseif ($clickthrough = $this->request->get('ct', [])) {
+        } elseif ($clickthrough = $this->requestStack->getCurrentRequest()->get('ct', [])) {
             $clickthrough = ClickthroughHelper::decodeArrayFromUrl($clickthrough);
         }
 
@@ -156,7 +158,9 @@ class ContactRequestHelper
             );
             if (is_null($this->trackedContact) or $foundContact->getId() !== $this->trackedContact->getId()) {
                 // A contact was found by a publicly updatable field
-                return $foundContact;
+                if (!$foundContact->isNew()) {
+                    return $foundContact;
+                }
             }
         }
 

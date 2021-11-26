@@ -11,6 +11,7 @@
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
+use DateTime;
 use Doctrine\DBAL\Driver\PDOStatement;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -22,10 +23,10 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ReportSubscriberTest extends WebTestCase
+class ReportSubscriberTest extends TestCase
 {
     /**
      * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
@@ -47,7 +48,7 @@ class ReportSubscriberTest extends WebTestCase
      */
     private $subscriber;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
@@ -66,7 +67,7 @@ class ReportSubscriberTest extends WebTestCase
     {
         $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'checkContext',
                 'addGraph',
                 'getStandardColumns',
@@ -126,7 +127,7 @@ class ReportSubscriberTest extends WebTestCase
     {
         $mockEvent = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'getContext',
                 'getQueryBuilder',
                 'addCategoryLeftJoin',
@@ -142,7 +143,7 @@ class ReportSubscriberTest extends WebTestCase
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->setMethods(['from', 'leftJoin'])
+            ->onlyMethods(['from', 'leftJoin'])
             ->getMock();
 
         $mockQueryBuilder->expects($this->once())
@@ -172,7 +173,7 @@ class ReportSubscriberTest extends WebTestCase
     {
         $mockEvent = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'getContext',
                 'getQueryBuilder',
                 'addCategoryLeftJoin',
@@ -192,7 +193,7 @@ class ReportSubscriberTest extends WebTestCase
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->setMethods(['from', 'leftJoin'])
+            ->onlyMethods(['from', 'leftJoin'])
             ->getMock();
 
         $mockQueryBuilder->expects($this->once())
@@ -222,7 +223,7 @@ class ReportSubscriberTest extends WebTestCase
     {
         $mockEvent = $this->getMockBuilder(ReportGraphEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods(['checkContext', 'getRequestedGraphs'])
+            ->onlyMethods(['checkContext', 'getRequestedGraphs'])
             ->getMock();
 
         $mockEvent->expects($this->once())
@@ -239,7 +240,7 @@ class ReportSubscriberTest extends WebTestCase
     {
         $mockEvent = $this->getMockBuilder(ReportGraphEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'checkContext',
                 'getQuerybuilder',
                 'getOptions',
@@ -257,12 +258,12 @@ class ReportSubscriberTest extends WebTestCase
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->setMethods(['expr', 'execute'])
+            ->onlyMethods(['expr', 'execute'])
             ->getMock();
 
         $mockStmt = $this->getMockBuilder(PDOStatement::class)
             ->disableOriginalConstructor()
-            ->setMethods(['fetchAll'])
+            ->onlyMethods(['fetchAll'])
             ->getMock();
 
         $mockStmt->expects($this->exactly(2))
@@ -296,7 +297,7 @@ class ReportSubscriberTest extends WebTestCase
 
         $mockChartQuery = $this->getMockBuilder(ChartQuery::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'modifyCountQuery',
                 'modifyTimeDataQuery',
                 'loadAndBuildTimeData',
@@ -320,8 +321,8 @@ class ReportSubscriberTest extends WebTestCase
         $graphOptions = [
             'chartQuery' => $mockChartQuery,
             'translator' => $this->translator,
-            'dateFrom'   => new \DateTime(),
-            'dateTo'     => new \DateTime(),
+            'dateFrom'   => new DateTime(),
+            'dateTo'     => new DateTime(),
         ];
 
         $mockEvent->expects($this->once())
@@ -361,8 +362,8 @@ class ReportSubscriberTest extends WebTestCase
             ->willReturn(
                 [
                     [
-                        'from'  => new \DateTime(),
-                        'till'  => new \DateTime(),
+                        'from'  => new DateTime(),
+                        'till'  => new DateTime(),
                         'label' => 'My Chart',
                     ],
                 ]

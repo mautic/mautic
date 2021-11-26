@@ -17,9 +17,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 
-/**
- * Class Redirect.
- */
 class Redirect extends FormEntity
 {
     /**
@@ -32,9 +29,6 @@ class Redirect extends FormEntity
      */
     private $redirectId;
 
-    /**
-     * @var
-     */
     private $url;
 
     /**

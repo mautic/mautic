@@ -118,6 +118,8 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.campaign.service.campaign',
+                    'mautic.core.service.flashbag',
                 ],
             ],
             'mautic.campaign.leadbundle.subscriber'     => [
@@ -130,7 +132,6 @@ return [
                     'translator',
                     'doctrine.orm.entity_manager',
                     'router',
-                    'mautic.security',
                 ],
             ],
             'mautic.campaign.calendarbundle.subscriber' => [
@@ -188,6 +189,7 @@ return [
                     'mautic.campaign.repository.event',
                     'mautic.campaign.event_executioner',
                     'translator',
+                    'mautic.campaign.repository.lead',
                 ],
             ],
         ],
@@ -232,11 +234,11 @@ return [
             'mautic.campaign.model.campaign' => [
                 'class'     => \Mautic\CampaignBundle\Model\CampaignModel::class,
                 'arguments' => [
-                    'mautic.lead.model.lead',
                     'mautic.lead.model.list',
                     'mautic.form.model.form',
                     'mautic.campaign.event_collector',
                     'mautic.campaign.membership.builder',
+                    'mautic.tracker.contact',
                 ],
             ],
             'mautic.campaign.model.event'     => [
@@ -497,9 +499,9 @@ return [
                     'event_dispatcher',
                     'mautic.campaign.scheduler',
                     'monolog.logger.mautic',
-                    'mautic.lead.model.lead',
                     'mautic.campaign.helper.notification',
                     'mautic.factory',
+                    'mautic.tracker.contact',
                 ],
             ],
         ],
@@ -591,9 +593,18 @@ return [
                 'tag' => 'console.command',
             ],
         ],
+        'services' => [
+            'mautic.campaign.service.campaign'=> [
+                'class'     => \Mautic\CampaignBundle\Service\Campaign::class,
+                'arguments' => [
+                    'mautic.campaign.repository.campaign',
+                    'mautic.email.repository.email',
+                ],
+            ],
+        ],
         'fixtures' => [
             'mautic.campaign.fixture.campaign' => [
-                'class'    => \Mautic\CampaignBundle\Tests\DataFixtures\Orm\CampaignData::class,
+                'class'    => \Mautic\CampaignBundle\DataFixtures\ORM\CampaignData::class,
                 'tag'      => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'optional' => true,
             ],

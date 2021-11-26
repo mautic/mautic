@@ -34,6 +34,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
                 $this->notificationModel,
                 $this->fieldModel,
                 $this->integrationEntityModel,
+                $this->doNotContact,
             ])
             ->setMethodsExcept(['convertLeadFieldKey', 'getLeadDoNotContact', 'populateLeadData', 'setTranslator', 'setLeadModel'])
             ->getMock();
