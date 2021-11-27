@@ -27,7 +27,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private mixed $mockCoreParametersHelper;
+    private $mockCoreParametersHelper;
 
     /**
      * @var PageModel|\PHPUnit\Framework\MockObject\MockObject
