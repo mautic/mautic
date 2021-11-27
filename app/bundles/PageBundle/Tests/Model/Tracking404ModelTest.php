@@ -20,22 +20,22 @@ use Mautic\PageBundle\Model\Tracking404Model;
 class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var CoreParametersHelper|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $mockCoreParametersHelper;
-
-    /**
-     * @var ContactTracker|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject
      */
     private $mockContactTracker;
 
     /**
-     * @var PageModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private mixed $mockCoreParametersHelper;
+
+    /**
+     * @var PageModel|\PHPUnit\Framework\MockObject\MockObject
      */
     private $mockPageModel;
 
     /**
-     * @var Lead
+     * @var Lead|\PHPUnit\Framework\MockObject\MockObject
      */
     private $lead;
 
@@ -51,7 +51,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
         $this->lead = new Lead();
     }
 
-    public function testIsTrackableIfTracking404OptionEnabled()
+    public function testIsTrackableIfTracking404OptionEnabled(): void
     {
         $this->mockCoreParametersHelper->expects($this->at(0))
             ->method('get')
@@ -62,7 +62,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($tracking404Model->isTrackable());
     }
 
-    public function testIsTrackableIfTracking404OptionDisable()
+    public function testIsTrackableIfTracking404OptionDisable(): void
     {
         $this->mockCoreParametersHelper->expects($this->at(0))
             ->method('get')
@@ -73,7 +73,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($tracking404Model->isTrackable());
     }
 
-    public function testIsTrackableForIdentifiedContacts()
+    public function testIsTrackableForIdentifiedContacts(): void
     {
         $this->mockCoreParametersHelper->expects($this->at(0))
             ->method('get')
@@ -89,7 +89,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($tracking404Model->isTrackable());
     }
 
-    public function testIsTrackableForAnonymouse()
+    public function testIsTrackableForAnonymouse(): void
     {
         $this->mockCoreParametersHelper->expects($this->at(0))
             ->method('get')

@@ -52,7 +52,7 @@ class Tracking404Model
      *
      * @throws \Exception
      */
-    public function hitPage($entity, Request $request)
+    public function hitPage($entity, Request $request): void
     {
         $this->pageModel->hitPage($entity, $request, 404);
     }
