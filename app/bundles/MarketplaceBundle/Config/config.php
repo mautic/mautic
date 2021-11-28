@@ -90,6 +90,13 @@ return [
                     ],
                 ],
             ],
+            'marketplace.controller.ajax' => [
+                'class'     => \Mautic\MarketplaceBundle\Controller\AjaxController::class,
+                'arguments' => [
+                    'marketplace.service.composer',
+                    'mautic.helper.cache',
+                ],
+            ],
         ],
         'commands' => [
             'marketplace.command.list' => [

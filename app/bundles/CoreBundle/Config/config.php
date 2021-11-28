@@ -855,6 +855,7 @@ return [
                     '%kernel.cache_dir%',
                     'session',
                     'mautic.helper.paths',
+                    'kernel',
                 ],
             ],
             'mautic.helper.templating' => [

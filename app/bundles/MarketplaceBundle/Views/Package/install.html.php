@@ -25,7 +25,7 @@ try {
 </div>
 <div style="display: none" class="text-center" id="marketplace-installation-success">
     <p>Successfully installed <strong><?php echo $packageDetail->packageBase->getHumanPackageName(); ?></strong>!</p>
-    <p><a class="btn btn-primary" href="<?php echo $view['router']->path('mautic_plugin_index'); ?>">Go to the plugin page to activate the plugin</a></p>
+    <p><a class="btn btn-primary" href="<?php echo $view['router']->path('mautic_plugin_reload'); ?>">Go to the plugin page to activate the plugin</a></p>
 </div>
 
 <script>
