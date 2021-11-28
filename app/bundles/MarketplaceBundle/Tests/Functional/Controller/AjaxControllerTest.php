@@ -48,8 +48,6 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $controller = new AjaxController(
             $composer,
-            self::$container->get('kernel'),
-            self::$container->get('mautic.plugin.facade.reload'),
             $cacheHelper
         );
         $controller->setContainer(self::$container);
