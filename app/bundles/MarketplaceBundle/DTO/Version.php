@@ -13,8 +13,9 @@ final class Version
     public \DateTimeInterface $time;
     public array $require;
     public array $keywords;
+    public ?string $type;
 
-    public function __construct(string $version, array $license, \DateTimeInterface $time, string $homepage, string $issues, array $require, array $keywords)
+    public function __construct(string $version, array $license, \DateTimeInterface $time, string $homepage, string $issues, array $require, array $keywords, ?string $type)
     {
         $this->version  = $version;
         $this->license  = $license;
@@ -23,6 +24,7 @@ final class Version
         $this->issues   = $issues;
         $this->require  = $require;
         $this->keywords = $keywords;
+        $this->type     = $type;
     }
 
     public static function fromArray(array $array): Version
@@ -34,7 +36,8 @@ final class Version
             $array['homepage'],
             $array['support']['issues'] ?? '',
             $array['require'] ?? [],
-            $array['keywords'] ?? []
+            $array['keywords'] ?? [],
+            $array['type'] ?? null
         );
     }
 }

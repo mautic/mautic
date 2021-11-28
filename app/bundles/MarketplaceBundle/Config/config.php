@@ -100,7 +100,7 @@ return [
             'marketplace.command.install' => [
                 'class'     => \Mautic\MarketplaceBundle\Command\InstallCommand::class,
                 'tag'       => 'console.command',
-                'arguments' => ['marketplace.service.composer'],
+                'arguments' => ['marketplace.service.composer', 'marketplace.model.package'],
             ],
             'marketplace.command.remove' => [
                 'class'     => \Mautic\MarketplaceBundle\Command\RemoveCommand::class,
