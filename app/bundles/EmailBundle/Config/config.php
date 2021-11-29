@@ -842,6 +842,9 @@ return [
                 'class'     => \Mautic\EmailBundle\Model\SendEmailToUser::class,
                 'arguments' => [
                     'mautic.email.model.email',
+                    'event_dispatcher',
+                    'mautic.lead.validator.custom_field',
+                    'mautic.validator.email',
                 ],
             ],
             'mautic.email.model.send_email_to_contacts' => [
@@ -890,6 +893,14 @@ return [
                 'class'     => \Mautic\EmailBundle\Validator\MultipleEmailsValidValidator::class,
                 'arguments' => [
                     'mautic.validator.email',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
+            'mautic.email.validator.email_or_token_list_validator' => [
+                'class'     => \Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator::class,
+                'arguments' => [
+                    'mautic.validator.email',
+                    'mautic.lead.validator.custom_field',
                 ],
                 'tag' => 'validator.constraint_validator',
             ],

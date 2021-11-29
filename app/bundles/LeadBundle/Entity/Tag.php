@@ -96,6 +96,6 @@ class Tag
      */
     protected function validateTag($tag)
     {
-        return InputHelper::clean($tag);
+        return InputHelper::clean(trim($tag));
     }
 }

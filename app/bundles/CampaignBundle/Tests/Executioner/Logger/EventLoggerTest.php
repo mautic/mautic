@@ -12,11 +12,15 @@
 namespace Mautic\CampaignBundle\Tests\Executioner\Logger;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 
 class EventLoggerTest extends \PHPUnit\Framework\TestCase
@@ -72,6 +76,36 @@ class EventLoggerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($persistedLogs->count(), $logCollection->count());
         $this->assertEquals($logCollection->getValues(), $persistedLogs->getValues());
+    }
+
+    public function testBuildLogEntry()
+    {
+        $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress());
+
+        $this->leadRepository->expects($this->exactly(3))
+            ->method('getContactRotations')
+            ->willReturnOnConsecutiveCalls([1 => 1], [1 => 2], [1 => 1]);
+
+        $campaign = $this->createMock(Campaign::class);
+        $campaign->method('getId')->willReturnOnConsecutiveCalls([1, 1, 2]);
+
+        $event = $this->createMock(Event::class);
+        $event->method('getCampaign')->willReturn($campaign);
+
+        $contact = $this->createMock(Lead::class);
+        $contact->method('getId')->willReturn(1);
+
+        // rotation for campaign 1 and contact 1
+        $log = $this->getLogger()->buildLogEntry($event, $contact, false);
+        $this->assertEquals(1, $log->getRotation());
+
+        // rotation for campaign 1 and contact 1
+        $log = $this->getLogger()->buildLogEntry($event, $contact, false);
+        $this->assertEquals(2, $log->getRotation());
+
+        // rotation for campaign 2 and contact 1
+        $log = $this->getLogger()->buildLogEntry($event, $contact, false);
+        $this->assertEquals(1, $log->getRotation());
     }
 
     private function getLogger()
