@@ -68,8 +68,8 @@ class FormController extends CommonFormController
             $filter['force'][] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
-        $orderBy    = $session->get('mautic.form.orderby', 'f.name');
-        $orderByDir = $session->get('mautic.form.orderbydir', 'ASC');
+        $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
+        $orderByDir = $session->get('mautic.form.orderbydir', 'DESC');
         $forms      = $this->getModel('form.form')->getEntities(
             [
                 'start'      => $start,
