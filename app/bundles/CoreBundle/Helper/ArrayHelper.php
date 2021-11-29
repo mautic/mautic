@@ -78,6 +78,23 @@ class ArrayHelper
     }
 
     /**
+     * Removes null and empty string values from the array.
+     *
+     * @param mixed[] $array
+     *
+     * @return mixed[]
+     */
+    public static function removeEmptyValues(array $array): array
+    {
+        return array_filter(
+            $array,
+            function ($value) {
+                return !is_null($value) && '' !== $value;
+            }
+        );
+    }
+
+    /**
      *  SUM/SUBSTRACT between two arrays.
      *
      * @param bool $subtracted

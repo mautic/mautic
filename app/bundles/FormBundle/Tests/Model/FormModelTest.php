@@ -26,7 +26,38 @@ class FormModelTest extends FormTestAbstract
         $formModel = $this->getFormModel();
         $formModel->setFields($form, $fields);
         $entityFields = $form->getFields()->toArray();
-        $this->assertInstanceOf(Field::class, $entityFields[array_keys($fields)[0]]);
+
+        /** @var Field $newField */
+        $newField = $entityFields[array_keys($fields)[0]];
+
+        /** @var Field $fileField */
+        $fileField = $entityFields[array_keys($fields)[1]];
+
+        /** @var Field $parentField */
+        $parentField = $entityFields[array_keys($fields)[2]];
+
+        /** @var Field $childField */
+        $childField = $entityFields[array_keys($fields)[3]];
+
+        /** @var Field $childField */
+        $newChildField = $entityFields[array_keys($fields)[4]];
+
+        $this->assertInstanceOf(Field::class, $newField);
+        $this->assertSame('email', $newField->getType());
+        $this->assertSame('email', $newField->getAlias());
+        $this->assertSame(1, $newField->getOrder());
+        $this->assertSame('file', $fileField->getType());
+        $this->assertSame('file', $fileField->getAlias());
+        $this->assertSame(2, $fileField->getOrder());
+        $this->assertSame('select', $parentField->getType());
+        $this->assertSame('parent', $parentField->getAlias());
+        $this->assertSame(3, $parentField->getOrder());
+        $this->assertSame('text', $childField->getType());
+        $this->assertSame('child', $childField->getAlias());
+        $this->assertSame(4, $childField->getOrder());
+        $this->assertSame('text', $newChildField->getType());
+        $this->assertSame('new_child', $newChildField->getAlias());
+        $this->assertSame(4, $newChildField->getOrder());
     }
 
     public function testGetComponentsFields()
@@ -275,5 +306,45 @@ class FormModelTest extends FormTestAbstract
         $formModel->getEntity(5);
 
         return $formField;
+    }
+
+    public function testGetContactFieldPropertiesListWhenFieldNotFound(): void
+    {
+        $formModel = $this->getFormModel();
+
+        $this->leadFieldModel->expects($this->once())
+            ->method('getEntityByAlias');
+
+        $this->assertNull($formModel->getContactFieldPropertiesList('alias_a'));
+    }
+
+    public function testGetContactFieldPropertiesListWhenFieldFoundButNotList(): void
+    {
+        $formModel = $this->getFormModel();
+        $field     = new LeadField();
+        $field->setType('text');
+
+        $this->leadFieldModel->expects($this->once())
+            ->method('getEntityByAlias')
+            ->willReturn($field);
+
+        $this->assertNull($formModel->getContactFieldPropertiesList('alias_a'));
+    }
+
+    public function testGetContactFieldPropertiesListWhenSelectFieldFound(): void
+    {
+        $formModel = $this->getFormModel();
+        $field     = new LeadField();
+        $field->setType('select');
+        $field->setProperties(['list' => ['choice_a' => 'Choice A']]);
+
+        $this->leadFieldModel->expects($this->once())
+            ->method('getEntityByAlias')
+            ->willReturn($field);
+
+        $this->assertSame(
+            ['choice_a' => 'Choice A'],
+            $formModel->getContactFieldPropertiesList('alias_a')
+        );
     }
 }
