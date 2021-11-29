@@ -55,6 +55,7 @@ return [
                     'marketplace.service.route_provider',
                     'mautic.security',
                     'marketplace.service.config',
+                    'mautic.helper.composer',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -93,7 +94,7 @@ return [
             'marketplace.controller.ajax' => [
                 'class'     => \Mautic\MarketplaceBundle\Controller\AjaxController::class,
                 'arguments' => [
-                    'marketplace.service.composer',
+                    'mautic.helper.composer',
                     'mautic.helper.cache',
                 ],
             ],
@@ -107,12 +108,12 @@ return [
             'marketplace.command.install' => [
                 'class'     => \Mautic\MarketplaceBundle\Command\InstallCommand::class,
                 'tag'       => 'console.command',
-                'arguments' => ['marketplace.service.composer', 'marketplace.model.package'],
+                'arguments' => ['mautic.helper.composer', 'marketplace.model.package'],
             ],
             'marketplace.command.remove' => [
                 'class'     => \Mautic\MarketplaceBundle\Command\RemoveCommand::class,
                 'tag'       => 'console.command',
-                'arguments' => ['marketplace.service.composer'],
+                'arguments' => ['mautic.helper.composer'],
             ],
         ],
         'events' => [
@@ -163,13 +164,6 @@ return [
                 'class'     => \Mautic\MarketplaceBundle\Service\Config::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                ],
-            ],
-            'marketplace.service.composer' => [
-                'class'     => \Mautic\MarketplaceBundle\Service\Composer::class,
-                'arguments' => [
-                    'kernel',
-                    'monolog.logger.mautic',
                 ],
             ],
             'marketplace.service.allowlist' => [

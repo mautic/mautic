@@ -6,16 +6,16 @@ namespace Mautic\MarketplaceBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\CacheHelper;
-use Mautic\MarketplaceBundle\Service\Composer;
+use Mautic\CoreBundle\Helper\ComposerHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    private Composer $composer;
+    private ComposerHelper $composer;
     private CacheHelper $cacheHelper;
 
-    public function __construct(Composer $composer, CacheHelper $cacheHelper)
+    public function __construct(ComposerHelper $composer, CacheHelper $cacheHelper)
     {
         $this->composer    = $composer;
         $this->cacheHelper = $cacheHelper;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\MarketplaceBundle\Service;
+namespace Mautic\CoreBundle\Helper;
 
 use Composer\Console\Application;
 use Mautic\MarketplaceBundle\Model\ConsoleOutputModel;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Provides several helper functions to interact with Composer (composer require, remove, etc.).
  */
-class Composer
+class ComposerHelper
 {
     private KernelInterface $kernel;
     private LoggerInterface $logger;
@@ -107,6 +107,26 @@ class Composer
     public function isInstalled(string $packageName): bool
     {
         return \Composer\InstalledVersions::isInstalled($packageName);
+    }
+
+    /**
+     * Updates one or multiple Composer packages.
+     */
+    public function update(?string $packageName = null, bool $dryRun = false): ConsoleOutputModel
+    {
+        $input = [
+            'command'  => 'update',
+        ];
+
+        if (!empty($packageName)) {
+            $input['packages'] = [$packageName];
+        }
+
+        if (true === $dryRun) {
+            $input['--dry-run'] = null;
+        }
+
+        return $this->runCommand($input);
     }
 
     /**

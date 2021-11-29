@@ -4,10 +4,10 @@ namespace Mautic\MarketplaceBundle\Command;
 
 use Exception;
 use InvalidArgumentException;
+use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Exception\InstallException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
-use Mautic\MarketplaceBundle\Service\Composer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,10 +17,10 @@ class InstallCommand extends Command
 {
     public const NAME = 'mautic:marketplace:install';
 
-    private Composer $composer;
+    private ComposerHelper $composer;
     private PackageModel $packageModel;
 
-    public function __construct(Composer $composer, PackageModel $packageModel)
+    public function __construct(ComposerHelper $composer, PackageModel $packageModel)
     {
         parent::__construct();
         $this->composer     = $composer;

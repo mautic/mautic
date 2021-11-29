@@ -2,7 +2,7 @@
 
 namespace Mautic\MarketplaceBundle\Command;
 
-use Mautic\MarketplaceBundle\Service\Composer;
+use Mautic\CoreBundle\Helper\ComposerHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,9 +12,9 @@ class RemoveCommand extends Command
 {
     public const NAME = 'mautic:marketplace:remove';
 
-    private Composer $composer;
+    private ComposerHelper $composer;
 
-    public function __construct(Composer $composer)
+    public function __construct(ComposerHelper $composer)
     {
         parent::__construct();
         $this->composer = $composer;

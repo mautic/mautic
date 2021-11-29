@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Tests\Functional\Command;
 
+use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Command\InstallCommand;
 use Mautic\MarketplaceBundle\DTO\PackageDetail;
 use Mautic\MarketplaceBundle\Model\ConsoleOutputModel;
 use Mautic\MarketplaceBundle\Model\PackageModel;
-use Mautic\MarketplaceBundle\Service\Composer;
 use PHPUnit\Framework\Assert;
 
 final class InstallCommandTest extends AbstractMauticTestCase
@@ -19,7 +19,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
         $packageName = 'koco/mautic-recaptcha-bundle';
         $payload     = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), true);
 
-        $composer = $this->createMock(Composer::class);
+        $composer = $this->createMock(ComposerHelper::class);
         $composer->method('install')
             ->with($packageName)
             ->willReturn(new ConsoleOutputModel(0, 'OK'));

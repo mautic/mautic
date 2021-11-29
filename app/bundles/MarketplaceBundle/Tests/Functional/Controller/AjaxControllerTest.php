@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Helper\CacheHelper;
+use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Controller\AjaxController;
 use Mautic\MarketplaceBundle\Model\ConsoleOutputModel;
-use Mautic\MarketplaceBundle\Service\Composer;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -38,7 +38,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
     private function generateController(bool $isPackageInstalled): AjaxController
     {
-        $composer = $this->createMock(Composer::class);
+        $composer = $this->createMock(ComposerHelper::class);
         $composer->method('install')->willReturn(new ConsoleOutputModel(0, 'OK'));
         $composer->method('remove')->willReturn(new ConsoleOutputModel(0, 'OK'));
         $composer->method('isInstalled')->willReturn($isPackageInstalled);
