@@ -19,7 +19,6 @@
     "php": ">=7.4.0 <8.1",
     "ext-zlib": "*",
     "ext-zip": "*",
-    "ext-imap": "*",
     "symfony/console": "~4.4.0",
     "symfony/debug": "~4.4.0",
     "symfony/form": "~4.4.0",
