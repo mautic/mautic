@@ -51,6 +51,38 @@ class ReportGraphEvent extends AbstractReportEvent
     }
 
     /**
+     * Check if the report has a specific filter.
+     *
+     * @param array|string $column
+     *
+     * @return bool
+     */
+    public function hasFilter($column)
+    {
+        static $sorted;
+
+        if (null == $sorted) {
+            $filters = $this->getReport()->getFilters();
+
+            foreach ($filters as $field) {
+                $sorted[$field['column']] = true;
+            }
+        }
+
+        if (is_array($column)) {
+            foreach ($column as $checkMe) {
+                if (isset($sorted[$checkMe])) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return isset($sorted[$column]);
+    }
+
+    /**
      * Set the graph array.
      *
      * @param string $graph

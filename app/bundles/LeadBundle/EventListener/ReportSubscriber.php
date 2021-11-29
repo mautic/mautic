@@ -443,7 +443,14 @@ class ReportSubscriber implements EventSubscriberInterface
                 $queryBuilder->resetQueryPart('join');
                 $queryBuilder->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
             }
-
+            if ($event->hasFilter('s.leadlist_id')) {
+                $queryBuilder->join(
+                    'l',
+                    MAUTIC_TABLE_PREFIX.'lead_lists_leads',
+                    's',
+                    's.lead_id = l.id AND s.manually_removed = 0'
+                );
+            }
             switch ($g) {
                 case 'mautic.lead.graph.pie.attribution_stages':
                 case 'mautic.lead.graph.pie.attribution_campaigns':
