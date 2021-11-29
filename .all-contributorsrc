@@ -208,7 +208,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/4246909?v=4",
       "profile": "https://github.com/jos0405",
       "contributions": [
-        "code"
+        "code",
+        "userTesting"
       ]
     },
     {
@@ -429,7 +430,8 @@
       "profile": "http://www.idea2.ch",
       "contributions": [
         "review",
-        "userTesting"
+        "userTesting",
+        "code"
       ]
     },
     {
@@ -455,6 +457,88 @@
       "name": "Johan Buchert",
       "avatar_url": "https://avatars.githubusercontent.com/u/31535432?v=4",
       "profile": "https://github.com/johbuch",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "TS16V",
+      "name": "TS16V",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38064792?v=4",
+      "profile": "https://github.com/TS16V",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "rafalsk",
+      "name": "rafalsk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9338163?v=4",
+      "profile": "https://github.com/rafalsk",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "jonathandhn",
+      "name": "Jonathan Dahan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/55917666?v=4",
+      "profile": "https://jonathanphoto.fr",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "j26w",
+      "name": "j26w",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1260184?v=4",
+      "profile": "http://twitter.com/j26w",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "theodorosploumis",
+      "name": "Theodoros Ploumis",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1315321?v=4",
+      "profile": "http://theodorosploumis.com/en",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "sreenia806",
+      "name": "Sreenivasulu Avula",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2764179?v=4",
+      "profile": "https://github.com/sreenia806",
+      "contributions": [
+        "userTesting",
+        "review"
+      ]
+    },
+    {
+      "login": "mlahlouh",
+      "name": "Mohammad Lahlouh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7312050?v=4",
+      "profile": "https://www.linkedin.com/in/mohammadlahlouh/",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "ArnaudSau",
+      "name": "ArnaudSau",
+      "avatar_url": "https://avatars.githubusercontent.com/u/50580844?v=4",
+      "profile": "https://github.com/ArnaudSau",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "bell87",
+      "name": "Andrew Bell",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5338785?v=4",
+      "profile": "https://github.com/bell87",
       "contributions": [
         "userTesting"
       ]
