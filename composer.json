@@ -105,7 +105,7 @@
     "fixcs": "bin/php-cs-fixer fix -v",
     "rector": "bin/rector process",
     "remove-git-submodules": "find . -mindepth 2 -type d -name .git | xargs rm -rf",
-    "generate-assets": "./bin/console mautic:assets:generate"
+    "generate-assets": "bin/console mautic:assets:generate"
   },
   "config": {
     "bin-dir": "bin",
