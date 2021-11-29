@@ -11,9 +11,13 @@
 
 namespace Mautic\CampaignBundle\Controller;
 
+use Doctrine\DBAL\Cache\CacheException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\Summary;
+use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -24,7 +28,9 @@ use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class CampaignController extends AbstractStandardFormController
 {
@@ -99,7 +105,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * Deletes a group of entities.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse
      */
     public function batchDeleteAction()
     {
@@ -111,7 +117,7 @@ class CampaignController extends AbstractStandardFormController
      *
      * @param $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function cloneAction($objectId)
     {
@@ -119,13 +125,17 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param     $objectId
-     * @param int $page
+     * @param string|int $objectId
+     * @param int        $page
+     * @param int|null   $count
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
-    public function contactsAction($objectId, $page = 1)
+    public function contactsAction($objectId, $page = 1, $count = null, \DateTimeInterface $dateFrom = null, \DateTimeInterface $dateTo = null)
     {
+        $session = $this->get('session');
+        $session->set('mautic.campaign.contact.page', $page);
+
         return $this->generateContactsGrid(
             $objectId,
             $page,
@@ -134,7 +144,16 @@ class CampaignController extends AbstractStandardFormController
             'campaign_leads',
             null,
             'campaign_id',
-            ['manually_removed' => 0]
+            ['manually_removed' => 0],
+            null,
+            null,
+            [],
+            null,
+            'entity.lead_id',
+            'DESC',
+            $count,
+            $dateFrom,
+            $dateTo
         );
     }
 
@@ -143,7 +162,7 @@ class CampaignController extends AbstractStandardFormController
      *
      * @param $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse
      */
     public function deleteAction($objectId)
     {
@@ -154,7 +173,7 @@ class CampaignController extends AbstractStandardFormController
      * @param      $objectId
      * @param bool $ignorePost
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function editAction($objectId, $ignorePost = false)
     {
@@ -285,7 +304,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * Generates new form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function newAction()
     {
@@ -875,11 +894,11 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param $action
+     * @param string $action
      *
-     * @return array
+     * @throws CacheException
      */
-    protected function getViewArguments(array $args, $action)
+    protected function getViewArguments(array $args, $action): array
     {
         /** @var EventCollector $eventCollector */
         $eventCollector = $this->get('mautic.campaign.event_collector');
@@ -896,58 +915,26 @@ class CampaignController extends AbstractStandardFormController
                 $dateRangeValues = $this->request->get('daterange', []);
                 $action          = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $objectId]);
                 $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
+                $events          = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
+                $dateFrom        = null;
+                $dateTo          = null;
+                $dateToPlusOne   = null;
+                $this->setCoreParametersHelper($this->get('mautic.config'));
 
-                /** @var LeadEventLogRepository $eventLogRepo */
-                $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
-                $events                   = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
-                $leadCount                = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId());
-                $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true);
-                $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false);
-                $sortedEvents             = [
-                    'decision'  => [],
-                    'action'    => [],
-                    'condition' => [],
-                ];
-                foreach ($events as &$event) {
-                    $event['logCount']           =
-                    $event['logCountForPending'] =
-                    $event['percent']            =
-                    $event['yesPercent']         =
-                    $event['noPercent']          = 0;
-                    $event['leadCount']          = $leadCount;
-
-                    if (isset($campaignLogCounts[$event['id']])) {
-                        $event['logCount']           = array_sum($campaignLogCounts[$event['id']]);
-                        $event['logCountForPending'] = isset($pendingCampaignLogCounts[$event['id']]) ? array_sum($pendingCampaignLogCounts[$event['id']]) : 0;
-
-                        $pending  = $event['leadCount'] - $event['logCountForPending'];
-                        $totalYes = $campaignLogCounts[$event['id']][1];
-                        $totalNo  = $campaignLogCounts[$event['id']][0];
-                        $total    = $totalYes + $totalNo + $pending;
-                        if ($leadCount) {
-                            $event['percent']    = round(($event['logCount'] / $total) * 100, 1);
-                            $event['yesPercent'] = round(($campaignLogCounts[$event['id']][1] / $total) * 100, 1);
-                            $event['noPercent']  = round(($campaignLogCounts[$event['id']][0] / $total) * 100, 1);
-                        }
-                    }
+                if ($this->coreParametersHelper->get('campaign_by_range')) {
+                    $dateFrom      = new \DateTimeImmutable($dateRangeForm->get('date_from')->getData());
+                    $dateTo        = new \DateTimeImmutable($dateRangeForm->get('date_to')->getData());
+                    $dateToPlusOne = $dateTo->modify('+1 day');
                 }
 
-                // rewrite stats data from parent condition if exist
-                foreach ($events as &$event) {
-                    if (!empty($event['decisionPath']) && !empty($event['parent_id']) && isset($events[$event['parent_id']])) {
-                        $parentEvent                 = $events[$event['parent_id']];
-                        $event['logCountForPending'] = $parentEvent['logCountForPending'];
-                        $event['percent']            = $parentEvent['percent'];
-                        $event['yesPercent']         = $parentEvent['yesPercent'];
-                        $event['noPercent']          = $parentEvent['noPercent'];
-                        if ('yes' == $event['decisionPath']) {
-                            $event['noPercent'] = 0;
-                        } else {
-                            $event['yesPercent'] = 0;
-                        }
-                    }
-                    $sortedEvents[$event['eventType']][] = $event;
-                }
+                $leadCount = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId());
+                $logCounts = $this->processCampaignLogCounts($entity->getId(), $dateFrom, $dateToPlusOne);
+
+                $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
+                $campaignLogCountsProcessed = $logCounts['campaignLogCountsProcessed'] ?? [];
+
+                $this->processCampaignEvents($events, $leadCount, $campaignLogCounts, $campaignLogCountsProcessed);
+                $sortedEvents = $this->processCampaignEventsFromParentCondition($events);
 
                 $stats = $this->getCampaignModel()->getCampaignMetricsLineChartData(
                     null,
@@ -957,9 +944,9 @@ class CampaignController extends AbstractStandardFormController
                     ['campaign_id' => $objectId]
                 );
 
-                $campaignSources = $this->getCampaignModel()->getSourceLists();
+                $sourcesList = $this->getCampaignModel()->getSourceLists();
 
-                $this->prepareCampaignSourcesForEdit($objectId, $campaignSources, true);
+                $this->prepareCampaignSourcesForEdit($objectId, $sourcesList, true);
                 $this->prepareCampaignEventsForEdit($entity, $objectId, true);
 
                 $args['viewParameters'] = array_merge(
@@ -973,18 +960,9 @@ class CampaignController extends AbstractStandardFormController
                         'dateRangeForm'   => $dateRangeForm->createView(),
                         'campaignSources' => $this->campaignSources,
                         'campaignEvents'  => $events,
-                        'campaignLeads'   => $this->forward(
-                            'MauticCampaignBundle:Campaign:contacts',
-                            [
-                                'objectId'   => $entity->getId(),
-                                'page'       => $this->get('session')->get('mautic.campaign.contact.page', 1),
-                                'ignoreAjax' => true,
-                            ]
-                        )->getContent(),
                     ]
                 );
                 break;
-
             case 'new':
             case 'edit':
                 $args['viewParameters'] = array_merge(
@@ -1112,5 +1090,118 @@ class CampaignController extends AbstractStandardFormController
     protected function getSessionCanvasSettings($sessionId)
     {
         return $this->get('session')->get('mautic.campaign.'.$sessionId.'.events.canvassettings');
+    }
+
+    /**
+     * @return array<string, array<int|string, array<int|string, int|string>>>
+     *
+     * @throws CacheException
+     */
+    private function processCampaignLogCounts(int $id, ?\DateTimeImmutable $dateFrom, ?\DateTimeImmutable $dateToPlusOne): array
+    {
+        if ($this->coreParametersHelper->get('campaign_use_summary')) {
+            /** @var SummaryRepository $summaryRepo */
+            $summaryRepo                = $this->getDoctrine()->getManager()->getRepository(Summary::class);
+            $campaignLogCounts          = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateToPlusOne);
+            $campaignLogCountsProcessed = $this->getCampaignLogCountsProcessed($campaignLogCounts);
+        } else {
+            /** @var LeadEventLogRepository $eventLogRepo */
+            $eventLogRepo               = $this->getDoctrine()->getManager()->getRepository(LeadEventLog::class);
+            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, true, $dateFrom, $dateToPlusOne);
+            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateToPlusOne);
+        }
+
+        return [
+            'campaignLogCounts'          => $campaignLogCounts,
+            'campaignLogCountsProcessed' => $campaignLogCountsProcessed,
+        ];
+    }
+
+    /**
+     * @param array<int, array<int|string, int|string>>        $events
+     * @param array<int|string, array<int|string, int|string>> $campaignLogCounts
+     * @param array<int|string, array<int|string, int|string>> $campaignLogCountsProcessed
+     */
+    private function processCampaignEvents(
+        array &$events,
+        int $leadCount,
+        array $campaignLogCounts,
+        array $campaignLogCountsProcessed
+    ): void {
+        foreach ($events as &$event) {
+            $event['logCountForPending'] =
+            $event['logCountProcessed']  =
+            $event['percent']            =
+            $event['yesPercent']         =
+            $event['noPercent']          = 0;
+
+            if (isset($campaignLogCounts[$event['id']])) {
+                $loggedCount                 = array_sum($campaignLogCounts[$event['id']]);
+                $logCountsProcessed          = isset($campaignLogCountsProcessed[$event['id']]) ? array_sum($campaignLogCountsProcessed[$event['id']]) : 0;
+                $pending                     = $loggedCount - $logCountsProcessed;
+                $event['logCountForPending'] = $pending;
+                $event['logCountProcessed']  = $logCountsProcessed;
+                [$totalNo, $totalYes]        = $campaignLogCounts[$event['id']];
+                $total                       = $totalYes + $totalNo;
+
+                if ($leadCount) {
+                    $event['percent']    = min(100, max(0, round(($loggedCount / $total) * 100, 1)));
+                    $event['yesPercent'] = min(100, max(0, round(($totalYes / $total) * 100, 1)));
+                    $event['noPercent']  = min(100, max(0, round(($totalNo / $total) * 100, 1)));
+                }
+            }
+        }
+    }
+
+    /**
+     * @param array<int, array<int|string, int|string>> $events
+     *
+     * @return array<string, array<int, array<int|string, int|string>>>
+     */
+    private function processCampaignEventsFromParentCondition(array &$events): array
+    {
+        $sortedEvents = [
+            'decision'  => [],
+            'action'    => [],
+            'condition' => [],
+        ];
+
+        // rewrite stats data from parent condition if exist
+        foreach ($events as &$event) {
+            if (!empty($event['decisionPath']) &&
+                !empty($event['parent_id']) &&
+                isset($events[$event['parent_id']]) &&
+                'condition' !== $event['eventType']) {
+                $parentEvent                 = $events[$event['parent_id']];
+                $event['percent']            = $parentEvent['percent'];
+                $event['yesPercent']         = $parentEvent['yesPercent'];
+                $event['noPercent']          = $parentEvent['noPercent'];
+                if ('yes' === $event['decisionPath']) {
+                    $event['noPercent'] = 0;
+                } else {
+                    $event['yesPercent'] = 0;
+                }
+            }
+            $sortedEvents[$event['eventType']][] = $event;
+        }
+
+        return $sortedEvents;
+    }
+
+    /**
+     * @param array<int, array<int, string>> $campaignLogCounts
+     *
+     * @return array<int, array<int, string>>
+     */
+    private function getCampaignLogCountsProcessed(array &$campaignLogCounts): array
+    {
+        $campaignLogCountsProcessed = [];
+
+        foreach ($campaignLogCounts as $eventId => $campaignLogCount) {
+            $campaignLogCountsProcessed[$eventId][] = $campaignLogCount[2];
+            unset($campaignLogCounts[$eventId][2]);
+        }
+
+        return $campaignLogCountsProcessed;
     }
 }
