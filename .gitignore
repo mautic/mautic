@@ -82,6 +82,9 @@
 !/media/images/favicon.ico
 !/media/images/mautic_logo*
 !/media/images/.htaccess
+!/media/css/app.css
+!/media/js/app.js
+!/media/js/mautic-form.js
 
 /plugins/*
 !/plugins/GrapesJsBuilderBundle
