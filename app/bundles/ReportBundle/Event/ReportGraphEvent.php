@@ -53,11 +53,9 @@ class ReportGraphEvent extends AbstractReportEvent
     /**
      * Check if the report has a specific filter.
      *
-     * @param array|string $column
-     *
-     * @return bool
+     * @param array<string>|string $column
      */
-    public function hasFilter($column)
+    public function hasFilter($column): bool
     {
         static $sorted;
 
