@@ -66,6 +66,7 @@ jobs:
                     - theme-oxygen
                     - theme-paprika
                     - theme-skyline
+                    - theme-sparse
                     - theme-sunday
                     - theme-trulypersonal
                     - theme-vibrant
