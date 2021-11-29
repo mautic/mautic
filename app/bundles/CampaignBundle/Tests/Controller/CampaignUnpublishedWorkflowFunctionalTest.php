@@ -1,0 +1,65 @@
+<?php
+
+namespace Mautic\CampaignBundle\Tests\Controller;
+
+use DOMElement;
+use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
+
+final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTest
+{
+    public function testCampaignEditPageCheckUnpublishWorkflowAttributesPresent(): void
+    {
+        $campaign   = $this->saveSomeCampaignLeadEventLogs();
+        $translator = $this->container->get('translator');
+
+        // Check the message in the Campaign edit page
+        $crawler  = $this->client->request('GET', sprintf('/s/campaigns/edit/%d', $campaign->getId()));
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+
+        $attributes = [
+            'onchange'              => 'Mautic.showCampaignConfirmation(mQuery(this));',
+            'data-toggle'           => 'confirmation',
+            'data-message'          => $translator->trans('mautic.campaign.form.confirmation.message'),
+            'data-confirm-text'     => $translator->trans('mautic.campaign.form.confirmation.confirm_text'),
+            'data-confirm-callback' => 'dismissConfirmation',
+            'data-cancel-text'      => $translator->trans('mautic.campaign.form.confirmation.cancel_text'),
+            'data-cancel-callback'  => 'setPublishedButtonToYes',
+        ];
+
+        $elements = $crawler->filter('form input[name*="campaign[isPublished]"]')->getIterator();
+
+        /** @var DOMElement $element */
+        foreach ($elements as $element) {
+            foreach ($attributes as $key => $val) {
+                $this->assertStringContainsString($val, $element->getAttribute($key));
+            }
+        }
+    }
+
+    public function testCampaignListPageCheckUnpublishWorkflowAttributesPresent(): void
+    {
+        $this->saveSomeCampaignLeadEventLogs();
+        $translator = $this->container->get('translator');
+
+        // Check the message in the Campaign listing page
+        $crawler  = $this->client->request('GET', sprintf('/s/campaigns'));
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+
+        $attributes    = [
+            'onclick'               => 'Mautic.confirmationCampaignPublishStatus(mQuery(this));',
+            'data-toggle'           => 'confirmation',
+            'data-confirm-callback' => 'confirmCallbackCampaignPublishStatus',
+            'data-cancel-callback'  => 'dismissConfirmation',
+            'data-message'          => $translator->trans('mautic.campaign.form.confirmation.message'),
+            'data-confirm-text'     => $translator->trans('mautic.campaign.form.confirmation.confirm_text'),
+            'data-cancel-text'      => $translator->trans('mautic.campaign.form.confirmation.cancel_text'),
+        ];
+
+        $toggleElement = $crawler->filter('.toggle-publish-status');
+        foreach ($attributes as $key => $val) {
+            $this->assertStringContainsString($val, $toggleElement->attr($key));
+        }
+    }
+}
