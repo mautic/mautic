@@ -72,26 +72,34 @@ $backdropFlag = (isset($backdrop)) ? 'true' : 'false';
 
 $onclick = "Mautic.togglePublishStatus(event, '.{$idClass}', '{$model}', '{$item->getId()}', '{$query}', {$backdropFlag})";
 
+$defaultAttributes = [
+    'data-container' => 'body',
+    'data-placement' => 'right',
+    'data-toggle'    => 'tooltip',
+    'data-status'    => $status,
+];
+
 // Get the attributes if set.
 $attributes = $attributes ?? [];
 
-$additionalAttrs = '';
 if (!empty($attributes)) {
-    $onclick = $attributes['data-onclick'] ?? '';
-    unset($attributes['data-onclick']);
+    $onclick = $attributes['onclick'] ?? '';
+    unset($attributes['onclick']);
 
     $attributes['data-id-class']    = '.'.$idClass;
     $attributes['data-model']       = $model;
     $attributes['data-item-id']     = $item->getId();
     $attributes['data-query']       = $query;
     $attributes['data-backdrop']    = $backdropFlag;
-
-    $additionalAttrs = implode(' ', array_map(
-        function ($v, $k) { return sprintf("%s='%s'", $k, $v); },
-        $attributes,
-        array_keys($attributes)
-    ));
 }
+
+$allDataAttrs = array_merge($attributes + $defaultAttributes);
+
+$dataAttributes = implode(' ', array_map(
+    function ($v, $k) { return sprintf("%s='%s'", $k, $v); },
+    $allDataAttrs,
+    array_keys($allDataAttrs)
+));
 ?>
 
-<i class="fa fa-fw <?php echo $size.' '.$icon.$clickAction.' '.$idClass; ?>" data-toggle="tooltip" data-container="body" data-placement="right" data-status="<?php echo $status; ?>" title="<?php echo $text; ?>" <?php echo $additionalAttrs; ?> <?php if (empty($disableToggle)): ?> onclick="<?php echo $onclick; ?>"<?php endif; ?>></i>
+<i class="fa fa-fw <?php echo $size.' '.$icon.$clickAction.' '.$idClass; ?> toggle-publish-status"  title="<?php echo $text; ?>" <?php echo $dataAttributes; ?> <?php if (empty($disableToggle)): ?> onclick="<?php echo $onclick; ?>"<?php endif; ?>></i>

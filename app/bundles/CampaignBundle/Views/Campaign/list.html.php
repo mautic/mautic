@@ -134,7 +134,7 @@ if ('index' == $tmpl) {
                                     'item'          => $item,
                                     'model'         => 'campaign',
                                     'attributes'    => [
-                                        'data-onclick'          => 'Mautic.confirmationCampaignPublishStatus(mQuery(this));',
+                                        'onclick'               => 'Mautic.confirmationCampaignPublishStatus(mQuery(this));',
                                         'data-toggle'           => 'confirmation',
                                         'data-confirm-callback' => 'confirmCallbackCampaignPublishStatus',
                                         'data-cancel-callback'  => 'dismissConfirmation',
