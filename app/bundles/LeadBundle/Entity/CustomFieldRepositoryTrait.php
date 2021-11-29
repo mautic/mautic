@@ -30,11 +30,8 @@ trait CustomFieldRepositoryTrait
     protected $uniqueIdentifiersOperator;
 
     /**
-     * @param      $object
-     * @param      $args
-     * @param null $resultsCallback
-     *
-     * @return array
+     * @param string $object
+     * @param array  $args
      */
     public function getEntitiesWithCustomFields($object, $args, $resultsCallback = null)
     {
@@ -51,23 +48,27 @@ trait CustomFieldRepositoryTrait
         $this->useDistinctCount = false;
         $this->buildWhereClause($dq, $args);
 
-        // Distinct is required here to get the correct count when group by is used due to applied filters
-        $countSelect = ($this->useDistinctCount) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
-        $dq->select($countSelect.' as count');
+        if (!empty($args['withTotalCount']) || !isset($args['count'])) {
+            // Distinct is required here to get the correct count when group by is used due to applied filters
+            $countSelect = ($this->useDistinctCount) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
+            $dq->select($countSelect.' as count');
 
-        // Advanced search filters may have set a group by and if so, let's remove it for the count.
-        if ($groupBy = $dq->getQueryPart('groupBy')) {
-            $dq->resetQueryPart('groupBy');
+            // Advanced search filters may have set a group by and if so, let's remove it for the count.
+            if ($groupBy = $dq->getQueryPart('groupBy')) {
+                $dq->resetQueryPart('groupBy');
+            }
+
+            //get a total count
+            $result = $dq->execute()->fetchAll();
+            $total  = ($result) ? $result[0]['count'] : 0;
+        } else {
+            $total = $args['count'];
         }
 
-        //get a total count
-        $result = $dq->execute()->fetchAll();
-        $total  = ($result) ? (int) $result[0]['count'] : 0;
-
-        if (!$total) {
+        if (!$total && !empty($args['withTotalCount'])) {
             $results = [];
         } else {
-            if ($groupBy) {
+            if (isset($groupBy) && $groupBy) {
                 $dq->groupBy($groupBy);
             }
             //now get the actual paginated results
