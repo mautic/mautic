@@ -124,10 +124,10 @@ class CampaignModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param object      $entity
+     * @param object      $formFactory
+     * @param string|null $action
+     * @param array       $options
      *
      * @return mixed
      *

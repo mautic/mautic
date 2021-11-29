@@ -1,18 +1,18 @@
 <?php
 
-namespace Mautic\FormBundle\Tests\Controller;
+namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class FormControllerFunctionalTest extends MauticMysqlTestCase
+class CampaignControllerTest extends MauticMysqlTestCase
 {
     /**
      * Index should return status code 200.
      */
     public function testIndexActionWhenNotFiltered(): void
     {
-        $this->client->request('GET', '/s/forms');
+        $this->client->request('GET', '/s/campaigns');
         $clientResponse = $this->client->getResponse();
         $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
     }
@@ -22,17 +22,17 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenFiltering(): void
     {
-        $this->client->request('GET', '/s/forms?search=has%3Aresults&tmpl=list');
+        $this->client->request('GET', '/s/campaigns?search=has%3Aresults&tmpl=list');
         $clientResponse = $this->client->getResponse();
         $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
     }
 
     /**
-     * Get form's create page.
+     * Get campaign's create page.
      */
-    public function testNewActionForm(): void
+    public function testNewActionCampaign(): void
     {
-        $this->client->request('GET', '/s/forms/new/');
+        $this->client->request('GET', '/s/campaigns/new/');
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
