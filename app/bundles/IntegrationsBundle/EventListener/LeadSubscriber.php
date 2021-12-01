@@ -89,7 +89,6 @@ class LeadSubscriber implements EventSubscriberInterface
             // Don't track changes just made by an active sync
             return;
         }
-
         if (!$this->syncIntegrationsHelper->hasObjectSyncEnabled(Contact::NAME)) {
             // Only track if an integration is syncing with contacts
             return;
@@ -169,6 +168,16 @@ class LeadSubscriber implements EventSubscriberInterface
 
     public function onLeadCompanyChange(Events\LeadChangeCompanyEvent $event): void
     {
+        if (defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS')) {
+            // Don't track changes just made by an active sync
+            return;
+        }
+
+        if (!$this->syncIntegrationsHelper->hasObjectSyncEnabled(MauticSyncDataExchange::OBJECT_CONTACT)) {
+            // Only track if an integration is syncing with companies
+            return;
+        }
+
         $lead = $event->getLead();
 
         // This mechanism is not able to record multiple company changes.
