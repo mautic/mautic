@@ -77,6 +77,8 @@ $container->loadFromExtension('doctrine', [
                     'point' => 'string',
                     'bit'   => 'string',
                 ],
+                'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
+                'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
             ],
         ],
     ],
