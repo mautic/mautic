@@ -522,7 +522,7 @@ class LeadField extends FormEntity
     /**
      * Set object.
      *
-     * @param int $object
+     * @param string $object
      *
      * @return LeadField
      */
