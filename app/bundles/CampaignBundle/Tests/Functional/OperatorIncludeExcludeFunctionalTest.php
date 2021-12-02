@@ -15,6 +15,8 @@ final class OperatorIncludeExcludeFunctionalTest extends MauticMysqlTestCase
      * The include/exclude operator should return the multiselect field.
      *
      * @dataProvider dataCustomFields
+     *
+     * @param array<string, string> $fieldDetails
      */
     public function testOperatorConditionIncludeExclude(array $fieldDetails, string $expectedFieldType): void
     {
@@ -34,6 +36,9 @@ final class OperatorIncludeExcludeFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectedFieldType, $response['fieldType']);
     }
 
+    /**
+     * @return iterable<mixed>
+     */
     public function dataCustomFields(): iterable
     {
         yield [
