@@ -89,6 +89,23 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
+    public function onLeadCompanyChange(Events\LeadChangeCompanyEvent $event)
+    {
+        $lead = $event->getLead();
+        if ($lead->getEventData('pipedrive.webhook')) {
+            // Don't export what was just imported
+            return;
+        }
+
+        /** @var PipedriveIntegration $integrationObject */
+        $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
+        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
+            return;
+        }
+        $this->leadExport->setIntegration($integrationObject);
+        $this->leadExport->update($lead);
+    }
+
     protected function syncContactToIntegration(\Mautic\LeadBundle\Entity\Lead $lead): void
     {
         if ($lead->isAnonymous()) {
