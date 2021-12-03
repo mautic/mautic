@@ -323,6 +323,14 @@ return [
                     'mautic.tracker.contact',
                 ],
             ],
+            'mautic.page.model.tracking.404' => [
+                'class'     => \Mautic\PageBundle\Model\Tracking404Model::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.tracker.contact',
+                    'mautic.page.model.page',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.page.repository.hit' => [
@@ -397,5 +405,6 @@ return [
         'facebook_pixel_id'                     => null,
         'facebook_pixel_trackingpage_enabled'   => false,
         'facebook_pixel_landingpage_enabled'    => false,
+        'do_not_track_404_anonymous'            => false,
     ],
 ];

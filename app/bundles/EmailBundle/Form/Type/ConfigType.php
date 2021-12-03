@@ -212,6 +212,52 @@ class ConfigType extends AbstractType
                     new Email(
                         [
                             'message' => 'mautic.core.email.required',
+                            'strict'  => true,
+                        ]
+                    ),
+                ],
+            ]
+        );
+
+        $builder->add(
+            'mailer_reply_to_email',
+            TextType::class,
+            [
+                'label'       => 'mautic.email.reply_to_email',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.email.reply_to_email.tooltip',
+                    'onchange' => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'required'    => false,
+                'constraints' => [
+                    new Email(
+                        [
+                            'message' => 'mautic.core.email.required',
+                            'strict'  => true,
+                        ]
+                    ),
+                ],
+            ]
+        );
+
+        $builder->add(
+            'mailer_reply_to_email',
+            TextType::class,
+            [
+                'label'       => 'mautic.email.reply_to_email',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.email.reply_to_email.tooltip',
+                    'onchange' => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'required'    => false,
+                'constraints' => [
+                    new Email(
+                        [
+                            'message' => 'mautic.core.email.required',
                         ]
                     ),
                 ],
