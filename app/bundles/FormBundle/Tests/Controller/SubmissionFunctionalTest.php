@@ -30,11 +30,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    /**
-     * @var MockObject|EntityManagerInterface
-     */
-    protected $em;
-
     public function testRequiredConditionalFieldIfNotEmpty(): void
     {
         // Create the test form via API.
@@ -399,6 +394,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $submission     = $response['submissions'][0];
 
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
         Assert::assertSame($formId, $submission['form']['id']);
         Assert::assertGreaterThanOrEqual(1, $response['total']);
 
