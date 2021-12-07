@@ -666,8 +666,6 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param int $emailId
-     *
      * @return array Formatted as [contactId => sentCount]
      */
     public function getSentCountForContacts(array $contacts, int $emailId)
@@ -693,9 +691,6 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param int $emailId
-     * @param string $time
-     *
      * @return mixed
      */
     public function getChannelDetails(int $emailId, string $time)
