@@ -666,11 +666,11 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param $emailId
+     * @param int $emailId
      *
      * @return array Formatted as [contactId => sentCount]
      */
-    public function getSentCountForContacts(array $contacts, $emailId)
+    public function getSentCountForContacts(array $contacts, int $emailId)
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
@@ -693,12 +693,12 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param $emailId
-     * @param $time
+     * @param int $emailId
+     * @param string $time
      *
      * @return mixed
      */
-    public function getChannelDetails($emailId, $time)
+    public function getChannelDetails(int $emailId, string $time)
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
