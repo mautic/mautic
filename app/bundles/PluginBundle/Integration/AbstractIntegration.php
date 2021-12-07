@@ -825,10 +825,14 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 case 'POST':
                 case 'PUT':
                 case 'PATCH':
+                    $payloadKey = \GuzzleHttp\RequestOptions::FORM_PARAMS;
+                    if (is_string($parameters)) {
+                        $payloadKey = \GuzzleHttp\RequestOptions::BODY;
+                    }
                     $result = $client->request($method, $url, [
-                        \GuzzleHttp\RequestOptions::FORM_PARAMS => $parameters,
-                        \GuzzleHttp\RequestOptions::HEADERS     => $headers,
-                        \GuzzleHttp\RequestOptions::TIMEOUT     => $timeout,
+                        $payloadKey                         => $parameters,
+                        \GuzzleHttp\RequestOptions::HEADERS => $headers,
+                        \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
                     ]);
                     break;
                 case 'DELETE':
