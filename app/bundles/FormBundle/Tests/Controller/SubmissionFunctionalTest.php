@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Controller;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
