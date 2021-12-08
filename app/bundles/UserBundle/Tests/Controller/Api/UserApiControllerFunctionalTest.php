@@ -135,7 +135,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
+        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
         $user->setPassword($encoder->encodePassword('mautic', null));
         $user->setRole($role);
         $this->em->persist($user);
