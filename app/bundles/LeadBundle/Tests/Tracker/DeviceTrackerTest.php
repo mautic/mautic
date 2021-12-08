@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Tests\Tracker;
 
+use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
@@ -50,7 +52,10 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
     {
         $this->deviceCreatorService = new DeviceCreatorService();
 
-        $this->deviceDetectorFactory = new DeviceDetectorFactory();
+        $coreParametersHelper        = $this->createMock(CoreParametersHelper::class);
+        $container                   = $this->createMock(ContainerInterface::class);
+        $cacheProvider               = new CacheProvider($coreParametersHelper, $container);
+        $this->deviceDetectorFactory = new DeviceDetectorFactory($cacheProvider);
 
         $this->deviceTrackingService = $this->getMockBuilder(DeviceTrackingServiceInterface::class)
             ->disableOriginalConstructor()
