@@ -74,12 +74,10 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->configTo['id']);
         $companyEntityTo->method('getName')
             ->willReturn($this->configTo['companyname']);
+        $companyEntityTo->method('getProfileFields')
+            ->willReturn($this->configTo);
 
         $mockCompanyModel->expects($this->once())->method('getEntity')->willReturn($companyEntityFrom);
-
-        $mockCompanyModel->expects($this->once())
-            ->method('getEntities')
-            ->willReturn([$companyEntityTo]);
 
         $mockCompanyLeadRepo  = $this->createMock(CompanyLeadRepository::class);
         $mockCompanyLeadRepo->expects($this->once())->method('getCompaniesByLeadId')->willReturn(null);
@@ -87,6 +85,14 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyModel->expects($this->once())
             ->method('getCompanyLeadRepository')
             ->willReturn($mockCompanyLeadRepo);
+
+        $mockCompanyModel->expects($this->once())
+            ->method('checkForDuplicateCompanies')
+            ->willReturn([$companyEntityTo]);
+
+        $mockCompanyModel->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([['alias' => 'companyname']]);
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -131,7 +137,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($event->getResult());
 
         $primaryCompany = $lead->getPrimaryCompany();
-
         $this->assertSame($this->configTo['companyname'], $primaryCompany['companyname']);
     }
 

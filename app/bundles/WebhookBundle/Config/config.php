@@ -70,6 +70,7 @@ return [
                     'mautic.core.model.notification',
                     'doctrine.orm.entity_manager',
                     'mautic.helper.mailer',
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],
@@ -114,7 +115,7 @@ return [
             'mautic.webhook.campaign.helper' => [
                 'class'     => \Mautic\WebhookBundle\Helper\CampaignHelper::class,
                 'arguments' => [
-                    'mautic.http.connector',
+                    'mautic.http.client',
                     'mautic.lead.model.company',
                     'event_dispatcher',
                 ],

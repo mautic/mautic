@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -15,17 +17,41 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\EmailBundle\Controller\AjaxController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|Session
+     */
     private $sessionMock;
+
+    /**
+     * @var MockObject|ModelFactory
+     */
     private $modelFactoryMock;
+
+    /**
+     * @var MockObject|Container
+     */
     private $containerMock;
+
+    /**
+     * @var MockObject|EmailModel
+     */
     private $modelMock;
+
+    /**
+     * @var MockObject|Email
+     */
     private $emailMock;
+
+    /**
+     * @var AjaxController
+     */
     private $controller;
 
     protected function setUp(): void
@@ -41,14 +67,14 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $this->controller->setContainer($this->containerMock);
     }
 
-    public function testSendBatchActionWhenNoIdProvided()
+    public function testSendBatchActionWhenNoIdProvided(): void
     {
-        $this->containerMock->expects($this->at(0))
+        $this->containerMock->expects($this->once())
             ->method('get')
             ->with('mautic.model.factory')
             ->willReturn($this->modelFactoryMock);
 
-        $this->modelFactoryMock->expects($this->at(0))
+        $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
             ->with('email')
             ->willReturn($this->modelMock);
@@ -58,19 +84,14 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('{"success":0}', $response->getContent());
     }
 
-    public function testSendBatchActionWhenIdProvidedButEmailNotPublished()
+    public function testSendBatchActionWhenIdProvidedButEmailNotPublished(): void
     {
-        $this->containerMock->expects($this->at(0))
+        $this->containerMock->expects($this->exactly(2))
             ->method('get')
-            ->with('mautic.model.factory')
-            ->willReturn($this->modelFactoryMock);
+            ->withConsecutive(['mautic.model.factory'], ['session'])
+            ->willReturnOnConsecutiveCalls($this->modelFactoryMock, $this->sessionMock);
 
-        $this->containerMock->expects($this->at(1))
-            ->method('get')
-            ->with('session')
-            ->willReturn($this->sessionMock);
-
-        $this->modelFactoryMock->expects($this->at(0))
+        $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
             ->with('email')
             ->willReturn($this->modelMock);
@@ -83,20 +104,18 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $this->modelMock->expects($this->never())
             ->method('sendEmailToLists');
 
-        $this->sessionMock->expects($this->at(0))
+        $this->sessionMock->expects($this->exactly(3))
             ->method('get')
-            ->with('mautic.email.send.progress')
-            ->willReturn([0, 100]);
-
-        $this->sessionMock->expects($this->at(1))
-            ->method('get')
-            ->with('mautic.email.send.stats')
-            ->willReturn(['sent' => 0, 'failed' => 0, 'failedRecipients' => []]);
-
-        $this->sessionMock->expects($this->at(2))
-            ->method('get')
-            ->with('mautic.email.send.active')
-            ->willReturn(false);
+            ->withConsecutive(
+                ['mautic.email.send.progress'],
+                ['mautic.email.send.stats'],
+                ['mautic.email.send.active']
+            )
+            ->willReturnOnConsecutiveCalls(
+                [0, 100],
+                ['sent' => 0, 'failed' => 0, 'failedRecipients' => []],
+                false
+            );
 
         $this->emailMock->expects($this->once())
             ->method('isPublished')
@@ -107,19 +126,14 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $response->getContent());
     }
 
-    public function testSendBatchActionWhenIdProvidedAndEmailIsPublished()
+    public function testSendBatchActionWhenIdProvidedAndEmailIsPublished(): void
     {
-        $this->containerMock->expects($this->at(0))
+        $this->containerMock->expects($this->exactly(2))
             ->method('get')
-            ->with('mautic.model.factory')
-            ->willReturn($this->modelFactoryMock);
+            ->withConsecutive(['mautic.model.factory'], ['session'])
+            ->willReturnOnConsecutiveCalls($this->modelFactoryMock, $this->sessionMock);
 
-        $this->containerMock->expects($this->at(1))
-            ->method('get')
-            ->with('session')
-            ->willReturn($this->sessionMock);
-
-        $this->modelFactoryMock->expects($this->at(0))
+        $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
             ->with('email')
             ->willReturn($this->modelMock);
@@ -134,20 +148,18 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
             ->with($this->emailMock, null, 50)
             ->willReturn([50, 0, []]);
 
-        $this->sessionMock->expects($this->at(0))
+        $this->sessionMock->expects($this->exactly(3))
             ->method('get')
-            ->with('mautic.email.send.progress')
-            ->willReturn([0, 100]);
-
-        $this->sessionMock->expects($this->at(1))
-            ->method('get')
-            ->with('mautic.email.send.stats')
-            ->willReturn(['sent' => 0, 'failed' => 0, 'failedRecipients' => []]);
-
-        $this->sessionMock->expects($this->at(2))
-            ->method('get')
-            ->with('mautic.email.send.active')
-            ->willReturn(false);
+            ->withConsecutive(
+                ['mautic.email.send.progress'],
+                ['mautic.email.send.stats'],
+                ['mautic.email.send.active']
+            )
+            ->willReturn(
+                [0, 100],
+                ['sent' => 0, 'failed' => 0, 'failedRecipients' => []],
+                false
+            );
 
         $this->emailMock->expects($this->once())
             ->method('isPublished')
