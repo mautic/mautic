@@ -28,7 +28,6 @@ use Mautic\LeadBundle\Model\ListModel;
 
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array */
     private $configFrom = [
         'id'          => 111,
         'companyname' => 'Mautic',
@@ -41,13 +40,11 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'companemail' => 'mautic@mauticsecond.com',
     ];
 
-    /** @var array */
     private $dncConditionForm = [
         'condition'   => 0,
         'channels'    => ['email'],
     ];
 
-    /** @var array */
     private $dncConditionForm2 = [
         'condition'   => 1,
         'channels'    => ['email'],
@@ -110,7 +107,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $doNotContact
         );
 
-        /** @var LeadModel $leadModel */
         $lead = new Lead();
         $lead->setId(99);
         $lead->setPrimaryCompany($this->configFrom);
