@@ -4,6 +4,7 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 
 use DOMElement;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
+use Symfony\Component\HttpFoundation\Request;
 
 final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTest
 {
@@ -60,6 +61,34 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
         $toggleElement = $crawler->filter('.toggle-publish-status');
         foreach ($attributes as $key => $val) {
             $this->assertStringContainsString($val, $toggleElement->attr($key));
+        }
+    }
+
+    public function testCampaignUnpublishToggle(): void
+    {
+        $campaign   = $this->saveSomeCampaignLeadEventLogs();
+        $translator = $this->container->get('translator');
+
+        $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'campaign', 'id' => $campaign->getId()]);
+        $response = $this->client->getResponse();
+
+        $this->assertTrue($response->isOk());
+
+        $attributes    = [
+            'onclick'               => 'Mautic.confirmationCampaignPublishStatus(mQuery(this));',
+            'data-toggle'           => 'confirmation',
+            'data-confirm-callback' => 'confirmCallbackCampaignPublishStatus',
+            'data-cancel-callback'  => 'dismissConfirmation',
+            'data-message'          => $translator->trans('mautic.campaign.form.confirmation.message'),
+            'data-confirm-text'     => $translator->trans('mautic.campaign.form.confirmation.confirm_text'),
+            'data-cancel-text'      => $translator->trans('mautic.campaign.form.confirmation.cancel_text'),
+        ];
+
+        $content = $response->getContent();
+
+        foreach ($attributes as $key => $val) {
+            $this->assertStringContainsString($key, $content);
+            $this->assertStringContainsString($val, $content);
         }
     }
 }

@@ -293,14 +293,21 @@ class AjaxController extends CommonController
                     if (!empty($refresh)) {
                         $dataArray['reload'] = 1;
                     } else {
+                        $onclickMethod  = (method_exists($entity, 'getOnclickMethod')) ? $entity->getOnclickMethod() : '';
+                        $dataAttr       = (method_exists($entity, 'getDataAttributes')) ? $entity->getDataAttributes() : [];
+                        $attrTransKeys  = (method_exists($entity, 'getTranslationKeysDataAttributes')) ? $entity->getTranslationKeysDataAttributes() : [];
+
                         //get updated icon HTML
                         $html = $this->renderView(
                             'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                             [
-                                'item'  => $entity,
-                                'model' => $name,
-                                'query' => $extra,
-                                'size'  => (isset($post['size'])) ? $post['size'] : '',
+                                'item'          => $entity,
+                                'model'         => $name,
+                                'query'         => $extra,
+                                'size'          => (isset($post['size'])) ? $post['size'] : '',
+                                'onclick'       => $onclickMethod,
+                                'attributes'    => $dataAttr,
+                                'transKeys'     => $attrTransKeys,
                             ]
                         );
                         $dataArray['statusHtml'] = $html;
