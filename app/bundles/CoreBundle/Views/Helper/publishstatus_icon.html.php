@@ -79,18 +79,24 @@ $defaultAttributes = [
     'data-status'    => $status,
 ];
 
-// Get the attributes if set.
-$attributes = $attributes ?? [];
+$attributes = [];
 
-if (!empty($attributes)) {
-    $onclick = $attributes['onclick'] ?? '';
-    unset($attributes['onclick']);
-
-    $attributes['data-id-class']    = '.'.$idClass;
-    $attributes['data-model']       = $model;
-    $attributes['data-item-id']     = $item->getId();
-    $attributes['data-query']       = $query;
-    $attributes['data-backdrop']    = $backdropFlag;
+// Update the attribute for campaign.
+if ('campaign' === $model) {
+    $onclick    = 'Mautic.confirmationCampaignPublishStatus(mQuery(this));';
+    $attributes = [
+        'data-toggle'           => 'confirmation',
+        'data-confirm-callback' => 'confirmCallbackCampaignPublishStatus',
+        'data-cancel-callback'  => 'dismissConfirmation',
+        'data-message'          => $view['translator']->trans('mautic.campaign.form.confirmation.message'),
+        'data-confirm-text'     => $view['translator']->trans('mautic.campaign.form.confirmation.confirm_text'),
+        'data-cancel-text'      => $view['translator']->trans('mautic.campaign.form.confirmation.cancel_text'),
+        'data-id-class'         => '.'.$idClass,
+        'data-model'            => $model,
+        'data-item-id'          => $item->getId(),
+        'data-query'            => $query,
+        'data-backdrop'         => $backdropFlag,
+    ];
 }
 
 $allDataAttrs = array_merge($attributes + $defaultAttributes);
