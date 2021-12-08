@@ -133,6 +133,9 @@ if ('index' == $tmpl) {
                                 [
                                     'item'          => $item,
                                     'model'         => 'campaign',
+                                    'onclick'       => $item->getOnclickMethod(),
+                                    'attributes'    => $item->getDataAttributes(),
+                                    'transKeys'     => $item->getTranslationKeysDataAttributes(),
                                 ]
                             ); ?>
                             <a href="<?php echo $view['router']->path(
