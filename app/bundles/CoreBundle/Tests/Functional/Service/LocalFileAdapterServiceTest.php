@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Test\Service;
+namespace Mautic\CoreBundle\Tests\Functional\Service;
 
 use FM\ElfinderBundle\Connector\ElFinderConnector;
 use FM\ElfinderBundle\Loader\ElFinderLoader;
