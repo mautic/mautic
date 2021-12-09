@@ -25,6 +25,8 @@ class LeadPermissions extends AbstractPermissions
                 'view' => 1,
             ],
         ];
+
+        $this->addExtendedPermissions('lists', false);
         $this->addExtendedPermissions('leads', false);
         $this->addStandardPermissions('imports');
     }
@@ -41,22 +43,7 @@ class LeadPermissions extends AbstractPermissions
     {
         $this->addExtendedFormFields('lead', 'leads', $builder, $data, false);
 
-        $builder->add(
-            'lead:lists',
-            PermissionListType::class,
-            [
-                'choices' => [
-                    'mautic.core.permissions.viewother'   => 'viewother',
-                    'mautic.core.permissions.editother'   => 'editother',
-                    'mautic.core.permissions.deleteother' => 'deleteother',
-                    'mautic.core.permissions.full'        => 'full',
-                ],
-                'label'             => 'mautic.lead.permissions.lists',
-                'data'              => (!empty($data['lists']) ? $data['lists'] : []),
-                'bundle'            => 'lead',
-                'level'             => 'lists',
-            ]
-        );
+        $this->addExtendedFormFields('lead', 'lists', $builder, $data, false);
 
         $builder->add(
             'lead:fields',
