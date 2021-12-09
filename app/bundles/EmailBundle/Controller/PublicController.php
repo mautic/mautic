@@ -431,8 +431,8 @@ class PublicController extends CommonFormController
             foreach ($payload as $key => $item) {
                 $newPayload[$key] = $item;
                 if (isset($item['email']) && isset($item['timestamp']) && in_array($item['event'], ['dropped', 'bounce'])) {
-                    $channelId = null;
                     $time = date('Y-m-d H:i:s', $item['timestamp']);
+                    $channelId = null;
                     $model = $this->get('mautic.email.model.email');
                     $stat = $model->getStatRepository()->getChannelDetails($item['email'], $time);
                     if ($stat && isset($stat['email_id'])) {
