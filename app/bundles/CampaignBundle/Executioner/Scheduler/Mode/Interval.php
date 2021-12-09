@@ -100,14 +100,17 @@ class Interval implements ScheduleModeInterface
             return $this->getExecutionDateTime($event, $compareFromDateTime, $dateTriggered);
         }
 
+        $interval = $event->getTriggerInterval();
+        $unit     = $event->getTriggerIntervalUnit();
+
+        $dateTriggered->add((new DateTimeHelper())->buildInterval($interval, $unit));
+
         $hour      = $event->getTriggerHour();
         $startTime = $event->getTriggerRestrictedStartHour();
         $endTime   = $event->getTriggerRestrictedStopHour();
         $dow       = $event->getTriggerRestrictedDaysOfWeek();
 
-        $diff = $dateTriggered->diff($compareFromDateTime);
-
-        return $this->getGroupExecutionDateTime($event->getId(), $log->getLead(), $diff, $dateTriggered, $hour, $startTime, $endTime, $dow);
+        return $this->getGroupExecutionDateTime($event->getId(), $log->getLead(), $dateTriggered, $hour, $startTime, $endTime, $dow);
     }
 
     /**
@@ -131,7 +134,6 @@ class Interval implements ScheduleModeInterface
             $groupExecutionDate = $this->getGroupExecutionDateTime(
                 $event->getId(),
                 $contact,
-                $diff,
                 $compareFromDateTime,
                 $hour,
                 $startTime,
@@ -183,7 +185,6 @@ class Interval implements ScheduleModeInterface
     private function getGroupExecutionDateTime(
         $eventId,
         Lead $contact,
-        \DateInterval $diff,
         \DateTime $compareFromDateTime,
         \DateTime $hour = null,
         \DateTime $startTime = null,
@@ -198,7 +199,7 @@ class Interval implements ScheduleModeInterface
             $this->logger->debug(
                 sprintf('CAMPAIGN: Scheduling event ID %s for contact ID %s based on hour of %s', $eventId, $contact->getId(), $hour->format('H:i e'))
             );
-            $groupDateTime = $this->getExecutionDateTimeFromHour($contact, $hour, $diff, $eventId, $compareFromDateTime);
+            $groupDateTime = $this->getExecutionDateTimeFromHour($contact, $hour, $eventId, $compareFromDateTime);
         } elseif ($startTime && $endTime) {
             $this->logger->debug(
                 sprintf(
@@ -210,14 +211,13 @@ class Interval implements ScheduleModeInterface
                 )
             );
 
-            $groupDateTime = $this->getExecutionDateTimeBetweenHours($contact, $startTime, $endTime, $diff, $eventId, $compareFromDateTime);
+            $groupDateTime = $this->getExecutionDateTimeBetweenHours($contact, $startTime, $endTime, $eventId, $compareFromDateTime);
         } else {
             $this->logger->debug(
                 sprintf('CAMPAIGN: Scheduling event ID %s for contact ID %s without hour restrictions.', $eventId, $contact->getId())
             );
 
             $groupDateTime = clone $compareFromDateTime;
-            $groupDateTime->add($diff);
         }
 
         if ($daysOfWeek) {
@@ -244,7 +244,7 @@ class Interval implements ScheduleModeInterface
      *
      * @return \DateTime
      */
-    private function getExecutionDateTimeFromHour(Lead $contact, \DateTime $hour, \DateInterval $diff, $eventId, \DateTime $compareFromDateTime)
+    private function getExecutionDateTimeFromHour(Lead $contact, \DateTime $hour, $eventId, \DateTime $compareFromDateTime)
     {
         $groupHour = clone $hour;
 
@@ -262,8 +262,6 @@ class Interval implements ScheduleModeInterface
                 $groupExecutionDate = clone $compareFromDateTime;
                 $groupExecutionDate->setTimezone($contactTimezone);
 
-                $groupExecutionDate->add($diff);
-
                 $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
 
                 return $groupExecutionDate;
@@ -277,7 +275,6 @@ class Interval implements ScheduleModeInterface
 
         $groupExecutionDate = clone $compareFromDateTime;
         $groupExecutionDate->setTimezone($this->getDefaultTimezone());
-        $groupExecutionDate->add($diff);
 
         $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
 
@@ -293,7 +290,6 @@ class Interval implements ScheduleModeInterface
         Lead $contact,
         \DateTime $startTime,
         \DateTime $endTime,
-        \DateInterval $diff,
         $eventId,
         \DateTime $compareFromDateTime
     ) {
@@ -321,8 +317,6 @@ class Interval implements ScheduleModeInterface
                 // Get now in the contacts timezone then add the number of days from now and the original execution date
                 $groupExecutionDate = clone $compareFromDateTime;
                 $groupExecutionDate->setTimezone($contactTimezone);
-
-                $groupExecutionDate->add($diff);
             } catch (\Exception $exception) {
                 // Timezone is not recognized so use the default
                 $this->logger->debug(
@@ -334,7 +328,6 @@ class Interval implements ScheduleModeInterface
         if (!isset($groupExecutionDate)) {
             $groupExecutionDate = clone $compareFromDateTime;
             $groupExecutionDate->setTimezone($this->getDefaultTimezone());
-            $groupExecutionDate->add($diff);
         }
 
         // Is the time between the start and end hours?
