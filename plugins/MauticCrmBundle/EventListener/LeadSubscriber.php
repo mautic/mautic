@@ -60,7 +60,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $lead              = $event->getLead();
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
         if (false !== $integrationObject && $integrationObject->shouldImportDataToPipedrive()) {
-            $leadFields = $this->integrationHelper->getIntegrationSettings()->getFeatureSettings()['leadFields'];
+            $leadFields = $integrationObject->getIntegrationSettings()->getFeatureSettings()['leadFields'];
             if (false !== array_search('points', $leadFields)) {
                 $this->syncContactToIntegration($lead);
             }
