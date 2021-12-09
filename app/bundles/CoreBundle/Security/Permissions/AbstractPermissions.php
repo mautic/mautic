@@ -448,8 +448,8 @@ abstract class AbstractPermissions
      * Adds the standard permission set of viewown, viewother, editown, editother, create, deleteown, deleteother,
      * publishown, publishother and full.
      *
-     * @param array $permissionNames
-     * @param bool  $includePublish
+     * @param array|string $permissionNames
+     * @param bool         $includePublish
      */
     protected function addExtendedPermissions($permissionNames, $includePublish = true)
     {
