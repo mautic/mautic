@@ -73,9 +73,21 @@ final class SmsEvents
      * The event listener receives a
      * Mautic\CampaignBundle\Event\CampaignExecutionEvent
      *
+     * @depreacated
+     *
      * @var string
      */
     public const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.sms.on_campaign_trigger_action';
+
+    /**
+     * The mautic.sms.on_campaign_trigger_batch_action event is fired when the campaign action triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_BATCH_ACTION = 'mautic.sms.on_campaign_trigger_batch_action';
 
     /**
      * The mautic.sms.on_reply event is dispatched when a SMS service receives a reply.

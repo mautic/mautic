@@ -5,7 +5,10 @@ namespace Mautic\SmsBundle\Sms;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Entity\Stat;
+use Mautic\SmsBundle\Collection\RecipientCollection;
+use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
+use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
 
 class TransportChain
 {
@@ -65,6 +68,32 @@ class TransportChain
         }
 
         return $enabled[$this->primaryTransport];
+    }
+
+    /**
+     * @param RecipientCollection<SmsRecipientDTO> $collection
+     *
+     * @return RecipientCollection<SmsRecipientDTO>
+     *
+     * @throws PrimaryTransportNotEnabledException
+     */
+    public function sendBatchSms(RecipientCollection $collection, string $template): RecipientCollection
+    {
+        // If the transport support sending of bulk sms
+        if ($this->getPrimaryTransport() instanceof BulkTransportInterface) {
+            return $this->getPrimaryTransport()->sendBatchSms($collection, $template);
+        }
+
+        // loops through contacts
+        foreach ($collection as &$recipient) {
+            $substitutionData = $recipient->getSubstitutionData();
+            // replace all tokens
+            $content = str_replace(array_keys($substitutionData), array_values($substitutionData), $template);
+            $status  = $this->sendSms($recipient->getLead(), $content);
+            $recipient->setResult($status);
+        }
+
+        return $collection;
     }
 
     /**

@@ -22,11 +22,13 @@ use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
+use Mautic\SmsBundle\Collection\RecipientCollection;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Event\SmsEvent;
 use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Form\Type\SmsType;
+use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 use Psr\Log\LoggerInterface;
@@ -80,6 +82,14 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         return $this->em->getRepository(Stat::class);
     }
 
+    public function getDoNotContactRepository(): DoNotContactRepository
+    {
+        return $this->em->getRepository('MauticLeadBundle:DoNotContact');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getPermissionBase(): string
     {
         return 'sms:smses';
@@ -234,8 +244,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 
         $contactIds = array_keys($contacts);
 
-        /** @var DoNotContactRepository $dncRepo */
-        $dncRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class);
+        $dncRepo = $this->getDoNotContactRepository();
         $dnc     = $dncRepo->getChannelList('sms', $contactIds);
 
         foreach ($dnc as $removeMeId => $removeMeReason) {
@@ -272,9 +281,11 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             }
 
             $stats = [];
-            // @todo we should allow batch sending based on transport, MessageBird does support 20 SMS at once
             // the transport chain is already prepared for it
             if (count($contacts)) {
+                $collection = new RecipientCollection();
+                $message    = '';
+
                 /** @var Lead $lead */
                 foreach ($contacts as $lead) {
                     $leadId          = $lead->getId();
@@ -298,21 +309,37 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                     $smsEvent->setSmsId($sms->getId());
                     $this->dispatcher->dispatch($smsEvent, SmsEvents::SMS_ON_SEND);
 
-                    $tokenEvent = $this->dispatcher->dispatch(
-                        new TokenReplacementEvent(
-                            $smsEvent->getContent(),
-                            $lead,
-                            [
-                                'channel' => [
-                                    'sms',          // Keep BC pre 2.14.1
-                                    $sms->getId(),  // Keep BC pre 2.14.1
-                                    'sms' => $sms->getId(),
-                                ],
-                                'stat'    => $stat->getTrackingHash(),
-                            ]
-                        ),
+                    $tokenEvent = new TokenReplacementEvent(
+                        $smsEvent->getContent(),
+                        $lead,
+                        [
+                            'channel' => [
+                                'sms',          // Keep BC pre 2.14.1
+                                $sms->getId(),  // Keep BC pre 2.14.1
+                                'sms' => $sms->getId(),
+                            ],
+                            'stat'    => $stat->getTrackingHash(),
+                        ]
+                    );
+
+                    $this->dispatcher->dispatch(
+                        $tokenEvent,
                         SmsEvents::TOKEN_REPLACEMENT
                     );
+
+                    $collection->append(new SmsRecipientDTO($lead, $tokenEvent->getTokens()));
+
+                    $stats[$lead->getId()] = $stat;
+
+                    // capture the message to be used later
+                    $message = $tokenEvent->getContent();
+
+                    unset($smsEvent, $tokenEvent);
+                }
+
+                if (count($collection)) {
+                    // assumption made that the Sms message is same for all contacts
+                    $metadata = $this->transport->sendBatchSms($collection, $message);
 
                     $sendResult = [
                         'sent'    => false,
@@ -320,27 +347,20 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                         'status'  => 'mautic.sms.timeline.status.delivered',
                         'id'      => $sms->getId(),
                         'name'    => $sms->getName(),
-                        'content' => $tokenEvent->getContent(),
+                        'content' => $sms->getMessage(),
                     ];
 
-                    $metadata = $this->transport->sendSms($lead, $tokenEvent->getContent(), $stat);
-                    if (true !== $metadata) {
-                        $sendResult['status'] = $metadata;
-                        $stat->setIsFailed(true);
-                        if (is_string($metadata)) {
-                            $stat->addDetail('failed', $metadata);
+                    foreach ($collection as $recipient) {
+                        if (true !== $recipient->getResult()) {
+                            $sendResult['status'] = $recipient->getResult();
+                            unset($stats[$recipient->getKey()]);
+                        } else {
+                            $sendResult['sent'] = true;
+                            ++$sentCount;
                         }
-                        ++$failedCount;
-                    } else {
-                        $sendResult['sent'] = true;
-                        ++$sentCount;
+
+                        $results[$recipient->getKey()] = $sendResult;
                     }
-
-                    $stats[]            = $stat;
-                    unset($stat);
-                    $results[$leadId] = $sendResult;
-
-                    unset($smsEvent, $tokenEvent, $sendResult, $metadata);
                 }
             }
         }

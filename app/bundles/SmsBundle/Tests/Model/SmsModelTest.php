@@ -9,8 +9,14 @@ use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Model\TrackableModel;
+use Mautic\SmsBundle\Entity\Sms;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -23,6 +29,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\SmsBundle\Sms\TransportChain;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SmsModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -123,5 +131,51 @@ class SmsModelTest extends \PHPUnit\Framework\TestCase
         $results = $this->smsModel->sendSms($sms, $lead);
         self::assertFalse((bool) $results[1]['sent']);
         self::assertSame('mautic.sms.campaign.failed.unpublished', $results[1]['status']);
+    }
+
+    public function testSendSMSTest(): void
+    {
+        $dncMock = $this->createMock(DoNotContactRepository::class);
+        $dncMock->method('getChannelList')
+            ->with('sms', [1, 2])
+            ->willReturn([]);
+
+        $pageTrackableModel = $this->createMock(TrackableModel::class);
+        $leadModel          = $this->createMock(LeadModel::class);
+        $messageQueueModel  = $this->createMock(MessageQueueModel::class);
+        $transport          = $this->createMock(TransportChain::class);
+
+        $dispatcher         = $this->createMock(EventDispatcherInterface::class);
+
+        $sms          = $this->createMock(Sms::class);
+        $sms->method('getId')
+            ->willReturn(1);
+        $sms->method('getMessage')
+            ->willReturn('test');
+
+        $lead1 = new Lead();
+        $lead1->setMobile('+123456789');
+        $lead1->setId(1);
+
+        $lead2 = new Lead();
+        $lead2->setMobile('+123456790');
+        $lead2->setId(2);
+
+        $leadModel->method('getEntities')
+            ->with(['ids' => [$lead1, $lead2]])
+            ->willReturn([$lead1, $lead2]);
+
+        // Partial mock, mocks just getRepository
+        $smsModel = $this->getMockBuilder(SmsModel::class)
+            ->setConstructorArgs([$pageTrackableModel, $leadModel, $messageQueueModel, $transport])
+            ->setMethods(['getDoNotContactRepository'])
+            ->getMock();
+
+        $smsModel->setDispatcher($dispatcher);
+        $smsModel->method('getDoNotContactRepository')
+            ->willReturn($dncMock);
+
+        $results = $smsModel->sendSms($sms, [$lead1, $lead2], ['channel' => ['campaign.event', 1]]);
+        $this->assertCount(2, $results);
     }
 }

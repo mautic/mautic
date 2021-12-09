@@ -4,7 +4,11 @@ namespace Mautic\SmsBundle\Tests\Sms;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\SmsBundle\Collection\RecipientCollection;
+use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
 use Mautic\SmsBundle\Integration\Twilio\TwilioTransport;
+use Mautic\SmsBundle\Sms\BulkTransportInterface;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\Sms\TransportInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -78,5 +82,60 @@ class TransportChainTest extends MauticMysqlTestCase
             $message = $e->getMessage();
             $this->assertEquals('Primary SMS transport is not enabled', $message);
         }
+    }
+
+    public function testSendBatchSms(): void
+    {
+        $bulkSmsTransport = new class() implements BulkTransportInterface {
+            public function sendBatchSms(RecipientCollection $collection, string $content): RecipientCollection
+            {
+                foreach ($collection as &$recipient) {
+                    $recipient->setResult(true);
+                }
+
+                return $collection;
+            }
+
+            public function sendSms(Lead $lead, $content): bool
+            {
+                return true;
+            }
+        };
+
+        $transportChain = new class('mautic.test.bulktwilio.mock', $this->container->get('mautic.helper.integration')) extends TransportChain {
+            public function getEnabledTransports(): array
+            {
+                $transports = $this->getTransports();
+
+                return array_map(function ($v) {
+                    return $v['service'];
+                }, $transports);
+            }
+        };
+
+        $transportChain->addTransport('mautic.test.bulktwilio.mock', $bulkSmsTransport, 'mautic.test.bulktwilio.mock', 'BulkTwilio');
+
+        $lead1 = new Lead();
+        $lead1->setMobile('+123456789');
+        $lead1->setId(1);
+
+        $lead2 = new Lead();
+        $lead2->setMobile('+123456790');
+        $lead2->setId(2);
+
+        $recipientCollection = new RecipientCollection();
+        $recipientCollection->append(new SmsRecipientDTO($lead1, []));
+        $recipientCollection->append(new SmsRecipientDTO($lead2, []));
+
+        $recipientCollection = $transportChain->sendBatchSms($recipientCollection, 'Yeah');
+
+        $sentCount = 0;
+        foreach ($recipientCollection as $recipient) {
+            if ($recipient->getResult()) {
+                ++$sentCount;
+            }
+        }
+
+        self::assertEquals(2, $sentCount);
     }
 }
