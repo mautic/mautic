@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @copyright   2014 Mautic, NP
  * @author      Mautic
