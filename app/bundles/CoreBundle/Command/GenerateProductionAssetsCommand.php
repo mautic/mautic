@@ -56,9 +56,16 @@ EOT
         // Combine and minify bundle assets
         $this->assetGenerationHelper->getAssets(true);
 
-        $assetsDir = $this->pathsHelper->getAssetsPath();
+        $assetsDir = $this->pathsHelper->getSystemPath('media', true);
 
         $this->moveExtraLibraries($nodeModulesDir, $assetsDir);
+
+        foreach (['mediaelementplayer', 'modal'] as $css_file) {
+            file_put_contents(
+              $this->pathsHelper->getSystemPath('media', true).'/css/'.$css_file.'.min.css',
+                (new \Minify(new \Minify_Cache_Null()))->combine([$pathsHelper->getSystemPath('assets', true).'/css/'.$css_file.'.css'])
+            );
+        }
 
         // Minify Mautic Form SDK
         file_put_contents(

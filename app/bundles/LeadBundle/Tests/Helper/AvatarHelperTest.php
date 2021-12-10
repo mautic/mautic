@@ -48,7 +48,7 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
         $this->pathsHelperMock->method('getSystemPath')
         ->willReturn('http://localhost');
         $this->assetsHelperMock->setPathsHelper($this->pathsHelperMock);
-        $this->defaultAvatarHelperMock = new DefaultAvatarHelper($this->pathsHelperMock, $this->assetsHelperMock);
+        $this->defaultAvatarHelperMock = new DefaultAvatarHelper($this->assetsHelperMock);
         $this->gravatarHelperMock      = new GravatarHelper($this->defaultAvatarHelperMock, $coreParametersHelper, $this->createMock(RequestStack::class));
         $this->leadMock                = $this->createMock(Lead::class);
         $this->avatarHelper            = new AvatarHelper($this->assetsHelperMock, $this->pathsHelperMock, $this->gravatarHelperMock, $this->defaultAvatarHelperMock);
