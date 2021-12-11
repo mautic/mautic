@@ -582,17 +582,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get contacts for a specific channel entity.
      *
-     * @param $args - same as getEntity/getEntities
-     * @param        $joinTable
-     * @param        $entityId
-     * @param array  $filters
-     * @param string $entityColumnName
-     * @param array  $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
-     *
-     * @return array
+     * @param array      $args             same as getEntity/getEntities
+     * @param string     $joinTable
+     * @param int        $entityId
+     * @param array      $filters
+     * @param string     $entityColumnName
+     * @param array|null $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
      */
-    public function getEntityContacts($args, $joinTable, $entityId, $filters = [], $entityColumnName = 'id', array $additionalJoins = null, $contactColumnName = 'lead_id')
-    {
+    public function getEntityContacts(
+        $args,
+        $joinTable,
+        $entityId,
+        $filters = [],
+        $entityColumnName = 'id',
+        array $additionalJoins = null,
+        $contactColumnName = 'lead_id',
+        \DateTimeInterface $dateFrom = null,
+        \DateTimeInterface $dateTo = null
+    ): array {
         $qb = $this->getEntitiesDbalQueryBuilder();
 
         if (empty($contactColumnName)) {
@@ -645,6 +652,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $qb->andWhere($expr);
                 }
             }
+        }
+
+        if ($dateFrom && $dateTo) {
+            $qb->andWhere('entity.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
         }
 
         $args['qb'] = $qb;
