@@ -9,6 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'list');
 $view['slots']->set('headerTitle', $list->getName());
@@ -23,23 +25,23 @@ $view['slots']->set(
             'customButtons'   => (isset($customButtons)) ? $customButtons : [],
             'templateButtons' => [
                 'edit' => $view['security']->hasEntityAccess(
-                    $permissions['lead:leads:editown'],
-                    $permissions['lead:lists:editother'],
+                    $permissions[LeadPermissions::LISTS_EDIT_OWN],
+                    $permissions[LeadPermissions::LISTS_EDIT_OTHER],
                     $list->getCreatedBy()
                 ),
                 'delete' => $view['security']->hasEntityAccess(
-                    $permissions['lead:lists:deleteother'],
-                    $permissions['lead:lists:editother'],
+                    $permissions[LeadPermissions::LISTS_DELETE_OTHER],
+                    $permissions[LeadPermissions::LISTS_EDIT_OTHER],
                     $list->getCreatedBy()
                 ),
                 'close' => $view['security']->hasEntityAccess(
-                    $permissions['lead:leads:editown'],
-                    $permissions['lead:lists:viewother'],
+                    $permissions[LeadPermissions::LISTS_EDIT_OWN],
+                    $permissions[LeadPermissions::LISTS_VIEW_OTHER],
                     $list->getCreatedBy()
                 ),
                 'clone' => $view['security']->hasEntityAccess(
-                    $permissions['lead:leads:editown'],
-                    $permissions['lead:lists:viewother'],
+                    $permissions[LeadPermissions::LISTS_EDIT_OWN],
+                    $permissions[LeadPermissions::LISTS_VIEW_OTHER],
                     $list->getCreatedBy()
                 ),
             ],

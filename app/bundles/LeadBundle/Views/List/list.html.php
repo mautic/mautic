@@ -8,6 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
+
 //Check to see if the entire page should be displayed or just main content
 if ('index' == $tmpl):
     $view->extend('MauticLeadBundle:List:index.html.php');
@@ -29,7 +32,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         'langVar'         => 'lead.list',
                         'routeBase'       => 'segment',
                         'templateButtons' => [
-                            'delete' => $permissions['lead:lists:deleteother'],
+                            'delete' => $permissions[LeadPermissions::LISTS_DELETE_OTHER],
                         ],
                     ]
                 );
@@ -76,9 +79,9 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             [
                                 'item'            => $item,
                                 'templateButtons' => [
-                                    'edit'   => $view['security']->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy()),
-                                    'clone'  => $view['security']->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy()),
-                                    'delete' => $view['security']->hasEntityAccess(true, $permissions['lead:lists:deleteother'], $item->getCreatedBy()),
+                                    'edit'   => $view['security']->hasEntityAccess(true, $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy()),
+                                    'clone'  => $view['security']->hasEntityAccess(true, $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy()),
+                                    'delete' => $view['security']->hasEntityAccess(true, $permissions[LeadPermissions::LISTS_DELETE_OTHER], $item->getCreatedBy()),
                                 ],
                                 'routeBase' => 'segment',
                                 'langVar'   => 'lead.list',
@@ -107,7 +110,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 ['item' => $item, 'model' => 'lead.list']
                             ); ?>
-                            <?php if ($view['security']->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy())) : ?>
+                            <?php if ($view['security']->hasEntityAccess(true, $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy())) : ?>
                                 <a href="<?php echo $view['router']->path(
                                     'mautic_segment_action',
                                     ['objectAction' => 'view', 'objectId' => $item->getId()]

@@ -8,6 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'leadlist');
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.list.header.index'));
@@ -18,7 +21,7 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
             'templateButtons' => [
-                'new' => true, // this is intentional. Each user can segment leads
+                'new' => $permissions[LeadPermissions::LISTS_CREATE],
             ],
             'routeBase' => 'segment',
             'langVar'   => 'lead.list',
