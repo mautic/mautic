@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -175,10 +176,10 @@ class ListApiController extends CommonApiController
     protected function checkEntityAccess($entity, $action = 'view')
     {
         if ('create' == $action || 'edit' == $action || 'view' == $action) {
-            return $this->security->isGranted('lead:leads:viewown');
+            return $this->security->isGranted(LeadPermissions::LISTS_VIEW_OWN);
         } elseif ('delete' == $action) {
             return $this->factory->getSecurity()->hasEntityAccess(
-                true, 'lead:lists:deleteother', $entity->getCreatedBy()
+                true, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
             );
         }
 
