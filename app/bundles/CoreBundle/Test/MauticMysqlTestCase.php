@@ -8,6 +8,7 @@ use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+use Symfony\Bundle\FrameworkBundle\Client;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
@@ -89,6 +90,20 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         foreach ($tables as $table) {
             $connection->query(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
         }
+    }
+
+    protected function createAnotherClient(string $username = 'admin', string $password = 'mautic'): Client
+    {
+        // turn off rollback cleanup as this client creates a separate DB connection
+        $this->useCleanupRollback = false;
+
+        return self::createClient(
+            $this->clientOptions,
+            [
+                'PHP_AUTH_USER' => $username,
+                'PHP_AUTH_PW'   => $password,
+            ]
+        );
     }
 
     /**
