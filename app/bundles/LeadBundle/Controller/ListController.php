@@ -164,7 +164,7 @@ class ListController extends FormController
      */
     public function newAction()
     {
-        if (!$this->get('mautic.security')->isGranted('lead:leads:viewown')) {
+        if (!$this->get('mautic.security')->isGranted(LeadPermissions::LISTS_CREATE)) {
             return $this->accessDenied();
         }
 
