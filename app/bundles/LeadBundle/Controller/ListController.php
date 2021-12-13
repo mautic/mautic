@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Segment\Stat\SegmentDependencies;
+use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -49,15 +50,21 @@ class ListController extends FormController
         $model   = $this->getModel('lead.list');
         $session = $request->getSession();
 
-        // set some permissions
+        //set some permissions
         $permissions = $this->security->isGranted([
-            'lead:leads:viewown',
-            'lead:leads:viewother',
-            'lead:lists:viewother',
-            'lead:lists:editother',
-            'lead:lists:deleteother',
+            LeadPermissions::LISTS_VIEW_OWN,
+            LeadPermissions::LISTS_VIEW_OTHER,
+            LeadPermissions::LISTS_EDIT_OWN,
+            LeadPermissions::LISTS_EDIT_OTHER,
+            LeadPermissions::LISTS_CREATE,
+            LeadPermissions::LISTS_DELETE_OWN,
+            LeadPermissions::LISTS_DELETE_OTHER,
+            LeadPermissions::LISTS_FULL,
         ], 'RETURN_ARRAY');
 
+        // If no permission set to the current user.
+        if (!in_array(1, $permissions)) {
+            $this->accessDenied();
         // Lists can be managed by anyone who has access to leads
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
             return $this->accessDenied();
@@ -85,7 +92,7 @@ class ListController extends FormController
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
-        if (!$permissions['lead:lists:viewother']) {
+        if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
             $translator      = $this->translator;
             $mine            = $translator->trans('mautic.core.searchcommand.ismine');
             $global          = $translator->trans('mautic.lead.list.searchcommand.isglobal');
@@ -758,7 +765,7 @@ class ListController extends FormController
                 ],
             ]);
         } elseif (!$this->security->hasEntityAccess(
-            'lead:leads:viewown',
+            'lead:lists:viewown',
             'lead:lists:viewother',
             $list->getCreatedBy()
         )
@@ -795,7 +802,7 @@ class ListController extends FormController
                 'list'           => $list,
                 'segmentCount'   => $listModel->getRepository()->getLeadCount($list->getId()),
                 'permissions'    => $security->isGranted([
-                    'lead:leads:editown',
+                    'lead:lists:editown',
                     'lead:lists:viewother',
                     'lead:lists:editother',
                     'lead:lists:deleteother',
