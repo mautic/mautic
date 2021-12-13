@@ -399,7 +399,6 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param      $q
      * @param      $filter
      * @param null $parameterName
      *
@@ -1168,7 +1167,7 @@ class CommonRepository extends EntityRepository
      *
      * @return bool
      */
-    protected function buildDbalJoinsFromAssociations(\Doctrine\DBAL\Query\QueryBuilder $q, $associations, $alias, array $allowed)
+    protected function buildDbalJoinsFromAssociations(DbalQueryBuilder $q, $associations, $alias, array $allowed)
     {
         $joinAdded = false;
         foreach ($associations as $property => $association) {
@@ -1540,7 +1539,6 @@ class CommonRepository extends EntityRepository
                             break;
                         case 'in':
                         case 'notIn':
-
                             $parsed = str_getcsv(html_entity_decode($clause['val']), ',', '"');
 
                             $param = $this->generateRandomParameterName();

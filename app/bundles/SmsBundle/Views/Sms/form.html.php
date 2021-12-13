@@ -27,6 +27,13 @@ $isExisting = $sms->getId();
 <div class="row">
     <div class="col-md-12">
         <?php echo $view['form']->row($form['message']); ?>
+        <div>
+            <?php echo $view['translator']->trans('mautic.sms.form.nbcharacter.counter'); ?>
+            <span id="sms_nb_char">0</span>
+        </div>
+        <div class="alert alert-info mt-10">
+            <?php echo $view['translator']->trans('mautic.sms.form.nbcharacter.infobox'); ?>
+        </div>
     </div>
 </div>
 <?php $view['slots']->stop(); ?>

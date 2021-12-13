@@ -385,7 +385,7 @@ return [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\Spool\DelegatingSpool::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'swiftmailer.transport.real',
+                    'swiftmailer.mailer.default.transport.real',
                 ],
             ],
 
@@ -669,7 +669,7 @@ return [
             'mautic.message.processor.bounce' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class,
                 'arguments' => [
-                    'swiftmailer.transport.real',
+                    'swiftmailer.mailer.default.transport.real',
                     'mautic.message.search.contact',
                     'mautic.email.repository.stat',
                     'mautic.lead.model.lead',
@@ -681,7 +681,7 @@ return [
             'mautic.message.processor.unsubscribe' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class,
                 'arguments' => [
-                    'swiftmailer.transport.real',
+                    'swiftmailer.mailer.default.transport.real',
                     'mautic.message.search.contact',
                     'translator',
                     'monolog.logger.mautic',
@@ -842,6 +842,9 @@ return [
                 'class'     => \Mautic\EmailBundle\Model\SendEmailToUser::class,
                 'arguments' => [
                     'mautic.email.model.email',
+                    'event_dispatcher',
+                    'mautic.lead.validator.custom_field',
+                    'mautic.validator.email',
                 ],
             ],
             'mautic.email.model.send_email_to_contacts' => [
@@ -875,12 +878,29 @@ return [
                 ],
                 'tag' => 'console.command',
             ],
+            'mautic.email.command.queue' => [
+                'class'     => \Mautic\EmailBundle\Command\ProcessEmailQueueCommand::class,
+                'arguments' => [
+                    'swiftmailer.mailer.default.transport.real',
+                    'event_dispatcher',
+                    'mautic.helper.core_parameters',
+                ],
+                'tag' => 'console.command',
+            ],
         ],
         'validator' => [
             'mautic.email.validator.multiple_emails_valid_validator' => [
                 'class'     => \Mautic\EmailBundle\Validator\MultipleEmailsValidValidator::class,
                 'arguments' => [
                     'mautic.validator.email',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
+            'mautic.email.validator.email_or_token_list_validator' => [
+                'class'     => \Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator::class,
+                'arguments' => [
+                    'mautic.validator.email',
+                    'mautic.lead.validator.custom_field',
                 ],
                 'tag' => 'validator.constraint_validator',
             ],
@@ -920,6 +940,7 @@ return [
         'mailer_api_key'                 => null, // Api key from mail delivery provider.
         'mailer_from_name'               => 'Mautic',
         'mailer_from_email'              => 'email@yoursite.com',
+        'mailer_reply_to_email'          => null,
         'mailer_return_path'             => null,
         'mailer_transport'               => 'smtp',
         'mailer_append_tracking_pixel'   => true,

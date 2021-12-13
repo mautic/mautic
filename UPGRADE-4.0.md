@@ -1,7 +1,6 @@
 # Backwards compatibility breaking changes
 *   Platform Requirements
     *   Minimal PHP version was increased from 7.3 to 7.4.
-    *   Minimal MySQL version was increased from x to x
 *   API
     *   OAuth1 support has been removed. Mautic supports the OAuth2 standard, including the Client Credentials grant, which was added in Mautic 4. Documentation can be found here: https://developer.mautic.org/#client-credentials
 *   Symfony 4
