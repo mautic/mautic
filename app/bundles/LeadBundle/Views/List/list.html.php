@@ -10,12 +10,14 @@
  */
 
 use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 // Check to see if the entire page should be displayed or just main content
 if ('index' == $tmpl):
     $view->extend('MauticLeadBundle:List:index.html.php');
 endif;
 $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list');
+$now         = (new DateTimeHelper())->getUtcDateTime();
 ?>
 
 <?php if (count($items)): ?>

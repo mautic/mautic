@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
-use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class LeadPermissions extends AbstractPermissions
