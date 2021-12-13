@@ -11,6 +11,7 @@
 
 use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 
 //Check to see if the entire page should be displayed or just main content
 if ('index' == $tmpl):
