@@ -413,7 +413,7 @@ class ListController extends FormController
         }
 
         if (!$this->get('mautic.security')->hasEntityAccess(
-            true, 'lead:lists:editother', $segment->getCreatedBy()
+            true, LeadPermissions::LISTS_EDIT_OTHER, $segment->getCreatedBy()
         )) {
             throw new AccessDeniedException(sprintf('User has not access on segment with id %d', $segmentId));
         }
@@ -507,7 +507,7 @@ class ListController extends FormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->get('mautic.security')->hasEntityAccess(
-                true, 'lead:lists:deleteother', $list->getCreatedBy()
+                true, LeadPermissions::LISTS_DELETE_OTHER, $list->getCreatedBy()
             )
             ) {
                 return $this->accessDenied();
@@ -583,7 +583,7 @@ class ListController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->get('mautic.security')->hasEntityAccess(
-                    true, 'lead:lists:deleteother', $entity->getCreatedBy()
+                    true, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
                 )) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
@@ -673,7 +673,7 @@ class ListController extends FormController
                     'msgVars' => ['%id%' => $listId],
                 ];
             } elseif (!$this->get('mautic.security')->hasEntityAccess(
-                'lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser()
+                LeadPermissions::LISTS_CREATE, LeadPermissions::LISTS_EDIT_OTHER, $lead->getPermissionUser()
             )) {
                 return $this->accessDenied();
             } elseif (null === $list) {
@@ -683,7 +683,7 @@ class ListController extends FormController
                     'msgVars' => ['%id%' => $list->getId()],
                 ];
             } elseif (!$list->isGlobal() && !$this->get('mautic.security')->hasEntityAccess(
-                    true, 'lead:lists:viewother', $list->getCreatedBy()
+                    true, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
                 )) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($lead)) {
@@ -765,8 +765,8 @@ class ListController extends FormController
                 ],
             ]);
         } elseif (!$security->hasEntityAccess(
-            'lead:lists:viewown',
-            'lead:lists:viewother',
+            LeadPermissions::LISTS_VIEW_OWN,
+            LeadPermissions::LISTS_VIEW_OTHER,
             $list->getCreatedBy()
         )
         ) {
@@ -802,10 +802,10 @@ class ListController extends FormController
                 'list'           => $list,
                 'segmentCount'   => $listModel->getRepository()->getLeadCount($list->getId()),
                 'permissions'    => $security->isGranted([
-                    'lead:lists:editown',
-                    'lead:lists:viewother',
-                    'lead:lists:editother',
-                    'lead:lists:deleteother',
+                    LeadPermissions::LISTS_EDIT_OWN,
+                    LeadPermissions::LISTS_VIEW_OTHER,
+                    LeadPermissions::LISTS_EDIT_OTHER,
+                    LeadPermissions::LISTS_DELETE_OTHER,
                 ], 'RETURN_ARRAY'),
                 'security'      => $security,
                 'dateRangeForm' => $dateRangeForm->createView(),
@@ -992,7 +992,7 @@ class ListController extends FormController
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            ['lead:leads:viewother', 'lead:leads:viewown'],
+            LeadPermissions::LISTS_VIEW_OTHER,
             'segment',
             'lead_lists_leads',
             null,
