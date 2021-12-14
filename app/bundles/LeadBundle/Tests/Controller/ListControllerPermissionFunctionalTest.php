@@ -100,7 +100,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
-    public function testUserWithoutPermissionCreatingNewSegments(): void
+    public function testCreateSegmentForUserWithoutPermission(): void
     {
         $this->loginOtherUser($this->nonAdminUser->getUsername());
 
@@ -108,7 +108,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
-    public function testUserWithPermissionCreatingNewSegments(): void
+    public function testCreateSegmentForUserWithPermission(): void
     {
         $this->loginOtherUser($this->userOne->getUsername());
 
@@ -155,7 +155,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('No list with an id of 2000 was found!', $crawler->text());
     }
 
-    public function testEditInvalidSegment()
+    public function testEditInvalidSegment(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/2000');
         // For no entity found it will redirect to index page.
