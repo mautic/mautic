@@ -146,6 +146,24 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
+    public function testCloneInvalidSegment(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/clone/2000');
+        // For no entity found it will redirect to index page.
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('/s/segments/1', $this->client->getRequest()->getRequestUri());
+        $this->assertStringContainsString('No list with an id of 2000 was found!', $crawler->text());
+    }
+
+    public function testEditInvalidSegment()
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/2000');
+        // For no entity found it will redirect to index page.
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('/s/segments/1', $this->client->getRequest()->getRequestUri());
+        $this->assertStringContainsString('No list with an id of 2000 was found!', $crawler->text());
+    }
+
     public function testEditOwnSegment(): void
     {
         $this->loginOtherUser($this->userOne->getUsername());
