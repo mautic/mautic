@@ -29,6 +29,11 @@ class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
      */
     private $userTwo;
 
+    /**
+     * @var LeadList
+     */
+    private $segmentA;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -73,14 +78,14 @@ class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
                 'bitwise'   => 16,
             ],
         ]);
+
+        $this->segmentA = $this->createSegment('Segment List A', $this->userOne);
     }
 
     public function testIndexPageWithCreatePermission(): void
     {
-        $this->client->request(Request::METHOD_GET, '/s/logout');
-        $this->loginUser($this->userOne->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $this->userOne->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
+        $this->loginOtherUser($this->userOne->getUsername());
+
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
@@ -89,50 +94,38 @@ class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
     public function testIndexPageNonAdmin(): void
     {
-        $this->client->request(Request::METHOD_GET, '/s/logout');
-        $this->loginUser($this->nonAdminUser->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $this->nonAdminUser->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
+        $this->loginOtherUser($this->nonAdminUser->getUsername());
+
         $this->client->request(Request::METHOD_GET, '/s/segments');
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
     public function testUserWithoutPermissionCreatingNewSegments(): void
     {
-        $this->client->request(Request::METHOD_GET, '/s/logout');
-        $this->loginUser($this->nonAdminUser->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $this->nonAdminUser->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
+        $this->loginOtherUser($this->nonAdminUser->getUsername());
+
         $this->client->request(Request::METHOD_GET, '/s/segments/new');
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
     public function testUserWithPermissionCreatingNewSegments(): void
     {
-        $this->client->request(Request::METHOD_GET, '/s/logout');
-        $this->loginUser($this->userOne->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $this->userOne->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
+        $this->loginOtherUser($this->userOne->getUsername());
+
         $this->client->request(Request::METHOD_GET, '/s/segments/new');
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
     public function testSegmentCloningUsingUserHavingPermissions(): void
     {
-        $segment = $this->createSegment('Segment List', $this->userOne);
+        $this->loginOtherUser($this->userTwo->getUsername());
 
-        $this->client->request(Request::METHOD_GET, '/s/logout');
-        $this->loginUser($this->userTwo->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $this->userTwo->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
-        $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$segment->getId());
+        $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
     public function testSegmentCloningUsingUserWithoutPermissions(): void
     {
-        $segment = $this->createSegment('Segment List', $this->userOne);
-
         $userThree = $this->createUser(
             [
                 'user-name'     => 'user-3',
@@ -147,12 +140,54 @@ class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->client->request(Request::METHOD_GET, '/s/logout');
-        $this->loginUser($userThree->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $userThree->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
-        $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$segment->getId());
+        $this->loginOtherUser($userThree->getUsername());
+
+        $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testEditOwnSegment(): void
+    {
+        $this->loginOtherUser($this->userOne->getUsername());
+
+        $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$this->segmentA->getId());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testEditOthersSegment(): void
+    {
+        $this->loginOtherUser($this->userTwo->getUsername());
+
+        $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$this->segmentA->getId());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testSegmentEditForUserWithoutPermission(): void
+    {
+        $user = $this->createUser([
+            'user-name'     => 'user-edit',
+            'email'         => 'user-edit@mautic-test.com',
+            'first-name'    => 'user-edit',
+            'last-name'     => 'user-edit',
+            'role'          => [
+                'name'      => 'perm_user_edit',
+                'perm'      => LeadPermissions::LISTS_EDIT_OWN,
+                'bitwise'   => 8,
+            ],
+        ]);
+
+        $this->loginOtherUser($user->getUsername());
+
+        $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$this->segmentA->getId());
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+    }
+
+    private function loginOtherUser(string $name): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/logout');
+        $this->loginUser($name);
+        $this->client->setServerParameter('PHP_AUTH_USER', $name);
+        $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
     }
 
     /**
