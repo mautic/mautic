@@ -299,7 +299,7 @@ return [
                 ],
                 'mautic.lead.list.menu.index' => [
                     'iconClass' => 'fa-pie-chart',
-                    'access'    => ['lead:leads:viewown', 'lead:leads:viewother'],
+                    'access'    => ['lead:lists:viewown', 'lead:lists:viewother'],
                     'route'     => 'mautic_segment_index',
                     'priority'  => 70,
                 ],

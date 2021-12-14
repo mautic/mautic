@@ -221,6 +221,30 @@ class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('No list with an id of 101 was found!', $crawler->text());
     }
 
+    public function testViewSegment(): void
+    {
+        $user = $this->createUser([
+            'user-name'     => 'user-view-own',
+            'email'         => 'user-view-own@mautic-test.com',
+            'first-name'    => 'user-view-own',
+            'last-name'     => 'user-view-own',
+            'role'          => [
+                'name'      => 'perm_user_view_own',
+                'perm'      => LeadPermissions::LISTS_VIEW_OWN,
+                'bitwise'   => 2,
+            ],
+        ]);
+        $segment = $this->createSegment('Segment News View', $user);
+
+        $this->loginOtherUser($user->getUsername());
+        $this->client->request(Request::METHOD_GET, '/s/segments/view/'.$segment->getId());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $this->loginOtherUser($this->userOne->getUsername());
+        $this->client->request(Request::METHOD_GET, '/s/segments/view/'.$segment->getId());
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+    }
+
     private function loginOtherUser(string $name): void
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
