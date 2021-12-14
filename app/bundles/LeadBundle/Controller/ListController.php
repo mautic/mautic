@@ -670,7 +670,7 @@ class ListController extends FormController
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.lead.lead.error.notfound',
-                    'msgVars' => ['%id%' => $listId],
+                    'msgVars' => ['%id%' => $leadId],
                 ];
             } elseif (!$this->get('mautic.security')->hasEntityAccess(
                 LeadPermissions::LISTS_CREATE, LeadPermissions::LISTS_EDIT_OTHER, $lead->getPermissionUser()
@@ -680,7 +680,7 @@ class ListController extends FormController
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.lead.list.error.notfound',
-                    'msgVars' => ['%id%' => $list->getId()],
+                    'msgVars' => ['%id%' => $listId],
                 ];
             } elseif (!$list->isGlobal() && !$this->get('mautic.security')->hasEntityAccess(
                     true, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
