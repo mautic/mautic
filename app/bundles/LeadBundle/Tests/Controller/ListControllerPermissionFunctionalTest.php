@@ -3,7 +3,9 @@
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
@@ -263,6 +265,39 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
+    public function testRemoveLeadFromSegmentWhereUserIsNotOwnerOfSegment(): void
+    {
+        $leadId = $this->createLead($this->userOne)->getId();
+        $this->loginOtherUser($this->userTwo->getUsername());
+        $this->client->request(Request::METHOD_POST, '/s/segments/removeLead/'.$this->segmentA->getId().'?leadId='.$leadId);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testRemoveLeadFromSegmentWhereUserIsOwnerOfSegment(): void
+    {
+        $leadId = $this->createLead($this->userOne)->getId();
+        $this->loginOtherUser($this->userOne->getUsername());
+        $this->client->request(Request::METHOD_POST, '/s/segments/removeLead/'.$this->segmentA->getId().'?leadId='.$leadId);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testAddLeadFromInvalidLeadId(): void
+    {
+        $leadId     = 99999;
+        $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/addLead/'.$this->segmentA->getId().'?leadId='.$leadId);
+        $this->assertStringContainsString("No contact with an id of {$leadId} was found!", $crawler->html());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testAddLeadFromInvalidSegment(): void
+    {
+        $listId     = 9999;
+        $leadId     = $this->createLead($this->userOne)->getId();
+        $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/addLead/'.$listId.'?leadId='.$leadId);
+        $this->assertStringContainsString("No list with an id of {$listId} was found!", $crawler->html());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+    }
+
     private function loginOtherUser(string $name): void
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
@@ -322,5 +357,16 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $segment;
+    }
+
+    private function createLead(User $user): Lead
+    {
+        $lead = new Lead();
+        $lead->setCreatedByUser($user);
+
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        return $lead;
     }
 }
