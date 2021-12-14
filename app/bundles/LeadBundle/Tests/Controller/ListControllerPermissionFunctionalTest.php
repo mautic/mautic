@@ -162,7 +162,7 @@ class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
-    public function testSegmentEditForUserWithoutPermission(): void
+    public function testEditSegmentForUserWithoutPermission(): void
     {
         $user = $this->createUser([
             'user-name'     => 'user-edit',
@@ -180,6 +180,45 @@ class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testDeleteSegmentWithoutPermission(): void
+    {
+        $this->loginOtherUser($this->nonAdminUser->getUsername());
+        $this->client->request(Request::METHOD_POST, '/s/segments/edit/'.$this->segmentA->getId());
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testDeleteOthersSegmentWithPermission(): void
+    {
+        $this->loginOtherUser($this->userTwo->getUsername());
+        $this->client->request(Request::METHOD_POST, '/s/segments/edit/'.$this->segmentA->getId());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testBatchDeleteSegmentForDeletingSelfOthersAndNonExisting(): void
+    {
+        $user = $this->createUser([
+            'user-name'     => 'user-delete-a',
+            'email'         => 'user-delete-a@mautic-test.com',
+            'first-name'    => 'user-delete-a',
+            'last-name'     => 'user-delete-a',
+            'role'          => [
+                'name'      => 'perm_user_delete_a',
+                'perm'      => LeadPermissions::LISTS_EDIT_OWN,
+                'bitwise'   => 8,
+            ],
+        ]);
+
+        $segment = $this->createSegment('Segment List New', $user);
+
+        $this->loginOtherUser($user->getUsername());
+
+        $segmentIds = [$this->segmentA->getId(), 101, $segment->getId()];
+        $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/batchDelete?ids='.json_encode($segmentIds));
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('You do not have access to the requested area/action.', $crawler->text());
+        $this->assertStringContainsString('No list with an id of 101 was found!', $crawler->text());
     }
 
     private function loginOtherUser(string $name): void
