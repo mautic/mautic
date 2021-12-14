@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
-class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
+final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @var User

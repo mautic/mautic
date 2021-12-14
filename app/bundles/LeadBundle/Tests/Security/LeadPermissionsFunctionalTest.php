@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class LeadPermissionsFunctionalTest extends MauticMysqlTestCase
+final class LeadPermissionsFunctionalTest extends MauticMysqlTestCase
 {
     public function testRolePageForPermissionAvailability(): void
     {
