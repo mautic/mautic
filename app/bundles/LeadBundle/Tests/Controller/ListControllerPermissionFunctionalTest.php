@@ -203,14 +203,14 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     public function testDeleteSegmentWithoutPermission(): void
     {
         $this->loginOtherUser($this->nonAdminUser->getUsername());
-        $this->client->request(Request::METHOD_POST, '/s/segments/edit/'.$this->segmentA->getId());
+        $this->client->request(Request::METHOD_POST, '/s/segments/delete/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
     public function testDeleteOthersSegmentWithPermission(): void
     {
         $this->loginOtherUser($this->userTwo->getUsername());
-        $this->client->request(Request::METHOD_POST, '/s/segments/edit/'.$this->segmentA->getId());
+        $this->client->request(Request::METHOD_POST, '/s/segments/delete/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
