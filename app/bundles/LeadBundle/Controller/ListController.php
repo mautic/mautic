@@ -673,7 +673,7 @@ class ListController extends FormController
                     'msgVars' => ['%id%' => $leadId],
                 ];
             } elseif (!$this->get('mautic.security')->hasEntityAccess(
-                LeadPermissions::LISTS_CREATE, LeadPermissions::LISTS_EDIT_OTHER, $lead->getPermissionUser()
+                LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $lead->getPermissionUser()
             )) {
                 return $this->accessDenied();
             } elseif (null === $list) {

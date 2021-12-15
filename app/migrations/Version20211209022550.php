@@ -53,7 +53,14 @@ final class Version20211209022550 extends AbstractMauticMigration
             }
 
             // Map all leads permission to list.
-            $rawPermissions['lead:lists'] = $leadPermission;
+            $newPermissions = $leadPermission;
+
+            // If lead has viewown permission, then update
+            if (in_array('viewown', $leadPermission)) {
+                $newPermissions[] = 'create';
+            }
+
+            $rawPermissions['lead:lists'] = array_flip(array_flip($newPermissions));
 
             $model->setRolePermissions($role, $rawPermissions);
             $model->saveEntity($role);
