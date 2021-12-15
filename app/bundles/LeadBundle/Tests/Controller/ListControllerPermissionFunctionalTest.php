@@ -226,6 +226,14 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
+    public function testDeleteInvalidSegment()
+    {
+        $listId     = 99999;
+        $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/delete/'.$listId);
+        $this->assertStringContainsString("No list with an id of {$listId} was found!", $crawler->html());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+    }
+
     public function testBatchDeleteSegmentForDeletingSelfOthersAndNonExisting(): void
     {
         $user = $this->createUser([
