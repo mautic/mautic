@@ -513,18 +513,18 @@ class ListController extends FormController
                 return $this->accessDenied();
             } elseif ($model->isLocked($list)) {
                 return $this->isLocked($postActionVars, $list, 'lead.list');
+            } else {
+                $model->deleteEntity($list);
+
+                $flashes[] = [
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.core.notice.deleted',
+                    'msgVars' => [
+                        '%name%' => $list->getName(),
+                        '%id%'   => $objectId,
+                    ],
+                ];
             }
-
-            $model->deleteEntity($list);
-
-            $flashes[] = [
-                'type'    => 'notice',
-                'msg'     => 'mautic.core.notice.deleted',
-                'msgVars' => [
-                    '%name%' => $list->getName(),
-                    '%id%'   => $objectId,
-                ],
-            ];
         } //else don't do anything
 
         return $this->postActionRedirect(
