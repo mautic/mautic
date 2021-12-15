@@ -53,7 +53,6 @@ final class Version20211209022550 extends AbstractMauticMigration
             }
 
             // Map all leads permission to list.
-            // @todo, we need to improvise the mapping here.
             $rawPermissions['lead:lists'] = $leadPermission;
 
             $model->setRolePermissions($role, $rawPermissions);
