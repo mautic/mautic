@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
@@ -211,7 +210,18 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
     public function testDeleteOthersSegmentWithPermission(): void
     {
-        $this->loginOtherUser($this->userTwo->getUsername());
+        $user = $this->createUser([
+            'user-name'     => 'user-delete-other',
+            'email'         => 'user-delete-other@mautic-test.com',
+            'first-name'    => 'user-delete-other',
+            'last-name'     => 'user-delete-other',
+            'role'          => [
+                'name'      => 'perm_user_delete_other',
+                'perm'      => LeadPermissions::LISTS_DELETE_OTHER,
+                'bitwise'   => 128,
+            ],
+        ]);
+        $this->loginOtherUser($user->getUsername());
         $this->client->request(Request::METHOD_POST, '/s/segments/delete/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
