@@ -226,7 +226,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
-    public function testDeleteInvalidSegment()
+    public function testDeleteInvalidSegment(): void
     {
         $listId     = 99999;
         $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/delete/'.$listId);
@@ -248,15 +248,33 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $segment = $this->createSegment('Segment List New', $user);
+        $segmentA  = $this->createSegment('Segment List A', $user);
+        $segmentB  = $this->createSegment('Segment List B', $user);
+
+        $filter = [[
+            'object'     => 'lead',
+            'glue'       => 'and',
+            'field'      => 'leadlist',
+            'type'       => 'leadlist',
+            'operator'   => 'in',
+            'properties' => [
+                'filter' => [$segmentB->getId()],
+            ],
+            'display'   => '',
+            'filter'    => [$segmentB->getId()],
+        ]];
+
+        $segmentC = $this->createSegment('Segment List with filter', $user, $filter);
+        $this->assertSame($filter, $segmentC->getFilters(), 'Filters');
 
         $this->loginOtherUser($user->getUsername());
 
-        $segmentIds = [$this->segmentA->getId(), 101, $segment->getId()];
+        $segmentIds = [$this->segmentA->getId(), 101, $segmentA->getId(), $segmentB->getId()];
         $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/batchDelete?ids='.json_encode($segmentIds));
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $this->assertStringContainsString('You do not have access to the requested area/action.', $crawler->text());
         $this->assertStringContainsString('No list with an id of 101 was found!', $crawler->text());
+        $this->assertStringContainsString("{$segmentB->getName()} cannot be deleted, it is required by other segments.", $crawler->text());
     }
 
     public function testViewSegment(): void
@@ -365,12 +383,20 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($permission);
     }
 
-    private function createSegment(string $name, User $user): LeadList
+    /**
+     * @param mixed[] $filters
+     */
+    private function createSegment(string $name, User $user, array $filters = []): LeadList
     {
         $segment = new LeadList();
         $segment->setName($name);
         $segment->setAlias(str_shuffle('abcdefghijklmnopqrstuvwxyz'));
         $segment->setCreatedBy($user);
+
+        if ($filters) {
+            $segment->setFilters($filters);
+        }
+
         $this->em->persist($segment);
         $this->em->flush();
 
