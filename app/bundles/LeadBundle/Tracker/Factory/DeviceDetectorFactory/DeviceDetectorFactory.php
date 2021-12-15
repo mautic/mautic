@@ -22,7 +22,7 @@ final class DeviceDetectorFactory implements DeviceDetectorFactoryInterface
 {
     private CacheProvider $cacheProvider;
 
-    public function __construct(CacheProvider $cacheProvider) 
+    public function __construct(CacheProvider $cacheProvider)
     {
         $this->cacheProvider = $cacheProvider;
     }
