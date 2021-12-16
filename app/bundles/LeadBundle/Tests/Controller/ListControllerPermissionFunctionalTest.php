@@ -119,8 +119,25 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $this->loginOtherUser($this->userOne->getUsername());
 
-        $this->client->request(Request::METHOD_GET, '/s/segments/new');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/new');
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        // Submitting for cancel button click.
+        $form           = $crawler->selectButton('Cancel')->form();
+        $crawlerCancel  = $this->client->submit($form);
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('Contact Segments', $crawlerCancel->html());
+
+        // Save the Segment.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/new');
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form['leadlist[name]']->setValue('Segment Test');
+        $form['leadlist[alias]']->setValue('segment_test');
+        $form['leadlist[isPublished]']->setValue(false);
+        $crawler = $this->client->submit($form);
+
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('Edit Segment - Segment Test', $crawler->html());
     }
 
     public function testSegmentCloningUsingUserHavingPermissions(): void
