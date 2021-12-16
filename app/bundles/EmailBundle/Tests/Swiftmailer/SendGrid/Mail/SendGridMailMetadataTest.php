@@ -19,9 +19,32 @@ use SendGrid\ReplyTo;
 
 class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
 {
+    private function make_header($key, $value)
+    {
+        $an_header = $this->getMockBuilder(\Swift_Mime_Header::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $an_header->method('getFieldName')
+            ->willReturn($key);
+
+        $an_header->method('getFieldBody')
+            ->willReturn($value);
+
+        return $an_header;
+    }
+
     public function testBaseMessage()
     {
         $sendGridMailMetadata = new SendGridMailMetadata();
+
+        $headers = $this->getMockBuilder(\Swift_Mime_SimpleHeaderSet::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $headers->expects($this->once())
+            ->method('getAll')
+            ->willReturn([$this->make_header('X-FOO', 'Bar'), $this->make_header('to', 'nobody@email.com')]);
 
         $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
             ->disableOriginalConstructor()
@@ -36,6 +59,10 @@ class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
             ->method('getBcc')
             ->with()
             ->willReturn(['bcc@example.com' => 'bcc@example.com']);
+
+        $message->expects($this->once())
+            ->method('getHeaders')
+            ->willReturn($headers);
 
         $mail = new Mail('from', 'subject', 'to', 'content');
 

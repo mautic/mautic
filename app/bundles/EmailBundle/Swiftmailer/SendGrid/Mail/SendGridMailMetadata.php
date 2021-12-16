@@ -33,14 +33,15 @@ class SendGridMailMetadata
             'mime-version', 'date',
         ];
 
-        if (isset($headers)){
-            // remove list-unsubscribe header when not Bulk
-            if ('Bulk' != $headers->get('Precedence')) {
-                $skip_headers[] = 'list-unsubscribe';
-                // Mail sent directly should  try to send each time, IMHO, eg: password reset forms!
+        // in prod, this is always defined, but not all tests are mocking headers
+        if (isset($headers)) {
+            /* if ('Bulk' != $headers->get('Precedence')) {
+                // IMHO we should also remove list-unsubscribe header when Precedence != Bulk, but this should be done
+                // where list-unsubscribe is created at no in each transport!
+                // However, mail sent directly should  try to send each time, even if address have active bounces
                 // TODO: turn on BypassBounceManagement
-                // however, current version of vendor SendGrid does not support this object yet
-            }
+                // current version of vendor "sendgrid/sendgrid": "~6.0" do not support this feature
+            } */
 
             foreach ($headers->getAll() as $header) {
                 $key   = $header->getFieldName();
