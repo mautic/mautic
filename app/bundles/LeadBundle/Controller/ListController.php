@@ -52,8 +52,7 @@ class ListController extends FormController
         $model   = $this->getModel('lead.list');
         $session = $this->get('session');
 
-        //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted([
+        $permissionsToCheck = [
             LeadPermissions::LISTS_VIEW_OWN,
             LeadPermissions::LISTS_VIEW_OTHER,
             LeadPermissions::LISTS_EDIT_OWN,
@@ -62,7 +61,9 @@ class ListController extends FormController
             LeadPermissions::LISTS_DELETE_OWN,
             LeadPermissions::LISTS_DELETE_OTHER,
             LeadPermissions::LISTS_FULL,
-        ], 'RETURN_ARRAY');
+        ];
+
+        $permissions = $this->get('mautic.security')->isGranted($permissionsToCheck, 'RETURN_ARRAY');
 
         // If no permission set to the current user.
         if (!in_array(1, $permissions)) {
@@ -793,6 +794,13 @@ class ListController extends FormController
             ]
         );
 
+        $permissions = [
+            LeadPermissions::LISTS_EDIT_OWN,
+            LeadPermissions::LISTS_VIEW_OTHER,
+            LeadPermissions::LISTS_EDIT_OTHER,
+            LeadPermissions::LISTS_DELETE_OTHER,
+        ];
+
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
             'viewParameters' => [
@@ -801,15 +809,10 @@ class ListController extends FormController
                 'stats'          => $segmentContactsLineChartData,
                 'list'           => $list,
                 'segmentCount'   => $listModel->getRepository()->getLeadCount($list->getId()),
-                'permissions'    => $security->isGranted([
-                    LeadPermissions::LISTS_EDIT_OWN,
-                    LeadPermissions::LISTS_VIEW_OTHER,
-                    LeadPermissions::LISTS_EDIT_OTHER,
-                    LeadPermissions::LISTS_DELETE_OTHER,
-                ], 'RETURN_ARRAY'),
-                'security'      => $security,
-                'dateRangeForm' => $dateRangeForm->createView(),
-                'events'        => [
+                'permissions'    => $security->isGranted($permissions, 'RETURN_ARRAY'),
+                'security'       => $security,
+                'dateRangeForm'  => $dateRangeForm->createView(),
+                'events'         => [
                     'filters' => $filters,
                     'types'   => [
                         'manually_added'   => $translator->trans('mautic.segment.contact.manually.added'),
