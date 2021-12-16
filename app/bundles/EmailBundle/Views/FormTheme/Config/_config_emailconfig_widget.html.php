@@ -86,6 +86,10 @@ $template  = '<div class="col-md-6">{content}</div>';
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_custom_headers', $template); ?>
             </div>
 
+            <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_transport_custom_args', $template); ?>
+            </div>
+
             <?php if (isset($fields['mailer_transport'])): ?>
                 <hr class="text-muted" />
             <?php endif; ?>

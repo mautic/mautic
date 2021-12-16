@@ -639,6 +639,24 @@ class ConfigType extends AbstractType
             ]
         );
 
+        // label and tooltip values seems to be ignored, but I updated it to reflect the ones used on the messages.ini
+        $builder->add(
+            'mailer_transport_custom_args',
+            SortableListType::class,
+            [
+                'required'        => false,
+                'label'           => 'mautic.email.transport_custom_args',
+                'attr'            => [
+                    'tooltip'      => 'mautic.email.transport_custom_args.config.tooltip',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceAcceptsCustomArgs().']}',
+                ],
+                'option_required' => false,
+                'with_labels'     => true,
+                'key_value_pairs' => true, // do not store under a `list` key and use label as the key
+            ]
+        );
+
         $builder->add(
             'mailer_spool_path',
             TextType::class,

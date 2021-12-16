@@ -64,6 +64,13 @@ class TransportType
     /**
      * @var array
      */
+    private $showCustomArgs = [
+        'mautic.transport.sendgrid_api',
+    ];
+
+    /**
+     * @var array
+     */
     private $showPassword = [
         'mautic.transport.mailjet',
         'mautic.transport.sendgrid',
@@ -157,6 +164,14 @@ class TransportType
     public function getServiceRequiresUser()
     {
         return $this->getString($this->showUser);
+    }
+
+    /**
+     * @return string
+     */
+    public function getServiceAcceptsCustomArgs()
+    {
+        return $this->getString($this->showCustomArgs);
     }
 
     /**

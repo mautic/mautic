@@ -18,6 +18,16 @@ use SendGrid\ReplyTo;
 
 class SendGridMailMetadata
 {
+    /**
+     * @var array
+     */
+    private $customArgs;
+
+    public function __construct($customArgs)
+    {
+        $this->customArgs = isset($customArgs) ? $customArgs : [];
+    }
+
     public function addMetadataToMail(Mail $mail, \Swift_Mime_SimpleMessage $message)
     {
         $mail_settings = new MailSettings();
@@ -31,6 +41,10 @@ class SendGridMailMetadata
             $bcc_settings->setEnable(true);
             $bcc_settings->setEmail(key($message->getBcc()));
             $mail_settings->setBccSettings($bcc_settings);
+        }
+
+        foreach ($this->customArgs as $key =>  $value) {
+            $mail->addCustomArg($key, $value);
         }
 
         $mail->setMailSettings($mail_settings);
