@@ -101,6 +101,12 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
+    public function testIndexPageForPaging(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/segments/2');
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+    }
+
     public function testCreateSegmentForUserWithoutPermission(): void
     {
         $this->loginOtherUser($this->nonAdminUser->getUsername());
@@ -201,6 +207,21 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
+    public function testEditSegmentWhileLock(): void
+    {
+        $segmentA = $this->segmentA;
+        $segmentA->setCheckedOut(new \DateTime());
+        $segmentA->setCheckedOutBy($this->userOne);
+        $this->em->persist($segmentA);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segmentA->getId());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        // As $segmentA is locked, so it will redirect user to its view page.
+        $this->assertStringContainsString('/s/segments/view/'.$segmentA->getId(), $this->client->getRequest()->getRequestUri());
+    }
+
     public function testDeleteSegmentWithoutPermission(): void
     {
         $this->loginOtherUser($this->nonAdminUser->getUsername());
@@ -226,6 +247,42 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
+    public function testDeleteSegmentWithDependencyAndLockedInWithOtherUser(): void
+    {
+        $listId = $this->segmentA->getId();
+        $filter = [[
+            'object'     => 'lead',
+            'glue'       => 'and',
+            'field'      => 'leadlist',
+            'type'       => 'leadlist',
+            'operator'   => 'in',
+            'properties' => [
+                'filter' => [$listId],
+            ],
+            'display'   => '',
+            'filter'    => [$listId],
+        ]];
+        $segmentA  = $this->createSegment('Segment List A', $this->userTwo, $filter);
+
+        $this->assertSame($filter, $segmentA->getFilters(), 'Filters');
+        $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/delete/'.$listId);
+        $this->assertStringContainsString("Segment cannot be deleted, it is required by {$segmentA->getName()}.", $crawler->text());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $segmentA->setCheckedOut(new \DateTime());
+        $segmentA->setCheckedOutBy($this->userOne);
+        $this->em->persist($segmentA);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_POST, '/s/segments/delete/'.$segmentA->getId());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $this->assertStringContainsString("{$segmentA->getName()} is currently checked out by", $crawler->html());
+
+        // As $segmentA is locked, so it will redirect user to its view page.
+        $this->assertStringContainsString('/s/segments/1', $this->client->getRequest()->getRequestUri());
+    }
+
     public function testDeleteInvalidSegment(): void
     {
         $listId     = 99999;
@@ -234,7 +291,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
-    public function testBatchDeleteSegmentForDeletingSelfOthersAndNonExisting(): void
+    public function testBatchDeleteSegmentForDeletingSelfOthersAndNonExistingAndLocked(): void
     {
         $user = $this->createUser([
             'user-name'     => 'user-delete-a',
@@ -267,14 +324,32 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $segmentC = $this->createSegment('Segment List with filter', $user, $filter);
         $this->assertSame($filter, $segmentC->getFilters(), 'Filters');
 
+        $segmentD = $this->createSegment('Segment List D', $user);
+        $segmentD->setCheckedOut(new \DateTime());
+        $segmentD->setCheckedOutBy($this->userOne);
+        $this->em->persist($segmentD);
+        $this->em->flush();
+
         $this->loginOtherUser($user->getUsername());
 
-        $segmentIds = [$this->segmentA->getId(), 101, $segmentA->getId(), $segmentB->getId()];
+        $segmentIds = [$this->segmentA->getId(), 101, $segmentA->getId(), $segmentB->getId(), $segmentD->getId()];
         $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/batchDelete?ids='.json_encode($segmentIds));
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        // The logged-in user do not have permission to delete the segment $this->segmentA.
         $this->assertStringContainsString('You do not have access to the requested area/action.', $crawler->text());
+
+        // The segment 101 is invalid.
         $this->assertStringContainsString('No list with an id of 101 was found!', $crawler->text());
+
+        // The segment $segmentB is used as filter in $segmentC.
         $this->assertStringContainsString("{$segmentB->getName()} cannot be deleted, it is required by other segments.", $crawler->text());
+
+        // The segment $segmentD is being locked by user other than logged-in.
+        $this->assertStringContainsString("{$segmentD->getName()} is currently checked out by", $crawler->html());
+
+        // Only one segments is deleted.
+        $this->assertStringContainsString('1 lists have been deleted!', $crawler->html());
     }
 
     public function testViewSegment(): void
@@ -317,21 +392,28 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
-    public function testAddLeadFromInvalidLeadId(): void
+    public function testAddLeadToSegmentForInvalidLeadAndLockedLeadAndInvalidSegment(): void
     {
         $leadId     = 99999;
         $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/addLead/'.$this->segmentA->getId().'?leadId='.$leadId);
         $this->assertStringContainsString("No contact with an id of {$leadId} was found!", $crawler->html());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-    }
 
-    public function testAddLeadFromInvalidSegment(): void
-    {
         $listId     = 9999;
-        $leadId     = $this->createLead($this->userOne)->getId();
-        $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/addLead/'.$listId.'?leadId='.$leadId);
+        $lead       = $this->createLead($this->userOne);
+        $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/addLead/'.$listId.'?leadId='.$lead->getId());
         $this->assertStringContainsString("No list with an id of {$listId} was found!", $crawler->html());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $lead->setCheckedOut(new \DateTime());
+        $lead->setCheckedOutBy($this->userOne);
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/addLead/'.$this->segmentA->getId().'?leadId='.$lead->getId());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $this->assertStringContainsString("{$lead->getPrimaryIdentifier()} is currently checked out by", $crawler->html());
     }
 
     private function loginOtherUser(string $name): void
