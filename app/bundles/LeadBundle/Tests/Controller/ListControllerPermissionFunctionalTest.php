@@ -179,6 +179,27 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('No list with an id of 2000 was found!', $crawler->text());
     }
 
+    public function testEditSegmentAndClickOnButtons(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$this->segmentA->getId());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        // Submitting for cancel button click.
+        $form           = $crawler->selectButton('Cancel')->form();
+        $crawlerCancel  = $this->client->submit($form);
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString($this->segmentA->getName(), $crawlerCancel->html());
+
+        // Save the Segment.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$this->segmentA->getId());
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form['leadlist[isPublished]']->setValue(false);
+        $crawler = $this->client->submit($form);
+
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('Edit Segment - '.$this->segmentA->getName(), $crawler->html());
+    }
+
     public function testEditInvalidSegment(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/2000');
