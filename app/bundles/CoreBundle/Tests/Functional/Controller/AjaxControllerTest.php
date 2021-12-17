@@ -27,7 +27,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     {
         $responseToPostUpdate  = new Response();
         $responseToGetUpdate   = new Response(200, [], file_get_contents(__DIR__.'/../../Fixtures/releases.json'));
-        $responseToGetMetadata = new Response(200, [], file_get_contents(__DIR__.'/../../Fixtures/releases.json'));
+        $responseToGetMetadata = new Response(200, [], file_get_contents(__DIR__.'/../../Fixtures/metadata.json'));
 
         $this->clientMockHandler->append($responseToPostUpdate, $responseToGetUpdate, $responseToGetMetadata);
 
