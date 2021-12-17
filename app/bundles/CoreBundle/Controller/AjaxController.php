@@ -372,7 +372,7 @@ class AjaxController extends CommonController
     /**
      * Run pre-update checks, like if the user has the correct PHP version, database version, etc.
      */
-    protected function updateRunChecksAction(Request $request): JsonResponse
+    protected function updateRunChecksAction(): JsonResponse
     {
         $dataArray  = [];
         $translator = $this->translator;
