@@ -857,17 +857,13 @@ class Form extends FormEntity
 
     public function useCache(bool $useCache): bool
     {
-        if (!$this->usesProgressiveProfiling()) {
-            return false;
-        }
-
         foreach ($this->getFields() as $field) {
             if ($field->getCustomParameters()[FormBuilderEvent::DYNAMIC_FIELD] ?? false) {
                 return false;
             }
         }
 
-        return $useCache;
+        return $useCache && !$this->usesProgressiveProfiling();
     }
 
     /**
