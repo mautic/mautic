@@ -2536,7 +2536,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Because so many integrations extend this class and mautic.http.client is not in the
      * constructor at the time of writing, let's just create a new client here. In addition,
      * we add some custom cURL options.
-     * 
+     *
      * @param mixed[] $options
      */
     protected function makeHttpClient(array $options): Client

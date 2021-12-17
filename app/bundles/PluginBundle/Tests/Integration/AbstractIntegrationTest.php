@@ -108,7 +108,6 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
         $integration->method('makeHttpClient')
             ->willReturn(
                 new class($assertRequest) extends Client {
-
                     private object $assertRequest;
 
                     public function __construct(object $assertRequest)
@@ -139,11 +138,12 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
                 'ignore_event_dispatch' => true,
                 'encode_parameters'     => 'json',
             ],
-            new class {
+            new class() {
                 /**
                  * @param mixed[] $options
                  */
-                function assert(string $method, string $uri = '', array $options = []) {
+                public function assert(string $method, string $uri = '', array $options = [])
+                {
                     Assert::assertSame('POST', $method);
                     Assert::assertSame('https://some.uri', $uri);
                     Assert::assertSame(
@@ -155,7 +155,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
                         $options
                     );
                 }
-            }
+            },
         ];
 
         // Test with form params.
@@ -164,23 +164,24 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
             ['this will be' => 'encoded to form array'],
             'POST',
             ['ignore_event_dispatch' => true],
-            new class {
+            new class() {
                 /**
                  * @param mixed[] $options
                  */
-                function assert(string $method, string $uri = '', array $options = []) {
+                public function assert(string $method, string $uri = '', array $options = [])
+                {
                     Assert::assertSame('POST', $method);
                     Assert::assertSame('https://some.uri', $uri);
                     Assert::assertSame(
                         [
                             RequestOptions::FORM_PARAMS => ['this will be' => 'encoded to form array'],
-                            'headers'            => [],
-                            'timeout'            => 10,
+                            'headers'                   => [],
+                            'timeout'                   => 10,
                         ],
                         $options
                     );
                 }
-            }
+            },
         ];
     }
 }
