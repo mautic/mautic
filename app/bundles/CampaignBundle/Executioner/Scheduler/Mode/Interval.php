@@ -124,17 +124,12 @@ class Interval implements ScheduleModeInterface
         $endTime               = $event->getTriggerRestrictedStopHour();
         $daysOfWeek            = $event->getTriggerRestrictedDaysOfWeek();
 
-        // Get the difference between now and the date we're supposed to be executing
-        $compareFromDateTime = $compareFromDateTime ? clone $compareFromDateTime : new \DateTime('now');
-        $diff                = $compareFromDateTime->diff($executionDate);
-        $diff->f             = 0; // we don't care about microseconds
-
         /** @var Lead $contact */
         foreach ($contacts as $contact) {
             $groupExecutionDate = $this->getGroupExecutionDateTime(
                 $event->getId(),
                 $contact,
-                $compareFromDateTime,
+                $executionDate,
                 $hour,
                 $startTime,
                 $endTime,
