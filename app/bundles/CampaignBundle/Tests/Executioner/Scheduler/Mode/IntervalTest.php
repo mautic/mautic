@@ -23,7 +23,19 @@ use Throwable;
 
 class IntervalTest extends \PHPUnit\Framework\TestCase
 {
-    public function testRescheduledToDueBeingBeforeSpecificHourRestriction()
+    /**
+     * @return iterable<string, array<mixed>>
+     */
+    public function rescheduledToDueBeingBeforeSpecificHourRestrictionProvider(): iterable
+    {
+        yield 'Without any Interval' => [0, '', '1970-01-01 09:00:00', '2018-10-18 14:00:00', '2018-10-18 09:00'];
+        yield 'With Interval' => [5, 'D', '1970-01-01 09:00:00', '2018-10-18 14:00:00', '2018-10-23 09:00'];
+    }
+
+    /**
+     * @dataProvider rescheduledToDueBeingBeforeSpecificHourRestrictionProvider
+     */
+    public function testRescheduledToDueBeingBeforeSpecificHourRestriction(int $triggerInterval, string $triggerIntervalUnit, string $triggerHour, string $executionDate, string $resultedExecutionDate)
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -32,9 +44,13 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $event = $this->createMock(Event::class);
         $event->method('getTriggerMode')
             ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event->method('getTriggerInterval')
+            ->willReturn($triggerInterval);
+        $event->method('getTriggerIntervalUnit')
+            ->willReturn($triggerIntervalUnit);
         $event->method('getTriggerHour')
             ->willReturn(
-                new \DateTime('1970-01-01 09:00:00')
+                new \DateTime($triggerHour)
             );
         $event->method('getTriggerRestrictedDaysOfWeek')
             ->willReturn([]);
@@ -50,15 +66,27 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
             ->willReturn('America/Los_Angeles');
         $contacts = new ArrayCollection([$contact1]);
 
-        $grouped    = $interval->groupContactsByDate($event, $contacts, new \DateTime('2018-10-18 14:00:00', new \DateTimeZone('UTC')));
+        $grouped    = $interval->groupContactsByDate($event, $contacts, new \DateTime($executionDate, new \DateTimeZone('UTC')));
         $firstGroup = reset($grouped);
 
         $executionDate = $firstGroup->getExecutionDate();
 
-        $this->assertEquals('2018-10-18 09:00', $executionDate->format('Y-m-d H:i'));
+        $this->assertEquals($resultedExecutionDate, $executionDate->format('Y-m-d H:i'));
     }
 
-    public function testRescheduledDueToBeingAfterSpecificHourRestriction()
+    /**
+     * @return iterable<string, array<mixed>>
+     */
+    public function rescheduledDueToBeingAfterSpecificHourRestrictionProvider(): iterable
+    {
+        yield 'Without any Interval' => [0, '', '1970-01-01 09:00:00', '2018-10-18 16:00:00', '2018-10-18 09:00'];
+        yield 'With Interval' => [5, 'D', '1970-01-01 09:00:00', '2018-10-18 16:00:00', '2018-10-23 09:00'];
+    }
+
+    /**
+     * @dataProvider rescheduledDueToBeingAfterSpecificHourRestrictionProvider
+     */
+    public function testRescheduledDueToBeingAfterSpecificHourRestriction(int $triggerInterval, string $triggerIntervalUnit, string $triggerHour, string $executionDate, string $resultedExecutionDate)
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -67,9 +95,13 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $event = $this->createMock(Event::class);
         $event->method('getTriggerMode')
             ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event->method('getTriggerInterval')
+            ->willReturn($triggerInterval);
+        $event->method('getTriggerIntervalUnit')
+            ->willReturn($triggerIntervalUnit);
         $event->method('getTriggerHour')
             ->willReturn(
-                new \DateTime('1970-01-01 09:00:00')
+                new \DateTime($triggerHour)
             );
         $event->method('getTriggerRestrictedDaysOfWeek')
             ->willReturn([]);
@@ -85,15 +117,27 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
             ->willReturn('America/Los_Angeles');
         $contacts = new ArrayCollection([$contact1]);
 
-        $grouped    = $interval->groupContactsByDate($event, $contacts, new \DateTime('2018-10-18 16:00:00', new \DateTimeZone('UTC')));
+        $grouped    = $interval->groupContactsByDate($event, $contacts, new \DateTime($executionDate, new \DateTimeZone('UTC')));
         $firstGroup = reset($grouped);
 
         $executionDate = $firstGroup->getExecutionDate();
 
-        $this->assertEquals('2018-10-18 09:00', $executionDate->format('Y-m-d H:i'));
+        $this->assertEquals($resultedExecutionDate, $executionDate->format('Y-m-d H:i'));
     }
 
-    public function testNotRescheduledDueToSpecificHourRestriction()
+    /**
+     * @return iterable<string, array<mixed>>
+     */
+    public function notRescheduledDueToSpecificHourRestrictionProvider(): iterable
+    {
+        yield 'Without any Interval' => [0, '', '1970-01-01 09:00:00', '2018-10-18 14:00:00', '2018-10-18 09:00'];
+        yield 'With Interval' => [5, 'D', '1970-01-01 09:00:00', '2018-10-18 14:00:00', '2018-10-23 09:00'];
+    }
+
+    /**
+     * @dataProvider notRescheduledDueToSpecificHourRestrictionProvider
+     */
+    public function testNotRescheduledDueToSpecificHourRestriction(int $triggerInterval, string $triggerIntervalUnit, string $triggerHour, string $executionDate, string $resultedExecutionDate)
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -102,9 +146,13 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $event = $this->createMock(Event::class);
         $event->method('getTriggerMode')
             ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event->method('getTriggerInterval')
+            ->willReturn($triggerInterval);
+        $event->method('getTriggerIntervalUnit')
+            ->willReturn($triggerIntervalUnit);
         $event->method('getTriggerHour')
             ->willReturn(
-                new \DateTime('1970-01-01 09:00:00')
+                new \DateTime($triggerHour)
             );
         $event->method('getTriggerRestrictedDaysOfWeek')
             ->willReturn([]);
@@ -120,15 +168,27 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
             ->willReturn('America/New_York');
         $contacts = new ArrayCollection([$contact1]);
 
-        $grouped       = $interval->groupContactsByDate($event, $contacts, new \DateTime('2018-10-18 14:00:00', new \DateTimeZone('UTC')));
+        $grouped       = $interval->groupContactsByDate($event, $contacts, new \DateTime($executionDate, new \DateTimeZone('UTC')));
         $firstGroup    = reset($grouped);
         $executionDate = $firstGroup->getExecutionDate();
 
         // 6am pacific = 9am eastern so don't reschedule
-        $this->assertEquals('2018-10-18 09:00', $executionDate->format('Y-m-d H:i'));
+        $this->assertEquals($resultedExecutionDate, $executionDate->format('Y-m-d H:i'));
     }
 
-    public function testRescheduledToSameDayDueToStartHourRestriction()
+    /**
+     * @return iterable<string, array<mixed>>
+     */
+    public function rescheduledToSameDayDueToStartHourRestrictionProvider(): iterable
+    {
+        yield 'Without any Interval' => [0, '', '1970-01-01 10:00:00', '1970-01-01 20:00:00', '2018-10-18 12:00', '2018-10-18 10:00'];
+        yield 'With Interval' => [5, 'D', '1970-01-01 10:00:00', '1970-01-01 20:00:00', '2018-10-18 12:00', '2018-10-23 10:00'];
+    }
+
+    /**
+     * @dataProvider rescheduledToSameDayDueToStartHourRestrictionProvider
+     */
+    public function testRescheduledToSameDayDueToStartHourRestriction(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, string $executionDate, string $resultedExecutionDate)
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -137,10 +197,14 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $event = $this->createMock(Event::class);
         $event->method('getTriggerMode')
             ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event->method('getTriggerInterval')
+            ->willReturn($triggerInterval);
+        $event->method('getTriggerIntervalUnit')
+            ->willReturn($triggerIntervalUnit);
         $event->method('getTriggerRestrictedStartHour')
-            ->willReturn(new \DateTime('1970-01-01 10:00:00'));
+            ->willReturn(new \DateTime($triggerRestrictedStartHour));
         $event->method('getTriggerRestrictedStopHour')
-            ->willReturn(new \DateTime('1970-01-01 20:00:00'));
+            ->willReturn(new \DateTime($triggerRestrictedStopHour));
         $event->method('getTriggerRestrictedDaysOfWeek')
             ->willReturn([]);
         $event->method('getCampaign')
@@ -154,13 +218,13 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $contacts = new ArrayCollection([$contact1]);
 
         $interval               = $this->getInterval();
-        $scheduledExecutionDate = new \DateTime('2018-10-18 12:00', new \DateTimeZone('UTC'));
+        $scheduledExecutionDate = new \DateTime($executionDate, new \DateTimeZone('UTC'));
         $grouped                = $interval->groupContactsByDate($event, $contacts, $scheduledExecutionDate);
 
         $firstGroup    = reset($grouped);
         $executionDate = $firstGroup->getExecutionDate();
 
-        $this->assertEquals('2018-10-18 10:00', $executionDate->format('Y-m-d H:i'));
+        $this->assertEquals($resultedExecutionDate, $executionDate->format('Y-m-d H:i'));
     }
 
     public function testExecutionDateIsValidatedAsExpectedWithStartHourAndDaylightSavingsTimeChange()
