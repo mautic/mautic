@@ -51,7 +51,7 @@ class ListController extends FormController
         $session = $request->getSession();
 
         // set some permissions
-        $permissions = $this->security->isGranted([
+        $permissionsToCheck = $this->security->isGranted([
             LeadPermissions::LISTS_VIEW_OWN,
             LeadPermissions::LISTS_VIEW_OTHER,
             LeadPermissions::LISTS_EDIT_OWN,
@@ -60,7 +60,7 @@ class ListController extends FormController
             LeadPermissions::LISTS_DELETE_OWN,
             LeadPermissions::LISTS_DELETE_OTHER,
             LeadPermissions::LISTS_FULL,
-        ];
+        ]);
 
         $permissions = $this->get('mautic.security')->isGranted($permissionsToCheck, 'RETURN_ARRAY');
 
@@ -479,7 +479,8 @@ class ListController extends FormController
         $model     = $this->getModel('lead.list');
         $page      = $request->getSession()->get('mautic.segment.page', 1);
         $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
-        $flashes   = [];
+
+        $flashes = [];
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
@@ -668,6 +669,9 @@ class ListController extends FormController
             /** @var LeadList $list */
             $list = $model->getEntity($listId);
             /** @var LeadModel $leadModel */
+            $leadModel = $this->getModel('lead');
+            $lead      = $leadModel->getEntity($leadId);
+
             if (null === $lead) {
                 $flashes[] = [
                     'type'    => 'error',
@@ -788,7 +792,7 @@ class ListController extends FormController
             new \DateTime($dateRangeForm->get('date_to')->getData()),
             null,
             [
-                'leadlist_id'   => [
+                'leadlist_id' => [
                     'value'            => $objectId,
                     'list_column_name' => 't.lead_id',
                 ],
@@ -796,12 +800,7 @@ class ListController extends FormController
             ]
         );
 
-        $permissions = [
-            LeadPermissions::LISTS_EDIT_OWN,
-            LeadPermissions::LISTS_VIEW_OTHER,
-            LeadPermissions::LISTS_EDIT_OTHER,
-            LeadPermissions::LISTS_DELETE_OTHER,
-        ];
+        $permissions = [LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_VIEW_OTHER, LeadPermissions::LISTS_EDIT_OTHER, LeadPermissions::LISTS_DELETE_OTHER];
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
