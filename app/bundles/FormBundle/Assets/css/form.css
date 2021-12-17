@@ -1,4 +1,21 @@
 /* FormBundle */
+
+.panel2 {
+    border: 1px solid #ebedf0;
+    -webkit-box-shadow: 0px 1px 1px #f3f3f3;
+    box-shadow: 0px 1px 1px #f3f3f3;
+    margin-left:25px;
+    margin-bottom:25px;
+    margin-right:25px;
+    zoom:0.9;
+}
+.panel2 label {
+    font-size:1em;
+}
+.panel:hover, .panel2:hover {
+    border-color:#ccc;
+}
+
 .form-submitaction-group-header {
     font-size: 1.1em;
     font-weight: bold;

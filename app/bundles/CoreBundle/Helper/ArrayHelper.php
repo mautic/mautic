@@ -78,6 +78,23 @@ class ArrayHelper
     }
 
     /**
+     * Removes null and empty string values from the array.
+     *
+     * @param mixed[] $array
+     *
+     * @return mixed[]
+     */
+    public static function removeEmptyValues(array $array): array
+    {
+        return array_filter(
+            $array,
+            function ($value) {
+                return !is_null($value) && '' !== $value;
+            }
+        );
+    }
+
+    /**
      * Flip array or sub arrays.
      */
     public static function flipArray(array $masterArrays): array
@@ -103,7 +120,7 @@ class ArrayHelper
      */
     private static function sumOrSub(array $a1, array $b2, $subtracted = false)
     {
-        return  array_map(function ($x, $y) use ($subtracted) {
+        return array_map(function ($x, $y) use ($subtracted) {
             if ($subtracted) {
                 return $x - $y;
             } else {

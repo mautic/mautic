@@ -51,7 +51,7 @@ trait FilterTrait
         $fieldType   = isset($data['type']) ? $data['type'] : '';
         $fieldName   = isset($data['field']) ? $data['field'] : '';
         $type        = TextType::class;
-        $attr        = ['class' => 'form-control'];
+        $attr        = ['class' => 'form-control filter-value'];
         $displayType = HiddenType::class;
         $displayAttr = [];
         $operator    = isset($data['operator']) ? $data['operator'] : '';
@@ -290,7 +290,6 @@ trait FilterTrait
                 $type                                       = ChoiceType::class;
             break;
             case 'lookup':
-            default:
                 if ('number' !== $fieldType) {
                     $attr = array_merge(
                         $attr,
@@ -397,7 +396,7 @@ trait FilterTrait
                 'label'             => false,
                 'choices'           => isset($field['operators']) ? $field['operators'] : [],
                 'attr'              => [
-                    'class'    => 'form-control not-chosen',
+                    'class'    => 'form-control not-chosen filter-operator',
                     'onchange' => 'Mautic.convertLeadFilterInput(this)',
                 ],
             ]
