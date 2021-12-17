@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailMetadata;
+use PHPUnit\Framework\MockObject\MockObject;
 use SendGrid\BccSettings;
 use SendGrid\Mail;
 use SendGrid\MailSettings;
@@ -19,7 +20,7 @@ use SendGrid\ReplyTo;
 
 class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
 {
-    private function make_header($key, $value)
+    private function make_header(string $key, string $value): MockObject
     {
         $an_header = $this->getMockBuilder(\Swift_Mime_Header::class)
             ->disableOriginalConstructor()
