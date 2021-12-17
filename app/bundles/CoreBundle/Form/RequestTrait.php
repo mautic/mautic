@@ -116,6 +116,11 @@ trait RequestTrait
                 case DateTimeType::class:
                 case DateType::class:
                 case TimeType::class:
+
+                if ($params[$name] === '' || $params[$name] === null) {
+                    break;
+                }
+
                     // Prevent zero based date placeholders
                     $dateTest = (int) str_replace(['/', '-', ' '], '', $params[$name]);
 
@@ -183,6 +188,10 @@ trait RequestTrait
             case 'datetime':
             case 'date':
             case 'time':
+                if ($fieldData[$leadField['alias']] === '' || $fieldData[$leadField['alias']] === null) {
+                    return;
+                }
+
                 // Prevent zero based date placeholders
                 $dateTest = (int) str_replace(['/', '-', ' '], '', $fieldData[$leadField['alias']]);
                 if (!$dateTest) {
