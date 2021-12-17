@@ -34,7 +34,7 @@ class SendGridMailMetadata
         ];
 
         // in prod, this is always defined, but not all tests are mocking headers
-        if (isset($headers)) {
+        if (false === is_null($headers)) {
             /* if ('Bulk' != $headers->get('Precedence')) {
                 // IMHO we should also remove list-unsubscribe header when Precedence != Bulk, but this should be done
                 // where list-unsubscribe is created at no in each transport!
