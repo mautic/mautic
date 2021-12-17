@@ -121,9 +121,7 @@ trait RequestTrait
 
                     if (!$dateTest) {
                         // Date placeholder was used so just ignore it to allow import of the field
-                        if (!defined('MAUTIC_API_REQUEST') || (defined('MAUTIC_API_REQUEST') && !MAUTIC_API_REQUEST)) {
-                            unset($params[$name]);
-                        }
+                        unset($params[$name]);
                         break;
                     }
 
