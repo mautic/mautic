@@ -917,6 +917,7 @@ class ListController extends FormController
 
             if (!empty($catIds)) {
                 $joinCategories    = true;
+		$filter['force'] = [];
                 $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => $catIds];
             }
         }
