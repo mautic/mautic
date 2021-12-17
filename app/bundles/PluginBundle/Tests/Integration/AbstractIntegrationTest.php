@@ -77,7 +77,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
 
     /**
      * @dataProvider requestProvider
-     * 
+     *
      * @param mixed[] $parameters
      * @param mixed[] $settings
      */
