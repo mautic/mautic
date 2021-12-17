@@ -77,6 +77,9 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
 
     /**
      * @dataProvider requestProvider
+     * 
+     * @param mixed[] $parameters
+     * @param mixed[] $settings
      */
     public function testMakeRequest(string $uri, array $parameters, string $method, array $settings, object $assertRequest): void
     {
@@ -115,6 +118,9 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
                         $this->assertRequest = $assertRequest;
                     }
 
+                    /**
+                     * @param mixed[] $options
+                     */
                     public function request(string $method, $uri = '', array $options = []): ResponseInterface
                     {
                         $this->assertRequest->assert($method, $uri, $options);
@@ -127,6 +133,9 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
         $this->assertEquals([], $integration->makeRequest($uri, $parameters, $method, $settings));
     }
 
+    /**
+     * @return iterable<mixed[]>
+     */
     public function requestProvider(): iterable
     {
         // Test with JSON.
@@ -142,7 +151,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
                 /**
                  * @param mixed[] $options
                  */
-                public function assert(string $method, string $uri = '', array $options = [])
+                public function assert(string $method, string $uri = '', array $options = []): void
                 {
                     Assert::assertSame('POST', $method);
                     Assert::assertSame('https://some.uri', $uri);
@@ -168,7 +177,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
                 /**
                  * @param mixed[] $options
                  */
-                public function assert(string $method, string $uri = '', array $options = [])
+                public function assert(string $method, string $uri = '', array $options = []): void
                 {
                     Assert::assertSame('POST', $method);
                     Assert::assertSame('https://some.uri', $uri);
