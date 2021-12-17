@@ -30,9 +30,9 @@ class ListController extends FormController
 {
     use EntityContactsTrait;
 
-    const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
+    public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
 
-    const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
+    public const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
 
     /**
      * @var array
@@ -45,6 +45,8 @@ class ListController extends FormController
      * @param int $page
      *
      * @return JsonResponse|Response
+     *
+     * @throws InvalidArgumentException
      */
     public function indexAction($page = 1)
     {
@@ -52,16 +54,7 @@ class ListController extends FormController
         $model   = $this->getModel('lead.list');
         $session = $this->get('session');
 
-        $permissionsToCheck = [
-            LeadPermissions::LISTS_VIEW_OWN,
-            LeadPermissions::LISTS_VIEW_OTHER,
-            LeadPermissions::LISTS_EDIT_OWN,
-            LeadPermissions::LISTS_EDIT_OTHER,
-            LeadPermissions::LISTS_CREATE,
-            LeadPermissions::LISTS_DELETE_OWN,
-            LeadPermissions::LISTS_DELETE_OTHER,
-            LeadPermissions::LISTS_FULL,
-        ];
+        $permissionsToCheck = [LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, LeadPermissions::LISTS_CREATE, LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER, LeadPermissions::LISTS_FULL];
 
         $permissions = $this->get('mautic.security')->isGranted($permissionsToCheck, 'RETURN_ARRAY');
 
@@ -433,8 +426,8 @@ class ListController extends FormController
     {
         //set the return URL
         if ($objectId) {
-            $returnUrl       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId'=> $objectId]);
-            $viewParameters  = ['objectAction' => 'view', 'objectId'=> $objectId];
+            $returnUrl       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $objectId]);
+            $viewParameters  = ['objectAction' => 'view', 'objectId' => $objectId];
             $contentTemplate = 'MauticLeadBundle:List:view';
         } else {
             //set the page we came from
@@ -468,7 +461,8 @@ class ListController extends FormController
         $model     = $this->getModel('lead.list');
         $page      = $this->get('session')->get('mautic.segment.page', 1);
         $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
-        $flashes   = [];
+
+        $flashes = [];
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
@@ -786,7 +780,7 @@ class ListController extends FormController
             new \DateTime($dateRangeForm->get('date_to')->getData()),
             null,
             [
-                'leadlist_id'   => [
+                'leadlist_id' => [
                     'value'            => $objectId,
                     'list_column_name' => 't.lead_id',
                 ],
@@ -794,25 +788,20 @@ class ListController extends FormController
             ]
         );
 
-        $permissions = [
-            LeadPermissions::LISTS_EDIT_OWN,
-            LeadPermissions::LISTS_VIEW_OTHER,
-            LeadPermissions::LISTS_EDIT_OTHER,
-            LeadPermissions::LISTS_DELETE_OTHER,
-        ];
+        $permissions = [LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_VIEW_OTHER, LeadPermissions::LISTS_EDIT_OTHER, LeadPermissions::LISTS_DELETE_OTHER];
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
             'viewParameters' => [
-                'usageStats'     => $this->get('mautic.lead.segment.stat.dependencies')->getChannelsIds($list->getId()),
-                'campaignStats'  => $this->get('mautic.lead.segment.stat.campaign.share')->getCampaignList($list->getId()),
-                'stats'          => $segmentContactsLineChartData,
-                'list'           => $list,
-                'segmentCount'   => $listModel->getRepository()->getLeadCount($list->getId()),
-                'permissions'    => $security->isGranted($permissions, 'RETURN_ARRAY'),
-                'security'       => $security,
-                'dateRangeForm'  => $dateRangeForm->createView(),
-                'events'         => [
+                'usageStats'    => $this->get('mautic.lead.segment.stat.dependencies')->getChannelsIds($list->getId()),
+                'campaignStats' => $this->get('mautic.lead.segment.stat.campaign.share')->getCampaignList($list->getId()),
+                'stats'         => $segmentContactsLineChartData,
+                'list'          => $list,
+                'segmentCount'  => $listModel->getRepository()->getLeadCount($list->getId()),
+                'permissions'   => $security->isGranted($permissions, 'RETURN_ARRAY'),
+                'security'      => $security,
+                'dateRangeForm' => $dateRangeForm->createView(),
+                'events'        => [
                     'filters' => $filters,
                     'types'   => [
                         'manually_added'   => $translator->trans('mautic.segment.contact.manually.added'),
@@ -969,6 +958,10 @@ class ListController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
+        /** @var Session */
+        $session = $this->get('session');
+        $session->set('mautic.segment.contact.page', $page);
+
         $manuallyRemoved = 0;
         $listFilters     = ['manually_removed' => $manuallyRemoved];
         if ('POST' === $this->request->getMethod() && $this->request->request->has('includeEvents')) {
