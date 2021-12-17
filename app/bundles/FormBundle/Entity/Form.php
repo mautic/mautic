@@ -13,6 +13,7 @@ namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -182,7 +183,7 @@ class Form extends FormEntity
             ->columnName('post_action')
             ->build();
 
-        $builder->createField('postActionProperty', 'string')
+        $builder->createField('postActionProperty', Types::TEXT)
             ->columnName('post_action_property')
             ->nullable()
             ->build();
@@ -792,20 +793,17 @@ class Form extends FormEntity
     }
 
     /**
-     * Set noIndex.
-     *
-     * @param bool $noIndex
+     * @param bool|null $noIndex
      */
     public function setNoIndex($noIndex)
     {
-        $this->isChanged('noIndex', $noIndex);
-        $this->noIndex = $noIndex;
+        $sanitizedNoIndex = null === $noIndex ? null : (bool) $noIndex;
+        $this->isChanged('noIndex', $sanitizedNoIndex);
+        $this->noIndex = $sanitizedNoIndex;
     }
 
     /**
-     * Get noIndex.
-     *
-     * @return bool
+     * @return bool|null
      */
     public function getNoIndex()
     {

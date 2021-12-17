@@ -219,7 +219,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->orWhere("l.$col = :".$col)
+            $q->{$this->getUniqueIdentifiersWherePart()}("l.$col = :".$col)
                 ->setParameter($col, $val);
         }
 
@@ -287,7 +287,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->orWhere("l.$col = :".$col)
+            $q->{$this->getUniqueIdentifiersWherePart()}("l.$col = :".$col)
                 ->setParameter($col, $val);
         }
 
@@ -582,17 +582,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get contacts for a specific channel entity.
      *
-     * @param $args - same as getEntity/getEntities
-     * @param        $joinTable
-     * @param        $entityId
-     * @param array  $filters
-     * @param string $entityColumnName
-     * @param array  $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
-     *
-     * @return array
+     * @param array      $args             same as getEntity/getEntities
+     * @param string     $joinTable
+     * @param int        $entityId
+     * @param array      $filters
+     * @param string     $entityColumnName
+     * @param array|null $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
      */
-    public function getEntityContacts($args, $joinTable, $entityId, $filters = [], $entityColumnName = 'id', array $additionalJoins = null, $contactColumnName = 'lead_id')
-    {
+    public function getEntityContacts(
+        $args,
+        $joinTable,
+        $entityId,
+        $filters = [],
+        $entityColumnName = 'id',
+        array $additionalJoins = null,
+        $contactColumnName = 'lead_id',
+        \DateTimeInterface $dateFrom = null,
+        \DateTimeInterface $dateTo = null
+    ): array {
         $qb = $this->getEntitiesDbalQueryBuilder();
 
         if (empty($contactColumnName)) {
@@ -647,6 +654,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             }
         }
 
+        if ($dateFrom && $dateTo) {
+            $qb->andWhere('entity.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+        }
+
         $args['qb'] = $qb;
 
         return $this->getEntities($args);
@@ -689,11 +702,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     protected function addSearchCommandWhereClause($q, $filter)
     {
-        $command                 = $filter->command;
-        $string                  = $filter->string;
-        $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        $command             = $filter->command;
+        $string              = $filter->string;
+        $unique              = $this->generateRandomParameterName();
+        $returnParameter     = false; //returning a parameter that is not used will lead to a Doctrine error
+        [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
 
         //DBAL QueryBuilder does not have an expr()->not() function; boo!!
 
@@ -960,6 +973,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.email_pending',
             'mautic.lead.lead.searchcommand.page_source',
             'mautic.lead.lead.searchcommand.page_source_id',
+            'mautic.lead.lead.searchcommand.import_id',
+            'mautic.lead.lead.searchcommand.import_action',
             'mautic.lead.lead.searchcommand.page_id',
             'mautic.lead.lead.searchcommand.sms_sent',
             'mautic.lead.lead.searchcommand.web_sent',
