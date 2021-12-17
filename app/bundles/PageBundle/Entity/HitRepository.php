@@ -268,9 +268,8 @@ class HitRepository extends CommonRepository
         }
         if (isset($options['second_to_last'])) {
             $sq->andWhere($sq->expr()->neq('h.id', $options['second_to_last']));
-        } else {
-            $sq->orderBy('h.date_hit', 'DESC limit 1');
         }
+        $sq->orderBy('h.date_hit', 'DESC limit 1');
         $result = $sq->execute()->fetch();
 
         return new \DateTime($result['latest_hit'], new \DateTimeZone('UTC'));
