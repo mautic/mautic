@@ -74,7 +74,7 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
         yield [['value A', ''], ['value A']];
     }
 
-    public function testflipArray()
+    public function testflipArray(): void
     {
         $array = [
             'first' => 'Custom first',

@@ -96,6 +96,10 @@ class ArrayHelper
 
     /**
      * Flip array or sub arrays.
+     *
+     * @param array<int|string|array<int|string>> $masterArrays
+     *
+     * @return array<int|string|array<int|string>>
      */
     public static function flipArray(array $masterArrays): array
     {
