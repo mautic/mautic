@@ -26,16 +26,16 @@ class RedirectResponseSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<array<string|int>>
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::ON_REDIRECT_RESPONSE => ['onRedirect', 0],
         ];
     }
 
-    public function onRedirect(RedirectResponseEvent $redirectResponseEvent)
+    public function onRedirect(RedirectResponseEvent $redirectResponseEvent): void
     {
         $redirectResponse = $this->redirectHelper->trackedRedirect($redirectResponseEvent->getRedirect());
         $redirectResponseEvent->setRedirectResponse($redirectResponse);

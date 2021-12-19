@@ -12,6 +12,7 @@
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -445,11 +446,9 @@ class PublicController extends CommonFormController
     /**
      * @param $redirectId
      *
-     * @return RedirectResponse
-     *
      * @throws \Exception
      */
-    public function redirectAction($redirectId)
+    public function redirectAction($redirectId): Response
     {
         $this->logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
@@ -477,6 +476,8 @@ class PublicController extends CommonFormController
         } elseif ($redirectResponseEvent->getContentResponse() instanceof Response) {
             return $redirectResponseEvent->getContentResponse();
         }
+
+        return $this->notFound();
     }
 
     /**

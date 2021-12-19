@@ -28,8 +28,14 @@ class RedirectResponseEvent extends Event
 
     private ?Response $contentResponse = null;
 
+    /**
+     * @var array<string>
+     */
     private array $query;
 
+    /**
+     * @param array<string> $query
+     */
     public function __construct(Redirect $redirect, array $query)
     {
         $this->redirect = $redirect;
@@ -51,12 +57,15 @@ class RedirectResponseEvent extends Event
         $this->redirectResponse = $redirectResponse;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getQuery(): array
     {
         return $this->query;
     }
 
-    public function getChannel()
+    public function getChannel(): ?string
     {
         if (isset($this->query['ct'])) {
             try {
@@ -66,6 +75,8 @@ class RedirectResponseEvent extends Event
             } catch (InvalidDecodedStringException $invalidDecodedStringException) {
             }
         }
+
+        return null;
     }
 
     /**
