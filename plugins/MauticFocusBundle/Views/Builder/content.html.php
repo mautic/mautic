@@ -60,6 +60,17 @@ $props = $focus['properties'];
         ]
     );
 
+    ?>
+    <style scoped>
+    <?php
+
+    if (isset($focus['properties']['content']['css'])) {
+        echo $focus['properties']['content']['css'];
+    }
+
+    ?>
+    </style>
+    <?php
     // Add view tracking image
     if (!$preview): ?>
 
