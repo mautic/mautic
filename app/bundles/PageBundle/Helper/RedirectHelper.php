@@ -54,9 +54,11 @@ class RedirectHelper
     }
 
     /**
+     * @return RedirectResponse|NotFoundHttpException
+     *
      * @throws \Exception
      */
-    public function trackedRedirect(Redirect $redirect): RedirectResponse
+    public function trackedRedirect(Redirect $redirect)
     {
         // Ensure the URL does not have encoded ampersands
         $url = str_replace('&amp;', '&', $redirect->getUrl());
