@@ -35,7 +35,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider rescheduledToDueBeingBeforeSpecificHourRestrictionProvider
      */
-    public function testRescheduledToDueBeingBeforeSpecificHourRestriction(int $triggerInterval, string $triggerIntervalUnit, string $triggerHour, string $executionDate, string $resultedExecutionDate)
+    public function testRescheduledToDueBeingBeforeSpecificHourRestriction(int $triggerInterval, string $triggerIntervalUnit, string $triggerHour, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -86,7 +86,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider rescheduledDueToBeingAfterSpecificHourRestrictionProvider
      */
-    public function testRescheduledDueToBeingAfterSpecificHourRestriction(int $triggerInterval, string $triggerIntervalUnit, string $triggerHour, string $executionDate, string $resultedExecutionDate)
+    public function testRescheduledDueToBeingAfterSpecificHourRestriction(int $triggerInterval, string $triggerIntervalUnit, string $triggerHour, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -137,7 +137,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider notRescheduledDueToSpecificHourRestrictionProvider
      */
-    public function testNotRescheduledDueToSpecificHourRestriction(int $triggerInterval, string $triggerIntervalUnit, string $triggerHour, string $executionDate, string $resultedExecutionDate)
+    public function testNotRescheduledDueToSpecificHourRestriction(int $triggerInterval, string $triggerIntervalUnit, string $triggerHour, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -188,7 +188,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider rescheduledToSameDayDueToStartHourRestrictionProvider
      */
-    public function testRescheduledToSameDayDueToStartHourRestriction(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, string $executionDate, string $resultedExecutionDate)
+    public function testRescheduledToSameDayDueToStartHourRestriction(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -227,7 +227,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($resultedExecutionDate, $executionDate->format('Y-m-d H:i'));
     }
 
-    public function testExecutionDateIsValidatedAsExpectedWithStartHourAndDaylightSavingsTimeChange()
+    public function testExecutionDateIsValidatedAsExpectedWithStartHourAndDaylightSavingsTimeChange(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -271,7 +271,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2021-11-08 17:00', $executionDate->format('Y-m-d H:i'));
     }
 
-    public function test()
+    public function testExecutionDateIsValidatedAsExpectedWithTriggerHourAndDaylightSavingsTimeChange(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -332,7 +332,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isNotRescheduledDueToStartAndStopHourRestrictionsProvider
      */
-    public function testIsNotRescheduledDueToStartAndStopHourRestrictions(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, string $executionDate, string $resultedExecutionDate)
+    public function testIsNotRescheduledDueToStartAndStopHourRestrictions(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -383,7 +383,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider rescheduledToNextDayDueToStopHourRestrictionProvider
      */
-    public function testRescheduledToNextDayDueToStopHourRestriction(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, string $executionDate, string $resultedExecutionDate)
+    public function testRescheduledToNextDayDueToStopHourRestriction(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -434,7 +434,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider rescheduledDueDayOfWeekRestrictionProvider
      */
-    public function testRescheduledDueDayOfWeekRestriction(int $triggerInterval, string $triggerIntervalUnit, int $dayOfWeek, string $executionDate, string $resultedExecutionDate)
+    public function testRescheduledDueDayOfWeekRestriction(int $triggerInterval, string $triggerIntervalUnit, int $dayOfWeek, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -485,7 +485,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider notRescheduledDueDayOfWeekRestrictionProvider
      */
-    public function testNotRescheduledDueDayOfWeekRestriction(int $triggerInterval, string $triggerIntervalUnit, int $dayOfWeek, string $executionDate, string $resultedExecutionDate)
+    public function testNotRescheduledDueDayOfWeekRestriction(int $triggerInterval, string $triggerIntervalUnit, int $dayOfWeek, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -535,7 +535,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider rescheduledDueToSpecificHourAndDayOfWeekRestrictionsProvider
      */
-    public function testRescheduledDueToSpecificHourAndDayOfWeekRestrictions(int $triggerInterval, string $triggerIntervalUnit, string $triggerHour, int $dayOfWeek, string $executionDate, string $resultedExecutionDate)
+    public function testRescheduledDueToSpecificHourAndDayOfWeekRestrictions(int $triggerInterval, string $triggerIntervalUnit, string $triggerHour, int $dayOfWeek, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -588,7 +588,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider notRescheduledDueToSpecificHourAndDayOfWeekRestrictionsProvider
      */
-    public function testNotRescheduledDueToSpecificHourAndDayOfWeekRestrictions(int $triggerInterval, string $triggerIntervalUnit, string $triggerHour, int $dayOfWeek, string $executionDate, string $resultedExecutionDate)
+    public function testNotRescheduledDueToSpecificHourAndDayOfWeekRestrictions(int $triggerInterval, string $triggerIntervalUnit, string $triggerHour, int $dayOfWeek, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -641,7 +641,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider rescheduledDueToStartEndHoursAndDayOfWeekRestrictionsProvider
      */
-    public function testRescheduledDueToStartEndHoursAndDayOfWeekRestrictions(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, int $dayOfWeek, string $executionDate, string $resultedExecutionDate)
+    public function testRescheduledDueToStartEndHoursAndDayOfWeekRestrictions(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, int $dayOfWeek, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -694,7 +694,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider notRescheduledDueToStartEndHoursAndDayOfWeekRestrictionsProvider
      */
-    public function testNotRescheduledDueToStartEndHoursAndDayOfWeekRestrictions(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, int $dayOfWeek, string $executionDate, string $resultedExecutionDate)
+    public function testNotRescheduledDueToStartEndHoursAndDayOfWeekRestrictions(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, int $dayOfWeek, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -747,7 +747,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider rescheduledDueToStartEndHoursAndDayOfWeekRestrictionsWithOnlyDowViolationProvider
      */
-    public function testRescheduledDueToStartEndHoursAndDayOfWeekRestrictionsWithOnlyDowViolation(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, int $dayOfWeek, string $executionDate, string $resultedExecutionDate)
+    public function testRescheduledDueToStartEndHoursAndDayOfWeekRestrictionsWithOnlyDowViolation(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, int $dayOfWeek, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -800,7 +800,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider rescheduledToSameDayDueToStartEndHoursAndDayOfWeekRestrictionsWithOnlyStartHourViolationProvider
      */
-    public function testRescheduledToSameDayDueToStartEndHoursAndDayOfWeekRestrictionsWithOnlyStartHourViolation(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, int $dayOfWeek, string $executionDate, string $resultedExecutionDate)
+    public function testRescheduledToSameDayDueToStartEndHoursAndDayOfWeekRestrictionsWithOnlyStartHourViolation(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, int $dayOfWeek, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -853,7 +853,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider rescheduledToNextDayDueToStartEndHoursAndDayOfWeekRestrictionsWithOnlyEndHourViolationProvider
      */
-    public function testRescheduledToNextDayDueToStartEndHoursAndDayOfWeekRestrictionsWithOnlyEndHourViolation(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, array $daysOfWeek, string $executionDate, string $resultedExecutionDate)
+    public function testRescheduledToNextDayDueToStartEndHoursAndDayOfWeekRestrictionsWithOnlyEndHourViolation(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, array $daysOfWeek, string $executionDate, string $resultedExecutionDate): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -893,7 +893,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($resultedExecutionDate, $executionDate->format('Y-m-d H:i'));
     }
 
-    public function testContactsAreGrouped()
+    public function testContactsAreGrouped(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
