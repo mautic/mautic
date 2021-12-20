@@ -852,6 +852,8 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider rescheduledToNextDayDueToStartEndHoursAndDayOfWeekRestrictionsWithOnlyEndHourViolationProvider
+     *
+     * @param array<int> $daysOfWeek
      */
     public function testRescheduledToNextDayDueToStartEndHoursAndDayOfWeekRestrictionsWithOnlyEndHourViolation(int $triggerInterval, string $triggerIntervalUnit, string $triggerRestrictedStartHour, string $triggerRestrictedStopHour, array $daysOfWeek, string $executionDate, string $resultedExecutionDate): void
     {
