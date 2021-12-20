@@ -13,6 +13,9 @@ namespace Mautic\LeadBundle\Segment;
 
 class OperatorOptions
 {
+    /**
+     * @var array<string,array<string,string|bool>>
+     */
     private static $operatorOptions = [
         '=' => [
             'label'       => 'mautic.lead.list.form.operator.equals',
@@ -119,11 +122,17 @@ class OperatorOptions
         ],
     ];
 
+    /**
+     * @return array<string,array<string,string>>
+     */
     public static function getFilterExpressionFunctions()
     {
         return self::$operatorOptions;
     }
 
+    /**
+     * @return array<string,array<string,string>>
+     */
     public function getFilterExpressionFunctionsNonStatic()
     {
         return self::$operatorOptions;

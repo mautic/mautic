@@ -32,7 +32,6 @@ $emptyOption = '';
 if ((!empty($properties['placeholder']) || empty($field['defaultValue']) && empty($properties['multiple']))):
     $placeholder = $properties['placeholder'] ?? '';
     $emptyOption = <<<HTML
-
                     <option value="">{$placeholder}</option>
 HTML;
 endif;
