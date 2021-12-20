@@ -107,6 +107,14 @@ class Interval implements ScheduleModeInterface
             $dateTriggered->add((new DateTimeHelper())->buildInterval($interval, $unit));
         }
 
+        if ($dateTriggered < $compareFromDateTime) {
+            $this->logger->debug(
+                'CAMPAIGN: ('.$event->getId().') '.$dateTriggered->format('Y-m-d H:i:s T').' is earlier than '
+                .$compareFromDateTime->format('Y-m-d H:i:s T').' and thus setting '.$compareFromDateTime->format('Y-m-d H:i:s T')
+            );
+            $dateTriggered = clone $compareFromDateTime;
+        }
+
         $hour      = $event->getTriggerHour();
         $startTime = $event->getTriggerRestrictedStartHour();
         $endTime   = $event->getTriggerRestrictedStopHour();

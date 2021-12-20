@@ -265,7 +265,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        $executionDate  = $interval->validateExecutionDateTime($log, new \DateTime());
+        $executionDate  = $interval->validateExecutionDateTime($log, new \DateTime('2021-11-08'));
         $executionDate->setTimezone(new \DateTimeZone('UTC'));
 
         $this->assertEquals('2021-11-08 17:00', $executionDate->format('Y-m-d H:i'));
@@ -314,7 +314,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        $executionDate  = $interval->validateExecutionDateTime($log, new \DateTime());
+        $executionDate  = $interval->validateExecutionDateTime($log, new \DateTime('2021-11-08'));
         $executionDate->setTimezone(new \DateTimeZone('UTC'));
 
         $this->assertEquals('2021-11-08 17:00', $executionDate->format('Y-m-d H:i'));
