@@ -55,6 +55,9 @@ class ListLeadRepository extends CommonRepository
         }
     }
 
+    /**
+     * @param mixed[] $filters
+     */
     public function getContactsCountBySegment(int $segmentId, array $filters = []): int
     {
         $qb = $this->createQueryBuilder('ll');
