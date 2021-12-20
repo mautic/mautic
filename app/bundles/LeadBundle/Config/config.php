@@ -959,6 +959,16 @@ return [
                     'setUniqueIdentifiersOperator' => [
                         '%mautic.contact_unique_identifiers_operator%',
                     ],
+                    'setListLeadRepository' => [
+                        '@mautic.lead.repository.list_lead',
+                    ],
+                ],
+            ],
+            'mautic.lead.repository.list_lead' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\ListLead::class,
                 ],
             ],
             'mautic.lead.repository.frequency_rule' => [
