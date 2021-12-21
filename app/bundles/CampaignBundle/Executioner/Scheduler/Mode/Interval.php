@@ -54,24 +54,24 @@ class Interval implements ScheduleModeInterface
      */
     public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime)
     {
-        $interval = $event->getTriggerInterval();
-        $unit     = $event->getTriggerIntervalUnit();
+        $interval      = $event->getTriggerInterval();
+        $unit          = $event->getTriggerIntervalUnit();
+        $logDateFormat = 'Y-m-d H:i:s T';
 
         try {
             $this->logger->debug(
-                'CAMPAIGN: ('.$event->getId().') Adding interval of '.$interval.$unit.' to '.$comparedToDateTime->format('Y-m-d H:i:s T')
+                sprintf('CAMPAIGN: (%s) Adding interval of  %s%s to %s', $event->getId(), $interval, $unit, $comparedToDateTime->format($logDateFormat))
             );
             $comparedToDateTime->add((new DateTimeHelper())->buildInterval($interval, $unit));
         } catch (\Exception $exception) {
-            $this->logger->error('CAMPAIGN: Determining interval scheduled failed with "'.$exception->getMessage().'"');
+            $this->logger->error(sprintf('CAMPAIGN: Determining interval scheduled failed with "%s"', $exception->getMessage()));
 
             throw new NotSchedulableException();
         }
 
         if ($comparedToDateTime > $compareFromDateTime) {
             $this->logger->debug(
-                'CAMPAIGN: ('.$event->getId().') '.$comparedToDateTime->format('Y-m-d H:i:s T').' is later than '
-                .$compareFromDateTime->format('Y-m-d H:i:s T').' and thus returning '.$comparedToDateTime->format('Y-m-d H:i:s T')
+                sprintf('CAMPAIGN: (%s) %s is later than %s and thus returning %s', $event->getId(), $comparedToDateTime->format($logDateFormat), $compareFromDateTime->format($logDateFormat), $comparedToDateTime->format($logDateFormat))
             );
 
             //the event is to be scheduled based on the time interval
@@ -79,8 +79,8 @@ class Interval implements ScheduleModeInterface
         }
 
         $this->logger->debug(
-            'CAMPAIGN: ('.$event->getId().') '.$comparedToDateTime->format('Y-m-d H:i:s T').' is earlier than '
-            .$compareFromDateTime->format('Y-m-d H:i:s T').' and thus returning '.$compareFromDateTime->format('Y-m-d H:i:s T')
+            'CAMPAIGN: ('.$event->getId().') '.$comparedToDateTime->format($logDateFormat).' is earlier than '
+            .$compareFromDateTime->format($logDateFormat).' and thus returning '.$compareFromDateTime->format($logDateFormat)
         );
 
         return $compareFromDateTime;
@@ -100,8 +100,9 @@ class Interval implements ScheduleModeInterface
             return $this->getExecutionDateTime($event, $compareFromDateTime, $dateTriggered);
         }
 
-        $interval = $event->getTriggerInterval();
-        $unit     = $event->getTriggerIntervalUnit();
+        $interval      = $event->getTriggerInterval();
+        $unit          = $event->getTriggerIntervalUnit();
+        $logDateFormat = 'Y-m-d H:i:s T';
 
         if ($interval && $unit) {
             $dateTriggered->add((new DateTimeHelper())->buildInterval($interval, $unit));
@@ -109,8 +110,7 @@ class Interval implements ScheduleModeInterface
 
         if ($dateTriggered < $compareFromDateTime) {
             $this->logger->debug(
-                'CAMPAIGN: ('.$event->getId().') '.$dateTriggered->format('Y-m-d H:i:s T').' is earlier than '
-                .$compareFromDateTime->format('Y-m-d H:i:s T').' and thus setting '.$compareFromDateTime->format('Y-m-d H:i:s T')
+                sprintf('CAMPAIGN: (%s) %s is earlier than %s and thus setting %s', $event->getId(), $dateTriggered->format($logDateFormat), $compareFromDateTime->format($logDateFormat), $compareFromDateTime->format($logDateFormat))
             );
             $dateTriggered = clone $compareFromDateTime;
         }
