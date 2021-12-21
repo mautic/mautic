@@ -79,8 +79,7 @@ class Interval implements ScheduleModeInterface
         }
 
         $this->logger->debug(
-            'CAMPAIGN: ('.$event->getId().') '.$comparedToDateTime->format($logDateFormat).' is earlier than '
-            .$compareFromDateTime->format($logDateFormat).' and thus returning '.$compareFromDateTime->format($logDateFormat)
+            sprintf('CAMPAIGN: (%s) %s is earlier than %s and thus returning %s', $event->getId(), $comparedToDateTime->format($logDateFormat), $compareFromDateTime->format($logDateFormat), $compareFromDateTime->format($logDateFormat))
         );
 
         return $compareFromDateTime;
