@@ -60,7 +60,7 @@ final class Version20211209022550 extends AbstractMauticMigration
                 $newPermissions[] = 'create';
             }
 
-            $rawPermissions['lead:lists'] = array_flip(array_flip($newPermissions));
+            $rawPermissions['lead:lists'] = array_unique($newPermissions);
 
             $model->setRolePermissions($role, $rawPermissions);
             $model->saveEntity($role);
