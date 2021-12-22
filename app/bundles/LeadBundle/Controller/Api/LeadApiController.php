@@ -429,6 +429,7 @@ class LeadApiController extends CommonApiController
         }
 
         $mapping = json_decode($mapping, true);
+        $mapping = CsvHelper::convertHeadersIntoFields($mapping);
 
         // Default configuration
         $config = [
