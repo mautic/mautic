@@ -2070,7 +2070,7 @@ Mautic.highlightJumpTarget = function(event, el) {
  */
 Mautic.showCampaignConfirmation = function (el) {
     let element = mQuery(el);
-    if (element.prop('checked') && element.val() === "0") {
+    if (element.prop('checked') && element.val() !== "1") {
         Mautic.showConfirmation(element);
     }
 };
@@ -2087,6 +2087,8 @@ Mautic.setPublishedButtonToYes = function (el) {
     var yesButtonId = mQuery(yesButton).attr('id');
     if (yesButtonId !== undefined) {
         mQuery('#' + yesButtonId).trigger('click');
+        mQuery(el).parent('.btn-no').removeClass('active');
+        mQuery(el).parent('.btn-no').siblings('.btn-yes').addClass('active');
     }
 };
 
