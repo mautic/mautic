@@ -20,7 +20,6 @@ use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -249,15 +248,6 @@ class InstallCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $command = $this->getApplication()->find('cache:clear');
-
-        $arguments = [
-            '--env'    => $input->getOptions()['env'] ?? 'prod',
-        ];
-
-        $commandInput = new ArrayInput($arguments);
-        $returnCode   = $command->run($commandInput, $output);
-
         $container = $this->getContainer();
         /** @var \Mautic\InstallBundle\Install\InstallService $installer */
         $installer = $container->get('mautic.install.service');
