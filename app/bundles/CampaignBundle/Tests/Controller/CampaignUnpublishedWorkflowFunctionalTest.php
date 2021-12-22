@@ -8,6 +8,32 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTest
 {
+    public function testCreateCampaignPageShouldNotContainConformation(): void
+    {
+        // Check the message in the Campaign edit page
+        $crawler  = $this->client->request('GET', '/s/campaigns/new');
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+
+        $attributes = [
+            'data-toggle',
+            'data-message',
+            'data-confirm-text',
+            'data-confirm-callback',
+            'data-cancel-text',
+            'data-cancel-callback',
+        ];
+
+        $elements = $crawler->filter('form input[name*="campaign[isPublished]"]')->getIterator();
+
+        /** @var DOMElement $element */
+        foreach ($elements as $element) {
+            foreach ($attributes as $attribute) {
+                $this->assertFalse($element->hasAttribute($attribute), sprintf('The "%s" attribute is present.', $attribute));
+            }
+        }
+    }
+
     public function testCampaignEditPageCheckUnpublishWorkflowAttributesPresent(): void
     {
         $campaign   = $this->saveSomeCampaignLeadEventLogs();

@@ -80,21 +80,11 @@ class CampaignType extends AbstractType
             'bundle' => 'campaign',
         ]);
 
+        $attr = [];
         if (!empty($options['data']) && $options['data']->getId()) {
             $readonly = !$this->security->isGranted('campaign:campaigns:publish');
             $data     = $options['data']->isPublished(false);
-        } elseif (!$this->security->isGranted('campaign:campaigns:publish')) {
-            $readonly = true;
-            $data     = false;
-        } else {
-            $readonly = false;
-            $data     = false;
-        }
-
-        $builder->add('isPublished', YesNoButtonGroupType::class, [
-            'data' => $data,
-            'attr' => [
-                'readonly'              => $readonly,
+            $attr     = [
                 'onchange'              => 'Mautic.showCampaignConfirmation(mQuery(this));',
                 'data-toggle'           => 'confirmation',
                 'data-message'          => $this->translator->trans('mautic.campaign.form.confirmation.message'),
@@ -103,7 +93,20 @@ class CampaignType extends AbstractType
                 'data-cancel-text'      => $this->translator->trans('mautic.campaign.form.confirmation.cancel_text'),
                 'data-cancel-callback'  => 'setPublishedButtonToYes',
                 'class'                 => 'btn btn-default',
-            ],
+            ];
+        } elseif (!$this->security->isGranted('campaign:campaigns:publish')) {
+            $readonly = true;
+            $data     = false;
+        } else {
+            $readonly = false;
+            $data     = false;
+        }
+
+        $attr['readonly'] = $readonly;
+
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'data' => $data,
+            'attr' => $attr,
         ]);
 
         $builder->add('publishUp', DateTimeType::class, [
