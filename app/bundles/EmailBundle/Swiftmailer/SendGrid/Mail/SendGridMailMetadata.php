@@ -19,13 +19,13 @@ use SendGrid\ReplyTo;
 class SendGridMailMetadata
 {
     /**
-     * @var array
+     * @var array<int,string>
      */
     private $customArgs;
 
     public function __construct($customArgs)
     {
-        $this->customArgs = isset($customArgs) ? $customArgs : [];
+        $this->customArgs = is_array($customArgs) ? $customArgs : [];
     }
 
     public function addMetadataToMail(Mail $mail, \Swift_Mime_SimpleMessage $message)

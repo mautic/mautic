@@ -62,7 +62,7 @@ class TransportType
     ];
 
     /**
-     * @var array
+     * @var array<int, string>
      */
     private $showCustomArgs = [
         'mautic.transport.sendgrid_api',
