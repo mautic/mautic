@@ -38,7 +38,7 @@ final class EventLogApiControllerTest extends MauticMysqlTestCase
         $campaignMember2->setCampaign($campaign);
         $campaignMember2->setManuallyAdded(true);
         $campaignMember2->setDateAdded(new \DateTime());
-        
+
         $event1 = new Event();
         $event1->setCampaign($campaign);
         $event1->setType('lead.changepoints');

@@ -102,7 +102,6 @@ class EventLogModel extends AbstractCommonModel
                 'mautic.campaign.error.contact_not_in_campaign',
                 ['%campaign%' => $campaign->getId(), '%contact%' => $contact->getId()],
                 'flashes'
-
             );
         }
 
