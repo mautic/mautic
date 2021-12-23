@@ -10,6 +10,7 @@ use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CategoryBundle\Entity\Category;
@@ -943,8 +944,8 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     }
 
     /**
-     * @param      $results
-     * @param null $callback
+     * @param array<mixed[]> $results
+     * @param callable|null  $callback
      *
      * @return array($entities, $totalCount)
      */
@@ -957,6 +958,9 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
             $totalCount = count($results);
         }
 
+        /**
+         * @var EntityResultHelper
+         */
         $entityResultHelper = $this->get('mautic.api.helper.entity_result');
 
         $entities = $entityResultHelper->getArray($results, $callback);

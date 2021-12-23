@@ -7,10 +7,10 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 class EntityResultHelper
 {
     /**
-     * @param mixed  $results
-     * @param string $callback
+     * @param array<mixed[]> $results
+     * @param callable|null  $callback
      *
-     * @return array
+     * @return array<mixed[]>
      */
     public function getArray($results, $callback = null)
     {
