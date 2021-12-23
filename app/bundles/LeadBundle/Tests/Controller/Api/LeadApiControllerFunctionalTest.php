@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testBatchNewEndpointDoesNotCreateDuplicates()
+    public function testBatchNewEndpointDoesNotCreateDuplicates(): void
     {
         $payload = [
             [
@@ -194,7 +194,44 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(null, $response['contacts'][2]['owner']);
     }
 
-    public function testSingleNewEndpointCreateAndUpdate()
+    public function testBatchEditEndpoint(): void
+    {
+        $contact = new Lead();
+        $contact->setEmail('batcheditcontact1@gmail.com');
+
+        $this->em->persist($contact);
+        $this->em->flush();
+        $this->em->clear();
+
+        $payload = [
+            ['email' => 'batcheditcontact1-updated@gmail.com', 'id' => $contact->getId()],
+        ];
+
+        $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][0]);
+        $this->assertEquals($contact->getId(), $response['contacts'][0]['id']);
+        $this->assertEquals('batcheditcontact1-updated@gmail.com', $response['contacts'][0]['fields']['all']['email']);
+    }
+
+    public function testBatchEditEndpointWithRubbishId(): void
+    {
+        $payload = [
+            ['email' => 'batchemail1@email.com', 'id' => 'rubbish'],
+        ];
+
+        $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0]);
+        $this->assertGreaterThanOrEqual(1, $response['contacts'][0]['id']);
+        $this->assertEquals('batchemail1@email.com', $response['contacts'][0]['fields']['all']['email']);
+    }
+
+    public function testSingleNewEndpointCreateAndUpdate(): void
     {
         $payload = [
             'email'            => 'apiemail1@email.com',
@@ -405,7 +442,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
-    public function testBachdDncAddAndRemove()
+    public function testBatchDncAddAndRemove(): void
     {
         // Create contact
         $emailAddress = uniqid('', false).'@mautic.com';
