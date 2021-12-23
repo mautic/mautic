@@ -62,6 +62,8 @@ class StatModel
             return;
         }
 
+        $this->stat->setDetails($deliveryEvent->getDetails());
+
         $smsStatRepository->saveEntity($this->stat);
 
         // If SMS entity changed

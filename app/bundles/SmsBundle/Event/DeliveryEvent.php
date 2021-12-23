@@ -29,6 +29,16 @@ class DeliveryEvent extends AbstractCallbackEvent
     private $isFailed = false;
 
     /**
+     * @var array
+     */
+    private $details;
+
+    public function getDetails(): array
+    {
+        return $this->details;
+    }
+
+    /**
      * @return bool
      */
     public function isDelivered()
@@ -84,6 +94,16 @@ class DeliveryEvent extends AbstractCallbackEvent
     public function setIsFailed($isFailed)
     {
         $this->isFailed = $isFailed;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function addDetail(string $type, string $detail)
+    {
+        $this->details[$type][] = $detail;
 
         return $this;
     }
