@@ -10,9 +10,9 @@ use PHPUnit\Framework\Assert;
 class HitTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider setIsPreferenceCenterDataProvider
+     * @dataProvider setUrlTitle
      */
-    public function testSetUrlTitle($urlTitle, $expected): void
+    public function testSetUrlTitle(string $urlTitle, int $expected): void
     {
         $hit = new Hit();
         $hit->setUrlTitle($urlTitle);
@@ -20,7 +20,10 @@ class HitTest extends \PHPUnit\Framework\TestCase
         Assert::assertEquals($expected, strlen($hit->getUrlTitle()));
     }
 
-    public function setIsPreferenceCenterDataProvider(): iterable
+    /**
+     * @return iterable<array<int,int|string>>
+     */
+    public function setUrlTitle(): iterable
     {
         yield ['custom', 6];
         yield ['Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars Title longer than 191 chars ', 191];
