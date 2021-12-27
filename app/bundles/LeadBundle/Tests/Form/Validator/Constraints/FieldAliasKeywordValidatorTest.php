@@ -13,7 +13,6 @@ namespace Mautic\LeadBundle\Tests\Form\Validator\Constraints;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
-use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\EventListener\SegmentFiltersSubscriber;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeyword;
@@ -21,7 +20,6 @@ use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
