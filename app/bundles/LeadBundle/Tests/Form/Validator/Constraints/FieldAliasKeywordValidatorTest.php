@@ -28,9 +28,14 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
     private $fieldAliasHelperlMock;
     private $executionContextMock;
     private $entityManagerMock;
+
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
+     */
+    private $translatorMock;
+
     private $unitOfWorkMock;
     private $validator;
-    private $translatorMock;
 
     protected function setUp(): void
     {
@@ -168,7 +173,7 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($field, new FieldAliasKeyword());
     }
 
-    public function testFailureReservedKeyWords()
+    public function testFailureReservedKeyWords(): void
     {
         $originalFields = [
             'alias' => 'old_alias',

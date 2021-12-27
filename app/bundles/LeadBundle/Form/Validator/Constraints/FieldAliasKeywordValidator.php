@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\EventListener\SegmentFiltersSubscriber;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
-use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -48,7 +47,7 @@ class FieldAliasKeywordValidator extends ConstraintValidator
     private $em;
 
     /**
-     * @var DataCollectorTranslator
+     * @var TranslatorInterface
      */
     private $translator;
 
