@@ -11,7 +11,7 @@
 
 namespace Mautic\CoreBundle\Entity;
 
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use PDO;
 
 /**
@@ -40,7 +40,9 @@ class IpAddressRepository extends CommonRepository
     /**
      * Get IP addresses that are not being used in any other table.
      *
-     * @throws DBALException
+     * @return array<int, array<int>>
+     *
+     * @throws Exception
      */
     public function getUnusedIpAddressesIds(int $limit): array
     {
@@ -100,7 +102,9 @@ SQL;
     }
 
     /**
-     * @throws DBALException
+     * @param array<int, array<int>> $ids
+     *
+     * @throws Exception
      */
     public function deleteUnusedIpAddresses(array $ids): int
     {

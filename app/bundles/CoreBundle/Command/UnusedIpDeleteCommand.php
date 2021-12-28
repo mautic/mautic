@@ -12,7 +12,6 @@
 namespace Mautic\CoreBundle\Command;
 
 use Doctrine\DBAL\DBALException;
-use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\LeadBundle\Model\IpAddressModel;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -59,9 +58,9 @@ EOT
         } catch (DBALException $e) {
             $output->writeln(sprintf('<error>Deletion of unused IP addresses failed because of database error: %s</error>', $e->getMessage()));
 
-            return ExitCode::FAILURE;
+            return 1;
         }
 
-        return ExitCode::SUCCESS;
+        return 0;
     }
 }
