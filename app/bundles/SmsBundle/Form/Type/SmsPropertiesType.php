@@ -31,7 +31,7 @@ class SmsPropertiesType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $event = new SmsPropertiesEvent($builder, $options['data']);
+        $event = new SmsPropertiesEvent($builder, $options['data'] ?? []);
         $this->dispatcher->dispatch(SmsEvents::SMS_PROPERTIES, $event);
 
         foreach ($event->getFields() as $formField) {
