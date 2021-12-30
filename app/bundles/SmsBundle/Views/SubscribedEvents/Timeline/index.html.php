@@ -24,14 +24,14 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)):
                 $errors = implode('<br />', $failedDetails);
             }
             ?>
-        <span class="text-danger mt-0 mb-10"><i class="fa fa-warning"></i>
+            <span class="text-danger mt-0 mb-10"><i class="fa fa-warning"></i>
             <?php
             if (!empty($errors)) {
                 echo $errors;
             } else {
                 echo $view['translator']->trans('mautic.sms.timeline.event.failed');
             }
-        ?></span>
+            ?></span>
 
         <?php endif; ?>
         <?php if (!empty($item['list_name']) && 'failed' != $type) : ?>
@@ -40,27 +40,23 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)):
     </p>
 <?php endif; ?>
 
-<?php if (isset($errors)): ?>
-<p class="text-danger mt-0 mb-10">
-    <i class="fa fa-warning"></i> <?php echo $view['translator']->trans('mautic.campaign.event.last_error').': '.$errors; ?>
-</p>
-<?php else: ?>
-<dl class="dl-horizontal">
-    <dt><?php echo $view['translator']->trans('mautic.sms.timeline.status'); ?></dt>
-    <dd>
-        <?php if (!empty($item['is_failed'])): ?>
-            <?php echo $view['translator']->trans('mautic.email.stat.failed'); ?>
-        <?php else: ?>
-            <?php echo $view['translator']->trans('mautic.email.send'); ?>
-        <?php endif; ?>
-    </dd>
-    <dt><?php echo $view['translator']->trans('mautic.sms.timeline.type'); ?></dt>
-    <dd><?php echo $view['translator']->trans($item['type']); ?></dd>
-</dl>
-<div class="small">
-    <hr />
-    <strong><?php echo $view['translator']->trans('mautic.sms.timeline.content.heading'); ?></strong>
-    <br />
-    <?php echo $item['message']; ?>
-</div>
+<?php if (!isset($errors)): ?>
+    <dl class="dl-horizontal">
+        <dt><?php echo $view['translator']->trans('mautic.sms.timeline.status'); ?></dt>
+        <dd>
+            <?php if (!empty($item['is_failed'])): ?>
+                <?php echo $view['translator']->trans('mautic.email.stat.failed'); ?>
+            <?php else: ?>
+                <?php echo $view['translator']->trans('mautic.email.send'); ?>
+            <?php endif; ?>
+        </dd>
+        <dt><?php echo $view['translator']->trans('mautic.sms.timeline.type'); ?></dt>
+        <dd><?php echo $view['translator']->trans($item['type']); ?></dd>
+    </dl>
+    <div class="small">
+        <hr />
+        <strong><?php echo $view['translator']->trans('mautic.sms.timeline.content.heading'); ?></strong>
+        <br />
+        <?php echo $item['message']; ?>
+    </div>
 <?php endif; ?>

@@ -58,7 +58,6 @@ class LeadSubscriber implements EventSubscriberInterface
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         $this->addSmsEvents($event, 'sent');
-        $this->addSmsEvents($event, 'failed');
     }
 
     protected function addSmsEvents(LeadTimelineEvent $event, $state)
@@ -96,9 +95,19 @@ class LeadSubscriber implements EventSubscriberInterface
                         'label'      => $label,
                         'href'       => $this->router->generate('mautic_sms_action', ['objectAction'=>'view', 'objectId' => $stat['sms_id']]),
                     ];
-                if ('failed' == $state or 'sent' == $state) { //this is to get the correct column for date dateSent
+                if ('sent' == $state) { //this is to get the correct column for date dateSent
                     $dateSent = 'sent';
                 }
+
+                if (!empty($stat['isFailed'])) {
+                    $state = 'failed';
+                } elseif (!empty($stat['isDelivered'])) {
+                    $state = 'delivered';
+                }
+
+                $eventTypeKey  = 'sms.'.$state;
+                $eventTypeName = $this->translator->trans('mautic.sms.timeline.status.'.$state);
+                $event->addEventType($eventTypeKey, $eventTypeName);
 
                 $contactId = $stat['lead_id'];
                 unset($stat['lead_id']);

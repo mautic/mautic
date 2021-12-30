@@ -31,7 +31,7 @@ class DeliveryEvent extends AbstractCallbackEvent
     /**
      * @var array
      */
-    private $details;
+    private $details = [];
 
     public function getDetails(): array
     {
