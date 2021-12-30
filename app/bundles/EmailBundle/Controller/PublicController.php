@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
@@ -140,18 +141,29 @@ class PublicController extends CommonFormController
 
         if (!empty($stat)) {
             if ($email = $stat->getEmail()) {
-                $template = $email->getTemplate();
-                if ('mautic_code_mode' === $template) {
-                    // Use system default
-                    $template = null;
-                }
+                try {
+                    // No longer exists
+                    $template = $email->getTemplate();
 
-                /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
-                $unsubscribeForm = $email->getUnsubscribeForm();
-                if (null != $unsubscribeForm && $unsubscribeForm->isPublished()) {
-                    $formTemplate = $unsubscribeForm->getTemplate();
-                    $formModel    = $this->getModel('form');
-                    $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
+                    if ('mautic_code_mode' === $template) {
+                        // Use system default
+                        $template = null;
+                    }
+
+                    /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
+                    try {
+                        $unsubscribeForm = $email->getUnsubscribeForm();
+                    } catch (EntityNotFoundException $e) {
+                        $unsubscribeForm = null;
+                    }
+                    if (null != $unsubscribeForm && $unsubscribeForm->isPublished()) {
+                        $formTemplate = $unsubscribeForm->getTemplate();
+                        $formModel    = $this->getModel('form');
+                        $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
+                    }
+                } catch (EntityNotFoundException $e) {
+                    $email    = null;
+                    $template = null;
                 }
             }
         }
