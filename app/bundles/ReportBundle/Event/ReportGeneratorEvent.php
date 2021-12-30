@@ -536,8 +536,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     {
         $joins = $query->getQueryParts()['join'];
 
-        if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) //@phpstan-ignore-line
-        {
+        if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) { //@phpstan-ignore-line
             return false;
         }
 
