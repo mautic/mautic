@@ -988,7 +988,7 @@ class ListController extends FormController
             $pageHelperFactory,
             $objectId,
             $page,
-            LeadPermissions::LISTS_VIEW_OTHER,
+            LeadPermissions::LISTS_VIEW,
             'segment',
             'lead_lists_leads',
             null,
