@@ -988,7 +988,7 @@ class ListController extends FormController
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            LeadPermissions::LISTS_VIEW_OTHER,
+            LeadPermissions::LISTS_VIEW,
             'segment',
             'lead_lists_leads',
             null,

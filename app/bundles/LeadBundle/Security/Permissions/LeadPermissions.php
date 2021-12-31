@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class LeadPermissions extends AbstractPermissions
 {
+    public const LISTS_VIEW         = 'lead:lists:view';
     public const LISTS_VIEW_OWN     = 'lead:lists:viewown';
     public const LISTS_VIEW_OTHER   = 'lead:lists:viewother';
     public const LISTS_EDIT_OWN     = 'lead:lists:editown';
