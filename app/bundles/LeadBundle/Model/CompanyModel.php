@@ -784,9 +784,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array $data
      * @param null  $owner
      *
-     * @return bool|null
+     * @return \Mautic\LeadBundle\Deduplicate\Company|Company|null
      *
-     * @throws \Exception
+     * @throws \Doctrine\ORM\ORMException
      */
     public function importCompany($fields, $data, $owner = null, $persist = true, $skipIfExists = false)
     {
