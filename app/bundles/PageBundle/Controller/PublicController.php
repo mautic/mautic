@@ -25,29 +25,16 @@ use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\Tracking404Model;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
+use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PublicController extends CommonFormController
 {
-    /**
-     * @var object|\Symfony\Bridge\Monolog\Logger|null
-     */
-    private $logger;
-
-    /**
-     * Initialize controller.
-     */
-    public function initialize(FilterControllerEvent $event)
-    {
-        $this->logger    = $this->container->get('monolog.logger.mautic');
-    }
-
     /**
      * @param $slug
      *
@@ -450,16 +437,19 @@ class PublicController extends CommonFormController
      */
     public function redirectAction($redirectId): Response
     {
-        $this->logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
+        /** @var Logger $logger */
+        $logger = $this->container->get('monolog.logger.mautic');
+
+        $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->getModel('page.redirect');
         $redirect      = $redirectModel->getRedirectById($redirectId);
 
-        $this->logger->debug('Executing Redirect: '.$redirect);
+        $logger->debug('Executing Redirect: '.$redirect);
 
         if (null === $redirect || !$redirect->isPublished(false)) {
-            $this->logger->debug('Redirect with tracking_id of '.$redirectId.' not found');
+            $logger->debug('Redirect with tracking_id of '.$redirectId.' not found');
 
             $url = ($redirect) ? $redirect->getUrl() : 'n/a';
 
