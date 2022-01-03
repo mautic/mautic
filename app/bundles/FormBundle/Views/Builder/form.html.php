@@ -49,13 +49,15 @@ if (!isset($lead)) {
 ?>
 
 <?php echo $style; ?>
+<style type="text/css" scoped>
+    .mauticform-field-hidden { display:none }
+</style>
 
 <div id="mauticform_wrapper<?php echo $formName; ?>" class="mauticform_wrapper">
     <form autocomplete="false" role="form" method="post" action="<?php echo  $action; ?>" id="mauticform<?php echo $formName; ?>" <?php if ($isAjax): ?> data-mautic-form="<?php echo ltrim($formName, '_'); ?>"<?php endif; ?> enctype="multipart/form-data" <?php echo $form->getFormAttributes(); ?>>
         <div class="mauticform-error" id="mauticform<?php echo $formName; ?>_error"></div>
         <div class="mauticform-message" id="mauticform<?php echo $formName; ?>_message"></div>
         <div class="mauticform-innerform">
-
             <?php
             $displayManager = new \Mautic\FormBundle\ProgressiveProfiling\DisplayManager(
                 $form,
@@ -69,7 +71,39 @@ if (!isset($lead)) {
                     echo "\n          <div class=\"mauticform-page-wrapper mauticform-page-$pageCount\" data-mautic-form-page=\"$pageCount\"$lastFieldAttribute>\n";
                 endif;
 
-                if ($f->showForContact($submissions, $lead, $form, $displayManager)):
+                if (!$f->getParent() && $f->showForContact($submissions, $lead, $form, $displayManager)):
+                    if ($f->isCustom()):
+                        if (!isset($fieldSettings[$f->getType()])):
+                            continue;
+                        endif;
+                        $params = $fieldSettings[$f->getType()];
+                        $f->setCustomParameters($params);
+
+                        $template = $params['template'];
+                    else:
+                        if (!$f->getShowWhenValueExists() && $f->getLeadField() && $f->getIsAutoFill() && $lead && !empty($lead->getFieldValue($f->getLeadField()))) {
+                            $f->setType('hidden');
+                        }
+                        $template = 'MauticFormBundle:Field:'.$f->getType().'.html.php';
+                    endif;
+
+                    echo $view->render(
+                        $theme.$template,
+                        [
+                            'field'         => $f->convertToArray(),
+                            'id'            => $f->getAlias(),
+                            'formName'      => $formName,
+                            'fieldPage'     => ($pageCount - 1), // current page,
+                            'contactFields' => $contactFields,
+                            'companyFields' => $companyFields,
+                            'inBuilder'     => $inBuilder,
+                            'fields'        => $fields,
+                        ]
+                    );
+                endif;
+                $parentField = $f;
+                foreach ($fields as $fieldId2 => $f):
+                    if ('hidden' !== $parentField->getType() && $f->getParent() == $parentField->getId()):
                     if ($f->isCustom()):
                         if (!isset($fieldSettings[$f->getType()])):
                             continue;
@@ -97,9 +131,11 @@ if (!isset($lead)) {
                             'contactFields' => $contactFields,
                             'companyFields' => $companyFields,
                             'inBuilder'     => $inBuilder,
+                            'fields'        => $fields,
                         ]
                     );
-                endif;
+                    endif;
+                endforeach;
 
                 if (isset($formPages) && isset($formPages['close'][$fieldId])):
                     // Close the page

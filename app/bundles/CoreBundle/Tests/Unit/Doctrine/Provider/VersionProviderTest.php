@@ -16,12 +16,10 @@ namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Provider;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class VersionProviderTest extends \PHPUnit\Framework\TestCase
 {
     private $connection;
-    private $coreParametersHelper;
     private $statement;
     private $provider;
 
@@ -30,30 +28,12 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->connection           = $this->createMock(Connection::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->statement            = $this->createMock(Statement::class);
-        $this->provider             = new VersionProvider($this->connection, $this->coreParametersHelper);
-    }
-
-    public function testGetVersionFromConfig()
-    {
-        $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
-            ->willReturn('5.7.23-0ubuntu0.18.04.1');
-
-        $version = $this->provider->getVersion();
-
-        $this->assertSame('5.7.23-0ubuntu0.18.04.1', $version);
-        $this->assertFalse($this->provider->isMariaDb());
-        $this->assertTrue($this->provider->isMySql());
+        $this->provider             = new VersionProvider($this->connection);
     }
 
     public function testGetVersionForMySql()
     {
-        $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
-            ->willReturn(null);
-
         $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with('SELECT VERSION()')
@@ -72,10 +52,6 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetVersionForMariaDb()
     {
-        $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
-            ->willReturn('5.7');
-
         $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with('SELECT VERSION()')

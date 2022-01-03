@@ -501,10 +501,11 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $value     = $event->getConfig()['value'];
                 $fields    = $this->getFields($lead);
 
-                $result = $this->leadFieldModel->getRepository()->compareValue(
+                $fieldValue = isset($fields[$field]) ? CustomFieldHelper::fieldValueTransfomer($fields[$field], $value) : $value;
+                $result     = $this->leadFieldModel->getRepository()->compareValue(
                     $lead->getId(),
                     $field,
-                    CustomFieldHelper::fieldValueTransfomer($fields[$field], $value),
+                    $fieldValue,
                     $operators[$event->getConfig()['operator']]['expr']
                 );
             }
