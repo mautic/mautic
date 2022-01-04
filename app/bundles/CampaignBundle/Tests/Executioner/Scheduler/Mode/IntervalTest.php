@@ -19,7 +19,6 @@ use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
-use Throwable;
 
 class IntervalTest extends \PHPUnit\Framework\TestCase
 {
