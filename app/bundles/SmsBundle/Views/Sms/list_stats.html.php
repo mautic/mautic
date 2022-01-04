@@ -33,20 +33,11 @@ $type = $item->getSmsType();
                         </span>
     <?php endif; ?>
 
-    <span class="mt-xs label label-warning has-click-event clickable-stat"
-          id="sent-count-<?php echo $item->getId(); ?>"
-          data-toggle="tooltip"
-          title="<?php echo $view['translator']->trans('mautic.channel.stat.leadcount.tooltip'); ?>">
-                            <a href="<?php echo $view['router']->path(
-                                'mautic_contact_index',
-                                [
-                                    'search' => $view['translator']->trans(
-                                            'mautic.lead.lead.searchcommand.sms_sent'
-                                        ).':'.$item->getId(),
-                                ]
-                            ); ?>"><?php echo $view['translator']->trans(
-                                    'mautic.sms.stat.sentcount',
-                                    ['%count%' => $item->getSentCount(true)]
-                                ); ?></a>
-                        </span>
+    <?php echo $view->render(
+        'MauticSmsBundle:Sms:list_stats_column.html.php',
+        [
+            'item'            => $item,
+            'transport'       => $transport,
+        ]
+    ); ?>
 </td>

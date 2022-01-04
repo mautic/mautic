@@ -146,7 +146,7 @@ if (count($items)):
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats">
                         <?php echo $view->render(
-                            'MauticSmsBundle:Sms:list_stats_column.html.php',
+                            'MauticSmsBundle:Sms:list_stats.html.php',
                             [
                                 'item'            => $item,
                                 'transport'       => $transport,
