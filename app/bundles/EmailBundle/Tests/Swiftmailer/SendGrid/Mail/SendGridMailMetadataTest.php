@@ -39,9 +39,7 @@ class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
     {
         $sendGridMailMetadata = new SendGridMailMetadata();
 
-        $headers = $this->getMockBuilder(\Swift_Mime_SimpleHeaderSet::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $headers = $this->createMock(\Swift_Mime_SimpleHeaderSet::class);
 
         $headers->expects($this->once())
             ->method('getAll')
