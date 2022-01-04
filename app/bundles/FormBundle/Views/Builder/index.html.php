@@ -124,6 +124,10 @@ if ($view['form']->errors(
                             </div>
                             <div class="drop-here">
                             <?php foreach ($formFields as $field): ?>
+                            <?php if (!is_null($field['parent'])) {
+                                            continue;
+                                        }
+                                ?>
                                 <?php if (!in_array($field['id'], $deletedFields)) : ?>
                                     <?php if (!empty($field['isCustom'])):
                                         $params   = $field['customParameters'];
@@ -131,18 +135,23 @@ if ($view['form']->errors(
                                     else:
                                         $template = 'MauticFormBundle:Field:'.$field['type'].'.html.php';
                                     endif; ?>
-                                    <?php echo $view->render(
+                                    <?php
+
+                                    echo $view->render(
                                         'MauticFormBundle:Builder:fieldwrapper.html.php',
                                         [
-                                            'template'      => $template,
-                                            'field'         => $field,
-                                            'inForm'        => true,
-                                            'id'            => $field['id'],
-                                            'formId'        => $formId,
-                                            'formName'      => $activeForm->generateFormName(),
-                                            'contactFields' => $contactFields,
-                                            'companyFields' => $companyFields,
-                                            'inBuilder'     => $inBuilder,
+                                            'template'       => $template,
+                                            'field'          => $field,
+                                            'viewOnlyFields' => $viewOnlyFields,
+                                            'inForm'         => true,
+                                            'id'             => $field['id'],
+                                            'formId'         => $formId,
+                                            'formName'       => $activeForm->generateFormName(),
+                                            'contactFields'  => $contactFields,
+                                            'companyFields'  => $companyFields,
+                                            'inBuilder'      => $inBuilder,
+                                            'fields'         => $fields,
+                                            'formFields'     => $formFields,
                                         ]
                                     ); ?>
                                 <?php endif; ?>
