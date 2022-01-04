@@ -17,7 +17,7 @@ class HitTest extends \PHPUnit\Framework\TestCase
         $hit = new Hit();
         $hit->setUrlTitle($urlTitle);
 
-        Assert::assertEquals($expected, mb_substr($hit->getUrlTitle()));
+        Assert::assertEquals($expected, mb_strlen($hit->getUrlTitle()));
     }
 
     /**
