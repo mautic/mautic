@@ -87,7 +87,7 @@ class ListController extends FormController
             $translator      = $this->get('translator');
             $mine            = $translator->trans('mautic.core.searchcommand.ismine');
             $global          = $translator->trans('mautic.lead.list.searchcommand.isglobal');
-            $filter['force'] = "($mine or $global)";
+            $filter['force'] = ["($mine or $global)"];
         }
 
         list($count, $items) = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
@@ -917,7 +917,6 @@ class ListController extends FormController
 
             if (!empty($catIds)) {
                 $joinCategories    = true;
-		$filter['force'] = [];
                 $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => $catIds];
             }
         }
