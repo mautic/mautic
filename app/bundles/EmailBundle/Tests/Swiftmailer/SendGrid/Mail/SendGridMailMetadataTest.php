@@ -20,19 +20,12 @@ use SendGrid\ReplyTo;
 
 class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
 {
-    private function make_header(string $key, string $value): MockObject
+    private function make_header(string $key, string $value): \Swift_Mime_Header
     {
-        $an_header = $this->getMockBuilder(\Swift_Mime_Header::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $header = new \Swift_Mime_Headers_OpenDKIMHeader($key);
+        $header->setValue($value);
 
-        $an_header->method('getFieldName')
-            ->willReturn($key);
-
-        $an_header->method('getFieldBody')
-            ->willReturn($value);
-
-        return $an_header;
+        return $header;
     }
 
     public function testBaseMessage()
