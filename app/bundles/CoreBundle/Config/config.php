@@ -702,14 +702,6 @@ return [
                 ],
                 'tag'       => 'mautic.parameters.storage.service',
             ],
-            // DB parameters storage
-            'mautic.parameters.storage.database' => [
-                'class'     => \Mautic\CoreBundle\ParametersStorage\Database\DatabaseParametersStorage::class,
-                'arguments' => [
-                    'mautic.cache.provider',
-                ],
-                'tag'       => 'mautic.parameters.storage.service',
-            ],
 
             // System uses
             'mautic.di.env_processor.nullable' => [
