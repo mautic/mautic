@@ -558,7 +558,7 @@ class Hit
      */
     public function setUrlTitle($urlTitle)
     {
-        $urlTitle       = mb_strlen($urlTitle) <= 191 ? $urlTitle : substr($urlTitle, 0, 191);
+        $urlTitle       = mb_strlen($urlTitle) <= 191 ? $urlTitle : mb_substr($urlTitle, 0, 191);
         $this->urlTitle = $urlTitle;
 
         return $this;
