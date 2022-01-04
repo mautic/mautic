@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
 
 class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -403,10 +404,8 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * Test creating a new contact with doNotContact information.
      * The API response should include DNC information.
-     *
-     * @return void
      */
-    public function testSingleNewEndpointCreateAndDeleteWithDnc()
+    public function testSingleNewEndpointCreateAndDeleteWithDnc(): void
     {
         $payload = [
             'email'            => 'apidnc@email.com',
@@ -506,7 +505,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
-    public function testAddAndRemoveDncToExistingContact()
+    public function testAddAndRemoveDncToExistingContact(): void
     {
         // Create contact
         $payload = [

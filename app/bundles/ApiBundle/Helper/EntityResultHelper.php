@@ -7,8 +7,8 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 class EntityResultHelper
 {
     /**
-     * @param array<mixed>|Paginator<int,mixed> $results
-     * @param callable|null                     $callback
+     * @param array<mixed>|Paginator<mixed> $results
+     * @param callable|null                 $callback
      *
      * @return array<mixed>
      */
