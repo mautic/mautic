@@ -24,7 +24,7 @@ class ParametersStorage
         // we cannot load CoreParametersHelper, because this service is used in it
         $loader = new ParameterLoader();
 
-        $this->parameters = $loader->getLocalParameterBag();
+        $this->parameters = $loader->getParameterBag();
     }
 
     /**
