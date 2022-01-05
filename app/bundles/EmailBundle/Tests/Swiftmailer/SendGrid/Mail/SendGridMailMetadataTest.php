@@ -12,7 +12,6 @@
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailMetadata;
-use PHPUnit\Framework\MockObject\MockObject;
 use SendGrid\BccSettings;
 use SendGrid\Mail;
 use SendGrid\MailSettings;
