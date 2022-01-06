@@ -427,7 +427,7 @@ class ListController extends FormController
         }
 
         if (!$this->security->hasEntityAccess(
-            true, LeadPermissions::LISTS_EDIT_OTHER, $segment->getCreatedBy()
+            LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $segment->getCreatedBy()
         )) {
             throw new AccessDeniedException(sprintf('User has not access on segment with id %d', $segmentId));
         }
@@ -520,7 +520,7 @@ class ListController extends FormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->security->hasEntityAccess(
-                true, LeadPermissions::LISTS_DELETE_OTHER, $list->getCreatedBy()
+                LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER, $list->getCreatedBy()
             )
             ) {
                 return $this->accessDenied();
@@ -596,7 +596,7 @@ class ListController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    true, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
+                    LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
                 )) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
@@ -689,7 +689,7 @@ class ListController extends FormController
                     'msgVars' => ['%id%' => $listId],
                 ];
             } elseif (!$list->isGlobal() && !$this->security->hasEntityAccess(
-                    true, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
+                    LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
                 )) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($lead)) {

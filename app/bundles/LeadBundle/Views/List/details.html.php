@@ -41,7 +41,7 @@ $view['slots']->set(
                 ),
                 'clone' => $view['security']->hasEntityAccess(
                     $permissions[LeadPermissions::LISTS_EDIT_OWN],
-                    $permissions[LeadPermissions::LISTS_VIEW_OTHER],
+                    $permissions[LeadPermissions::LISTS_EDIT_OTHER],
                     $list->getCreatedBy()
                 ),
             ],
