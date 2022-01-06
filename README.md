@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-50-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-56-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -48,7 +48,7 @@ The GitHub version is recommended for both development and testing. The producti
 *Also note that source code outside of a [tagged release][tagged-release] should be considered ‘alpha’. It may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*
 
 ### How to install Mautic
-You must already have [Composer v1][composer-v1] available on your computer because this is a development release and you'll need Composer to download the vendor packages. Note that Composer v2 is not yet supported.
+You must already have [Composer][composer] available on your computer because this is a development release and you'll need Composer to download the vendor packages.
 
 Also note that if you have DDEV installed, you can run 'ddev config' followed by 'ddev start'. This will kick off the Mautic first-run process which will automatically install dependencies and configure Mautic for use. ✨ 🚀 Read more [here][ddev-mautic]
 
@@ -140,6 +140,12 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="http://twitter.com/j26w"><img src="https://avatars.githubusercontent.com/u/1260184?v=4?s=100" width="100px;" alt=""/><br /><sub><b>j26w</b></sub></a><br /><a href="#userTesting-j26w" title="User Testing">📓</a></td>
+    <td align="center"><a href="http://theodorosploumis.com/en"><img src="https://avatars.githubusercontent.com/u/1315321?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Theodoros Ploumis</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=theodorosploumis" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/sreenia806"><img src="https://avatars.githubusercontent.com/u/2764179?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Sreenivasulu Avula</b></sub></a><br /><a href="#userTesting-sreenia806" title="User Testing">📓</a> <a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Asreenia806" title="Reviewed Pull Requests">👀</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/mohammadlahlouh/"><img src="https://avatars.githubusercontent.com/u/7312050?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mohammad Lahlouh</b></sub></a><br /><a href="#userTesting-mlahlouh" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://github.com/ArnaudSau"><img src="https://avatars.githubusercontent.com/u/50580844?v=4?s=100" width="100px;" alt=""/><br /><sub><b>ArnaudSau</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=ArnaudSau" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/bell87"><img src="https://avatars.githubusercontent.com/u/5338785?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Andrew Bell</b></sub></a><br /><a href="#userTesting-bell87" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://github.com/alfredoct96"><img src="https://avatars.githubusercontent.com/u/50916237?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Alfredo Arena</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=alfredoct96" title="Code">💻</a></td>
   </tr>
 </table>
 
@@ -161,7 +167,7 @@ This project follows the [all-contributors][all-contributors] specification. Con
 [t1-issues]: <https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AT1>
 [download-mautic]: <https://www.mautic.org/download>
 [tagged-release]: <https://github.com/mautic/mautic/releases>
-[composer-v1]: <http://getcomposer.org/>
+[composer]: <http://getcomposer.org/>
 [download-zip]: <https://github.com/mautic/mautic/archive/refs/heads/features.zip>
 [ddev-mautic]: <https://kb.mautic.org/knowledgebase/development/how-to-install-mautic-using-ddev>
 [troubleshooting]: <https://docs.mautic.org/en/troubleshooting>
