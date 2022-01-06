@@ -79,9 +79,9 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             [
                                 'item'            => $item,
                                 'templateButtons' => [
-                                    'edit'   => $view['security']->hasEntityAccess(true, $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy()),
-                                    'clone'  => $view['security']->hasEntityAccess(true, $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy()),
-                                    'delete' => $view['security']->hasEntityAccess(true, $permissions[LeadPermissions::LISTS_DELETE_OTHER], $item->getCreatedBy()),
+                                    'edit'   => $view['security']->hasEntityAccess($permissions[LeadPermissions::LISTS_EDIT_OWN], $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy()),
+                                    'clone'  => $view['security']->hasEntityAccess($permissions[LeadPermissions::LISTS_EDIT_OWN], $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy()),
+                                    'delete' => $view['security']->hasEntityAccess($permissions[LeadPermissions::LISTS_DELETE_OWN], $permissions[LeadPermissions::LISTS_DELETE_OTHER], $item->getCreatedBy()),
                                 ],
                                 'routeBase' => 'segment',
                                 'langVar'   => 'lead.list',
@@ -110,7 +110,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 ['item' => $item, 'model' => 'lead.list']
                             ); ?>
-                            <?php if ($view['security']->hasEntityAccess(true, $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy())) : ?>
+                            <?php if ($view['security']->hasEntityAccess($permissions[LeadPermissions::LISTS_VIEW_OWN], $permissions[LeadPermissions::LISTS_VIEW_OTHER], $item->getCreatedBy())) : ?>
                                 <a href="<?php echo $view['router']->path(
                                     'mautic_segment_action',
                                     ['objectAction' => 'view', 'objectId' => $item->getId()]
