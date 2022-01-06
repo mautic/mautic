@@ -16,13 +16,14 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class MessageApiController extends CommonApiController
 {
     /**
-     * @var MessageModel
+     * @var MessageModel|AbstractCommonModel
      */
     protected $model;
 
