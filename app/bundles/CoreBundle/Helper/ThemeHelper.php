@@ -114,6 +114,7 @@ class ThemeHelper
         'skyline',
         'sparse',
         'sunday',
+        'system',
         'trulypersonal',
         'vibrant',
     ];
