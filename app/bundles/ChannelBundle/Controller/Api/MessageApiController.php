@@ -15,14 +15,17 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\ChannelBundle\Event\ChannelEvent;
+use Mautic\ChannelBundle\Model\MessageModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-/**
- * Class MessageController.
- */
 class MessageApiController extends CommonApiController
 {
+    /**
+     * @var MessageModel
+     */
+    protected $model;
+
     public function initialize(FilterControllerEvent $event)
     {
         $this->model            = $this->getModel('channel.message');
@@ -38,23 +41,18 @@ class MessageApiController extends CommonApiController
     {
         parent::prepareParametersFromRequest($form, $params, $entity, $masks);
 
-        if ('PATCH' != $this->request->getMethod()) {
-            $channels = $this->getModel('channel.message')->getChannels();
-            if (!isset($params['channels'])) {
-                $params['channels'] = [];
-            }
+        $channels = $this->model->getChannels();
+        if (!isset($params['channels'])) {
+            $params['channels'] = [];
+        }
 
-            foreach ($channels as $channelType => $channel) {
-                if (!isset($params['channels'][$channelType])) {
-                    $params['channels'][$channelType] = [
-                        'isEnabled' => 0,
-                        'channel'   => $channelType,
-                    ];
-                } else {
-                    $params['channels'][$channelType]['channel']   = $channelType;
-                    $params['channels'][$channelType]['isEnabled'] = (int) $params['channels'][$channelType]['isEnabled'];
-                }
+        foreach ($channels as $channelType => $channel) {
+            if (!isset($params['channels'][$channelType]) && 'PATCH' != $this->request->getMethod()) {
+                $params['channels'][$channelType] = ['isEnabled' => 0];
+            } else {
+                $params['channels'][$channelType]['isEnabled'] = (int) $params['channels'][$channelType]['isEnabled'];
             }
+            $params['channels'][$channelType]['channel'] = $channelType;
         }
     }
 
