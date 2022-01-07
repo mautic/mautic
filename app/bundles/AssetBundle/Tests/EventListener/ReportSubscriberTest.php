@@ -8,7 +8,10 @@ use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\EventListener\ReportSubscriber;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -50,7 +53,10 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function getCompanyData()
+            /**
+             * @return array<mixed>
+             */
+            public function getCompanyData(): array
             {
                 return [];
             }
@@ -122,23 +128,66 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private function createTranslatorMock(): TranslatorInterface
     {
         return new class() implements TranslatorInterface {
-            public function trans($id, array $parameters = [], $domain = null, $locale = null)
+            /**
+             * @param array<int|string> $parameters
+             */
+            public function trans($id, array $parameters = [], $domain = null, $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';
             }
 
+            /**
+             * @param array<int|string> $parameters
+             *
+             * @return string
+             */
             public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
             {
                 return '[trans]'.$id.'[/trans]';
             }
 
-            public function setLocale($locale)
+            public function setLocale($locale): void
             {
             }
 
             public function getLocale()
             {
+                return '';
             }
         };
+    }
+
+    public function testGroupByIfNotConfigured(): void
+    {
+        $queryBuilder       = $this->createMock(QueryBuilder::class);
+        $channelListHelper  = $this->createMock(ChannelListHelper::class);
+        $companyReportData  = $this->createMock(CompanyReportData::class);
+        $downloadRepository = $this->createMock(DownloadRepository::class);
+        $event              = new ReportGeneratorEvent(new Report(), [], $queryBuilder, $channelListHelper);
+        $subscriber         = new ReportSubscriber($companyReportData, $downloadRepository);
+
+        $queryBuilder->expects($this->once())
+            ->method('groupBy')
+            ->with('ad.asset_id');
+
+        $subscriber->onReportGenerate($event);
+    }
+
+    public function testGroupByIfConfigured(): void
+    {
+        $queryBuilder       = $this->createMock(QueryBuilder::class);
+        $channelListHelper  = $this->createMock(ChannelListHelper::class);
+        $companyReportData  = $this->createMock(CompanyReportData::class);
+        $downloadRepository = $this->createMock(DownloadRepository::class);
+        $report             = new Report();
+        $report->setGroupBy(['a.id' => 'desc']);
+        $event              = new ReportGeneratorEvent($report, [], $queryBuilder, $channelListHelper);
+        $subscriber         = new ReportSubscriber($companyReportData, $downloadRepository);
+
+        $queryBuilder->expects($this->never())
+            ->method('groupBy')
+            ->with('ad.asset_id');
+
+        $subscriber->onReportGenerate($event);
     }
 }
