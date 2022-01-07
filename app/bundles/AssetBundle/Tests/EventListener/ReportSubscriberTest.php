@@ -16,8 +16,38 @@ use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Translation\TranslatorInterface;
 
+define('MAUTIC_TABLE_PREFIX', '');
+
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var ChannelListHelper|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $channelListHelper;
+
+    /**
+     * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $companyReportData;
+
+    /**
+     * @var DownloadRepository|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $downloadRepository;
+
+    /**
+     * @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $queryBuilder;
+
+    public function setUp(): void
+    {
+        $this->queryBuilder       = $this->createMock(QueryBuilder::class);
+        $this->channelListHelper  = $this->createMock(ChannelListHelper::class);
+        $this->companyReportData  = $this->createMock(CompanyReportData::class);
+        $this->downloadRepository = $this->createMock(DownloadRepository::class);
+    }
+
     public function testOnReportBuilderWithUnknownContext(): void
     {
         $companyReportData = new class() extends CompanyReportData {
@@ -159,14 +189,13 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testGroupByIfNotConfigured(): void
     {
-        $queryBuilder       = $this->createMock(QueryBuilder::class);
-        $channelListHelper  = $this->createMock(ChannelListHelper::class);
-        $companyReportData  = $this->createMock(CompanyReportData::class);
-        $downloadRepository = $this->createMock(DownloadRepository::class);
-        $event              = new ReportGeneratorEvent(new Report(), [], $queryBuilder, $channelListHelper);
-        $subscriber         = new ReportSubscriber($companyReportData, $downloadRepository);
+        $report             = new Report();
+        $report->setSource(ReportSubscriber::CONTEXT_ASSET_DOWNLOAD);
+        $event              = new ReportGeneratorEvent($report, [], $this->queryBuilder, $this->channelListHelper);
+        $subscriber         = new ReportSubscriber($this->companyReportData, $this->downloadRepository);
+        $this->queryBuilder->method('from')->willReturn($this->queryBuilder);
 
-        $queryBuilder->expects($this->once())
+        $this->queryBuilder->expects($this->once())
             ->method('groupBy')
             ->with('ad.asset_id');
 
@@ -175,16 +204,14 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testGroupByIfConfigured(): void
     {
-        $queryBuilder       = $this->createMock(QueryBuilder::class);
-        $channelListHelper  = $this->createMock(ChannelListHelper::class);
-        $companyReportData  = $this->createMock(CompanyReportData::class);
-        $downloadRepository = $this->createMock(DownloadRepository::class);
         $report             = new Report();
+        $report->setSource(ReportSubscriber::CONTEXT_ASSET_DOWNLOAD);
+        $this->queryBuilder->method('from')->willReturn($this->queryBuilder);
         $report->setGroupBy(['a.id' => 'desc']);
-        $event              = new ReportGeneratorEvent($report, [], $queryBuilder, $channelListHelper);
-        $subscriber         = new ReportSubscriber($companyReportData, $downloadRepository);
+        $event              = new ReportGeneratorEvent($report, [], $this->queryBuilder, $this->channelListHelper);
+        $subscriber         = new ReportSubscriber($this->companyReportData, $this->downloadRepository);
 
-        $queryBuilder->expects($this->never())
+        $this->queryBuilder->expects($this->never())
             ->method('groupBy')
             ->with('ad.asset_id');
 
