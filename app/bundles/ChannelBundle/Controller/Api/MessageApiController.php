@@ -48,7 +48,7 @@ class MessageApiController extends CommonApiController
         }
 
         foreach ($channels as $channelType => $channel) {
-            if (!isset($params['channels'][$channelType]) && 'PATCH' != $this->request->getMethod()) {
+            if (!isset($params['channels'][$channelType])) {
                 $params['channels'][$channelType] = ['isEnabled' => 0];
             } else {
                 $params['channels'][$channelType]['isEnabled'] = (int) $params['channels'][$channelType]['isEnabled'];
