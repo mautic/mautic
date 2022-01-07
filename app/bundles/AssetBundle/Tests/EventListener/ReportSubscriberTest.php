@@ -16,8 +16,6 @@ use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Translation\TranslatorInterface;
 
-define('MAUTIC_TABLE_PREFIX', '');
-
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
