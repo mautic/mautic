@@ -17,18 +17,22 @@ use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\EventListener\CampaignSendSubscriber;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var mixed[]
+     */
     private $args;
 
     /**
-     * @var SmsModel
+     * @var MockObject|SmsModel
      */
     private $smsModel;
 
     /**
-     * @var TransportChain
+     * @var MockObject|TransportChain
      */
     private $transportChain;
 
@@ -51,7 +55,7 @@ class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSendDeletedSms()
+    public function testSendDeletedSms(): void
     {
         $this->smsModel->expects(self::once())->method('getEntity')->willReturn(null);
 
@@ -62,7 +66,7 @@ class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         self::assertSame('mautic.sms.campaign.failed.missing_entity', $event->getResult()['reason']);
     }
 
-    public function testSendUnpublishedSms()
+    public function testSendUnpublishedSms(): void
     {
         $lead = new Lead();
         $lead->setId(1);
@@ -77,10 +81,7 @@ class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         self::assertSame('mautic.sms.campaign.failed.unpublished', $event->getResult()['reason']);
     }
 
-    /**
-     * @return CampaignSendSubscriber
-     */
-    private function CampaignSendSubscriber()
+    private function CampaignSendSubscriber(): CampaignSendSubscriber
     {
         return new CampaignSendSubscriber($this->smsModel, $this->transportChain);
     }
