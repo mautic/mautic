@@ -55,7 +55,7 @@ abstract class CommonMocks extends \PHPUnit\Framework\TestCase
      */
     protected function getCoreParametersHelperMock()
     {
-        return $this->createMock(CoreParametersHelper::class);;
+        return $this->createMock(CoreParametersHelper::class);
     }
 
     /**
