@@ -31,11 +31,16 @@ class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
     {
         $sendGridMailMetadata = new SendGridMailMetadata();
 
-        $headers = $this->createMock(\Swift_Mime_SimpleHeaderSet::class);
+        $randomvalue = rand(-100, 100);
+        $headers     = $this->createMock(\Swift_Mime_SimpleHeaderSet::class);
 
         $headers->expects($this->once())
             ->method('getAll')
-            ->willReturn([$this->make_header('X-FOO', 'Bar'), $this->make_header('to', 'nobody@email.com')]);
+            ->willReturn([
+                $this->make_header('X-FOO', 'Bar'),
+                $this->make_header('X-rand', $randomvalue),
+                $this->make_header('to', 'nobody@email.com'),
+            ]);
 
         $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
             ->disableOriginalConstructor()
@@ -61,6 +66,12 @@ class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
 
         $replyTo = new ReplyTo('email@example.com');
         $this->assertEquals($replyTo, $mail->getReplyTo());
+
+        // Header "to" should be ignored
+        $this->assertEquals([
+            'X-FOO'  => 'Bar',
+            'X-rand' => $randomvalue,
+        ], $mail->getheaders());
 
         /**
          * @var MailSettings
