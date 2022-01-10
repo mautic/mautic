@@ -830,6 +830,10 @@ return [
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'uniqueleadlist',
             ],
+            'mautic.lead.validator.custom_field' => [
+                'class'     => \Mautic\LeadBundle\Validator\CustomFieldValidator::class,
+                'arguments' => ['mautic.lead.model.field', 'translator'],
+            ],
             'mautic.lead_list.constraint.in_use' => [
                 'class'     => Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUseValidator::class,
                 'arguments' => [
@@ -955,6 +959,16 @@ return [
                     'setUniqueIdentifiersOperator' => [
                         '%mautic.contact_unique_identifiers_operator%',
                     ],
+                    'setListLeadRepository' => [
+                        '@mautic.lead.repository.list_lead',
+                    ],
+                ],
+            ],
+            'mautic.lead.repository.list_lead' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\ListLead::class,
                 ],
             ],
             'mautic.lead.repository.frequency_rule' => [

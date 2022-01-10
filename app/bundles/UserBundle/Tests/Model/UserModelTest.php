@@ -16,9 +16,9 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Model\UserModel;
-use Mautic\UserBundle\Model\UserToken\UserTokenService;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -26,48 +26,45 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class UserModelTest extends TestCase
 {
-    /**
-     * @var UserModel
-     */
-    private $userModel;
+    private UserModel $userModel;
 
     /**
-     * @var MailHelper
+     * @var MockObject&MailHelper
      */
     private $mailHelper;
 
     /**
-     * @var EntityManager
+     * @var MockObject&EntityManager
      */
     private $entityManager;
 
     /**
-     * @var Router
+     * @var MockObject&Router
      */
     private $router;
 
     /**
-     * @var TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private $translator;
 
     /**
-     * @var User
+     * @var MockObject&User
      */
     private $user;
 
     /**
-     * @var UserToken
+     * @var MockObject&UserToken
      */
     private $userToken;
 
     /**
-     * @var UserTokenService
+     * @var MockObject&UserTokenServiceInterface
      */
     private $userTokenService;
 
     /**
-     * @var Logger
+     * @var MockObject&Logger
      */
     private $logger;
 
@@ -95,7 +92,7 @@ class UserModelTest extends TestCase
             ->method('generateSecret')
             ->willReturn($this->userToken);
 
-        $this->mailHelper->expects($this->once())
+        $this->mailHelper
             ->method('getMailer')
             ->willReturn($this->mailHelper);
 
@@ -109,6 +106,11 @@ class UserModelTest extends TestCase
         $this->router->expects($this->once())
             ->method('generate')
             ->with('mautic_user_passwordresetconfirm', ['token' => null], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $this->translator
+            ->expects($this->any())
+            ->method('trans')
+            ->willReturn('test');
 
         $this->userModel->sendResetEmail($this->user);
     }
@@ -128,5 +130,59 @@ class UserModelTest extends TestCase
             ->with($errorMessage);
 
         $this->userModel->sendResetEmail($this->user);
+    }
+
+    public function testEmailUser(): void
+    {
+        $email   = 'a@test.com';
+        $name    = 'name';
+        $toMail  = [$email => $name];
+        $subject = 'subject';
+        $content = 'content';
+
+        $this->user->expects($this->once())
+            ->method('getEmail')
+            ->willReturn($email);
+
+        $this->user->expects($this->once())
+            ->method('getName')
+            ->willReturn($name);
+
+        $this->mailHelper->expects($this->once())
+            ->method('getMailer')
+            ->willReturn($this->mailHelper);
+
+        $this->mailHelper->expects($this->once())
+            ->method('setTo')
+            ->with($toMail)
+            ->willReturn(true);
+
+        $this->mailHelper->expects($this->once())
+            ->method('send');
+
+        // Means no erros.
+        $this->userModel->emailUser($this->user, $subject, $content);
+    }
+
+    public function testSendMailToEmailAddresses(): void
+    {
+        $toMails = ['a@test.com', 'b@test.com'];
+        $subject = 'subject';
+        $content = 'content';
+
+        $this->mailHelper->expects($this->once())
+            ->method('getMailer')
+            ->willReturn($this->mailHelper);
+
+        $this->mailHelper->expects($this->once())
+            ->method('setTo')
+            ->with($toMails)
+            ->willReturn(true);
+
+        $this->mailHelper->expects($this->once())
+            ->method('send');
+
+        // Means no erros.
+        $this->userModel->sendMailToEmailAddresses($toMails, $subject, $content);
     }
 }
