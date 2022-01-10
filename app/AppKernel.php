@@ -286,9 +286,7 @@ class AppKernel extends Kernel
         if (null === $this->installed) {
             $localParameters = $this->getParameterLoader()->getLocalParameterBag();
             $dbDriver        = $localParameters->get('db_driver');
-            $mailerFromName  = $localParameters->get('mailer_from_name');
-
-            $this->installed = !empty($dbDriver) && !empty($mailerFromName);
+            $this->installed = !empty($dbDriver);
         }
 
         return $this->installed;
