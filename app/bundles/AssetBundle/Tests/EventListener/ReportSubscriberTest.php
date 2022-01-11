@@ -209,9 +209,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $event              = new ReportGeneratorEvent($report, [], $this->queryBuilder, $this->channelListHelper);
         $subscriber         = new ReportSubscriber($this->companyReportData, $this->downloadRepository);
 
-        $this->queryBuilder->expects($this->never())
+        $this->queryBuilder->expects($this->once())
             ->method('groupBy')
-            ->with('ad.asset_id');
+            ->with('a.id');
 
         $subscriber->onReportGenerate($event);
     }
