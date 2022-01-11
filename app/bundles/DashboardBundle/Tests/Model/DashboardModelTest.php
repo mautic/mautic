@@ -63,7 +63,7 @@ class DashboardModelTest extends TestCase
     {
         $dateFromStr = '-1 month';
         $dateFrom    = new \DateTime($dateFromStr);
-        $dateTo      = new \DateTime();
+        $dateTo      = new \DateTime('23:59:59'); // till end of the 'to' date selected
 
         $this->coreParametersHelper->expects(self::once())
             ->method('get')
