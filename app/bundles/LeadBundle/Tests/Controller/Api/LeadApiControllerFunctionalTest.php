@@ -195,6 +195,19 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(null, $response['contacts'][2]['owner']);
     }
 
+    /**
+     * If there are some entities to return then the response returns a hash table (JSON object),
+     * So for response with no entities we must also return a JSON object because some languages
+     * decode it differently then emtpty array.
+     */
+    public function testEmptyResponseReturnsJsonObject(): void
+    {
+        $this->client->request('GET', '/api/contacts?limit=0');
+        $clientResponse = $this->client->getResponse();
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertEquals('{"total":"0","contacts":{}}', $clientResponse->getContent());
+    }
+
     public function testBatchEditEndpoint(): void
     {
         $contact = new Lead();
