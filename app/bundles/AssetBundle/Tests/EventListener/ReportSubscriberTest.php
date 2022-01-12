@@ -44,6 +44,10 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->channelListHelper  = $this->createMock(ChannelListHelper::class);
         $this->companyReportData  = $this->createMock(CompanyReportData::class);
         $this->downloadRepository = $this->createMock(DownloadRepository::class);
+
+        if (!defined('MAUTIC_TABLE_PREFIX')) {
+            define('MAUTIC_TABLE_PREFIX', '');
+        }
     }
 
     public function testOnReportBuilderWithUnknownContext(): void
@@ -185,7 +189,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         };
     }
 
-    public function testGroupByIfNotConfigured(): void
+    public function testGroupByDefaultConfigured(): void
     {
         $report             = new Report();
         $report->setSource(ReportSubscriber::CONTEXT_ASSET_DOWNLOAD);
@@ -200,7 +204,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber->onReportGenerate($event);
     }
 
-    public function testGroupByIfConfigured(): void
+    public function testGroupByNotDefaultConfigured(): void
     {
         $report             = new Report();
         $report->setSource(ReportSubscriber::CONTEXT_ASSET_DOWNLOAD);
@@ -209,9 +213,8 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $event              = new ReportGeneratorEvent($report, [], $this->queryBuilder, $this->channelListHelper);
         $subscriber         = new ReportSubscriber($this->companyReportData, $this->downloadRepository);
 
-        $this->queryBuilder->expects($this->once())
-            ->method('groupBy')
-            ->with('a.id');
+        $this->queryBuilder->expects($this->never())
+            ->method('groupBy');
 
         $subscriber->onReportGenerate($event);
     }
