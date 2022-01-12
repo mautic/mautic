@@ -154,9 +154,10 @@ JSON;
         $responseArray = json_decode($responseJson, true);
         $this->assertMessagePayload(
             [
-                'id'       => $message1->getId(),
-                'name'     => 'API message 1 (updated)',
-                'channels' => [
+                'id'          => $message1->getId(),
+                'name'        => 'API message 1 (updated)',
+                'description' => null,
+                'channels'    => [
                     'email' => [
                         'channel'   => 'email',
                         'channelId' => 12,
@@ -169,9 +170,10 @@ JSON;
         );
         $this->assertMessagePayload(
             [
-                'id'       => $message2->getId(),
-                'name'     => 'API message 2',
-                'channels' => [
+                'id'          => $message2->getId(),
+                'name'        => 'API message 2',
+                'description' => null,
+                'channels'    => [
                     'email' => [
                         'channel'   => 'email',
                         'channelId' => 14,
