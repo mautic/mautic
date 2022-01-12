@@ -201,6 +201,8 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('groupBy')
             ->with('ad.asset_id');
 
+        $this->assertFalse($event->hasGroupBy());
+
         $subscriber->onReportGenerate($event);
     }
 
@@ -212,10 +214,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $report->setGroupBy(['a.id' => 'desc']);
         $event              = new ReportGeneratorEvent($report, [], $this->queryBuilder, $this->channelListHelper);
         $subscriber         = new ReportSubscriber($this->companyReportData, $this->downloadRepository);
-
-        $this->queryBuilder->expects($this->never())
-            ->method('groupBy');
-
         $subscriber->onReportGenerate($event);
+        $this->assertTrue($event->hasGroupBy());
     }
 }
