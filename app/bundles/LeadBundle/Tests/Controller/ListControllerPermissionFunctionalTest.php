@@ -39,7 +39,6 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        // A user without any segment permissions.
         $this->nonAdminUser = $this->createUser([
             'user-name'     => 'non-admin',
             'email'         => 'non-admin@mautic-test.com',
@@ -47,12 +46,11 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             'last-name'     => 'non-admin',
             'role'          => [
                 'name'      => 'perm_non_admin',
-                'perm'      => 'core:themes.full',
+                'perm'      => 'core:themes',
                 'bitwise'   => 1024,
             ],
         ]);
 
-        // A user without any segment create, view own, edit own.
         $this->userOne = $this->createUser(
             [
                 'user-name'     => 'user-one',
@@ -61,13 +59,12 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
                 'last-name'     => 'user-one',
                 'role'          => [
                     'name'      => 'perm_user_one',
-                    'perm'      => LeadPermissions::LISTS_CREATE,
-                    'bitwise'   => 32,
+                    'perm'      => 'lead:lists',
+                    'bitwise'   => 40,
                 ],
             ]
         );
 
-        // A user without any segment view own/others, edit own/others and delete own/others.
         $this->userTwo = $this->createUser([
             'user-name'     => 'user-two',
             'email'         => 'user-two@mautic-test.com',
@@ -75,7 +72,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             'last-name'     => 'user-two',
             'role'          => [
                 'name'      => 'perm_user_two',
-                'perm'      => LeadPermissions::LISTS_EDIT_OTHER,
+                'perm'      => 'lead:lists',
                 'bitwise'   => 16,
             ],
         ]);
@@ -158,8 +155,8 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
                 'last-name'     => 'user-3',
                 'role'          => [
                     'name'      => 'perm_user_three',
-                    'perm'      => LeadPermissions::LISTS_DELETE_OTHER,
-                    'bitwise'   => 32,
+                    'perm'      => 'lead:lists',
+                    'bitwise'   => 128,
                 ],
             ]
         );
@@ -234,7 +231,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             'last-name'     => 'user-edit',
             'role'          => [
                 'name'      => 'perm_user_edit',
-                'perm'      => LeadPermissions::LISTS_EDIT_OWN,
+                'perm'      => 'lead:lists',
                 'bitwise'   => 8,
             ],
         ]);
@@ -276,7 +273,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             'last-name'     => 'user-delete-other',
             'role'          => [
                 'name'      => 'perm_user_delete_other',
-                'perm'      => LeadPermissions::LISTS_DELETE_OTHER,
+                'perm'      => 'lead:lists',
                 'bitwise'   => 128,
             ],
         ]);
@@ -338,8 +335,8 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             'last-name'     => 'user-delete-a',
             'role'          => [
                 'name'      => 'perm_user_delete_a',
-                'perm'      => LeadPermissions::LISTS_EDIT_OWN,
-                'bitwise'   => 8,
+                'perm'      => 'lead:lists',
+                'bitwise'   => 82,
             ],
         ]);
 
@@ -399,7 +396,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             'last-name'     => 'user-view-own',
             'role'          => [
                 'name'      => 'perm_user_view_own',
-                'perm'      => LeadPermissions::LISTS_VIEW_OWN,
+                'perm'      => 'lead:lists',
                 'bitwise'   => 2,
             ],
         ]);
