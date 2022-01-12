@@ -37,7 +37,7 @@ JSON;
 
     /**
      * @dataProvider patchProvider
-     * 
+     *
      * @param mixed[] $payload
      * @param mixed[] $expectedResponsePayload
      */
@@ -70,14 +70,14 @@ JSON;
 
     /**
      * Note: the ID is added to the payload automatically in the test.
-     * 
+     *
      * @return iterable<mixed[]>
      */
     public function patchProvider(): iterable
     {
         yield [
             [
-                'name' => 'API message (updated)'
+                'name' => 'API message (updated)',
             ],
             [
                 'name'        => 'API message (updated)',
@@ -89,7 +89,7 @@ JSON;
                         'isEnabled' => true,
                     ],
                 ],
-            ]
+            ],
         ];
 
         yield [
@@ -113,7 +113,7 @@ JSON;
                         'isEnabled' => false,
                     ],
                 ],
-            ]
+            ],
         ];
     }
 
@@ -148,7 +148,7 @@ JSON;
             ['id' => $message1->getId(), 'name' => 'API message 1 (updated)'],
             ['id' => $message2->getId(), 'channels' => ['email' => ['channelId' => 14, 'isEnabled' => false]]],
         ];
-        $this->client->request('PATCH', "/api/messages/batch/edit", $patchPayload);
+        $this->client->request('PATCH', '/api/messages/batch/edit', $patchPayload);
         $responseJson = $this->client->getResponse()->getContent();
         Assert::assertSame(200, $this->client->getResponse()->getStatusCode(), $responseJson);
         $responseArray = json_decode($responseJson, true);
@@ -160,7 +160,7 @@ JSON;
                     'email' => [
                         'channel'   => 'email',
                         'channelId' => 12,
-                        'isEnabled' => true
+                        'isEnabled' => true,
                     ],
                 ],
             ],
@@ -175,7 +175,7 @@ JSON;
                     'email' => [
                         'channel'   => 'email',
                         'channelId' => 14,
-                        'isEnabled' => false
+                        'isEnabled' => false,
                     ],
                 ],
             ],
@@ -187,7 +187,6 @@ JSON;
     /**
      * @param mixed[] $expectedPayload
      * @param mixed[] $actualPayload
-     * @param string  $deliveredPayloadJson
      */
     private function assertMessagePayload(array $expectedPayload, array $actualPayload, string $deliveredPayloadJson): void
     {
