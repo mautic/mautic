@@ -12,13 +12,12 @@
 
 <style type="text/css" scoped>
     .mauticform_wrapper { max-width: 600px; margin: 10px auto; }
-    .mauticform_wrapper form { display: flex; flex-direction: column; }
     .mauticform-innerform {}
     .mauticform-post-success {}
     .mauticform-name { font-weight: bold; font-size: 1.5em; margin-bottom: 3px; }
     .mauticform-description { margin-top: 2px; margin-bottom: 10px; }
-    .mauticform-error { margin-bottom: 10px; color: red; order: 1; }
-    .mauticform-message { margin-bottom: 10px;color: green; order: 2; }
+    .mauticform-error { margin-bottom: 10px; color: red; }
+    .mauticform-message { margin-bottom: 10px; color: green; }
     .mauticform-row { display: block; margin-bottom: 20px; }
     .mauticform-label { font-size: 1.1em; display: block; font-weight: bold; margin-bottom: 5px; }
     .mauticform-row.mauticform-required .mauticform-label:after { color: #e32; content: " *"; display: inline; }
