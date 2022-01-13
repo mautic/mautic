@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -24,24 +26,27 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
-    protected $clientOptions = ['debug' => true];
+    public function setUp(): void
+    {
+        $this->clientOptions = ['debug' => true];
+
+        parent::setUp();
+    }
 
     /**
      * Ensure there is no query for DNC reasons if there are no contacts who received the email
      * because it loads the whole DNC table if no contact IDs are provided. It can lead to
      * memory limit error if the DNC table is big.
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
-    public function testProfileEmailDetailPageForUnsentEmail()
+    public function testProfileEmailDetailPageForUnsentEmail(): void
     {
-        $segment = new LeadList();
-        $segment->setName('Segment A');
-        $segment->setPublicName('Segment A');
-        $segment->setAlias('segment-a');
-        $email = new Email();
-        $email->setName('Email A');
-        $email->setSubject('Email A Subject');
-        $email->setEmailType('list');
+        $segment = $this->createSegment();
+        $email   = $this->createEmail();
         $email->addList($segment);
+
         $this->em->persist($segment);
         $this->em->persist($email);
         $this->em->flush();
@@ -54,7 +59,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = $this->container->getParameter('mautic.db_table_prefix');
+        $prefix      = self::$container->getParameter('mautic.db_table_prefix');
 
         $dncQueries = array_filter(
             $queries['default'],
@@ -68,17 +73,14 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     /**
      * On the other hand there should be the query for DNC reasons if there are contacts who received the email.
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
-    public function testProfileEmailDetailPageForSentEmail()
+    public function testProfileEmailDetailPageForSentEmail(): void
     {
-        $segment = new LeadList();
-        $segment->setName('Segment A');
-        $segment->setPublicName('Segment A');
-        $segment->setAlias('segment-a');
-        $email = new Email();
-        $email->setName('Email A');
-        $email->setSubject('Email A Subject');
-        $email->setEmailType('list');
+        $segment = $this->createSegment();
+        $email   = $this->createEmail();
         $email->addList($segment);
         $contact = new Lead();
         $contact->setEmail('john@doe.email');
@@ -101,7 +103,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = $this->container->getParameter('mautic.db_table_prefix');
+        $prefix      = self::$container->getParameter('mautic.db_table_prefix');
 
         $dncQueries = array_filter(
             $queries['default'],
@@ -111,5 +113,85 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         Assert::assertCount(1, $dncQueries, 'DNC query not found. '.var_export($queries, true));
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function testSegmentEmailTranslationLookUp(): void
+    {
+        $segment = $this->createSegment();
+        $email   = $this->createEmail();
+        $email->addList($segment);
+
+        $this->em->persist($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        $html    = $crawler->filterXPath("//select[@id='emailform_segmentTranslationParent']//optgroup")->html();
+        self::assertSame('<option value="'.$email->getId().'">'.$email->getName().'</option>', trim($html));
+    }
+
+    private function createSegment(string $suffix = 'A'): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName("Segment $suffix");
+        $segment->setPublicName("Segment $suffix");
+        $segment->setAlias("segment-$suffix");
+
+        return $segment;
+    }
+
+    private function createEmail(string $suffix = 'A', string $emailType = 'list')
+    {
+        $email = new Email();
+        $email->setName("Email $suffix");
+        $email->setSubject("Email $suffix Subject");
+        $email->setEmailType($emailType);
+
+        return $email;
+    }
+
+    public function testEmailDetailsPageShouldNotHavePendingCount(): void
+    {
+        // Create a segment
+        $segment = new LeadList();
+        $segment->setName('Test Segment A');
+        $segment->setPublicName('Test Segment A');
+        $segment->setAlias('test-segment-a');
+
+        // Create email template of type "list" and attach the segment to it
+        $email = new Email();
+        $email->setName('Test Email C');
+        $email->setSubject('Test Email C Subject');
+        $email->setEmailType('list');
+        $email->addList($segment);
+
+        $this->em->persist($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $this->client->enableProfiler();
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
+
+        // checking if pending count is removed from details page ui
+        $emailDetailsContainer = trim($crawler->filter('#email-details')->filter('tbody')->text());
+        $this->assertStringNotContainsString('Pending', $emailDetailsContainer);
+
+        $profile = $this->client->getProfile();
+
+        /** @var DoctrineDataCollector $dbCollector */
+        $dbCollector = $profile->getCollector('db');
+        $queries     = $dbCollector->getQueries();
+        $prefix      = self::$container->getParameter('mautic.db_table_prefix');
+
+        $pendingCountQuery = array_filter(
+            $queries['default'],
+            fn (array $query) => $query['sql'] === "SELECT count(*) as count FROM {$prefix}leads l WHERE (EXISTS (SELECT null FROM {$prefix}lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN ({$segment->getId()})) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM {$prefix}lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM {$prefix}email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id IN ({$email->getId()})))) AND (NOT EXISTS (SELECT null FROM {$prefix}message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id IN ({$email->getId()})))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"
+        );
+
+        $this->assertCount(0, $pendingCountQuery);
     }
 }

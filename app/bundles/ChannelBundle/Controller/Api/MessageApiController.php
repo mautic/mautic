@@ -47,12 +47,12 @@ class MessageApiController extends CommonApiController
             foreach ($channels as $channelType => $channel) {
                 if (!isset($params['channels'][$channelType])) {
                     $params['channels'][$channelType] = [
-                        'isEnabled' => 0,
+                        'isEnabled' => false,
                         'channel'   => $channelType,
                     ];
                 } else {
                     $params['channels'][$channelType]['channel']   = $channelType;
-                    $params['channels'][$channelType]['isEnabled'] = (int) $params['channels'][$channelType]['isEnabled'];
+                    $params['channels'][$channelType]['isEnabled'] = (bool) $params['channels'][$channelType]['isEnabled'];
                 }
             }
         }
@@ -61,7 +61,6 @@ class MessageApiController extends CommonApiController
     /**
      * Load and set channel names to the response.
      *
-     * @param        $entity
      * @param string $action
      *
      * @return mixed

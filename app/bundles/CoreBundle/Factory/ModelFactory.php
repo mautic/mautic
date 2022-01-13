@@ -43,9 +43,8 @@ class ModelFactory
 
         [$bundle, $name] = $parts;
 
-        $containerKey = strtolower(
-            sprintf('mautic.%s.model.%s', $bundle, $name)
-        );
+        // The container is now case sensitive
+        $containerKey = sprintf('mautic.%s.model.%s', $bundle, $name);
 
         if ($this->container->has($containerKey)) {
             return $this->container->get($containerKey);

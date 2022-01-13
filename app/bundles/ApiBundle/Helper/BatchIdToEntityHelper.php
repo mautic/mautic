@@ -144,8 +144,8 @@ class BatchIdToEntityHelper
             return;
         }
 
-        // ['ids' => '1,2,3']
-        if (false !== strpos($ids, ',')) {
+        // ['ids' => '1,2,3'] OR ['ids' => '1']
+        if (false !== strpos($ids, ',') || is_numeric($ids)) {
             $this->ids           = str_getcsv($ids);
             $this->originalKeys  = array_keys($this->ids);
             $this->isAssociative = false;
@@ -198,5 +198,10 @@ class BatchIdToEntityHelper
         $firstKey = key($array);
 
         return array_keys($array) !== range(0, count($array) - 1) && 0 !== $firstKey;
+    }
+
+    public function setIsAssociative(bool $isAssociative): void
+    {
+        $this->isAssociative = $isAssociative;
     }
 }

@@ -20,7 +20,6 @@ use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -265,13 +264,8 @@ class ConfigController extends FormController
 
     /**
      * Merges default parameters from each subscribed bundle with the local (real) params.
-     *
-     * @param array $forms
-     * @param array $doNotChange
-     *
-     * @return array
      */
-    private function mergeParamsWithLocal(&$forms)
+    private function mergeParamsWithLocal(array &$forms): void
     {
         $doNotChange = $this->getParameter('mautic.security.restrictedConfigFields');
         /** @var PathsHelper $pathsHelper */
@@ -280,7 +274,7 @@ class ConfigController extends FormController
 
         // Import the current local configuration, $parameters is defined in this file
 
-        /** @var $parameters */
+        /** @var array $parameters */
         include $localConfigFile;
 
         $localParams = $parameters;
@@ -291,7 +285,8 @@ class ConfigController extends FormController
                 if (in_array($key, $doNotChange)) {
                     unset($form['parameters'][$key]);
                 } elseif (array_key_exists($key, $localParams)) {
-                    $form['parameters'][$key] = (is_string($localParams[$key])) ? str_replace('%%', '%', $localParams[$key]) : $localParams[$key];
+                    $paramValue               = $localParams[$key];
+                    $form['parameters'][$key] = $paramValue;
                 }
             }
         }
