@@ -202,7 +202,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testEmptyResponseReturnsJsonObject(): void
     {
-        $this->client->request('GET', '/api/contacts?limit=0');
+        $this->client->request('GET', '/api/contacts?where[0][val]=unicorn&where[0][col]=email&where[0][expr]=eq');
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertEquals('{"total":"0","contacts":{}}', $clientResponse->getContent());
