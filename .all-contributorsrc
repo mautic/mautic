@@ -542,6 +542,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "alfredoct96",
+      "name": "Alfredo Arena",
+      "avatar_url": "https://avatars.githubusercontent.com/u/50916237?v=4",
+      "profile": "https://github.com/alfredoct96",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
