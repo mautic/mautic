@@ -54,10 +54,19 @@ $view['slots']->set(
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
-                            <?php echo $view->render(
-                                'MauticCoreBundle:Helper:details.html.php',
-                                ['entity' => $tag]
-                            ); ?>
+                            <tr>
+                                <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans('mautic.core.id'); ?></span></td>
+                                <td><?php echo $tag->getId(); ?></td>
+                            </tr>
+                            <tr>
+                                <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans('mautic.tagmanager.tag.summary'); ?></span></td>
+                                <td><?php echo $tag->getSummary(); ?></td>
+                            </tr>
+
+                            <tr>
+                                <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans('mautic.core.description'); ?></span></td>
+                                <td><?php echo $tag->getDescription(); ?></td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>

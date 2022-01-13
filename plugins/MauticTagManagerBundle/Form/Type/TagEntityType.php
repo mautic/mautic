@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticTagManagerBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -32,6 +33,28 @@ class TagEntityType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+            ]
+        );
+
+        $builder->add(
+            'summary',
+            TextType::class,
+            [
+                'required'   => false,
+                'label'      => 'mautic.tagmanager.tag.summary',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+            ]
+        );
+
+        $builder->add(
+            'description',
+            TextareaType::class,
+            [
+                'required'   => false,
+                'label'      => 'mautic.core.description',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
