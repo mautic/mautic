@@ -30,6 +30,11 @@ class Tag
     private $tag;
 
     /**
+     * @var string
+     */
+    private $description;
+
+    /**
      * @param string $tag
      * @param bool   $clean
      */
@@ -47,6 +52,7 @@ class Tag
 
         $builder->addId();
         $builder->addField('tag', Type::STRING);
+        $builder->addNamedField('description', Type::TEXT, 'description', true);
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
@@ -56,6 +62,8 @@ class Tag
                 [
                     'id',
                     'tag',
+                    'summary',
+                    'description',
                 ]
             )
             ->build();
@@ -85,6 +93,26 @@ class Tag
     public function setTag($tag)
     {
         $this->tag = $this->validateTag($tag);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     *
+     * @return Tag
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
 
         return $this;
     }
