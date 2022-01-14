@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
-use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Segment\Stat\SegmentDependencies;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -245,20 +244,25 @@ class ListController extends FormController
      */
     public function cloneAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, $objectId, $ignorePost = false)
     {
+        if (!$this->get('mautic.security')->isGranted(LeadPermissions::LISTS_CREATE)) {
+            return $this->accessDenied();
+        }
+
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
-            $segment = $this->getSegment($objectId);
+        /** @var LeadList $segment */
+        $segment = $this->getModel('lead.list')->getEntity($objectId);
 
-            return $this->createSegmentModifyResponse(
-                $request,
+
+
+            return $this->createSegmentNewResponse(
                 clone $segment,
-                $segmentDependencies,
-                $segmentCampaignShare,
                 $postActionVars,
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
                 $ignorePost
             );
+
         } catch (AccessDeniedException $exception) {
             return $this->accessDenied();
         } catch (EntityNotFoundException $exception) {
@@ -289,17 +293,22 @@ class ListController extends FormController
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
-            $segment = $this->getSegment($objectId);
+
+            /** @var LeadList $segment */
+            $segment = $this->getModel('lead.list')->getEntity($objectId);
 
             if ($isNew) {
                 $segment->setNew();
             }
 
+            if (!$this->get('mautic.security')->hasEntityAccess(
+                LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $segment->getCreatedBy()
+            )) {
+                return $this->accessDenied();
+            }
+
             return $this->createSegmentModifyResponse(
-                $request,
                 $segment,
-                $segmentDependencies,
-                $segmentCampaignShare,
                 $postActionVars,
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
@@ -800,7 +809,7 @@ class ListController extends FormController
             ]
         );
 
-        $permissions = [LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_VIEW_OTHER, LeadPermissions::LISTS_EDIT_OTHER, LeadPermissions::LISTS_DELETE_OTHER];
+        $permissions = [LeadPermissions::LISTS_CREATE, LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_VIEW_OTHER, LeadPermissions::LISTS_EDIT_OTHER, LeadPermissions::LISTS_DELETE_OTHER];
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),

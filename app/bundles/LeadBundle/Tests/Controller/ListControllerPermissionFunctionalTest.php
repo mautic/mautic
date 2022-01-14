@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
@@ -139,15 +138,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentCloningUsingUserHavingPermissions(): void
     {
-        $this->loginOtherUser($this->userTwo->getUsername());
-
-        $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$this->segmentA->getId());
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-    }
-
-    public function testSegmentCloningUsingUserWithoutPermissions(): void
-    {
-        $userThree = $this->createUser(
+        $user = $this->createUser(
             [
                 'user-name'     => 'user-3',
                 'email'         => 'user-3@mautic-test.com',
@@ -156,12 +147,19 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
                 'role'          => [
                     'name'      => 'perm_user_three',
                     'perm'      => 'lead:lists',
-                    'bitwise'   => 128,
+                    'bitwise'   => 32,
                 ],
             ]
         );
+        $this->loginOtherUser($user->getUsername());
 
-        $this->loginOtherUser($userThree->getUsername());
+        $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$this->segmentA->getId());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testSegmentCloningUsingUserWithoutPermissions(): void
+    {
+        $this->loginOtherUser($this->userTwo->getUsername());
 
         $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
@@ -409,6 +407,18 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->loginOtherUser($this->userOne->getUsername());
         $this->client->request(Request::METHOD_GET, '/s/segments/view/'.$segment->getId());
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testPostOnViewSegment(): void
+    {
+        $this->client->request(Request::METHOD_POST, '/s/segments/view/'.$this->segmentA->getId(), [
+            'includeEvents' => [
+                'manually_added',
+                'manually_removed',
+                'filter_added',
+            ],
+        ]);
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
     public function testRemoveLeadFromSegmentWhereUserIsNotOwnerOfSegment(): void
