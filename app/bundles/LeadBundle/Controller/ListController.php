@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -23,7 +22,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ListController extends FormController
@@ -232,20 +230,17 @@ class ListController extends FormController
      */
     public function cloneAction($objectId, $ignorePost = false)
     {
+        if (!$this->get('mautic.security')->isGranted(LeadPermissions::LISTS_CREATE)) {
+            return $this->accessDenied();
+        }
+
         $postActionVars = $this->getPostActionVars();
 
-        try {
-            $segment = $this->getSegment($objectId);
+        /** @var LeadList $segment */
+        $segment = $this->getModel('lead.list')->getEntity($objectId);
 
-            return $this->createSegmentModifyResponse(
-                clone $segment,
-                $postActionVars,
-                $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
-                $ignorePost
-            );
-        } catch (AccessDeniedException $exception) {
-            return $this->accessDenied();
-        } catch (EntityNotFoundException $exception) {
+        // Check if exists
+        if (!$segment instanceof LeadList) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -258,6 +253,13 @@ class ListController extends FormController
                 ])
             );
         }
+
+        return $this->createSegmentNewResponse(
+            clone $segment,
+            $postActionVars,
+            $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
+            $ignorePost
+        );
     }
 
     /**
@@ -272,18 +274,11 @@ class ListController extends FormController
     {
         $postActionVars = $this->getPostActionVars($objectId);
 
-        try {
-            $segment = $this->getSegment($objectId);
+        /** @var LeadList $segment */
+        $segment = $this->getModel('lead.list')->getEntity($objectId);
 
-            return $this->createSegmentModifyResponse(
-                $segment,
-                $postActionVars,
-                $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
-                $ignorePost
-            );
-        } catch (AccessDeniedException $exception) {
-            return $this->accessDenied();
-        } catch (EntityNotFoundException $exception) {
+        // Check if exists
+        if (!$segment instanceof LeadList) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -296,6 +291,19 @@ class ListController extends FormController
                 ])
             );
         }
+
+        if (!$this->get('mautic.security')->hasEntityAccess(
+            LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $segment->getCreatedBy()
+        )) {
+            return $this->accessDenied();
+        }
+
+        return $this->createSegmentModifyResponse(
+            $segment,
+            $postActionVars,
+            $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
+            $ignorePost
+        );
     }
 
     /**
@@ -384,35 +392,6 @@ class ListController extends FormController
                 'mauticContent' => 'leadlist',
             ],
         ]);
-    }
-
-    /**
-     * Return segment if exists and user has access.
-     *
-     * @param int $segmentId
-     *
-     * @return LeadList
-     *
-     * @throws EntityNotFoundException
-     * @throws AccessDeniedException
-     */
-    private function getSegment($segmentId)
-    {
-        /** @var LeadList $segment */
-        $segment = $this->getModel('lead.list')->getEntity($segmentId);
-
-        // Check if exists
-        if (!$segment instanceof LeadList) {
-            throw new EntityNotFoundException(sprintf('Segment with id %d not found.', $segmentId));
-        }
-
-        if (!$this->get('mautic.security')->hasEntityAccess(
-            LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $segment->getCreatedBy()
-        )) {
-            throw new AccessDeniedException(sprintf('User has not access on segment with id %d', $segmentId));
-        }
-
-        return $segment;
     }
 
     /**
@@ -788,7 +767,7 @@ class ListController extends FormController
             ]
         );
 
-        $permissions = [LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_VIEW_OTHER, LeadPermissions::LISTS_EDIT_OTHER, LeadPermissions::LISTS_DELETE_OTHER];
+        $permissions = [LeadPermissions::LISTS_CREATE, LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_VIEW_OTHER, LeadPermissions::LISTS_EDIT_OTHER, LeadPermissions::LISTS_DELETE_OTHER];
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),

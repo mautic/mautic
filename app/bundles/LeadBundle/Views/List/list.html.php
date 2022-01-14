@@ -80,7 +80,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                                 'item'            => $item,
                                 'templateButtons' => [
                                     'edit'   => $view['security']->hasEntityAccess($permissions[LeadPermissions::LISTS_EDIT_OWN], $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy()),
-                                    'clone'  => $view['security']->hasEntityAccess($permissions[LeadPermissions::LISTS_EDIT_OWN], $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy()),
+                                    'clone'  => $permissions[LeadPermissions::LISTS_CREATE],
                                     'delete' => $view['security']->hasEntityAccess($permissions[LeadPermissions::LISTS_DELETE_OWN], $permissions[LeadPermissions::LISTS_DELETE_OTHER], $item->getCreatedBy()),
                                 ],
                                 'routeBase' => 'segment',
