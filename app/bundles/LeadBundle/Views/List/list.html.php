@@ -123,7 +123,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                                 'item'            => $item,
                                 'templateButtons' => [
                                     'edit'   => $view['security']->hasEntityAccess($permissions[LeadPermissions::LISTS_EDIT_OWN], $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy()),
-                                    'clone'  => $permissions[LeadPermissions::LISTS_CREATE] && $view['security']->hasEntityAccess($permissions[LeadPermissions::LISTS_VIEW_OWN], $permissions[LeadPermissions::LISTS_VIEW_OTHER], $item->getCreatedBy()),
+                                    'clone'  => $permissions[LeadPermissions::LISTS_CREATE],
                                     'delete' => $view['security']->hasEntityAccess($permissions[LeadPermissions::LISTS_DELETE_OWN], $permissions[LeadPermissions::LISTS_DELETE_OTHER], $item->getCreatedBy()),
                                 ],
                                 'routeBase' => 'segment',
