@@ -99,7 +99,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
         $format   = 'Y-m-d';
 
         // set now datetime for relative dates like -8 hours, -24 minutes with gt/lt types of operator
-        if ($contactSegmentFilterCrate->hasTimeParts() && in_array($contactSegmentFilterCrate->getOperator(), ['!gt', 'gt', 'gte', '!lt', 'lt', 'lte'])) {
+        if ($contactSegmentFilterCrate->hasTimeParts() && !in_array($contactSegmentFilterCrate->getOperator(), ['=', '!='])) {
             $format   = 'Y-m-d H:i:s';
         }
 
