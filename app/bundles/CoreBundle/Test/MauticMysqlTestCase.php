@@ -26,6 +26,18 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     protected $useCleanupRollback = true;
 
     /**
+     * @param array<mixed> $data
+     */
+    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+
+        $this->configParams += [
+            'db_driver' => 'pdo_mysql',
+        ];
+    }
+
+    /**
      * @throws Exception
      */
     protected function setUp(): void

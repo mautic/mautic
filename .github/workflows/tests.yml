@@ -63,17 +63,6 @@ jobs:
         composer validate
         composer install --prefer-dist --no-progress --no-suggest
 
-    - name: Temp install Mautic first due to failing tests
-      env:
-        mysql_port: ${{ job.services.mysql.ports[3306] }}
-        mariadb_port: ${{ job.services.mariadb.ports[3306] }}
-      run: |
-        export DB_PORT_STRING="${{ matrix.db-types }}_port"
-        export DB_PORT=${!DB_PORT_STRING}
-
-        cp ./.github/ci-files/local.php ./app/config/local.php
-        php bin/console mautic:install --force http://localhost
-
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
         export DB_PORT_STRING="${{ matrix.db-types }}_port"
