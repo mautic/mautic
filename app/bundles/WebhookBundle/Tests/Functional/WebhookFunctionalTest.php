@@ -22,6 +22,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->setUpSymfony(
+            $this->configParams +
             [
                 'queue_mode' => WebhookModel::COMMAND_PROCESS,
             ]
