@@ -127,12 +127,24 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $connection = $this->connection;
         $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
-        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} < {$file} 2>&1 | grep -v \"Using a password\" || true";
+        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} < {$file}";
 
-        $lastLine = system($command, $status);
+        // 0 -> stdin, 1 -> stdout, 2 -> stderr
+        // We only need stderr, in case we need to output errors when the result code != 0.
+        $descriptors = [
+            2 => ['pipe', 'w'],
+        ];
+        $pipes       = [];
 
-        if (0 !== $status) {
-            throw new Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
+        $process = proc_open($command, $descriptors, $pipes);
+        $stderr  = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+        $result_code = proc_close($process);
+
+        $lastLine = system($command, $result_code);
+
+        if (0 !== $result_code) {
+            throw new Exception($command.' failed with status code '.$result_code.' and last line of "'.$lastLine.'"');
         }
     }
 
@@ -143,7 +155,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     private function prepareDatabase()
     {
-        if (!function_exists('system')) {
+        if (!function_exists('proc_open')) {
             $this->installDatabase();
 
             return;
@@ -204,22 +216,26 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     private function dumpToFile(string $sqlDumpFile): void
     {
-        $password   = ($this->connection->getPassword()) ? " -p{$this->connection->getPassword()}" : '';
-        $command    = "mysqldump --add-drop-table --opt -h{$this->connection->getHost()} -P{$this->connection->getPort()} -u{$this->connection->getUsername()}$password {$this->connection->getDatabase()} > {$sqlDumpFile} 2>&1 | grep -v \"Using a password\" || true";
+        $connection = $this->connection;
+        $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
+        $command    = "mysqldump --add-drop-table --opt -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()} $password {$connection->getDatabase()} > {$sqlDumpFile}";
 
-        $lastLine = system($command, $status);
-        if (0 !== $status) {
-            throw new Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
-        }
+        // 0 -> stdin, 1 -> stdout, 2 -> stderr
+        // We only need stderr, in case we need to output errors when the result code != 0.
+        $descriptors = [
+            2 => ['pipe', 'w'],
+        ];
+        $pipes       = [];
 
-        $f         = fopen($sqlDumpFile, 'r');
-        $firstLine = fgets($f);
-        if (false !== strpos($firstLine, 'Using a password')) {
-            $file = file($sqlDumpFile);
-            unset($file[0]);
-            file_put_contents($sqlDumpFile, $file);
+        $process = proc_open($command, $descriptors, $pipes);
+        $stderr  = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+        $result_code = proc_close($process);
+
+        if (0 !== $result_code) {
+            unlink($sqlDumpFile);
+            throw new Exception($command.' failed with status code '.$result_code.' and last line of "'.$stderr.'"');
         }
-        fclose($f);
     }
 
     /**
