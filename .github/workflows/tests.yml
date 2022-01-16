@@ -77,13 +77,6 @@ jobs:
         mysql_port: ${{ job.services.mysql.ports[3306] }}
         mariadb_port: ${{ job.services.mariadb.ports[3306] }}
 
-    - name: Run Pipedrive tests separately due to bug
-      run: |
-        export DB_PORT_STRING="${{ matrix.db-types }}_port"
-        export DB_PORT=${!DB_PORT_STRING}
-
-        composer test -- plugins/MauticCrmBundle/Tests/Pipedrive
-
     - name: Upload coverage report
       if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' }}
       uses: codecov/codecov-action@v2
