@@ -7,19 +7,16 @@ export default (editor, opts = {}) => {
   const cfg = editor.getConfig();
   const blocks = bm.getAll();
 
-  // Add Dynamic Content block only for newsletter
-  if ('grapesjsmjml' in cfg.pluginsOpts) {
-    // Dynamic Content MJML block
-  } else if ('grapesjsnewsletter' in cfg.pluginsOpts) {
-    const dcb = new DynamicContentBlocks(editor, opts);
-    dcb.addDynamciContentBlock();
-  }
+  const mode = ContentService.getMode();
 
-  //add button block for landing page
-  const mode = ContentService.getMode(editor);
+  // a add button block for landing page
   if (mode === ContentService.modePageHtml) {
     const buttonBlock = new ButtonBlock(editor);
     buttonBlock.addButtonBlock();
+  } else {
+    // Add Dynamic Content block only for email modes
+    const dcb = new DynamicContentBlocks(editor, opts);
+    dcb.addDynamciContentBlock();
   }
 
   // Add icon to mj-hero

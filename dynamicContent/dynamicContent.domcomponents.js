@@ -3,17 +3,18 @@ import DynamicContentService from './dynamicContent.service';
 export default class DynamicContentDomComponents {
   dcService;
 
+  // @todo make sure a mjml text element is used. instead of a div
   static addDynamicContentType(editor) {
     const dc = editor.DomComponents;
     const defaultType = dc.getType('default');
     const defaultModel = defaultType.model;
-
+    
     const model = defaultModel.extend(
       {
         defaults: {
           ...defaultModel.prototype.defaults,
           name: 'Dynamic Content',
-          draggable: '[data-gjs-type=cell]',
+          draggable: '[data-gjs-type=cell]', // @todo make dropable in mjml content
           droppable: false,
           editable: false,
           stylable: false,
