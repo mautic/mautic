@@ -22,7 +22,6 @@ use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
@@ -762,21 +761,19 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array        $fields
-     * @param array        $data
-     * @param null         $owner
-     * @param null         $list
-     * @param null         $tags
-     * @param bool         $persist
-     * @param LeadEventLog $eventLog
+     * @param array $fields
+     * @param array $data
+     * @param null  $owner
+     * @param null  $list
+     * @param bool  $skipIfExists
      *
      * @return bool|null
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
+    public function import($fields, $data, $owner = null, $list = null, $skipIfExists = false)
     {
-        $company = $this->importCompany($fields, $data, $owner, false, $list);
+        $company = $this->importCompany($fields, $data, $owner, false, $list, $skipIfExists);
 
         if (null === $company) {
             throw new \Exception($this->translator->trans('mautic.company.error.notfound', [], 'flashes'));
@@ -798,7 +795,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws \Exception
      */
-    public function importCompany($fields, $data, $owner = null, $persist = true, $list = null)
+    public function importCompany($fields, $data, $owner = null, $persist = true, $list = null, $skipIfExists = false)
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));
@@ -847,6 +844,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $fieldErrors = [];
 
         foreach ($this->fetchCompanyFields() as $entityField) {
+            // Skip If value already exists
+            if ($skipIfExists && !$company->isNew() && !empty($company->getProfileFields()[$entityField['alias']])) {
+                unset($fieldData[$entityField['alias']]);
+                continue;
+            }
+
             if (isset($fieldData[$entityField['alias']])) {
                 $fieldData[$entityField['alias']] = InputHelper::_($fieldData[$entityField['alias']], 'string');
 

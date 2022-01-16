@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
-use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\TestCase;
 
 class MatchFilterForLeadTraitTest extends TestCase
@@ -78,6 +77,45 @@ class MatchFilterForLeadTraitTest extends TestCase
         $this->lead['custom'] = 'another words';
 
         self::assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+    }
+
+    /**
+     * @dataProvider dateMatchTestProvider
+     */
+    public function testMatchFilterForLeadTraitForDate(?string $value, string $operator, bool $expect)
+    {
+        $filters = [
+            [
+                'glue'     => 'and',
+                'field'    => 'date',
+                'object'   => 'lead',
+                'type'     => 'date',
+                'filter'   => '2021-05-01',
+                'display'  => null,
+                'operator' => $operator,
+            ],
+        ];
+
+        $lead = [
+            'id'   => 1,
+            'date' => $value,
+        ];
+
+        $this->assertEquals($expect, $this->matchFilterForLeadTrait->match($filters, $lead));
+    }
+
+    public function dateMatchTestProvider(): iterable
+    {
+        $date = '2021-05-01';
+
+        yield [$date, '=', true];
+        yield [$date, '!=', false];
+        yield ['2020-02-02', '!=', true];
+        yield [$date, '!=', false];
+        yield [null, 'empty', true];
+        yield [$date, 'empty', false];
+        yield [$date, '!empty', true];
+        yield [null, '!empty', false];
     }
 }
 

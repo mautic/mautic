@@ -234,7 +234,6 @@ class BatchIdToEntityHelperTest extends TestCase
         $orderedEntities = $helper->orderByOriginalKey($entities);
         $this->assertEquals([0, 1, 2, 3], array_keys($orderedEntities));
         foreach ($parameters as $key => $contact) {
-            var_dump($orderedEntities[$key]->getId());
             Assert::assertEquals($orderedEntities[$key]->getId(), $entities[$key]->getId());
         }
 
