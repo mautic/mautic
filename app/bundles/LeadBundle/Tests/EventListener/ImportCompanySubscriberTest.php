@@ -39,7 +39,10 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
-                public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
+                /**
+                 * @param string $requestedPermission
+                 */
+                public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false): bool
                 {
                     Assert::assertSame('lead:imports:create', $requestedPermission);
 
@@ -62,6 +65,9 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
+                /**
+                 * @param string $requestedPermission
+                 */
                 public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
                 {
                     Assert::assertSame('lead:imports:create', $requestedPermission);
@@ -100,6 +106,11 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
+                /**
+                 * @param array<string|bool> $filters
+                 *
+                 * @return string[]
+                 */
                 public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array
                 {
                     return ['some fields'];
@@ -152,7 +163,11 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
-                public function import($fields, $data, $owner = null, $skipIfExists = false)
+                /**
+                 * @param array<int|string> $fields
+                 * @param array<int|string> $data
+                 */
+                public function import($fields, $data, $owner = null, $list = null, $skipIfExists = false)
                 {
                     return true;
                 }
