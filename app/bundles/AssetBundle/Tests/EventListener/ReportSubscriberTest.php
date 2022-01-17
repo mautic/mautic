@@ -82,6 +82,14 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             public function __construct()
             {
             }
+
+            /**
+             * @param array<mixed> $filters
+             * @param string       $segmentPrefix
+             */
+            public function appendSegmentFilter(array &$filters, $segmentPrefix = 's.'): void
+            {
+            }
         };
 
         $reportHelper = new class() extends ReportHelper {
