@@ -24,31 +24,24 @@ ports:
   # mailhog http port
   - port: 8025
     onOpen: ignore
-    visibility: private
   # mailhog https port
   - port: 8026
     onOpen: ignore
-    visibility: private
   # phpmyadmin http port
   - port: 8036
     onOpen: ignore
-    visibility: private
   # phpmyadmin https port
   - port: 8037
     onOpen: ignore
-    visibility: private
   # router http port that we're ignoring.
   - port: 8888
     onOpen: ignore
-    visibility: private
   # router https port that we're ignoring.
   - port: 8889
     onOpen: ignore
-    visibility: private
   # xdebug port
   - port: 9000
     onOpen: ignore
-    visibility: private
 
 github:
   prebuilds:
