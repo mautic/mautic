@@ -17,9 +17,6 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class EmailSendEvent.
- */
 class EmailSendEvent extends CommonEvent
 {
     /**
@@ -28,7 +25,7 @@ class EmailSendEvent extends CommonEvent
     private $helper;
 
     /**
-     * @var Mail
+     * @var Email|null
      */
     private $email;
 
@@ -48,12 +45,12 @@ class EmailSendEvent extends CommonEvent
     private $subject = '';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $idHash;
 
     /**
-     * @var Lead
+     * @var Lead|mixed[]|null
      */
     private $lead;
 
@@ -83,59 +80,30 @@ class EmailSendEvent extends CommonEvent
     private $isDynamicContentParsing;
 
     /**
-     * EmailSendEvent constructor.
-     *
      * @param array $args
      * @param bool  $isDynamicContentParsing
      */
     public function __construct(MailHelper $helper = null, $args = [], $isDynamicContentParsing = false)
     {
-        $this->helper = $helper;
+        $this->helper      = $helper;
+        $this->content     = $args['content'] ?? '';
+        $this->plainText   = $args['plainText'] ?? '';
+        $this->subject     = $args['subject'] ?? '';
+        $this->email       = $args['email'] ?? null;
+        $this->idHash      = $args['idHash'] ?? null;
+        $this->lead        = $args['lead'] ?? null;
+        $this->source      = $args['source'] ?? [];
+        $this->tokens      = $args['tokens'] ?? [];
+        $this->textHeaders = $args['textHeaders'] ?? [];
 
-        if (isset($args['content'])) {
-            $this->content = $args['content'];
-        }
-
-        if (isset($args['plainText'])) {
-            $this->plainText = $args['plainText'];
-        }
-
-        if (isset($args['subject'])) {
-            $this->subject = $args['subject'];
-        }
-
-        if (isset($args['email'])) {
-            $this->email = $args['email'];
-        }
-
-        if (!$this->subject && isset($args['email']) && $args['email'] instanceof Email) {
+        if (!$this->subject && $this->email instanceof Email) {
             $this->subject = $args['email']->getSubject();
-        }
-
-        if (isset($args['idHash'])) {
-            $this->idHash = $args['idHash'];
-        }
-
-        if (isset($args['lead'])) {
-            $this->lead = $args['lead'];
-        }
-
-        if (isset($args['source'])) {
-            $this->source = $args['source'];
-        }
-
-        if (isset($args['tokens'])) {
-            $this->tokens = $args['tokens'];
         }
 
         if (isset($args['internalSend'])) {
             $this->internalSend = $args['internalSend'];
         } elseif (null !== $helper) {
             $this->internalSend = $helper->isInternalSend();
-        }
-
-        if (isset($args['textHeaders'])) {
-            $this->textHeaders = $args['textHeaders'];
         }
 
         $this->isDynamicContentParsing = $isDynamicContentParsing;

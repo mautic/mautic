@@ -31,7 +31,7 @@
         <?php endif; ?>
         <div><?php echo $view['formatter']->_($n['message'], 'html'); ?></div>
         <div class="clearfix mt-xs">
-            <span class="fa fa-clock-o text-success pull-left mr-xs"></span>
+            <span class="fa fa-clock-o text-success pull-left mr-xs notification-timer-icon"></span>
             <span class="fs-10 text-muted pull-left"><?php echo $view['date']->toText($n['dateAdded']); ?></span>
         </div>
     </div>
