@@ -6,7 +6,7 @@ parameters:
 	level: 6
 	reportUnmatchedIgnoredErrors: false
 	parallel:
-		maximumNumberOfProcesses: 1
+		maximumNumberOfProcesses: 4
 		processTimeout: 1000.0
 	paths:
 		- app/bundles
@@ -28,6 +28,10 @@ parameters:
 		- app/bundles/CoreBundle/Loader/ParameterLoader.php
 		- app/bundles/CoreBundle/Helper/PathsHelper.php
 		- app/bundles/CoreBundle/Configurator/Configurator.php
+	dynamicConstantNames:
+		- MAUTIC_ENV
+		- MAUTIC_TABLE_PREFIX
+		- MAUTIC_VERSION
 	ignoreErrors:
 		- '#Cannot unset offset#'
 		- '#Undefined variable: \$parameters#'
