@@ -45,7 +45,7 @@ class ReportSubscriber implements EventSubscriberInterface
     {
         $this->companyReportData    = $companyReportData;
         $this->submissionRepository = $submissionRepository;
-        $this->fieldsBuilder     = $fieldsBuilder;
+        $this->fieldsBuilder        = $fieldsBuilder;
     }
 
     /**

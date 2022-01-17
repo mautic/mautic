@@ -82,7 +82,6 @@ class FieldsBuilder
     }
 
     /**
-     * @param array  $filters
      * @param string $segmentPrefix
      */
     public function appendSegmentFilter(array &$filters, $segmentPrefix = 's.')
