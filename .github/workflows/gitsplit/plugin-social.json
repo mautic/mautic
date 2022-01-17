@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "MauticSocialBundle",
+            "directory": "plugins/MauticSocialBundle",
+            "target": "git@github.com:mautic/plugin-social.git"
+        }
+    ]
+}

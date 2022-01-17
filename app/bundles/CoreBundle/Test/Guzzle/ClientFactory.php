@@ -20,8 +20,8 @@ use GuzzleHttp\HandlerStack;
 
 class ClientFactory
 {
-    public static function stub(): ClientInterface
+    public static function stub(MockHandler $handler): ClientInterface
     {
-        return new Client(['handler' => HandlerStack::create(new MockHandler())]);
+        return new Client(['handler' => HandlerStack::create($handler)]);
     }
 }

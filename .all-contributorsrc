@@ -496,6 +496,61 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "theodorosploumis",
+      "name": "Theodoros Ploumis",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1315321?v=4",
+      "profile": "http://theodorosploumis.com/en",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "sreenia806",
+      "name": "Sreenivasulu Avula",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2764179?v=4",
+      "profile": "https://github.com/sreenia806",
+      "contributions": [
+        "userTesting",
+        "review"
+      ]
+    },
+    {
+      "login": "mlahlouh",
+      "name": "Mohammad Lahlouh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7312050?v=4",
+      "profile": "https://www.linkedin.com/in/mohammadlahlouh/",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "ArnaudSau",
+      "name": "ArnaudSau",
+      "avatar_url": "https://avatars.githubusercontent.com/u/50580844?v=4",
+      "profile": "https://github.com/ArnaudSau",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "bell87",
+      "name": "Andrew Bell",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5338785?v=4",
+      "profile": "https://github.com/bell87",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "alfredoct96",
+      "name": "Alfredo Arena",
+      "avatar_url": "https://avatars.githubusercontent.com/u/50916237?v=4",
+      "profile": "https://github.com/alfredoct96",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

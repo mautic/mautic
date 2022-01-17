@@ -29,6 +29,10 @@ class ListController extends FormController
 {
     use EntityContactsTrait;
 
+    const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
+
+    const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
+
     /**
      * @var array
      */
@@ -39,7 +43,7 @@ class ListController extends FormController
      *
      * @param int $page
      *
-     * @return JsonResponse | Response
+     * @return JsonResponse|Response
      */
     public function indexAction($page = 1)
     {
@@ -152,7 +156,7 @@ class ListController extends FormController
     /**
      * Generate's new form and processes post data.
      *
-     * @return JsonResponse | RedirectResponse | Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function newAction()
     {
@@ -451,7 +455,7 @@ class ListController extends FormController
      *
      * @param $objectId
      *
-     * @return JsonResponse | RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function deleteAction($objectId)
     {
@@ -529,7 +533,7 @@ class ListController extends FormController
     /**
      * Deletes a group of entities.
      *
-     * @return JsonResponse | RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function batchDeleteAction()
     {
@@ -609,7 +613,7 @@ class ListController extends FormController
     /**
      * @param $objectId
      *
-     * @return JsonResponse | RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function removeLeadAction($objectId)
     {
@@ -619,7 +623,7 @@ class ListController extends FormController
     /**
      * @param $objectId
      *
-     * @return JsonResponse | RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function addLeadAction($objectId)
     {
@@ -630,7 +634,7 @@ class ListController extends FormController
      * @param $listId
      * @param $action
      *
-     * @return array | JsonResponse | RedirectResponse
+     * @return array|JsonResponse|RedirectResponse
      */
     protected function changeList($listId, $action)
     {
