@@ -43,6 +43,11 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private $companyReportDataMock;
 
     /**
+     * @var FieldsBuilder|MockObject
+     */
+    private $fieldBuilderMock;
+
+    /**
      * @var MockObject|StatRepository
      */
     private $statRepository;

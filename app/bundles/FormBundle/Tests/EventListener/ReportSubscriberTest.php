@@ -18,6 +18,7 @@ use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -34,7 +35,7 @@ class ReportSubscriberTest extends TestCase
     private $subscriber;
 
     /**
-     * @var FieldsBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldsBuilder
      */
     private $fieldBuilderMock;
 
@@ -47,7 +48,7 @@ class ReportSubscriberTest extends TestCase
 
         $this->companyReportData    = $this->createMock(CompanyReportData::class);
         $this->submissionRepository = $this->createMock(SubmissionRepository::class);
-        $this->subscriber           = new ReportSubscriber($this->companyReportData, $this->submissionRepository);
+        $this->subscriber           = new ReportSubscriber($this->companyReportData, $this->submissionRepository, $this->fieldBuilderMock);
     }
 
     public function testOnReportBuilderAddsFormAndFormSubmissionReports()
@@ -181,6 +182,10 @@ class ReportSubscriberTest extends TestCase
         $mockEvent->expects($this->once())
             ->method('getContext')
             ->willReturn('form.submissions');
+
+        $mockEvent->expects($this->once())
+            ->method('getReport')
+            ->willReturn(new Report());
 
         $this->subscriber->onReportGenerate($mockEvent);
     }

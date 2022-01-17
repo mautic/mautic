@@ -8,6 +8,7 @@ use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\EventListener\ReportSubscriber;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\Assert;
@@ -29,6 +30,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             }
         };
 
+        $fieldsBuilder = new class() extends FieldsBuilder {
+            public function __construct()
+            {
+            }
+        };
+
         $event = new class() extends ReportBuilderEvent {
             public function __construct()
             {
@@ -36,7 +43,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository);
+        $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository, $fieldsBuilder);
 
         $reportSubscriber->onReportBuilder($event);
 
@@ -50,6 +57,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             {
             }
 
+            /**
+             * @return array<int|string>
+             */
             public function getCompanyData()
             {
                 return [];
@@ -68,6 +78,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             }
         };
 
+        $fieldsBuilder = new class() extends FieldsBuilder {
+            public function __construct()
+            {
+            }
+        };
+
         $reportHelper = new class() extends ReportHelper {
             public function __construct()
             {
@@ -76,7 +92,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event = new ReportBuilderEvent($this->createTranslatorMock(), $channelListHelper, ReportSubscriber::CONTEXT_ASSET_DOWNLOAD, [], $reportHelper);
 
-        $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository);
+        $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository, $fieldsBuilder);
 
         $reportSubscriber->onReportBuilder($event);
 
@@ -122,22 +138,29 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private function createTranslatorMock(): TranslatorInterface
     {
         return new class() implements TranslatorInterface {
+            /**
+             * @param array<int|string> $parameters
+             */
             public function trans($id, array $parameters = [], $domain = null, $locale = null)
             {
                 return '[trans]'.$id.'[/trans]';
             }
 
+            /**
+             * @param array<int|string> $parameters
+             */
             public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
             {
                 return '[trans]'.$id.'[/trans]';
             }
 
-            public function setLocale($locale)
+            public function setLocale($locale): void
             {
             }
 
-            public function getLocale()
+            public function getLocale(): string
             {
+                return '';
             }
         };
     }

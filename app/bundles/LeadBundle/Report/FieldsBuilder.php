@@ -82,9 +82,10 @@ class FieldsBuilder
     }
 
     /**
-     * @param string $segmentPrefix
+     * @param array<mixed> $filters
+     * @param string       $segmentPrefix
      */
-    public function appendSegmentFilter(array &$filters, $segmentPrefix = 's.')
+    public function appendSegmentFilter(array &$filters, $segmentPrefix = 's.'): void
     {
         $segmentPrefix        = $this->sanitizePrefix($segmentPrefix);
         $segmentKey           = $segmentPrefix.'leadlist_id';
@@ -92,9 +93,9 @@ class FieldsBuilder
     }
 
     /**
-     * @return array
+     * @return array<string, array<int|string, mixed>|string>
      */
-    private function getSegmentFilter()
+    private function getSegmentFilter(): array
     {
         // Append segment filters
         $userSegments = $this->listModel->getUserLists();
