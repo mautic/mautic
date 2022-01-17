@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "core-lib",
+            "directory": "app",
+            "target": "git@github.com:mautic/core-lib.git"
+        }
+    ]
+}

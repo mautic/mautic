@@ -1,7 +1,6 @@
 # Backwards compatibility breaking changes
 *   Platform Requirements
     *   Minimal PHP version was increased from 7.3 to 7.4.
-    *   Minimal MySQL version was increased from x to x
 *   API
     *   OAuth1 support has been removed. Mautic supports the OAuth2 standard, including the Client Credentials grant, which was added in Mautic 4. Documentation can be found here: https://developer.mautic.org/#client-credentials
 *   Symfony 4
@@ -34,6 +33,7 @@
     *   phpstan/phpstan to ^0.12.82
 *   Commands
     * \Mautic\CoreBundle\Command\ModeratedCommand::$lockHandler is now private
+    * \Mautic\InstallBundle\Command\InstallCommand (Mautic's CLI installer) had some bugs fixed and might as well be slightly stricter in some edge cases. Please validate if your CLI installation scripts are still working correctly.
 *   Services
     * `mautic.http.client` has been upgraded from GuzzleHttp 6 to 7. You can now leverage `Psr\Http\Client\ClientInterface` (PSR-18) or `GuzzleHttp\Client` (more convenience methods) in your class constructors! Example:
 

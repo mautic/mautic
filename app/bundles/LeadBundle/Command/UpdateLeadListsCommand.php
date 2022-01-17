@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateLeadListsCommand extends ModeratedCommand
@@ -69,6 +70,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $batch                 = $input->getOption('batch-limit');
         $max                   = $input->getOption('max-contacts');
         $enableTimeMeasurement = (bool) $input->getOption('timing');
+        $output                = ($input->getOption('quiet')) ? new NullOutput() : $output;
 
         if (!$this->checkRunStatus($input, $output, $id)) {
             return 0;
@@ -112,10 +114,15 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 if ($l->isPublished()) {
                     $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $l->getId()]).'</info>');
 
-                    $processed = $listModel->rebuildListLeads($l, $batch, $max, $output);
+                    $startTimeForSingleSegment = time();
+                    $processed                 = $listModel->rebuildListLeads($l, $batch, $max, $output);
                     $output->writeln(
-                        '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'."\n"
+                        '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
                     );
+                    if ($enableTimeMeasurement) {
+                        $totalTime = round(microtime(true) - $startTimeForSingleSegment, 2);
+                        $output->writeln($translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime])."\n");
+                    }
                 }
 
                 unset($l);
@@ -128,7 +135,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
         if ($enableTimeMeasurement) {
             $totalTime = round(microtime(true) - $startTime, 2);
-            $output->writeln("Total time: {$totalTime} seconds");
+            $output->writeln($translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime]));
         }
 
         return 0;

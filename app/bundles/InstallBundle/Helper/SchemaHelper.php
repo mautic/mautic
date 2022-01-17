@@ -21,6 +21,8 @@ use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\SchemaTool;
+use Mautic\CoreBundle\Release\ThisRelease;
+use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 
 class SchemaHelper
 {
@@ -192,6 +194,32 @@ class SchemaHelper
         $this->db->close();
 
         return true;
+    }
+
+    public function validateDatabaseVersion(): void
+    {
+        // Version strings are in the format 10.3.30-MariaDB-1:10.3.30+maria~focal-log
+        $version  = $this->db->executeQuery('SELECT VERSION()')->fetchOne();
+
+        // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
+        $platform = strtolower(get_class($this->db->getDatabasePlatform()));
+        $metadata = ThisRelease::getMetadata();
+
+        /**
+         * The second case is for MariaDB < 10.2, where Doctrine reports it as MySQLPlatform. Here we can use a little
+         * help from the version string, which contains "MariaDB" in that case: 10.1.48-MariaDB-1~bionic.
+         */
+        if (false !== strpos($platform, 'mariadb') || false !== strpos(strtolower($version), 'mariadb')) {
+            $minSupported = $metadata->getMinSupportedMariaDbVersion();
+        } elseif (false !== strpos($platform, 'mysql')) {
+            $minSupported = $metadata->getMinSupportedMySqlVersion();
+        } else {
+            throw new \Exception('Invalid database platform '.$platform.'. Mautic only supports MySQL and MariaDB!');
+        }
+
+        if (true !== version_compare($version, $minSupported, 'gt')) {
+            throw new DatabaseVersionTooOldException($version);
+        }
     }
 
     /**
