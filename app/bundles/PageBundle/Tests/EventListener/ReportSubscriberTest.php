@@ -50,7 +50,7 @@ class ReportSubscriberTest extends TestCase
     private $subscriber;
 
     /**
-     * @var FieldsBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldsBuilder
      */
     private $fieldBuilderMock;
 
