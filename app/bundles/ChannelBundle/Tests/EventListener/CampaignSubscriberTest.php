@@ -34,7 +34,6 @@ use Mautic\EmailBundle\Form\Type\EmailListType;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\SmsBundle\Form\Type\SmsSendType;
