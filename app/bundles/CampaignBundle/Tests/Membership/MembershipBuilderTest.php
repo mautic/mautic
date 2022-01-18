@@ -14,17 +14,14 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Membership;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignMemberRepository;
-use Mautic\CampaignBundle\Event\CampaignUpdateIterationCompletedEvent;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
@@ -50,11 +47,6 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
     private $translator;
 
     /**
-     * @var EventDispatcherInterface|MockObject
-     */
-    private $eventDispatcher;
-
-    /**
      * @var MembershipBuilder
      */
     private $membershipBuilder;
@@ -65,13 +57,11 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
         $this->campaignMemberRepository = $this->createMock(CampaignMemberRepository::class);
         $this->leadRepository           = $this->createMock(LeadRepository::class);
         $this->translator               = $this->createMock(TranslatorInterface::class);
-        $this->eventDispatcher          = $this->createMock(EventDispatcherInterface::class);
         $this->membershipBuilder        = new MembershipBuilder(
             $this->manager,
             $this->campaignMemberRepository,
             $this->leadRepository,
-            $this->translator,
-            $this->eventDispatcher
+            $this->translator
         );
     }
 
@@ -151,11 +141,6 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('getContactCollection')
             ->willReturn(new ArrayCollection([new Lead()]));
 
-        $this->eventDispatcher
-            ->expects($this->exactly(3))
-            ->method('dispatch')
-            ->with($this->equalTo(CampaignEvents::ON_CAMPAIGN_BATCH_UPDATE_COMPLETED), $this->isInstanceOf(CampaignUpdateIterationCompletedEvent::class));
-
         $this->membershipBuilder->build($campaign, $contactLimiter, 100);
     }
 
@@ -195,11 +180,6 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
         $this->leadRepository->expects($this->exactly(6))
             ->method('getContactCollection')
             ->willReturn(new ArrayCollection([new Lead()]));
-
-        $this->eventDispatcher
-            ->expects($this->exactly(3))
-            ->method('dispatch')
-            ->with($this->equalTo(CampaignEvents::ON_CAMPAIGN_BATCH_UPDATE_COMPLETED), $this->isInstanceOf(CampaignUpdateIterationCompletedEvent::class));
 
         $this->membershipBuilder->build($campaign, $contactLimiter, 100);
     }
