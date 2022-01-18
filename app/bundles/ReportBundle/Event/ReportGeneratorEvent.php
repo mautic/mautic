@@ -170,6 +170,15 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
+     * @param $column
+     * @param $formula
+     */
+    public function setColumnFormula($column, $formula)
+    {
+        $this->options['columns'][$column]['formula'] = $formula;
+    }
+
+    /**
      * @return ExpressionBuilder|null
      */
     public function getFilterExpression()
@@ -362,7 +371,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
             $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d'));
             $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d'));
         } else {
-            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (%1$s BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
             $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d H:i:s'));
             $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d H:i:s'));
         }
