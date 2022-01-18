@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class StandardImportTestHelper extends CommonMocks
@@ -94,6 +95,9 @@ abstract class StandardImportTestHelper extends CommonMocks
         $this->eventEntities = [];
     }
 
+    /**
+     * @return Import|MockObject
+     */
     protected function initImportEntity(array $methods = null)
     {
         $entity = $this->getMockBuilder(Import::class)

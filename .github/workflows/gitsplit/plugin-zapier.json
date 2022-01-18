@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "MauticZapierBundle",
+            "directory": "plugins/MauticZapierBundle",
+            "target": "git@github.com:mautic/plugin-zapier.git"
+        }
+    ]
+}
