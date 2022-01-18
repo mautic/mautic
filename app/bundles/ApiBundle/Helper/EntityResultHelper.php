@@ -10,7 +10,7 @@ class EntityResultHelper
      * @param array<mixed>|Paginator<mixed> $results
      * @param callable|null                 $callback
      *
-     * @return array<mixed>|\ArrayObject<mixed>
+     * @return array<mixed>|\ArrayObject<int,mixed>
      */
     public function getArray($results, $callback = null)
     {
@@ -81,7 +81,7 @@ class EntityResultHelper
     }
 
     /**
-     * @param array<mixed>|Paginator<int,mixed> $results
+     * @param array<mixed>|Paginator<mixed> $results
      *
      * @return bool
      */
