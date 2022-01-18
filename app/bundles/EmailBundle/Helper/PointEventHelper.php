@@ -21,10 +21,10 @@ use Mautic\LeadBundle\Entity\Lead;
 class PointEventHelper
 {
     /**
-     * @param Email $eventDetails
-     * @param $action
+     * @param Email|null   $eventDetails
+     * @param array<mixed> $action
      *
-     * @return int
+     * @return bool
      */
     public static function validateEmail($eventDetails, $action)
     {

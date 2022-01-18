@@ -27,6 +27,9 @@ class PointChangeActionExecutedEvent extends Event
      */
     private $lead;
 
+    /**
+     * @var mixed
+     */
     private $eventDetails;
 
     /**
@@ -35,15 +38,15 @@ class PointChangeActionExecutedEvent extends Event
     private $changePoints;
 
     /**
-     * @var array
+     * @var array<mixed>
      */
     private $completedActions;
 
     /**
      * PointChangeActionExecutedEvent constructor.
      *
-     * @param       $eventDetails
-     * @param array $completedActions
+     * @param mixed        $eventDetails
+     * @param array<mixed> $completedActions
      */
     public function __construct(Point $pointAction, Lead $lead, $eventDetails, $completedActions = [])
     {
@@ -61,30 +64,25 @@ class PointChangeActionExecutedEvent extends Event
         return $this->changePoints;
     }
 
-    public function setSucceded()
+    public function setSucceded(): void
     {
         $this->changePoints = true;
     }
 
-    public function setFailed()
+    public function setFailed(): void
     {
         $this->changePoints = false;
     }
 
-    /**
-     * @return bool
-     */
-    public function setStatusFromLogs()
+    public function setStatusFromLogs(): void
     {
         $this->changePoints = !(isset($this->completedActions[$this->pointAction->getId()]));
     }
 
     /**
-     * @param $internalId
-     *
-     * @return bool
+     * @param int|string $internalId
      */
-    public function setStatusFromLogsForInternalId($internalId)
+    public function setStatusFromLogsForInternalId($internalId): void
     {
         $this->changePoints = !isset($this->completedActions[$this->pointAction->getId()][$internalId]);
     }
@@ -114,7 +112,7 @@ class PointChangeActionExecutedEvent extends Event
     }
 
     /**
-     * @return array
+     * @return array<int|string>
      */
     public function getCompletedActions()
     {
