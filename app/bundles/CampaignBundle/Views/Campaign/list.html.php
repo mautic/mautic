@@ -131,8 +131,11 @@ if ('index' == $tmpl) {
                             <?php echo $view->render(
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 [
-                                    'item'  => $item,
-                                    'model' => 'campaign',
+                                    'item'          => $item,
+                                    'model'         => 'campaign',
+                                    'onclick'       => $item->getOnclickMethod(),
+                                    'attributes'    => $item->getDataAttributes(),
+                                    'transKeys'     => $item->getTranslationKeysDataAttributes(),
                                 ]
                             ); ?>
                             <a href="<?php echo $view['router']->path(

@@ -248,6 +248,8 @@ jobs:
   upload-release-asset:
     name: Upload release asset to m.mautic.org
     needs: [release, test-fresh-install, test-update-install]
+    # We only want this job to run in Mautic's repo, not in forks
+    if: github.repository_owner == 'mautic'
     runs-on: ubuntu-latest
 
     steps:

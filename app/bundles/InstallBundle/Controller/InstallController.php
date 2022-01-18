@@ -12,6 +12,7 @@
 namespace Mautic\InstallBundle\Controller;
 
 use Doctrine\DBAL\DBALException;
+use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\Form\Form;
@@ -22,8 +23,10 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class InstallController extends CommonController
 {
+    /** @var Configurator */
     private $configurator;
 
+    /** @var InstallService */
     private $installer;
 
     /**
@@ -224,9 +227,9 @@ class InstallController extends CommonController
                     'tmpl'           => $tmpl,
                     'majors'         => $this->configurator->getRequirements(),
                     'minors'         => $this->configurator->getOptionalSettings(),
-                    'appRoot'        => $this->container->getParameter('kernel.root_dir'),
-                    'cacheDir'       => $this->container->getParameter('kernel.cache_dir'),
-                    'logDir'         => $this->container->getParameter('kernel.logs_dir'),
+                    'appRoot'        => $this->getParameter('kernel.root_dir'),
+                    'cacheDir'       => $this->getParameter('kernel.cache_dir'),
+                    'logDir'         => $this->getParameter('kernel.logs_dir'),
                     'configFile'     => $this->get('mautic.helper.paths')->getSystemPath('local_config'),
                     'completedSteps' => $completedSteps,
                 ],
