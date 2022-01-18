@@ -23,6 +23,9 @@ class SendGridMailMetadata
      */
     private $customArgs;
 
+    /**
+     * @param array<int,string>|null
+     */
     public function __construct($customArgs)
     {
         $this->customArgs = is_array($customArgs) ? $customArgs : [];
