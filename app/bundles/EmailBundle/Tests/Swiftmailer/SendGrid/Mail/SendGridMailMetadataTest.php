@@ -9,49 +9,59 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
+namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Mail;
 
-use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailMetadata;
 use SendGrid\BccSettings;
 use SendGrid\Mail;
 use SendGrid\MailSettings;
 use SendGrid\ReplyTo;
 
-class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
+class SendGridMailMetadata
 {
-    public function testBaseMessage()
+    public function addMetadataToMail(Mail $mail, \Swift_Mime_SimpleMessage $message)
     {
-        $sendGridMailMetadata = new SendGridMailMetadata();
+        $mail_settings = new MailSettings();
 
-        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $headers = $message->getHeaders();
 
-        $message->expects($this->exactly(2))
-            ->method('getReplyTo')
-            ->with()
-            ->willReturn(['email@example.com' => 'email@example.com']);
+        // Some headers headers are reserved and cannot be sent via API
+        // -> https://docs.sendgrid.com/api-reference/mail-send/mail-send
+        // 'mime-version', 'date' are allowed, but not needed to be when using API, is put by their server
+        $skip_headers = [
+            'x-sg-id', 'x-sg-eid', 'received', 'dkim-signature', 'content-type',
+            'content-transfer-encoding', 'to', 'from', 'subject', 'reply-to', 'cc', 'bcc',
+            'mime-version', 'date',
+        ];
 
-        $message->expects($this->exactly(2))
-            ->method('getBcc')
-            ->with()
-            ->willReturn(['bcc@example.com' => 'bcc@example.com']);
+        /* if ('Bulk' != $headers->get('Precedence')) {
+            // IMHO we should also remove list-unsubscribe header when Precedence != Bulk, but this should be done
+            // where list-unsubscribe is created at no in each transport!
+            // However, mail sent directly should  try to send each time, even if address have active bounces
+            // TODO: turn on BypassBounceManagement
+            // current version of vendor "sendgrid/sendgrid": "~6.0" do not support this feature
+        } */
 
-        $mail = new Mail('from', 'subject', 'to', 'content');
+        foreach ($headers->getAll() as $header) {
+            $key   = $header->getFieldName();
+            $value = $header->getFieldBody();
 
-        $sendGridMailMetadata->addMetadataToMail($mail, $message);
+            if (in_array(strtolower($key), $skip_headers) || '' === $value) {
+                continue;
+            }
+            $mail->addHeader($key, $value);
+        }
 
-        $replyTo = new ReplyTo('email@example.com');
-        $this->assertEquals($replyTo, $mail->getReplyTo());
+        if ($message->getReplyTo()) {
+            $replyTo = new ReplyTo(key($message->getReplyTo()));
+            $mail->setReplyTo($replyTo);
+        }
+        if ($message->getBcc()) {
+            $bcc_settings = new BccSettings();
+            $bcc_settings->setEnable(true);
+            $bcc_settings->setEmail(key($message->getBcc()));
+            $mail_settings->setBccSettings($bcc_settings);
+        }
 
-        /**
-         * @var MailSettings
-         * @var BccSettings  $bccSettings
-         */
-        $mailSettings = $mail->getMailSettings();
-        $bccSettings  = $mailSettings->getBccSettings();
-
-        $this->assertSame('bcc@example.com', $bccSettings->getEmail());
-        $this->assertTrue($bccSettings->getEnable());
+        $mail->setMailSettings($mail_settings);
     }
 }
