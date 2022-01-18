@@ -29,7 +29,7 @@ $props = $focus['properties'];
 
         <?php if (isset($props['colors'])): ?>
 
-        .mf-content a.mf-link, .mf-content .mauticform-button {
+        .mf-content a.mf-link, .mf-content .mauticform-button, .mf-content .mauticform-pagebreak {
             background-color: #<?php echo $props['colors']['button']; ?>;
             color: #<?php echo $props['colors']['button_text']; ?>;
         }
@@ -60,6 +60,17 @@ $props = $focus['properties'];
         ]
     );
 
+    ?>
+    <style scoped>
+    <?php
+
+    if (isset($focus['properties']['content']['css'])) {
+        echo $focus['properties']['content']['css'];
+    }
+
+    ?>
+    </style>
+    <?php
     // Add view tracking image
     if (!$preview): ?>
 

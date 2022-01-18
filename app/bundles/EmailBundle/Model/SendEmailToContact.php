@@ -13,7 +13,6 @@ namespace Mautic\EmailBundle\Model;
 
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
@@ -428,7 +427,7 @@ class SendEmailToContact
         // Dispatch the event to generate the tokens
         $this->mailer->dispatchSendEvent();
 
-        // Create the stat to ensure it is availble for emails sent
+        // Create the stat to ensure it is available for emails sent
         $this->createContactStatEntry($this->contact['email']);
 
         // Now send but don't redispatch the event

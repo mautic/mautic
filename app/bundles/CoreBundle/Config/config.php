@@ -306,6 +306,10 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.form.type.timeformat' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\TimeFormatType::class,
+                'arguments' => ['translator'],
+            ],
             'mautic.form.type.slot.saveprefsbutton' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
                 'arguments' => [
@@ -316,6 +320,12 @@ return [
                 'class'     => Mautic\CoreBundle\Form\Type\SlotSuccessMessageType::class,
                 'arguments' => [
                     'translator',
+                ],
+            ],
+            'mautic.form.type.slot.gatedvideo' => [
+                'class'     => Mautic\CoreBundle\Form\Type\GatedVideoType::class,
+                'arguments' => [
+                    'mautic.form.repository.form',
                 ],
             ],
             'mautic.form.type.slot.segmentlist' => [
@@ -347,6 +357,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.list',
                     'mautic.stage.model.stage',
+                    'mautic.integrations.helper.builder_integrations',
                 ],
             ],
             'mautic.form.type.dynamic_content_filter_entry_filters' => [
@@ -367,6 +378,12 @@ return [
                     'translator',
                     'database_connection',
                     'router',
+                ],
+            ],
+            'mautic.form.type.dynamic_content_filter' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,
+                'arguments' => [
+                    'mautic.integrations.helper.builder_integrations',
                 ],
             ],
         ],
@@ -681,6 +698,10 @@ return [
             ],
             'mautic.di.env_processor.int_nullable' => [
                 'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class,
+                'tag'   => 'container.env_var_processor',
+            ],
+            'mautic.di.env_processor.mauticconst' => [
+                'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class,
                 'tag'   => 'container.env_var_processor',
             ],
             'mautic.cipher.openssl' => [
@@ -1162,6 +1183,7 @@ return [
     'parameters' => [
         'site_url'                        => '',
         'webroot'                         => '',
+        '404_page'                        => '',
         'cache_path'                      => '%kernel.root_dir%/../var/cache',
         'log_path'                        => '%kernel.root_dir%/../var/logs',
         'max_log_files'                   => 7,
@@ -1177,7 +1199,6 @@ return [
         'db_user'                         => '',
         'db_password'                     => '',
         'db_table_prefix'                 => '',
-        'db_server_version'               => '5.7',
         'locale'                          => 'en_US',
         'secret_key'                      => 'temp',
         'dev_hosts'                       => [],
@@ -1202,7 +1223,7 @@ return [
         'update_stability'                => 'stable',
         'cookie_path'                     => '/',
         'cookie_domain'                   => '',
-        'cookie_secure'                   => null,
+        'cookie_secure'                   => true,
         'cookie_httponly'                 => false,
         'do_not_track_ips'                => [],
         'do_not_track_bots'               => [

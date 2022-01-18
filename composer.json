@@ -5,26 +5,60 @@
   "description": "Mautic Open Source Distribution",
   "require": {
     "composer/installers": "^1.11",
-    "mautic/core-lib": "self.version",
-    "mautic/grapes-js-builder-bundle": "dev-mautic3x"
+    "mautic/core-lib": "^3.0"
   },
   "require-dev": {
-    "symfony/web-profiler-bundle": "~4.4.0",
-    "symfony/var-dumper": "~4.4.0",
+    "friendsofphp/php-cs-fixer": "^2.19.2",
+    "http-interop/http-factory-guzzle": "^1.0",
+    "liip/functional-test-bundle": "^4.2",
+    "liip/test-fixtures-bundle": "^1.6",
+    "mautic/transifex": "^4.0",
+    "php-http/mock-client": "^1.4",
+    "phpstan/phpstan": "0.12.91",
+    "phpunit/phpunit": "^9.5",
+    "rector/rector": "^0.11.37",
     "symfony/browser-kit": "~4.4.0",
     "symfony/dom-crawler": "~4.4.0",
-    "mautic/transifex": "^4.0",
-    "http-interop/http-factory-guzzle": "^1.0",
-    "webfactory/exceptions-bundle": "~4.3",
-    "friendsofphp/php-cs-fixer": "~2.16.1",
-    "liip/test-fixtures-bundle": "^1.6",
-    "phpstan/phpstan": "0.12.25",
-    "rector/rector-prefixed": "^0.6.13",
     "symfony/phpunit-bridge": "~5.1.0",
-    "phpunit/phpunit": "^9.5",
-    "liip/functional-test-bundle": "^4.2",
-    "php-http/mock-client": "^1.4"
-  },  
+    "symfony/var-dumper": "~4.4.0",
+    "symfony/web-profiler-bundle": "~4.4.0",
+    "webfactory/exceptions-bundle": "~4.3"
+  },
+  "replace": {
+    "mautic/grapes-js-builder-bundle": "self.version",
+    "mautic/plugin-citrix": "self.version",
+    "mautic/plugin-clearbit": "self.version",
+    "mautic/plugin-cloudstorage": "self.version",
+    "mautic/plugin-crm": "self.version",
+    "mautic/plugin-emailmarketing": "self.version",
+    "mautic/plugin-focus": "self.version",
+    "mautic/plugin-fullcontact": "self.version",
+    "mautic/plugin-gmail": "self.version",
+    "mautic/plugin-outlook": "self.version",
+    "mautic/plugin-social": "self.version",
+    "mautic/plugin-zapier": "self.version",
+    "mautic/plugin-tagmanager": "self.version",
+    "mautic/theme-coffee": "self.version",
+    "mautic/theme-mauve": "self.version",
+    "mautic/theme-nature": "self.version",
+    "mautic/theme-aurora": "self.version",
+    "mautic/theme-blank": "self.version",
+    "mautic/theme-brienz": "self.version",
+    "mautic/theme-cards": "self.version",
+    "mautic/theme-confirmme": "self.version",
+    "mautic/theme-fresh-center": "self.version",
+    "mautic/theme-fresh-fixed": "self.version",
+    "mautic/theme-fresh-left": "self.version",
+    "mautic/theme-fresh-wide": "self.version",
+    "mautic/theme-goldstar": "self.version",
+    "mautic/theme-neopolitan": "self.version",
+    "mautic/theme-oxygen": "self.version",
+    "mautic/theme-paprika": "self.version",
+    "mautic/theme-skyline": "self.version",
+    "mautic/theme-sparse": "self.version",
+    "mautic/theme-sunday": "self.version",
+    "mautic/theme-vibrant": "self.version"
+  },
   "autoload": {
     "psr-4": {
       "MauticPlugin\\": "plugins/"
@@ -33,11 +67,12 @@
   "repositories": [
     {
       "type": "path",
-      "url": "app"
-    },
-    {
-      "type": "git",
-      "url": "https://github.com/mautic/BazingaOAuthServerBundle.git"
+      "url": "app",
+      "options": {
+        "versions": {
+            "mautic/core-lib": "3.2.x-dev"
+        }
+      }
     },
     {
       "type": "git",
@@ -63,7 +98,7 @@
       "@remove-git-submodules"
     ],
     "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
-    "phpstan": "bin/phpstan analyse app/bundles app/migrations plugins",
+    "phpstan": "php -d memory_limit=4G bin/phpstan analyse",
     "cs": "bin/php-cs-fixer fix -v --dry-run --diff",
     "fixcs": "bin/php-cs-fixer fix -v",
     "rector": "bin/rector process",
