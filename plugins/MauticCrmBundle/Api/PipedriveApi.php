@@ -123,9 +123,9 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @param     $name
-     * @param int $start
-     * @param int $limit
+     * @param string $name
+     * @param int    $start
+     * @param int    $limit
      *
      * @return array
      */

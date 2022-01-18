@@ -49,6 +49,10 @@ class LeadImport extends AbstractImport
         $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(self::PERSON_ENTITY_TYPE));
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
+        if (empty($dataToUpdate['email'])) {
+            return;
+        }
+
         if (!$lead =  $this->leadModel->checkForDuplicateContact($dataToUpdate)) {
             $lead = new Lead();
         }
@@ -102,6 +106,10 @@ class LeadImport extends AbstractImport
 
         $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(self::PERSON_ENTITY_TYPE));
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
+
+        if (empty($dataToUpdate['email'])) {
+            return;
+        }
 
         $lastSyncDate      = $integrationEntity->getLastSyncDate();
         $leadDateModified  = $lead->getDateModified();

@@ -5,6 +5,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\AbstractPipedrive;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -17,12 +18,18 @@ class LeadExport extends AbstractPipedrive
     private $companyExport;
 
     /**
+     * @var LeadModel
+     */
+    private $leadModel;
+
+    /**
      * LeadExport constructor.
      */
-    public function __construct(EntityManager $em, CompanyExport $companyExport)
+    public function __construct(EntityManager $em, CompanyExport $companyExport, LeadModel $leadModel)
     {
         $this->em            = $em;
         $this->companyExport = $companyExport;
+        $this->leadModel     = $leadModel;
     }
 
     /**
@@ -135,6 +142,10 @@ class LeadExport extends AbstractPipedrive
         $mappedData = [];
         $leadFields = $this->getIntegration()->getIntegrationSettings()->getFeatureSettings()['leadFields'];
 
+        if (empty($lead->getProfileFields())) {
+            $lead = $this->leadModel->getEntity($lead->getId());
+        }
+
         $accessor = PropertyAccess::createPropertyAccessor();
 
         foreach ($leadFields as $externalField => $internalField) {
@@ -171,7 +182,7 @@ class LeadExport extends AbstractPipedrive
             // check if company already exist on Pipedrive
             $companyData = $this->getIntegration()->getApiHelper()->findCompanyByName($leadCompany->getCompany()->getName(), 0, 1);
             if (!empty($companyData)) {
-                $integrationEntityCompany = $this->createIntegrationLeadEntity(new \DateTime(), $companyData[0]['id'], $leadCompany->getCompany()->getId());
+                $integrationEntityCompany = $this->createIntegrationCompanyEntity(new \DateTime(), $companyData[0]['id'], $leadCompany->getCompany()->getId());
                 $this->em->persist($integrationEntityCompany);
                 $this->em->flush();
             } else {

@@ -91,6 +91,8 @@ class PipedriveController extends CommonController
                     ];
             }
         } catch (\Exception $e) {
+            $pipedriveIntegration->logIntegrationError($e);
+
             return new JsonResponse([
                 'status'  => 'error',
                 'message' => $e->getMessage(),

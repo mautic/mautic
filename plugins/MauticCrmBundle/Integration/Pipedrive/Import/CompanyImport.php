@@ -45,18 +45,17 @@ class CompanyImport extends AbstractImport
 
         $company = new Company();
 
-        // prevent listeners from exporting
-        $company->setEventData('pipedrive.webhook', 1);
-
         $data       = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(self::ORGANIZATION_ENTITY_TYPE));
         $mappedData = $this->getMappedCompanyData($data);
 
         // find company exists
         $findCompany = IdentifyCompanyHelper::findCompany($mappedData, $this->companyModel);
         if (isset($findCompany[0]['id'])) {
-            throw new \Exception('Company already exist', Response::HTTP_CONFLICT);
+            $company =  $findCompany[1][$findCompany[0]['id']];
         }
 
+        // prevent listeners from exporting
+        $company->setEventData('pipedrive.webhook', 1);
         $this->companyModel->setFieldValues($company, $mappedData);
         $this->companyModel->saveEntity($company);
 

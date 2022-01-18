@@ -64,6 +64,10 @@ class CompanySubscriber implements EventSubscriberInterface
             return;
         }
 
+        if (empty($company->getChanges(true))) {
+            return;
+        }
+
         $this->companyExport->setIntegration($integrationObject);
         $this->companyExport->pushCompany($company);
     }

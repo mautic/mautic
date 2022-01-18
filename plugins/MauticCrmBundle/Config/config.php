@@ -271,6 +271,7 @@ return [
                 'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\CompanyExport::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                    'mautic.lead.model.company',
                 ],
             ],
             'mautic_integration.pipedrive.export.lead' => [
@@ -278,6 +279,7 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic_integration.pipedrive.export.company',
+                    'mautic.lead.model.lead',
                 ],
             ],
         ],
