@@ -1,4 +1,4 @@
-(function (factory) {
+(function(factory) {
 	if (typeof define === 'function' && define.amd) {
 		define(factory);
 	} else if (typeof exports !== 'undefined') {
@@ -6,6 +6,6 @@
 	} else {
 		factory();
 	}
-}(this, function () {
+}(this, function() {
 	return void 0;
 }));

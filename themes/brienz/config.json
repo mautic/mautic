@@ -1,0 +1,9 @@
+{
+  "name": "Brienz",
+  "author": "Mautic team",
+  "authorUrl": "https://mautic.org",
+  "builder": ["grapesjsbuilder"],
+  "features": [
+    "email"
+  ]
+}

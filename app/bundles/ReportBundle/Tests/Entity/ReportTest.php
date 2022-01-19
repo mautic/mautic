@@ -121,6 +121,28 @@ class ReportTest extends \PHPUnit\Framework\TestCase
         $report->getFilterValue('I need coffee');
     }
 
+    public function testSetAsScheduledNow()
+    {
+        $email  = 'john@doe.email';
+        $report = new Report();
+        $report->setAsScheduledNow($email);
+
+        $this->assertTrue($report->isScheduled());
+        $this->assertSame($email, $report->getToAddress());
+        $this->assertSame(SchedulerEnum::UNIT_NOW, $report->getScheduleUnit());
+    }
+
+    public function testIsScheduledNowIfNot()
+    {
+        $report = new Report();
+
+        $this->assertFalse($report->isScheduledNow());
+
+        $report->setScheduleUnit(SchedulerEnum::UNIT_NOW);
+
+        $this->assertTrue($report->isScheduledNow());
+    }
+
     /**
      * @return Report
      */

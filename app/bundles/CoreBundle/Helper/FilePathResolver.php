@@ -40,16 +40,12 @@ class FilePathResolver
         $inputHelper       = $this->inputHelper;
         $fullName          = $file->getClientOriginalName();
         $fullNameSanitized = $inputHelper::filename($fullName);
+        $ext               = $this->getFileExtension($file);
+        $baseFileName      = pathinfo($fullNameSanitized, PATHINFO_FILENAME);
+        $name              = $baseFileName;
+        $filePath          = $this->getFilePath($uploadDir, $baseFileName, $ext);
+        $i                 = 1;
 
-        $ext = $this->getFileExtension($file);
-
-        $baseFileName = pathinfo($fullNameSanitized, PATHINFO_FILENAME);
-
-        $name = $baseFileName;
-
-        $filePath = $this->getFilePath($uploadDir, $baseFileName, $ext);
-
-        $i = 1;
         while ($this->filesystem->exists($filePath)) {
             $name     = $baseFileName.'-'.$i;
             $filePath = $this->getFilePath($uploadDir, $name, $ext);
@@ -80,6 +76,32 @@ class FilePathResolver
         }
     }
 
+    /**
+     * @param string $path
+     */
+    public function delete($path)
+    {
+        if (!$this->filesystem->exists($path)) {
+            return;
+        }
+        try {
+            $this->filesystem->remove($path);
+        } catch (IOException $e) {
+        }
+    }
+
+    public function move(string $originPath, string $targetPath): void
+    {
+        $this->filesystem->rename($originPath, $targetPath);
+    }
+
+    /**
+     * @param string $uploadDir
+     * @param string $fileName
+     * @param string $ext
+     *
+     * @return string
+     */
     private function getFilePath($uploadDir, $fileName, $ext)
     {
         return $uploadDir.DIRECTORY_SEPARATOR.$fileName.$ext;
@@ -93,19 +115,5 @@ class FilePathResolver
         $ext = $file->getClientOriginalExtension();
 
         return ('' === $ext ? '' : '.').$ext;
-    }
-
-    /**
-     * @param string $path
-     */
-    public function delete($path)
-    {
-        if (!$this->filesystem->exists($path)) {
-            return;
-        }
-        try {
-            $this->filesystem->remove($path);
-        } catch (IOException $e) {
-        }
     }
 }

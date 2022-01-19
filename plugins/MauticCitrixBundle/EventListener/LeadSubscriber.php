@@ -133,6 +133,10 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     public function onListChoicesGenerate(LeadListFiltersChoicesEvent $event)
     {
+        if (false === strpos($event->getRoute(), 'mautic_segment_action')) {
+            return;
+        }
+
         $activeProducts = [];
         foreach (CitrixProducts::toArray() as $p) {
             if (CitrixHelper::isAuthorized('Goto'.$p)) {

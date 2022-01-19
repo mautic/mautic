@@ -12,9 +12,14 @@
 namespace Mautic\CampaignBundle\Tests\Command;
 
 use Doctrine\DBAL\Connection;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
+use Mautic\LeadBundle\Entity\Lead;
 
 class AbstractCampaignCommand extends MauticMysqlTestCase
 {
@@ -50,7 +55,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         parent::setUp();
 
         $this->db     = $this->em->getConnection();
-        $this->prefix = $this->container->getParameter('mautic.db_table_prefix');
+        $this->prefix = self::$container->getParameter('mautic.db_table_prefix');
 
         // Populate contacts
         $this->installDatabaseFixtures([LeadFieldData::class, LoadLeadData::class]);
@@ -59,7 +64,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $sql = file_get_contents(__DIR__.'/campaign_schema.sql');
 
         // Update table prefix
-        $sql = str_replace('#__', $this->container->getParameter('mautic.db_table_prefix'), $sql);
+        $sql = str_replace('#__', self::$container->getParameter('mautic.db_table_prefix'), $sql);
 
         // Schedule event
         date_default_timezone_set('UTC');
@@ -117,5 +122,62 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         }
 
         return $byEvent;
+    }
+
+    protected function createLead(string $leadName): Lead
+    {
+        $lead = new Lead();
+        $lead->setFirstname($leadName);
+        $this->em->persist($lead);
+
+        return $lead;
+    }
+
+    protected function createCampaign(string $campaignName): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName($campaignName);
+        $campaign->setIsPublished(true);
+        $this->em->persist($campaign);
+
+        return $campaign;
+    }
+
+    protected function createCampaignLead(Campaign $campaign, Lead $lead): CampaignLead
+    {
+        $campaignLead = new CampaignLead();
+        $campaignLead->setCampaign($campaign);
+        $campaignLead->setLead($lead);
+        $campaignLead->setDateAdded(new \DateTime());
+        $this->em->persist($campaignLead);
+
+        return $campaignLead;
+    }
+
+    protected function createEvent(string $name, Campaign $campaign, string $type, string $eventType, array $property = null): Event
+    {
+        $event = new Event();
+        $event->setName($name);
+        $event->setCampaign($campaign);
+        $event->setType($type);
+        $event->setEventType($eventType);
+        $event->setTriggerInterval(1);
+        $event->setProperties($property);
+        $event->setTriggerMode('immediate');
+        $this->em->persist($event);
+
+        return $event;
+    }
+
+    protected function createEventLog(Lead $lead, Event $event, Campaign $campaign): LeadEventLog
+    {
+        $leadEventLog = new LeadEventLog();
+        $leadEventLog->setLead($lead);
+        $leadEventLog->setEvent($event);
+        $leadEventLog->setCampaign($campaign);
+        $leadEventLog->setRotation(0);
+        $this->em->persist($leadEventLog);
+
+        return $leadEventLog;
     }
 }

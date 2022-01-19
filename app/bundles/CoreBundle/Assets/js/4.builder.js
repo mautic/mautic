@@ -219,7 +219,7 @@ Mautic.formatCode = function() {
  */
 Mautic.openMediaManager = function() {
     Mautic.openServerBrowser(
-        mauticBasePath + '/elfinder',
+        mauticBasePath + (typeof mauticEnv !== 'undefined' &&  mauticEnv === 'dev' ? '/index_dev.php' : '') + '/elfinder',
         screen.width * 0.7,
         screen.height * 0.7
     );
@@ -809,24 +809,49 @@ Mautic.initSectionListeners = function() {
                 sectionForm.find('#builder_section_content-background-color').val(Mautic.rgb2hex(section.css('backgroundColor')));
             }
 
+            // Prefill The Content Background Image
+            if (bgImage = section.css('background-image')) {
+                sectionForm.find('#builder_section_content-background-image').val(bgImage.replace(/url\((?:'|")(.+)(?:'|")\)/g, '$1'));
+            }
+
+            // Prefill The Content Background Size
+            if (bgSize = section.css('background-size')) {
+                sectionForm.find('#builder_section_content-background-size').val(bgSize || 'auto auto');
+            }
+
+            // Prefill The Content Background Repeat
+            if (bgRepeat = section.css('background-repeat')) {
+                sectionForm.find('#builder_section_content-background-repeat').val(bgRepeat);
+            }
+
+            // Prefill The Content Background Position
+            if (bgPosition = section.css('background-position')) {
+                sectionForm.find('#builder_section_content-background-position').val(bgPosition);
+            }
+
             // Prefill the sectionform with section wrapper color
             if (sectionWrapper.css('background-color') !== 'rgba(0, 0, 0, 0)') {
                 sectionForm.find('#builder_section_wrapper-background-color').val(Mautic.rgb2hex(sectionWrapper.css('backgroundColor')));
             }
 
-            // Prefill The Background Image
+            // Prefill The Wrapper Background Image
             if (bgImage = sectionWrapper.css('background-image')) {
                 sectionForm.find('#builder_section_wrapper-background-image').val(bgImage.replace(/url\((?:'|")(.+)(?:'|")\)/g, '$1'));
             }
 
-            // Prefill The Background Size
+            // Prefill The Wrapper Background Size
             if (bgSize = sectionWrapper.css('background-size')) {
                 sectionForm.find('#builder_section_wrapper-background-size').val(bgSize || 'auto auto');
             }
 
-            // Prefill The Background Repeat
+            // Prefill The Wrapper Background Repeat
             if (bgRepeat = sectionWrapper.css('background-repeat')) {
                 sectionForm.find('#builder_section_wrapper-background-repeat').val(bgRepeat);
+            }
+
+            // Prefill The Wrapper Background Position
+            if (bgPosition = sectionWrapper.css('background-position')) {
+                sectionForm.find('#builder_section_wrapper-background-position').val(bgPosition);
             }
 
             // Initialize the color picker
@@ -841,6 +866,18 @@ Mautic.initSectionListeners = function() {
                     case 'builder_section_content-background-color':
                         Mautic.sectionBackgroundChanged(section, field.val());
                         break;
+                    case 'builder_section_content-background-image':
+                        Mautic.sectionBackgroundImageChanged(section, field.val());
+                        break;
+                    case 'builder_section_content-background-repeat':
+                        section.css('background-repeat', field.val());
+                        break;
+                    case 'builder_section_content-background-size':
+                        Mautic.sectionBackgroundSize(section, field.val());
+                        break;
+                    case 'builder_section_content-background-position':
+                        section.css('background-position', field.val());
+                        break;
                     case 'builder_section_wrapper-background-color':
                         Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
                         break;
@@ -852,6 +889,9 @@ Mautic.initSectionListeners = function() {
                         break;
                     case 'builder_section_wrapper-background-size':
                         Mautic.sectionBackgroundSize(sectionWrapper, field.val());
+                        break;
+                    case 'builder_section_wrapper-background-position':
+                        sectionWrapper.css('background-position', field.val());
                         break;
                 }
             });
@@ -970,6 +1010,7 @@ Mautic.sectionBackgroundChanged = function(element, color) {
     }
     element.css('background-color', color).attr('bgcolor', color);
 
+    Mautic.updateOutlookTag(element);
 
     // Change the color of the editor for selected slots
     mQuery(element).find('[data-slot-focus]').each(function() {
@@ -991,6 +1032,8 @@ Mautic.sectionBackgroundImageChanged = function (element, imageUrl) {
     } else {
         element.css('background-image', "url(" + imageUrl + ")");
     }
+
+    Mautic.updateOutlookTag(element);
 };
 
 Mautic.sectionBackgroundSize = function (element, size) {
@@ -999,6 +1042,7 @@ Mautic.sectionBackgroundSize = function (element, size) {
     }
 
     element.css('background-size', size);
+    Mautic.updateOutlookTag(element);
 };
 
 Mautic.rgb2hex = function(orig) {
@@ -1007,6 +1051,80 @@ Mautic.rgb2hex = function(orig) {
         ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
         ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
         ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : orig;
+};
+
+Mautic.updateOutlookTag = function (element) {
+    if (parent.mQuery('.builder').hasClass('email-builder')) {
+
+        // section-wrapper is TABLE element, no outlook hack need
+        if (element.get(0).tagName == 'TABLE') {
+            return;
+        }
+
+        var sectionForm = parent.mQuery('#section-form-container');
+
+        if (element[0].hasAttribute('data-section-wrapper')) {
+            var color = sectionForm.find('#builder_section_wrapper-background-color').val() ? '#'+sectionForm.find('#builder_section_wrapper-background-color').val() : '';
+            var image = sectionForm.find('#builder_section_wrapper-background-image').val();
+            var size  = sectionForm.find('#builder_section_wrapper-background-size').val();
+        } else {
+            var color = sectionForm.find('#builder_section_content-background-color').val() ? '#'+sectionForm.find('#builder_section_content-background-color').val() : '';
+            var image = sectionForm.find('#builder_section_content-background-image').val();
+            var size  = sectionForm.find('#builder_section_content-background-size').val();
+        }
+
+        var comments = element.contents().filter(function(){return this.nodeType == 8;});
+
+        if (comments.length === 0) {
+            element.prepend(
+                '<!--[if gte mso 9]>\n' +
+                '<v:rect style="" xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false">\n' +
+                '<v:fill type="tile" src="" color=""/>\n' +
+                '<v:textbox style="" inset="0,0,0,0">\n' +
+                '<![endif]-->'
+            );
+
+            element.append(
+                '<!--[if gte mso 9]>\n' +
+                '</v:textbox>\n' +
+                '</v:rect>\n' +
+                '<![endif]-->'
+            );
+        }
+
+        comments.each(function(i, e) {
+                if (i == 0) {
+                    mQuery(this)[0].data = e.data.replace(/src\s*=\s*".*?"/mg, 'src="' + image + '"');
+                    mQuery(this)[0].data = e.data.replace(/color\s*=\s*".*?"/mg, 'color="' + color + '"');
+
+                    if (!size) {
+                        mQuery(this)[0].data = e.data.replace(/rect\s*style=\s*".*?"/mg, 'rect style="mso-width-percent:1000;"');
+                        mQuery(this)[0].data = e.data.replace(/textbox\s*style=\s*".*?"/mg, 'textbox style="mso-fit-shape-to-text:true"');
+                    } else {
+                        var newSize     = "";
+                        var splitedSize = size.split(" ");
+
+                        if (splitedSize[0] && splitedSize[0].match(/[0-9]*?px/gm)) {
+                            newSize = "width:"+splitedSize[0]+";";
+                        } else {
+                            newSize = "mso-width-percent:1000;";
+                        }
+
+                        if (splitedSize[1] && splitedSize[1].match(/[0-9]*?px/gm)) {
+                            newSize += "height:"+splitedSize[1]+";";
+                            mQuery(this)[0].data = e.data.replace(/textbox\s*style=\s*".*?"/mg, 'textbox style=""');
+                        } else {
+                            mQuery(this)[0].data = e.data.replace(/textbox\s*style=\s*".*?"/mg, 'textbox style="mso-fit-shape-to-text:true"');
+                        }
+
+                        mQuery(this)[0].data = e.data.replace(/rect\s*style=\s*".*?"/mg, 'rect style="'+newSize+'"');
+                    }
+
+                    return false;
+                }
+            }
+        );
+    }
 };
 
 Mautic.initSlots = function(slotContainers) {
@@ -2008,7 +2126,7 @@ Mautic.getDynamicContentDataForToken = function(token) {
     if (dynConContainer.html()) {
         var dynConContent = dynConContainer.find(dynConTarget+'_content');
 
-        if (dynConContent.hasClass('editor')) {
+        if (dynConContent.hasClass('editor') && Mautic.getActiveBuilderName() === 'legacy') {
             dynConContent = dynConContent.froalaEditor('html.get');
         } else {
             dynConContent = dynConContent.html();

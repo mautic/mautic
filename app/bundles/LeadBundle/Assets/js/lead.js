@@ -1,4 +1,10 @@
 //LeadBundle
+Mautic.companyOnLoad = function (container, response) {
+
+    if (mQuery(container + ' #list-search').length) {
+        Mautic.activateSearchAutocomplete('list-search', 'lead.company');
+    }
+}
 Mautic.leadOnLoad = function (container, response) {
     Mautic.addKeyboardShortcut('a', 'Quick add a New Contact', function(e) {
         if(mQuery('a.quickadd').length) {
@@ -237,48 +243,6 @@ Mautic.getLeadId = function() {
     return mQuery('input#leadId').val();
 }
 
-Mautic.leadEmailOnLoad = function(container, response) {
-    // Some hacky editations made on every form submit because of Froala (more at: https://github.com/froala/wysiwyg-editor/issues/1372)
-    mQuery('[name="lead_quickemail"]').on('submit.ajaxform', function() {
-        var emailHtml = mQuery('.fr-iframe').contents();
-        var textarea = mQuery(this).find('#lead_quickemail_body');
-        mQuery.each(emailHtml.find('td, th, table'), function() {
-            var td = mQuery(this);
-
-            // Bring back element's class names.
-            if (td.attr('fr-original-class')) {
-                td.attr('class', td.attr('fr-original-class'));
-                td.removeAttr('fr-original-class');
-            }
-
-            // Bring back element's class inline styles.
-            if (td.attr('fr-original-style')) {
-                td.attr('style', td.attr('fr-original-style'));
-                td.removeAttr('fr-original-style');
-            }
-
-            // Remove Froala's border.
-            if (td.css('border') === '1px solid rgb(221, 221, 221)') {
-                td.css('border', '');
-            }
-        });
-
-        // Prevents contenteditable in sent e-mail.
-        emailHtml.find('body').removeAttr('contenteditable');
-        // Prevents unscrollable sent e-mail.
-        emailHtml.find('body').css('overflow', 'initial');
-
-        // Prevents unscrollable e-mail also in style tag.
-        var styleElement = emailHtml.find('style[data-fr-style]'); // We hope, that there's no other style with this attribute...
-        var style = styleElement.text();
-        style = style.replace(/overflow:\s*hidden\s*;\s*/, ''); // ...and we hope, that no other element will have `overflow: hidden` before `body`. This replaces only first occurence.
-        styleElement.get(0).innerHTML = style;
-
-        // Rewrites value of the body textarea.
-        textarea.val(emailHtml.find('html').get(0).outerHTML);
-    });
-}
-
 Mautic.leadlistOnLoad = function(container, response) {
 
     mQuery('#campaign-share-tab').hover(function () {
@@ -379,6 +343,10 @@ Mautic.leadlistOnLoad = function(container, response) {
             Mautic.refreshSegmentContacts(segmentContactForm);
         });
     }
+
+    jQuery(document).ajaxComplete(function(){
+        Mautic.ajaxifyForm('daterange');
+    });
 };
 
 Mautic.reorderSegmentFilters = function() {
@@ -499,6 +467,32 @@ Mautic.convertLeadFilterInput = function(el) {
         mQuery(filterId).attr('data-placeholder', placeholder);
 
         Mautic.activateChosenSelect(mQuery(filterId));
+    }
+
+    Mautic.setProcessorForFilterValue(filterId, operator);
+};
+
+Mautic.setFilterValuesProcessor = function () {
+    mQuery('.filter-operator').each(function (index) {
+        let filterId = "#" + mQuery('.filter-value').eq(index).attr('id');
+        Mautic.setProcessorForFilterValue(filterId, mQuery(this).val())
+    });
+};
+
+Mautic.setProcessorForFilterValue = function (filterId, operator) {
+    let isInOperator = (operator == 'in' || operator == '!in');
+    if (isInOperator && mQuery(filterId).attr('type') === 'text') {
+        mQuery(filterId).on('paste', function (e) {
+            let value  = e.originalEvent.clipboardData.getData('text');
+            value = value.replace(/\r?\n/g, '|');
+            if (value.slice(-1) === '|') {
+                value = value.slice(0, -1);
+            }
+            mQuery(filterId).val(value);
+            e.preventDefault();
+        });
+    } else {
+        mQuery(filterId).off('paste');
     }
 };
 
@@ -738,7 +732,8 @@ Mautic.leadfieldOnLoad = function (container) {
 };
 
 Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
-    if (selectedVal == 'multiselect') {
+    let isMultiselect = selectedVal === 'multiselect' ? true : false;
+    if (selectedVal === 'multiselect') {
         // Use select
         selectedVal = 'select';
     }
@@ -826,7 +821,6 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
             isSelect = true;
             break;
         case 'select':
-        case 'multiselect':
         case 'lookup':
             html = mQuery('#field-templates .default_template_select').html();
             tempType = 'select';
@@ -854,6 +848,10 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
         html = html.replace(regex, 'defaultValue')
         defaultValueField.replaceWith(mQuery(html));
         mQuery('#leadfield_defaultValue').val(defaultVal);
+        if (isMultiselect) {
+            mQuery('#leadfield_defaultValue').attr('multiple', 'multiple');
+            mQuery('#leadfield_defaultValue').attr('name', mQuery('#leadfield_defaultValue').attr('name')+'[]');
+        }
     }
 
     if (selectedVal === 'datetime' || selectedVal === 'date' || selectedVal === 'time') {
@@ -898,6 +896,8 @@ Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
         }
     });
+
+    Mautic.setFilterValuesProcessor();
 };
 
 Mautic.clearLeadSocialProfile = function(network, leadId, event) {
@@ -1262,7 +1262,9 @@ Mautic.getLeadEmailContent = function (el) {
         }
         var idPrefix = id.replace('templates', '');
         var bodyEl = (mQuery('#'+idPrefix+'message').length) ? '#'+idPrefix+'message' : '#'+idPrefix+'body';
-        mQuery(bodyEl).froalaEditor('html.set', response.body);
+
+        mQuery(bodyEl).ckeditorGet().setData(response.body);
+
         mQuery(bodyEl).val(response.body);
         mQuery('#'+idPrefix+'subject').val(response.subject);
 

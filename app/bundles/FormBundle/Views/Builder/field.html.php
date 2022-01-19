@@ -15,6 +15,7 @@ $validation     = (isset($form['validation'])) ? $form['validation'] : [];
 
 $showAttributes = isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes']) || isset($form['alias']);
 $showBehavior   = isset($form['showWhenValueExists']) || isset($properties['showWhenValueExists']);
+$showConditions = (isset($form['parent'])) ? $form['parent']->vars['value'] : null;
 
 $placeholder = '';
 if (isset($properties['placeholder'])):
@@ -44,6 +45,7 @@ endif;
 // Check for validation errors to show on tabs
 $generalTabError    = (isset($form['label']) && ($view['form']->containsErrors($form['label'])));
 $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErrors($form['properties'])));
+$conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErrors($form['conditions'])));
 ?>
 
 
@@ -64,6 +66,17 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                     <?php endif; ?>
                 </a>
             </li>
+
+            <?php if ($showConditions): ?>
+                <li role="presentation">
+                    <a<?php if ($conditionsTabError): echo ' class="text-danger" '; endif; ?> href="#conditions" aria-controls="conditions" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.form.field.form.condition'); ?>
+                        <?php if ($conditionsTabError): ?>
+                            <i class="fa fa-warning"></i>
+                        <?php endif; ?>
+                    </a>
+                </li>
+            <?php endif; ?>
 
             <?php if (isset($form['leadField'])): ?>
             <li role="presentation">
@@ -270,12 +283,41 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
             </div>
             <?php endif; ?>
 
+            <?php echo $view['form']->row($form['parent']); ?>
+
+            <?php if ($showConditions): ?>
+                <div role="tabpanel" class="tab-pane" id="conditions">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label data-toggle="tooltip" data-container="body" data-placement="top" data-original-title="<?php echo $view['translator']->trans('mautic.form.field.form.condition.show.only.tooltip'); ?>">
+                                <?php echo $view['translator']->trans('mautic.form.field.form.condition.show.only'); ?>
+                                <i class="fa fa-question-circle"></i>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>&nbsp;</label>
+                            <?php echo $view['form']->widget($form['conditions']['expr']); ?>
+                        </div>
+                        <div class="col-md-5">
+                            <label>&nbsp;</label>
+                            <?php echo $view['form']->row($form['conditions']['values']); ?>
+                        </div>
+                        <div class="col-md-4">
+                            <?php echo $view['form']->row($form['conditions']['any']); ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <?php if ($showBehavior): ?>
             <div role="tabpanel" class="tab-pane" id="progressive-profiling">
                 <div class="row">
+                    <?php echo $view['form']->rowIfExists($form, 'alwaysDisplay', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'isAutoFill', $template); ?>
                     <?php echo $view['form']->rowIfExists($form, 'showWhenValueExists', $template); ?>
                     <?php echo $view['form']->rowIfExists($form, 'showAfterXSubmissions', $template); ?>
-                    <?php echo $view['form']->rowIfExists($form, 'isAutoFill', $template); ?>
                 </div>
             </div>
             <?php endif; ?>

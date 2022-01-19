@@ -60,6 +60,11 @@ class FieldHelper
     /**
      * @var array
      */
+    private $requiredFieldList = [];
+
+    /**
+     * @var array
+     */
     private $syncFields = [];
 
     /**
@@ -108,6 +113,10 @@ class FieldHelper
                 return NormalizedValueDAO::DATETIME_TYPE;
             case 'number':
                 return NormalizedValueDAO::FLOAT_TYPE;
+            case 'select':
+                return NormalizedValueDAO::SELECT_TYPE;
+            case 'multiselect':
+                return NormalizedValueDAO::MULTISELECT_TYPE;
             default:
                 return NormalizedValueDAO::STRING_TYPE;
         }
@@ -184,6 +193,10 @@ class FieldHelper
 
     public function getRequiredFields(string $object): array
     {
+        if (isset($this->requiredFieldList[$object])) {
+            return $this->requiredFieldList[$object];
+        }
+
         $requiredFields = $this->fieldModel->getFieldList(
             false,
             false,
@@ -196,7 +209,9 @@ class FieldHelper
 
         // We don't use unique identifier field for companies.
         if ('company' === $object) {
-            return $requiredFields;
+            $this->requiredFieldList[$object] = $requiredFields;
+
+            return $this->requiredFieldList[$object];
         }
 
         $uniqueIdentifierFields = $this->fieldModel->getUniqueIdentifierFields(
@@ -206,6 +221,8 @@ class FieldHelper
             ]
         );
 
-        return array_merge($requiredFields, $uniqueIdentifierFields);
+        $this->requiredFieldList[$object] = array_merge($requiredFields, $uniqueIdentifierFields);
+
+        return $this->requiredFieldList[$object];
     }
 }

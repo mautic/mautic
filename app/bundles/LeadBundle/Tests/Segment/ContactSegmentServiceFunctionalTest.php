@@ -56,7 +56,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     public function testSegmentCountIsCorrect(): void
     {
         /** @var ContactSegmentService $contactSegmentService */
-        $contactSegmentService = $this->container->get('mautic.lead.model.lead_segment_service');
+        $contactSegmentService = self::$container->get('mautic.lead.model.lead_segment_service');
 
         $segmentTest1Ref = $this->getReference('segment-test-1');
         $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest1Ref);
@@ -246,7 +246,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     public function testSegmentRebuildCommand(): void
     {
         /** @var ContactSegmentService $contactSegmentService */
-        $contactSegmentService = $this->container->get('mautic.lead.model.lead_segment_service');
+        $contactSegmentService = self::$container->get('mautic.lead.model.lead_segment_service');
         $segmentTest3Ref       = $this->getReference('segment-test-3');
 
         $this->runCommand('mautic:segments:update', [

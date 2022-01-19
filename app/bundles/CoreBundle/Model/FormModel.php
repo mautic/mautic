@@ -200,6 +200,7 @@ class FormModel extends AbstractCommonModel
                 case 'published':
                 case 'expired':
                 case 'pending':
+                    $event = $this->dispatchEvent('pre_unpublish', $entity);
                     $entity->setIsPublished(false);
                     break;
             }
@@ -341,10 +342,9 @@ class FormModel extends AbstractCommonModel
     /**
      * Dispatches events for child classes.
      *
-     * @param       $action
-     * @param       $entity
-     * @param bool  $isNew
-     * @param Event $event
+     * @param string $action
+     * @param object $entity
+     * @param bool   $isNew
      *
      * @return Event|null
      */

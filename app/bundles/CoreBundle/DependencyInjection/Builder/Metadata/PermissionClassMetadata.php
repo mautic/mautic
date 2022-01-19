@@ -45,7 +45,7 @@ class PermissionClassMetadata
         /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             $className       = basename($file->getFilename(), '.php');
-            $permissionClass = sprintf('\\%s\\Security\\Permissions\\%s', $this->metadata->getNamespace(), $className);
+            $permissionClass = sprintf('%s\\Security\\Permissions\\%s', $this->metadata->getNamespace(), $className);
 
             // Required because https://github.com/mautic/mautic/pull/7312 introduces permission DI and thus classes cannot be instantiated here
             $reflectionClass = new \ReflectionClass($permissionClass);
@@ -61,8 +61,7 @@ class PermissionClassMetadata
                 continue;
             }
 
-            $permissionName = $permissionInstance->getName();
-            $this->metadata->addPermissionClass($permissionName, $permissionClass);
+            $this->metadata->addPermissionClass($permissionClass);
         }
     }
 }

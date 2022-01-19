@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Command;
 
+use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Api\PipedriveApi;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -12,10 +16,19 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class FetchPipedriveDataCommand extends ContainerAwareCommand
 {
-    /**
-     * @var SymfonyStyle
-     */
-    private $io;
+    private SymfonyStyle $io;
+    private IntegrationHelper $integrationHelper;
+    private TranslatorHelper $translatorHelper;
+
+    public function __construct(
+        IntegrationHelper $integrationHelper,
+        TranslatorHelper $translatorHelper
+    ) {
+        $this->integrationHelper = $integrationHelper;
+        $this->translatorHelper  = $translatorHelper;
+
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -42,11 +55,12 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
         $container = $this->getContainer();
         $this->io  = new SymfonyStyle($input, $output);
 
-        $integrationHelper = $container->get('mautic.helper.integration');
-        $integrationObject = $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
+        /** @var PipedriveIntegration $integrationObject */
+        $integrationObject = $this->integrationHelper
+            ->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
-        if (!$integrationObject->getIntegrationSettings()->getIsPublished()) {
-            $this->io->note('Pipedrive integration id disabled.');
+        if (!$integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
+            $this->io->note('Pipedrive integration is disabled.');
 
             return;
         }
@@ -62,7 +76,7 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
 
         if ($input->getOption('restart')) {
             $this->io->note(
-                $container->get('templating.helper.translator')->trans(
+                $this->translatorHelper->trans(
                     'mautic.plugin.config.integration.restarted',
                     ['%integration%' => $integrationObject->getName()]
                 )
@@ -106,7 +120,7 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
             }
 
             $this->io->text('Pulled '.$result['processed']);
-            $this->io->note('Using '.memory_get_peak_usage(1) / 1000000 .' megabytes of ram.');
+            $this->io->note('Using '.memory_get_peak_usage(true) / 1000000 .' megabytes of ram.');
 
             if (!$result['more_items_in_collection']) {
                 return;

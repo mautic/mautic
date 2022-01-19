@@ -144,7 +144,7 @@ class IntegrationSyncProcess
      */
     public function getSyncOrder(ReportDAO $syncReport)
     {
-        $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO->getIntegration());
+        $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO->getIntegration(), $this->inputOptionsDAO->getOptions());
 
         $internalObjectNames = $this->mappingManualDAO->getInternalObjectNames();
         foreach ($internalObjectNames as $internalObjectName) {

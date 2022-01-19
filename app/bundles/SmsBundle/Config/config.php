@@ -92,6 +92,12 @@ return [
                     'mautic.lead.repository.lead_event_log',
                 ],
             ],
+            'mautic.sms.webhook.subscriber' => [
+                'class'     => \Mautic\SmsBundle\EventListener\WebhookSubscriber::class,
+                'arguments' => [
+                    'mautic.webhook.model.webhook',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.sms' => [

@@ -43,6 +43,8 @@ class WebhookModel extends FormModel
     const COMMAND_PROCESS   = 'command_process';
     const IMMEDIATE_PROCESS = 'immediate_process';
 
+    private const DELETE_BATCH_LIMIT = 5000;
+
     /**
      * Whet queue mode is turned on.
      *
@@ -56,6 +58,13 @@ class WebhookModel extends FormModel
      * @var int
      */
     protected $webhookLimit;
+
+    /**
+     * How long the webhook processing can run in seconds.
+     *
+     * @var int
+     */
+    private $webhookTimeLimit;
 
     /**
      * How many responses in 1 row can fail until the webhook disables itself.
@@ -107,6 +116,13 @@ class WebhookModel extends FormModel
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
+
+    /**
+     * Timestamp when the webhook processing starts.
+     *
+     * @var float
+     */
+    private $startTime;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
@@ -281,6 +297,8 @@ class WebhookModel extends FormModel
      */
     public function processWebhooks($webhooks)
     {
+        $this->startTime = microtime(true);
+
         foreach ($webhooks as $webhook) {
             $this->processWebhook($webhook);
         }
@@ -301,14 +319,18 @@ class WebhookModel extends FormModel
             return false;
         }
 
-        $start = microtime(true);
+        $start            = microtime(true);
+        $webhookQueueRepo = $this->getQueueRepository();
 
         try {
             $response = $this->httpClient->post($webhook->getWebhookUrl(), $payload, $webhook->getSecret());
 
             // remove successfully processed queues from the Webhook object so they won't get stored again
-            foreach ($this->webhookQueueIdList as $queue) {
-                $webhook->removeQueue($queue);
+            $queueIds        = array_keys($this->webhookQueueIdList);
+            $chunkedQueueIds = array_chunk($queueIds, self::DELETE_BATCH_LIMIT);
+
+            foreach ($chunkedQueueIds as $queueIds) {
+                $webhookQueueRepo->deleteQueuesById($queueIds);
             }
 
             $responseBody = $response->getBody()->getContents();
@@ -318,7 +340,7 @@ class WebhookModel extends FormModel
 
             $responseStatusCode = $response->getStatusCode();
 
-            $this->addLog($webhook, $response->getStatusCode(), (microtime(true) - $start), $responseBody);
+            $this->addLog($webhook, $responseStatusCode, (microtime(true) - $start), $responseBody);
 
             // throw an error exception if we don't get a 200 back
             if ($responseStatusCode >= 300 || $responseStatusCode < 200) {
@@ -349,9 +371,6 @@ class WebhookModel extends FormModel
         // Run this on command as well as immediate send because if switched from queue to immediate
         // it can have some rows in the queue which will be send in every webhook forever
         if (!empty($this->webhookQueueIdList)) {
-            /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
-            $webhookQueueRepo = $this->getQueueRepository();
-
             // delete all the queued items we just processed
             $webhookQueueRepo->deleteQueuesById(array_keys($this->webhookQueueIdList));
             $queueCount = $webhookQueueRepo->getQueueCountByWebhookId($webhook->getId());
@@ -361,7 +380,7 @@ class WebhookModel extends FormModel
 
             // if there are still items in the queue after processing we re-process
             // WARNING: this is recursive
-            if ($queueCount > 0) {
+            if ($queueCount > 0 && !$this->isProcessingExpired()) {
                 $this->processWebhook($webhook);
             }
         }
@@ -640,12 +659,21 @@ class WebhookModel extends FormModel
         return 'webhook:webhooks';
     }
 
+    private function isProcessingExpired(): bool
+    {
+        $currentTime = microtime(true);
+        $runTime     = $currentTime - $this->startTime;
+
+        return $runTime >= $this->webhookTimeLimit;
+    }
+
     /**
      * Sets all class properties from CoreParametersHelper.
      */
     private function setConfigProps(CoreParametersHelper $coreParametersHelper)
     {
         $this->webhookLimit     = (int) $coreParametersHelper->get('webhook_limit', 10);
+        $this->webhookTimeLimit = (int) $coreParametersHelper->get('webhook_time_limit', 600);
         $this->disableLimit     = (int) $coreParametersHelper->get('webhook_disable_limit', 100);
         $this->webhookTimeout   = (int) $coreParametersHelper->get('webhook_timeout', 15);
         $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', 1000);
