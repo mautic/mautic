@@ -44,6 +44,14 @@ class ConfigSubscriber implements EventSubscriberInterface
             'formTheme'  => 'MauticLeadBundle:FormTheme\Config',
             'parameters' => $parameters,
         ]);
+
+        $event->addForm([
+            'bundle'     => 'LeadBundle',
+            'formAlias'  => 'segment_config',
+            'formType'   => SegmentConfigType::class,
+            'formTheme'  => 'MauticLeadBundle:FormTheme\Config',
+            'parameters' => $event->getParametersFromConfig('MauticLeadBundle'),
+        ]);
     }
 
     public function onConfigCompanyGenerate(ConfigBuilderEvent $event)
@@ -57,14 +65,6 @@ class ConfigSubscriber implements EventSubscriberInterface
             'parameters' => [
                 'company_unique_identifiers_operator' => $parameters['company_unique_identifiers_operator'],
             ],
-        ]);
-
-        $event->addForm([
-            'bundle'     => 'LeadBundle',
-            'formAlias'  => 'segment_config',
-            'formType'   => SegmentConfigType::class,
-            'formTheme'  => 'MauticLeadBundle:FormTheme\Config',
-            'parameters' => $event->getParametersFromConfig('MauticLeadBundle'),
         ]);
     }
 }
