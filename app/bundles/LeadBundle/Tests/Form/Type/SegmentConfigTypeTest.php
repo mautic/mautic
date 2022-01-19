@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
 use Mautic\LeadBundle\Form\Type\SegmentConfigType;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -26,7 +27,7 @@ final class SegmentConfigTypeTest extends TestCase
     private $segmentConfigType;
 
     /**
-     * @var FormBuilderInterface
+     * @var FormBuilderInterface<FormBuilderInterface>&MockObject
      */
     private $formBuilderInterface;
 

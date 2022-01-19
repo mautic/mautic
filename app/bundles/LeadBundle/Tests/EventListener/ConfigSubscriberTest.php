@@ -16,6 +16,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\LeadBundle\EventListener\ConfigSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ConfigSubscriberTest extends TestCase
@@ -26,7 +27,7 @@ class ConfigSubscriberTest extends TestCase
     private $configSubscriber;
 
     /**
-     * @var ConfigBuilderEvent
+     * @var ConfigBuilderEvent&MockObject
      */
     private $configBuilderEvent;
 

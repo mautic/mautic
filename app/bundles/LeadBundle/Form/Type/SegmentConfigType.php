@@ -17,7 +17,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SegmentConfigType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    /**
+     * @param FormBuilderInterface<FormBuilderInterface> $builder
+     * @param mixed[]                                    $options
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'segment_rebuild_time_warning',

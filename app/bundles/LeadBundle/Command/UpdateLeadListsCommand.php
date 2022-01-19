@@ -90,7 +90,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     $processed = 0;
                     try {
                         $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
-                        if (0 >= $max) {
+                        if (is_numeric($max) && 0 >= $max) {
                             // Only full segment rebuilds count
                             $list->setLastBuiltDateToCurrentDatetime();
                             $listModel->saveEntity($list);
@@ -113,9 +113,9 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 ]
             );
 
-            /** @var LeadList $leadList */
             while (false !== ($leadList = $leadLists->next())) {
                 // Get first item; using reset as the key will be the ID and not 0
+                /** @var LeadList $leadList */
                 $leadList = reset($leadList);
 
                 if ($leadList->isPublished()) {
@@ -123,7 +123,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
                     $startTimeForSingleSegment = time();
                     $processed                 = $listModel->rebuildListLeads($leadList, $batch, $max, $output);
-                    if (0 >= $max) {
+                    if (is_numeric($max) && 0 >= $max) {
                         // Only full segment rebuilds count
                         $leadList->setLastBuiltDateToCurrentDatetime();
                         $listModel->saveEntity($leadList);
