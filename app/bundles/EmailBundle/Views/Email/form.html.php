@@ -90,6 +90,7 @@ if (!isset($previewUrl)) {
                             <?php echo $view['translator']->trans('mautic.core.dynamicContent'); ?>
                         </a>
                     </li>
+                    <?php echo $view['content']->getCustomContent('email.tabs', $mauticTemplateVars); ?>
                 </ul>
                 <!--/ tabs controls -->
                 <div class="tab-content pa-md">
@@ -177,6 +178,7 @@ if (!isset($previewUrl)) {
                             </div>
                         </div>
                     </div>
+                    <?php echo $view['content']->getCustomContent('email.tabs.content', $mauticTemplateVars); ?>
                 </div>
             </div>
         </div>

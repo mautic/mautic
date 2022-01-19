@@ -15,10 +15,12 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\UpgradeEvent;
+use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckError;
 use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
@@ -279,29 +281,41 @@ class AjaxController extends CommonController
             }
 
             if ($hasPermission) {
-                $dataArray['success'] = 1;
-                //toggle permission state
-                if ($customToggle) {
-                    $accessor = PropertyAccess::createPropertyAccessor();
-                    $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
-                    $model->getRepository()->saveEntity($entity);
-                } else {
-                    $refresh = $model->togglePublishStatus($entity);
-                }
-                if (!empty($refresh)) {
-                    $dataArray['reload'] = 1;
-                } else {
-                    //get updated icon HTML
-                    $html = $this->renderView(
-                        'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                        [
-                            'item'  => $entity,
-                            'model' => $name,
-                            'query' => $extra,
-                            'size'  => (isset($post['size'])) ? $post['size'] : '',
-                        ]
-                    );
-                    $dataArray['statusHtml'] = $html;
+                try {
+                    $dataArray['success'] = 1;
+                    //toggle permission state
+                    if ($customToggle) {
+                        $accessor = PropertyAccess::createPropertyAccessor();
+                        $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
+                        $model->getRepository()->saveEntity($entity);
+                    } else {
+                        $refresh = $model->togglePublishStatus($entity);
+                    }
+                    if (!empty($refresh)) {
+                        $dataArray['reload'] = 1;
+                    } else {
+                        $onclickMethod  = (method_exists($entity, 'getOnclickMethod')) ? $entity->getOnclickMethod() : '';
+                        $dataAttr       = (method_exists($entity, 'getDataAttributes')) ? $entity->getDataAttributes() : [];
+                        $attrTransKeys  = (method_exists($entity, 'getTranslationKeysDataAttributes')) ? $entity->getTranslationKeysDataAttributes() : [];
+
+                        //get updated icon HTML
+                        $html = $this->renderView(
+                            'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                            [
+                                'item'          => $entity,
+                                'model'         => $name,
+                                'query'         => $extra,
+                                'size'          => (isset($post['size'])) ? $post['size'] : '',
+                                'onclick'       => $onclickMethod,
+                                'attributes'    => $dataAttr,
+                                'transKeys'     => $attrTransKeys,
+                            ]
+                        );
+                        $dataArray['statusHtml'] = $html;
+                    }
+                } catch (RecordCanNotUnpublishException $e) {
+                    $this->addFlash($e->getMessage());
+                    $status = Response::HTTP_UNPROCESSABLE_ENTITY;
                 }
             } else {
                 $this->addFlash('mautic.core.error.access.denied');
@@ -358,6 +372,50 @@ class AjaxController extends CommonController
         /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
         $cookieHelper = $this->container->get('mautic.helper.cookie');
         $cookieHelper->setCookie('mautic_update', 'setupUpdate', 300);
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Run pre-update checks, like if the user has the correct PHP version, database version, etc.
+     */
+    protected function updateRunChecksAction(): JsonResponse
+    {
+        $dataArray  = [];
+        $translator = $this->translator;
+        /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+        $cookieHelper = $this->container->get('mautic.helper.cookie');
+        /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
+        $updateHelper = $this->container->get('mautic.helper.update');
+
+        $results = $updateHelper->runPreUpdateChecks();
+        $errors  = [];
+
+        foreach ($results as $result) {
+            if (!$result->success) {
+                $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error) => $translator->trans($error->key, $error->parameters), $result->errors));
+            }
+        }
+
+        if (!empty($errors)) {
+            $dataArray['success']    = 0;
+            $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
+            $dataArray['message']    = $translator->trans('mautic.core.update.check.error');
+            $dataArray['errors']     = $errors;
+
+            // A way to keep the upgrade from failing if the session is lost after
+            // the cache is cleared by upgrade.php
+            $cookieHelper->deleteCookie('mautic_update');
+        } else {
+            $dataArray['success']        = 1;
+            $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
+            $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.downloading.package');
+            $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
+
+            // A way to keep the upgrade from failing if the session is lost after
+            // the cache is cleared by upgrade.php
+            $cookieHelper->setCookie('mautic_update', 'runChecks', 300);
+        }
 
         return $this->sendJsonResponse($dataArray);
     }

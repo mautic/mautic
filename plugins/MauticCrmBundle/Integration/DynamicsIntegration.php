@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -444,7 +445,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     return $integrationEntityId;
                 }
                 /* @todo check if exist */
-                /** @var Response $response */
+                /** @var ResponseInterface $response */
                 $response = $this->getApiHelper()->createLead($mappedData, $lead, $object);
                 // OData-EntityId: https://clientname.crm.dynamics.com/api/data/v8.2/contacts(9844333b-c955-e711-80f1-c4346bad526c)
                 $header = $response->headers['OData-EntityId'];
