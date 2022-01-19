@@ -1,0 +1,7 @@
+changelog:
+  repository: mautic/mautic
+  sections:
+  - title: "Enhancements"
+    labels: ["enhancement", "feature"]
+  - title: "Bugs"
+    labels: ["bug", "regression"]

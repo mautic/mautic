@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticFocusBundle\Helper;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class TokenHelper
@@ -68,8 +69,13 @@ class TokenHelper
                         )
                     )
                 ) {
-                    $script = '<script src="'.$this->router->generate('mautic_focus_generate', ['id' => $id], true)
-                        .'" type="text/javascript" charset="utf-8" async="async"></script>';
+                    $script = '<script src="'.
+                        $this->router->generate(
+                        'mautic_focus_generate',
+                        ['id' => $id],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ).
+                    '" type="text/javascript" charset="utf-8" async="async"></script>';
                     $tokens[$token] = $script;
                 } else {
                     $tokens[$token] = '';

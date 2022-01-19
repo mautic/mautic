@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "MauticOutlookBundle",
+            "directory": "plugins/MauticOutlookBundle",
+            "target": "git@github.com:mautic/plugin-outlook.git"
+        }
+    ]
+}

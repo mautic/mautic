@@ -25,5 +25,7 @@ class ThisReleaseTest extends TestCase
         $this->assertNotEmpty($metadata->getMinSupportedPHPVersion(), 'A minimum PHP version is required');
         $this->assertNotEmpty($metadata->getMaxSupportedPHPVersion(), 'A maximum PHP version is required');
         $this->assertNotEmpty($metadata->getMinSupportedMauticVersion(), 'A minimum Mautic version this version can upgrade from is required');
+        $this->assertNotEmpty($metadata->getMinSupportedMySqlVersion(), 'A minimum MySQL version this version needs is required');
+        $this->assertNotEmpty($metadata->getMinSupportedMariaDbVersion(), 'A minimum MariaDB version this version needs is required');
     }
 }

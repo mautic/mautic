@@ -18,7 +18,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -38,13 +37,11 @@ class PageTestAbstract extends WebTestCase
     protected static $mockId   = 123;
     protected static $mockName = 'Mock test name';
     protected $mockTrackingId;
-    protected $container;
 
     protected function setUp(): void
     {
         self::bootKernel();
         $this->mockTrackingId = hash('sha1', uniqid(mt_rand(), true));
-        $this->container      = self::$kernel->getContainer();
     }
 
     /**
@@ -57,7 +54,7 @@ class PageTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $router = $this->container->get('router');
+        $router = self::$container->get('router');
 
         $ipLookupHelper = $this
             ->getMockBuilder(IpLookupHelper::class)

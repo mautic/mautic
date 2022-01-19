@@ -21,7 +21,6 @@ use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -82,11 +81,6 @@ class LeadSubscriber implements EventSubscriberInterface
     private $router;
 
     /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
      * @var LeadListRepository
      */
     private $segmentRepository;
@@ -108,8 +102,7 @@ class LeadSubscriber implements EventSubscriberInterface
         LeadModel $leadModel,
         TranslatorInterface $translator,
         EntityManager $entityManager,
-        RouterInterface $router,
-        CorePermissions $security
+        RouterInterface $router
     ) {
         $this->membershipManager         = $membershipManager;
         $this->eventCollector            = $eventCollector;
@@ -118,7 +111,6 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->translator                = $translator;
         $this->entityManager             = $entityManager;
         $this->router                    = $router;
-        $this->security                  = $security;
         $this->segmentRepository         = $entityManager->getRepository(LeadList::class);
         $this->contactEventLogRepository = $entityManager->getRepository(LeadEventLog::class);
         $this->contactRepository         = $entityManager->getRepository(CampaignLead::class);
@@ -204,10 +196,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $action = $event->wasAdded() ? 'added' : 'removed';
 
         //get campaigns for the list
-        $listCampaigns = $this->campaignModel->getRepository()->getPublishedCampaignsByLeadLists(
-            $list->getId(),
-            $this->security->isGranted('campaign:campaigns:viewother')
-        );
+        $listCampaigns = $this->campaignModel->getRepository()->getPublishedCampaignsByLeadLists($list->getId());
 
         $leadLists     = $this->leadModel->getLists($lead, true);
         $leadListIds   = array_keys($leadLists);

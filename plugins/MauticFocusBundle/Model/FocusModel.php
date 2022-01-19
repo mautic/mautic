@@ -247,7 +247,7 @@ class FocusModel extends FormModel
      */
     public function getContent(array $focus, $isPreview = false, $url = '#')
     {
-        $form = (!empty($focus['form'])) ? $this->formModel->getEntity($focus['form']) : null;
+        $form = (!empty($focus['form']) && 'form' === $focus['type']) ? $this->formModel->getEntity($focus['form']) : null;
 
         if (isset($focus['html_mode'])) {
             $htmlMode = $focus['html_mode'];
@@ -268,15 +268,20 @@ class FocusModel extends FormModel
         );
 
         // Form has to be generated outside of the content or else the form src will be converted to clickables
-        $formContent = (!empty($form)) ? $this->templating->getTemplating()->render(
+        $fields             = $form ? $form->getFields()->toArray() : [];
+        [$pages, $lastPage] = $this->formModel->getPages($fields);
+        $formContent        = (!empty($form)) ? $this->templating->getTemplating()->render(
             'MauticFocusBundle:Builder:form.html.php',
             [
-                'form'          => $form,
-                'style'         => $focus['style'],
-                'focusId'       => $focus['id'],
-                'preview'       => $isPreview,
-                'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
-                'companyFields' => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'form'           => $form,
+                'pages'          => $pages,
+                'lastPage'       => $lastPage,
+                'style'          => $focus['style'],
+                'focusId'        => $focus['id'],
+                'preview'        => $isPreview,
+                'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
+                'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'viewOnlyFields' => $this->formModel->getCustomComponents()['viewOnlyFields'],
             ]
         ) : '';
 
