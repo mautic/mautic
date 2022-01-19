@@ -508,44 +508,44 @@ class LeadSubscriber implements EventSubscriberInterface
                 $icon = 'fa-tag';
                 if (isset($utmTag['utm_medium'])) {
                     switch (strtolower($utmTag['utm_medium'])) {
-                            case 'social':
-                            case 'socialmedia':
-                                $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'share-alt');
-                                break;
-                            case 'email':
-                            case 'newsletter':
-                                $icon = 'fa-envelope-o';
-                                break;
-                            case 'banner':
-                            case 'ad':
-                                $icon = 'fa-bullseye';
-                                break;
-                            case 'cpc':
-                                $icon = 'fa-money';
-                                break;
-                            case 'location':
-                                $icon = 'fa-map-marker';
-                                break;
-                            case 'device':
-                                $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'tablet');
-                                break;
-                        }
+                        case 'social':
+                        case 'socialmedia':
+                            $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'share-alt');
+                            break;
+                        case 'email':
+                        case 'newsletter':
+                            $icon = 'fa-envelope-o';
+                            break;
+                        case 'banner':
+                        case 'ad':
+                            $icon = 'fa-bullseye';
+                            break;
+                        case 'cpc':
+                            $icon = 'fa-money';
+                            break;
+                        case 'location':
+                            $icon = 'fa-map-marker';
+                            break;
+                        case 'device':
+                            $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'tablet');
+                            break;
+                    }
                 }
                 $event->addEvent(
-                        [
-                            'event'      => $eventTypeKey,
-                            'eventType'  => $eventTypeName,
-                            'eventId'    => $eventTypeKey.$utmTag['id'],
-                            'eventLabel' => !empty($utmTag) ? $utmTag['utm_campaign'] : 'UTM Tags',
-                            'timestamp'  => $utmTag['date_added'],
-                            'icon'       => $icon,
-                            'extra'      => [
-                                'utmtags' => $utmTag,
-                            ],
-                            'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:utmadded.html.php',
-                            'contactId'       => $utmTag['lead_id'],
-                        ]
-                    );
+                    [
+                        'event'      => $eventTypeKey,
+                        'eventType'  => $eventTypeName,
+                        'eventId'    => $eventTypeKey.$utmTag['id'],
+                        'eventLabel' => !empty($utmTag) ? $utmTag['utm_campaign'] : 'UTM Tags',
+                        'timestamp'  => $utmTag['date_added'],
+                        'icon'       => $icon,
+                        'extra'      => [
+                            'utmtags' => $utmTag,
+                        ],
+                        'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:utmadded.html.php',
+                        'contactId'       => $utmTag['lead_id'],
+                    ]
+                );
             }
         } else {
             // Purposively not including this in engagements graph as the engagement is counted by the page hit
@@ -656,28 +656,28 @@ class LeadSubscriber implements EventSubscriberInterface
                 }
                 $eventLabel = $this->translator->trans('mautic.lead.import.contact.action.'.$import['action'], ['%name%' => $eventLabel]);
                 $event->addEvent(
-                        [
-                            'event'      => $eventTypeKey,
-                            'eventId'    => $eventTypeKey.$import['id'],
-                            'eventType'  => $eventTypeName,
-                            'eventLabel' => !empty($import['object_id']) ? [
-                                'label' => $eventLabel,
-                                'href'  => $this->router->generate(
-                                    'mautic_import_action',
-                                    [
-                                        'objectAction' => 'view',
-                                        'object'       => 'lead',
-                                        'objectId'     => $import['object_id'],
-                                    ]
-                                ),
-                            ] : $eventLabel,
-                            'timestamp'       => $import['date_added'],
-                            'icon'            => 'fa-download',
-                            'extra'           => $import,
-                            'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:import.html.php',
-                            'contactId'       => $import['lead_id'],
-                        ]
-                    );
+                    [
+                        'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$import['id'],
+                        'eventType'  => $eventTypeName,
+                        'eventLabel' => !empty($import['object_id']) ? [
+                            'label' => $eventLabel,
+                            'href'  => $this->router->generate(
+                                'mautic_import_action',
+                                [
+                                    'objectAction' => 'view',
+                                    'object'       => 'lead',
+                                    'objectId'     => $import['object_id'],
+                                ]
+                            ),
+                        ] : $eventLabel,
+                        'timestamp'       => $import['date_added'],
+                        'icon'            => 'fa-download',
+                        'extra'           => $import,
+                        'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:import.html.php',
+                        'contactId'       => $import['lead_id'],
+                    ]
+                );
             }
         } else {
             // Purposively not including this

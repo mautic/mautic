@@ -439,6 +439,7 @@ return [
                 'arguments' => [
                     'mautic.helper.file_uploader',
                     'mautic.helper.core_parameters',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.form.helper.token' => [

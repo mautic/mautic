@@ -43,10 +43,10 @@ $isCodeMode = ($active == $codeMode);
             $hasThumbnail  = true;
         else:
             $thumbnailName = 'thumbnail.png';
-            $hasThumbnail  = file_exists($themeInfo['dir'].'/'.$thumbnailName);
+            $hasThumbnail  = $themeInfo['hasThumbnail'] ?? false;
         endif;
         ?>
-        <?php $thumbnailUrl = $view['assets']->getUrl($themeInfo['themesLocalDir'].'/'.$themeKey.'/'.$thumbnailName); ?>
+        <?php $thumbnailUrl = $themeInfo['thumbnailUrl'] ?? ''; ?>
         <div class="col-md-3 theme-list">
             <div class="panel panel-default <?php echo $isSelected ? 'theme-selected' : ''; ?>">
                 <div class="panel-body text-center">

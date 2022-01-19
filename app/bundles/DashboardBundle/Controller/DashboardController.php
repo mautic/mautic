@@ -12,6 +12,9 @@
 namespace Mautic\DashboardBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\StorageDashboardDirectoryEvent;
+use Mautic\CoreBundle\Event\StorageDashboardFileEvent;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PhpVersionHelper;
@@ -394,6 +397,9 @@ class DashboardController extends AbstractFormController
             unlink($path);
         }
 
+        $fileStorageEvent = new StorageDashboardFileEvent($path);
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_REMOVE, $fileStorageEvent);
+
         return $this->redirect($this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']));
     }
 
@@ -417,13 +423,16 @@ class DashboardController extends AbstractFormController
         $dir  = $this->container->get('mautic.helper.paths')->getSystemPath("dashboard.$type");
         $path = $dir.'/'.$name.'.json';
 
-        if (!file_exists($path) || !is_readable($path)) {
+        $fileStorageEvent = new StorageDashboardFileEvent($path);
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $fileStorageEvent);
+
+        if (!($fileStorageEvent->existsInStorage() ?? (file_exists($path) || !is_readable($path)))) {
             $this->addFlash('mautic.dashboard.upload.filenotfound', [], 'error', 'validators');
 
             return $this->redirect($this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']));
         }
 
-        $widgets = json_decode(file_get_contents($path), true);
+        $widgets = json_decode($fileStorageEvent->existsInStorage() ? $fileStorageEvent->getContents() : file_get_contents($path), true);
         if (isset($widgets['widgets'])) {
             $widgets = $widgets['widgets'];
         }
@@ -478,6 +487,8 @@ class DashboardController extends AbstractFormController
                         $extension = pathinfo($fileData->getClientOriginalName(), PATHINFO_EXTENSION);
                         if ('json' === $extension) {
                             $fileData->move($directories['user'], $fileData->getClientOriginalName());
+                            $directoryStorageEvent = new StorageDashboardFileEvent($directories['user'].'/'.$fileData->getClientOriginalName());
+                            $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_UPLOAD, $directoryStorageEvent);
                         } else {
                             $form->addError(
                                 new FormError(
@@ -496,27 +507,36 @@ class DashboardController extends AbstractFormController
             }
         }
 
-        $dashboardFiles = ['user' => [], 'gobal' => []];
+        $dashboardFiles = ['user' => [], 'global' => []];
         $dashboards     = [];
-
         if (is_readable($directories['user'])) {
             // User specific layouts
             chdir($directories['user']);
-            $dashboardFiles['user'] = glob('*.json');
+
+            $directoryStorageEvent = new StorageDashboardDirectoryEvent($directories['user']);
+            $this->dispatcher->dispatch(CoreEvents::STORAGE_LIST_FILES, $directoryStorageEvent);
+
+            $dashboardFiles['user'] = $directoryStorageEvent->existsInStorage() ? $directoryStorageEvent->getFileNames() : glob('*.json');
         }
 
         if (is_readable($directories['global'])) {
             // Global dashboards
             chdir($directories['global']);
-            $dashboardFiles['global'] = glob('*.json');
-        }
 
+            $directoryStorageEvent = new StorageDashboardDirectoryEvent($directories['user']);
+            $this->dispatcher->dispatch(CoreEvents::STORAGE_LIST_FILES, $directoryStorageEvent);
+            $dashboardFiles['global'] = $directoryStorageEvent->existsInStorage() ? $directoryStorageEvent->getFileNames() : glob('*.json');
+        }
         foreach ($dashboardFiles as $type => $dirDashboardFiles) {
             $tempDashboard = [];
             foreach ($dirDashboardFiles as $dashId => $dashboard) {
-                $dashboard = str_replace('.json', '', $dashboard);
-                $config    = json_decode(
-                    file_get_contents($directories[$type].'/'.$dirDashboardFiles[$dashId]),
+                $dashboard         = str_replace('.json', '', $dashboard);
+
+                $directoryStorageEvent = new StorageDashboardFileEvent($directories[$type].'/'.$dirDashboardFiles[$dashId]);
+                $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $directoryStorageEvent);
+                $contents = $directoryStorageEvent->getContents() ?? file_get_contents($directories[$type].'/'.$dirDashboardFiles[$dashId]);
+                $config   = json_decode(
+                    $contents,
                     true
                 );
 

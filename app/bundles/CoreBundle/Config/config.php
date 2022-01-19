@@ -873,6 +873,8 @@ return [
                     'mautic.filesystem',
                     'symfony.finder',
                     'mautic.integrations.helper.builder_integrations',
+                    'event_dispatcher',
+                    'templating.helper.assets',
                 ],
                 'methodCalls' => [
                     'setDefaultTheme' => [

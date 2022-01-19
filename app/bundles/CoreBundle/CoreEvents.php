@@ -169,4 +169,40 @@ final class CoreEvents
      * @var string
      */
     const ON_GENERATED_COLUMNS_BUILD = 'mautic.on_generated_columns_build';
+
+    /**
+     * The mautic.storage_file_upload event is dispatched when file is upload.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\StorageFileEventInterface instance.
+     *
+     * @var string
+     */
+    const STORAGE_FILE_UPLOAD = 'mautic.storage_file_upload';
+
+    /**
+     * The mautic.storage_file_read event is dispatched when file is requested.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\StorageFileEventInterface instance.
+     *
+     * @var string
+     */
+    const STORAGE_FILE_READ = 'mautic.storage_file_read';
+
+    /**
+     * The mautic.storage_remove event is dispatched when file or directory is removed.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\StorageEventInterface instance.
+     *
+     * @var string
+     */
+    const STORAGE_REMOVE = 'mautic.storage_remove';
+
+    /**
+     * The mautic.storage_files_list event is dispatched when requested a list of files from directory.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\StorageFileEventInterface instance.
+     *
+     * @var string
+     */
+    const STORAGE_LIST_FILES = 'mautic.storage_list_files';
 }

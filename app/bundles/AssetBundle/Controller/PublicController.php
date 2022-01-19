@@ -12,6 +12,8 @@
 namespace Mautic\AssetBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\StorageAssetFileEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -69,7 +71,11 @@ class PublicController extends CommonFormController
                 try {
                     //set the uploadDir
                     $entity->setUploadDir($this->get('mautic.helper.core_parameters')->get('upload_dir'));
-                    $contents = $entity->getFileContents();
+
+                    $fileStorageEvent = new StorageAssetFileEvent($entity->getFilePath());
+                    $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $fileStorageEvent);
+                    $contents = $fileStorageEvent->existsInStorage() ? $fileStorageEvent->getContents() : $entity->getFileContents();
+
                     $model->trackDownload($entity, $this->request, 200);
                 } catch (\Exception $e) {
                     $model->trackDownload($entity, $this->request, 404);

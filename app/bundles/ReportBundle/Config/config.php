@@ -233,6 +233,7 @@ return [
                     'mautic.helper.file_path_resolver',
                     'mautic.helper.file_properties',
                     'mautic.helper.core_parameters',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.report.model.message_schedule' => [

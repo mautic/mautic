@@ -239,6 +239,7 @@ class ThemeController extends FormController
     {
         $flashes     = [];
         $themeHelper = $this->container->get('mautic.helper.theme');
+        $themeHelper->getInstalledThemes();
 
         if (!$themeHelper->exists($themeName)) {
             $flashes[] = [

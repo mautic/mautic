@@ -11,6 +11,8 @@
 
 namespace Mautic\DashboardBundle\Model;
 
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\StorageDashboardFileEvent;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -163,6 +165,9 @@ class DashboardModel extends FormModel
         $filename = InputHelper::filename($name, 'json');
         $path     = $dir.'/'.$filename;
         $this->filesystem->dumpFile($path, json_encode($this->toArray($name)));
+
+        $fileStorageEvent = new StorageDashboardFileEvent($path);
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_UPLOAD, $fileStorageEvent);
     }
 
     /**

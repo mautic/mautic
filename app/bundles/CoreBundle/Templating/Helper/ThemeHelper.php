@@ -46,11 +46,16 @@ class ThemeHelper
      * @throws BadConfigurationException
      * @throws FileNotFoundException
      */
-    public function __construct(PathsHelper $pathsHelper, $theme)
+    public function __construct(PathsHelper $pathsHelper, $theme, ?array $themesConfig = null)
     {
         $this->theme     = $theme;
         $this->themeDir  = $pathsHelper->getSystemPath('themes').'/'.$this->theme;
         $this->themePath = $pathsHelper->getSystemPath('themes_root').'/'.$this->themeDir;
+        if (isset($themesConfig[$this->theme])) {
+            $this->config = $themesConfig[$this->theme];
+
+            return;
+        }
 
         // check to make sure the theme exists
         if (!file_exists($this->themePath)) {

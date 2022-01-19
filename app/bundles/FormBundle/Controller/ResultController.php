@@ -12,12 +12,15 @@
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\StorageFormFileEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionResultLoader;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -220,6 +223,20 @@ class ResultController extends CommonFormController
 
         $fileName = $results[$field];
         $file     = $formUploader->getCompleteFilePath($fieldEntity, $fileName);
+
+        $fileStorageEvent = new StorageFormFileEvent($file);
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $fileStorageEvent);
+
+        if ($fileStorageEvent->existsInStorage()) {
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/octet-stream');
+            $response->headers->set('Content-Length', strlen($fileStorageEvent->getContents()));
+            $response->headers->set('Content-Disposition', 'attachment;filename="'.$fileName.'"');
+
+            $response->setContent($fileStorageEvent->getContents());
+
+            return $response;
+        }
 
         $fs = new Filesystem();
         if (!$fs->exists($file)) {

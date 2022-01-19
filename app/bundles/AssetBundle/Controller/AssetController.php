@@ -11,7 +11,10 @@
 
 namespace Mautic\AssetBundle\Controller;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\StorageAssetFileEvent;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -242,11 +245,14 @@ class AssetController extends FormController
         $download = $this->request->query->get('download', 0);
         $stream   = $this->request->query->get('stream', 0);
 
+        $fileStorageEvent = new StorageAssetFileEvent($activeAsset->getFilePath());
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $fileStorageEvent);
+
         if ('1' === $download || '1' === $stream) {
             try {
                 //set the uploadDir
                 $activeAsset->setUploadDir($this->get('mautic.helper.core_parameters')->get('upload_dir'));
-                $contents = $activeAsset->getFileContents();
+                $contents = $fileStorageEvent->existsInStorage() ? $fileStorageEvent->getContents() : $activeAsset->getFileContents();
             } catch (\Exception $e) {
                 return $this->notFound();
             }
@@ -264,7 +270,7 @@ class AssetController extends FormController
         return $this->delegateView([
             'viewParameters' => [
                 'activeAsset'      => $activeAsset,
-                'assetDownloadUrl' => $model->generateUrl($activeAsset),
+                'assetDownloadUrl' => $fileStorageEvent->existsInStorage() ? $fileStorageEvent->getUrl() : $model->generateUrl($activeAsset),
             ],
             'contentTemplate' => 'MauticAssetBundle:Asset:preview.html.php',
             'passthroughVars' => [
@@ -333,6 +339,9 @@ class AssetController extends FormController
                     $entity->setUploadDir($this->get('mautic.helper.core_parameters')->get('upload_dir'));
                     $entity->preUpload();
                     $entity->upload();
+
+                    $fileStorageEvent = new StorageAssetFileEvent($entity->getFilePath());
+                    $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_UPLOAD, $fileStorageEvent);
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
@@ -499,6 +508,9 @@ class AssetController extends FormController
                     $entity->preUpload();
                     $entity->upload();
 
+                    $event = new StorageAssetFileEvent($entity->getFilePath());
+                    $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_UPLOAD, $event);
+
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
@@ -656,6 +668,9 @@ class AssetController extends FormController
 
             $entity->removeUpload();
             $model->deleteEntity($entity);
+
+            $event = new StorageAssetFileEvent($entity->getFilePath());
+            $this->dispatcher->dispatch(CoreEvents::STORAGE_REMOVE, $event);
 
             $flashes[] = [
                 'type'    => 'notice',

@@ -14,11 +14,14 @@ namespace Mautic\EmailBundle\Controller;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
+use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+use Mautic\CoreBundle\Event\StorageThemeFileEvent;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
@@ -972,18 +975,32 @@ class EmailController extends FormController
 
         $this->processSlots($slots, $entity);
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.php');
+        $templateName      = ':'.$template.':email.html.php';
+
+        /** @var ThemeHelper $themeHelper */
+        $themeHelper    = $this->factory->getHelper('theme');
+        $theme          = $themeHelper->parseTheme($templateName);
+
+        $logicalName               = $themeHelper->checkForTwigTemplate($templateName);
+        $viewparameters            = [
+            'isNew'    => $isNew,
+            'slots'    => $slots,
+            'content'  => $content,
+            'email'    => $entity,
+            'template' => $template,
+            'basePath' => $this->request->getBasePath(),
+        ];
+
+        $fileStorageEvent = new StorageThemeFileEvent($theme->getPath());
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $fileStorageEvent);
+
+        if ($fileStorageEvent->existsInStorage()) {
+            return new JsonResponse($this->get('twig')->createTemplate($fileStorageEvent->getContents())->render($viewparameters));
+        }
 
         return $this->render(
             $logicalName,
-            [
-                'isNew'    => $isNew,
-                'slots'    => $slots,
-                'content'  => $content,
-                'email'    => $entity,
-                'template' => $template,
-                'basePath' => $this->request->getBasePath(),
-            ]
+            $viewparameters
         );
     }
 

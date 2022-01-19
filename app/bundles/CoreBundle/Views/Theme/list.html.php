@@ -58,8 +58,8 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                 <?php if (!empty($item['config']['onlyForBC'])) {
                     continue;
                 } ?>
-                <?php $thumbnailUrl = $view['assets']->getUrl('themes/'.$k.'/thumbnail.png'); ?>
-                <?php $hasThumbnail = file_exists($item['dir'].'/thumbnail.png'); ?>
+                <?php $thumbnailUrl = $item['thumbnailUrl']; ?>
+                <?php $hasThumbnail = $item['hasThumbnail']; ?>
                 <tr>
                     <td>
                         <?php

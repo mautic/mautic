@@ -11,6 +11,9 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\StorageBuilderDirectoryEvent;
+use Mautic\CoreBundle\Event\StorageBuilderFileEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -50,7 +53,11 @@ class FileController extends AjaxController
                 if (in_array($file->getMimeType(), $this->imageMimes)) {
                     $fileName = md5(uniqid()).'.'.$file->guessExtension();
                     $file->move($mediaDir, $fileName);
-                    $this->successfulResponse($fileName, $editor);
+
+                    $fileStorageEvent = new StorageBuilderFileEvent($mediaDir.'/'.$fileName);
+                    $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_UPLOAD, $fileStorageEvent);
+
+                    $this->successfulResponse($fileStorageEvent->existsInStorage() ? $fileStorageEvent->getUrl() : $fileName, $editor);
                 } else {
                     $this->failureResponse($editor);
                 }
@@ -67,9 +74,18 @@ class FileController extends AjaxController
      */
     public function listAction()
     {
-        $fnames = scandir($this->getMediaAbsolutePath());
+        $directoryStorageEvent = new StorageBuilderDirectoryEvent($this->getMediaAbsolutePath());
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_LIST_FILES, $directoryStorageEvent);
 
-        if ($fnames) {
+        if (is_array($directoryStorageEvent->getFiles())) {
+            foreach ($directoryStorageEvent->getFiles() as $file) {
+                $this->response[] = [
+                    'url'   => $file,
+                    'thumb' => $file,
+                    'name'  => pathinfo($file, PATHINFO_BASENAME),
+                ];
+            }
+        } elseif ($fnames = scandir($this->getMediaAbsolutePath())) {
             foreach ($fnames as $name) {
                 $imagePath = $this->getMediaAbsolutePath().'/'.$name;
                 $imageUrl  = $this->getMediaUrl().'/'.$name;
@@ -99,7 +115,12 @@ class FileController extends AjaxController
         $response  = ['deleted' => false];
         $imagePath = $this->getMediaAbsolutePath().'/'.basename($src);
 
-        if (!file_exists($imagePath)) {
+        $fileStorageEvent = new StorageBuilderFileEvent($imagePath);
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_REMOVE, $fileStorageEvent);
+
+        if ($fileStorageEvent->wasRemoved()) {
+            $this->response['deleted'] = true;
+        } elseif (!file_exists($imagePath)) {
             $this->response['error'] = 'File does not exist';
             $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
         } elseif (!is_writable($imagePath)) {
@@ -153,9 +174,9 @@ class FileController extends AjaxController
         $filePath = $this->getMediaUrl().'/'.$fileName;
         if (self::EDITOR_CKEDITOR === $editor) {
             $this->response['uploaded'] = true;
-            $this->response['url']      = $filePath;
+            $this->response['url']      = parse_url($fileName, PHP_URL_SCHEME) ? $fileName : $filePath;
         } else {
-            $this->response['link'] = $filePath;
+            $this->response['link'] = parse_url($fileName, PHP_URL_SCHEME) ? $fileName : $filePath;
         }
     }
 

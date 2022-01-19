@@ -12,6 +12,8 @@
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\ORMException;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\StorageImportFileEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -198,13 +200,17 @@ class ImportModel extends FormModel
             throw new ImportFailedException($msg);
         }
 
-        if (!$import->canProceed()) {
+        $fileStorageEvent = new StorageImportFileEvent($import->getFilePath());
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $fileStorageEvent);
+
+        $existFile = $fileStorageEvent->existsInStorage() ?? $import->existFile();
+
+        if (!$existFile && !$import->canProceed()) {
             $this->saveEntity($import);
             $msg = 'import cannot be processed because '.$import->getStatusInfo();
             $this->logDebug($msg, $import);
             throw new ImportFailedException($msg);
         }
-
         if (!$this->checkParallelImportLimit()) {
             $info = $this->translator->trans(
                 'mautic.lead.import.parallel.limit.hit',
@@ -234,7 +240,6 @@ class ImportModel extends FormModel
         // Save the start changes so the user could see it
         $this->saveEntity($import);
         $this->logDebug('The background import is about to start', $import);
-
         try {
             if (!$this->process($import, $progress, $limit)) {
                 throw new ImportFailedException($import->getStatusInfo());
@@ -286,7 +291,18 @@ class ImportModel extends FormModel
         ini_set('auto_detect_line_endings', true);
 
         try {
-            $file = new \SplFileObject($import->getFilePath());
+            $fileStorageEvent = new StorageImportFileEvent($import->getFilePath());
+            $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $fileStorageEvent);
+            if ($fileStorageEvent->existsInStorage()) {
+                // create SplFileObject from content  https://stackoverflow.com/a/17626665
+                $file = 'php://memory';
+                $o    = new \SplFileObject($file, 'w+');
+                $o->fwrite($fileStorageEvent->getContents());
+                $o->rewind();
+                $file = $o;
+            } else {
+                $file = new \SplFileObject($import->getFilePath());
+            }
         } catch (\Exception $e) {
             $import->setStatusInfo('SplFileObject cannot read the file. '.$e->getMessage());
             $import->setStatus(Import::FAILED);
@@ -351,11 +367,11 @@ class ImportModel extends FormModel
                 $data = array_combine($headers, $data);
 
                 try {
-                    $event = new ImportProcessEvent($import, $eventLog, $data);
+                    $fileStorageEvent = new ImportProcessEvent($import, $eventLog, $data);
 
-                    $this->dispatcher->dispatch(LeadEvents::IMPORT_ON_PROCESS, $event);
+                    $this->dispatcher->dispatch(LeadEvents::IMPORT_ON_PROCESS, $fileStorageEvent);
 
-                    if ($event->wasMerged()) {
+                    if ($fileStorageEvent->wasMerged()) {
                         $this->logDebug('Entity on line '.$lineNumber.' has been updated', $import);
                         $import->increaseUpdatedCount();
                     } else {

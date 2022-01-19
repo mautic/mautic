@@ -241,6 +241,11 @@ class Import extends FormEntity
             return false;
         }
 
+        return true;
+    }
+
+    public function existFile(): bool
+    {
         if (false === file_exists($this->getFilePath()) || false === is_readable($this->getFilePath())) {
             $this->setStatus(self::FAILED);
             $this->setStatusInfo($this->getFile().' not found');

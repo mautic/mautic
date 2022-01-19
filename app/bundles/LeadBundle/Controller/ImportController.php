@@ -12,6 +12,8 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\StorageImportFileEvent;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Event\ImportInitEvent;
@@ -25,6 +27,7 @@ use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -291,6 +294,7 @@ class ImportController extends FormController
                                 unlink($fullPath);
                             }
 
+                            /** @var UploadedFile $fileData */
                             $fileData = $form['file']->getData();
                             if (!empty($fileData)) {
                                 $errorMessage    = null;
@@ -435,6 +439,9 @@ class ImportController extends FormController
                             $importModel->saveEntity($import);
 
                             $session->set('mautic.'.$object.'.import.id', $import->getId());
+
+                            $fileStorageEvent = new StorageImportFileEvent($fullPath);
+                            $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_UPLOAD, $fileStorageEvent);
 
                             // In case the user decided to queue the import
                             if ($this->importInCli($form, $object)) {

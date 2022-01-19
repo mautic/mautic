@@ -12,6 +12,8 @@
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\StorageReportFileEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -21,6 +23,7 @@ use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
 use Mautic\ReportBundle\Model\ExportResponse;
 use Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class ReportController extends FormController
@@ -860,6 +863,24 @@ class ReportController extends FormController
 
         if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
             return $this->accessDenied();
+        }
+
+        $absolutePathToFile = $fileHandler->getPathToCompressedCsvFileForReport($report);
+        $fileStorageEvent   = new StorageReportFileEvent($absolutePathToFile);
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $fileStorageEvent);
+
+        if ($fileStorageEvent->existsInStorage()) {
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/octet-stream');
+            $response->headers->set('Content-Length', strlen($fileStorageEvent->getContents()));
+            $response->headers->set(
+                'Content-Disposition',
+                'attachment;filename="'.pathinfo($absolutePathToFile, PATHINFO_BASENAME).'"'
+            );
+
+            $response->setContent($fileStorageEvent->getContents());
+
+            return $response;
         }
 
         if (!$fileHandler->compressedCsvFileForReportExists($report)) {

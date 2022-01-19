@@ -11,12 +11,17 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\StorageThemeDirectoryEvent;
+use Mautic\CoreBundle\Event\StorageThemeFileEvent;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileExistsException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
+use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\TemplateReference;
@@ -35,9 +40,18 @@ class ThemeHelper
     private $templatingHelper;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    private ?array $themesConfig = null;
+
+    /**
      * @var TranslatorInterface
      */
     private $translator;
+
+    private AssetsHelper $assetsHelper;
 
     /**
      * @var array|mixed
@@ -119,7 +133,9 @@ class ThemeHelper
         CoreParametersHelper $coreParametersHelper,
         Filesystem $filesystem,
         Finder $finder,
-        BuilderIntegrationsHelper $builderIntegrationsHelper
+        BuilderIntegrationsHelper $builderIntegrationsHelper,
+        EventDispatcherInterface $dispatcher,
+        AssetsHelper $assetsHelper
     ) {
         $this->pathsHelper               = $pathsHelper;
         $this->templatingHelper          = $templatingHelper;
@@ -128,6 +144,8 @@ class ThemeHelper
         $this->builderIntegrationsHelper = $builderIntegrationsHelper;
         $this->filesystem                = clone $filesystem;
         $this->finder                    = clone $finder;
+        $this->dispatcher                = $dispatcher;
+        $this->assetsHelper              = $assetsHelper;
     }
 
     /**
@@ -162,7 +180,7 @@ class ThemeHelper
             $themeName = $this->defaultTheme;
         }
 
-        return new TemplatingThemeHelper($this->pathsHelper, $themeName);
+        return new TemplatingThemeHelper($this->pathsHelper, $themeName, $this->themesConfig);
     }
 
     /**
@@ -185,7 +203,12 @@ class ThemeHelper
         $root    = $this->pathsHelper->getSystemPath('themes', true).'/';
         $dirName = $this->getDirectoryName($theme);
 
-        return $this->filesystem->exists($root.$dirName);
+        $themePath = $root.$dirName;
+
+        $fileEvent = new StorageThemeFileEvent($themePath);
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $fileEvent);
+
+        return $fileEvent->existsInStorage() ?? $this->filesystem->exists($themePath);
     }
 
     /**
@@ -260,7 +283,10 @@ class ThemeHelper
             throw new FileNotFoundException($theme.' not found!');
         }
 
-        $this->filesystem->remove($root.$theme);
+        $directoryStorageEvent = new StorageThemeDirectoryEvent($root.$theme);
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_REMOVE, $directoryStorageEvent);
+
+        $directoryStorageEvent->wasRemoved() ?? $this->filesystem->remove($root.$theme);
     }
 
     /**
@@ -300,6 +326,14 @@ class ThemeHelper
         return $minors;
     }
 
+    public function parseTheme(string $template)
+    {
+        $twigTemplate = $this->templatingHelper->getTemplateNameParser()->parse($template);
+        $twigTemplate->set('engine', 'twig');
+
+        return $twigTemplate;
+    }
+
     /**
      * @param string $template
      *
@@ -314,7 +348,6 @@ class ThemeHelper
 
         $twigTemplate = clone $template;
         $twigTemplate->set('engine', 'twig');
-
         // Does a twig version exist?
         if ($templating->exists($twigTemplate)) {
             return $twigTemplate->getLogicalName();
@@ -478,11 +511,14 @@ class ThemeHelper
         if ($missingFiles = array_diff($requiredFiles, $foundRequiredFiles)) {
             throw new FileNotFoundException($this->translator->trans('mautic.core.theme.missing.files', ['%files%' => implode(', ', $missingFiles)], 'validators'));
         }
-
         // Extract the archive file now
         if (!$zipper->extractTo($themePath, $allowedFiles)) {
-            throw new \Exception('mautic.core.update.error_extracting_package');
+            throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
         } else {
+            foreach ($allowedFiles as $allowedFile) {
+                $fileStorageEvent = new StorageThemeFileEvent($themePath.DIRECTORY_SEPARATOR.$allowedFile);
+                $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_UPLOAD, $fileStorageEvent);
+            }
             $zipper->close();
             unlink($zipFile);
 
@@ -536,21 +572,30 @@ class ThemeHelper
      */
     public function zip($themeName)
     {
-        $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
-        $tmpPath   = $this->pathsHelper->getSystemPath('cache', true).'/tmp_'.$themeName.'.zip';
-        $zipper    = new \ZipArchive();
-
+        $themePath      = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
+        $tmpPath        = $this->pathsHelper->getSystemPath('cache', true).'/tmp_'.$themeName.'.zip';
+        $zipper         = new \ZipArchive();
+        $directoryEvent = new StorageThemeDirectoryEvent($themePath);
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_LIST_FILES, $directoryEvent);
+        $files = $directoryEvent->getFiles();
         if ($this->filesystem->exists($tmpPath)) {
             $this->filesystem->remove($tmpPath);
         }
-
         $archive = $zipper->open($tmpPath, \ZipArchive::CREATE);
-
-        $this->finder->files()->in($themePath);
 
         if (true !== $archive) {
             throw new \Exception($this->getExtractError($archive));
         } else {
+            foreach ($files as $file) {
+                if (!pathinfo($file, PATHINFO_EXTENSION)) {
+                    continue;
+                }
+                $absolutePathToFile = $this->pathsHelper->getSystemPath('themes_root', true).DIRECTORY_SEPARATOR.$file;
+                $fileEvent          = new StorageThemeFileEvent($absolutePathToFile);
+                $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $fileEvent);
+                $zipper->addFromString(str_replace($themePath, '', $absolutePathToFile), $fileEvent->getContents());
+            }
+
             foreach ($this->finder as $file) {
                 $filePath  = $file->getRealPath();
                 $localPath = $file->getRelativePathname();
@@ -601,46 +646,68 @@ class ThemeHelper
 
     private function loadThemes(string $specificFeature, bool $includeDirs, string $key): void
     {
+        static $themes;
+        static $directoryEvent;
+        static $dir;
+
         if (!$this->themesLoadedFromFilesystem) {
             $this->themesLoadedFromFilesystem = true;
             // prevent the finder from duplicating directories in its internal state
             // https://symfony.com/doc/current/components/finder.html#usage
-            $dir = $this->pathsHelper->getSystemPath('themes', true);
+            $dir            = $this->pathsHelper->getSystemPath('themes', true);
+            $directoryEvent = new StorageThemeDirectoryEvent($dir);
+            $this->dispatcher->dispatch(CoreEvents::STORAGE_LIST_FILES, $directoryEvent);
             $this->finder->directories()->depth('0')->ignoreDotFiles(true)->in($dir)->sortByName();
+            $themes = $directoryEvent->existsInStorage() ? $directoryEvent->getRootDirectories() : $this->finder;
         }
-
         $this->themes[$key]     = [];
         $this->themesInfo[$key] = [];
+        foreach ($themes as $theme) {
+            if (is_string($theme)) {
+                $theme = new \SplFileInfo($theme);
+            }
+            $themeDirname   = $theme->getBasename();
+            $realPath       = $dir.DIRECTORY_SEPARATOR.$themeDirname;
+            $themeDirectory = $this->pathsHelper->getSystemPath('themes').DIRECTORY_SEPARATOR.$themeDirname;
+            $configFile     = $realPath.'/config.json';
 
-        foreach ($this->finder as $theme) {
-            if (!$this->filesystem->exists($theme->getRealPath().'/config.json')) {
+            $thumbnailFileEvent = new StorageThemeFileEvent($configFile);
+            $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $thumbnailFileEvent);
+            $isFileValid = $thumbnailFileEvent->existsInStorage() ?? $this->filesystem->exists($configFile);
+            if (!$isFileValid) {
                 continue;
             }
 
-            $config = json_decode($this->filesystem->readFile($theme->getRealPath().'/config.json'), true);
+            $configContent = $thumbnailFileEvent->existsInStorage() ? $thumbnailFileEvent->getContents() : $this->filesystem->readFile($configFile);
+            $config        = json_decode($configContent, true);
 
             if (!$this->shouldLoadTheme($config, $specificFeature)) {
                 continue;
             }
 
-            $this->themes[$key][$theme->getBasename()] = $config['name'];
-
-            $this->themesInfo[$key][$theme->getBasename()]           = [];
-            $this->themesInfo[$key][$theme->getBasename()]['name']   = $config['name'];
-            $this->themesInfo[$key][$theme->getBasename()]['key']    = $theme->getBasename();
+            $this->themes[$key][$themeDirname]             = $config['name'];
+            $this->themesInfo[$key][$themeDirname]         = [];
+            $this->themesInfo[$key][$themeDirname]['name'] = $config['name'];
+            $this->themesInfo[$key][$themeDirname]['key']  = $themeDirname;
 
             // fix for legacy themes who do not have a builder configured
             if (empty($config['builder']) || !is_array($config['builder'])) {
                 $config['builder'] = ['legacy'];
             }
-            $this->themesInfo[$key][$theme->getBasename()]['config'] = $config;
+            $this->themesInfo[$key][$themeDirname]['config'] = $config;
 
             if (!$includeDirs) {
                 continue;
             }
 
-            $this->themesInfo[$key][$theme->getBasename()]['dir']            = $theme->getRealPath();
-            $this->themesInfo[$key][$theme->getBasename()]['themesLocalDir'] = $this->pathsHelper->getSystemPath('themes');
+            $this->themesInfo[$key][$themeDirname]['dir']            = $realPath;
+            $this->themesInfo[$key][$themeDirname]['themesLocalDir'] = $this->pathsHelper->getSystemPath('themes');
+            $this->themesConfig[$themeDirname]                       = $config;
+            $thumbnailFile                                           = $realPath.'/thumbnail.png';
+            $thumbnailFileEvent                                      = new StorageThemeFileEvent($thumbnailFile);
+            $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $thumbnailFileEvent);
+            $this->themesInfo[$key][$themeDirname]['hasThumbnail']  = $thumbnailFileEvent->existsInStorage() ?? file_exists($realPath.'/thumbnail.png');
+            $this->themesInfo[$key][$themeDirname]['thumbnailUrl']  = $thumbnailFileEvent->existsInStorage() ? $thumbnailFileEvent->getUrl() : $this->assetsHelper->getUrl($themeDirectory, null, null, true);
         }
     }
 

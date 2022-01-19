@@ -11,6 +11,8 @@
 
 namespace Mautic\FormBundle\Helper;
 
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\StorageFormFileEvent;
 use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileUploader;
@@ -18,9 +20,15 @@ use Mautic\FormBundle\Crate\UploadFileCrate;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FormUploader
 {
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
     /**
      * @var FileUploader
      */
@@ -31,10 +39,11 @@ class FormUploader
      */
     private $coreParametersHelper;
 
-    public function __construct(FileUploader $fileUploader, CoreParametersHelper $coreParametersHelper)
+    public function __construct(FileUploader $fileUploader, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher)
     {
         $this->fileUploader         = $fileUploader;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->dispatcher           = $dispatcher;
     }
 
     /**
@@ -55,7 +64,10 @@ class FormUploader
                 $result[$alias]  = $fileName;
                 $uploadedFile    = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
                 $this->fixRotationJPG($uploadedFile);
-                $uploadedFiles[] =$uploadedFile;
+                $uploadedFiles[] = $uploadedFile;
+
+                $fileStorageEvent = new StorageFormFileEvent($uploadedFile);
+                $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_UPLOAD, $fileStorageEvent);
             }
             $submission->setResults($result);
         } catch (FileUploadException $e) {

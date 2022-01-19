@@ -13,15 +13,20 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Scheduler\Model;
 
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\StorageReportFileEvent;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Exception\FileTooBigException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FileHandler
 {
+    private EventDispatcherInterface $dispatcher;
+
     /**
      * @var FilePathResolver
      */
@@ -40,11 +45,13 @@ class FileHandler
     public function __construct(
         FilePathResolver $filePathResolver,
         FileProperties $fileProperties,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher
     ) {
         $this->filePathResolver     = $filePathResolver;
         $this->fileProperties       = $fileProperties;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->dispatcher           = $dispatcher;
     }
 
     /**
@@ -101,7 +108,13 @@ class FileHandler
         $compressedCsvPath = $this->getPathToCompressedCsvFileForReport($report);
 
         $this->filePathResolver->delete($compressedCsvPath);
+
+        $fileStorageEvent = new StorageReportFileEvent($compressedCsvPath);
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_REMOVE, $fileStorageEvent);
+
         $this->filePathResolver->createDirectory(dirname($compressedCsvPath));
         $this->filePathResolver->move($originalPath, $compressedCsvPath);
+
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_UPLOAD, $fileStorageEvent);
     }
 }
