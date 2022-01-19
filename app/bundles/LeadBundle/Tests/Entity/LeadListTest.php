@@ -206,7 +206,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         yield [0, false, []];
         yield ['string', true, ['isPreferenceCenter' => [false, true]]];
     }
-    
+
     public function testThatInitializeLastBuiltTimeMethodWorks(): void
     {
         $leadList = new LeadList();
