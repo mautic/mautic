@@ -33,6 +33,7 @@ class SchemaDefinition
             ];
         }
 
+        $schemaLength = null;
         switch ($type) {
             case 'datetime':
             case 'date':
@@ -49,10 +50,13 @@ class SchemaDefinition
             case 'email':
             case 'lookup':
             case 'select':
-            case 'multiselect':
             case 'region':
             case 'tel':
                 $schemaType = 'string';
+                break;
+            case 'multiselect':
+                $schemaType   = 'text';
+                $schemaLength = 65535;
                 break;
             case 'text':
                 $schemaType = (false !== strpos($alias, 'description')) ? 'text' : 'string';
@@ -64,7 +68,7 @@ class SchemaDefinition
         return [
             'name'    => $alias,
             'type'    => $schemaType,
-            'options' => ['notnull' => false],
+            'options' => ['notnull' => false, 'length' => $schemaLength],
         ];
     }
 
