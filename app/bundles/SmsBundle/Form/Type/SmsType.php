@@ -13,7 +13,6 @@ namespace Mautic\SmsBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;

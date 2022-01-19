@@ -12,12 +12,9 @@
 namespace Mautic\CoreBundle\Tests\Form;
 
 use Mautic\CoreBundle\Form\RequestTrait;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\DataMapperInterface;
-use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormFactoryBuilder;

@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
@@ -19,6 +20,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class SegmentFiltersSubscriber implements EventSubscriberInterface
 {
+    use OperatorListTrait;
     /**
      * @var TranslatorInterface
      */
@@ -48,6 +50,8 @@ class SegmentFiltersSubscriber implements EventSubscriberInterface
     public function filtersChoicesGenerate(LeadListFiltersChoicesEvent $event)
     {
         if (0 === strpos($event->getRoute(), 'mautic_segment_action')) {
+            $this->setIncludeExcludeOperatorsToTextFilters($event);
+
             foreach ($this->getSegmentFilters() as $choiceKey => $segmentFilter) {
                 $event->addChoice('lead', $choiceKey, $segmentFilter);
             }
@@ -560,5 +564,39 @@ class SegmentFiltersSubscriber implements EventSubscriberInterface
         ];
 
         return $choices;
+    }
+
+    private function setIncludeExcludeOperatorsToTextFilters(LeadListFiltersChoicesEvent $event): void
+    {
+        $choices = $event->getChoices();
+
+        foreach ($choices as $group=>$groups) {
+            foreach ($groups as $alias => $choice) {
+                $type = $choice['properties']['type'] ?? null;
+                if ('text' === $type) {
+                    $choices[$group][$alias]['operators'] = $this->getOperatorsForFieldType(
+                        [
+                            'include' => [
+                                '=',
+                                '!=',
+                                'empty',
+                                '!empty',
+                                'like',
+                                '!like',
+                                'regexp',
+                                '!regexp',
+                                'in',
+                                '!in',
+                                'startsWith',
+                                'endsWith',
+                                'contains',
+                            ],
+                        ]
+                    );
+                }
+            }
+        }
+
+        $event->setChoices($choices);
     }
 }
