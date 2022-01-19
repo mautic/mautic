@@ -23,9 +23,6 @@ class ConfigSaveEvent extends Event
      */
     private $integrationConfiguration;
 
-    /**
-     * ConfigSaveEvent constructor.
-     */
     public function __construct(Integration $integrationConfiguration)
     {
         $this->integrationConfiguration = $integrationConfiguration;

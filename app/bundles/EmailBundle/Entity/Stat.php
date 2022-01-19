@@ -21,6 +21,9 @@ use Mautic\LeadBundle\Entity\LeadList;
 
 class Stat
 {
+    /** @var int Limit number of stored 'openDetails' */
+    const MAX_OPEN_DETAILS = 1000;
+
     /**
      * @var int|null
      */
@@ -543,7 +546,9 @@ class Stat
      */
     public function addOpenDetails($details)
     {
-        $this->openDetails[] = $details;
+        if (self::MAX_OPEN_DETAILS > $this->getOpenCount()) {
+            $this->openDetails[] = $details;
+        }
 
         ++$this->openCount;
     }

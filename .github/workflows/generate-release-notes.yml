@@ -1,0 +1,33 @@
+name: Manually generate release notes
+on:
+  workflow_dispatch:
+    inputs:
+      milestone:
+        description: 'The milestone name (e.g. 4.0.0-alpha1)'
+        required: true
+        default: 'none'
+
+jobs:
+  release-notes:
+    name: Create draft release
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Generate release notes for milestone ${{ github.event.inputs.milestone }}
+      run: |
+        # Download changelog generator
+        wget -q https://github.com/spring-io/github-changelog-generator/releases/download/v0.0.5/github-changelog-generator.jar
+
+        # Copy of release-notes.yml to root folder needed, since the Jar can't read from hidden folders anymore (bug): https://github.com/Decathlon/release-notes-generator-action/pull/21
+        cp ./.github/release-notes.yml ./release-notes.yml
+        java -jar ./github-changelog-generator.jar --spring.config.location="./release-notes.yml" ${{ github.event.inputs.milestone }} mautic-changelog.txt || true
+    
+    - name: Upload mautic-changelog.txt artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: mautic-changelog.txt
+        path: ./mautic-changelog.txt
+
+    - name: You can now find the changelog in this run's artifacts
+      run: echo "You can now find the changelog in this run's artifacts!"
+      

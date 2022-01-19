@@ -112,6 +112,8 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
                 ->setObjectId($campaign->getId())
                 ->setProperties(
                     [
+                        'campaign_id'        => $campaign->getId(),
+                        'campaign_name'      => $campaign->getName(),
                         'object_description' => $campaign->getName(),
                     ]
                 );

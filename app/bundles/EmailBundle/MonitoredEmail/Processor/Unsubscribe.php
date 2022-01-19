@@ -116,7 +116,7 @@ class Unsubscribe implements ProcessorInterface
 
         $comments = $this->translator->trans('mautic.email.bounce.reason.unsubscribed');
         foreach ($contacts as $contact) {
-            $this->doNotContact->addDncForContact($contact->getId(), $channel, $comments, DoNotContact::UNSUBSCRIBED);
+            $this->doNotContact->addDncForContact($contact->getId(), $channel, DoNotContact::UNSUBSCRIBED, $comments);
         }
 
         return true;

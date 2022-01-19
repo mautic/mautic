@@ -348,13 +348,13 @@ class AjaxController extends CommonAjaxController
         if (!empty($leadId) && !empty($channel) && in_array($action, ['remove', 'add'])) {
             $leadModel = $this->getModel('lead');
             /** @var DoNotContactModel $doNotContact */
-            $doNotContact = $this->getModel('mautic.lead.model.dnc');
+            $doNotContact = $this->getModel('lead.dnc');
 
             $lead = $leadModel->getEntity($leadId);
 
             if (null !== $lead && null !== $channel) {
                 if ('remove' === $action) {
-                    $doNotContact->addDncForContact($leadId, $channel, 'user', DoNotContact::MANUAL);
+                    $doNotContact->addDncForContact($leadId, $channel, DoNotContact::MANUAL, 'user');
                 } elseif ('add' === $action) {
                     $doNotContact->removeDncForContact($leadId, $channel);
                 }
@@ -463,7 +463,7 @@ class AjaxController extends CommonAjaxController
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
 
             /** @var DoNotContactModel $doNotContact */
-            $doNotContact = $this->getModel('mautic.lead.model.dnc');
+            $doNotContact = $this->getModel('lead.dnc');
 
             /** @var DoNotContactModel $dnc */
             $dnc = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->findOneBy(

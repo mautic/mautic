@@ -108,7 +108,7 @@ class CoreSubscriberTest extends TestCase
      */
     private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->bundleHelper         = $this->createMock(BundleHelper::class);
         $this->menuHelper           = $this->createMock(MenuHelper::class);
@@ -171,7 +171,7 @@ class CoreSubscriberTest extends TestCase
 
         $request    = $this->createMock(Request::class);
         $controller = $this->getMockBuilder(MauticController::class)
-            ->setMethods(['initialize', 'setRequest', 'setFactory', 'setUser', 'setCoreParametersHelper', 'setDispatcher', 'setTranslator', 'setFlashBag'])
+            ->onlyMethods(['initialize', 'setRequest', 'setFactory', 'setUser', 'setCoreParametersHelper', 'setDispatcher', 'setTranslator', 'setFlashBag'])
             ->getMock();
         $controllers = [$controller];
 

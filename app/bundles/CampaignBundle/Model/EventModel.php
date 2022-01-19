@@ -100,8 +100,11 @@ class EventModel extends FormModel
             // wipe out any references to these events to prevent restraint violations
             $this->getRepository()->nullEventRelationships($deletedKeys);
 
-            // delete the events
-            $this->deleteEntities($deletedEvents);
+            foreach ($deletedEvents as $eventToDelete) {
+                // delete the events
+                $this->getLeadEventLogRepository()->removeEventLogs($eventToDelete);
+                $this->deleteEntities([$eventToDelete]);
+            }
         }
     }
 

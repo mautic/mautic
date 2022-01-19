@@ -24,7 +24,7 @@ class TagRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $mockRepository = $this->getMockBuilder(TagRepository::class)
             ->disableOriginalConstructor()
-            ->setMethods(['findOneBy'])
+            ->onlyMethods(['findOneBy'])
             ->getMock();
 
         $mockRepository->expects($this->once())
@@ -39,7 +39,7 @@ class TagRepositoryTest extends \PHPUnit\Framework\TestCase
     {
         $mockRepository = $this->getMockBuilder(TagRepository::class)
             ->disableOriginalConstructor()
-            ->setMethods(['findOneBy'])
+            ->onlyMethods(['findOneBy'])
             ->getMock();
 
         $mockRepository->expects($this->once())
@@ -51,6 +51,23 @@ class TagRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame('sometag', $newEntity->getTag());
         $this->assertNull($newEntity->getId());
+    }
+
+    public function testGetTagByNameOrCreateNewOneInputFilter()
+    {
+        $fetchedEntity = new Tag('hello" world');
+
+        $mockRepository = $this->getMockBuilder(TagRepository::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['findOneBy'])
+            ->getMock();
+
+        $mockRepository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['tag' => 'hello&#34; world'])
+            ->willReturn($fetchedEntity);
+
+        $this->assertSame($fetchedEntity, $mockRepository->getTagByNameOrCreateNewOne('hello" world'));
     }
 
     public function testRemoveMinusFromTags()

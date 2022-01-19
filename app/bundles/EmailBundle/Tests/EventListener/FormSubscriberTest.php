@@ -32,7 +32,7 @@ class FormSubscriberTest extends TestCase
      */
     protected $formSubscriber;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->emailModel     = $this->createMock(EmailModel::class);
         $this->contactTracker = $this->createMock(ContactTracker::class);

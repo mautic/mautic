@@ -11,7 +11,10 @@
 
 namespace Mautic\ApiBundle\Controller;
 
+use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use OAuth2\OAuth2;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,20 +34,17 @@ class ClientController extends FormController
             return $this->accessDenied();
         }
 
-        //set limits
-        $limit = $this->get('session')->get('mautic.client.limit', $this->get('mautic.helper.core_parameters')->get('default_pagelimit'));
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-
-        $orderBy    = $this->get('session')->get('mautic.client.orderby', 'c.name');
-        $orderByDir = $this->get('session')->get('mautic.client.orderbydir', 'ASC');
-        $filter     = $this->request->get('search', $this->get('session')->get('mautic.client.filter', ''));
-        $apiMode    = $this->factory->getRequest()->get('api_mode', $this->get('session')->get('mautic.client.filter.api_mode', 'oauth1a'));
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make('mautic.client', $page);
+        $limit             = $pageHelper->getLimit();
+        $start             = $pageHelper->getStart();
+        $orderBy           = $this->get('session')->get('mautic.client.orderby', 'c.name');
+        $orderByDir        = $this->get('session')->get('mautic.client.orderbydir', 'ASC');
+        $filter            = $this->request->get('search', $this->get('session')->get('mautic.client.filter', ''));
+        $apiMode           = $this->factory->getRequest()->get('api_mode', $this->get('session')->get('mautic.client.filter.api_mode', 'oauth2'));
         $this->get('session')->set('mautic.client.filter.api_mode', $apiMode);
         $this->get('session')->set('mautic.client.filter', $filter);
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         $clients = $this->getModel('api.client')->getEntities(
             [
@@ -58,10 +58,9 @@ class ClientController extends FormController
 
         $count = count($clients);
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.client.page', $lastPage);
+            $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_client_index', ['page' => $lastPage]);
+            $pageHelper->rememberPage($lastPage);
 
             return $this->postActionRedirect(
                 [
@@ -76,41 +75,34 @@ class ClientController extends FormController
             );
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.client.page', $page);
-
-        //set some permissions
-        $permissions = [
-            'create' => $this->get('mautic.security')->isGranted('api:clients:create'),
-            'edit'   => $this->get('mautic.security')->isGranted('api:clients:editother'),
-            'delete' => $this->get('mautic.security')->isGranted('api:clients:deleteother'),
-        ];
+        $pageHelper->rememberPage($page);
 
         // filters
         $filters = [];
 
         // api options
         $apiOptions           = [];
-        $apiOptions['oauth1'] = 'OAuth 1';
         $apiOptions['oauth2'] = 'OAuth 2';
         $filters['api_mode']  = [
             'values'  => [$apiMode],
             'options' => $apiOptions,
         ];
 
-        $parameters = [
-            'items'       => $clients,
-            'page'        => $page,
-            'limit'       => $limit,
-            'permissions' => $permissions,
-            'tmpl'        => $tmpl,
-            'searchValue' => $filter,
-            'filters'     => $filters,
-        ];
-
         return $this->delegateView(
             [
-                'viewParameters'  => $parameters,
+                'viewParameters'  => [
+                    'items'       => $clients,
+                    'page'        => $page,
+                    'limit'       => $limit,
+                    'permissions' => [
+                        'create' => $this->get('mautic.security')->isGranted('api:clients:create'),
+                        'edit'   => $this->get('mautic.security')->isGranted('api:clients:editother'),
+                        'delete' => $this->get('mautic.security')->isGranted('api:clients:deleteother'),
+                    ],
+                    'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                    'searchValue' => $filter,
+                    'filters'     => $filters,
+                ],
                 'contentTemplate' => 'MauticApiBundle:Client:list.html.php',
                 'passthroughVars' => [
                     'route'         => $this->generateUrl('mautic_client_index', ['page' => $page]),
@@ -191,7 +183,7 @@ class ClientController extends FormController
             return $this->accessDenied();
         }
 
-        $apiMode = (0 === $objectId) ? $this->get('session')->get('mautic.client.filter.api_mode', 'oauth1a') : $objectId;
+        $apiMode = (0 === $objectId) ? $this->get('session')->get('mautic.client.filter.api_mode', 'oauth2') : $objectId;
         $this->get('session')->set('mautic.client.filter.api_mode', $apiMode);
 
         /** @var \Mautic\ApiBundle\Model\ClientModel $model */
@@ -221,6 +213,11 @@ class ClientController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
+                    // If the admin is creating API credentials, enable 'Client Credential' grant type
+                    if (ClientModel::API_MODE_OAUTH2 == $apiMode && $this->getUser()->getRole()->isAdmin()) {
+                        $client->addGrantType(OAuth2::GRANT_TYPE_CLIENT_CREDENTIALS);
+                    }
+                    $client->setRole($this->getUser()->getRole());
                     $model->saveEntity($client);
                     $this->addFlash(
                         'mautic.api.client.notice.created',

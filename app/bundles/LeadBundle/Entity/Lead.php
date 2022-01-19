@@ -586,9 +586,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get owner.
-     *
-     * @return User
+     * @return User|null
      */
     public function getOwner()
     {
@@ -718,7 +716,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function getSecondaryIdentifier()
     {
-        if (!$this->getCompany()) {
+        if ($this->getCompany()) {
             return $this->getCompany();
         }
 

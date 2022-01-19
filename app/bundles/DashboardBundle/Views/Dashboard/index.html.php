@@ -61,6 +61,14 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'customButtons' => $buttons,
 ]));
 ?>
+<?php if (true === $phpVersion['isOutdated']): ?>
+<div class="pt-md pl-md col-md-12">
+    <div class="pt-md pl-md alert alert-warning">
+        <h3><?php echo $view['translator']->trans('mautic.dashboard.phpversionwarning.title'); ?></h3>
+        <p><?php echo $view['translator']->trans('mautic.dashboard.phpversionwarning.body', ['%phpversion%' => $phpVersion['version']]); ?></p>
+    </div>
+</div>
+<?php endif; ?>
 <div class="row pt-md pl-md">
     <div class="col-sm-6">
         <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', ['dateRangeForm' => $dateRangeForm]); ?>
@@ -71,7 +79,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     <div id="dashboard-widgets" class="dashboard-widgets cards">
         <?php foreach ($widgets as $widget): ?>
             <div class="card-flex widget" data-widget-id="<?php echo $widget->getId(); ?>" style="width: <?php echo $widget->getWidth() ? $widget->getWidth().'' : '100'; ?>%; height: <?php echo $widget->getHeight() ? $widget->getHeight().'px' : '300px'; ?>">
-                <?php echo $view->render('MauticDashboardBundle:Widget:detail.html.php', ['widget' => $widget]); ?>
+                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
             </div>
         <?php endforeach; ?>
     </div>

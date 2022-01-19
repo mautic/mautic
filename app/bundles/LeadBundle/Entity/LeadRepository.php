@@ -12,11 +12,13 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
+use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PointBundle\Model\TriggerModel;
@@ -54,6 +56,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     private $triggerModel;
 
     /**
+     * @var ListLeadRepository
+     */
+    private $listLeadRepository;
+
+    /**
      * Used by search functions to search social profiles.
      */
     public function setAvailableSocialFields(array $fields)
@@ -80,6 +87,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    public function setListLeadRepository(ListLeadRepository $listLeadRepository): void
+    {
+        $this->listLeadRepository = $listLeadRepository;
     }
 
     /**
@@ -178,6 +190,30 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
+     * @param string[] $emails
+     *
+     * @return int[]|array
+     */
+    public function getContactIdsByEmails(array $emails): array
+    {
+        $result = $this->getEntityManager()
+            ->createQuery("
+                SELECT c.id 
+                FROM Mautic\LeadBundle\Entity\Lead c
+                WHERE c.email IN (:emails)
+            ")
+            ->setParameter(':emails', $emails, Connection::PARAM_STR_ARRAY)
+            ->getArrayResult();
+
+        return array_map(
+            function ($row) {
+                return (int) $row['id'];
+            },
+            $result
+        );
+    }
+
+    /**
      * Get a list of lead entities.
      *
      * @param     $uniqueFieldsWithData
@@ -194,7 +230,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->orWhere("l.$col = :".$col)
+            $q->{$this->getUniqueIdentifiersWherePart()}("l.$col = :".$col)
                 ->setParameter($col, $val);
         }
 
@@ -262,7 +298,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->orWhere("l.$col = :".$col)
+            $q->{$this->getUniqueIdentifiersWherePart()}("l.$col = :".$col)
                 ->setParameter($col, $val);
         }
 
@@ -557,17 +593,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get contacts for a specific channel entity.
      *
-     * @param $args - same as getEntity/getEntities
-     * @param        $joinTable
-     * @param        $entityId
-     * @param array  $filters
-     * @param string $entityColumnName
-     * @param array  $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
-     *
-     * @return array
+     * @param array      $args             same as getEntity/getEntities
+     * @param string     $joinTable
+     * @param int        $entityId
+     * @param array      $filters
+     * @param string     $entityColumnName
+     * @param array|null $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
      */
-    public function getEntityContacts($args, $joinTable, $entityId, $filters = [], $entityColumnName = 'id', array $additionalJoins = null, $contactColumnName = 'lead_id')
-    {
+    public function getEntityContacts(
+        $args,
+        $joinTable,
+        $entityId,
+        $filters = [],
+        $entityColumnName = 'id',
+        array $additionalJoins = null,
+        $contactColumnName = 'lead_id',
+        \DateTimeInterface $dateFrom = null,
+        \DateTimeInterface $dateTo = null
+    ): array {
         $qb = $this->getEntitiesDbalQueryBuilder();
 
         if (empty($contactColumnName)) {
@@ -584,12 +627,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             );
         }
 
-        $qb->join(
-            $this->getTableAlias(),
-            MAUTIC_TABLE_PREFIX.$joinTable,
-            'entity',
-            $joinCondition
-        );
+        if (!empty($joinTable)) {
+            $qb->join(
+                $this->getTableAlias(),
+                MAUTIC_TABLE_PREFIX.$joinTable,
+                'entity',
+                $joinCondition
+            );
+        }
 
         if (is_array($additionalJoins)) {
             foreach ($additionalJoins as $t) {
@@ -620,7 +665,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             }
         }
 
-        $args['qb'] = $qb;
+        $args['qb']    = $qb;
+        $args['count'] = (ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) ? $this->listLeadRepository->getContactsCountBySegment($entityId, $filters) : null;
+
+        if ($dateFrom && $dateTo) {
+            $qb->andWhere('entity.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+        }
 
         return $this->getEntities($args);
     }
@@ -662,11 +714,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     protected function addSearchCommandWhereClause($q, $filter)
     {
-        $command                 = $filter->command;
-        $string                  = $filter->string;
-        $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        $command             = $filter->command;
+        $string              = $filter->string;
+        $unique              = $this->generateRandomParameterName();
+        $returnParameter     = false; //returning a parameter that is not used will lead to a Doctrine error
+        [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
 
         //DBAL QueryBuilder does not have an expr()->not() function; boo!!
 
@@ -933,6 +985,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.email_pending',
             'mautic.lead.lead.searchcommand.page_source',
             'mautic.lead.lead.searchcommand.page_source_id',
+            'mautic.lead.lead.searchcommand.import_id',
+            'mautic.lead.lead.searchcommand.import_action',
             'mautic.lead.lead.searchcommand.page_id',
             'mautic.lead.lead.searchcommand.sms_sent',
             'mautic.lead.lead.searchcommand.web_sent',
@@ -1168,8 +1222,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
 
         $this->useDistinctCount = true;
-        $joins                  = $q->getQueryPart('join');
-        if (!preg_match('/"'.preg_quote($primaryTable['alias'], '/').'"/i', json_encode($joins))) {
+        if (!preg_match('/"'.preg_quote($primaryTable['alias'], '/').'"/i', json_encode($q->getQueryPart('join')))) {
             $q->$joinType(
                 $primaryTable['from_alias'],
                 MAUTIC_TABLE_PREFIX.$primaryTable['table'],
@@ -1178,7 +1231,26 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             );
         }
         foreach ($tables as $table) {
-            $q->$joinType($table['from_alias'], MAUTIC_TABLE_PREFIX.$table['table'], $table['alias'], $table['condition']);
+            $exists = false;
+            $joins  = $q->getQueryPart('join');
+
+            if (isset($joins[$table['from_alias']])) {
+                foreach ($joins[$table['from_alias']] as $standingJoin) {
+                    if ($standingJoin['joinAlias'] === $table['alias']) { // There can be just one alias
+                        $exists = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!$exists) {
+                $q->$joinType(
+                    $table['from_alias'],
+                    MAUTIC_TABLE_PREFIX.$table['table'],
+                    $table['alias'],
+                    $table['condition']
+                );
+            }
         }
 
         if ($whereExpression) {

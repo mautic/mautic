@@ -132,7 +132,6 @@ return [
                     'translator',
                     'doctrine.orm.entity_manager',
                     'router',
-                    'mautic.security',
                 ],
             ],
             'mautic.campaign.calendarbundle.subscriber' => [
@@ -190,13 +189,17 @@ return [
                     'mautic.campaign.repository.event',
                     'mautic.campaign.event_executioner',
                     'translator',
+                    'mautic.campaign.repository.lead',
                 ],
             ],
         ],
         'forms'        => [
             'mautic.campaign.type.form'                 => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignType',
-                'arguments' => 'mautic.security',
+                'arguments' => [
+                    'mautic.security',
+                    'translator',
+                ],
             ],
             'mautic.campaignrange.type.action'          => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventType',
@@ -270,6 +273,12 @@ return [
                     'mautic.campaign.scheduler',
                 ],
             ],
+            'mautic.campaign.model.summary' => [
+                'class'     => \Mautic\CampaignBundle\Model\SummaryModel::class,
+                'arguments' => [
+                    'mautic.campaign.repository.lead_event_log',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.campaign.repository.campaign' => [
@@ -298,6 +307,13 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\CampaignBundle\Entity\LeadEventLog::class,
+                ],
+            ],
+            'mautic.campaign.repository.summary' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\CampaignBundle\Entity\Summary::class,
                 ],
             ],
         ],
@@ -355,6 +371,7 @@ return [
                     'mautic.tracker.contact',
                     'mautic.campaign.repository.lead_event_log',
                     'mautic.campaign.repository.lead',
+                    'mautic.campaign.model.summary',
                 ],
             ],
             'mautic.campaign.event_collector' => [
@@ -489,6 +506,7 @@ return [
                     'mautic.core.model.notification',
                     'translator',
                     'router',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             // @deprecated 2.13.0 for BC support; to be removed in 3.0
@@ -591,12 +609,13 @@ return [
                 ],
                 'tag' => 'console.command',
             ],
-        ],
-        'fixtures' => [
-            'mautic.campaign.fixture.campaign' => [
-                'class'    => \Mautic\CampaignBundle\Tests\DataFixtures\Orm\CampaignData::class,
-                'tag'      => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'optional' => true,
+            'mautic.campaign.command.summarize' => [
+                'class'     => \Mautic\CampaignBundle\Command\SummarizeCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.campaign.model.summary',
+                ],
+                'tag' => 'console.command',
             ],
         ],
         'services' => [
@@ -608,8 +627,17 @@ return [
                 ],
             ],
         ],
+        'fixtures' => [
+            'mautic.campaign.fixture.campaign' => [
+                'class'    => \Mautic\CampaignBundle\DataFixtures\ORM\CampaignData::class,
+                'tag'      => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'optional' => true,
+            ],
+        ],
     ],
     'parameters' => [
         'campaign_time_wait_on_event_false' => 'PT1H',
+        'campaign_use_summary'              => 0,
+        'campaign_by_range'                 => 0,
     ],
 ];

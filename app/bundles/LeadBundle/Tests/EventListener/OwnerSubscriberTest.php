@@ -63,7 +63,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
     }

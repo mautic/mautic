@@ -45,6 +45,12 @@ class CoreParametersHelper
         $this->resolveParameters();
     }
 
+    /**
+     * @param string $name
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
     public function get($name, $default = null)
     {
         $name = $this->stripMauticPrefix($name);
@@ -63,6 +69,9 @@ class CoreParametersHelper
         return $this->parameters->get($name, $default);
     }
 
+    /**
+     * @param string $name
+     */
     public function has($name): bool
     {
         return $this->parameters->has($this->stripMauticPrefix($name));

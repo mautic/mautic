@@ -11,32 +11,18 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Joomla\Http\Http;
+use GuzzleHttp\Client;
 use Monolog\Logger;
 
 class UrlHelper
 {
-    /**
-     * @var Http
-     */
-    protected $http;
+    protected ?Client $client;
+    protected ?string $shortnerServiceUrl;
+    protected ?Logger $logger;
 
-    /**
-     * @var string
-     */
-    protected $shortnerServiceUrl;
-
-    /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
-     * @param string|null $shortnerServiceUrl
-     */
-    public function __construct(Http $http = null, $shortnerServiceUrl = null, Logger $logger = null)
+    public function __construct(?Client $client = null, ?string $shortnerServiceUrl = null, ?Logger $logger = null)
     {
-        $this->http               = $http;
+        $this->client             = $client;
         $this->shortnerServiceUrl = $shortnerServiceUrl;
         $this->logger             = $logger;
     }
@@ -55,12 +41,12 @@ class UrlHelper
         }
 
         try {
-            $response = $this->http->get($this->shortnerServiceUrl.urlencode($url));
+            $response = $this->client->get($this->shortnerServiceUrl.urlencode($url));
 
-            if (200 === $response->code) {
-                return rtrim($response->body);
+            if (200 === $response->getStatusCode()) {
+                return rtrim($response->getBody());
             } else {
-                $this->logger->addWarning("Url shortner failed with code {$response->code}: {$response->body}");
+                $this->logger->addWarning("Url shortner failed with code {$response->getStatusCode()}: {$response->getBody()}");
             }
         } catch (\Exception $exception) {
             $this->logger->addError(
@@ -323,5 +309,22 @@ class UrlHelper
         }
 
         return $string;
+    }
+
+    /**
+     *  This method return true with special characters in URL, for example https://domain.tld/é.pdf
+     * filter_var($url, FILTER_VALIDATE_URL) allow only alphanumerics [0-9a-zA-Z], the special characters "$-_.+!*'()," [not including the quotes - ed].
+     *
+     * @param string $url
+     *
+     * @return bool
+     */
+    public static function isValidUrl($url)
+    {
+        $path         = parse_url($url, PHP_URL_PATH);
+        $encodedPath  = array_map('urlencode', explode('/', $path));
+        $url          = str_replace($path, implode('/', $encodedPath), $url);
+
+        return (bool) filter_var($url, FILTER_VALIDATE_URL);
     }
 }

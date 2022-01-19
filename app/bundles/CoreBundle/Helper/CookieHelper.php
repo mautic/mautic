@@ -19,7 +19,7 @@ class CookieHelper
     const SAME_SITE_VALUE = 'None';
     private $path;
     private $domain;
-    private $secure       = false;
+    private $secure       = true;
     private $httponly     = false;
     private $request;
 
@@ -38,7 +38,7 @@ class CookieHelper
 
         $this->request = $requestStack->getCurrentRequest();
         if (('' === $this->secure || null === $this->secure) && $this->request) {
-            $this->secure = filter_var($requestStack->getCurrentRequest()->server->get('HTTPS', false), FILTER_VALIDATE_BOOLEAN);
+            $this->secure = $requestStack->getCurrentRequest()->isSecure();
         }
     }
 

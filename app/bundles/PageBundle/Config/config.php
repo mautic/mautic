@@ -295,6 +295,7 @@ return [
                     'mautic.lead.model.company',
                     'mautic.tracker.device',
                     'mautic.tracker.contact',
+                    'mautic.helper.core_parameters',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [
@@ -320,6 +321,14 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.tracker.contact',
+                ],
+            ],
+            'mautic.page.model.tracking.404' => [
+                'class'     => \Mautic\PageBundle\Model\Tracking404Model::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.tracker.contact',
+                    'mautic.page.model.page',
                 ],
             ],
         ],
@@ -382,7 +391,7 @@ return [
 
     'parameters' => [
         'cat_in_page_url'       => false,
-        'google_analytics'      => false,
+        'google_analytics'      => null,
         'track_contact_by_ip'   => false,
         'track_by_tracking_url' => false,
         'redirect_list_types'   => [
@@ -396,5 +405,6 @@ return [
         'facebook_pixel_id'                     => null,
         'facebook_pixel_trackingpage_enabled'   => false,
         'facebook_pixel_landingpage_enabled'    => false,
+        'do_not_track_404_anonymous'            => false,
     ],
 ];

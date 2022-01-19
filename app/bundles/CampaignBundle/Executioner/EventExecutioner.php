@@ -88,9 +88,6 @@ class EventExecutioner
      */
     private $leadRepository;
 
-    /**
-     * EventExecutioner constructor.
-     */
     public function __construct(
         EventCollector $eventCollector,
         EventLogger $eventLogger,
@@ -302,7 +299,7 @@ class EventExecutioner
 
         // Save updated log entries and clear from memory
         $this->eventLogger->persistCollection($logs)
-            ->clearCollection($logs);
+            ->clear();
     }
 
     /**
@@ -324,7 +321,7 @@ class EventExecutioner
 
         // Save updated log entries and clear from memory
         $this->eventLogger->persistCollection($logs)
-            ->clearCollection($logs);
+            ->clear();
     }
 
     /**
@@ -517,5 +514,14 @@ class EventExecutioner
         $counter->advanceEvaluated($children->count());
 
         $this->executeEventsForContacts($children, $contacts, $counter);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function persistSummaries(): void
+    {
+        $this->eventLogger->getSummaryModel()->persistSummaries();
     }
 }

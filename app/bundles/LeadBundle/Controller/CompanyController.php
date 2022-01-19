@@ -12,9 +12,11 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Form\Type\CompanyMergeType;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -49,19 +51,13 @@ class CompanyController extends FormController
 
         $this->setListFilters();
 
-        //set limits
-        $limit = $this->get('session')->get(
-            'mautic.company.limit',
-            $this->factory->getParameter('default_pagelimit')
-        );
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make('mautic.company', $page);
 
-        $search = $this->request->get('search', $this->get('session')->get('mautic.company.filter', ''));
-        $this->get('session')->set('mautic.company.filter', $search);
-
+        $limit      = $pageHelper->getLimit();
+        $start      = $pageHelper->getStart();
+        $search     = $this->request->get('search', $this->get('session')->get('mautic.company.filter', ''));
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $this->get('session')->get('mautic.company.orderby', 'comp.companyname');
         $orderByDir = $this->get('session')->get('mautic.company.orderbydir', 'ASC');
@@ -77,13 +73,15 @@ class CompanyController extends FormController
             ]
         );
 
+        $this->get('session')->set('mautic.company.filter', $search);
+
         $count     = $companies['count'];
         $companies = $companies['results'];
 
         if ($count && $count < ($start + 1)) {
-            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.company.page', $lastPage);
+            $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_company_index', ['page' => $lastPage]);
+            $pageHelper->rememberPage($lastPage);
 
             return $this->postActionRedirect(
                 [
@@ -98,8 +96,7 @@ class CompanyController extends FormController
             );
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.company.page', $page);
+        $pageHelper->rememberPage($page);
 
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
         $model      = $this->getModel('lead.company');
@@ -156,7 +153,7 @@ class CompanyController extends FormController
             'RETURN_ARRAY'
         );
 
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        /** @var CompanyModel $model */
         $model  = $this->getModel('lead.company');
 
         /** @var \Mautic\LeadBundle\Entity\Company $company */
@@ -523,7 +520,7 @@ class CompanyController extends FormController
      */
     public function viewAction($objectId)
     {
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        /** @var CompanyModel $model */
         $model  = $this->getModel('lead.company');
 
         // When we change company data these changes get cached
@@ -839,7 +836,7 @@ class CompanyController extends FormController
             ],
             'RETURN_ARRAY'
         );
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        /** @var CompanyModel $model */
         $model            = $this->getModel('lead.company');
         $secondaryCompany = $model->getEntity($objectId);
         $page             = $this->get('session')->get('mautic.lead.page', 1);

@@ -32,7 +32,7 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
      */
     private $campaignRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->leadRepository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()

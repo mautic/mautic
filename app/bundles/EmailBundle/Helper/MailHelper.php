@@ -19,6 +19,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Exception\PartialEmailSendFailure;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
@@ -71,6 +72,16 @@ class MailHelper
     protected $from;
 
     protected $systemFrom;
+
+    /**
+     * @var string
+     */
+    protected $replyTo;
+
+    /**
+     * @var string
+     */
+    protected $systemReplyTo;
 
     /**
      * @var string
@@ -208,13 +219,6 @@ class MailHelper
     protected $fatal = false;
 
     /**
-     * Flag whether to use only the globally set From email and name or whether to switch to mailer is owner.
-     *
-     * @var bool
-     */
-    protected $useGlobalFrom = false;
-
-    /**
      * Large batch mail sends may result on timeouts with SMTP servers. This will will keep track of the number of sends and restart the connection once met.
      *
      * @var int
@@ -258,11 +262,13 @@ class MailHelper
             $this->logError($e);
         }
 
-        $systemFromEmail  = $factory->getParameter('mailer_from_email');
-        $systemFromName   = $this->cleanName(
+        $systemFromEmail    = $factory->getParameter('mailer_from_email');
+        $systemReplyToEmail = $factory->getParameter('mailer_reply_to_email');
+        $systemFromName     = $this->cleanName(
             $factory->getParameter('mailer_from_name')
         );
         $this->setDefaultFrom($from, [$systemFromEmail => $systemFromName]);
+        $this->setDefaultReplyTo($systemReplyToEmail, $this->from);
 
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
@@ -310,7 +316,7 @@ class MailHelper
             return $this->getMailer($cleanSlate);
         }
 
-        $transport  = $this->factory->get('swiftmailer.transport.real');
+        $transport  = $this->factory->get('swiftmailer.mailer.default.transport.real');
         $mailer     = new \Swift_Mailer($transport);
         $mailHelper = new self($this->factory, $mailer, $this->from);
 
@@ -322,18 +328,17 @@ class MailHelper
      *
      * @param bool $dispatchSendEvent
      * @param bool $isQueueFlush      (a tokenized/batch send via API such as Mandrill)
-     * @param bool $useOwnerAsMailer
      *
      * @return bool
      */
-    public function send($dispatchSendEvent = false, $isQueueFlush = false, $useOwnerAsMailer = true)
+    public function send($dispatchSendEvent = false, $isQueueFlush = false)
     {
         if ($this->tokenizationEnabled && !empty($this->queuedRecipients) && !$isQueueFlush) {
             // This transport uses tokenization and queue()/flushQueue() was not used therefore use them in order
             // properly populate metadata for this transport
 
             if ($result = $this->queue($dispatchSendEvent)) {
-                $result = $this->flushQueue(['To', 'Cc', 'Bcc'], $useOwnerAsMailer);
+                $result = $this->flushQueue(['To', 'Cc', 'Bcc']);
             }
 
             return $result;
@@ -342,18 +347,29 @@ class MailHelper
         // Set from email
         $ownerSignature = false;
         if (!$isQueueFlush) {
-            if ($useOwnerAsMailer) {
-                if ($owner = $this->getContactOwner($this->lead)) {
-                    $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name'], null);
-                    $ownerSignature = $this->getContactOwnerSignature($owner);
+            $emailToSend    = $this->getEmail();
+            if (!empty($emailToSend)) {
+                if ($emailToSend->getUseOwnerAsMailer()) {
+                    $owner = $this->getContactOwner($this->lead);
+                    if (!empty($owner)) {
+                        $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
+                        $ownerSignature = $this->getContactOwnerSignature($owner);
+                    } else {
+                        $this->setFrom($this->systemFrom, null);
+                    }
+                } elseif (!empty($emailToSend->getFromAddress())) {
+                    $this->setFrom($emailToSend->getFromAddress(), $emailToSend->getFromName());
                 } else {
-                    $this->setFrom($this->from, null, null);
+                    $this->setFrom($this->from, null);
                 }
-            } elseif (!$from = $this->message->getFrom()) {
-                $this->setFrom($this->from, null, null);
+            } else {
+                $this->setFrom($this->from, null);
             }
         } // from is set in flushQueue
 
+        if (!empty($this->replyTo)) {
+            $this->setReplyTo($this->replyTo);
+        }
         // Set system return path if applicable
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
             $this->message->setReturnPath($bounceEmail);
@@ -432,6 +448,15 @@ class MailHelper
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
                     $this->logError('Sending failed for one or more recipients');
+                }
+
+                // Clear the log so that previous output is not associated with new errors
+                $this->logger->clear();
+            } catch (PartialEmailSendFailure $exception) {
+                // Don't fail the entire message
+                if (!empty($failures)) {
+                    $this->errors['failures'] = $failures;
+                    $this->logError($exception->getMessage());
                 }
 
                 // Clear the log so that previous output is not associated with new errors
@@ -562,12 +587,11 @@ class MailHelper
     /**
      * Send batched mail to mailer.
      *
-     * @param array $resetEmailTypes  Array of email types to clear after flusing the queue
-     * @param bool  $useOwnerAsMailer
+     * @param array $resetEmailTypes Array of email types to clear after flusing the queue
      *
      * @return bool
      */
-    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'], $useOwnerAsMailer = true)
+    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'])
     {
         // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
         $flushed = empty($this->fatal);
@@ -583,10 +607,18 @@ class MailHelper
 
                 $this->errors = [];
 
-                if (!$this->useGlobalFrom && $useOwnerAsMailer && 'default' !== $fromKey) {
-                    $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name'], null);
+                $email = $this->getEmail();
+
+                if (!empty($email)) {
+                    if ($email->getUseOwnerAsMailer() && 'default' !== $fromKey) {
+                        $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name']);
+                    } elseif (!empty($email->getFromAddress())) {
+                        $this->setFrom($email->getFromAddress(), $email->getFromName());
+                    } else {
+                        $this->setFrom($this->systemFrom, null);
+                    }
                 } else {
-                    $this->setFrom($this->from, null, null);
+                    $this->setFrom($this->from, null);
                 }
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
@@ -647,7 +679,6 @@ class MailHelper
         $this->internalSend     = false;
         $this->fatal            = false;
         $this->idHashState      = true;
-        $this->useGlobalFrom    = false;
         $this->checkIfTransportNeedsRestart(true);
 
         $this->logger->clear();
@@ -656,6 +687,7 @@ class MailHelper
             $this->appendTrackingPixel = false;
             $this->queueEnabled        = false;
             $this->from                = $this->systemFrom;
+            $this->replyTo             = $this->systemReplyTo;
             $this->headers             = [];
             [];
             $this->source              = [];
@@ -980,7 +1012,7 @@ class MailHelper
         $content = strtr($content, $this->embedImagesReplaces);
         if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
             foreach ($matches[1] as $match) {
-                if (false === strpos($match, 'cid:')) {
+                if (false === strpos($match, 'cid:') && false === strpos($match, '{tracking_pixel}') && !array_key_exists($match, $this->embedImagesReplaces)) {
                     $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
                 }
             }
@@ -1225,25 +1257,15 @@ class MailHelper
      *
      * @param string|array $fromEmail
      * @param string       $fromName
-     * @param bool|null    $isGlobal
      */
-    public function setFrom($fromEmail, $fromName = null, $isGlobal = true)
+    public function setFrom($fromEmail, $fromName = null)
     {
         $fromName = $this->cleanName($fromName);
 
-        if (null !== $isGlobal) {
-            if ($isGlobal) {
-                if (is_array($fromEmail)) {
-                    $this->from = $fromEmail;
-                } else {
-                    $this->from = [$fromEmail => $fromName];
-                }
-            } else {
-                // Reset the default to the system from
-                $this->from = $this->systemFrom;
-            }
-
-            $this->useGlobalFrom = $isGlobal;
+        if (is_array($fromEmail)) {
+            $this->from = $fromEmail;
+        } else {
+            $this->from = [$fromEmail => $fromName];
         }
 
         try {
@@ -1361,15 +1383,22 @@ class MailHelper
                 $fromEmail = key($this->from);
             }
 
-            $this->setFrom($fromEmail, $fromName, null);
+            $this->setFrom($fromEmail, $fromName);
             $this->from = [$fromEmail => $fromName];
         } else {
             $this->from = $this->systemFrom;
         }
 
-        $replyTo = $email->getReplyToAddress();
-        if (!empty($replyTo)) {
-            $addresses = explode(',', $replyTo);
+        $this->replyTo = $email->getReplyToAddress();
+        if (empty($this->replyTo)) {
+            if (!empty($fromEmail) && empty($this->factory->getParameter('mailer_reply_to_email'))) {
+                $this->replyTo = $fromEmail;
+            } else {
+                $this->replyTo = $this->systemReplyTo;
+            }
+        }
+        if (!empty($this->replyTo)) {
+            $addresses = explode(',', $this->replyTo);
 
             // Only a single email is supported
             $this->setReplyTo($addresses[0]);
@@ -2045,15 +2074,19 @@ class MailHelper
     protected function getContactOwner(&$contact)
     {
         $owner = false;
+        $email = $this->getEmail();
 
-        if ($this->factory->getParameter('mailer_is_owner') && is_array($contact) && isset($contact['id'])) {
-            if (!isset($contact['owner_id'])) {
-                $contact['owner_id'] = 0;
-            } elseif (isset($contact['owner_id'])) {
-                if (isset(self::$leadOwners[$contact['owner_id']])) {
-                    $owner = self::$leadOwners[$contact['owner_id']];
-                } elseif ($owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($contact['owner_id'])) {
-                    self::$leadOwners[$owner['id']] = $owner;
+        if (!empty($email)) {
+            if ($email->getUseOwnerAsMailer() && is_array($contact) && isset($contact['id'])) {
+                if (!isset($contact['owner_id'])) {
+                    $contact['owner_id'] = 0;
+                } elseif (isset($contact['owner_id'])) {
+                    $leadModel = $this->factory->getModel('lead');
+                    if (isset(self::$leadOwners[$contact['owner_id']])) {
+                        $owner = self::$leadOwners[$contact['owner_id']];
+                    } elseif ($owner = $leadModel->getRepository()->getLeadOwner($contact['owner_id'])) {
+                        self::$leadOwners[$owner['id']] = $owner;
+                    }
                 }
             }
         }
@@ -2178,5 +2211,22 @@ class MailHelper
 
         $this->systemFrom = $overrideFrom ?: $systemFrom;
         $this->from       = $this->systemFrom;
+    }
+
+    /**
+     * @param $systemReplyToEmail
+     * @param $systemFromEmail
+     */
+    private function setDefaultReplyTo($systemReplyToEmail =null, $systemFromEmail = null)
+    {
+        $fromEmail = null;
+        if (is_array($systemFromEmail)) {
+            $fromEmail    = key($systemFromEmail);
+        } elseif (!empty($systemFromEmail)) {
+            $fromEmail = $systemFromEmail;
+        }
+
+        $this->systemReplyTo = $systemReplyToEmail ?: $fromEmail;
+        $this->replyTo       = $this->systemReplyTo;
     }
 }

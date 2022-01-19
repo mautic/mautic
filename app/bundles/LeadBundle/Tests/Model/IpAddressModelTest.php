@@ -28,7 +28,7 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
     private $logger;
     private $ipAddressModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

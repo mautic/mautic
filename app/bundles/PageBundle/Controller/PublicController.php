@@ -22,10 +22,13 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Event\TrackingEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
+use Mautic\PageBundle\Model\Tracking404Model;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -99,7 +102,7 @@ class PublicController extends CommonFormController
             }
 
             // Check for variants
-            list($parentVariant, $childrenVariants) = $entity->getVariants();
+            [$parentVariant, $childrenVariants] = $entity->getVariants();
 
             // Is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing
             if ($parentVariant != $entity && !$userAccess) {
@@ -211,7 +214,7 @@ class PublicController extends CommonFormController
 
                 // Now show the translation for the page or a/b test - only fetch a translation if a slug was not used
                 if ($entity->isTranslation() && empty($entity->languageSlug)) {
-                    list($translationParent, $translatedEntity) = $model->getTranslatedEntity(
+                    [$translationParent, $translatedEntity] = $model->getTranslatedEntity(
                         $entity,
                         $lead,
                         $this->request
@@ -289,7 +292,11 @@ class PublicController extends CommonFormController
             return new Response($content);
         }
 
-        $model->hitPage($entity, $this->request, 404);
+        /** @var Tracking404Model $tracking404Model */
+        $tracking404Model = $this->get('mautic.page.model.tracking.404');
+        if ($tracking404Model->isTrackable()) {
+            $tracking404Model->hitPage($entity, $this->request);
+        }
 
         return $this->notFound();
     }
@@ -343,9 +350,7 @@ class PublicController extends CommonFormController
 
             $content = $response->getContent();
         } else {
-            if (!empty($analytics)) {
-                $content = str_replace('</head>', $analytics."\n</head>", $content);
-            }
+            $content = str_replace('</head>', $analytics.$this->renderView('MauticPageBundle:Page:preview_header.html.php')."\n</head>", $content);
         }
 
         $dispatcher = $this->get('event_dispatcher');
@@ -377,19 +382,26 @@ class PublicController extends CommonFormController
      *
      * @throws \Exception
      */
-    public function trackingAction()
+    public function trackingAction(Request $request)
     {
+        $notSuccessResponse = new JsonResponse(
+            [
+                'success' => 0,
+            ]
+        );
         if (!$this->get('mautic.security')->isAnonymous()) {
-            return new JsonResponse(
-                [
-                    'success' => 0,
-                ]
-            );
+            return $notSuccessResponse;
         }
 
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
-        $model->hitPage(null, $this->request);
+
+        try {
+            $model->hitPage(null, $this->request);
+        } catch (InvalidDecodedStringException $invalidDecodedStringException) {
+            // do not track invalid ct
+            return $notSuccessResponse;
+        }
 
         /** @var ContactTracker $contactTracker */
         $contactTracker = $this->get(ContactTracker::class);
@@ -403,13 +415,18 @@ class PublicController extends CommonFormController
         $trackingHelper = $this->get('mautic.page.helper.tracking');
         $sessionValue   = $trackingHelper->getSession(true);
 
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->get('event_dispatcher');
+        $event           = new TrackingEvent($lead, $request, $sessionValue);
+        $eventDispatcher->dispatch(PageEvents::ON_CONTACT_TRACKED, $event);
+
         return new JsonResponse(
             [
                 'success'   => 1,
                 'id'        => ($lead) ? $lead->getId() : null,
                 'sid'       => $trackingId,
                 'device_id' => $trackingId,
-                'events'    => $sessionValue,
+                'events'    => $event->getResponse()->all(),
             ]
         );
     }
@@ -489,9 +506,13 @@ class PublicController extends CommonFormController
             $url = TokenHelper::findLeadTokens($url, $leadArray, true);
         }
 
+        if (false !== strpos($url, $this->generateUrl('mautic_asset_download'))) {
+            $url .= '?ct='.$ct;
+        }
+
         $url = UrlHelper::sanitizeAbsoluteUrl($url);
 
-        if (false === filter_var($url, FILTER_VALIDATE_URL)) {
+        if (!UrlHelper::isValidUrl($url)) {
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
         }
 

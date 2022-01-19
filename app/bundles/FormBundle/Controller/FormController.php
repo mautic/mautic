@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -21,9 +22,6 @@ use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class FormController.
- */
 class FormController extends CommonFormController
 {
     /**
@@ -57,26 +55,22 @@ class FormController extends CommonFormController
 
         $session = $this->get('session');
 
-        //set limits
-        $limit = $session->get('mautic.form.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-
-        $search = $this->request->get('search', $session->get('mautic.form.filter', ''));
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make('mautic.form', $page);
+        $limit             = $pageHelper->getLimit();
+        $start             = $pageHelper->getStart();
+        $search            = $this->request->get('search', $session->get('mautic.form.filter', ''));
+        $filter            = ['string' => $search, 'force' => []];
         $session->set('mautic.form.filter', $search);
-
-        $filter = ['string' => $search, 'force' => []];
 
         if (!$permissions['form:forms:viewother']) {
             $filter['force'][] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
-        $orderBy    = $session->get('mautic.form.orderby', 'f.name');
-        $orderByDir = $session->get('mautic.form.orderbydir', 'ASC');
-
-        $forms = $this->getModel('form.form')->getEntities(
+        $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
+        $orderByDir = $session->get('mautic.form.orderbydir', 'DESC');
+        $forms      = $this->getModel('form.form')->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -90,9 +84,8 @@ class FormController extends CommonFormController
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = (1 === $count) ? 1 : ((ceil($count / $limit)) ?: 1) ?: 1;
-
-            $session->set('mautic.form.page', $lastPage);
+            $lastPage = $pageHelper->countPage($count);
+            $pageHelper->rememberPage($lastPage);
             $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $lastPage]);
 
             return $this->postActionRedirect(
@@ -108,23 +101,20 @@ class FormController extends CommonFormController
             );
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $session->set('mautic.form.page', $page);
-
-        $viewParameters = [
-            'searchValue' => $search,
-            'items'       => $forms,
-            'totalItems'  => $count,
-            'page'        => $page,
-            'limit'       => $limit,
-            'permissions' => $permissions,
-            'security'    => $this->get('mautic.security'),
-            'tmpl'        => $this->request->get('tmpl', 'index'),
-        ];
+        $pageHelper->rememberPage($page);
 
         return $this->delegateView(
             [
-                'viewParameters'  => $viewParameters,
+                'viewParameters'  => [
+                    'searchValue' => $search,
+                    'items'       => $forms,
+                    'totalItems'  => $count,
+                    'page'        => $page,
+                    'limit'       => $limit,
+                    'permissions' => $permissions,
+                    'security'    => $this->get('mautic.security'),
+                    'tmpl'        => $this->request->get('tmpl', 'index'),
+                ],
                 'contentTemplate' => 'MauticFormBundle:Form:list.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_form_index',
@@ -442,6 +432,7 @@ class FormController extends CommonFormController
             [
                 'viewParameters' => [
                     'fields'         => $fieldHelper->getChoiceList($customComponents['fields']),
+                    'viewOnlyFields' => $customComponents['viewOnlyFields'],
                     'actions'        => $customComponents['choices'],
                     'actionSettings' => $customComponents['actions'],
                     'formFields'     => $modifiedFields,
@@ -746,7 +737,7 @@ class FormController extends CommonFormController
 
                 $modifiedFields[$id] = $field;
 
-                if (!empty($field['leadField'])) {
+                if (!empty($field['leadField']) && empty($field['parent'])) {
                     $usedLeadFields[$id] = $field['leadField'];
                 }
             }
@@ -818,6 +809,7 @@ class FormController extends CommonFormController
             [
                 'viewParameters' => [
                     'fields'             => $availableFields,
+                    'viewOnlyFields'     => $customComponents['viewOnlyFields'],
                     'actions'            => $customComponents['choices'],
                     'actionSettings'     => $customComponents['actions'],
                     'formFields'         => $modifiedFields,
@@ -962,12 +954,6 @@ class FormController extends CommonFormController
             $assetsHelper    = $this->get('templating.helper.assets');
             $slotsHelper     = $this->get('templating.helper.slots');
             $analyticsHelper = $this->get('mautic.helper.template.analytics');
-
-            if (!empty($customStylesheets)) {
-                foreach ($customStylesheets as $css) {
-                    $assetsHelper->addStylesheet($css);
-                }
-            }
 
             $slotsHelper->set('pageTitle', $form->getName());
 

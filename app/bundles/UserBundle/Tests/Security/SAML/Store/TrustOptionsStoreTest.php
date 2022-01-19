@@ -28,7 +28,7 @@ class TrustOptionsStoreTest extends TestCase
      */
     private $store;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->store                = new TrustOptionsStore($this->coreParametersHelper, 'foobar');

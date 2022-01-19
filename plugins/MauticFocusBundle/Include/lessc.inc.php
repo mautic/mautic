@@ -1518,6 +1518,7 @@ class lessc
         if (count($color) > 4) {
             $out[] = $color[4];
         } // copy alpha
+
         return $out;
     }
 
@@ -1577,6 +1578,7 @@ class lessc
         if (count($color) > 4) {
             $out[] = $color[4];
         } // copy alpha
+
         return $out;
     }
 

@@ -63,7 +63,6 @@ class CampaignSendSubscriber implements EventSubscriberInterface
                     'formType'         => SmsSendType::class,
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
                     'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
-                    'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php',
                     'channel'          => 'sms',
                     'channelIdField'   => 'sms',
                 ]

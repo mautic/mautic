@@ -21,7 +21,7 @@ class RequestStorageHelperTest extends \PHPUnit\Framework\TestCase
     private $cacheStorageMock;
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

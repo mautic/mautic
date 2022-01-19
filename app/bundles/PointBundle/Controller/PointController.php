@@ -12,13 +12,11 @@
 namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Point;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class PointController.
- */
 class PointController extends AbstractFormController
 {
     /**
@@ -43,21 +41,17 @@ class PointController extends AbstractFormController
 
         $this->setListFilters();
 
-        //set limits
-        $limit = $this->get('session')->get('mautic.point.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make('mautic.point', $page);
 
-        $search = $this->request->get('search', $this->get('session')->get('mautic.point.filter', ''));
-        $this->get('session')->set('mautic.point.filter', $search);
-
+        $limit      = $pageHelper->getLimit();
+        $start      = $pageHelper->getStart();
+        $search     = $this->request->get('search', $this->get('session')->get('mautic.point.filter', ''));
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $this->get('session')->get('mautic.point.orderby', 'p.name');
         $orderByDir = $this->get('session')->get('mautic.point.orderbydir', 'ASC');
-
-        $points = $this->getModel('point')->getEntities([
+        $points     = $this->getModel('point')->getEntities([
             'start'      => $start,
             'limit'      => $limit,
             'filter'     => $filter,
@@ -65,11 +59,13 @@ class PointController extends AbstractFormController
             'orderByDir' => $orderByDir,
         ]);
 
+        $this->get('session')->set('mautic.point.filter', $search);
+
         $count = count($points);
         if ($count && $count < ($start + 1)) {
-            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.point.page', $lastPage);
+            $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_point_index', ['page' => $lastPage]);
+            $pageHelper->rememberPage($lastPage);
 
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
@@ -82,10 +78,7 @@ class PointController extends AbstractFormController
             ]);
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.point.page', $page);
-
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $pageHelper->rememberPage($page);
 
         //get the list of actions
         $actions = $this->getModel('point')->getPointActions();
@@ -98,7 +91,7 @@ class PointController extends AbstractFormController
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
-                'tmpl'        => $tmpl,
+                'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
             ],
             'contentTemplate' => 'MauticPointBundle:Point:list.html.php',
             'passthroughVars' => [

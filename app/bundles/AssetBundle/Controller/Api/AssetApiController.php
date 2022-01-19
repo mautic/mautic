@@ -34,7 +34,6 @@ class AssetApiController extends CommonApiController
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer.
      *
-     * @param        $entity
      * @param string $action
      *
      * @return mixed
@@ -70,8 +69,11 @@ class AssetApiController extends CommonApiController
                 }
             } elseif ('remote' === $parameters['storageLocation']) {
                 $parameters['remotePath'] = $parameters['file'];
-                $entity->setFileInfoFromFile();
-                $entity->setFileNameFromRemote();
+                $entity->setTitle($parameters['title']);
+                $entity->setStorageLocation('remote');
+                $entity->setRemotePath($parameters['remotePath']);
+                $entity->preUpload();
+                $entity->upload();
             }
 
             unset($parameters['file']);

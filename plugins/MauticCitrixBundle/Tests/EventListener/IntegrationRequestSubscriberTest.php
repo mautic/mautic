@@ -25,7 +25,7 @@ class IntegrationRequestSubscriberTest extends TestCase
     /** @var IntegrationRequestSubscriber */
     protected $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->subscriber = $this->getMockBuilder(IntegrationRequestSubscriber::class)
             ->disableOriginalConstructor()
