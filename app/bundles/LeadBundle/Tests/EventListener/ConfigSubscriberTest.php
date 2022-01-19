@@ -21,10 +21,7 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigSubscriberTest extends TestCase
 {
-    /**
-     * @var ConfigSubscriber
-     */
-    private $configSubscriber;
+    private ConfigSubscriber $configSubscriber;
 
     /**
      * @var ConfigBuilderEvent&MockObject

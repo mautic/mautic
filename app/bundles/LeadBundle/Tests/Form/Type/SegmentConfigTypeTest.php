@@ -21,10 +21,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class SegmentConfigTypeTest extends TestCase
 {
-    /**
-     * @var SegmentConfigType
-     */
-    private $segmentConfigType;
+    private SegmentConfigType $segmentConfigType;
 
     /**
      * @var FormBuilderInterface<FormBuilderInterface>&MockObject
