@@ -732,7 +732,8 @@ Mautic.leadfieldOnLoad = function (container) {
 };
 
 Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
-    if (selectedVal == 'multiselect') {
+    let isMultiselect = selectedVal === 'multiselect' ? true : false;
+    if (selectedVal === 'multiselect') {
         // Use select
         selectedVal = 'select';
     }
@@ -820,7 +821,6 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
             isSelect = true;
             break;
         case 'select':
-        case 'multiselect':
         case 'lookup':
             html = mQuery('#field-templates .default_template_select').html();
             tempType = 'select';
@@ -848,6 +848,10 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
         html = html.replace(regex, 'defaultValue')
         defaultValueField.replaceWith(mQuery(html));
         mQuery('#leadfield_defaultValue').val(defaultVal);
+        if (isMultiselect) {
+            mQuery('#leadfield_defaultValue').attr('multiple', 'multiple');
+            mQuery('#leadfield_defaultValue').attr('name', mQuery('#leadfield_defaultValue').attr('name')+'[]');
+        }
     }
 
     if (selectedVal === 'datetime' || selectedVal === 'date' || selectedVal === 'time') {
