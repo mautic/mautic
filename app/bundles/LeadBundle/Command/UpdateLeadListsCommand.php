@@ -118,24 +118,21 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     ).'</info>'
                 );
 
-                    $startTimeForSingleSegment = time();
-                    $processed                 = $listModel->rebuildListLeads($l, $batch, $max, $output);
-                    $output->writeln(
+                $startTimeForSingleSegment = microtime(true);
+                $processed                 = $listModel->rebuildListLeads($segment, $batch, $max, $output);
+                $output->writeln(
                         '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
                     );
-                    if ($enableTimeMeasurement) {
-                        $totalTime = round(microtime(true) - $startTimeForSingleSegment, 2);
-                        $output->writeln($translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime])."\n");
-                    }
+                if ($enableTimeMeasurement) {
+                    $totalTime = round(microtime(true) - $startTimeForSingleSegment, 3);
+                    $output->writeln($translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime])."\n");
                 }
-
-                unset($l);
             }
         }
         $this->completeRun();
 
         if ($enableTimeMeasurement) {
-            $totalTime = round(microtime(true) - $startTime, 2);
+            $totalTime = round(microtime(true) - $startTime, 3);
             $output->writeln($translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime]));
         }
 
