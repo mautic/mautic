@@ -13,7 +13,6 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
@@ -32,11 +31,6 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
     private $leadSegmentQueryBuilder;
 
     /**
-     * @var ContactSegmentFilterFactory
-     */
-    private $leadSegmentFilterFactory;
-
-    /**
      * @var EntityManager
      */
     private $entityManager;
@@ -47,13 +41,11 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
     public function __construct(
         RandomParameterName $randomParameterNameService,
         ContactSegmentQueryBuilder $leadSegmentQueryBuilder,
-        EntityManager $entityManager,
-        ContactSegmentFilterFactory $leadSegmentFilterFactory
+        EntityManager $entityManager
     ) {
         parent::__construct($randomParameterNameService);
 
         $this->leadSegmentQueryBuilder  = $leadSegmentQueryBuilder;
-        $this->leadSegmentFilterFactory = $leadSegmentFilterFactory;
         $this->entityManager            = $entityManager;
     }
 

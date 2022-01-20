@@ -142,7 +142,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
     /**
      * Build based on filters. Segment membership filters process on the end.
      *
-     * @param $segments
+     * @param \Doctrine\ORM\Internal\Hydration\IterableResult|array<mixed> $segments
      *
      * @return LeadList[]
      */
@@ -167,6 +167,9 @@ class UpdateLeadListsCommand extends ModeratedCommand
         return array_merge($simpleSegments, $complexSegments);
     }
 
+    /**
+     * @param array<array<int|string>> $filters
+     */
     protected function hasComplexFilter(array $filters): bool
     {
         foreach ($filters as $filter) {

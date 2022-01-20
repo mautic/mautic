@@ -1055,7 +1055,7 @@ return [
                     'mautic.lead.model.random_parameter_name',
                     'mautic.lead.repository.lead_segment_query_builder',
                     'doctrine.orm.entity_manager',
-                    'mautic.lead.model.lead_segment_filter_factory', ],
+                    ],
             ],
         ],
         'helpers' => [
