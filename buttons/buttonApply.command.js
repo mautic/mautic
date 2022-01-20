@@ -4,7 +4,7 @@ import ButtonCloseCommands from './buttonClose.command';
 
 export default class ButtonApplyCommand {
   /**
-   * The command to run on button click
+   * The command name
    */
   static name = 'preset-mautic:apply-email';
 
@@ -132,10 +132,6 @@ export default class ButtonApplyCommand {
     });
   }
 
-  static getBtnViewsApply() {
-    return mQuery('#btn-views-apply');
-  }
-
   static getEmailForm() {
     return mQuery('form[name=emailform]');
   }
@@ -148,21 +144,24 @@ export default class ButtonApplyCommand {
     return emailForm.find('#emailform_name');
   }
 
-  static getEmailFormList(emailForm) {
-    return emailForm.find('#emailform_lists');
-  }
-
-  static getEmailType(emailForm) {
-    return emailForm.find('#emailform_emailType');
-  }
-
   static getDefaultEmailName() {
     return `E-Mail ${moment().format('YYYY-MM-D hh:mm:ss')}`;
   }
 
-  static strcmp(str1, str2) {
-    if (str1.toString() < str2.toString()) return -1;
-    if (str1.toString() > str2.toString()) return 1;
+  /**
+   * Compares two strings and returns an integer value that represents the result of the comparison:
+   *  1 - string 1 less than string 2
+   *  0 - string 1 equal string 2
+   * -1 - string 1 greater than string 2
+   *
+   * @param string1
+   * @param string2
+   *
+   * @returns Integer
+   */
+  static strcmp(string1, string2) {
+    if (string1.toString() < string2.toString()) return -1;
+    if (string1.toString() > string2.toString()) return 1;
     return 0;
   }
 }
