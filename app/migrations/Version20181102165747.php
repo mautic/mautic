@@ -66,10 +66,10 @@ class Version20181102165747 extends AbstractMauticMigration
     }
 
     /**
-     * @param $id
-     * @param $properties
+     * @param int               $id
+     * @param array<int|string> $properties
      */
-    protected function fixRow(QueryBuilder $qb, $id, $properties)
+    protected function fixRow(QueryBuilder $qb, $id, $properties): void
     {
         $qb->resetQueryParts()
             ->update($this->prefix.'campaign_events')

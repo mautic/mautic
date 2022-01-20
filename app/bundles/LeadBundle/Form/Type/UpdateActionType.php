@@ -20,7 +20,10 @@ class UpdateActionType extends AbstractType
 {
     const FIELD_TYPE_TO_UPDATE_VALUES = ['multiselect'];
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    /**
+     * @param array<mixed> $options
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $object = isset($options['object']) ? $options['object'] : 'lead';
         foreach ($options['fields'] as $field) {
@@ -48,7 +51,6 @@ class UpdateActionType extends AbstractType
                         'onchange' => 'Mautic.updateContactActionModifier(this)',
                     ],
                     'choices'           => $choices,
-                    'choices_as_values' => true,
                 ]
             );
         }
@@ -57,7 +59,7 @@ class UpdateActionType extends AbstractType
     /**
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['fields', 'object']);
     }

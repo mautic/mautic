@@ -17,7 +17,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class UpdateLeadActionType extends AbstractType
 {
-    const FIELD_TYPE_TO_REMOVE_VALUES = ['multiselect'];
     use EntityFieldsBuildFormTrait;
 
     /**
@@ -70,8 +69,8 @@ class UpdateLeadActionType extends AbstractType
             [
                 'fields'  => $leadFields,
                 'object'  => 'lead',
-                'actions' => $options['data']['actions'],
-                'data'    => $options['data']['fields'],
+                'actions' => $options['data']['actions'] ?? [],
+                'data'    => $options['data']['fields'] ?? [],
             ]
         );
 
@@ -80,7 +79,7 @@ class UpdateLeadActionType extends AbstractType
             UpdateActionType::class,
             [
                 'fields' => $leadFields,
-                'data'   => $options['data']['actions'],
+                'data'   => $options['data']['actions'] ?? [],
             ]
         );
     }
