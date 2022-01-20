@@ -218,7 +218,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $connection = $this->connection;
         $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
-        $command    = "mysqldump --add-drop-table --opt -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()} $password {$connection->getDatabase()} > {$sqlDumpFile}";
+        $command    = "mysqldump --add-drop-table --column-statistics=0 --opt -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()} $password {$connection->getDatabase()} > {$sqlDumpFile}";
 
         // 0 -> stdin, 1 -> stdout, 2 -> stderr
         // We only need stderr, in case we need to output errors when the result code != 0.
