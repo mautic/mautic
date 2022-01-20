@@ -51,7 +51,8 @@ class PageListType extends AbstractType
             [
                 'choices' => function (Options $options) use ($model, $canViewOther) {
                     $choices = [];
-                    $pages = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids']);
+                    $publishedOnly = $options['published_only'] ?? false;
+                    $pages = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids'], [], $publishedOnly);
                     foreach ($pages as $page) {
                         $choices[$page['language']]["{$page['title']} ({$page['id']})"] = $page['id'];
                     }
@@ -74,7 +75,7 @@ class PageListType extends AbstractType
                 ]
         );
 
-        $resolver->setDefined(['top_level', 'ignore_ids']);
+        $resolver->setDefined(['top_level', 'ignore_ids', 'published_only']);
     }
 
     /**

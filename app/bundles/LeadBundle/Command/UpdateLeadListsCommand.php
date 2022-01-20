@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateLeadListsCommand extends ModeratedCommand
@@ -70,6 +71,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $batch                 = $input->getOption('batch-limit');
         $max                   = $input->getOption('max-contacts');
         $enableTimeMeasurement = (bool) $input->getOption('timing');
+        $output                = ($input->getOption('quiet')) ? new NullOutput() : $output;
 
         if (!$this->checkRunStatus($input, $output, $id)) {
             return 0;
@@ -116,20 +118,25 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     ).'</info>'
                 );
 
-                $processed = $listModel->rebuildListLeads($segment, $batch, $max, $output);
-                $output->writeln(
-                    '<comment>'.$translator->trans(
-                        'mautic.lead.list.rebuild.leads_affected',
-                        ['%leads%' => $processed]
-                    ).'</comment>'."\n"
-                );
+                    $startTimeForSingleSegment = time();
+                    $processed                 = $listModel->rebuildListLeads($l, $batch, $max, $output);
+                    $output->writeln(
+                        '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
+                    );
+                    if ($enableTimeMeasurement) {
+                        $totalTime = round(microtime(true) - $startTimeForSingleSegment, 2);
+                        $output->writeln($translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime])."\n");
+                    }
+                }
+
+                unset($l);
             }
         }
         $this->completeRun();
 
         if ($enableTimeMeasurement) {
             $totalTime = round(microtime(true) - $startTime, 2);
-            $output->writeln("Total time: {$totalTime} seconds");
+            $output->writeln($translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime]));
         }
 
         return 0;

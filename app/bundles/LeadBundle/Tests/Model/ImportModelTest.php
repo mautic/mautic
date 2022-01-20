@@ -15,11 +15,15 @@ use Doctrine\ORM\ORMException;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ImportModelTest extends StandardImportTestHelper
 {
@@ -46,7 +50,23 @@ class ImportModelTest extends StandardImportTestHelper
 
     public function testProcess()
     {
-        $model  = $this->initImportModel();
+        /** @var EventDispatcherInterface|MockObject $dispatcher */
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $dispatcher->expects($this->exactly(4))
+            ->method('dispatch')
+            ->with(
+                LeadEvents::IMPORT_ON_PROCESS,
+                $this->callback(function (ImportProcessEvent $event) {
+                    // Emulate a subscriber.
+                    $event->setWasMerged(false);
+
+                    return true;
+                })
+            );
+
+        $model = $this->initImportModel();
+        $model->setDispatcher($dispatcher);
         $entity = $this->initImportEntity();
         $entity->start();
         $model->process($entity, new Progress());
@@ -60,7 +80,6 @@ class ImportModelTest extends StandardImportTestHelper
 
     public function testCheckParallelImportLimitWhenMore()
     {
-        $entity = $this->initImportEntity();
         $model  = $this->getMockBuilder(ImportModel::class)
             ->onlyMethods(['getParallelImportLimit', 'getRepository'])
             ->disableOriginalConstructor()
@@ -120,7 +139,6 @@ class ImportModelTest extends StandardImportTestHelper
 
     public function testCheckParallelImportLimitWhenLess()
     {
-        $entity = $this->initImportEntity();
         $model  = $this->getMockBuilder(ImportModel::class)
             ->onlyMethods(['getParallelImportLimit', 'getRepository'])
             ->disableOriginalConstructor()
