@@ -26,9 +26,9 @@ class CampaignLeadSourceType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $sourceType = $options['data']['sourceType'];
+        $sourceType    = $options['data']['sourceType'];
         $sourceChoices = $options['source_choices'] ?? [];
-        foreach($sourceChoices as $key => $val) {
+        foreach ($sourceChoices as $key => $val) {
             $sourceChoices[$key] = $val.' ('.$key.')';
         }
 
