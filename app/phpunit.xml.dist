@@ -43,6 +43,7 @@
     <server name="DB_PASSWORD" value="root"/>
     <const name="DB_PASSWORD" value="root"/>
     <env name="DB_PASSWORD" value="root"/>
+    <ini name="error_reporting" value="E_ALL" />
   </php>
   <listeners>
     <listener class="\Mautic\CoreBundle\Test\Listeners\CleanupListener" />
