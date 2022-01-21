@@ -40,9 +40,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 trait EntityFieldsBuildFormTrait
 {
     /**
-    /**
-     * @param array<mixed> $options
-     * @param string       $object
+     * /**
+     * @param FormBuilderInterface<string|FormBuilderInterface> $builder
+     * @param array<mixed>                                      $options
+     * @param string                                            $object
      *
      * @return array<string>
      */
