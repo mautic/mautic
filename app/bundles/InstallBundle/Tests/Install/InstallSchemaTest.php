@@ -17,7 +17,7 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
     protected $connection;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     protected $dbParams;
 
