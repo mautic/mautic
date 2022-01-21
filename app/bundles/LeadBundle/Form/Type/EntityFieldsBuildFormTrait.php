@@ -39,7 +39,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 trait EntityFieldsBuildFormTrait
 {
-    private function getFormFields(FormBuilderInterface $builder, array $options, $object = 'lead')
+    /**
+    /**
+     * @param array<mixed> $options
+     * @param string       $object
+     *
+     * @return array<string>
+     */
+    private function getFormFields(FormBuilderInterface $builder, array $options, $object = 'lead'): array
     {
         $cleaningRules = [];
         $fieldValues   = [];

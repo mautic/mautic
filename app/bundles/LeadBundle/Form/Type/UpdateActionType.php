@@ -21,7 +21,8 @@ class UpdateActionType extends AbstractType
     const FIELD_TYPE_TO_UPDATE_VALUES = ['multiselect'];
 
     /**
-     * @param array<mixed> $options
+     * @param FormBuilderInterface<string|FormBuilderInterface> $builder
+     * @param array<mixed>                                      $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

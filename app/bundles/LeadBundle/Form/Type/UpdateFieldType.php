@@ -22,7 +22,11 @@ class UpdateFieldType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    /**
+     * @param FormBuilderInterface<string|FormBuilderInterface> $builder
+     * @param array<mixed>                                      $options
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $options['ignore_required_constraints'] = true;
 
@@ -50,7 +54,7 @@ class UpdateFieldType extends AbstractType
     /**
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['fields', 'object', 'actions']);
     }

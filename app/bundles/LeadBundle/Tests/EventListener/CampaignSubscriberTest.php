@@ -85,7 +85,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->companyEntityFrom  = $this->createMock(Company::class);
     }
 
-    public function testOnCampaignTriggerActionUpdateContact()
+    public function testOnCampaignTriggerActionUpdateContact(): void
     {
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -102,7 +102,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCoreParametersHelper
         );
 
-        /** @var LeadModel $leadModel */
         $lead = new Lead();
         $lead->setId(99);
         $fields = [
