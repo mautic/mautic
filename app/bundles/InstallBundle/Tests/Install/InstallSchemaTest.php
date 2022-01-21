@@ -36,15 +36,17 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
         $envFile = file_exists($root.'.env') ? $root.'.env' : $root.'.env.dist';
 
         $env->load($envFile);
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 
         $this->dbParams = [
             'driver'        => getenv('DB_DRIVER') ?: 'pdo_mysql',
             'host'          => getenv('DB_HOST'),
             'port'          => getenv('DB_PORT'),
-            'dbname'        => getenv('DB_NAME'),
+            'dbname'        => getenv('DB_NAME'), // Doctrine needs 'dbname', not 'name'
             'user'          => getenv('DB_USER'),
             'password'      => getenv('DB_PASSWD'),
-            'backup_prefix' => getenv('DB_BACKUP_PREFIX') ?: 'bak_',
+            'table_prefix'  => MAUTIC_TABLE_PREFIX,
+            'backup_prefix' => 'bak_',
         ];
 
         $this->connection = DriverManager::getConnection($this->dbParams);
