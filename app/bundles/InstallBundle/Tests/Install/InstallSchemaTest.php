@@ -38,7 +38,7 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
         $env->load($envFile);
 
         $this->dbParams = [
-            'driver'        => getenv('DB_DRIVER'),
+            'driver'        => getenv('DB_DRIVER') ?: 'pdo_mysql',
             'host'          => getenv('DB_HOST'),
             'port'          => getenv('DB_PORT'),
             'dbname'        => getenv('DB_NAME'),
