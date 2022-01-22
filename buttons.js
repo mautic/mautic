@@ -108,45 +108,41 @@ export default (editor, opts = {}) => {
     }
 
     // Load and show settings and style manager
-    const openTmBtn = pm.getButton('views', 'open-tm');
-    const openSm = pm.getButton('views', 'open-sm');
-    if (openTmBtn) {
-      openTmBtn.set('active', 1);
-    }
-    if (openSm) {
-      openSm.set('active', 1);
-    }
+    if (!opts.combineSettingsAndSm) {
+      const openTmBtn = pm.getButton('views', 'open-tm');
+      const openSm = pm.getButton('views', 'open-sm');
+      if (openTmBtn) {
+        openTmBtn.set('active', 1);
+      }
+      if (openSm) {
+        openSm.set('active', 1);
+      }
 
-    pm.removeButton('views', 'open-tm');
+      pm.removeButton('views', 'open-tm');
 
-    // Add Settings Sector
-    const traitsSector = $(
-      '<div class="gjs-sm-sector no-select">' +
+      // Add Settings Sector
+      const traitsSector = $(
+        '<div class="gjs-sm-sector no-select">' +
         '<div class="gjs-sm-title"><span class="icon-settings fa fa-cog"></span> Settings</div>' +
         '<div class="gjs-sm-properties" style="display: none;"></div></div>'
-    );
-    const traitsProps = traitsSector.find('.gjs-sm-properties');
+      );
+      const traitsProps = traitsSector.find('.gjs-sm-properties');
 
-    traitsProps.append($('.gjs-trt-traits'));
-    $('.gjs-sm-sectors').before(traitsSector);
-    traitsSector.find('.gjs-sm-title').on('click', () => {
-      const traitStyle = traitsProps.get(0).style;
-      const hidden = traitStyle.display === 'none';
+      traitsProps.append($('.gjs-trt-traits'));
+      $('.gjs-sm-sectors').before(traitsSector);
+      traitsSector.find('.gjs-sm-title').on('click', () => {
+        const traitStyle = traitsProps.get(0).style;
+        const hidden = traitStyle.display === 'none';
 
-      if (hidden) {
-        traitStyle.display = 'block';
-      } else {
-        traitStyle.display = 'none';
-      }
-    });
+        if (hidden) {
+          traitStyle.display = 'block';
+        } else {
+          traitStyle.display = 'none';
+        }
+      });
 
-    // Open settings
-    traitsProps.get(0).style.display = 'block';
-
-    // Open block manager
-    const openBlocksBtn = editor.Panels.getButton('views', 'open-blocks');
-    if (openBlocksBtn) {
-      openBlocksBtn.set('active', 1);
+      // Open settings
+      traitsProps.get(0).style.display = 'block';
     }
   });
 };
