@@ -1,9 +1,12 @@
 // import ContentService from '../../../../../../../grapesjs-preset-mautic/src/content.service';
 import MjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
 import ContentService from 'grapesjs-preset-mautic/dist/content.service';
+import Logger from 'grapesjs-preset-mautic/dist/logger';
 
 class CodeEditor {
   editor;
+
+  logger;
 
   opts;
 
@@ -15,6 +18,7 @@ class CodeEditor {
     this.editor = editor;
     this.opts = opts;
 
+    this.logger = new Logger(editor);
     this.codeEditor = this.buildCodeEditor();
     this.codePopup = this.buildCodePopup();
   }
@@ -65,8 +69,12 @@ class CodeEditor {
     return codePopup;
   }
 
-  // Load content and show popup
+  /**
+   * Load content and show popup
+   * @param {Editor} editor GrapesJs Editor
+   */
   showCodePopup(editor) {
+    this.logger.debug('Show the CodePopup',{ editor });
     this.updateEditorContents();
     // this.codeEditor.editor.refresh();
     // editor.Modal.setContent('');
@@ -82,7 +90,7 @@ class CodeEditor {
    * content from modals editor.
    * @todo show validation results in UI
    */
-  updateCode() {
+  updateCode(editor) {
     const code = this.codeEditor.editor.getValue();
     // validate MJML code
     if (ContentService.isMjmlMode(this.editor)) {
@@ -108,11 +116,14 @@ class CodeEditor {
    * Set the content to be edited in the popup editor
    */
   updateEditorContents() {
+
     // Check if MJML plugin is on
     let content;
     if (ContentService.isMjmlMode(this.editor)) {
+      this.logger.debug('updateEditorContents mjml');
       content = MjmlService.getEditorMjmlContent(this.editor);
     } else {
+      this.logger.debug('updateEditorContents html');
       content = ContentService.getEditorHtmlContent(this.editor);
     }
     this.codeEditor.setContent(content);
