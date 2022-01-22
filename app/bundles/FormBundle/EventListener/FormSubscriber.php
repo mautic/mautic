@@ -252,8 +252,10 @@ class FormSubscriber implements EventSubscriberInterface
             // Use the cleaned value by default - but if set to not save result, get from post
             $value               = (isset($results[$field['alias']])) ? $results[$field['alias']] : $post[$field['alias']];
             $matchedFields[$key] = $field['alias'];
-            $payload[$key]       = $value;
+            $payload[$key]       = htmlspecialchars_decode($value);
         }
+
+        $event->setPostSubmitPayload($payload);
 
         $headers = [
             'X-Forwarded-For' => $event->getSubmission()->getIpAddress()->getIpAddress(),
