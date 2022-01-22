@@ -3,6 +3,7 @@ import ButtonClose from './buttons/buttonClose';
 export default (editor, opts = {}) => {
   const { $ } = editor;
   const pm = editor.Panels;
+  const defaultPanel = opts.defaultPanel || 'open-blocks';
 
   // Disable Import code button
   if (!opts.showImportButton) {
@@ -144,5 +145,16 @@ export default (editor, opts = {}) => {
       // Open settings
       traitsProps.get(0).style.display = 'block';
     }
+
+    // Open the default panel
+    const openBlocksBtn = editor.Panels.getButton('views', defaultPanel);
+    if (openBlocksBtn) {
+      openBlocksBtn.set('active', 1);
+    }
+  });
+  // Workaround to set the default panel when the editor is reopened. Missing a dedicated event for 'opening'.
+  editor.on('update', () => {
+    const btn = editor.Panels.getButton('views', defaultPanel);
+    btn.set('active', 1);
   });
 };
