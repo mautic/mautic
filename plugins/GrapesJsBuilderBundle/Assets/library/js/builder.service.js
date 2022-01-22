@@ -15,6 +15,7 @@ import mjmlService from '../../../../../../grapesjs-preset-mautic/src/mjml/mjml.
 
 import CodeModeButton from './codeMode/codeMode.button';
 import ContentService from 'grapesjs-preset-mautic/dist/content.service';
+import Logger from 'grapesjs-preset-mautic/dist/logger';
 
 export default class BuilderService {
   editor;
@@ -101,6 +102,13 @@ export default class BuilderService {
    */
   initGrapesJS(type) {
 
+    // is there an existing editor in the correct mode?
+    if (this.editor && BuilderService.getRequestedMode(type) === ContentService.getMode(this.editor)) {
+      this.logger = new Logger(this.editor);
+      this.logger.debug('Using the existing editor', {mode: ContentService.getMode(this.editor)})
+      return this.editor;
+    }
+
     // initialize the editor in the correct mode
     if (ContentService.modePageHtml === BuilderService.getRequestedMode(type)) {
       this.editor = this.initPage();
@@ -110,7 +118,6 @@ export default class BuilderService {
       this.editor = this.initEmailHtml();
     }
 
-    // this.logger = new Logger(this.editor);
     this.addCodeModeButton();
 
     this.setListeners();
