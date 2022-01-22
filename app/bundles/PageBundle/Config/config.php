@@ -217,6 +217,12 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.page.subscriber.redirect.response' => [
+                'class'     => \Mautic\PageBundle\EventListener\RedirectResponseSubscriber::class,
+                'arguments' => [
+                   'mautic.page.helper.redirect',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.page' => [
@@ -384,6 +390,18 @@ return [
                     'mautic.helper.core_parameters',
                     'request_stack',
                     'mautic.tracker.contact',
+                ],
+            ],
+            'mautic.page.helper.redirect' => [
+                'class'     => \Mautic\PageBundle\Helper\RedirectHelper::class,
+                'arguments' => [
+                    'request_stack',
+                    'mautic.helper.ip_lookup',
+                    'mautic.lead.model.lead',
+                    'mautic.page.model.page',
+                    'monolog.logger.mautic',
+                    'mautic.lead.helper.primary_company',
+                    'translator',
                 ],
             ],
         ],
