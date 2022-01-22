@@ -17,10 +17,7 @@ import './grapesjs-custom.css';
  */
 function launchBuilderGrapesjs(formName) {
   const assets = AssetService.getAssets();
-
-  const builder = new BuilderService(assets);
-
-  Mautic.showChangeThemeWarning = true;
+  const builderService = new BuilderService(Mautic.builder, assets);
 
   // Prepare HTML
   mQuery('html').css('font-size', '100%');
@@ -29,8 +26,15 @@ function launchBuilderGrapesjs(formName) {
   mQuery('.builder-panel').css('display', 'block');
   mQuery('.builder').addClass('builder-active').removeClass('hide');
 
-  // Initialize GrapesJS
-  builder.initGrapesJS(formName);
+  // disable mautic global shortcuts
+  Mousetrap.reset();
+
+  // Initialize GrapesJS and make it available in the Mautic scope
+  // so it can be accessed by 3rd party plugins as requested
+  // by the community. Should not be used from the Mautic project.
+  Mautic.builder = builderService.initGrapesJS(formName);
+
+  Mautic.showChangeThemeWarning = true;
 }
 
 /**
