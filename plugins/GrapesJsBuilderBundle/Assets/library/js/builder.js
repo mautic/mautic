@@ -36,7 +36,29 @@ function launchBuilderGrapesjs(formName) {
   // by the community. Should not be used from the Mautic project.
   Mautic.builder = builderService.initGrapesJS(formName);
 
+  // const contentService = new ContentService();
+  const isMjmlMode = ContentService.isMjmlMode(Mautic.builder);
+  const components = getComponents(isMjmlMode);
+  Mautic.builder.setComponents(components);
+  
   Mautic.showChangeThemeWarning = true;
+}
+
+function getComponents(isMjmlMode) {
+  let components = '';
+
+  if (isMjmlMode) {
+    components = MjmlService.getOriginalContentMjml();
+    // validate
+    MjmlService.mjmlToHtml(components);
+  } else {
+    //html page and email html
+    components = ContentService.getOriginalContentHtml().body.innerHTML;
+  }
+  if (components.length <= 0) {
+    throw new Error('No components found');
+  }
+  return components;
 }
 
 /**
