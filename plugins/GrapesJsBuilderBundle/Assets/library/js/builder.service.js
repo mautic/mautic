@@ -3,17 +3,18 @@ import grapesjsmjml from 'grapesjs-mjml';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
-import contentService from 'grapesjs-preset-mautic/dist/content.service';
-import grapesjsmautic from 'grapesjs-preset-mautic';
-import mjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
+// import contentService from 'grapesjs-preset-mautic/dist/content.service';
+// import grapesjsmautic from 'grapesjs-preset-mautic';
+// import mjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
 import 'grapesjs-plugin-ckeditor';
 
 // for local dev
-// import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
-// import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
-// import mjmlService from '../../../../../../grapesjs-preset-mautic/src/mjml/mjml.service';
+import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
+import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
+import mjmlService from '../../../../../../grapesjs-preset-mautic/src/mjml/mjml.service';
 
 import CodeModeButton from './codeMode/codeMode.button';
+import ContentService from 'grapesjs-preset-mautic/dist/content.service';
 
 export default class BuilderService {
   editor;
@@ -25,10 +26,11 @@ export default class BuilderService {
   deletePath;
 
   /**
-   * @param {*} assets
+   * @param {Editor} editor GrapesJS Editor
+   * @param {Object} assets GrapesJS Asset Config Object
    */
-  constructor(assets) {
-    if (!assets.conf.uploadPath) {
+  constructor(editor, assets) {
+    if (!assets.conf || !assets.conf.uploadPath) {
       throw Error('No uploadPath found');
     }
     if (!assets.conf.deletePath) {
@@ -38,6 +40,7 @@ export default class BuilderService {
       console.warn('no assets');
     }
 
+    this.editor = editor;
     this.assets = assets.files;
     this.uploadPath = assets.conf.uploadPath;
     this.deletePath = assets.conf.deletePath;
@@ -94,29 +97,46 @@ export default class BuilderService {
   /**
    * Initialize the grapesjs build in the
    * correct mode
+   * @returns GrapesJsBuilder
    */
-  initGrapesJS(object) {
-    // disable mautic global shortcuts
-    Mousetrap.reset();
-    if (object === 'page') {
+  initGrapesJS(type) {
+
+    // initialize the editor in the correct mode
+    if (ContentService.modePageHtml === BuilderService.getRequestedMode(type)) {
       this.editor = this.initPage();
-    } else if (object === 'emailform') {
-      if (mjmlService.getOriginalContentMjml()) {
-        this.editor = this.initEmailMjml();
-      } else {
-        this.editor = this.initEmailHtml();
-      }
-    } else {
-      throw Error(`Not supported builder type: ${object}`);
+    } else if (ContentService.modeEmailMjml === BuilderService.getRequestedMode(type)) {
+      this.editor = this.initEmailMjml();
+    } else if (ContentService.modeEmailHtml === BuilderService.getRequestedMode(type)) {
+      this.editor = this.initEmailHtml();
     }
 
-    // add code mode button
-    // @todo: only show button if configured: sourceEdit: 1,
-    const codeModeButton = new CodeModeButton(this.editor);
-    codeModeButton.addCommand();
-    codeModeButton.addButton();
+    // this.logger = new Logger(this.editor);
+    this.addCodeModeButton();
 
     this.setListeners();
+
+    return this.editor;
+  }
+
+  /**
+   * Check if the editor needs to be in MJML mode
+   * @returns boolean
+   */
+  static isMjmlModeRequested() {
+    return mjmlService.getOriginalContentMjml().length > 0;
+  }
+  static getRequestedMode(type) {
+    if (type === 'page') {
+      return ContentService.modePageHtml;
+    } else if (type === 'emailform') {
+      if (BuilderService.isMjmlModeRequested()) {
+        return ContentService.modeEmailMjml;
+      } else {
+        return ContentService.modeEmailHtml;
+      }
+    } else {
+      throw Error(`Not supported builder type: ${type}`);
+    }
   }
 
   static getMauticConf(mode) {
@@ -124,6 +144,17 @@ export default class BuilderService {
       mode,
     };
   }
+
+  /**
+   * Add the code mode button
+   * @todo: only show button if configured: sourceEdit: 1,
+   */
+  addCodeModeButton() {
+    const codeModeButton = new CodeModeButton(this.editor);
+    codeModeButton.addCommand();
+    codeModeButton.addButton();
+  }
+
 
   static getCkeConf() {
     return {
