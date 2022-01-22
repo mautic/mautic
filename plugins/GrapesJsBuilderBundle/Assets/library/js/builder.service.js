@@ -3,15 +3,15 @@ import grapesjsmjml from 'grapesjs-mjml';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
-// import contentService from 'grapesjs-preset-mautic/dist/content.service';
-// import grapesjsmautic from 'grapesjs-preset-mautic';
-// import mjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
+import contentService from 'grapesjs-preset-mautic/dist/content.service';
+import grapesjsmautic from 'grapesjs-preset-mautic';
+import mjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
 import 'grapesjs-plugin-ckeditor';
 
 // for local dev
-import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
-import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
-import mjmlService from '../../../../../../grapesjs-preset-mautic/src/mjml/mjml.service';
+// import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
+// import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
+// import mjmlService from '../../../../../../grapesjs-preset-mautic/src/mjml/mjml.service';
 
 import CodeModeButton from './codeMode/codeMode.button';
 import ContentService from 'grapesjs-preset-mautic/dist/content.service';
@@ -188,7 +188,6 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: contentService.getOriginalContentHtml().body.innerHTML,
       height: '100%',
       canvas: {
         styles: contentService.getStyles(),
@@ -212,14 +211,10 @@ export default class BuilderService {
   }
 
   initEmailMjml() {
-    const components = mjmlService.getOriginalContentMjml();
-    // validate
-    mjmlService.mjmlToHtml(components);
 
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components,
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
@@ -239,16 +234,11 @@ export default class BuilderService {
   }
 
   initEmailHtml() {
-    const components = contentService.getOriginalContentHtml().body.innerHTML;
-    if (!components) {
-      throw new Error('no components');
-    }
 
     // Launch GrapesJS with body part
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components,
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
