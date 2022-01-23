@@ -1,4 +1,5 @@
 import Logger from '../logger';
+import MjmlService from '../mjml/mjml.service';
 import DynamicContentService from './dynamicContent.service';
 
 export default class DynamicContentCommands {
@@ -53,6 +54,8 @@ export default class DynamicContentCommands {
   convertDynamicContentComponentsToTokens(editor) {
     // get all dynamic content elements loaded in the editor
     const dynamicContents = editor.DomComponents.getWrapper().find('[data-slot="dynamicContent"]');
+    this.logger.debug(`DC: ${dynamicContents.length} components found`, { dynamicContents });
+
     dynamicContents.forEach((dynamicContent) => {
       const attributes = dynamicContent.getAttributes();
       const decId = attributes['data-param-dec-id'];

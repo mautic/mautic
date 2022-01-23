@@ -13,7 +13,7 @@ export default class DynamicContentDomComponents {
       {
         defaults: {
           ...defaultModel.prototype.defaults,
-          tagName: 'mj-text',
+          tagName: 'mj-raw',
           name: 'Dynamic Content',
           // draggable: '[data-gjs-type=cell]', // @todo make dropable in mjml content
           droppable: false,
@@ -23,7 +23,7 @@ export default class DynamicContentDomComponents {
           attributes: {
             // Default attributes
             'data-gjs-type': 'dynamic-content', // Type for GrapesJS
-            'data-slot': 'dynamicContent3', // Retro compatibility with old template
+            'data-slot': 'dynamicContent', // used to find the DC component on the canvas for e.g. token transformation
           },
         },
         /**

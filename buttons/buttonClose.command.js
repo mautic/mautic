@@ -43,6 +43,7 @@ export default class ButtonCloseCommands {
     editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
 
     const htmlCode = MjmlService.getEditorHtmlContent(editor);
+    console.warn({ htmlCode });
     const mjmlCode = MjmlService.getEditorMjmlContent(editor);
 
     // Update textarea for save

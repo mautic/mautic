@@ -52,6 +52,8 @@ export default class MjmlService {
         throw new Error('No valid MJML provided');
       }
       // html needs to be beautified for the click tracking to work.
+      // strict mode not working with e.g. id="" and data-type parameters that
+      // are e.g. used for Dynamic Content
       return mjml2html(mjml, { beautify: true });
     } catch (error) {
       console.warn(error);
