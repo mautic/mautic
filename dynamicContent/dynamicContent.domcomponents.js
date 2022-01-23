@@ -1,27 +1,27 @@
+import ContentService from '../content.service';
 import DynamicContentService from './dynamicContent.service';
 
 export default class DynamicContentDomComponents {
   dcService;
 
-  // @todo make sure a mjml text element is used. instead of a div
   static addDynamicContentType(editor) {
     const dc = editor.DomComponents;
     const defaultType = dc.getType('default');
     const defaultModel = defaultType.model;
-    
+    const tagName = ContentService.isMjmlMode(editor) ? 'mj-raw' : 'div';
+
     const model = defaultModel.extend(
       {
         defaults: {
           ...defaultModel.prototype.defaults,
-          tagName: 'mj-raw',
+          tagName,
           name: 'Dynamic Content',
-          // draggable: '[data-gjs-type=cell]', // @todo make dropable in mjml content
+          draggable: '[data-gjs-type=cell],[data-gjs-type=mj-column]',
           droppable: false,
           editable: false,
           stylable: false,
           propagate: ['droppable', 'editable'],
           attributes: {
-            // Default attributes
             'data-gjs-type': 'dynamic-content', // Type for GrapesJS
             'data-slot': 'dynamicContent', // used to find the DC component on the canvas for e.g. token transformation
           },
