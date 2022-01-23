@@ -11,7 +11,7 @@ export default (editor, opts = {}) => {
   const config = {
     showLayersManager: 0,
     showImportButton: 0,
-    logFilter: 'log:info',
+    logFilter: 'log:debug',
     ...opts,
   };
 
