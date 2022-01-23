@@ -13,8 +13,9 @@ export default class DynamicContentDomComponents {
       {
         defaults: {
           ...defaultModel.prototype.defaults,
+          tagName: 'mj-text',
           name: 'Dynamic Content',
-          draggable: '[data-gjs-type=cell]', // @todo make dropable in mjml content
+          // draggable: '[data-gjs-type=cell]', // @todo make dropable in mjml content
           droppable: false,
           editable: false,
           stylable: false,
@@ -22,7 +23,7 @@ export default class DynamicContentDomComponents {
           attributes: {
             // Default attributes
             'data-gjs-type': 'dynamic-content', // Type for GrapesJS
-            'data-slot': 'dynamicContent', // Retro compatibility with old template
+            'data-slot': 'dynamicContent3', // Retro compatibility with old template
           },
         },
         /**

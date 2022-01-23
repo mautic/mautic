@@ -4,10 +4,9 @@ import ButtonBlock from './buttonBlock';
 
 export default (editor, opts = {}) => {
   const bm = editor.BlockManager;
-  const cfg = editor.getConfig();
   const blocks = bm.getAll();
 
-  const mode = ContentService.getMode();
+  const mode = ContentService.getMode(editor);
 
   // a add button block for landing page
   if (mode === ContentService.modePageHtml) {
