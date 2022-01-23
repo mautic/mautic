@@ -49,7 +49,7 @@ class FormSubscriberTest extends TestCase
     public function testOnFormSubmitActionRepost(): void
     {
         $postData = [
-            'first_name' => 'Test Name',
+            'first_name' => "Test's Name",
             'notes'      => 'A & B < dy >',
             'formId'     => '1',
             'return'     => '',
@@ -58,7 +58,7 @@ class FormSubscriberTest extends TestCase
         ];
 
         $resultData = [
-            'first_name' => 'Test Name',
+            'first_name' => 'Test&#39;s Name',
             'notes'      => 'A &#38; B &#60; dy &#62;',
         ];
 
@@ -72,7 +72,13 @@ class FormSubscriberTest extends TestCase
         $this->subscriber->onFormSubmitActionRepost($submissionEvent);
         $postPayload = $submissionEvent->getPostSubmitPayload();
 
-        $this->assertSame($postData['notes'], $postPayload['notes'], 'Form repost payload data should not be htmlspecialchar encoded');
+        $this->assertSame([
+            $postData['first_name'],
+            $postData['notes'],
+        ], [
+            $postPayload['first_name'],
+            $postPayload['notes'],
+        ], 'Form data should be decode before posting to next form');
     }
 
     /**

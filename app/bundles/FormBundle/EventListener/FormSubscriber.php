@@ -252,7 +252,9 @@ class FormSubscriber implements EventSubscriberInterface
             // Use the cleaned value by default - but if set to not save result, get from post
             $value               = (isset($results[$field['alias']])) ? $results[$field['alias']] : $post[$field['alias']];
             $matchedFields[$key] = $field['alias'];
-            $payload[$key]       = htmlspecialchars_decode($value);
+
+            // decode html chars and quotes before posting to next form
+            $payload[$key]       = htmlspecialchars_decode($value, ENT_QUOTES);
         }
 
         $event->setPostSubmitPayload($payload);
