@@ -19,7 +19,7 @@ abstract class AbstractStorageFileEvent extends AbstractStorageEvent implements 
 
     public function existsInStorage(): ?bool
     {
-        return null !== $this->url;
+        return null !== $this->url ? true : null;
     }
 
     public function getContents(): ?string
