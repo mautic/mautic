@@ -14,7 +14,10 @@ namespace Mautic\SmsBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\SmsBundle\Broadcast\BroadcastQuery;
+use Mautic\SmsBundle\Event\TokensBuildEvent;
 use Mautic\SmsBundle\Model\SmsModel;
+use Mautic\SmsBundle\SmsEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -71,5 +74,37 @@ class AjaxController extends CommonAjaxController
         }
 
         return new JsonResponse($data);
+    }
+
+    /**
+     * Just selected get tokens from email  builder.
+     *
+     * @param $query
+     *
+     * @return array
+     */
+    protected function getBuilderTokens($query)
+    {
+        $model        = $this->getModel('email');
+        $components   = $model->getBuilderComponents(null, ['tokens'], $query);
+        $findTokens   = ['{contactfield=', '{assetlink', '{pagelink'];
+        $returnTokens = [];
+        $tokens       = $components['tokens'];
+
+        array_map(
+            function ($token, $value) use ($findTokens, &$returnTokens) {
+                foreach ($findTokens as $findToken) {
+                    if (substr($token, 0, strlen($findToken)) === $findToken) {
+                        $returnTokens[$token] = $value;
+                    }
+                }
+            }, array_keys($tokens), $tokens);
+
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->get('event_dispatcher');
+        $event           = new TokensBuildEvent($returnTokens);
+        $eventDispatcher->dispatch(SmsEvents::ON_SMS_TOKENS_BUILD, $event);
+
+        return ['tokens'=>$event->getTokens()];
     }
 }
