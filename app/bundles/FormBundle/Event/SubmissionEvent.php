@@ -97,7 +97,7 @@ class SubmissionEvent extends CommonEvent
     private $postSubmitResponse;
 
     /**
-     * @var array
+     * @var array<mixed>
      */
     private $postSubmitPayload;
 
@@ -357,11 +357,17 @@ class SubmissionEvent extends CommonEvent
         $this->postSubmitResponse = $response;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getPostSubmitPayload(): array
     {
         return $this->postSubmitPayload;
     }
 
+    /**
+     * @param mixed[] $postSubmitPayload
+     */
     public function setPostSubmitPayload(array $postSubmitPayload): void
     {
         $this->postSubmitPayload = $postSubmitPayload;
