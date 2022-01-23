@@ -13,6 +13,7 @@ namespace Mautic\SmsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\SmsBundle\Broadcast\BroadcastQuery;
 use Mautic\SmsBundle\Event\TokensBuildEvent;
 use Mautic\SmsBundle\Model\SmsModel;
@@ -79,12 +80,13 @@ class AjaxController extends CommonAjaxController
     /**
      * Just selected get tokens from email  builder.
      *
-     * @param $query
+     * @param string|null $query
      *
-     * @return array
+     * @return array<string,array<int|string>>
      */
-    protected function getBuilderTokens($query)
+    protected function getBuilderTokens($query): array
     {
+        /** @var EmailModel $model */
         $model        = $this->getModel('email');
         $components   = $model->getBuilderComponents(null, ['tokens'], $query);
         $findTokens   = ['{contactfield=', '{assetlink', '{pagelink'];

@@ -15,25 +15,31 @@ use Symfony\Component\EventDispatcher\Event;
 
 class TokensBuildEvent extends Event
 {
-    private $tokens;
+    /**
+     * @var array<int|string>
+     */
+    private array $tokens;
 
+    /**
+     * @param array<int|string> $tokens
+     */
     public function __construct(array $tokens)
     {
         $this->tokens = $tokens;
     }
 
     /**
-     * @return array
+     * @return array<int|string>
      */
-    public function getTokens()
+    public function getTokens(): array
     {
         return $this->tokens;
     }
 
     /**
-     * @param array $tokens
+     * @param array<int|string> $tokens
      */
-    public function setTokens($tokens)
+    public function setTokens($tokens): void
     {
         $this->tokens = $tokens;
     }
