@@ -6,16 +6,16 @@ export default class DynamicContentDomComponents {
 
   static addDynamicContentType(editor) {
     const dc = editor.DomComponents;
-    const defaultType = dc.getType('default');
-    const defaultModel = defaultType.model;
-    const tagName = ContentService.isMjmlMode(editor) ? 'mj-raw' : 'div';
-
-    const model = defaultModel.extend(
+    const baseTypeName = ContentService.isMjmlMode(editor) ? 'mj-text' : 'text';
+    const tagName = ContentService.isMjmlMode(editor) ? 'mj-text' : 'div';
+    const baseType = dc.getType(baseTypeName);
+    const baseModel = baseType.model;
+    const model = baseModel.extend(
       {
         defaults: {
-          ...defaultModel.prototype.defaults,
-          tagName,
+          ...baseModel.prototype.defaults,
           name: 'Dynamic Content',
+          tagName,
           draggable: '[data-gjs-type=cell],[data-gjs-type=mj-column]',
           droppable: false,
           editable: false,
@@ -69,7 +69,7 @@ export default class DynamicContentDomComponents {
       }
     );
 
-    const view = defaultType.view.extend({
+    const view = baseType.view.extend({
       attributes: {
         style: 'pointer-events: all; display: table; width: 100%;user-select: none;',
       },
