@@ -560,6 +560,33 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ekkeguembel",
+      "name": "ekkeguembel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43146234?v=4",
+      "profile": "http://Leuchtfeuer.com",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "MadlenF",
+      "name": "Madlen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/87804194?v=4",
+      "profile": "https://github.com/MadlenF",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "kathrin-schmid",
+      "name": "Kathrin Schmid",
+      "avatar_url": "https://avatars.githubusercontent.com/u/96054002?v=4",
+      "profile": "https://friendly.ch/kathrin",
+      "contributions": [
+        "translation"
+      ]
     }
   ],
   "contributorsPerLine": 7,
