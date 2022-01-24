@@ -189,7 +189,7 @@ trait LeadDetailsTrait
         $engagements = $model->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
         $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $engagements['byUnit']);
 
-        $pointStats = $chartQuery->fetchSumTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()], 'delta');
+        $pointStats = $chartQuery->fetchSumTimeData('lead_points_change_log', 'date_added', 'delta', ['lead_id' => $lead->getId()], );
         $lineChart->setDataset($translator->trans('mautic.lead.graph.line.points'), $pointStats);
 
         return $lineChart->render();
@@ -325,7 +325,7 @@ trait LeadDetailsTrait
         $chartQuery  = new ChartQuery($this->getDoctrine()->getConnection(), $fromDate, $toDate);
 
         $engagements = $model->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
-        $pointStats  = $chartQuery->fetchSumTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()], 'delta');
+        $pointStats  = $chartQuery->fetchSumTimeData('lead_points_change_log', 'date_added', 'delta', ['lead_id' => $lead->getId()]);
 
         return [
             'engagements' => $engagements,

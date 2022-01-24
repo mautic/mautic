@@ -267,12 +267,12 @@ class ChartQuery extends AbstractChart
      *
      * @param string $table     without prefix
      * @param string $column    name. The column must be type of datetime
-     * @param array  $filters   will be added to where claues
      * @param string $sumColumn name that will be summed
+     * @param array  $filters   will be added to where claues
      *
      * @return array
      */
-    public function fetchSumTimeData($table, $column, $filters = [], $sumColumn)
+    public function fetchSumTimeData($table, $column, $sumColumn, $filters = [])
     {
         $query = $this->prepareTimeDataQuery($table, $column, $filters, $sumColumn, 'sum');
 

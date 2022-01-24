@@ -22,14 +22,14 @@
     },
   "require": {
     "composer/installers": "^1.11",
-    "mautic/core-lib": "^4.0"
+    "mautic/core-lib": "*"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.19.2",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.2",
     "liip/test-fixtures-bundle": "^1.6",
-    "mautic/transifex": "^4.0",
+    "mautic/transifex": "^4.1",
     "php-http/mock-client": "^1.4",
     "phpstan/phpstan": "0.12.91",
     "phpunit/phpunit": "^9.5",
@@ -87,7 +87,7 @@
       "url": "app",
       "options": {
         "versions": {
-            "mautic/core-lib": "4.1.0"
+            "mautic/core-lib": "4.1.1"
         }
       }
     },

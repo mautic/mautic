@@ -272,7 +272,7 @@ class MailHelper
         }
 
         // Set factory if supported
-        if (method_exists($this->transport, 'setMauticFactory')) {
+        if ($this->transport && method_exists($this->transport, 'setMauticFactory')) {
             $this->transport->setMauticFactory($factory);
         }
 

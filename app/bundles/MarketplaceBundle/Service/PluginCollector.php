@@ -27,7 +27,7 @@ class PluginCollector
         $this->allowlist  = $allowlist;
     }
 
-    public function collectPackages(int $page = 1, int $limit, string $query = ''): PackageCollection
+    public function collectPackages(int $page, int $limit, string $query = ''): PackageCollection
     {
         $allowlist = $this->allowlist->getAllowList();
 
