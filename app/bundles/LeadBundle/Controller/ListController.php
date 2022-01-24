@@ -93,12 +93,9 @@ class ListController extends FormController
 
             $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
-            if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
-                $translator      = $this->translator;
-                $mine            = $translator->trans('mautic.core.searchcommand.ismine');
-                $global          = $translator->trans('mautic.lead.list.searchcommand.isglobal');
-                $filter['force'] = "($mine or $global)";
-            }
+        if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
+            $filter['force'][] = ['column' => $model->getRepository()->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
+        }
 
             [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 
@@ -809,7 +806,7 @@ class ListController extends FormController
             ]
         );
 
-        $permissions = [LeadPermissions::LISTS_CREATE, LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_VIEW_OTHER, LeadPermissions::LISTS_EDIT_OTHER, LeadPermissions::LISTS_DELETE_OTHER];
+        $permissions = [LeadPermissions::LISTS_CREATE, LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER];
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
