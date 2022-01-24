@@ -41,7 +41,7 @@ class CommonEntity
             return $this->getTitle();
         }
 
-        throw new \InvalidArgumentException('Method '.$name.' not exists');
+        throw new \InvalidArgumentException('Method '.$name.' does not exists');
     }
 
     /**
