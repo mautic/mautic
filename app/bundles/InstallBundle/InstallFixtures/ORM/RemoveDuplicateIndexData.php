@@ -40,6 +40,7 @@ class RemoveDuplicateIndexData extends AbstractFixture implements OrderedFixture
      */
     public function load(ObjectManager $manager): void
     {
+        return;
         $prefix = $this->container->getParameter('mautic.db_table_prefix');
         /** @var IndexSchemaHelper $indexHelper */
         $indexHelper = $this->container->get('mautic.schema.helper.index');
