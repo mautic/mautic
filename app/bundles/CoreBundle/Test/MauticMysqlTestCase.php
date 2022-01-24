@@ -53,7 +53,12 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         if ($this->useCleanupRollback) {
             $this->beforeBeginTransaction();
-            $this->connection->beginTransaction();
+            try {
+                $this->connection->beginTransaction();
+            }
+            catch (\Exception $e) {
+                $a = 'b';
+            }
         }
     }
 
@@ -61,7 +66,12 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         if ($this->useCleanupRollback) {
             if ($this->connection->isTransactionActive()) {
-                $this->connection->rollback();
+                try {
+                    $this->connection->rollback();
+                }
+                catch (\Exception $e) {
+                    $a = 'b';
+                }
             }
         } else {
             $this->prepareDatabase();
