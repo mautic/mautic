@@ -87,6 +87,7 @@ class ListController extends FormController
                     ['column' => $tableAlias.'.isGlobal', 'expr' => 'eq', 'value' => 1],
                 ],
             ];
+            $filter['force'][] = ['column' => $model->getRepository()->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
         [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
@@ -789,7 +790,7 @@ class ListController extends FormController
                 't.leadlist_id' => $objectId,
             ]
         );
-        
+
         $permissions = [LeadPermissions::LISTS_CREATE, LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER];
 
         return $this->delegateView([
