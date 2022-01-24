@@ -44,7 +44,7 @@ class FrequencyRuleRepository extends CommonRepository
 
         $violations = $this->getCustomFrequencyRuleViolations($channel, $leadIds, $statTable, $statContactColumn, $statSentColumn);
 
-        if ($defaultFrequencyTime && $defaultFrequencyTime) {
+        if ($defaultFrequencyNumber && $defaultFrequencyTime) {
             $violations = array_merge(
                 $violations,
                 $this->getDefaultFrequencyRuleViolations(

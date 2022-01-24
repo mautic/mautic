@@ -238,6 +238,18 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 $contacts[$contact->getId()] = $contact;
             }
         }
+
+        if (!$sms->isPublished()) {
+            foreach ($contacts as $leadId => $lead) {
+                $results[$leadId] = [
+                    'sent'   => false,
+                    'status' => 'mautic.sms.campaign.failed.unpublished',
+                ];
+            }
+
+            return $results;
+        }
+
         $contactIds = array_keys($contacts);
 
         /** @var DoNotContactRepository $dncRepo */

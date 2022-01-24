@@ -26,7 +26,11 @@ class CampaignLeadSourceType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $sourceType = $options['data']['sourceType'];
+        $sourceType    = $options['data']['sourceType'];
+        $sourceChoices = $options['source_choices'] ?? [];
+        foreach ($sourceChoices as $key => $val) {
+            $sourceChoices[$key] = $val.' ('.$key.')';
+        }
 
         switch ($sourceType) {
             case 'lists':
@@ -34,7 +38,7 @@ class CampaignLeadSourceType extends AbstractType
                     'lists',
                     ChoiceType::class,
                     [
-                        'choices'           => array_flip($options['source_choices']),
+                        'choices'           => array_flip($sourceChoices),
                         'multiple'          => true,
                         'label'             => 'mautic.campaign.leadsource.lists',
                         'label_attr'        => ['class' => 'control-label'],
@@ -56,7 +60,7 @@ class CampaignLeadSourceType extends AbstractType
                     'forms',
                     ChoiceType::class,
                     [
-                        'choices'           => array_flip($options['source_choices']),
+                        'choices'           => array_flip($sourceChoices),
                         'multiple'          => true,
                         'label'             => 'mautic.campaign.leadsource.forms',
                         'label_attr'        => ['class' => 'control-label'],
