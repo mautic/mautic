@@ -551,6 +551,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "mollux",
+      "name": "mollux",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3983285?v=4",
+      "profile": "https://github.com/mollux",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
