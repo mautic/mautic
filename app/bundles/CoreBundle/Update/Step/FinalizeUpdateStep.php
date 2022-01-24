@@ -51,7 +51,7 @@ final class FinalizeUpdateStep implements StepInterface
 
     public function getOrder(): int
     {
-        return 50;
+        return 60;
     }
 
     public function shouldExecuteInFinalStage(): bool
