@@ -3,7 +3,6 @@
 namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Symfony\Component\HttpFoundation\Response;
 
 class FormControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -13,8 +12,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     public function testIndexActionWhenNotFiltered(): void
     {
         $this->client->request('GET', '/s/forms');
-        $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertTrue($this->client->getResponse()->isOk());
     }
 
     /**
@@ -23,8 +21,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     public function testIndexActionWhenFiltering(): void
     {
         $this->client->request('GET', '/s/forms?search=has%3Aresults&tmpl=list');
-        $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertTrue($this->client->getResponse()->isOk());
     }
 
     /**
@@ -33,8 +30,37 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     public function testNewActionForm(): void
     {
         $this->client->request('GET', '/s/forms/new/');
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
-        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertTrue($this->client->getResponse()->isOk());
+    }
+
+    /**
+     * @see https://github.com/mautic/mautic/issues/10453
+     */
+    public function testSaveActionForm(): void
+    {
+        $crawler = $this->client->request('GET', '/s/forms/new/');
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
+        $form->setValues(
+            [
+                'mauticform[name]'        => 'Test',
+                'mauticform[renderStyle]' => '',
+            ]
+        );
+        $crawler = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
+        $form->setValues(
+            [
+                'mauticform[renderStyle]' => '',
+            ]
+        );
+
+        // The form failed to save when saved for the second time with renderStyle=No.
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString('Internal Server Error - Expected argument of type "null or string", "boolean" given', $this->client->getResponse()->getContent());
     }
 }
