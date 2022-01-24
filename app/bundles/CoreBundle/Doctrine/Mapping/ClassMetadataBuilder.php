@@ -240,11 +240,10 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Added dateAdded column.
      *
-     * @param bool|false $nullable
      *
      * @return $this
      */
-    public function addDateAdded($nullable = false)
+    public function addDateAdded(bool $nullable = false)
     {
         $dateAdded = $this->createField('dateAdded', Types::DATETIME_MUTABLE)
             ->columnName('date_added');
@@ -261,14 +260,12 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Add a contact column.
      *
-     * @param bool|false $nullable
      * @param string     $onDelete
-     * @param bool|false $isPrimaryKey
      * @param null       $inversedBy
      *
      * @return $this
      */
-    public function addContact($nullable = false, $onDelete = 'CASCADE', $isPrimaryKey = false, $inversedBy = null)
+    public function addContact(bool $nullable = false, $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null)
     {
         $lead = $this->createManyToOne('contact', Lead::class);
 
@@ -290,16 +287,14 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Add a lead column.
      *
-     * @param bool|false $nullable
      * @param string     $onDelete
-     * @param bool|false $isPrimaryKey
      * @param null       $inversedBy
      *
      * @deprecated Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id
      *
      * @return $this
      */
-    public function addLead($nullable = false, $onDelete = 'CASCADE', $isPrimaryKey = false, $inversedBy = null)
+    public function addLead(bool $nullable = false, $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null)
     {
         $lead = $this->createManyToOne('lead', Lead::class);
 
