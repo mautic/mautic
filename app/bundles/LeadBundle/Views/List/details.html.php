@@ -30,12 +30,12 @@ $view['slots']->set(
                     $list->getCreatedBy()
                 ),
                 'delete' => $view['security']->hasEntityAccess(
+                    $permissions[LeadPermissions::LISTS_DELETE_OWN],
                     $permissions[LeadPermissions::LISTS_DELETE_OTHER],
-                    $permissions[LeadPermissions::LISTS_EDIT_OTHER],
                     $list->getCreatedBy()
                 ),
                 'close' => $view['security']->hasEntityAccess(
-                    $permissions[LeadPermissions::LISTS_EDIT_OWN],
+                    $permissions[LeadPermissions::LISTS_VIEW_OWN],
                     $permissions[LeadPermissions::LISTS_VIEW_OTHER],
                     $list->getCreatedBy()
                 ),
