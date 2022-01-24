@@ -43,6 +43,7 @@ class SchemaDefinition
             case 'multiselect':
             case 'region':
             case 'tel':
+            case 'url':
                 $schemaType = 'string';
                 break;
             case 'text':

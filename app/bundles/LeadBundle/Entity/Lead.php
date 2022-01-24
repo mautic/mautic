@@ -203,6 +203,35 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     private $primaryCompany;
 
+
+    /**
+     * @return mixed
+     */
+    public function zzzgetAttributionDate()
+    {
+        return $this->attributionDate;
+    }
+
+    /**
+     * @param mixed $attributionDate
+     */
+    public function zzzsetAttributionDate($attributionDate): void
+    {
+        $this->attributionDate = $attributionDate;
+    }
+
+    private $fax;
+    private $preferredLocale;
+    private $attributionDate;
+    private $attribution;
+    private $website;
+    private $facebook;
+    private $foursquare;
+    private $instagram;
+    private $linkedin;
+    private $skype;
+    private $twitter;
+
     /**
      * Used to determine order of preferred channels.
      *
@@ -391,9 +420,25 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 'zipcode',
                 'timezone',
                 'country',
+                'fax',
+                'preferred_locale',
+                'attribution_date',
+                'attribution',
+                'website',
+                'facebook',
+                'foursquare',
+                'instagram',
+                'linkedin',
+                'skype',
+                'twitter',
             ],
             FieldModel::$coreFields
         );
+
+        // Add an attribution index
+        $builder->addIndex(['attribution', 'attribution_date'], 'contact_attribution');
+        //Add date added and country index
+        $builder->addIndex(['date_added', 'country'], 'date_added_country_index');
     }
 
     /**
@@ -1456,7 +1501,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function getAttribution()
     {
-        return (float) $this->getFieldValue('attribution');
+        return (float) $this->attribution;
     }
 
     /**

@@ -62,6 +62,58 @@ class Company extends FormEntity implements CustomFieldEntityInterface
 
     private $description;
 
+    /**
+     * @return mixed
+     */
+    public function getNumberOfEmployees()
+    {
+        return $this->numberOfEmployees;
+    }
+
+    /**
+     * @param mixed $numberOfEmployees
+     */
+    public function setNumberOfEmployees($numberOfEmployees): void
+    {
+        $this->numberOfEmployees = $numberOfEmployees;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFax()
+    {
+        return $this->fax;
+    }
+
+    /**
+     * @param mixed $fax
+     */
+    public function setFax($fax): void
+    {
+        $this->fax = $fax;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAnnualRevenue()
+    {
+        return $this->annualRevenue;
+    }
+
+    /**
+     * @param mixed $annualRevenue
+     */
+    public function setAnnualRevenue($annualRevenue): void
+    {
+        $this->annualRevenue = $annualRevenue;
+    }
+
+    private $numberOfEmployees;
+    private $fax;
+    private $annualRevenue;
+
     public function __clone()
     {
         $this->id = null;
@@ -129,9 +181,15 @@ class Company extends FormEntity implements CustomFieldEntityInterface
                 'website',
                 'industry',
                 'description',
+                'number_of_employees',
+                'fax',
+                'annual_revenue',
             ],
             FieldModel::$coreCompanyFields
         );
+
+        $builder->addIndex(['companyname', 'companyemail'], 'company_filter');
+        $builder->addIndex(['companyname', 'companycity', 'companycountry', 'companystate'], 'company_match');
     }
 
     /**
