@@ -641,6 +641,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "TonyBogdanov",
+      "name": "Tony Bogdanov",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3586948?v=4",
+      "profile": "http://tonybogdanov.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
