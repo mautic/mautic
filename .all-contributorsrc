@@ -587,6 +587,15 @@
       "contributions": [
         "translation"
       ]
+    },
+    {
+      "login": "rahuld-dev",
+      "name": "Rahul Dhande",
+      "avatar_url": "https://avatars.githubusercontent.com/u/68939488?v=4",
+      "profile": "https://github.com/rahuld-dev",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
