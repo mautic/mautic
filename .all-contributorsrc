@@ -605,6 +605,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "abailey-dev",
+      "name": "Anthony Bailey",
+      "avatar_url": "https://avatars.githubusercontent.com/u/65302481?v=4",
+      "profile": "https://github.com/abailey-dev",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
