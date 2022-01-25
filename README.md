@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-66-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-67-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -160,6 +160,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://twitter.com/eloimarques"><img src="https://avatars.githubusercontent.com/u/11034410?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Eloi Marques da Silva</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=eloimarquessilva" title="Code">💻</a></td>
     <td align="center"><a href="http://adevo.pl"><img src="https://avatars.githubusercontent.com/u/39382654?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tomasz Kowalczyk</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=tomekkowalczyk" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/jensolsson"><img src="https://avatars.githubusercontent.com/u/1985582?v=4?s=100" width="100px;" alt=""/><br /><sub><b>jensolsson</b></sub></a><br /><a href="#userTesting-jensolsson" title="User Testing">📓</a></td>
+    <td align="center"><a href="http://tonybogdanov.com"><img src="https://avatars.githubusercontent.com/u/3586948?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tony Bogdanov</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=TonyBogdanov" title="Code">💻</a></td>
   </tr>
 </table>
 
