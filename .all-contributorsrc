@@ -623,6 +623,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "tomekkowalczyk",
+      "name": "Tomasz Kowalczyk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/39382654?v=4",
+      "profile": "http://adevo.pl",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
