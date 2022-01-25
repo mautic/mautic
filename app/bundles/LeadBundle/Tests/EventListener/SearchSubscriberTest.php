@@ -148,5 +148,17 @@ class SearchSubscriberTest extends TestCase
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE (pn.id = ?) AND (pn.mobile = ?) GROUP BY l.id', $sql);
+
+        // test import id
+        $event = new LeadBuildSearchEvent('1', 'import_id', $alias, false, new QueryBuilder($connection));
+        $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+        $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
+        $this->assertEquals('SELECT  WHERE (lel.object_id = ?) AND (lel.object = ?) GROUP BY l.id', $sql);
+
+        // test import action
+        $event = new LeadBuildSearchEvent('1', 'import_action', $alias, false, new QueryBuilder($connection));
+        $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+        $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
+        $this->assertEquals('SELECT  WHERE lel.action = ? GROUP BY l.id', $sql);
     }
 }

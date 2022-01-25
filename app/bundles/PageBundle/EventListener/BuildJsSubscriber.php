@@ -446,7 +446,7 @@ MauticJS.processGatedVideos = function (videoElements) {
                                     }
                                     
                                     // Set a cookie to prevent showing the same form again
-                                    document.cookie = cookieName+"=true; max-age=" + 60 * 60 * 24 * 7; 
+                                    document.cookie = cookieName+"=true; max-age=" + 60 * 60 * 24 * 7+"; secure"; 
                                 } 
                                 
                                 if (data.message) {

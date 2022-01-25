@@ -57,6 +57,18 @@ class ConfigTrackingPageType extends AbstractType
         );
 
         $builder->add(
+            'do_not_track_404_anonymous',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.page.config.form.do_not_track_404_anonymous',
+                'data'  => isset($options['data']['do_not_track_404_anonymous']) ? (bool) $options['data']['do_not_track_404_anonymous'] : false,
+                'attr'  => [
+                    'tooltip'      => 'mautic.page.config.form.do_not_track_404_anonymous.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
             'facebook_pixel_id',
             TextType::class,
             [
