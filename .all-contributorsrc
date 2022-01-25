@@ -614,6 +614,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "eloimarquessilva",
+      "name": "Eloi Marques da Silva",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11034410?v=4",
+      "profile": "http://twitter.com/eloimarques",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
