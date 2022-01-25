@@ -632,6 +632,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "jensolsson",
+      "name": "jensolsson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1985582?v=4",
+      "profile": "https://github.com/jensolsson",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
