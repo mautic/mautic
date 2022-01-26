@@ -11,67 +11,29 @@
 
 namespace Mautic\CoreBundle\Release;
 
-class Metadata
+class Metadata implements \JsonSerializable
 {
-    /**
-     * @var string
-     */
-    private $version;
-
-    /**
-     * @var int
-     */
-    private $majorVersion;
-
-    /**
-     * @var int
-     */
-    private $minorVersion;
-
-    /**
-     * @var int
-     */
-    private $patchVersion;
-
-    /**
-     * @var string
-     */
-    private $extraVersion;
-
-    /**
-     * @var string
-     */
-    private $stability;
-
-    /**
-     * @var string
-     */
-    private $minSupportedPHPVersion;
-
-    /**
-     * @var string
-     */
-    private $maxSupportedPHPVersion;
+    private string $version;
+    private int $majorVersion;
+    private int $minorVersion;
+    private int $patchVersion;
+    private string $extraVersion;
+    private string $stability;
+    private string $minSupportedPHPVersion;
+    private string $maxSupportedPHPVersion;
 
     /**
      * We use this property to show a warning message on the dashboard
      * if the user has a PHP version that is lower than the given version.
      * Users are warned that their PHP version won't be supported by future
      * Mautic versions anymore.
-     *
-     * @var string
      */
-    private $showPHPVersionWarningIfUnder;
+    private string $showPHPVersionWarningIfUnder;
 
-    /**
-     * @var string
-     */
-    private $minSupportedMauticVersion;
-
-    /**
-     * @var string
-     */
-    private $announcementUrl;
+    private string $minSupportedMauticVersion;
+    private string $announcementUrl;
+    private string $minSupportedMySqlVersion;
+    private string $minSupportedMariaDbVersion;
 
     public function __construct(array $metadata)
     {
@@ -79,9 +41,11 @@ class Metadata
         $this->stability                    = $metadata['stability'];
         $this->minSupportedPHPVersion       = $metadata['minimum_php_version'];
         $this->maxSupportedPHPVersion       = $metadata['maximum_php_version'];
-        $this->showPHPVersionWarningIfUnder = empty($metadata['show_php_version_warning_if_under']) ? '' : $metadata['show_php_version_warning_if_under'];
+        $this->showPHPVersionWarningIfUnder = $metadata['show_php_version_warning_if_under'] ?? '';
         $this->minSupportedMauticVersion    = $metadata['minimum_mautic_version'];
         $this->announcementUrl              = $metadata['announcement_url'];
+        $this->minSupportedMySqlVersion     = $metadata['minimum_mysql_version'] ?? '';
+        $this->minSupportedMariaDbVersion   = $metadata['minimum_mariadb_version'] ?? '';
 
         preg_match('#^(\d+)\.(\d+)\.(\d+)[\. \-]?([a-z0-9\-\.]+)?$#', $this->version, $match);
         $this->majorVersion = $match[1];
@@ -149,5 +113,30 @@ class Metadata
     public function getAnnouncementUrl(): string
     {
         return $this->announcementUrl;
+    }
+
+    public function getMinSupportedMySqlVersion(): string
+    {
+        return $this->minSupportedMySqlVersion;
+    }
+
+    public function getMinSupportedMariaDbVersion(): string
+    {
+        return $this->minSupportedMariaDbVersion;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'version'                           => $this->version,
+            'stability'                         => $this->stability,
+            'minimum_php_version'               => $this->minSupportedPHPVersion,
+            'maximum_php_version'               => $this->maxSupportedPHPVersion,
+            'show_php_version_warning_if_under' => $this->showPHPVersionWarningIfUnder,
+            'minimum_mautic_version'            => $this->minSupportedMauticVersion,
+            'announcement_url'                  => $this->announcementUrl,
+            'minimum_mysql_version'             => $this->minSupportedMySqlVersion,
+            'minimum_mariadb_version'           => $this->minSupportedMariaDbVersion,
+        ];
     }
 }

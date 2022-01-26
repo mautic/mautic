@@ -28,6 +28,16 @@ final class EmailEvents
     const TOKEN_REPLACEMENT = 'mautic.email_token_replacement';
 
     /**
+     * The mautic.email_address_token_replacement event is thrown right before a email address token needs replacement.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\TokenReplacementEvent instance.
+     *
+     * @var string
+     */
+    const ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT = 'mautic.email_address_token_replacement';
+
+    /**
      * The mautic.email_on_open event is dispatched when an email is opened.
      *
      * The event listener receives a

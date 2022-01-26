@@ -213,6 +213,7 @@ return [
                     'mautic.form.model.form',
                     'mautic.form.model.submission',
                     'mautic.campaign.executioner.realtime',
+                    'mautic.helper.form.field_helper',
                 ],
             ],
             'mautic.form.leadbundle.subscriber' => [
@@ -263,6 +264,13 @@ return [
                 'arguments' => [
                     'mautic.form.repository.submission',
                     'translator',
+                ],
+            ],
+            'mautic.form.conditional.subscriber' => [
+                'class'     => \Mautic\FormBundle\EventListener\FormConditionalSubscriber::class,
+                'arguments' => [
+                    'mautic.form.model.form',
+                    'mautic.form.model.field',
                 ],
             ],
         ],
@@ -342,6 +350,13 @@ return [
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
                     'setFormModel'  => ['mautic.form.model.form'],
+                ],
+            ],
+            'mautic.form.type.field.conditional' => [
+                'class'       => \Mautic\FormBundle\Form\Type\FormFieldConditionType::class,
+                'arguments'   => [
+                    'mautic.form.model.field',
+                    'mautic.form.helper.properties.accessor',
                 ],
             ],
         ],
@@ -437,6 +452,12 @@ return [
                 'class'     => FieldValueTransformer::class,
                 'arguments' => [
                     'router',
+                ],
+            ],
+            'mautic.form.helper.properties.accessor' => [
+                'class'     => \Mautic\FormBundle\Helper\PropertiesAccessor::class,
+                'arguments' => [
+                    'mautic.form.model.form',
                 ],
             ],
         ],

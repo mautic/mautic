@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-goldstar",
+            "directory": "themes/goldstar",
+            "target": "git@github.com:mautic/theme-goldstar.git"
+        }
+    ]
+}
