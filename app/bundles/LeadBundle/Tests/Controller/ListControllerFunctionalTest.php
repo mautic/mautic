@@ -64,7 +64,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->restart();
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list1->getId());
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
-        $form['leadlist[isPublished]']->setValue('');
+        $form['leadlist[isPublished]']->setValue('0');
         $crawler = $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
@@ -89,7 +89,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list2->getId());
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
-        $form['leadlist[isPublished]']->setValue('');
+        $form['leadlist[isPublished]']->setValue('0');
         $crawler = $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
 
