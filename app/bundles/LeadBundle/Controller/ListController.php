@@ -257,13 +257,6 @@ class ListController extends FormController
 
         try {
             $segment = $this->getSegment($objectId, LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER);
-
-            return $this->createSegmentNewResponse(
-                clone $segment,
-                $postActionVars,
-                $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
-                $ignorePost
-            );
         } catch (AccessDeniedException $exception) {
             return $this->accessDenied();
         } catch (EntityNotFoundException $exception) {
@@ -296,16 +289,13 @@ class ListController extends FormController
         try {
             $segment = $this->getSegment($objectId, LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER);
 
-            if ($isNew) {
-                $segment->setNew();
-            }
 
             if (!$this->get('mautic.security')->hasEntityAccess(
                 LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $segment->getCreatedBy()
             )) {
                 return $this->accessDenied();
             }
-
+            
             return $this->createSegmentModifyResponse(
                 $segment,
                 $postActionVars,
