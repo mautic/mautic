@@ -28,7 +28,7 @@ class TagModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return TagRepository
      */
     public function getRepository()
     {

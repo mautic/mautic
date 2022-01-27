@@ -103,6 +103,9 @@ class Tag
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSummary()
     {
         return $this->summary;

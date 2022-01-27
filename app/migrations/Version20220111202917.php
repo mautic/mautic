@@ -17,6 +17,9 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20220111202917 extends AbstractMauticMigration
 {
+    /**
+     * @var string
+     */
     private $table = 'lead_tags';
 
     /**
