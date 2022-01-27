@@ -551,6 +551,105 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "mollux",
+      "name": "mollux",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3983285?v=4",
+      "profile": "https://github.com/mollux",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ekkeguembel",
+      "name": "ekkeguembel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43146234?v=4",
+      "profile": "http://Leuchtfeuer.com",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "MadlenF",
+      "name": "Madlen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/87804194?v=4",
+      "profile": "https://github.com/MadlenF",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "kathrin-schmid",
+      "name": "Kathrin Schmid",
+      "avatar_url": "https://avatars.githubusercontent.com/u/96054002?v=4",
+      "profile": "https://friendly.ch/kathrin",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "rahuld-dev",
+      "name": "Rahul Dhande",
+      "avatar_url": "https://avatars.githubusercontent.com/u/68939488?v=4",
+      "profile": "https://github.com/rahuld-dev",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "biozshock",
+      "name": "Artem Lopata",
+      "avatar_url": "https://avatars.githubusercontent.com/u/169384?v=4",
+      "profile": "https://github.com/biozshock",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "abailey-dev",
+      "name": "Anthony Bailey",
+      "avatar_url": "https://avatars.githubusercontent.com/u/65302481?v=4",
+      "profile": "https://github.com/abailey-dev",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "eloimarquessilva",
+      "name": "Eloi Marques da Silva",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11034410?v=4",
+      "profile": "http://twitter.com/eloimarques",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "tomekkowalczyk",
+      "name": "Tomasz Kowalczyk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/39382654?v=4",
+      "profile": "http://adevo.pl",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "jensolsson",
+      "name": "jensolsson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1985582?v=4",
+      "profile": "https://github.com/jensolsson",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "TonyBogdanov",
+      "name": "Tony Bogdanov",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3586948?v=4",
+      "profile": "http://tonybogdanov.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
