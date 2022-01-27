@@ -138,6 +138,42 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Edit Segment - Segment Test', $crawler->html());
     }
 
+    /**
+     * @dataProvider dataSegmentCloneUserPermissions
+     */
+    public function testSegmentCloningOwnedSegmentWithDifferentPermissions(string $name, int $perm, int $expected): void
+    {
+        $user = $this->createUser(
+            [
+                'user-name'     => $name,
+                'email'         => $name.'@mautic-test.com',
+                'first-name'    => $name,
+                'last-name'     => $name,
+                'role'          => [
+                    'name'      => 'perm_user_three',
+                    'perm'      => 'lead:lists',
+                    'bitwise'   => $perm, // Create and View own
+                ],
+            ]
+        );
+        $this->loginOtherUser($user->getUsername());
+
+        $segment = $this->createSegment('Test Segment for clone test', $user);
+
+        $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$segment->getId());
+        $this->assertEquals($expected, $this->client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * @return iterable<string, mixed[]>
+     */
+    public function dataSegmentCloneUserPermissions(): iterable
+    {
+        yield 'Only create' => ['user-clone-1', 32, Response::HTTP_FORBIDDEN];
+        yield 'Create and View own' => ['user-clone-2', 34, Response::HTTP_OK];
+        yield 'Create and View other' => ['user-clone-2', 36, Response::HTTP_FORBIDDEN];
+    }
+
     public function testSegmentCloningUsingUserHavingPermissions(): void
     {
         $user = $this->createUser(
@@ -149,7 +185,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
                 'role'          => [
                     'name'      => 'perm_user_three',
                     'perm'      => 'lead:lists',
-                    'bitwise'   => 32,
+                    'bitwise'   => 36, // Create and view other
                 ],
             ]
         );

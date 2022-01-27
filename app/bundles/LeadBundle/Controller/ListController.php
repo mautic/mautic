@@ -248,10 +248,7 @@ class ListController extends FormController
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
-        /** @var LeadList $segment */
-        $segment = $this->getModel('lead.list')->getEntity($objectId);
-
-
+            $segment = $this->getSegment($objectId, LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER);
 
             return $this->createSegmentNewResponse(
                 clone $segment,
@@ -259,7 +256,6 @@ class ListController extends FormController
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
                 $ignorePost
             );
-
         } catch (AccessDeniedException $exception) {
             return $this->accessDenied();
         } catch (EntityNotFoundException $exception) {
@@ -290,9 +286,7 @@ class ListController extends FormController
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
-
-            /** @var LeadList $segment */
-            $segment = $this->getModel('lead.list')->getEntity($objectId);
+            $segment = $this->getSegment($objectId, LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER);
 
             if ($isNew) {
                 $segment->setNew();
@@ -325,6 +319,31 @@ class ListController extends FormController
                 ])
             );
         }
+    }
+
+    /**
+     * Return segment if exists and user has access.
+     *
+     * @throws EntityNotFoundException
+     * @throws AccessDeniedException
+     */
+    private function getSegment(int $segmentId, string $ownPermission, string $otherPermission): LeadList
+    {
+        /** @var LeadList $segment */
+        $segment = $this->getModel('lead.list')->getEntity($segmentId);
+
+        // Check if exists
+        if (!$segment instanceof LeadList) {
+            throw new EntityNotFoundException(sprintf('Segment with id %d not found.', $segmentId));
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess(
+            $ownPermission, $otherPermission, $segment->getCreatedBy()
+        )) {
+            throw new AccessDeniedException(sprintf('User has not access on segment with id %d', $segmentId));
+        }
+
+        return $segment;
     }
 
     /**
@@ -410,35 +429,6 @@ class ListController extends FormController
                 'mauticContent' => 'leadlist',
             ],
         ]);
-    }
-
-    /**
-     * Return segment if exists and user has access.
-     *
-     * @param int $segmentId
-     *
-     * @return LeadList
-     *
-     * @throws EntityNotFoundException
-     * @throws AccessDeniedException
-     */
-    private function getSegment($segmentId)
-    {
-        /** @var LeadList|null $segment */
-        $segment = $this->getModel('lead.list')->getEntity($segmentId);
-
-        // Check if exists
-        if (!$segment) {
-            throw new EntityNotFoundException(sprintf('Segment with id %d not found.', $segmentId));
-        }
-
-        if (!$this->security->hasEntityAccess(
-            LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $segment->getCreatedBy()
-        )) {
-            throw new AccessDeniedException(sprintf('User has not access on segment with id %d', $segmentId));
-        }
-
-        return $segment;
     }
 
     /**
