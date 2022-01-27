@@ -45,7 +45,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $form->setValues(
             [
                 'mauticform[name]'        => 'Test',
-                'mauticform[renderStyle]' => '',
+                'mauticform[renderStyle]' => '0',
             ]
         );
         $crawler = $this->client->submit($form);
@@ -54,7 +54,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
         $form->setValues(
             [
-                'mauticform[renderStyle]' => '',
+                'mauticform[renderStyle]' => '0',
             ]
         );
 
