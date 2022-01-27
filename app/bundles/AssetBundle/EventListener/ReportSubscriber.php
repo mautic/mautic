@@ -188,6 +188,10 @@ class ReportSubscriber implements EventSubscriberInterface
             if ($this->companyReportData->eventHasCompanyColumns($event)) {
                 $event->addCompanyLeftJoin($queryBuilder);
             }
+
+            if (!$event->hasGroupBy()) {
+                $queryBuilder->groupBy('ad.asset_id');
+            }
         }
 
         $event->setQueryBuilder($queryBuilder);

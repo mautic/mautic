@@ -65,8 +65,8 @@ class LeadControllerTest extends MauticMysqlTestCase
             [
                 'leadlist[name]'               => 'Segment 1',
                 'leadlist[alias]'              => 'segment-1',
-                'leadlist[isGlobal]'           => '',
-                'leadlist[isPreferenceCenter]' => '',
+                'leadlist[isGlobal]'           => '0',
+                'leadlist[isPreferenceCenter]' => '0',
                 'leadlist[isPublished]'        => '1',
                 'leadlist[publicName]'         => 'Segment 1',
                 'leadlist[category]'           => '1',
