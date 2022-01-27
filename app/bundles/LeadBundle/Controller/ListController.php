@@ -233,11 +233,18 @@ class ListController extends FormController
 
         $postActionVars = $this->getPostActionVars();
 
-        /** @var LeadList $segment */
-        $segment = $this->getModel('lead.list')->getEntity($objectId);
+        try {
+            $segment = $this->getSegment($objectId, LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER);
 
-        // Check if exists
-        if (!$segment instanceof LeadList) {
+            return $this->createSegmentNewResponse(
+                clone $segment,
+                $postActionVars,
+                $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
+                $ignorePost
+            );
+        } catch (AccessDeniedException $exception) {
+            return $this->accessDenied();
+        } catch (EntityNotFoundException $exception) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -250,13 +257,6 @@ class ListController extends FormController
                 ])
             );
         }
-
-        return $this->createSegmentNewResponse(
-            clone $segment,
-            $postActionVars,
-            $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
-            $ignorePost
-        );
     }
 
     /**
@@ -271,11 +271,22 @@ class ListController extends FormController
     {
         $postActionVars = $this->getPostActionVars($objectId);
 
-        /** @var LeadList $segment */
-        $segment = $this->getModel('lead.list')->getEntity($objectId);
+        try {
+            $segment = $this->getSegment($objectId, LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER);
 
-        // Check if exists
-        if (!$segment instanceof LeadList) {
+            if ($isNew) {
+                $segment->setNew();
+            }
+
+            return $this->createSegmentModifyResponse(
+                $segment,
+                $postActionVars,
+                $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
+                $ignorePost
+            );
+        } catch (AccessDeniedException $exception) {
+            return $this->accessDenied();
+        } catch (EntityNotFoundException $exception) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -288,19 +299,31 @@ class ListController extends FormController
                 ])
             );
         }
+    }
 
-        if (!$this->get('mautic.security')->hasEntityAccess(
-            LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $segment->getCreatedBy()
-        )) {
-            return $this->accessDenied();
+    /**
+     * Return segment if exists and user has access.
+     *
+     * @throws EntityNotFoundException
+     * @throws AccessDeniedException
+     */
+    private function getSegment(int $segmentId, string $ownPermission, string $otherPermission): LeadList
+    {
+        /** @var LeadList $segment */
+        $segment = $this->getModel('lead.list')->getEntity($segmentId);
+
+        // Check if exists
+        if (!$segment instanceof LeadList) {
+            throw new EntityNotFoundException(sprintf('Segment with id %d not found.', $segmentId));
         }
 
-        return $this->createSegmentModifyResponse(
-            $segment,
-            $postActionVars,
-            $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
-            $ignorePost
-        );
+        if (!$this->get('mautic.security')->hasEntityAccess(
+            $ownPermission, $otherPermission, $segment->getCreatedBy()
+        )) {
+            throw new AccessDeniedException(sprintf('User has not access on segment with id %d', $segmentId));
+        }
+
+        return $segment;
     }
 
     /**
