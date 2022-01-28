@@ -255,6 +255,10 @@ class EmailRepository extends CommonRepository
             $q->andWhere(sprintf('l.id NOT IN (%s)', $excludedListQb->getSQL()));
         }
 
+        // Do not include leads which are not subscribed to the category set for email.
+        $unsubscribeLeadsQb = $this->getCategoryUnsubscribedLeadsQuery((int) $emailId);
+        $q->andWhere(sprintf('l.id NOT IN (%s)', $unsubscribeLeadsQb->getSQL()));
+
         $q = $this->setMinMaxIds($q, 'l.id', $minContactId, $maxContactId);
 
         // Has an email
@@ -626,6 +630,18 @@ class EmailRepository extends CommonRepository
             ->getOneOrNullResult();
 
         return (bool) $result;
+    }
+
+    private function getCategoryUnsubscribedLeadsQuery(int $emailId): QueryBuilder
+    {
+        $qb = $this->getEntityManager()->getConnection()
+            ->createQueryBuilder();
+
+        return $qb->select('lc.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_categories', 'lc')
+            ->innerJoin('lc', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.category_id = lc.category_id')
+            ->where($qb->expr()->eq('e.id', $emailId))
+            ->andWhere('lc.manually_removed = 1');
     }
 
     private function getExcludedListQuery(int $emailId): ?QueryBuilder
