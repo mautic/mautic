@@ -94,7 +94,14 @@ class ListController extends FormController
             $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
         if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
-            $filter['force'][] = ['column' => $model->getRepository()->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
+            $tableAlias        = $model->getRepository()->getTableAlias();
+            $filter['where'][] = [
+                'expr' => 'orX',
+                'val'  => [
+                    ['column' => $tableAlias.'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()],
+                    ['column' => $tableAlias.'.isGlobal', 'expr' => 'eq', 'value' => 1],
+                ],
+            ];
         }
 
             [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
