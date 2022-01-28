@@ -123,9 +123,9 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
         }
 
         if ($exclusion) {
-            $queryBuilder->andWhere(new CompositeExpression(CompositeExpression::TYPE_AND, $logic));
+            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_AND, $logic), $filter->getGlue());
         } else {
-            $queryBuilder->andWhere(new CompositeExpression(CompositeExpression::TYPE_OR, $logic));
+            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_OR, $logic), $filter->getGlue());
         }
 
         return $queryBuilder;
