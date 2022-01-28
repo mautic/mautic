@@ -80,8 +80,8 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
             $segmentIds = [intval($segmentIds)];
         }
 
-        $orLogic = [];
-
+        $logic     = [];
+        $exclusion = false;
         foreach ($segmentIds as $segmentId) {
             $exclusion = in_array($filter->getOperator(), ['notExists', 'notIn']);
 
@@ -119,15 +119,13 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
             }
             $queryBuilder->addSelect($segmentAlias.'.id as '.$segmentAlias.'_id');
 
-            if (!$exclusion && count($segmentIds) > 1) {
-                $orLogic[] = $expression;
-            } else {
-                $queryBuilder->addLogic($expression, $filter->getGlue());
-            }
+            $logic[] = $expression;
         }
 
-        if (count($orLogic)) {
-            $queryBuilder->andWhere(new CompositeExpression(CompositeExpression::TYPE_OR, $orLogic));
+        if ($exclusion) {
+            $queryBuilder->andWhere(new CompositeExpression(CompositeExpression::TYPE_AND, $logic));
+        } else {
+            $queryBuilder->andWhere(new CompositeExpression(CompositeExpression::TYPE_OR, $logic));
         }
 
         return $queryBuilder;
