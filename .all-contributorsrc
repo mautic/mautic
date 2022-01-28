@@ -650,6 +650,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "bradycargle",
+      "name": "Brady Cargle",
+      "avatar_url": "https://avatars.githubusercontent.com/u/79949869?v=4",
+      "profile": "https://github.com/bradycargle",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
