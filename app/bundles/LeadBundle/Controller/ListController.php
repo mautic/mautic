@@ -87,6 +87,7 @@ class ListController extends FormController
                     ['column' => $tableAlias.'.isGlobal', 'expr' => 'eq', 'value' => 1],
                 ],
             ];
+
             $filter['force'][] = ['column' => $model->getRepository()->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
