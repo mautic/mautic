@@ -17,6 +17,7 @@ use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 
 class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -127,7 +128,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getConfigPath(): string
     {
-        return self::$container->getParameter('kernel.project_dir').'/app/config/local.php';
+        return ParameterLoader::getLocalConfigFile(self::$container->getParameter('kernel.root_dir'));
     }
 
     private function getConfigParameters(): array
