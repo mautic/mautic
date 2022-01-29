@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace Mautic\ConfigBundle\Tests\Controller;
 
 use DateTime;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\CoreBundle\Loader\ParameterLoader;
 
 class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
