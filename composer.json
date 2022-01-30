@@ -22,7 +22,7 @@
     },
   "require": {
     "composer/installers": "^1.11",
-    "mautic/core-lib": "^3.0"
+    "mautic/core-lib": "dev-add_mailer"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.19.2",
@@ -87,13 +87,17 @@
       "url": "app",
       "options": {
         "versions": {
-            "mautic/core-lib": "3.2.x-dev"
+            "mautic/core-lib": "dev-add_mailer"
         }
       }
     },
     {
       "type": "git",
       "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/mabumusa1/core-lib"
     }
   ],
   "conflict": {
