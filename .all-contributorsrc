@@ -659,6 +659,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "mmarton",
+      "name": "mmarton",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1424582?v=4",
+      "profile": "https://github.com/mmarton",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
