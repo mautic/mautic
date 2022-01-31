@@ -128,7 +128,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getConfigPath(): string
     {
-        return ParameterLoader::getLocalConfigFile(self::$container->getParameter('kernel.root_dir'));
+        return self::$container->get('kernel')->getLocalConfigFile();
     }
 
     private function getConfigParameters(): array
