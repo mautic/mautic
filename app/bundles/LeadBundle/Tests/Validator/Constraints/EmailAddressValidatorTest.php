@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Form\Validator\Constraints\EmailAddressValidator;
 
 class EmailAddressValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testValidate()
+    public function testValidate(): void
     {
         $constraint            = new EmailAddress();
         $emailAddressValidator = $this->createMock(EmailValidator::class);

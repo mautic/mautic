@@ -13,7 +13,6 @@ namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -32,7 +31,7 @@ class EmailAddressValidator extends ConstraintValidator
     /**
      * @param mixed $value
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!empty($value)) {
             try {
