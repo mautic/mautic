@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-70-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-71-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -164,6 +164,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/bradycargle"><img src="https://avatars.githubusercontent.com/u/79949869?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Brady Cargle</b></sub></a><br /><a href="#userTesting-bradycargle" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/mmarton"><img src="https://avatars.githubusercontent.com/u/1424582?v=4?s=100" width="100px;" alt=""/><br /><sub><b>mmarton</b></sub></a><br /><a href="#userTesting-mmarton" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/bodrak"><img src="https://avatars.githubusercontent.com/u/3704648?v=4?s=100" width="100px;" alt=""/><br /><sub><b>bodrak</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=bodrak" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/nick-vanpraet"><img src="https://avatars.githubusercontent.com/u/7923739?v=4?s=100" width="100px;" alt=""/><br /><sub><b>nick-vanpraet</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=nick-vanpraet" title="Code">💻</a></td>
   </tr>
 </table>
 
