@@ -659,6 +659,24 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "mmarton",
+      "name": "mmarton",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1424582?v=4",
+      "profile": "https://github.com/mmarton",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "bodrak",
+      "name": "bodrak",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3704648?v=4",
+      "profile": "https://github.com/bodrak",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
