@@ -44,7 +44,7 @@ final class UpdateTranslationsStep implements StepInterface
 
     public function getOrder(): int
     {
-        return 30;
+        return 40;
     }
 
     public function shouldExecuteInFinalStage(): bool
