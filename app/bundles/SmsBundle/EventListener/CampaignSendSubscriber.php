@@ -71,24 +71,33 @@ class CampaignSendSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return $this
+     * @return void
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $lead  = $event->getLead();
-
         $smsId = (int) $event->getConfig()['sms'];
         $sms   = $this->smsModel->getEntity($smsId);
 
         if (!$sms) {
-            return $event->setFailed('mautic.sms.campaign.failed.missing_entity');
+            $event->setFailed('mautic.sms.campaign.failed.missing_entity');
+
+            return;
+        }
+
+        if (!$sms->isPublished()) {
+            $event->setFailed('mautic.sms.campaign.failed.unpublished');
+
+            return;
         }
 
         $result = $this->smsModel->sendSms($sms, $lead, ['channel' => ['campaign.event', $event->getEvent()['id']]])[$lead->getId()];
 
         if ('Authenticate' === $result['status']) {
             // Don't fail the event but reschedule it for later
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
         if (!empty($result['sent'])) {
