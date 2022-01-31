@@ -22,6 +22,6 @@ class EmailAddressValidatorTest extends \PHPUnit\Framework\TestCase
         $emailAddressValidator = $this->createMock(EmailValidator::class);
         $emailAddressValidator->method('validate')->willReturn(null);
         $validator  = new EmailAddressValidator($emailAddressValidator);
-        $this->assertNull($validator->validate('test@test.com', $constraint));
+        $validator->validate('test@test.com', $constraint);
     }
 }
