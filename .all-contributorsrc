@@ -677,6 +677,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "nick-vanpraet",
+      "name": "nick-vanpraet",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7923739?v=4",
+      "profile": "https://github.com/nick-vanpraet",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
