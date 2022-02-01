@@ -592,6 +592,9 @@ class Form extends FormEntity
         return $this->fields;
     }
 
+    /**
+     * @return array<int,Field>|ArrayCollection<int,Field>
+     */
     public function getOrderedFields()
     {
         $criteria = Criteria::create()
