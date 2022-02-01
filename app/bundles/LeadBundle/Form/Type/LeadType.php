@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\StageBundle\Entity\Stage;
@@ -49,11 +50,17 @@ class LeadType extends AbstractType
      */
     private $entityManager;
 
-    public function __construct(TranslatorInterface $translator, CompanyModel $companyModel, EntityManager $entityManager)
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    public function __construct(TranslatorInterface $translator, CompanyModel $companyModel, EntityManager $entityManager, CoreParametersHelper $coreParametersHelper)
     {
-        $this->translator    = $translator;
-        $this->companyModel  = $companyModel;
-        $this->entityManager = $entityManager;
+        $this->translator           = $translator;
+        $this->companyModel         = $companyModel;
+        $this->entityManager        = $entityManager;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -130,8 +137,11 @@ class LeadType extends AbstractType
             ]
         );
 
-        $companyLeadRepo = $this->companyModel->getCompanyLeadRepository();
-        $companies       = $companyLeadRepo->getCompaniesByLeadId($options['data']->getId());
+        $leadId                 = $options['data']->getId();
+        $companyLeadRepo        = $this->companyModel->getCompanyLeadRepository();
+        $allowMultipleCompanies = $this->coreParametersHelper->get('contact_allow_multiple_companies');
+
+        $companies       = $companyLeadRepo->getCompaniesByLeadId($leadId, null, !$allowMultipleCompanies);
         $leadCompanies   = [];
         foreach ($companies as $company) {
             $leadCompanies[(string) $company['company_id']] = (string) $company['company_id'];
@@ -143,10 +153,10 @@ class LeadType extends AbstractType
             [
                 'label'      => 'mautic.company.selectcompany',
                 'label_attr' => ['class' => 'control-label'],
-                'multiple'   => true,
+                'multiple'   => $allowMultipleCompanies,
                 'required'   => false,
                 'mapped'     => false,
-                'data'       => $leadCompanies,
+                'data'       => $allowMultipleCompanies ? $leadCompanies : (array_values($leadCompanies)[0] ?? null),
             ]
         );
 

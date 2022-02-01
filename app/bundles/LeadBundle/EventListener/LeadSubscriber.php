@@ -11,10 +11,13 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
@@ -25,6 +28,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event as Events;
+use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
@@ -73,6 +77,16 @@ class LeadSubscriber implements EventSubscriberInterface
     private $router;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * @var CompanyLeadRepository
+     */
+    private $companyLeadRepository;
+
+    /**
      * Whether or not we're running in a test environment.
      *
      * @var bool
@@ -87,16 +101,20 @@ class LeadSubscriber implements EventSubscriberInterface
         EntityManager $entityManager,
         TranslatorInterface $translator,
         RouterInterface $router,
+        CoreParametersHelper $coreParametersHelper,
+        CompanyLeadRepository $companyLeadRepository,
         $isTest = false
     ) {
-        $this->ipLookupHelper      = $ipLookupHelper;
-        $this->auditLogModel       = $auditLogModel;
-        $this->leadEventDispatcher = $eventDispatcher;
-        $this->dncReasonHelper     = $dncReasonHelper;
-        $this->entityManager       = $entityManager;
-        $this->translator          = $translator;
-        $this->router              = $router;
-        $this->isTest              = $isTest;
+        $this->ipLookupHelper        = $ipLookupHelper;
+        $this->auditLogModel         = $auditLogModel;
+        $this->leadEventDispatcher   = $eventDispatcher;
+        $this->dncReasonHelper       = $dncReasonHelper;
+        $this->entityManager         = $entityManager;
+        $this->translator            = $translator;
+        $this->router                = $router;
+        $this->coreParametersHelper  = $coreParametersHelper;
+        $this->companyLeadRepository = $companyLeadRepository;
+        $this->isTest                = $isTest;
     }
 
     /**
@@ -114,6 +132,7 @@ class LeadSubscriber implements EventSubscriberInterface
             LeadEvents::NOTE_POST_SAVE       => ['onNotePostSave', 0],
             LeadEvents::NOTE_POST_DELETE     => ['onNoteDelete', 0],
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadEvents::LEAD_COMPANY_CHANGE  => ['onLeadCompanyChange', 0],
         ];
     }
 
@@ -378,6 +397,19 @@ class LeadSubscriber implements EventSubscriberInterface
                     $this->addTimelineApiCreatedEntries($event, $type, $name);
                     break;
             }
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function onLeadCompanyChange(LeadChangeCompanyEvent $event)
+    {
+        $leadId                 = $event->getLead()->getId() ?? null;
+        $allowMultipleCompanies = $this->coreParametersHelper->get('contact_allow_multiple_companies');
+
+        if ($leadId && !$allowMultipleCompanies) {
+            $this->companyLeadRepository->removeContactSecondaryCompanies($leadId);
         }
     }
 

@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -25,6 +26,19 @@ class ConfigType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add(
+            'contact_allow_multiple_companies',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.allow_multiple_companies',
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.allow_multiple_companies.tooltip',
+                ],
+                'data'=> isset($options['data']['contact_allow_multiple_companies']) ? (bool) $options['data']['contact_allow_multiple_companies'] : true,
+            ]
+        );
+
         $builder->add(
             'contact_unique_identifiers_operator',
             ChoiceType::class,
