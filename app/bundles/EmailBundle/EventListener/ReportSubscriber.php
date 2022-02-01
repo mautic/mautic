@@ -366,7 +366,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         $qb->setParameter(':dateFrom', (new \DateTime())->modify('-999 years')->format('Y-m-d'));
                     }
                 } else {
-                    if ($useStatColumns) {
+                    if ($useStatColumns || $useClickColumns) {
                         $subQuery = $this->db->createQueryBuilder();
                         $subQuery->select(
                             'COUNT(es.email_id) as sent_count',
