@@ -26,6 +26,7 @@ use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -52,16 +53,23 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
     public function __construct(
         EmailModel $emailModel,
         RealTimeExecutioner $realTimeExecutioner,
         SendEmailToUser $sendEmailToUser,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        LeadModel $leadModel
     ) {
         $this->emailModel          = $emailModel;
         $this->realTimeExecutioner = $realTimeExecutioner;
         $this->sendEmailToUser     = $sendEmailToUser;
         $this->translator          = $translator;
+        $this->leadModel           = $leadModel;
     }
 
     /**
@@ -256,7 +264,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
             return;
         }
-
         $event->setChannel('email', $emailId);
 
         $type    = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
@@ -277,6 +284,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $contacts        = $event->getContacts();
         $contactIds      = $event->getContactIds();
         $credentialArray = [];
+        $emailCategory   = $email->getCategory() ? $email->getCategory()->getId() : null;
 
         /**
          * @var int
@@ -297,6 +305,20 @@ class CampaignSubscriber implements EventSubscriberInterface
                     $this->translator->trans(
                         'mautic.email.contact_has_no_email',
                         ['%contact%' => $contact->getPrimaryIdentifier()]
+                    )
+                );
+                unset($contactIds[$contact->getId()]);
+                continue;
+            }
+
+            $categories = $this->leadModel->getUnsubscribedLeadCategoriesIds($contact);
+            if ($emailCategory && !empty($categories) && in_array($emailCategory, $categories)) {
+                // Pass with a note to the UI because no use retrying
+                $event->passWithError(
+                    $pending->get($logId),
+                    $this->translator->trans(
+                        'mautic.email.contact_has_unsubscribed_from_category',
+                        ['%contact%' => $contact->getPrimaryIdentifier(), '%category%' => $emailCategory]
                     )
                 );
                 unset($contactIds[$contact->getId()]);

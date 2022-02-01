@@ -174,6 +174,7 @@ return [
                     'mautic.campaign.executioner.realtime',
                     'mautic.email.model.send_email_to_user',
                     'translator',
+                    'mautic.lead.model.lead',
                 ],
             ],
             'mautic.email.campaignbundle.condition_subscriber' => [
