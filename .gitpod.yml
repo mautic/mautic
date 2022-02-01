@@ -17,27 +17,21 @@ vscode:
     - ziyasal.vscode-open-in-github
 
 ports:
+  # Ddev db port
+  - port: 3306
+    onOpen: ignore
+  # phpmyadmin https port
+  - port: 8027
+    onOpen: ignore
+  # mailhog https port
+  - port: 8036
+    onOpen: ignore
   # Main web port
   - port: 8080
     onOpen: ignore
     visibility: public
-  # mailhog http port
-  - port: 8025
-    onOpen: ignore
-  # mailhog https port
-  - port: 8026
-    onOpen: ignore
-  # phpmyadmin http port
-  - port: 8036
-    onOpen: ignore
-  # phpmyadmin https port
-  - port: 8037
-    onOpen: ignore
-  # router http port that we're ignoring.
-  - port: 8888
-    onOpen: ignore
   # router https port that we're ignoring.
-  - port: 8889
+  - port: 8443
     onOpen: ignore
   # xdebug port
   - port: 9000
