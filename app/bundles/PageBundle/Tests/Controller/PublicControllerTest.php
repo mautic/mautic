@@ -48,7 +48,9 @@ class PublicControllerTest extends AbstractMauticTestCase
     /** @var PublicControllerTest */
     private $controller;
 
-    /** @var Container */
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|Container
+     */
     private $internalContainer;
 
     /** @var Logger */
