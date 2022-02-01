@@ -44,9 +44,11 @@ $view['slots']->set(
             <!-- sms detail collapseable toggler -->
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
+                    
                     <div class="col-xs-10">
-                        <div class="text-white dark-sm mb-0"><?php echo $tag->getTag(); ?></div>
+                        <div class="text-white dark-sm mb-0"><?php echo $tag->getDescription(); ?></div>
                     </div>
+
                 </div>
             </div>
             <div class="collapse" id="sms-details">
@@ -57,15 +59,6 @@ $view['slots']->set(
                             <tr>
                                 <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans('mautic.core.id'); ?></span></td>
                                 <td><?php echo $tag->getId(); ?></td>
-                            </tr>
-                            <tr>
-                                <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans('mautic.tagmanager.tag.summary'); ?></span></td>
-                                <td><?php echo $tag->getSummary(); ?></td>
-                            </tr>
-
-                            <tr>
-                                <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans('mautic.core.description'); ?></span></td>
-                                <td><?php echo $tag->getDescription(); ?></td>
                             </tr>
                             </tbody>
                         </table>

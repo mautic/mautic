@@ -45,11 +45,6 @@ echo $view['form']->start($form);
                         </div>
                         <div class="row">
                             <div class="col-xs-12">
-                                <?php echo $view['form']->row($form['summary']); ?>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-12">
                                 <?php echo $view['form']->row($form['description']); ?>
                             </div>
                         </div>

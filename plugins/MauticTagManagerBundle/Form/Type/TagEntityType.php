@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticTagManagerBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -25,8 +26,9 @@ class TagEntityType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('buttons', FormButtonsType::class);
+        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
 
-        // We are only allow to set tag field value if we are creating new tag.
+        // We only allow to set tag field value if we are creating new tag.
         $tagReadOnly = !empty($options['data']) && $options['data']->getId() ? true : false;
 
         $builder->add(
@@ -40,24 +42,13 @@ class TagEntityType extends AbstractType
         );
 
         $builder->add(
-            'summary',
-            TextType::class,
-            [
-                'required'   => false,
-                'label'      => 'mautic.tagmanager.tag.summary',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-            ]
-        );
-
-        $builder->add(
             'description',
             TextareaType::class,
             [
                 'required'   => false,
                 'label'      => 'mautic.core.description',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control editor'],
             ]
         );
 
