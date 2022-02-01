@@ -13,18 +13,28 @@ final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase
 {
     public function testSetFrequencyRulesForCategorySubscriptionUnsubscription(): void
     {
+        $categoriesFlags = [
+            'one'   => true,
+            'two'   => false,
+            'three' => true,
+            'four'  => true,
+            'five'  => false,
+        ];
+
         // Create category
-        $categories = $this->createCategories();
+        $categories = $this->createCategories($categoriesFlags);
+
         // Create lead
         $lead = $this->createLead();
 
-        shuffle($categories);
-
         // Subscribe categories.
-        $categoriesToSubscribe = [];
-        /** @var Category $category */
-        foreach (array_slice($categories, 0, 3) as $category) {
+        $categoriesToSubscribe   = [];
+        $categoriesToUnsubscribe = [];
+        foreach ($categories as $category) {
             $categoriesToSubscribe[$category->getId()] = $category->getId();
+            if (!$categoriesFlags[$category->getTitle()]) {
+                $categoriesToUnsubscribe[$category->getId()] = $category->getId();
+            }
         }
 
         $data = [
@@ -40,10 +50,9 @@ final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase
         $this->assertEmpty(array_diff($subscribedCategories, array_keys($categoriesToSubscribe)));
 
         // Unsubscribe categories.
-        unset($categoriesToSubscribe[$category->getId()]);
-        $data['global_categories'] = $categoriesToSubscribe;
+        $data['global_categories'] = array_keys($categoriesToUnsubscribe);
         $model->setFrequencyRules($lead, $data);
-        $unsubscribedCategories = $model->getLeadCategories($lead);
+        $unsubscribedCategories = $model->getUnsubscribedLeadCategoriesIds($lead);
         $this->assertEmpty(array_diff($unsubscribedCategories, array_keys($categoriesToSubscribe)));
     }
 
@@ -61,14 +70,16 @@ final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @param mixed[] $cats
+     *
      * @return Category[]
      */
-    private function createCategories(): array
+    private function createCategories(array $cats): array
     {
         $categories = [];
-        foreach (['one', 'two', 'three', 'four'] as $suffix) {
+        foreach ($cats as $suffix => $flag) {
             $category = new Category();
-            $category->setTitle('Category '.$suffix);
+            $category->setTitle($suffix);
             $category->setAlias('category-'.$suffix);
             $category->setBundle('global');
             $this->em->persist($category);

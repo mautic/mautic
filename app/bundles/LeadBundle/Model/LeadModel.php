@@ -1289,6 +1289,20 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @return mixed[]
+     */
+    public function getUnsubscribedLeadCategoriesIds(Lead $lead): array
+    {
+        $leadCategories   = $this->getLeadCategoryRepository()->getUnsubscribedLeadCategories($lead);
+        $leadCategoryList = [];
+        foreach ($leadCategories as $category) {
+            $leadCategoryList[$category['id']] = $category['category_id'];
+        }
+
+        return $leadCategoryList;
+    }
+
+    /**
      * @param array        $fields
      * @param array        $data
      * @param null         $owner
