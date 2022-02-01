@@ -17,8 +17,16 @@ if (!isset($alertType)) {
 }
 
 $alertClasses = ('growl' == $alertType) ?
-    ['notice' => 'alert-growl',   'warning' => 'alert-growl',   'error' => 'alert-growl'] :
-    ['notice' => 'alert-success', 'warning' => 'alert-warning', 'error' => 'alert-danger'];
+    [
+        'notice'  => 'alert-growl alert-growl--info',
+        'warning' => 'alert-growl alert-growl--warning',
+        'error'   => 'alert-growl alert-growl--error',
+    ] :
+    [
+        'notice'  => 'alert-success',
+        'warning' => 'alert-warning',
+        'error'   => 'alert-danger',
+    ];
 
 if (empty($flashes)) {
     $flashes = $app->getSession() ? $view['session']->getFlashes() : [];

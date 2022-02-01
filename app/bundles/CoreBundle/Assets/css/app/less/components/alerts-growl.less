@@ -1,0 +1,55 @@
+//
+// Alerts-growl styles
+// --------------------------------------------------
+.alert-growl-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 100000;
+
+  .alert-growl {
+    margin-bottom: 5px;
+  }
+}
+
+.alert-growl {
+  background: rgba(0,0,0,.8);
+  color: #FFFFFF;
+  border: 1px solid #000;
+
+  &.alert-growl--info {
+    background: @state-info-bg;
+    color: @state-info-text;
+    border: @state-info-border;
+
+    a {
+      color: @brand-success;
+    }
+  }
+
+  &.alert-growl--warning {
+    background: @state-warning-bg;
+    color: @state-warning-text;
+    border: @state-warning-border;
+
+    a {
+      color: @brand-primary;
+    }
+  }
+
+  &.alert-growl--error {
+    background: @state-danger-bg;
+    color: @state-danger-text;
+    border: @state-danger-border;
+
+    a {
+      color: @brand-primary;
+    }
+  }
+
+  .close {
+    font-size: (@font-size-base);
+    color: @brand-primary;
+    margin-left: 10px;
+  }
+}
