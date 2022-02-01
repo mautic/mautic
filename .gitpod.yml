@@ -6,7 +6,7 @@ image:
 # when starting a workspace all docker images are ready
 tasks:
   - before: bash .ddev/gitpod-setup-ddev.sh
-    init: yes | ddev ddev-setup-mautic
+    init: ddev-setup-mautic -y
     command: gp await-port 8080 && gp preview $(gp url 8080) 
 
 # VScode xdebug extension
