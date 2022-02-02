@@ -42,7 +42,10 @@ trait CreateTestEntitiesTrait
         return $campaign;
     }
 
-    private function createEvent(string $name, Campaign $campaign, string $type, string $eventType, array $property = null): Event
+    /**
+     * @param mixed[] $properties
+     */
+    private function createEvent(string $name, Campaign $campaign, string $type, string $eventType, array $properties = []): Event
     {
         $event = new Event();
         $event->setName($name);
@@ -50,8 +53,12 @@ trait CreateTestEntitiesTrait
         $event->setType($type);
         $event->setEventType($eventType);
         $event->setTriggerInterval(1);
-        $event->setProperties($property);
         $event->setTriggerMode('immediate');
+
+        if ($properties) {
+            $event->setProperties($properties);
+        }
+
         $this->em->persist($event);
 
         return $event;
