@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
-use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadCategory;
 use Symfony\Component\HttpFoundation\Request;
 
 class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
+
     /**
      * @var array<string, bool>
      */
@@ -23,7 +24,8 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testCategoriesOnContactPreferences(): void
     {
-        $lead       = $this->createLead();
+        $lead       = $this->createLead('John', 'Doe', 'john@doe.com');
+
         $categories = $this->createCategories();
         $this->setLeadCategories($lead, $categories);
 
@@ -37,19 +39,6 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(2, $subscribedCats);
     }
 
-    private function createLead(): Lead
-    {
-        $lead = new Lead();
-        $lead->setFirstname('John');
-        $lead->setLastname('Doe');
-        $lead->setEmail('john.doe@test.com');
-
-        $this->em->persist($lead);
-        $this->em->flush();
-
-        return $lead;
-    }
-
     /**
      * @return mixed[]
      */
@@ -57,12 +46,7 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         $categories = [];
         foreach ($this->categoryFlags as $suffix => $name) {
-            $category = new Category();
-            $category->setTitle('Category '.$suffix);
-            $category->setAlias('category-'.$suffix);
-            $category->setBundle('global');
-            $this->em->persist($category);
-            $categories[$suffix] = $category;
+            $categories[$suffix] = $this->createCategory('Category '.$suffix, 'category '.$suffix);
         }
 
         $this->em->flush();
@@ -76,14 +60,9 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
     private function setLeadCategories(Lead $lead, array $categories): void
     {
         foreach ($this->categoryFlags as $key => $flag) {
-            $newLeadCategory = new LeadCategory();
-            $newLeadCategory->setLead($lead);
-            $newLeadCategory->setCategory($categories[$key]);
-            $newLeadCategory->setDateAdded(new \DateTime());
-            $newLeadCategory->setManuallyAdded($flag);
-            $newLeadCategory->setManuallyRemoved(!$flag);
-            $this->em->persist($newLeadCategory);
+            $this->createLeadCategory($lead, $categories[$key], $flag);
         }
+
         $this->em->flush();
     }
 }

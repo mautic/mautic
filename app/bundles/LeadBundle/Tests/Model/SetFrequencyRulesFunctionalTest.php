@@ -6,11 +6,13 @@ namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Model\LeadModel;
 
 final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
+
     public function testSetFrequencyRulesForCategorySubscriptionUnsubscription(): void
     {
         $categoriesFlags = [
@@ -25,7 +27,9 @@ final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase
         $categories = $this->createCategories($categoriesFlags);
 
         // Create lead
-        $lead = $this->createLead();
+        $lead = $this->createLead('John', 'Doe', 'some@test.com');
+
+        $this->em->flush();
 
         // Subscribe categories.
         $categoriesToSubscribe   = [];
@@ -52,21 +56,9 @@ final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase
         // Unsubscribe categories.
         $data['global_categories'] = array_keys($categoriesToUnsubscribe);
         $model->setFrequencyRules($lead, $data);
+
         $unsubscribedCategories = $model->getUnsubscribedLeadCategoriesIds($lead);
         $this->assertEmpty(array_diff($unsubscribedCategories, array_keys($categoriesToSubscribe)));
-    }
-
-    private function createLead(): Lead
-    {
-        $lead = new Lead();
-        $lead->setFirstname('John');
-        $lead->setLastname('Doe');
-        $lead->setEmail('john.doe@test.com');
-
-        $this->em->persist($lead);
-        $this->em->flush();
-
-        return $lead;
     }
 
     /**
@@ -78,12 +70,7 @@ final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase
     {
         $categories = [];
         foreach ($cats as $suffix => $flag) {
-            $category = new Category();
-            $category->setTitle($suffix);
-            $category->setAlias('category-'.$suffix);
-            $category->setBundle('global');
-            $this->em->persist($category);
-            $categories[$suffix] = $category;
+            $categories[$suffix] = $this->createCategory($suffix, $suffix);
         }
 
         $this->em->flush();
