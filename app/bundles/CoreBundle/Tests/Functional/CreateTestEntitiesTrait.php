@@ -8,11 +8,13 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadCategory;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Entity\ListLead;
 
 trait CreateTestEntitiesTrait
 {
