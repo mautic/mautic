@@ -16,8 +16,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ImportControllerFunctionalTest extends MauticMysqlTestCase
 {
-    private $csvFile;
-    private $csvRows = [
+    private string $csvFile;
+    /**
+     * @var array|string[][]
+     */
+    private array $csvRows = [
         ['file', 'email', 'firstname', 'lastname'],
         ['test1.pdf', 'john1@doe.email', 'John', 'Doe1'],
         ['test2.pdf', 'john2@doe.email', 'John', 'Doe2'],
