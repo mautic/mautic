@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - '[0-9].*'
+      - mauticSonar
   pull_request:
   schedule:
     # Run every day at 10:45 AM UTC to discover potential issues with dependencies like PHP updates etc.
@@ -87,6 +88,24 @@ jobs:
       env:
         mysql_port: ${{ job.services.mysql.ports[3306] }}
         mariadb_port: ${{ job.services.mariadb.ports[3306] }}
+
+    - name: Make Coverage report Sonar readable
+      if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' }}
+      run: |
+        report_root="/home/runner/work/mautic/mautic"
+        scanner_root="/github/workspace"
+        sed "s|${report_root}|${scanner_root}|g" coverage.xml > clover.xml
+
+    - name: Analyze with SonarCloud
+      if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' }}
+      uses: sonarsource/sonarcloud-github-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        projectBaseDir: '.'
+        args: >
+          -Dproject.settings=sonar-project.properties
 
     - name: Run Pipedrive tests separately due to bug
       run: |
