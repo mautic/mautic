@@ -226,7 +226,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testRelativeFirstDayOf()
+    public function testRelativeFirstDayOf(): void
     {
         $filterName = 'first day of previous month';
 
@@ -238,7 +238,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testRelativeLastDayOf()
+    public function testRelativeLastDayOf(): void
     {
         $filterName = 'last day of previous month';
 
@@ -247,6 +247,9 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(DateRelativeInterval::class, $filterDecorator);
     }
 
+    /**
+     * @return string[][]
+     */
     public function getRelativeDateNotations(): array
     {
         return [
@@ -260,7 +263,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getRelativeDateNotations
      */
-    public function testRelativeDateNotations(string $expectedResult, string $filterName)
+    public function testRelativeDateNotations(string $expectedResult, string $filterName): void
     {
         $filterDecorator = $this->getFilterDecorator($filterName);
 
