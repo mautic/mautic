@@ -96,8 +96,8 @@
       "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
     },
     {
-      "type": "vcs",
-      "url": "https://github.com/mabumusa1/core-lib"
+      "type": "git",
+      "url": "https://github.com/mabumusa1/core-lib.git"
     }
   ],
   "conflict": {
