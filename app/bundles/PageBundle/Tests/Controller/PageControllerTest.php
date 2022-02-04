@@ -4,7 +4,10 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
+use Mautic\PageBundle\DataFixtures\ORM\LoadPageData;
 use Mautic\PageBundle\Entity\Page;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PageControllerTest extends MauticMysqlTestCase
@@ -15,12 +18,31 @@ class PageControllerTest extends MauticMysqlTestCase
     private $prefix;
 
     /**
+     * @var int
+     */
+    private $id;
+
+    /**
      * @throws \Exception
      */
     protected function setUp(): void
     {
         parent::setUp();
         $this->prefix = self::$container->getParameter('mautic.db_table_prefix');
+
+        $pageData = [
+            'title'    => 'Test Page',
+            'template' => 'blank',
+        ];
+
+        $model = self::$container->get('mautic.page.model.page');
+        $page  = new Page();
+        $page->setTitle($pageData['title'])
+            ->setTemplate($pageData['template']);
+
+        $model->saveEntity($page);
+
+        $this->id = $page->getId();
     }
 
     public function testLandingPageTracking()
@@ -153,5 +175,101 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $page;
+    }
+
+    /*
+     * Get page's view.
+     */
+    public function testViewActionPage(): void
+    {
+        $this->client->request('GET', '/s/pages/view/'.$this->id);
+        $clientResponse         = $this->client->getResponse();
+        $clientResponseContent  = $clientResponse->getContent();
+        $model                  = self::$container->get('mautic.page.model.page');
+        $page                   = $model->getEntity($this->id);
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertStringContainsString($page->getTitle(), $clientResponseContent, 'The return must contain the title of page');
+    }
+
+    /**
+     * Get landing page's create page.
+     */
+    public function testNewActionPage(): void
+    {
+        $this->client->request('GET', '/s/pages/new/');
+        $clientResponse         = $this->client->getResponse();
+        $clientResponseContent  = $clientResponse->getContent();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
+
+    /* Get landing page's submissions list */
+    public function testListLandingPageSubmissions(): void
+    {
+        $this->client->request('GET', 's/pages/results/'.$this->id);
+        $clientResponse         = $this->client->getResponse();
+        $clientResponseContent  = $clientResponse->getContent();
+        $model                  = self::$container->get('mautic.page.model.page');
+        $page                   = $model->getEntity($this->id);
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
+
+    /**
+     * Only tests if an actual CSV file is returned.
+     *
+     * @return void
+     */
+    public function testCsvIsExportedCorrectly()
+    {
+        $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
+
+        ob_start();
+        $this->client->request(Request::METHOD_GET, '/s/pages/results/'.$this->id.'/export');
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'text/csv; charset=UTF-8');
+    }
+
+    /**
+     * Only tests if an actual Excel file is returned.
+     *
+     * @return void
+     */
+    public function testExcelIsExportedCorrectly()
+    {
+        $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
+
+        ob_start();
+        $this->client->request(Request::METHOD_GET, '/s/pages/results/'.$this->id.'/export/xlsx');
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    }
+
+    /**
+     * Only tests if an actual HTML file is returned.
+     *
+     * @return void
+     */
+    public function testHTMLIsExportedCorrectly()
+    {
+        $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
+
+        ob_start();
+        $this->client->request(Request::METHOD_GET, '/s/pages/results/'.$this->id.'/export/html');
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'text/html; charset=UTF-8');
     }
 }

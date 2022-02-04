@@ -449,7 +449,7 @@ class PageModel extends FormModel
 
     /**
      * @param Page|Redirect $page
-     * @param string        $code
+     * @param string|int    $code
      * @param array         $query
      *
      * @throws \Exception

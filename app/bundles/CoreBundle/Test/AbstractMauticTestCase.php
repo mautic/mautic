@@ -5,13 +5,16 @@ namespace Mautic\CoreBundle\Test;
 use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use InvalidArgumentException;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -19,6 +22,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 abstract class AbstractMauticTestCase extends WebTestCase
 {
@@ -174,5 +178,23 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $application->run($input, $output);
 
         return $output->fetch();
+    }
+
+    protected function loginUser(string $username): void
+    {
+        $user = $this->em->getRepository(User::class)
+            ->findOneBy(['username' => $username]);
+
+        if (!$user) {
+            throw new InvalidArgumentException(sprintf('User with username "%s" not found.', $username));
+        }
+
+        $firewall = 'mautic';
+        $session  = self::$container->get('session');
+        $token    = new UsernamePasswordToken($user, null, $firewall, $user->getRoles());
+        $session->set('_security_'.$firewall, serialize($token));
+        $session->save();
+        $cookie = new Cookie($session->getName(), $session->getId());
+        $this->client->getCookieJar()->set($cookie);
     }
 }
