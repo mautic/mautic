@@ -686,6 +686,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "volha-pivavarchyk",
+      "name": "Volha Pivavarchyk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/96085911?v=4",
+      "profile": "https://github.com/volha-pivavarchyk",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
