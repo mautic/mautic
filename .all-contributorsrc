@@ -696,6 +696,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "J-Light",
+      "name": "Nish Joseph",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2544660?v=4",
+      "profile": "https://github.com/J-Light",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
