@@ -1308,7 +1308,10 @@ return [
                 ],
             ],
             'mautic.lead.factory.device_detector_factory' => [
-                'class' => \Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory::class,
+                'class'     => \Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory::class,
+                'arguments' => [
+                  'mautic.cache.provider',
+                ],
             ],
             'mautic.lead.service.contact_tracking_service' => [
                 'class'     => \Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingService::class,

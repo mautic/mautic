@@ -127,7 +127,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getConfigPath(): string
     {
-        return self::$container->getParameter('kernel.project_dir').'/app/config/local.php';
+        return self::$container->get('kernel')->getLocalConfigFile();
     }
 
     private function getConfigParameters(): array
@@ -237,7 +237,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $buttonCrawler  =  $crawler->selectButton('config[buttons][save]');
         $form           = $buttonCrawler->form();
 
-        $send_notification_to_author           = '';
+        $send_notification_to_author           = '0';
         $campaign_notification_email_addresses = 'a@test.com, b@test.com';
         $webhook_notification_email_addresses  = 'a@webhook.com, b@webhook.com';
 
