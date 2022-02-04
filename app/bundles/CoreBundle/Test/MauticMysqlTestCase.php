@@ -141,10 +141,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         fclose($pipes[2]);
         $result_code = proc_close($process);
 
-        $lastLine = system($command, $result_code);
-
         if (0 !== $result_code) {
-            throw new Exception($command.' failed with status code '.$result_code.' and last line of "'.$lastLine.'"');
+            throw new Exception($command.' failed with status code '.$result_code.' and last line of "'.$stderr.'"');
         }
     }
 
