@@ -126,8 +126,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function applySqlFromFile($file)
     {
         $connection = $this->connection;
-        $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
-        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} < {$file}";
+        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()} {$connection->getDatabase()} < {$file}";
 
         // 0 -> stdin, 1 -> stdout, 2 -> stderr
         // We only need stderr, in case we need to output errors when the result code != 0.
@@ -136,7 +135,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         ];
         $pipes       = [];
 
-        $process = proc_open($command, $descriptors, $pipes);
+        $env     = ['MYSQL_PWD' => $connection->getPassword()];
+        $process = proc_open($command, $descriptors, $pipes, null, $env);
         $stderr  = stream_get_contents($pipes[2]);
         fclose($pipes[2]);
         $result_code = proc_close($process);
@@ -217,8 +217,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function dumpToFile(string $sqlDumpFile): void
     {
         $connection = $this->connection;
-        $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
-        $command    = "mysqldump --add-drop-table --column-statistics=0 --opt -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()} $password {$connection->getDatabase()} > {$sqlDumpFile}";
+        $command    = "mysqldump --add-drop-table --column-statistics=0 --opt -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()} {$connection->getDatabase()} > {$sqlDumpFile}";
 
         // 0 -> stdin, 1 -> stdout, 2 -> stderr
         // We only need stderr, in case we need to output errors when the result code != 0.
@@ -227,7 +226,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         ];
         $pipes       = [];
 
-        $process = proc_open($command, $descriptors, $pipes);
+        $env     = ['MYSQL_PWD' => $connection->getPassword()];
+        $process = proc_open($command, $descriptors, $pipes, null, $env);
         $stderr  = stream_get_contents($pipes[2]);
         fclose($pipes[2]);
         $result_code = proc_close($process);
