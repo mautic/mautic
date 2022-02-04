@@ -343,6 +343,10 @@ Mautic.leadlistOnLoad = function(container, response) {
             Mautic.refreshSegmentContacts(segmentContactForm);
         });
     }
+
+    jQuery(document).ajaxComplete(function(){
+        Mautic.ajaxifyForm('daterange');
+    });
 };
 
 Mautic.reorderSegmentFilters = function() {
