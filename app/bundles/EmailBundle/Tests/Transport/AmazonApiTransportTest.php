@@ -70,17 +70,17 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator     = $this->createMock(TranslatorInterface::class);
         $this->amazonCallback = $this->createMock(AmazonCallback::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
-        $this->message = $this->createMock(MauticMessage::class);
-        $this->headers = $this->createMock(\Swift_Mime_SimpleHeaderSet::class);
-        $this->request = $this->createMock(Request::class);
+        $this->logger         = $this->createMock(LoggerInterface::class);
+        $this->message        = $this->createMock(MauticMessage::class);
+        $this->headers        = $this->createMock(\Swift_Mime_SimpleHeaderSet::class);
+        $this->request        = $this->createMock(Request::class);
 
         // Mock http connector
-        $this->mockHttp = $this->createMock(Client::class);
+        $this->mockHttp          = $this->createMock(Client::class);
         $this->transportCallback = $this->createMock(TransportCallback::class);
-        $this->amazonMock = new MockHandler();
+        $this->amazonMock        = new MockHandler();
 
         $this->amazonTransport = new AmazonApiTransport(
             $this->translator,
@@ -257,7 +257,7 @@ PAYLOAD;
 PAYLOAD;
 
         $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
-        $request = $this->createMock(Request::class);
+        $request        = $this->createMock(Request::class);
 
         $request->expects($this->any())
             ->method('getContent')
@@ -300,7 +300,7 @@ PAYLOAD;
             ->will($this->returnValue($payload));
 
         // Mock a successful response
-        $mockResponse = $this->getMockBuilder(Response::class)->getMock();
+        $mockResponse       = $this->getMockBuilder(Response::class)->getMock();
         $mockResponse->code = 200;
 
         $this->transportCallback->expects($this->once())
@@ -336,7 +336,7 @@ PAYLOAD;
             ->will($this->returnValue($payload));
 
         // Mock a successful response
-        $mockResponse = $this->getMockBuilder(Response::class)->getMock();
+        $mockResponse       = $this->getMockBuilder(Response::class)->getMock();
         $mockResponse->code = 200;
 
         $this->transportCallback->expects($this->once())
@@ -351,9 +351,9 @@ PAYLOAD;
                         ->disableOriginalConstructor()
                         ->getMock();
         $messageMock->fromAddress = 'no-reply@sns.amazonaws.com';
-        $messageMock->textPlain = '{"notificationType":"Bounce","bounce":{"bounceType":"Permanent","bounceSubType":"General","bouncedRecipients":[{"emailAddress":"nope@nope.com","action":"failed","status":"5.1.1","diagnosticCode":"smtp; 550 5.1.1 <nope@nope.com>: Recipient address rejected: User unknown in virtual alias table"}],"timestamp":"2016-08-17T07:43:12.776Z","feedbackId":"0102015697743d4c-619f1aa8-763f-4bea-8648-0b3bbdedd1ea-000000","reportingMTA":"dsn; a4-24.smtp-out.eu-west-1.amazonses.com"},"mail":{"timestamp":"2016-08-17T07:43:11.000Z","source":"admin@55hubs.ch","sourceArn":"arn:aws:ses:eu-west-1:918057160339:identity/nope.com","sendingAccountId":"918057160339","messageId":"010201569774384f-81311784-10dd-48a8-921f-8316c145e64d-000000","destination":["nope@nope.com"]}}';
-        $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
-        $bounce = new BouncedEmail();
+        $messageMock->textPlain   = '{"notificationType":"Bounce","bounce":{"bounceType":"Permanent","bounceSubType":"General","bouncedRecipients":[{"emailAddress":"nope@nope.com","action":"failed","status":"5.1.1","diagnosticCode":"smtp; 550 5.1.1 <nope@nope.com>: Recipient address rejected: User unknown in virtual alias table"}],"timestamp":"2016-08-17T07:43:12.776Z","feedbackId":"0102015697743d4c-619f1aa8-763f-4bea-8648-0b3bbdedd1ea-000000","reportingMTA":"dsn; a4-24.smtp-out.eu-west-1.amazonses.com"},"mail":{"timestamp":"2016-08-17T07:43:11.000Z","source":"admin@55hubs.ch","sourceArn":"arn:aws:ses:eu-west-1:918057160339:identity/nope.com","sendingAccountId":"918057160339","messageId":"010201569774384f-81311784-10dd-48a8-921f-8316c145e64d-000000","destination":["nope@nope.com"]}}';
+        $amazonCallback           = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
+        $bounce                   = new BouncedEmail();
         $bounce->setContactEmail('nope@nope.com')
             ->setBounceAddress('admin@55hubs.ch')
             ->setType('unknown')
@@ -370,9 +370,9 @@ PAYLOAD;
                         ->disableOriginalConstructor()
                         ->getMock();
         $messageMock->fromAddress = 'no-reply@sns.amazonaws.com';
-        $messageMock->textPlain = '{"notificationType":"Complaint", "complaint":{ "complainedRecipients":[ { "emailAddress":"nope@nope.com" } ], "timestamp":"2016-01-27T14:59:38.237Z", "feedbackId":"0000013786031775-fea503bc-7497-49e1-881b-a0379bb037d3-000000" }, "mail":{"source": "unknown"} }';
-        $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
-        $unsubscribe = new UnsubscribedEmail('nope@nope.com', 'unknown');
+        $messageMock->textPlain   = '{"notificationType":"Complaint", "complaint":{ "complainedRecipients":[ { "emailAddress":"nope@nope.com" } ], "timestamp":"2016-01-27T14:59:38.237Z", "feedbackId":"0000013786031775-fea503bc-7497-49e1-881b-a0379bb037d3-000000" }, "mail":{"source": "unknown"} }';
+        $amazonCallback           = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
+        $unsubscribe              = new UnsubscribedEmail('nope@nope.com', 'unknown');
         $this->assertEquals($unsubscribe, $amazonCallback->processUnsubscription($messageMock));
     }
 
@@ -393,7 +393,7 @@ PAYLOAD;
             ->will($this->returnValue($payload));
 
         // Mock a successful response
-        $mockResponse = $this->getMockBuilder(Response::class)->getMock();
+        $mockResponse       = $this->getMockBuilder(Response::class)->getMock();
         $mockResponse->code = 200;
 
         $this->transportCallback->expects($this->once())
@@ -419,7 +419,7 @@ PAYLOAD;
             ->will($this->returnValue($payload));
 
         // Mock a successful response
-        $mockResponse = $this->getMockBuilder(Response::class)->getMock();
+        $mockResponse       = $this->getMockBuilder(Response::class)->getMock();
         $mockResponse->code = 200;
 
         $this->transportCallback->expects($this->once())
@@ -434,9 +434,9 @@ PAYLOAD;
                         ->disableOriginalConstructor()
                         ->getMock();
         $messageMock->fromAddress = 'no-reply@sns.amazonaws.com';
-        $messageMock->textPlain = '{"eventType":"Bounce","bounce":{"bounceType":"Permanent","bounceSubType":"General","bouncedRecipients":[{"emailAddress":"nope@nope.com","action":"failed","status":"5.1.1","diagnosticCode":"smtp; 550 5.1.1 <nope@nope.com>: Recipient address rejected: User unknown in virtual alias table"}],"timestamp":"2016-08-17T07:43:12.776Z","feedbackId":"0102015697743d4c-619f1aa8-763f-4bea-8648-0b3bbdedd1ea-000000","reportingMTA":"dsn; a4-24.smtp-out.eu-west-1.amazonses.com"},"mail":{"timestamp":"2016-08-17T07:43:11.000Z","source":"admin@55hubs.ch","sourceArn":"arn:aws:ses:eu-west-1:918057160339:identity/nope.com","sendingAccountId":"918057160339","messageId":"010201569774384f-81311784-10dd-48a8-921f-8316c145e64d-000000","destination":["nope@nope.com"]}}';
-        $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
-        $bounce = new BouncedEmail();
+        $messageMock->textPlain   = '{"eventType":"Bounce","bounce":{"bounceType":"Permanent","bounceSubType":"General","bouncedRecipients":[{"emailAddress":"nope@nope.com","action":"failed","status":"5.1.1","diagnosticCode":"smtp; 550 5.1.1 <nope@nope.com>: Recipient address rejected: User unknown in virtual alias table"}],"timestamp":"2016-08-17T07:43:12.776Z","feedbackId":"0102015697743d4c-619f1aa8-763f-4bea-8648-0b3bbdedd1ea-000000","reportingMTA":"dsn; a4-24.smtp-out.eu-west-1.amazonses.com"},"mail":{"timestamp":"2016-08-17T07:43:11.000Z","source":"admin@55hubs.ch","sourceArn":"arn:aws:ses:eu-west-1:918057160339:identity/nope.com","sendingAccountId":"918057160339","messageId":"010201569774384f-81311784-10dd-48a8-921f-8316c145e64d-000000","destination":["nope@nope.com"]}}';
+        $amazonCallback           = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
+        $bounce                   = new BouncedEmail();
         $bounce->setContactEmail('nope@nope.com')
             ->setBounceAddress('admin@55hubs.ch')
             ->setType('unknown')
@@ -453,9 +453,9 @@ PAYLOAD;
                         ->disableOriginalConstructor()
                         ->getMock();
         $messageMock->fromAddress = 'no-reply@sns.amazonaws.com';
-        $messageMock->textPlain = '{"eventType":"Complaint", "complaint":{ "complainedRecipients":[ { "emailAddress":"nope@nope.com" } ], "timestamp":"2016-01-27T14:59:38.237Z", "feedbackId":"0000013786031775-fea503bc-7497-49e1-881b-a0379bb037d3-000000" }, "mail":{"source": "unknown"} }';
-        $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
-        $unsubscribe = new UnsubscribedEmail('nope@nope.com', 'unknown');
+        $messageMock->textPlain   = '{"eventType":"Complaint", "complaint":{ "complainedRecipients":[ { "emailAddress":"nope@nope.com" } ], "timestamp":"2016-01-27T14:59:38.237Z", "feedbackId":"0000013786031775-fea503bc-7497-49e1-881b-a0379bb037d3-000000" }, "mail":{"source": "unknown"} }';
+        $amazonCallback           = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
+        $unsubscribe              = new UnsubscribedEmail('nope@nope.com', 'unknown');
         $this->assertEquals($unsubscribe, $amazonCallback->processUnsubscription($messageMock));
     }
 }
