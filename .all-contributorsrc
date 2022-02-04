@@ -603,7 +603,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/169384?v=4",
       "profile": "https://github.com/biozshock",
       "contributions": [
-        "userTesting"
+        "userTesting",
+        "review"
       ]
     },
     {
@@ -694,6 +695,15 @@
       "profile": "https://github.com/volha-pivavarchyk",
       "contributions": [
         "userTesting"
+      ]
+    },
+    {
+      "login": "J-Light",
+      "name": "Nish Joseph",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2544660?v=4",
+      "profile": "https://github.com/J-Light",
+      "contributions": [
+        "code"
       ]
     }
   ],
