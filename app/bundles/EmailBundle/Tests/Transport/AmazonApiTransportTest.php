@@ -177,7 +177,7 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
     public function testGetAmazonMessage(): void
     {
         foreach ($this->amazonTransport->getAmazonMessage($this->message) as $rawEmail) {
-            $this->assertEquals('John <john@doe.email>', $rawEmail['FromEmailAddress']);
+            $this->assertEquals('"John" <john@doe.email>', $rawEmail['FromEmailAddress']);
             $this->assertEquals([
                 'ToAddresses'  => ['success227@simulator.amazonses.com'],
                 'CcAddresses'  => ['cc@doe.email'],
