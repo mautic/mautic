@@ -152,24 +152,25 @@ class FieldType extends AbstractType
         );
 
         $listChoices = [
-            'country'  => FormFieldHelper::getCountryChoices(),
-            'region'   => FormFieldHelper::getRegionChoices(),
-            'timezone' => FormFieldHelper::getTimezonesChoices(),
-            'locale'   => FormFieldHelper::getLocaleChoices(),
-            'select'   => [],
+            'country'       => FormFieldHelper::getCountryChoices(),
+            'region'        => FormFieldHelper::getRegionChoices(),
+            'timezone'      => FormFieldHelper::getTimezonesChoices(),
+            'locale'        => FormFieldHelper::getLocaleChoices(),
+            'select'        => [],
+            'multiselect'   => [],
         ];
-
         foreach ($listChoices as $listType => $choices) {
             $builder->add(
                 'default_template_'.$listType,
                 ChoiceType::class,
                 [
-                    'choices'           => $choices,
-                    'label'             => 'mautic.core.defaultvalue',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'attr'              => ['class' => 'form-control not-chosen'],
-                    'required'          => false,
-                    'mapped'            => false,
+                    'choices'     => $choices,
+                    'label'       => 'mautic.core.defaultvalue',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'attr'        => ['class' => 'form-control not-chosen'],
+                    'required'    => false,
+                    'mapped'      => false,
+                    'multiple'    => 'multiselect' === $listType,
                 ]
             );
         }
@@ -236,7 +237,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $event) use ($listChoices, $type) {
+        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options) {
             $cleaningRules = [];
             $form          = $event->getForm();
             $data          = $event->getData();
@@ -276,6 +277,8 @@ class FieldType extends AbstractType
                             'attr'              => ['class' => 'form-control'],
                             'required'          => false,
                             'choices'           => array_flip($list),
+                            'multiple'          => 'multiselect' === $type,
+                            'data'              => 'multiselect' === $type ? explode('|', $options['data']->getDefaultValue()) : $options['data']->getDefaultValue(),
                         ]
                     );
                     break;
