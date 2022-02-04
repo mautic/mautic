@@ -125,7 +125,12 @@
     "bin-dir": "bin",
     "component-dir": "media/assets",
     "process-timeout": 5000,
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "composer/installers": true,
+      "composer/package-versions-deprecated": true,
+      "symfony/flex": true
+    }
   },
   "extra": {
     "installer-paths": {
