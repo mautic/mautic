@@ -205,6 +205,45 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
+     * Get all submissions that derive from a landing page.
+     *
+     * @param array<mixed> $args
+     *
+     * @return array<mixed>
+     */
+    public function getEntitiesByPage(array $args = [])
+    {
+        $activePage = $args['activePage'];
+
+        $dq = $this->_em->getConnection()->createQueryBuilder();
+        $dq->select('count(s.id) as count')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 's')
+            ->innerJoin('s', MAUTIC_TABLE_PREFIX.'pages', 'p', 's.page_id = p.id')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'ip_addresses', 'i', 's.ip_id = i.id')
+            ->where($dq->expr()->eq('s.page_id', ':page'))
+            ->setParameter('page', $activePage->getId());
+
+        $this->buildWhereClause($dq, $args);
+
+        //get a total count
+        $result = $dq->execute()->fetchAll();
+        $total  = $result[0]['count'];
+
+        //now get the actual paginated results
+        $this->buildOrderByClause($dq, $args);
+        $this->buildLimiterClauses($dq, $args);
+
+        $dq->resetQueryPart('select');
+        $dq->select('s.id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.form_id as formId, s.referer, i.ip_address as ipAddress');
+        $results = $dq->execute()->fetchAll();
+
+        return [
+            'count'   => $total,
+            'results' => $results,
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFilterExpr(&$q, $filter, $parameterName = null)
