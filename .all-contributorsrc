@@ -603,7 +603,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/169384?v=4",
       "profile": "https://github.com/biozshock",
       "contributions": [
-        "userTesting"
+        "userTesting",
+        "review"
       ]
     },
     {
@@ -649,6 +650,51 @@
       "profile": "http://tonybogdanov.com",
       "contributions": [
         "code"
+      ]
+    },
+    {
+      "login": "bradycargle",
+      "name": "Brady Cargle",
+      "avatar_url": "https://avatars.githubusercontent.com/u/79949869?v=4",
+      "profile": "https://github.com/bradycargle",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "mmarton",
+      "name": "mmarton",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1424582?v=4",
+      "profile": "https://github.com/mmarton",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "bodrak",
+      "name": "bodrak",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3704648?v=4",
+      "profile": "https://github.com/bodrak",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "nick-vanpraet",
+      "name": "nick-vanpraet",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7923739?v=4",
+      "profile": "https://github.com/nick-vanpraet",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "volha-pivavarchyk",
+      "name": "Volha Pivavarchyk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/96085911?v=4",
+      "profile": "https://github.com/volha-pivavarchyk",
+      "contributions": [
+        "userTesting"
       ]
     }
   ],
