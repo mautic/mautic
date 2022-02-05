@@ -8,6 +8,7 @@ use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+use Symfony\Component\Process\Process;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
@@ -126,23 +127,22 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function applySqlFromFile($file)
     {
         $connection = $this->connection;
-        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()} {$connection->getDatabase()} < {$file}";
-
-        // 0 -> stdin, 1 -> stdout, 2 -> stderr
-        // We only need stderr, in case we need to output errors when the result code != 0.
-        $descriptors = [
-            2 => ['pipe', 'w'],
+        $command    = 'mysql -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" < "${:db_backup_file}"';
+        $envVars    = [
+            'MYSQL_PWD'      => $connection->getPassword(),
+            'db_host'        => $connection->getHost(),
+            'db_port'        => $connection->getPort(),
+            'db_user'        => $connection->getUsername(),
+            'db_name'        => $connection->getDatabase(),
+            'db_backup_file' => $file,
         ];
-        $pipes       = [];
 
-        $env     = ['MYSQL_PWD' => $connection->getPassword()];
-        $process = proc_open($command, $descriptors, $pipes, null, $env);
-        $stderr  = stream_get_contents($pipes[2]);
-        fclose($pipes[2]);
-        $result_code = proc_close($process);
+        $process = Process::fromShellCommandline($command);
+        $process->run(null, $envVars);
 
-        if (0 !== $result_code) {
-            throw new Exception($command.' failed with status code '.$result_code.' and last line of "'.$stderr.'"');
+        // executes after the command finishes
+        if (!$process->isSuccessful()) {
+            throw new Exception($command.' failed with status code '.$process->getExitCode().' and last line of "'.$process->getErrorOutput().'"');
         }
     }
 
@@ -215,24 +215,25 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function dumpToFile(string $sqlDumpFile): void
     {
         $connection = $this->connection;
-        $command    = "mysqldump --add-drop-table --column-statistics=0 --opt -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()} {$connection->getDatabase()} > {$sqlDumpFile}";
-
-        // 0 -> stdin, 1 -> stdout, 2 -> stderr
-        // We only need stderr, in case we need to output errors when the result code != 0.
-        $descriptors = [
-            2 => ['pipe', 'w'],
+        $command    = 'mysqldump --opt -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" > "${:db_backup_file}"';
+        $envVars    = [
+            'MYSQL_PWD'      => $connection->getPassword(),
+            'db_host'        => $connection->getHost(),
+            'db_port'        => $connection->getPort(),
+            'db_user'        => $connection->getUsername(),
+            'db_name'        => $connection->getDatabase(),
+            'db_backup_file' => $sqlDumpFile,
         ];
-        $pipes       = [];
 
-        $env     = ['MYSQL_PWD' => $connection->getPassword()];
-        $process = proc_open($command, $descriptors, $pipes, null, $env);
-        $stderr  = stream_get_contents($pipes[2]);
-        fclose($pipes[2]);
-        $result_code = proc_close($process);
+        $process = Process::fromShellCommandline($command);
+        $process->run(null, $envVars);
 
-        if (0 !== $result_code) {
-            unlink($sqlDumpFile);
-            throw new Exception($command.' failed with status code '.$result_code.' and last line of "'.$stderr.'"');
+        // executes after the command finishes
+        if (!$process->isSuccessful()) {
+            if (file_exists($sqlDumpFile)) {
+                unlink($sqlDumpFile);
+            }
+            throw new Exception($command.' failed with status code '.$process->getExitCode().' and last line of "'.$process->getErrorOutput().'"');
         }
     }
 
