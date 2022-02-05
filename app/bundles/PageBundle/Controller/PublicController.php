@@ -345,9 +345,7 @@ class PublicController extends CommonFormController
 
             $content = $response->getContent();
         } else {
-            if (!empty($analytics)) {
-                $content = str_replace('</head>', $analytics."\n</head>", $content);
-            }
+            $content = str_replace('</head>', $analytics.$this->renderView('MauticPageBundle:Page:preview_header.html.php')."\n</head>", $content);
         }
 
         $dispatcher = $this->get('event_dispatcher');
@@ -381,17 +379,24 @@ class PublicController extends CommonFormController
      */
     public function trackingAction(Request $request)
     {
+        $notSuccessResponse = new JsonResponse(
+            [
+                'success' => 0,
+            ]
+        );
         if (!$this->get('mautic.security')->isAnonymous()) {
-            return new JsonResponse(
-                [
-                    'success' => 0,
-                ]
-            );
+            return $notSuccessResponse;
         }
 
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
-        $model->hitPage(null, $this->request);
+
+        try {
+            $model->hitPage(null, $this->request);
+        } catch (InvalidDecodedStringException $invalidDecodedStringException) {
+            // do not track invalid ct
+            return $notSuccessResponse;
+        }
 
         /** @var ContactTracker $contactTracker */
         $contactTracker = $this->get(ContactTracker::class);
@@ -494,6 +499,10 @@ class PublicController extends CommonFormController
             $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
 
             $url = TokenHelper::findLeadTokens($url, $leadArray, true);
+        }
+
+        if (false !== strpos($url, $this->generateUrl('mautic_asset_download'))) {
+            $url .= '?ct='.$ct;
         }
 
         $url = UrlHelper::sanitizeAbsoluteUrl($url);

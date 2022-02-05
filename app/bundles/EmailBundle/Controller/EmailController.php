@@ -33,11 +33,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EmailController extends FormController
 {
-    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
-
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
+    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
     /**
      * @param int $page
