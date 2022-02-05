@@ -367,7 +367,7 @@ class MailHelper
             }
         } // from is set in flushQueue
 
-        if (!empty($this->replyTo)) {
+        if (empty($this->message->getReplyTo()) && !empty($this->replyTo)) {
             $this->setReplyTo($this->replyTo);
         }
         // Set system return path if applicable
