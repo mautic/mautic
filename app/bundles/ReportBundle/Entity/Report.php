@@ -338,7 +338,7 @@ class Report extends FormEntity implements SchedulerInterface
     /**
      * Set filters.
      *
-     * @param array<string, array<string, string|null>> $filters
+     * @param array<int|string, array<string, string|null>> $filters
      *
      * @return Report
      */
