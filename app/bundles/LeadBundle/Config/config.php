@@ -502,6 +502,22 @@ return [
                     'router',
                 ],
             ],
+            'mautic.lead.import.contact.subscriber' => [
+                'class'     => Mautic\LeadBundle\EventListener\ImportContactSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.field.field_list',
+                    'mautic.security',
+                    'mautic.lead.model.lead',
+                ],
+            ],
+            'mautic.lead.import.company.subscriber' => [
+                'class'     => Mautic\LeadBundle\EventListener\ImportCompanySubscriber::class,
+                'arguments' => [
+                    'mautic.lead.field.field_list',
+                    'mautic.security',
+                    'mautic.lead.model.company',
+                ],
+            ],
             'mautic.lead.import.subscriber' => [
                 'class'     => Mautic\LeadBundle\EventListener\ImportSubscriber::class,
                 'arguments' => [
@@ -566,6 +582,13 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.lead.model.list',
+                ],
+            ],
+            'mautic.lead.generated_columns.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\GeneratedColumnSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'translator',
                 ],
             ],
         ],
@@ -784,6 +807,13 @@ return [
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'leadlist_access',
             ],
+            'mautic.validator.emailaddress' => [
+                'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\EmailAddressValidator::class,
+                'arguments' => [
+                    'mautic.validator.email',
+                ],
+                'tag'       => 'validator.constraint_validator',
+            ],
             \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class => [
                 'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class,
                 'tag'       => 'validator.constraint_validator',
@@ -806,6 +836,10 @@ return [
                 'arguments' => ['mautic.lead.repository.lead_list', 'mautic.helper.user'],
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'uniqueleadlist',
+            ],
+            'mautic.lead.validator.custom_field' => [
+                'class'     => \Mautic\LeadBundle\Validator\CustomFieldValidator::class,
+                'arguments' => ['mautic.lead.model.field', 'translator'],
             ],
             'mautic.lead_list.constraint.in_use' => [
                 'class'     => Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUseValidator::class,
@@ -932,6 +966,16 @@ return [
                     'setUniqueIdentifiersOperator' => [
                         '%mautic.contact_unique_identifiers_operator%',
                     ],
+                    'setListLeadRepository' => [
+                        '@mautic.lead.repository.list_lead',
+                    ],
+                ],
+            ],
+            'mautic.lead.repository.list_lead' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\ListLead::class,
                 ],
             ],
             'mautic.lead.repository.frequency_rule' => [
@@ -1271,7 +1315,10 @@ return [
                 ],
             ],
             'mautic.lead.factory.device_detector_factory' => [
-                'class' => \Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory::class,
+                'class'     => \Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory::class,
+                'arguments' => [
+                  'mautic.cache.provider',
+                ],
             ],
             'mautic.lead.service.contact_tracking_service' => [
                 'class'     => \Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingService::class,

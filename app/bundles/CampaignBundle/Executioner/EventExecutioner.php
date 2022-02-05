@@ -88,9 +88,6 @@ class EventExecutioner
      */
     private $leadRepository;
 
-    /**
-     * EventExecutioner constructor.
-     */
     public function __construct(
         EventCollector $eventCollector,
         EventLogger $eventLogger,
@@ -517,5 +514,14 @@ class EventExecutioner
         $counter->advanceEvaluated($children->count());
 
         $this->executeEventsForContacts($children, $contacts, $counter);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function persistSummaries(): void
+    {
+        $this->eventLogger->getSummaryModel()->persistSummaries();
     }
 }
