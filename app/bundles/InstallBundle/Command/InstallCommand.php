@@ -20,7 +20,6 @@ use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -36,6 +35,8 @@ class InstallCommand extends ContainerAwareCommand
     public const COMMAND = 'mautic:install';
 
     /**
+     * Note: in every option (addOption()), please leave the default value empty to prevent problems with values from local.php being overwritten.
+     *
      * {@inheritdoc}
      */
     protected function configure()
@@ -68,7 +69,7 @@ class InstallCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Database driver.',
-                'pdo_mysql'
+                null
             )
             ->addOption(
                 '--db_host',
@@ -117,14 +118,14 @@ class InstallCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Backup database tables if they exist; otherwise drop them.',
-                true
+                null
             )
             ->addOption(
                 '--db_backup_prefix',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Database backup tables prefix.',
-                'bak_'
+                null
             )
             ->addOption(
                 '--admin_firstname',
@@ -249,15 +250,6 @@ class InstallCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $command = $this->getApplication()->find('cache:clear');
-
-        $arguments = [
-            '--env'    => $input->getOptions()['env'] ?? 'prod',
-        ];
-
-        $commandInput = new ArrayInput($arguments);
-        $returnCode   = $command->run($commandInput, $output);
-
         $container = $this->getContainer();
         /** @var \Mautic\InstallBundle\Install\InstallService $installer */
         $installer = $container->get('mautic.install.service');
@@ -289,15 +281,15 @@ class InstallCommand extends ContainerAwareCommand
          * user didn't set them both in local.php and the command line options.
          */
         $dbParams   = [
-            'driver'        => null,
+            'driver'        => 'pdo_mysql',
             'host'          => null,
             'port'          => null,
             'name'          => null,
             'user'          => null,
             'password'      => null,
             'table_prefix'  => null,
-            'backup_tables' => null,
-            'backup_prefix' => null,
+            'backup_tables' => true,
+            'backup_prefix' => 'bak_',
         ];
         $adminParam = [
             'firstname' => 'Admin',
@@ -383,9 +375,15 @@ class InstallCommand extends ContainerAwareCommand
                 // no break
             case InstallService::DOCTRINE_STEP:
                 $output->writeln($step.' - Creating database...');
-                /** @var ConnectionWrapper $connectionWrapper */
+
+                /**
+                 * This is needed for installations with database prefixes to work correctly.
+                 *
+                 * @var ConnectionWrapper $connectionWrapper
+                 */
                 $connectionWrapper = $container->get('doctrine')->getConnection();
                 $connectionWrapper->initConnection($dbParams);
+
                 $messages = $this->stepAction($installer, $dbParams, $step);
                 if (!empty($messages)) {
                     $output->writeln('Errors in database configuration/installation:');

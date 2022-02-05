@@ -15,7 +15,7 @@ namespace Mautic\CoreBundle\Doctrine\Mapping;
  * Class AssociationBuilder.
  *
  * Override Doctrine's builder classes to add support to orphanRemoval until the fix is incorporated into Doctrine release
- * See @link https://github.com/doctrine/doctrine2/pull/1326/
+ * See @see https://github.com/doctrine/doctrine2/pull/1326/
  *
  * Also gives support for allowing a many-to-one to be the primary key
  */
