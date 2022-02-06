@@ -17,28 +17,26 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\FormBundle\Entity\Form;
-use Mautic\LeadBundle\Entity\LeadList;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testUnsubscribeAction(): void
     {
-        $form = new Form();
+        $form     = new Form();
         $formName = 'Unsubscribe_test_form';
         $form->setName($formName);
         $form->setAlias($formName);
         $this->em->persist($form);
 
         $email = new Email();
-        $email->setName("Email");
-        $email->setSubject("EmailSubject");
+        $email->setName('Email');
+        $email->setSubject('EmailSubject');
         $email->setEmailType('template');
         $email->setUnsubscribeForm($form);
         $this->em->persist($email);
 
-
         // Create a test email stat.
-        $stat = new Stat();
+        $stat         = new Stat();
         $trackingHash = 'test_unsubscribe_form_email';
         $stat->setTrackingHash($trackingHash);
         $stat->setEmailAddress('john@doe.email');
@@ -53,5 +51,4 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         self::assertStringContainsString('form/submit?formId='.$form->getId(), $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertTrue($this->client->getResponse()->isOk());
     }
-
 }
