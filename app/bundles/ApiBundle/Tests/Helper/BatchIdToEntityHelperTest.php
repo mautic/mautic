@@ -36,6 +36,13 @@ class BatchIdToEntityHelperTest extends TestCase
         $this->assertEquals([1, 2, 3], $helper->getIds());
     }
 
+    public function testIdIsExtractedFromIdKeyWithNumericValue(): void
+    {
+        $parameters = ['ids' => '12'];
+        $helper     = new BatchIdToEntityHelper($parameters);
+        $this->assertEquals([12], $helper->getIds());
+    }
+
     public function testErrorSetForIdKeyThatsNotRecognized()
     {
         $parameters = ['ids' => 'foo'];
