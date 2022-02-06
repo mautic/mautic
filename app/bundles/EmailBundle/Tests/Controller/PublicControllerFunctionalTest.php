@@ -15,43 +15,43 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\Stat;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testUnsubscribeAction(): void
     {
-        $client  = $this->client;
-        $segment = $this->createSegment();
-        $email   = $this->createEmail();
-        $email->addList($segment);
+        $form = new Form();
+        $formName = 'Unsubscribe_test_form';
+        $form->setName($formName);
+        $form->setAlias($formName);
+        $this->em->persist($form);
 
-        $this->em->persist($segment);
+        $email = new Email();
+        $email->setName("Email");
+        $email->setSubject("EmailSubject");
+        $email->setEmailType('template');
+        $email->setUnsubscribeForm($form);
         $this->em->persist($email);
+
+
+        // Create a test email stat.
+        $stat = new Stat();
+        $trackingHash = 'test_unsubscribe_form_email';
+        $stat->setTrackingHash($trackingHash);
+        $stat->setEmailAddress('john@doe.email');
+        $stat->setDateSent(new \DateTime());
+        $stat->setEmail($email);
+        $this->em->persist($stat);
+
         $this->em->flush();
 
-        $client->request('GET', '/email/unsubscribe/'.$email->getId());
-        $response = $client->getResponse();
-        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$trackingHash);
+
+        self::assertStringContainsString('form/submit?formId='.$form->getId(), $crawler->filter('form')->eq(0)->attr('action'));
+        $this->assertTrue($this->client->getResponse()->isOk());
     }
 
-    private function createSegment(string $suffix = 'A'): LeadList
-    {
-        $segment = new LeadList();
-        $segment->setName("Segment $suffix");
-        $segment->setPublicName("Segment $suffix");
-        $segment->setAlias("segment-$suffix");
-
-        return $segment;
-    }
-
-    private function createEmail(string $suffix = 'A', string $emailType = 'list'): Email
-    {
-        $email = new Email();
-        $email->setName("Email $suffix");
-        $email->setSubject("Email $suffix Subject");
-        $email->setEmailType($emailType);
-
-        return $email;
-    }
 }
