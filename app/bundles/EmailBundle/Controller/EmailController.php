@@ -226,9 +226,6 @@ class EmailController extends FormController
         }
         $session->set('mautic.email.page', $page);
 
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $pageModel = $this->getModel('page.page');
-
         return $this->delegateView(
             [
                 'viewParameters' => [
