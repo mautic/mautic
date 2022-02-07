@@ -44,10 +44,10 @@ class CleanupMaintenanceCommand extends ContainerAwareCommand
                     new InputOption('dry-run', 'r', InputOption::VALUE_NONE, 'Do a dry run without actually deleting anything.'),
                     new InputOption('gdpr', 'g', InputOption::VALUE_NONE, 'Delete data to fullfil GDPR requirement.'),
                     new InputOption(
-                        'gdpr-days-old', 
-                        'g-d', 
-                        InputOption::VALUE_OPTIONAL, 
-                        'Delete data older than this number of days to fullfil GDPR requirement. Defaults to 3 * 365 days.', 
+                        'gdpr-days-old',
+                        'g-d',
+                        InputOption::VALUE_OPTIONAL,
+                        'Delete data older than this number of days to fullfil GDPR requirement. Defaults to 3 * 365 days.',
                         '1095'
                     ),
                 ]
