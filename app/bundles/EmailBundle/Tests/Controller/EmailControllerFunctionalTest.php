@@ -34,13 +34,25 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * Index should return status code 200.
+     * Check if email contains correct values.
      */
-    public function testIndexActionWhenNotFiltered(): void
+    public function testViewEmail(): void
     {
+        $email = $this->createEmail('ABC', 'template');
+        $email->setDateAdded(new \DateTime('2020-02-07 20:29:02'));
+        $email->setDateModified(new \DateTime('2020-03-21 20:29:02'));
+        $email->setCreatedByUser('Test User');
+
+        $this->em->persist($email);
+        $this->em->flush();
+        $this->em->clear();
+
         $this->client->request('GET', '/s/emails');
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200');
+        $this->assertStringContainsString('February 7, 2020', $clientResponse->getContent());
+        $this->assertStringContainsString('March 21, 2020', $clientResponse->getContent());
+        $this->assertStringContainsString('Test User', $clientResponse->getContent());
     }
 
     /**
