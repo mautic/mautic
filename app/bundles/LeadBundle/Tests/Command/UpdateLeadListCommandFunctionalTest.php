@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\UpdateLeadListsCommand;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use PHPUnit\Framework\Assert;
 
 final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
@@ -54,8 +55,19 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         /** @var LeadList $segment */
         $segment = $this->em->find(LeadList::class, $segment->getId());
         $assert($segment);
+
+        /** @var LeadListRepository $leadListRepository */
+        $leadListRepository = $this->em->getRepository(LeadList::class);
+
+        Assert::assertSame(
+            [$segment->getId() => '1'],
+            $leadListRepository->getLeadCount([$segment->getId()])
+        );
     }
 
+    /**
+     * @return iterable<array<callable>>
+     */
     public function provider(): iterable
     {
         // Test that all segments will be rebuilt with no params set.

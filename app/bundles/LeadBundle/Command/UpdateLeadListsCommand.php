@@ -92,7 +92,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     $processed = 0;
                     try {
                         $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
-                        if (0 >= $max) {
+                        if (0 >= (int) $max) {
                             // Only full segment rebuilds count
                             $list->setLastBuiltDateToCurrentDatetime();
                             $listModel->saveEntity($list);
@@ -125,7 +125,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
                     $startTimeForSingleSegment = time();
                     $processed                 = $listModel->rebuildListLeads($leadList, $batch, $max, $output);
-                    if (0 >= $max) {
+                    if (0 >= (int) $max) {
                         // Only full segment rebuilds count
                         $leadList->setLastBuiltDateToCurrentDatetime();
                         $listModel->saveEntity($leadList);
