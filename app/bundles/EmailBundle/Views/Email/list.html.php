@@ -250,9 +250,13 @@ if ('index' == $tmpl) {
                         <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
                         <?php echo $view['content']->getCustomContent('email.stats.below', $mauticTemplateVars); ?>
                     </td>
-                    <td class="visible-lg"><?php echo $item->getDateAdded() ? $view['date']->toFullConcat($item->getDateAdded()) : ''; ?></td>
-                    <td class="visible-lg"><?php echo $item->getDateModified() ? $view['date']->toFullConcat($item->getDateModified()) : ''; ?></td>
-                    <td class="visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
+                    <td class="visible-lg" title="<?php echo $item->getDateAdded() ? $view['date']->toFullConcat($item->getDateAdded()) : ''; ?>">
+                        <?php echo $item->getDateAdded() ? $view['date']->toDate($item->getDateAdded()) : ''; ?>
+                    </td>
+                    <td class="visible-lg" title="<?php echo $item->getDateModified() ? $view['date']->toFullConcat($item->getDateModified()) : ''; ?>">
+                        <?php echo $item->getDateModified() ? $view['date']->toDate($item->getDateModified()) : ''; ?>
+                    </td>
+                    <td class="visible-lg"><?php echo $view->escape($item->getCreatedByUser()); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
