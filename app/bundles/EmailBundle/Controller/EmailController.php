@@ -229,7 +229,7 @@ class EmailController extends FormController
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $pageModel = $this->getModel('page.page');
 
-        /** @var \Mautic\PageBundle\Entity\HitRepository $pageRepo */
+        /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepo */
         $hitRepo = $pageModel->getHitRepository();
 
         return $this->delegateView(

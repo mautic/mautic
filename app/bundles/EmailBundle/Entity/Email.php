@@ -1150,9 +1150,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Return clicks count of email.
      *
-     * @param $hitRepo Mautic\PageBundle\Entity\HitRepository
+     * @param \Mautic\PageBundle\Entity\HitRepository $hitRepo
      */
-    public function getClicksCount($hitRepo)
+    public function getClicksCount($hitRepo): int
     {
         $emailClicksResult = $hitRepo->getEmailClickthroughHitCount($this->getId());
         $emailClicks       = is_array($emailClicksResult) && count($emailClicksResult) > 0 ? $emailClicksResult[$this->getId()] : 0;
@@ -1163,9 +1163,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Get CTR of email.
      *
-     * @param $emailClicks clicks of email
+     * @param int $emailClicks
      */
-    public function getCtrPercentage($emailClicks = 0)
+    public function getCtrPercentage($emailClicks = 0): float
     {
         return 0 !== $this->getSentCount(true) ? round($emailClicks / $this->getSentCount(true) * 100, 2) : 0;
     }
@@ -1173,9 +1173,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Get total clicks and total unique clicks of email.
      *
-     * @param $trackables Array of email's link
+     * @param Array<int, array<string,int>> $trackables Array of email's link
      */
-    public function getEmailClickCounters($trackables)
+    public function getEmailClickCounters($trackables): array
     {
         $clickCounts = array_reduce($trackables, function ($accumulator, $link) {
             $accumulator[0] += $link['hits'];
