@@ -114,11 +114,6 @@ class SysinfoModel
             $this->pathsHelper->getSystemPath('translations', true),
         ];
 
-        // Show the spool folder only if the email queue is configured
-        if ('file' == $this->coreParametersHelper->get('mailer_spool_type')) {
-            $importantFolders[] = $this->coreParametersHelper->get('mailer_spool_path');
-        }
-
         foreach ($importantFolders as $folder) {
             $folderPath = realpath($folder);
             $folderKey  = ($folderPath) ? $folderPath : $folder;

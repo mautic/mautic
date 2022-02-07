@@ -700,21 +700,6 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'mailer_spool_clear_timeout',
-            TextType::class,
-            [
-                'label'      => 'mautic.email.config.mailer.spool.clear.timeout',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'data-hide-on' => $spoolConditions,
-                    'tooltip'      => 'mautic.email.config.mailer.spool.clear.timeout.tooltip',
-                ],
-                'required'   => false,
-            ]
-        );
-
-        $builder->add(
             'monitored_email',
             ConfigMonitoredEmailType::class,
             [

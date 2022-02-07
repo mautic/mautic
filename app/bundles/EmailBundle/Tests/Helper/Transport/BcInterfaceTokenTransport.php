@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
-use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
 use Swift_Events_EventListener;
 
