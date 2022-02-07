@@ -11,7 +11,6 @@
 
 namespace Mautic\InstallBundle\Configurator\Form;
 
-use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\EmailBundle\Model\TransportType;
 use Symfony\Component\Form\AbstractType;
@@ -299,21 +298,8 @@ class EmailStepType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'mailer_spool_type',
-            ButtonGroupType::class,
-            [
-                'choices'     => [
-                    'mautic.email.config.mailer_spool_type.memory' => 'memory',
-                    'mautic.email.config.mailer_spool_type.file'   => 'file',
-                ],
-                'label'       => 'mautic.install.form.email.spool_type',
-                'expanded'    => true,
-                'placeholder' => false,
-            ]
-        );
-
         $builder->add('mailer_spool_path', HiddenType::class);
+        $builder->add('mailer_dsn', HiddenType::class);
 
         $builder->add(
             'buttons',

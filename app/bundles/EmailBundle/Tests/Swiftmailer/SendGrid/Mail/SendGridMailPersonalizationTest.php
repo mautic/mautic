@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
 
-use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailPersonalization;
 use SendGrid\Email;
 use SendGrid\Mail;

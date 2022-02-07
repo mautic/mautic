@@ -96,28 +96,13 @@ class SubmitActionEmailType extends AbstractType
             ]
         );
 
-        if ('file' == $this->coreParametersHelper->get('mailer_spool_type')) {
-            $default = isset($options['data']['immediately']) ? $options['data']['immediately'] : false;
-            $builder->add(
-                'immediately',
-                YesNoButtonGroupType::class,
-                [
-                    'label' => 'mautic.form.action.sendemail.immediately',
-                    'data'  => $default,
-                    'attr'  => [
-                        'tooltip' => 'mautic.form.action.sendemail.immediately.desc',
-                    ],
-                ]
-            );
-        } else {
-            $builder->add(
-                'immediately',
-                HiddenType::class,
-                [
-                    'data' => false,
-                ]
-            );
-        }
+        $builder->add(
+            'immediately',
+            HiddenType::class,
+            [
+                'data' => false,
+            ]
+        );
 
         $default = isset($options['data']['copy_lead']) ? $options['data']['copy_lead'] : false;
         $builder->add(

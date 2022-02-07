@@ -14,7 +14,7 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
-use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 
 abstract class AbstractTokenArrayTransport implements TokenTransportInterface
 {
