@@ -807,6 +807,13 @@ return [
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'leadlist_access',
             ],
+            'mautic.validator.emailaddress' => [
+                'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\EmailAddressValidator::class,
+                'arguments' => [
+                    'mautic.validator.email',
+                ],
+                'tag'       => 'validator.constraint_validator',
+            ],
             \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class => [
                 'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class,
                 'tag'       => 'validator.constraint_validator',

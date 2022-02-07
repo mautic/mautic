@@ -131,8 +131,9 @@
     "process-timeout": 5000,
     "sort-packages": true,
     "allow-plugins": {
-      "symfony/flex": false,
-      "composer/installers": false
+      "composer/installers": true,
+      "composer/package-versions-deprecated": true,
+      "symfony/flex": true
     }
   },
   "extra": {

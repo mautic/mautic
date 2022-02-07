@@ -44,7 +44,7 @@ then
     printf "\nAnswer [yes/no]: "
     read MAUTIC_PREF
 
-    if [[ $MAUTIC_PREF == "yes" ]]
+    if [ $MAUTIC_PREF == "yes" ] || [ -n $GITPOD_HEADLESS ];
     then
         printf "Okay, setting up your Mautic instance... 🚀\n"
         echo "ddev-managed" > ./.ddev/mautic-preference
