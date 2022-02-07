@@ -9,9 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Swiftmailer\Message;
+namespace Mautic\EmailBundle\Mailer\Message;
 
-class MauticMessage extends \Swift_Message
+use Symfony\Component\Mime\Email;
+
+class MauticMessage extends Email
 {
     /**
      * @var array
@@ -19,23 +21,18 @@ class MauticMessage extends \Swift_Message
     protected $metadata = [];
 
     /**
-     * @var array
-     */
-    protected $attachments = [];
-
-    /**
      * Create a new Message.
      *
      * @param string $subject
      * @param string $body
-     * @param string $contentType
-     * @param string $charset
      *
-     * @return Swift_Message
+     * @return Email
      */
-    public static function newInstance($subject = null, $body = null, $contentType = null, $charset = null)
+    public static function newInstance($subject = null, $body = null)
     {
-        return new self($subject, $body, $contentType, $charset);
+        return (new Email())
+            ->subject($subject)
+            ->html($body);
     }
 
     /**
@@ -72,31 +69,12 @@ class MauticMessage extends \Swift_Message
      */
     public function addAttachment($filePath, $fileName = null, $contentType = null, $inline = false)
     {
-        $attachment = [
-            'filePath'    => $filePath,
-            'fileName'    => $fileName,
-            'contentType' => $contentType,
-            'inline'      => $inline,
-        ];
+        if (true === $inline) {
+            $this->embedFromPath($filePath, $fileName, $contentType);
 
-        $this->attachments[] = $attachment;
-    }
+            return;
+        }
 
-    /**
-     * Get attachments.
-     *
-     * @return array
-     */
-    public function getAttachments()
-    {
-        return $this->attachments;
-    }
-
-    /**
-     * Clear attachments.
-     */
-    public function clearAttachments()
-    {
-        $this->attachments = [];
+        $this->attachFromPath($filePath, $fileName, $contentType);
     }
 }

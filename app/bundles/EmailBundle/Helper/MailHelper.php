@@ -20,11 +20,13 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\PartialEmailSendFailure;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
-use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
-use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
-use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email as MailerEmail;
+use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -55,11 +57,6 @@ class MailHelper
      * @var null
      */
     protected $dispatcher;
-
-    /**
-     * @var \Swift_Plugins_Loggers_ArrayLogger
-     */
-    protected $logger;
 
     /**
      * @var bool|MauticMessage
@@ -249,18 +246,10 @@ class MailHelper
      */
     private $embedImagesReplaces = [];
 
-    public function __construct(MauticFactory $factory, \Swift_Mailer $mailer, $from = null)
+    public function __construct(MauticFactory $factory, MailerInterface $mailer, $from = null)
     {
         $this->factory   = $factory;
         $this->mailer    = $mailer;
-        $this->transport = $mailer->getTransport();
-
-        try {
-            $this->logger = new \Swift_Plugins_Loggers_ArrayLogger();
-            $this->mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($this->logger));
-        } catch (\Exception $e) {
-            $this->logError($e);
-        }
 
         $systemFromEmail    = $factory->getParameter('mailer_from_email');
         $systemReplyToEmail = $factory->getParameter('mailer_reply_to_email');
@@ -271,19 +260,6 @@ class MailHelper
         $this->setDefaultReplyTo($systemReplyToEmail, $this->from);
 
         $this->returnPath = $factory->getParameter('mailer_return_path');
-
-        // Check if batching is supported by the transport
-        if (
-            ('memory' == $this->factory->getParameter('mailer_spool_type') && $this->transport instanceof TokenTransportInterface)
-            || ($this->transport instanceof SpoolTransport && $this->transport->supportsTokenization())
-        ) {
-            $this->tokenizationEnabled = true;
-        }
-
-        // Set factory if supported
-        if (method_exists($this->transport, 'setMauticFactory')) {
-            $this->transport->setMauticFactory($factory);
-        }
 
         $this->message = $this->getMessageInstance();
     }
@@ -317,7 +293,7 @@ class MailHelper
         }
 
         $transport  = $this->factory->get('swiftmailer.mailer.default.transport.real');
-        $mailer     = new \Swift_Mailer($transport);
+        $mailer     = new Mailer($transport);
         $mailHelper = new self($this->factory, $mailer, $this->from);
 
         return $mailHelper->getMailer($cleanSlate);
@@ -390,11 +366,11 @@ class MailHelper
                 $this->queueAssetDownloadEntry();
             }
 
-            $this->message->setSubject($this->subject);
+            $this->message->subject($this->subject);
             // Only set body if not empty or if plain text is empty - this ensures an empty HTML body does not show for
             // messages only with plain text
             if (!empty($this->body['content']) || empty($this->plainText)) {
-                $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
+                $this->message->html($this->body['content'], $this->body['charset']);
             }
             $this->setMessagePlainText();
 
@@ -449,18 +425,12 @@ class MailHelper
                     $this->errors['failures'] = $failures;
                     $this->logError('Sending failed for one or more recipients');
                 }
-
-                // Clear the log so that previous output is not associated with new errors
-                $this->logger->clear();
             } catch (PartialEmailSendFailure $exception) {
                 // Don't fail the entire message
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
                     $this->logError($exception->getMessage());
                 }
-
-                // Clear the log so that previous output is not associated with new errors
-                $this->logger->clear();
             } catch (\Exception $e) {
                 $failures = $this->tokenizationEnabled ? array_keys($this->message->getMetadata()) : [];
 
@@ -681,8 +651,6 @@ class MailHelper
         $this->idHashState      = true;
         $this->checkIfTransportNeedsRestart(true);
 
-        $this->logger->clear();
-
         if ($cleanSlate) {
             $this->appendTrackingPixel = false;
             $this->queueEnabled        = false;
@@ -710,19 +678,18 @@ class MailHelper
     }
 
     /**
-     * Search and replace tokens
-     * Adapted from \Swift_Plugins_DecoratorPlugin.
+     * Search and replace tokens.
      *
      * @param array $search
      * @param array $replace
      */
-    public static function searchReplaceTokens($search, $replace, \Swift_Message &$message)
+    public static function searchReplaceTokens($search, $replace, MailerEmail $message)
     {
         // Body
         $body         = $message->getBody();
         $bodyReplaced = str_ireplace($search, $replace, $body, $updated);
         if ($updated) {
-            $message->setBody($bodyReplaced);
+            $message->html($bodyReplaced);
         }
         unset($body, $bodyReplaced);
 
@@ -731,14 +698,14 @@ class MailHelper
         $bodyReplaced = str_ireplace($search, $replace, $subject, $updated);
 
         if ($updated) {
-            $message->setSubject($bodyReplaced);
+            $message->subject($bodyReplaced);
         }
         unset($subject, $bodyReplaced);
 
         // Headers
-        /** @var \Swift_Mime_Header $header */
-        foreach ($message->getHeaders()->getAll() as $header) {
-            $headerBody = $header->getFieldBodyModel();
+        /** @var HeaderInterface $header */
+        foreach ($message->getHeaders()->all() as $header) {
+            $headerBody = $header->getBody();
             if ($headerBody instanceof \DateTimeInterface) {
                 // It's not possible to replace tokens in \DateTime objects
                 // because they can't contain tokens
@@ -762,7 +729,7 @@ class MailHelper
             }
 
             if (!empty($updated)) {
-                $header->setFieldBodyModel($bodyReplaced);
+                $header->setBody($bodyReplaced);
             }
 
             unset($headerBody, $bodyReplaced);
@@ -798,14 +765,14 @@ class MailHelper
     }
 
     /**
-     * Get a MauticMessage/Swift_Message instance.
+     * Get a MauticMessage/Email instance.
      *
      * @return bool|MauticMessage
      */
     public function getMessageInstance()
     {
         try {
-            return $this->tokenizationEnabled ? MauticMessage::newInstance() : (new \Swift_Message());
+            return $this->tokenizationEnabled ? MauticMessage::newInstance() : (new Email());
         } catch (\Exception $e) {
             $this->logError($e);
 
@@ -1013,7 +980,7 @@ class MailHelper
         if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
             foreach ($matches[1] as $match) {
                 if (false === strpos($match, 'cid:') && false === strpos($match, '{tracking_pixel}') && !array_key_exists($match, $this->embedImagesReplaces)) {
-                    $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                    $this->embedImagesReplaces[$match] = $this->message->embedFromPath($match);
                 }
             }
             $content = strtr($content, $this->embedImagesReplaces);
@@ -1068,7 +1035,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(count($addresses));
 
         try {
-            $this->message->setTo($addresses);
+            $this->message->to($addresses);
             $this->queuedRecipients = array_merge($this->queuedRecipients, $addresses);
 
             return true;
@@ -1665,11 +1632,6 @@ class MailHelper
             $errorMessage     = trim($error);
         }
 
-        $logDump = $this->logger->dump();
-        if (!empty($logDump) && false === strpos($error, $logDump)) {
-            $error .= " Log data: $logDump";
-        }
-
         if ($context) {
             $error .= " ($context)";
 
@@ -1679,8 +1641,6 @@ class MailHelper
         }
 
         $this->errors[] = $errorMessage;
-
-        $this->logger->clear();
 
         $this->factory->getLogger()->log('error', '[MAIL ERROR] '.$error, $exceptionContext);
     }

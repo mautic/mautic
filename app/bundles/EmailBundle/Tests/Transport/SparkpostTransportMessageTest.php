@@ -12,8 +12,8 @@
 namespace Mautic\EmailBundle\Tests\Transport;
 
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\TransportCallback;
-use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
 use Psr\Log\LoggerInterface;

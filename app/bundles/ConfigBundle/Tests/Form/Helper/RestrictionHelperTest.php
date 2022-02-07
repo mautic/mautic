@@ -93,7 +93,6 @@ class RestrictionHelperTest extends TypeTestCase
                 'mailer_spool_msg_limit'       => null,
                 'mailer_spool_time_limit'      => null,
                 'mailer_spool_recover_timeout' => 900,
-                'mailer_spool_clear_timeout'   => 1800,
                 'unsubscribe_text'             => null,
                 'webview_text'                 => null,
                 'unsubscribe_message'          => null,

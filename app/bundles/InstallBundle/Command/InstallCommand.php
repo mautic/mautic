@@ -226,13 +226,6 @@ class InstallCommand extends ContainerAwareCommand
                 null
             )
             ->addOption(
-                '--mailer_spool_type',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Spool mode (file|memory).',
-                null
-            )
-            ->addOption(
                 '--mailer_spool_path',
                 null,
                 InputOption::VALUE_REQUIRED,

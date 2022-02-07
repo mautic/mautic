@@ -11,52 +11,20 @@
 
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
-use Swift_Mime_SimpleMessage;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\RawMessage;
 
-class SmtpTransport implements \Swift_Transport
+class SmtpTransport implements TransportInterface
 {
-    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
+        return null;
     }
 
-    /**
-     * Test if this Transport mechanism has started.
-     *
-     * @return bool
-     */
-    public function isStarted()
+    public function __toString(): string
     {
-        return true;
-    }
-
-    /**
-     * Start this Transport mechanism.
-     */
-    public function start()
-    {
-        return true;
-    }
-
-    /**
-     * Stop this Transport mechanism.
-     */
-    public function stop()
-    {
-        return true;
-    }
-
-    /**
-     * Register a plugin in the Transport.
-     */
-    public function registerPlugin(\Swift_Events_EventListener $plugin)
-    {
-    }
-
-    /**
-     * @return bool
-     */
-    public function ping()
-    {
-        return true;
+        return 'null://';
     }
 }

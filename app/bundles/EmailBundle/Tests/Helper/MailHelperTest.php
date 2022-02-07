@@ -25,7 +25,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
-use Swift_Mailer;
+use Symfony\Component\Mailer\Mailer;
 
 class MailHelperTest extends TestCase
 {
@@ -111,9 +111,9 @@ class MailHelperTest extends TestCase
                 )
             );
 
-        $swiftMailer = new Swift_Mailer(new BatchTransport());
+        $mailer = new Mailer(new BatchTransport());
 
-        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer = new MailHelper($mockFactory, $mailer, ['nobody@nowhere.com' => 'No Body']);
 
         // Enable queue mode
         $mailer->enableQueue();

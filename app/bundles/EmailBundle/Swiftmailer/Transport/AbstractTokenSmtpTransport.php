@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 
 /**
  * Class AbstractBatchTransport.

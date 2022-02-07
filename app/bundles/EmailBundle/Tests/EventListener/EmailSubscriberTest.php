@@ -21,7 +21,8 @@ use Mautic\EmailBundle\Event\QueueEmailEvent;
 use Mautic\EmailBundle\EventListener\EmailSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -51,9 +52,9 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
     private $em;
 
     /**
-     * @var MockObject|\Swift_Message
+     * @var MockObject|Email
      */
-    private $mockSwiftMessage;
+    private $mockMessage;
 
     /**
      * @var EmailSubscriber
@@ -69,15 +70,15 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->emailModel       = $this->createMock(EmailModel::class);
         $this->translator       = $this->createMock(TranslatorInterface::class);
         $this->em               = $this->createMock(EntityManager::class);
-        $this->mockSwiftMessage = $this->createMock(\Swift_Message::class);
+        $this->mockMessage      = $this->createMock(Email::class);
         $this->subscriber       = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator, $this->em);
     }
 
     public function testOnEmailResendWhenShouldTryAgain(): void
     {
-        $this->mockSwiftMessage->leadIdHash = 'idhash';
+        $this->mockMessage->leadIdHash = 'idhash';
 
-        $queueEmailEvent = new QueueEmailEvent($this->mockSwiftMessage);
+        $queueEmailEvent = new QueueEmailEvent($this->mockMessage);
 
         $stat = new Stat();
         $stat->setRetryCount(2);
@@ -92,13 +93,13 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWhenShouldNotTryAgain(): void
     {
-        $this->mockSwiftMessage->leadIdHash = 'idhash';
+        $this->mockMessage->leadIdHash = 'idhash';
 
-        $this->mockSwiftMessage->expects($this->once())
+        $this->mockMessage->expects($this->once())
             ->method('getSubject')
             ->willReturn('Subject');
 
-        $queueEmailEvent = new QueueEmailEvent($this->mockSwiftMessage);
+        $queueEmailEvent = new QueueEmailEvent($this->mockMessage);
 
         $stat = new Stat();
         $stat->setRetryCount(3);

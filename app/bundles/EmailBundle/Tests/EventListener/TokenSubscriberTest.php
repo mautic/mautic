@@ -19,6 +19,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Mailer\MailerInterface;
 
 class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,7 +29,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $swiftMailer = $this->getMockBuilder(\Swift_Mailer::class)
+        $mailer = $this->getMockBuilder(MailerInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -36,7 +37,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             '{test}' => 'value',
         ];
 
-        $mailHelper = new MailHelper($mockFactory, $swiftMailer);
+        $mailHelper = new MailHelper($mockFactory, $mailer);
         $mailHelper->setTokens($tokens);
 
         $email = new Email();
@@ -120,7 +121,7 @@ CONTENT
         );
         $mailHelper->addTokens($eventTokens);
         $mailerTokens = $mailHelper->getTokens();
-        $mailHelper->message->setBody($email->getCustomHtml());
+        $mailHelper->message->html($email->getCustomHtml());
 
         MailHelper::searchReplaceTokens(array_keys($mailerTokens), $mailerTokens, $mailHelper->message);
         $parsedBody = $mailHelper->message->getBody();

@@ -16,6 +16,8 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\UserBundle\Form\Type\ContactType;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 
 class UserController extends FormController
 {
@@ -449,11 +451,11 @@ class UserController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $subject = InputHelper::clean($form->get('msg_subject')->getData());
                     $body    = InputHelper::clean($form->get('msg_body')->getData());
-                    $message = (new \Swift_Message())
-                        ->setSubject($subject)
-                        ->setFrom($currentUser->getEmail(), $currentUser->getName())
-                        ->setTo($user->getEmail(), $user->getName())
-                        ->setBody($body);
+                    $message = (new Email())
+                        ->subject($subject)
+                        ->from(new Address($currentUser->getEmail(), $currentUser->getName()))
+                        ->to(new Address($user->getEmail(), $user->getName()))
+                        ->html($body);
                     $this->get('mailer')->send($message);
 
                     $reEntity = $form->get('entity')->getData();
