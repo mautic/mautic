@@ -42,6 +42,7 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -167,6 +168,11 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private $redirectRepositoryMock;
 
     /**
+     * @var MockObject|HitRepository
+     */
+    private $hitRepositoryMock;
+
+    /**
      * @var MockObject|CacheStorageHelper
      */
     private $cacheStorageHelperMock;
@@ -222,6 +228,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->sendToContactModel       = new SendEmailToContact($this->mailHelper, $this->statHelper, $this->dncModel, $this->translator);
         $this->deviceTrackerMock        = $this->createMock(DeviceTracker::class);
         $this->redirectRepositoryMock   = $this->createMock(RedirectRepository::class);
+        $this->hitRepositoryMock        = $this->createMock(HitRepository::class);
         $this->cacheStorageHelperMock   = $this->createMock(CacheStorageHelper::class);
         $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->doNotContact             = $this->createMock(DoNotContact::class);
@@ -241,6 +248,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->sendToContactModel,
             $this->deviceTrackerMock,
             $this->redirectRepositoryMock,
+            $this->hitRepositoryMock,
             $this->cacheStorageHelperMock,
             $this->contactTracker,
             $this->doNotContact,
@@ -625,6 +633,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->sendToContactModel,
             $this->deviceTrackerMock,
             $this->redirectRepositoryMock,
+            $this->hitRepositoryMock,
             $this->cacheStorageHelperMock,
             $this->contactTracker,
             $this->doNotContact,

@@ -2357,6 +2357,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * Get email click through rate.
      *
      * @param int $emailId email id
+     *
+     * @return Array<integer, integer> $hits
      */
     public function getEmailClickthroughHitCount($emailId)
     {
