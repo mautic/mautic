@@ -43,6 +43,7 @@ use Mautic\LeadBundle\Model\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
@@ -129,6 +130,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $redirectRepository;
 
     /**
+     * @var HitRepository
+     */
+    private $hitRepository;
+
+    /**
      * @var CacheStorageHelper
      */
     private $cacheStorageHelper;
@@ -166,6 +172,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         SendEmailToContact $sendModel,
         DeviceTracker $deviceTracker,
         RedirectRepository $redirectRepository,
+        HitRepository $hitRepository,
         CacheStorageHelper $cacheStorageHelper,
         ContactTracker $contactTracker,
         DNC $doNotContact,
@@ -184,6 +191,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->sendModel                = $sendModel;
         $this->deviceTracker            = $deviceTracker;
         $this->redirectRepository       = $redirectRepository;
+        $this->hitRepository            = $hitRepository;
         $this->cacheStorageHelper       = $cacheStorageHelper;
         $this->contactTracker           = $contactTracker;
         $this->doNotContact             = $doNotContact;
@@ -2343,5 +2351,24 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function isUpdatingTranslationChildren(): bool
     {
         return $this->updatingTranslationChildren;
+    }
+
+    /**
+     * Get email click through rate.
+     *
+     * @param int $emailId email id
+     */
+    public function getEmailClickthroughHitCount($emailId)
+    {
+        $hitsCached         = $this->cacheStorageHelper->get(sprintf('%s|%s', 'emails_list', $emailId));
+
+        if (false !== $hitsCached) {
+            return $hitsCached;
+        }
+
+        $hits = $this->hitRepository->getEmailClickthroughHitCount($emailId);
+        $this->cacheStorageHelper->set(sprintf('%s|%s', 'emails_list', $emailId), $hits);
+
+        return $hits;
     }
 }

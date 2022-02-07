@@ -108,7 +108,7 @@ if ('index' == $tmpl) {
                 $hasTranslations            = $item->isTranslation();
                 $type                       = $item->getEmailType();
                 $mauticTemplateVars['item'] = $item;
-                $emailClicks                = $item->getClicksCount($hitRepo);
+                $emailClicks                = $item->getClicksCount($model);
 
                 ?>
                 <tr>

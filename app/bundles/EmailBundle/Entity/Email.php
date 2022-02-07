@@ -1150,11 +1150,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Return clicks count of email.
      *
-     * @param \Mautic\PageBundle\Entity\HitRepository $hitRepo
+     * @param \Mautic\EmailBundle\Model\EmailModel $emailModel
      */
-    public function getClicksCount($hitRepo): int
+    public function getClicksCount($emailModel): int
     {
-        $emailClicksResult = $hitRepo->getEmailClickthroughHitCount($this->getId());
+        $emailClicksResult = $emailModel->getEmailClickthroughHitCount($this->getId());
         $emailClicks       = is_array($emailClicksResult) && count($emailClicksResult) > 0 ? $emailClicksResult[$this->getId()] : 0;
 
         return $emailClicks;

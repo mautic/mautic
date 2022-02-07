@@ -823,6 +823,7 @@ return [
                     'mautic.email.model.send_email_to_contacts',
                     'mautic.tracker.device',
                     'mautic.page.repository.redirect',
+                    'mautic.page.repository.hit',
                     'mautic.helper.cache_storage',
                     'mautic.tracker.contact',
                     'mautic.lead.model.dnc',

@@ -229,9 +229,6 @@ class EmailController extends FormController
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $pageModel = $this->getModel('page.page');
 
-        /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepo */
-        $hitRepo = $pageModel->getHitRepository();
-
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -244,7 +241,6 @@ class EmailController extends FormController
                     'tmpl'        => $this->request->get('tmpl', 'index'),
                     'permissions' => $permissions,
                     'model'       => $model,
-                    'hitRepo'     => $hitRepo,
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:list.html.php',
                 'passthroughVars' => [
