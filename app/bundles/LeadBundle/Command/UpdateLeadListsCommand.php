@@ -21,6 +21,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateLeadListsCommand extends ModeratedCommand
 {
+    public const NAME = 'mautic:segments:update';
+
     protected function configure()
     {
         $this
@@ -90,7 +92,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     $processed = 0;
                     try {
                         $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
-                        if (is_numeric($max) && 0 >= $max) {
+                        if (0 >= $max) {
                             // Only full segment rebuilds count
                             $list->setLastBuiltDateToCurrentDatetime();
                             $listModel->saveEntity($list);
@@ -123,7 +125,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
                     $startTimeForSingleSegment = time();
                     $processed                 = $listModel->rebuildListLeads($leadList, $batch, $max, $output);
-                    if (is_numeric($max) && 0 >= $max) {
+                    if (0 >= $max) {
                         // Only full segment rebuilds count
                         $leadList->setLastBuiltDateToCurrentDatetime();
                         $listModel->saveEntity($leadList);
