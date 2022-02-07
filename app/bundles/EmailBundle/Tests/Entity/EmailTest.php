@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Entity;
 
 use Mautic\EmailBundle\Entity\Email;
-use PHPUnit\Framework\Assert;
 
 class EmailTest extends \PHPUnit\Framework\TestCase
 {
-    public function testSetReadCount()
+    /**
+     * test read count is setted.
+     */
+    public function testSetReadCount(): void
     {
         $readCount = 10;
         $email     = new Email();
@@ -18,7 +20,10 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($readCount, $email->getReadCount());
     }
 
-    public function testCtrCalculation()
+    /**
+     * test calculation of ctr percentage.
+     */
+    public function testCtrCalculation(): void
     {
         $ctr   = 80;
         $email = new Email();
@@ -27,7 +32,10 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($ctr, $email->getCtrPercentage(4));
     }
 
-    public function testEmailClickCounters()
+    /**
+     * test email click counters.
+     */
+    public function testEmailClickCounters(): void
     {
         $email      = new Email();
         $trackables = [
