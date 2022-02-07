@@ -43,11 +43,8 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
 
     public function testWebhookWorkflowWithCommandProcess()
     {
-        $httpClient                    = new class() extends Client {
-            /**
-             * @var int
-             */
-            public $sendRequestCounter = 0;
+        $httpClient                        = new class() extends Client {
+            public int $sendRequestCounter = 0;
 
             public function sendRequest(RequestInterface $request): ResponseInterface
             {
