@@ -83,8 +83,14 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->getContactEventLogRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
-        $this->getCampaignMemberRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+        /** @var LeadEventLogRepository $leadEventLogRepository */
+        $leadEventLogRepository = $this->entityManager->getRepository(LeadEventLog::class);
+
+        /** @var LeadRepository $campaignLeadRepository */
+        $campaignLeadRepository = $this->entityManager->getRepository(CampaignLead::class);
+
+        $leadEventLogRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+        $campaignLeadRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
 
     /**
@@ -101,9 +107,12 @@ class LeadSubscriber implements EventSubscriberInterface
             return;
         }
 
+        /** @var LeadEventLogRepository $leadEventLogRepository */
+        $leadEventLogRepository = $this->entityManager->getRepository(LeadEventLog::class);
+
         $options                   = $event->getQueryOptions();
         $options['scheduledState'] = ('campaign.event' === $eventTypeKey) ? false : true;
-        $logs                      = $this->getContactEventLogRepository()->getLeadLogs($event->getLeadId(), $options);
+        $logs                      = $leadEventLogRepository->getLeadLogs($event->getLeadId(), $options);
         $eventSettings             = $this->eventCollector->getEventsArray();
 
         // Add total number to counter
@@ -156,15 +165,5 @@ class LeadSubscriber implements EventSubscriberInterface
                 );
             }
         }
-    }
-
-    private function getContactEventLogRepository(): LeadEventLogRepository
-    {
-        return $this->entityManager->getRepository(LeadEventLog::class);
-    }
-
-    private function getCampaignMemberRepository(): LeadRepository
-    {
-        return $this->entityManager->getRepository(CampaignLead::class);
     }
 }

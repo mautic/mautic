@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testNewCaptchaFieldFormCanBeSaved()
+    public function testNewCaptchaFieldFormCanBeSaved(): void
     {
         $payload = [
             'name'        => 'Submission test form',
