@@ -19,12 +19,15 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Exception\PartialEmailSendFailure;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email as MailerEmail;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -310,14 +313,7 @@ class MailHelper
     public function send($dispatchSendEvent = false, $isQueueFlush = false)
     {
         if ($this->tokenizationEnabled && !empty($this->queuedRecipients) && !$isQueueFlush) {
-            // This transport uses tokenization and queue()/flushQueue() was not used therefore use them in order
-            // properly populate metadata for this transport
-
-            if ($result = $this->queue($dispatchSendEvent)) {
-                $result = $this->flushQueue(['To', 'Cc', 'Bcc']);
-            }
-
-            return $result;
+            return $this->queue($dispatchSendEvent);
         }
 
         // Set from email
@@ -370,7 +366,7 @@ class MailHelper
             // Only set body if not empty or if plain text is empty - this ensures an empty HTML body does not show for
             // messages only with plain text
             if (!empty($this->body['content']) || empty($this->plainText)) {
-                $this->message->html($this->body['content'], $this->body['charset']);
+                $this->message->html($this->body['content'], $this->body['charset'] ?? 'utf-8');
             }
             $this->setMessagePlainText();
 
@@ -413,9 +409,7 @@ class MailHelper
             }
 
             try {
-                if (!$this->transport->isStarted()) {
-                    $this->transportStartTime = time();
-                }
+                $this->transportStartTime = time();
 
                 $failures = null;
 
@@ -521,12 +515,12 @@ class MailHelper
             // Reset message
             switch (strtoupper($returnMode)) {
                 case self::QUEUE_RESET_TO:
-                    $this->message->setTo([]);
+                    $this->message->to();
                     $this->clearErrors();
                     break;
                 case self::QUEUE_NOTHING_IF_FAILED:
                     if ($success) {
-                        $this->message->setTo([]);
+                        $this->message->to();
                         $this->clearErrors();
                     }
 
@@ -537,7 +531,7 @@ class MailHelper
                     $this->clearErrors();
                     break;
                 case self::QUEUE_RETURN_ERRORS:
-                    $this->message->setTo([]);
+                    $this->message->to();
                     $errors = $this->getErrors();
 
                     $this->clearErrors();
@@ -561,7 +555,7 @@ class MailHelper
      *
      * @return bool
      */
-    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'])
+    public function flushMalQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'])
     {
         // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
         $flushed = empty($this->fatal);
@@ -573,7 +567,7 @@ class MailHelper
             foreach ($this->metadata as $fromKey => $metadatum) {
                 // Whatever is in the message "to" should be ignored as we will send to the contacts grouped by from addresses
                 // This prevents mailers such as sparkpost from sending duplicates to contacts
-                $this->message->setTo([]);
+                $this->message->to();
 
                 $this->errors = [];
 
@@ -686,7 +680,7 @@ class MailHelper
     public static function searchReplaceTokens($search, $replace, MailerEmail $message)
     {
         // Body
-        $body         = $message->getBody();
+        $body         = $message->getHtmlBody();
         $bodyReplaced = str_ireplace($search, $replace, $body, $updated);
         if ($updated) {
             $message->html($bodyReplaced);
@@ -736,23 +730,11 @@ class MailHelper
         }
 
         // Parts (plaintext)
-        $children = (array) $message->getChildren();
-        /** @var \Swift_Mime_SimpleMimeEntity $child */
-        foreach ($children as $child) {
-            $childType  = $child->getContentType();
-            [$type]     = sscanf($childType, '%[^/]/%s');
-
-            if ('text' == $type) {
-                $childBody = $child->getBody();
-
-                $bodyReplaced = str_ireplace($search, $replace, $childBody);
-                if ($childBody != $bodyReplaced) {
-                    $childBody = strip_tags($bodyReplaced);
-                    $child->setBody($childBody);
-                }
-            }
-
-            unset($childBody, $bodyReplaced);
+        $textBody     = $message->getTextBody();
+        $bodyReplaced = str_ireplace($search, $replace, $textBody);
+        if ($textBody != $bodyReplaced) {
+            $textBody = strip_tags($bodyReplaced);
+            $message->text($textBody);
         }
     }
 
@@ -772,7 +754,7 @@ class MailHelper
     public function getMessageInstance()
     {
         try {
-            return $this->tokenizationEnabled ? MauticMessage::newInstance() : (new Email());
+            return $this->tokenizationEnabled ? MauticMessage::newInstance() : (new MailerEmail());
         } catch (\Exception $e) {
             $this->logError($e);
 
@@ -918,22 +900,8 @@ class MailHelper
             return;
         }
 
-        if ($this->plainTextSet) {
-            $children = (array) $this->message->getChildren();
-
-            /** @var \Swift_Mime_SimpleMimeEntity $child */
-            foreach ($children as $child) {
-                $childType = $child->getContentType();
-                if ('text/plain' == $childType && $child instanceof \Swift_MimePart) {
-                    $child->setBody($this->plainText);
-
-                    break;
-                }
-            }
-        } else {
-            $this->message->addPart($this->plainText, 'text/plain');
-            $this->plainTextSet = true;
-        }
+        $this->message->text($this->plainText);
+        $this->plainTextSet = true;
     }
 
     /**
@@ -1035,7 +1003,9 @@ class MailHelper
         $this->checkBatchMaxRecipients(count($addresses));
 
         try {
-            $this->message->to($addresses);
+            foreach ($addresses as $address => $name) {
+                $this->message->addTo(new Address($address, $name ?? ''));
+            }
             $this->queuedRecipients = array_merge($this->queuedRecipients, $addresses);
 
             return true;
@@ -1060,7 +1030,7 @@ class MailHelper
 
         try {
             $name = $this->cleanName($name);
-            $this->message->addTo($address, $name);
+            $this->message->addTo(new Address($address, $name ?? ''));
             $this->queuedRecipients[$address] = $name;
 
             return true;
@@ -1157,7 +1127,7 @@ class MailHelper
 
         try {
             $name = $this->cleanName($name);
-            $this->message->addBcc($address, $name);
+            $this->message->addBcc(new Address($address, $name ?? ''));
 
             return true;
         } catch (\Exception $e) {
@@ -1199,7 +1169,7 @@ class MailHelper
     {
         try {
             $name = $this->cleanName($name);
-            $this->message->setReplyTo($addresses, $name);
+            $this->message->replyTo(new Address($addresses, $name ?? ''));
         } catch (\Exception $e) {
             $this->logError($e, 'reply to');
         }
@@ -1236,7 +1206,7 @@ class MailHelper
         }
 
         try {
-            $this->message->setFrom($fromEmail, $fromName);
+            $this->message->from(new Address(is_array($fromEmail) ? key($fromEmail) : $fromEmail, $fromName ?? ''));
         } catch (\Exception $e) {
             $this->logError($e, 'from');
         }
@@ -1675,7 +1645,7 @@ class MailHelper
     /**
      * Return transport.
      *
-     * @return \Swift_Transport
+     * @return TransportInterface
      */
     public function getTransport()
     {
@@ -2101,7 +2071,7 @@ class MailHelper
             foreach ($headers as $headerKey => $headerValue) {
                 if ($messageHeaders->has($headerKey)) {
                     $header = $messageHeaders->get($headerKey);
-                    $header->setFieldBodyModel($headerValue);
+                    $header->setBody($headerValue);
                 } else {
                     $messageHeaders->addTextHeader($headerKey, $headerValue);
                 }
@@ -2141,18 +2111,18 @@ class MailHelper
      *
      * @param $address
      *
-     * @throws \Swift_RfcComplianceException
+     * @throws InvalidEmailException
      */
     public static function validateEmail($address)
     {
         $invalidChar = strpbrk($address, '\'^&*%');
 
         if (false !== $invalidChar) {
-            throw new \Swift_RfcComplianceException('Email address ['.$address.'] contains this invalid character: '.substr($invalidChar, 0, 1));
+            throw new InvalidEmailException('Email address ['.$address.'] contains this invalid character: '.substr($invalidChar, 0, 1));
         }
 
         if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
-            throw new \Swift_RfcComplianceException('Email address ['.$address.'] is invalid');
+            throw new InvalidEmailException('Email address ['.$address.'] is invalid');
         }
     }
 

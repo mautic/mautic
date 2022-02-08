@@ -24,12 +24,13 @@ use Mautic\EmailBundle\Swiftmailer\Transport\BounceProcessorInterface;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Bounce implements ProcessorInterface
 {
     /**
-     * @var \Swift_Transport
+     * @var TransportInterface
      */
     protected $transport;
 
@@ -77,7 +78,7 @@ class Bounce implements ProcessorInterface
      * Bounce constructor.
      */
     public function __construct(
-        \Swift_Transport $transport,
+        TransportInterface $transport,
         ContactFinder $contactFinder,
         StatRepository $statRepository,
         LeadModel $leadModel,

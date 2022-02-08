@@ -25,6 +25,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\Context\ExecutionContext;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 final class EmailOrEmailTokenListValidatorTest extends TestCase
 {
@@ -104,6 +105,12 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             new EmailValidator($translator, $dispatcher),
             new CustomFieldValidator($fieldModel, $translator)
         );
+
+        // check if validator is not run for empty and valid values
+        if (in_array($value, ['', 'john@doe.com'])) {
+            $context  = $this->createMock(ExecutionContextInterface::class);
+            $context->expects($this->never())->method('addViolation');
+        }
 
         $emaiOrEmailTokenListValidator->initialize($context);
 
