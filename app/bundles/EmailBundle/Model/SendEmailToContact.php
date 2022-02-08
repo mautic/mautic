@@ -114,7 +114,7 @@ class SendEmailToContact
     public function flush($resetMailer = true)
     {
         // Flushes the batch in case of using API mailers
-        if ($this->emailEntityId && !$flushResult = $this->mailer->flushQueue()) {
+        if ($this->emailEntityId) {
             $sendFailures = $this->mailer->getErrors();
 
             // Check to see if failed recipients were stored by the transport

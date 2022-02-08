@@ -126,19 +126,19 @@ return [
                     'mautic.email.model.email',
                 ],
             ],
-//            'mautic.email.monitored.bounce.subscriber' => [
-//                'class'     => \Mautic\EmailBundle\EventListener\ProcessBounceSubscriber::class,
-//                'arguments' => [
-//                    'mautic.message.processor.bounce',
-//                ],
-//            ],
-//            'mautic.email.monitored.unsubscribe.subscriber' => [
-//                'class'     => \Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber::class,
-//                'arguments' => [
-//                    'mautic.message.processor.unsubscribe',
-//                    'mautic.message.processor.feedbackloop',
-//                ],
-//            ],
+            'mautic.email.monitored.bounce.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\ProcessBounceSubscriber::class,
+                'arguments' => [
+                    'mautic.message.processor.bounce',
+                ],
+            ],
+            'mautic.email.monitored.unsubscribe.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber::class,
+                'arguments' => [
+                    'mautic.message.processor.unsubscribe',
+                    'mautic.message.processor.feedbackloop',
+                ],
+            ],
             'mautic.email.monitored.unsubscribe.replier' => [
                 'class'     => \Mautic\EmailBundle\EventListener\ProcessReplySubscriber::class,
                 'arguments' => [
@@ -657,37 +657,37 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
-//            'mautic.message.processor.bounce' => [
-//                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class,
-//                'arguments' => [
-//                    'swiftmailer.mailer.default.transport.real',
-//                    'mautic.message.search.contact',
-//                    'mautic.email.repository.stat',
-//                    'mautic.lead.model.lead',
-//                    'translator',
-//                    'monolog.logger.mautic',
-//                    'mautic.lead.model.dnc',
-//                ],
-//            ],
-//            'mautic.message.processor.unsubscribe' => [
-//                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class,
-//                'arguments' => [
-//                    'swiftmailer.mailer.default.transport.real',
-//                    'mautic.message.search.contact',
-//                    'translator',
-//                    'monolog.logger.mautic',
-//                    'mautic.lead.model.dnc',
-//                ],
-//            ],
-//            'mautic.message.processor.feedbackloop' => [
-//                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class,
-//                'arguments' => [
-//                    'mautic.message.search.contact',
-//                    'translator',
-//                    'monolog.logger.mautic',
-//                    'mautic.lead.model.dnc',
-//                ],
-//            ],
+            'mautic.message.processor.bounce' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class,
+                'arguments' => [
+                    'mailer',
+                    'mautic.message.search.contact',
+                    'mautic.email.repository.stat',
+                    'mautic.lead.model.lead',
+                    'translator',
+                    'monolog.logger.mautic',
+                    'mautic.lead.model.dnc',
+                ],
+            ],
+            'mautic.message.processor.unsubscribe' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class,
+                'arguments' => [
+                    'mailer',
+                    'mautic.message.search.contact',
+                    'translator',
+                    'monolog.logger.mautic',
+                    'mautic.lead.model.dnc',
+                ],
+            ],
+            'mautic.message.processor.feedbackloop' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class,
+                'arguments' => [
+                    'mautic.message.search.contact',
+                    'translator',
+                    'monolog.logger.mautic',
+                    'mautic.lead.model.dnc',
+                ],
+            ],
             'mautic.message.processor.replier' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class,
                 'arguments' => [

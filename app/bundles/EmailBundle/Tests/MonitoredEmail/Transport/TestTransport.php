@@ -16,9 +16,31 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail;
 use Mautic\EmailBundle\Swiftmailer\Transport\BounceProcessorInterface;
 use Mautic\EmailBundle\Swiftmailer\Transport\UnsubscriptionProcessorInterface;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\NullTransport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\RawMessage;
 
-class TestTransport extends \Swift_Transport_NullTransport implements BounceProcessorInterface, UnsubscriptionProcessorInterface
+class TestTransport implements TransportInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
 {
+    private $nullTransport;
+
+    public function __construct()
+    {
+        $this->nullTransport = new NullTransport();
+    }
+
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    {
+        return $this->nullTransport->send($message, $envelope);
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->nullTransport;
+    }
+
     public function processBounce(Message $message)
     {
         return new BouncedEmail();
