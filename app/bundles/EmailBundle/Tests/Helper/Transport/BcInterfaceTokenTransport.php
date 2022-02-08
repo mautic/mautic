@@ -12,10 +12,12 @@
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
-use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
-use Swift_Events_EventListener;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\RawMessage;
 
-class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Transport
+class BcInterfaceTokenTransport implements TransportInterface
 {
     private $fromAddresses = [];
     private $metadatas     = [];
@@ -36,38 +38,15 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
         $this->numberToFail  = (int) $numberToFail;
     }
 
-    /**
-     * @param null $failedRecipients
-     */
-    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
+        $address = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+
         $this->message         = $message;
-        $this->fromAddresses[] = key($message->getFrom());
+        $this->fromAddresses[] = $address;
         $this->metadatas[]     = $this->getMetadata();
 
-        return true;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMaxBatchLimit()
-    {
-        return $this->maxRecipients;
-    }
-
-    /**
-     * @param int    $toBeAdded
-     * @param string $type
-     *
-     * @return int
-     */
-    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
-    {
-        $to      = $message->getTo();
-        $toCount = (is_array($to) || $to instanceof \Countable) ? count($to) : 0;
-
-        return ('to' === $type) ? $toCount + $toBeAdded : $toCount;
+        return null;
     }
 
     /**
@@ -91,34 +70,8 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
         return ($this->message instanceof MauticMessage) ? $this->message->getMetadata() : [];
     }
 
-    /**
-     * @return bool
-     */
-    public function isStarted()
+    public function __toString(): string
     {
-        return true;
-    }
-
-    public function stop()
-    {
-        // ignore
-    }
-
-    public function registerPlugin(Swift_Events_EventListener $plugin)
-    {
-        // ignore
-    }
-
-    public function start()
-    {
-        // ignore
-    }
-
-    /**
-     * @return bool
-     */
-    public function ping()
-    {
-        return true;
+        return 'BcInterface';
     }
 }

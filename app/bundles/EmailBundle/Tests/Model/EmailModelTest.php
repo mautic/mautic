@@ -204,6 +204,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
+
         $this->ipLookupHelper           = $this->createMock(IpLookupHelper::class);
         $this->themeHelper              = $this->createMock(ThemeHelper::class);
         $this->mailboxHelper            = $this->createMock(Mailbox::class);
@@ -261,7 +263,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     public function testVariantEmailWeightsAreAppropriateForMultipleContacts(): void
     {
         $this->mailHelper->method('getMailer')->will($this->returnValue($this->mailHelper));
-        $this->mailHelper->method('flushQueue')->will($this->returnValue(true));
         $this->mailHelper->method('addTo')->will($this->returnValue(true));
         $this->mailHelper->method('queue')->will($this->returnValue([true, []]));
         $this->mailHelper->method('setEmail')->will($this->returnValue(true));
@@ -406,7 +407,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     public function testVariantEmailWeightsAreAppropriateForMultipleContactsSentOneAtATime(): void
     {
         $this->mailHelper->method('getMailer')->will($this->returnValue($this->mailHelper));
-        $this->mailHelper->method('flushQueue')->will($this->returnValue(true));
         $this->mailHelper->method('addTo')->will($this->returnValue(true));
         $this->mailHelper->method('queue')->will($this->returnValue([true, []]));
         $this->mailHelper->method('setEmail')->will($this->returnValue(true));

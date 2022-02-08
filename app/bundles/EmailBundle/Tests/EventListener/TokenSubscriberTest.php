@@ -124,7 +124,7 @@ CONTENT
         $mailHelper->message->html($email->getCustomHtml());
 
         MailHelper::searchReplaceTokens(array_keys($mailerTokens), $mailerTokens, $mailHelper->message);
-        $parsedBody = $mailHelper->message->getBody();
+        $parsedBody = $mailHelper->message->getHtmlBody();
 
         $this->assertNotFalse(strpos($parsedBody, 'DEC value'));
         $this->assertNotFalse(strpos($parsedBody, 'value test We'));
