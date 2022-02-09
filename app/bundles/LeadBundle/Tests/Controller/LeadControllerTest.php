@@ -12,8 +12,12 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tightenco\Collect\Support\Collection;
@@ -363,15 +367,6 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->fetchAllAssociative();
     }
 
-    private function getLeadLists(): array
-    {
-        return $this->connection->createQueryBuilder()
-            ->select('ll.id', 'll.name', 'll.category_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'll')
-            ->execute()
-            ->fetchAllAssociative();
-    }
-
     /**
      * @testdox Ensure correct Preferred Timezone placeholder on add/edit contact page
      */
@@ -545,5 +540,108 @@ class LeadControllerTest extends MauticMysqlTestCase
         // Primary company should be in the UI of the details dropdown tray
         $details = $crawler->filter('#lead-details')->html();
         $this->assertStringContainsString($primaryCompanyName, $details);
+    }
+
+    public function testBatchDncIsNotUpdatingLeadEntities(): void
+    {
+        $contact = new Lead();
+        $contact->setEmail('john@doe.email');
+        $this->em->persist($contact);
+        $this->em->flush();
+        $this->em->clear();
+
+        $payload = [
+            'lead_batch_dnc' => [
+                'reason' => 'Test Reason',
+                'ids'    => json_encode([$contact->getId()]),
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchDnc', $payload, [], $this->createAjaxHeaders());
+
+        $clientResponse = $this->client->getResponse();
+
+        Assert::assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        Assert::assertStringContainsString('1 contact affected', $clientResponse->getContent());
+
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+
+        /** @var LeadRepository $contactRepository */
+        $contactRepository = $this->em->getRepository(Lead::class);
+
+        /** @var DoNotContact $dnc */
+        $dnc = $dncRepository->findOneBy(['lead' => $contact]);
+
+        /** @var Lead $fetchedContact */
+        $fetchedContact = $contactRepository->find($contact->getId());
+
+        // Ensure the DNC recored was created.
+        Assert::assertSame(DoNotContact::MANUAL, $dnc->getReason());
+
+        // Ensure the dateModified is still empty. Meaning the lead record was not updated which is correct.
+        Assert::assertNull($fetchedContact->getDateModified());
+    }
+
+    private function getLeadLists(): array
+    {
+        return $this->connection->createQueryBuilder()
+            ->select('ll.id', 'll.name', 'll.category_id')
+            ->from('lead_lists', 'll')
+            ->execute()
+            ->fetchAll();
+    }
+
+    public function testContactCompanyEditShowsOldCompanyNameInAuditLog(): void
+    {
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::$container->get('mautic.lead.model.company');
+        /** @var LeadModel $contactModel */
+        $contactModel = self::$container->get('mautic.lead.model.lead');
+
+        // Create companies
+        $company = (new Company())
+            ->setName('Co.');
+        $newCompany = (new Company())
+            ->setName('New Co.');
+        $companyModel->saveEntities([$company, $newCompany]);
+        $companyId    = (string) $company->getId();
+        $newCompanyId = (string) $newCompany->getId();
+
+        // Create contact with first 'Co.' company
+        $contact = (new Lead())
+            ->setFirstname('C1')
+            ->setCompany($company);
+        $contactModel->saveEntity($contact);
+
+        // Check contact detail view audit log
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/view/%d', $contact->getId()));
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $tableContent     = $this->getContactViewAuditLogTableHtmlInArray($crawler);
+        $expectedAuditLog = [['firstname', 'C1', '', 'company', $companyId, '']];
+        Assert::assertSame($expectedAuditLog, $tableContent);
+
+        // Edit contact with second 'New Co.' company
+        $contact->setCompany($newCompany);
+        $contactModel->saveEntity($contact);
+
+        // Check contact detail view audit log for old value
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/view/%d', $contact->getId()));
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $tableContent     = $this->getContactViewAuditLogTableHtmlInArray($crawler);
+        $expectedAuditLog = [['company', $newCompanyId, $companyId]];
+        Assert::assertSame($expectedAuditLog, $tableContent);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function getContactViewAuditLogTableHtmlInArray(Crawler $crawler): array
+    {
+        return $crawler->filter('tr#auditlog-details-1')->filter('table')->each(function ($tr) {
+            return $tr->filter('td')->each(function ($td) {
+                return $td->text();
+            });
+        });
     }
 }
