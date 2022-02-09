@@ -12,8 +12,11 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tightenco\Collect\Support\Collection;
@@ -545,5 +548,58 @@ class LeadControllerTest extends MauticMysqlTestCase
         // Primary company should be in the UI of the details dropdown tray
         $details = $crawler->filter('#lead-details')->html();
         $this->assertStringContainsString($primaryCompanyName, $details);
+    }
+
+    public function testContactCompanyEditShowsOldCompanyNameInAuditLog(): void
+    {
+        /** @var CompanyModel $companyModel */
+        $companyModel = $this->container->get('mautic.lead.model.company');
+        /** @var LeadModel $contactModel */
+        $contactModel = $this->container->get('mautic.lead.model.lead');
+
+        // Create companies
+        $company = (new Company())
+            ->setName('Co.');
+        $newCompany = (new Company())
+            ->setName('New Co.');
+        $companyModel->saveEntities([$company, $newCompany]);
+        $companyId    = (string) $company->getId();
+        $newCompanyId = (string) $newCompany->getId();
+
+        // Create contact with first 'Co.' company
+        $contact = (new Lead())
+            ->setFirstname('C1')
+            ->setCompany($company);
+        $contactModel->saveEntity($contact);
+
+        // Check contact detail view audit log
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/view/%d', $contact->getId()));
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $tableContent     = $this->getContactViewAuditLogTableHtmlInArray($crawler);
+        $expectedAuditLog = [['firstname', 'C1', '', 'company', $companyId, '']];
+        Assert::assertSame($expectedAuditLog, $tableContent);
+
+        // Edit contact with second 'New Co.' company
+        $contact->setCompany($newCompany);
+        $contactModel->saveEntity($contact);
+
+        // Check contact detail view audit log for old value
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/view/%d', $contact->getId()));
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $tableContent     = $this->getContactViewAuditLogTableHtmlInArray($crawler);
+        $expectedAuditLog = [['company', $newCompanyId, $companyId]];
+        Assert::assertSame($expectedAuditLog, $tableContent);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function getContactViewAuditLogTableHtmlInArray(Crawler $crawler): array
+    {
+        return $crawler->filter('tr#auditlog-details-1')->filter('table')->each(function ($tr) {
+            return $tr->filter('td')->each(function ($td) {
+                return $td->text();
+            });
+        });
     }
 }
