@@ -117,12 +117,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('Victoria', $contact->getState());
 
         // The previous request changes user to anonymous. We have to configure API again.
-        $this->setUpSymfony(
-            [
-                'api_enabled'           => true,
-                'api_enable_basic_auth' => true,
-            ]
-        );
+        $this->setUpSymfony($this->configParams);
         // Cleanup:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
         $clientResponse = $this->client->getResponse();
@@ -215,12 +210,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(null, $contact->getState());
 
         // The previous request changes user to anonymous. We have to configure API again.
-        $this->setUpSymfony(
-            [
-                'api_enabled'           => true,
-                'api_enable_basic_auth' => true,
-            ]
-        );
+        $this->setUpSymfony($this->configParams);
 
         // Cleanup:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
@@ -304,12 +294,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         Assert::assertCount(0, $submissions);
 
         // The previous request changes user to anonymous. We have to configure API again.
-        $this->setUpSymfony(
-            [
-                'api_enabled'           => true,
-                'api_enable_basic_auth' => true,
-            ]
-        );
+        $this->setUpSymfony($this->configParams);
 
         // Cleanup:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
