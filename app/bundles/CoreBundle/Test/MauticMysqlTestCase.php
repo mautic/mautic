@@ -8,6 +8,7 @@ use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+use Symfony\Component\Process\Process;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
@@ -24,6 +25,18 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      * @var bool
      */
     protected $useCleanupRollback = true;
+
+    /**
+     * @param array<mixed> $data
+     */
+    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+
+        $this->configParams += [
+            'db_driver' => 'pdo_mysql',
+        ];
+    }
 
     /**
      * @throws Exception
@@ -114,13 +127,22 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function applySqlFromFile($file)
     {
         $connection = $this->connection;
-        $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
-        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} < {$file} 2>&1 | grep -v \"Using a password\" || true";
+        $command    = 'mysql -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" < "${:db_backup_file}"';
+        $envVars    = [
+            'MYSQL_PWD'      => $connection->getPassword(),
+            'db_host'        => $connection->getHost(),
+            'db_port'        => $connection->getPort(),
+            'db_user'        => $connection->getUsername(),
+            'db_name'        => $connection->getDatabase(),
+            'db_backup_file' => $file,
+        ];
 
-        $lastLine = system($command, $status);
+        $process = Process::fromShellCommandline($command);
+        $process->run(null, $envVars);
 
-        if (0 !== $status) {
-            throw new Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
+        // executes after the command finishes
+        if (!$process->isSuccessful()) {
+            throw new Exception($command.' failed with status code '.$process->getExitCode().' and last line of "'.$process->getErrorOutput().'"');
         }
     }
 
@@ -131,7 +153,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     private function prepareDatabase()
     {
-        if (!function_exists('system')) {
+        if (!function_exists('proc_open')) {
             $this->installDatabase();
 
             return;
@@ -192,22 +214,27 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     private function dumpToFile(string $sqlDumpFile): void
     {
-        $password   = ($this->connection->getPassword()) ? " -p{$this->connection->getPassword()}" : '';
-        $command    = "mysqldump --add-drop-table --opt -h{$this->connection->getHost()} -P{$this->connection->getPort()} -u{$this->connection->getUsername()}$password {$this->connection->getDatabase()} > {$sqlDumpFile} 2>&1 | grep -v \"Using a password\" || true";
+        $connection = $this->connection;
+        $command    = 'mysqldump --opt -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" > "${:db_backup_file}"';
+        $envVars    = [
+            'MYSQL_PWD'      => $connection->getPassword(),
+            'db_host'        => $connection->getHost(),
+            'db_port'        => $connection->getPort(),
+            'db_user'        => $connection->getUsername(),
+            'db_name'        => $connection->getDatabase(),
+            'db_backup_file' => $sqlDumpFile,
+        ];
 
-        $lastLine = system($command, $status);
-        if (0 !== $status) {
-            throw new Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
-        }
+        $process = Process::fromShellCommandline($command);
+        $process->run(null, $envVars);
 
-        $f         = fopen($sqlDumpFile, 'r');
-        $firstLine = fgets($f);
-        if (false !== strpos($firstLine, 'Using a password')) {
-            $file = file($sqlDumpFile);
-            unset($file[0]);
-            file_put_contents($sqlDumpFile, $file);
+        // executes after the command finishes
+        if (!$process->isSuccessful()) {
+            if (file_exists($sqlDumpFile)) {
+                unlink($sqlDumpFile);
+            }
+            throw new Exception($command.' failed with status code '.$process->getExitCode().' and last line of "'.$process->getErrorOutput().'"');
         }
-        fclose($f);
     }
 
     /**

@@ -44,6 +44,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'api_enabled'                       => true,
         'api_enable_basic_auth'             => true,
         'create_custom_field_in_background' => false,
+        'mailer_from_name'                  => 'Mautic',
     ];
 
     protected function setUp(): void

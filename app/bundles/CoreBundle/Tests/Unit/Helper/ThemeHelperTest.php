@@ -196,7 +196,7 @@ class ThemeHelperTest extends TestCase
                 function ($path, $absolute) {
                     switch ($path) {
                         case 'themes':
-                            return ($absolute) ? __DIR__.'/../../../../../../resource/themes' : 'themes';
+                            return ($absolute) ? __DIR__.'/../../../../../../themes' : 'themes';
                         case 'themes_root':
                             return __DIR__.'/../../../../../..';
                     }
