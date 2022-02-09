@@ -14,12 +14,12 @@ final class FieldChoicesProvider implements FieldChoicesProviderInterface
     private EventDispatcherInterface $dispatcher;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private array $cachedTypeChoices = [];
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private array $cachedAliasChoices = [];
 
@@ -28,6 +28,9 @@ final class FieldChoicesProvider implements FieldChoicesProviderInterface
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getChoicesForField(string $fieldType, string $fieldAlias): array
     {
         $aliasChoices = $this->getAllChoicesForListFieldAliases();
@@ -44,6 +47,9 @@ final class FieldChoicesProvider implements FieldChoicesProviderInterface
         throw new ChoicesNotFoundException("No choices for field type {$fieldType} nor alias {$fieldAlias} were found");
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getAllChoicesForListFieldTypes(): array
     {
         $this->lookForFieldChoices();
@@ -51,7 +57,10 @@ final class FieldChoicesProvider implements FieldChoicesProviderInterface
         return $this->cachedTypeChoices;
     }
 
-    private function getAllChoicesForListFieldAliases()
+    /**
+     * @return mixed[]
+     */
+    private function getAllChoicesForListFieldAliases(): array
     {
         $this->lookForFieldChoices();
 

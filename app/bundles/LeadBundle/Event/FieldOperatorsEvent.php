@@ -15,8 +15,14 @@ final class FieldOperatorsEvent extends Event
 
     private string $field;
 
+    /**
+     * @var array<string,string>
+     */
     private array $operators;
 
+    /**
+     * @var array<string,array<string,string>>
+     */
     private array $allOperators;
 
     /**
@@ -39,6 +45,9 @@ final class FieldOperatorsEvent extends Event
      *      'equals' => '=',
      *      'not equal' => '!='
      * ]
+     *
+     * @param array<string,string>               $defaultOperators
+     * @param array<string,array<string,string>> $allOperators
      */
     public function __construct(string $type, string $field, array $allOperators, array $defaultOperators)
     {
@@ -48,6 +57,9 @@ final class FieldOperatorsEvent extends Event
         $this->operators    = $defaultOperators;
     }
 
+    /**
+     * @return array<string,string>
+     */
     public function getOperators(): array
     {
         return $this->operators;

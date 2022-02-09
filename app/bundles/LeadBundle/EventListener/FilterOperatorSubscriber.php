@@ -313,7 +313,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onGenerateSegmentFiltersAddBehaviors(LeadListFiltersChoicesEvent $event)
+    public function onGenerateSegmentFiltersAddBehaviors(LeadListFiltersChoicesEvent $event): void
     {
         // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
         if (!$this->isForSegmentation($event)) {

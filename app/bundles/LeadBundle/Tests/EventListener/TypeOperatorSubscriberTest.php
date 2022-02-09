@@ -32,47 +32,47 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private $leadModel;
 
     /**
-     * @var MockObject|ListModel
+     * @var MockObject&ListModel
      */
     private $listModel;
 
     /**
-     * @var MockObject|campaignModel
+     * @var MockObject&campaignModel
      */
     private $campaignModel;
 
     /**
-     * @var MockObject|emailModel
+     * @var MockObject&emailModel
      */
     private $emailModel;
 
     /**
-     * @var MockObject|StageModel
+     * @var MockObject&StageModel
      */
     private $stageModel;
 
     /**
-     * @var MockObject|StageRepostory
+     * @var MockObject&StageRepository
      */
     private $stageRepository;
 
     /**
-     * @var MockObject|CategoryModel
+     * @var MockObject&CategoryModel
      */
     private $categoryModel;
 
     /**
-     * @var MockObject|AssetModel
+     * @var MockObject&AssetModel
      */
     private $assetModel;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private $translator;
 
     /**
-     * @var MockObject|FormInterface
+     * @var MockObject&FormInterface<FormInterface>
      */
     private $form;
 

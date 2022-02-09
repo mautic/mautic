@@ -121,6 +121,9 @@ class LeadFieldRepository extends CommonRepository
                 ->execute()->fetchAll();
     }
 
+    /**
+     * @return ArrayCollection<int,LeadField>
+     */
     public function getListablePublishedFields(): ArrayCollection
     {
         $queryBuilder = $this->_em->createQueryBuilder();

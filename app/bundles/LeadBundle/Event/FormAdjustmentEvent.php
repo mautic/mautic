@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormInterface;
 
 final class FormAdjustmentEvent extends Event
 {
+    /**
+     * @var FormInterface<FormInterface>
+     */
     private FormInterface $form;
 
     private string $fieldAlias;
@@ -23,6 +26,10 @@ final class FormAdjustmentEvent extends Event
      */
     private array $fieldDetails;
 
+    /**
+     * @param FormInterface<FormInterface> $form
+     * @param mixed[]                      $fieldDetails
+     */
     public function __construct(FormInterface $form, string $fieldAlias, string $fieldObject, string $operator, array $fieldDetails)
     {
         $this->form         = $form;
@@ -32,6 +39,9 @@ final class FormAdjustmentEvent extends Event
         $this->fieldDetails = $fieldDetails;
     }
 
+    /**
+     * @return FormInterface<FormInterface>
+     */
     public function getForm(): FormInterface
     {
         return $this->form;
@@ -73,11 +83,17 @@ final class FormAdjustmentEvent extends Event
         return $this->fieldDetails['properties']['type'];
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getFieldDetails(): array
     {
         return $this->fieldDetails;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getFieldChoices(): array
     {
         return $this->fieldDetails['properties']['list'] ?? [];

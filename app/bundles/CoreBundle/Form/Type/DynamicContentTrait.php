@@ -11,7 +11,7 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
+use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -39,7 +39,7 @@ trait DynamicContentTrait
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) {
                 $data = $event->getData();
-                /** @var DynamicContentEntityTrait $entity */
+                /** @var Email $entity */
                 $entity = $event->getForm()->getData();
 
                 if (empty($data['dynamicContent'])) {

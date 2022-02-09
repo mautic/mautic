@@ -15,12 +15,12 @@ use Symfony\Component\Form\FormInterface;
 final class FormAdjustmentsProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private $dispatcher;
 
     /**
-     * @var MockObject|FormInterface
+     * @var MockObject&FormInterface<FormInterface>
      */
     private $form;
 

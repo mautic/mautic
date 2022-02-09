@@ -124,6 +124,10 @@ abstract class AbstractFormFieldHelper
 
     /**
      * Same as parseList method above but it will return labels as keys.
+     *
+     * @param mixed $list
+     *
+     * @return mixed[]
      */
     public static function parseListForChoices($list): array
     {
@@ -141,6 +145,11 @@ abstract class AbstractFormFieldHelper
         );
     }
 
+    /**
+     * @param mixed $list
+     *
+     * @return mixed[]
+     */
     public static function parseBooleanList($list): array
     {
         return static::parseChoiceList(
@@ -159,7 +168,7 @@ abstract class AbstractFormFieldHelper
      * @param $format
      * @param $choices
      *
-     * @return array|string
+     * @return mixed[]|string
      */
     public static function formatList($format, $choices)
     {
@@ -230,6 +239,11 @@ abstract class AbstractFormFieldHelper
         return $choices;
     }
 
+    /**
+     * @param mixed[] $choices
+     *
+     * @return mixed[]
+     */
     private static function appendChoice(array $choices, string $label, string $value, bool $labelsAsKeys = false): array
     {
         $label = trim(html_entity_decode($label, ENT_QUOTES));
@@ -247,6 +261,8 @@ abstract class AbstractFormFieldHelper
     /**
      * @param mixed                 $list
      * @param ListParserInterface[] $parsers
+     *
+     * @return mixed[]
      */
     private static function parseListsWithParsers($list, array $parsers): array
     {

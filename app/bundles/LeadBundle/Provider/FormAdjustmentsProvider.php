@@ -18,6 +18,12 @@ final class FormAdjustmentsProvider implements FormAdjustmentsProviderInterface
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * @param FormInterface<FormInterface> $form
+     * @param mixed[]                      $fieldDetails
+     *
+     * @return FormInterface<FormInterface>
+     */
     public function adjustForm(FormInterface $form, string $fieldAlias, string $fieldObject, string $operator, array $fieldDetails): FormInterface
     {
         $event = new FormAdjustmentEvent($form, $fieldAlias, $fieldObject, $operator, $fieldDetails);

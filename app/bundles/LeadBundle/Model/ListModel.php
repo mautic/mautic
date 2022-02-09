@@ -65,7 +65,7 @@ class ListModel extends FormModel
     private $leadSegmentService;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $choiceFieldsCache = [];
 

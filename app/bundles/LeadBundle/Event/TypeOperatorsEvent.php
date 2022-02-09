@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\Event;
 final class TypeOperatorsEvent extends Event
 {
     /**
-     * @var array<string,array<string,string>>
+     * @var array<string,mixed[]>
      */
     private array $operators = [];
 
@@ -22,12 +22,17 @@ final class TypeOperatorsEvent extends Event
      *      'include' => ['=' => 'like'],
      *      'exclude' => ['!=' => '!like'],
      * ].
+     *
+     * @param array<string,mixed[]> $operators
      */
     public function setOperatorsForFieldType(string $fieldType, array $operators): void
     {
         $this->operators[$fieldType] = $operators;
     }
 
+    /**
+     * @return array<string,mixed[]>
+     */
     public function getOperatorsForAllFieldTypes(): array
     {
         return $this->operators;

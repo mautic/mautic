@@ -10,6 +10,8 @@ interface FieldChoicesProviderInterface
 {
     /**
      * @throws ChoicesNotFoundException
+     *
+     * @return mixed[]
      */
     public function getChoicesForField(string $fieldType, string $fieldAlias): array;
 }

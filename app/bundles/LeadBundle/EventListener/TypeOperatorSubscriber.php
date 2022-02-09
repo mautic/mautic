@@ -24,8 +24,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class TypeOperatorSubscriber implements EventSubscriberInterface
 {
@@ -312,36 +312,59 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->stopPropagation();
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getCampaignChoices(): array
     {
         return $this->makeChoices($this->campaignModel->getPublishedCampaigns(true), 'name', 'id');
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getSegmentChoices(): array
     {
         return $this->makeChoices($this->listModel->getUserLists(), 'name', 'id');
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getTagChoices(): array
     {
         return $this->makeChoices($this->leadModel->getTagList(), 'label', 'value');
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getStageChoices(): array
     {
         return $this->makeChoices($this->stageModel->getRepository()->getSimpleList(), 'label', 'value');
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getCategoryChoices(): array
     {
         return $this->makeChoices($this->categoryModel->getLookupResults('global'), 'title', 'id');
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getAssetChoices(): array
     {
         return $this->makeChoices($this->assetModel->getLookupResults('asset'), 'title', 'id');
     }
 
+    /**
+     * @param mixed[] $items
+     *
+     * @return mixed[]
+     */
     private function makeChoices(array $items, string $labelName, string $keyName): array
     {
         $choices = [];

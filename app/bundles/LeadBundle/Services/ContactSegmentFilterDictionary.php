@@ -88,10 +88,7 @@ class ContactSegmentFilterDictionary
         throw new FilterNotFoundException("Filter '{$filterKey}' does not have property '{$property}' exist");
     }
 
-    /**
-     * @return mixed[]
-     */
-    private function setDefaultFilters()
+    private function setDefaultFilters(): void
     {
         $this->filters['lead_email_read_count']         = [
             'type'                => ForeignFuncFilterQueryBuilder::getServiceId(),
@@ -276,7 +273,7 @@ class ContactSegmentFilterDictionary
     /**
      * Other bundles can add more filters by subscribing to this event.
      */
-    private function fetchFiltersFromSubscribers()
+    private function fetchFiltersFromSubscribers(): void
     {
         if ($this->dispatcher->hasListeners(LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE)) {
             $event = new SegmentDictionaryGenerationEvent($this->filters);

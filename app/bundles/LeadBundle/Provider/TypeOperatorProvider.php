@@ -19,12 +19,12 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     private FilterOperatorProviderInterface $filterOperatorProvider;
 
     /**
-     * @var array
+     * @var array<string,mixed[]>
      */
     private array $cachedTypeOperators = [];
 
     /**
-     * @var array
+     * @var array<string,mixed[]>
      */
     private array $cachedTypeOperatorsChoices = [];
 
@@ -80,6 +80,8 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     /**
      * This method will add the default operators for the $type like the getOperatorsForFieldType() method
      * but also allows plugins to add more operators.
+     *
+     * @return array<string,string>
      */
     public function getOperatorsForField(string $type, string $field): array
     {
@@ -100,7 +102,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
      *
      * @param string $operator
      *
-     * @return array
+     * @return array<string,mixed[]>
      */
     public function getFilterExpressionFunctions($operator = null)
     {

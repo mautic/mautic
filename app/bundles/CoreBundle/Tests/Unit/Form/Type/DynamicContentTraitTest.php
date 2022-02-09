@@ -15,27 +15,27 @@ use Symfony\Component\Form\Test\FormInterface;
 final class DynamicContentTraitTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|FormBuilderInterface
+     * @var MockObject&FormBuilderInterface<FormBuilderInterface>
      */
     private $formBuilder;
 
     /**
-     * @var MockObject|FormEvent
+     * @var MockObject&FormEvent
      */
     private $formEvent;
 
     /**
-     * @var MockObject|FormInterface
+     * @var MockObject&FormInterface<FormInterface>
      */
     private $form;
 
     /**
-     * @var MockObject|DynamicContentEntityTrait
+     * @var MockObject (use DynamicContentEntityTrait)
      */
     private $entity;
 
     /**
-     * @var MockObject|DynamicContentTrait
+     * @var MockObject (use DynamicContentTrait)
      */
     private $trait;
 
@@ -119,7 +119,12 @@ final class DynamicContentTraitTest extends \PHPUnit\Framework\TestCase
         $this->invokeMethod($this->trait, 'addDynamicContentField', [$this->formBuilder]);
     }
 
-    private function invokeMethod($object, string $methodName, array $args = [])
+    /**
+     * @param mixed[] $args
+     *
+     * @return mixed
+     */
+    private function invokeMethod(object $object, string $methodName, array $args = [])
     {
         $reflection = new \ReflectionClass(get_class($object));
         $method     = $reflection->getMethod($methodName);

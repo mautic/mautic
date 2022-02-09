@@ -46,7 +46,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildFormWithTextField(): void
     {
-        /** @var MockObject|FormBuilderInterface $builder */
+        /** @var MockObject|FormBuilderInterface<FormBuilderInterface> $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $options = [];
 
@@ -77,7 +77,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                     FormEvents::PRE_SET_DATA,
                     $this->callback(
                         function (callable $formModifier) {
-                            /** @var FormInterface|MockObject $form */
+                            /** @var FormInterface<FormBuilderInterface>|MockObject $form */
                             $form = $this->createMock(FormInterface::class);
                             $data = [
                                 'field'    => 'address1',
@@ -106,7 +106,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                     FormEvents::PRE_SUBMIT,
                     $this->callback(
                         function (callable $formModifier) {
-                            /** @var FormInterface|MockObject $form */
+                            /** @var FormInterface<FormBuilderInterface>|MockObject $form */
                             $form = $this->createMock(FormInterface::class);
                             $data = [
                                 'field'    => 'deleted',
@@ -140,7 +140,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
      */
     public function testBuildFormWithNumberField(): void
     {
-        /** @var MockObject|FormBuilderInterface $builder */
+        /** @var MockObject|FormBuilderInterface<FormBuilderInterface> $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $options = [];
 
@@ -172,12 +172,15 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                     $this->callback(
                         function (callable $formModifier) {
                             $form = new class() extends Form {
-                                public $addMethodCallCounter = 0;
+                                public int $addMethodCallCounter = 0;
 
                                 public function __construct()
                                 {
                                 }
 
+                                /**
+                                 * @return FormInterface<FormInterface>
+                                 */
                                 public function get($name)
                                 {
                                     Assert::assertSame('properties', $name);
@@ -196,13 +199,21 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                                                 ],
                                                 $modelData
                                             );
+
+                                            return $this;
                                         }
                                     };
                                 }
 
+                                /**
+                                 * @param FormInterface<FormInterface>|string $child
+                                 * @param mixed[]                             $options
+                                 */
                                 public function add($child, $type = null, array $options = [])
                                 {
                                     ++$this->addMethodCallCounter;
+
+                                    return $this;
                                 }
                             };
 
