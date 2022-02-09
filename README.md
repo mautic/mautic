@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-71-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-73-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -153,7 +153,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/MadlenF"><img src="https://avatars.githubusercontent.com/u/87804194?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Madlen</b></sub></a><br /><a href="#userTesting-MadlenF" title="User Testing">📓</a></td>
     <td align="center"><a href="https://friendly.ch/kathrin"><img src="https://avatars.githubusercontent.com/u/96054002?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kathrin Schmid</b></sub></a><br /><a href="#translation-kathrin-schmid" title="Translation">🌍</a></td>
     <td align="center"><a href="https://github.com/rahuld-dev"><img src="https://avatars.githubusercontent.com/u/68939488?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rahul Dhande</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=rahuld-dev" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/biozshock"><img src="https://avatars.githubusercontent.com/u/169384?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Artem Lopata</b></sub></a><br /><a href="#userTesting-biozshock" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://github.com/biozshock"><img src="https://avatars.githubusercontent.com/u/169384?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Artem Lopata</b></sub></a><br /><a href="#userTesting-biozshock" title="User Testing">📓</a> <a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Abiozshock" title="Reviewed Pull Requests">👀</a></td>
     <td align="center"><a href="https://github.com/abailey-dev"><img src="https://avatars.githubusercontent.com/u/65302481?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Anthony Bailey</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=abailey-dev" title="Code">💻</a></td>
   </tr>
   <tr>
@@ -167,6 +167,8 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/nick-vanpraet"><img src="https://avatars.githubusercontent.com/u/7923739?v=4?s=100" width="100px;" alt=""/><br /><sub><b>nick-vanpraet</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=nick-vanpraet" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/volha-pivavarchyk"><img src="https://avatars.githubusercontent.com/u/96085911?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Volha Pivavarchyk</b></sub></a><br /><a href="#userTesting-volha-pivavarchyk" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://github.com/J-Light"><img src="https://avatars.githubusercontent.com/u/2544660?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nish Joseph</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=J-Light" title="Code">💻</a></td>
   </tr>
 </table>
 
