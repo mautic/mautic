@@ -22,9 +22,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class LeadField.
- */
 class LeadField extends FormEntity
 {
     /**
@@ -366,12 +363,13 @@ class LeadField extends FormEntity
     /**
      * Set defaultValue.
      *
-     * @param string $defaultValue
+     * @param string|array<string> $defaultValue
      *
      * @return LeadField
      */
     public function setDefaultValue($defaultValue)
     {
+        $defaultValue = is_array($defaultValue) ? implode('|', $defaultValue) : $defaultValue;
         $this->isChanged('defaultValue', $defaultValue);
         $this->defaultValue = $defaultValue;
 
@@ -458,9 +456,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Set properties.
-     *
-     * @param string $properties
+     * @param mixed[] $properties
      *
      * @return LeadField
      */
@@ -473,9 +469,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get properties.
-     *
-     * @return array
+     * @return mixed[]
      */
     public function getProperties()
     {
@@ -522,7 +516,7 @@ class LeadField extends FormEntity
     /**
      * Set object.
      *
-     * @param int $object
+     * @param string $object
      *
      * @return LeadField
      */

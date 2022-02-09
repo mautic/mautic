@@ -196,7 +196,10 @@ return [
         'forms'        => [
             'mautic.campaign.type.form'                 => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignType',
-                'arguments' => 'mautic.security',
+                'arguments' => [
+                    'mautic.security',
+                    'translator',
+                ],
             ],
             'mautic.campaignrange.type.action'          => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventType',
@@ -270,6 +273,12 @@ return [
                     'mautic.campaign.scheduler',
                 ],
             ],
+            'mautic.campaign.model.summary' => [
+                'class'     => \Mautic\CampaignBundle\Model\SummaryModel::class,
+                'arguments' => [
+                    'mautic.campaign.repository.lead_event_log',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.campaign.repository.campaign' => [
@@ -298,6 +307,13 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\CampaignBundle\Entity\LeadEventLog::class,
+                ],
+            ],
+            'mautic.campaign.repository.summary' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\CampaignBundle\Entity\Summary::class,
                 ],
             ],
         ],
@@ -355,6 +371,7 @@ return [
                     'mautic.tracker.contact',
                     'mautic.campaign.repository.lead_event_log',
                     'mautic.campaign.repository.lead',
+                    'mautic.campaign.model.summary',
                 ],
             ],
             'mautic.campaign.event_collector' => [
@@ -489,6 +506,7 @@ return [
                     'mautic.core.model.notification',
                     'translator',
                     'router',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             // @deprecated 2.13.0 for BC support; to be removed in 3.0
@@ -591,6 +609,14 @@ return [
                 ],
                 'tag' => 'console.command',
             ],
+            'mautic.campaign.command.summarize' => [
+                'class'     => \Mautic\CampaignBundle\Command\SummarizeCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.campaign.model.summary',
+                ],
+                'tag' => 'console.command',
+            ],
         ],
         'services' => [
             'mautic.campaign.service.campaign'=> [
@@ -611,5 +637,7 @@ return [
     ],
     'parameters' => [
         'campaign_time_wait_on_event_false' => 'PT1H',
+        'campaign_use_summary'              => 0,
+        'campaign_by_range'                 => 0,
     ],
 ];

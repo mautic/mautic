@@ -15,6 +15,9 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 
 trait OperatorListTrait
 {
+    /**
+     * @var array<string, array<string, array<int, string>>>
+     */
     protected $typeOperators = [
         'text' => [
             'include' => [
@@ -102,9 +105,9 @@ trait OperatorListTrait
     /**
      * @deprecated to be removed in Mautic 3. Use FilterOperatorProvider::getAllOperators() instead.
      *
-     * @param null $operator
+     * @param string|null $operator
      *
-     * @return array
+     * @return array<string,array<string,string>>|array<string,string>
      */
     public function getFilterExpressionFunctions($operator = null)
     {
@@ -114,10 +117,10 @@ trait OperatorListTrait
     }
 
     /**
-     * @param string|array|null $type
-     * @param array             $overrideHiddenTypes
+     * @param string|mixed[]|null $type
+     * @param mixed[]             $overrideHiddenTypes
      *
-     * @return array
+     * @return mixed[]
      */
     public function getOperatorsForFieldType($type = null, $overrideHiddenTypes = [])
     {
@@ -147,10 +150,10 @@ trait OperatorListTrait
     }
 
     /**
-     * @param       $definition
-     * @param array $overrideHiddenOperators
+     * @param mixed[] $definition
+     * @param mixed[] $overrideHiddenOperators
      *
-     * @return array
+     * @return mixed[]
      */
     public function getOperatorChoiceList($definition, $overrideHiddenOperators = [])
     {
@@ -188,7 +191,9 @@ trait OperatorListTrait
      *
      * Normalize type operator.
      *
-     * @param $type
+     * @param string|null $type
+     *
+     * @return void
      */
     protected function normalizeType(&$type)
     {

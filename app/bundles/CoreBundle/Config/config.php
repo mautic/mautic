@@ -583,6 +583,9 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.helper.update_checks' => [
+                'class' => \Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class,
+            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -837,6 +840,7 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.http.client',
                     'mautic.helper.update.release_parser',
+                    'mautic.helper.update_checks',
                 ],
             ],
             'mautic.helper.update.release_parser' => [
@@ -1097,6 +1101,25 @@ return [
                 ],
                 'tag' => 'mautic.update_step',
             ],
+            'mautic.update.step.checks' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\PreUpdateChecksStep::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.update',
+                ],
+                'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.checks.php' => [
+                'class' => \Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckPhpVersion::class,
+                'tag'   => 'mautic.update_check',
+            ],
+            'mautic.update.checks.database' => [
+                'class'     => \Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class,
+                'arguments' => [
+                    'doctrine.orm.default_entity_manager',
+                ],
+                'tag' => 'mautic.update_check',
+            ],
         ],
         'models' => [
             'mautic.core.model.auditlog' => [
@@ -1223,7 +1246,7 @@ return [
         'update_stability'                => 'stable',
         'cookie_path'                     => '/',
         'cookie_domain'                   => '',
-        'cookie_secure'                   => null,
+        'cookie_secure'                   => true,
         'cookie_httponly'                 => false,
         'do_not_track_ips'                => [],
         'do_not_track_bots'               => [

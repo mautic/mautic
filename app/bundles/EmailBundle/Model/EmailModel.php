@@ -2348,4 +2348,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         return $ids;
     }
+
+    public function isUpdatingTranslationChildren(): bool
+    {
+        return $this->updatingTranslationChildren;
+    }
 }
