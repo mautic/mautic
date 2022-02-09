@@ -15,12 +15,15 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
+use Mautic\EmailBundle\Mailer\Dsn\DsnGenerator;
+use Mautic\EmailBundle\Mailer\EmailSender;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\Mime\Address;
 
 class AjaxController extends CommonAjaxController
 {
@@ -192,27 +195,29 @@ class AjaxController extends CommonAjaxController
         $user      = $this->get('mautic.helper.user')->getUser();
 
         if ($user->isAdmin()) {
-            $settings = $request->request->all();
+            $settings      = $request->request->all();
+            $mailerFactory = $this->get('mautic.email.mailer.factory');
 
             $transport = $settings['transport'];
 
             switch ($transport) {
-                case 'gmail':
-                    $mailer = new \Swift_SmtpTransport('smtp.gmail.com', 465, 'ssl');
-                    break;
+//                case 'gmail':
+//                    $transport = $esmtpTransportFactory->create(new Dsn('smtp', 'smtp.gmail.com', null, null, 465));
+//                    $mailer = new Mailer($transport);
+//                    break;
                 case 'smtp':
-                    $mailer = new \Swift_SmtpTransport($settings['host'], $settings['port'], $settings['encryption']);
+                    $mailer = $mailerFactory->getMailerByDsn(DsnGenerator::getDsnString(new Dsn('smtp', $settings['host'], null, null, $settings['port'])));
                     break;
                 default:
                     if ($this->container->has($transport)) {
                         $mailer = $this->container->get($transport);
 
-                        if ('mautic.transport.amazon' == $transport) {
+                        if ('ses+smtp' == $transport) {
                             $amazonHost = $mailer->buildHost($settings['amazon_region'], $settings['amazon_other_region']);
                             $mailer->setHost($amazonHost, $settings['port']);
                         }
 
-                        if ('mautic.transport.amazon_api' == $transport) {
+                        if ('ses+api' == $transport) {
                             $mailer->setRegion($settings['amazon_region'], $settings['amazon_other_region']);
                         }
                     }
@@ -246,15 +251,11 @@ class AjaxController extends CommonAjaxController
                     // Transport had magic method defined and threw an exception
                 }
 
-                $logger = new \Swift_Plugins_Loggers_ArrayLogger();
-                $mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
-
                 try {
-                    $mailer->start();
                     $dataArray['success'] = 1;
                     $dataArray['message'] = $this->get('translator')->trans('mautic.core.success');
                 } catch (\Exception $e) {
-                    $dataArray['message'] = $e->getMessage().'<br />'.$logger->dump();
+                    $dataArray['message'] = $e->getMessage();
                 }
             }
         }
@@ -264,28 +265,23 @@ class AjaxController extends CommonAjaxController
 
     protected function sendTestEmailAction(Request $request)
     {
-        /** @var MailHelper $mailer */
-        $mailer = $this->get('mautic.helper.mailer');
         /** @var Translator $translator */
         $translator = $this->get('translator');
-
-        $mailer->setSubject($translator->trans('mautic.email.config.mailer.transport.test_send.subject'));
-        $mailer->setBody($translator->trans('mautic.email.config.mailer.transport.test_send.body'));
 
         $user         = $this->get('mautic.helper.user')->getUser();
         $userFullName = trim($user->getFirstName().' '.$user->getLastName());
         if (empty($userFullName)) {
-            $userFullName = null;
+            $userFullName = '';
         }
-        $mailer->setTo([$user->getEmail() => $userFullName]);
-
-        $success = 1;
-        $message = $translator->trans('mautic.core.success');
-        if (!$mailer->send(true)) {
-            $success   = 0;
-            $errors    = $mailer->getErrors();
-            unset($errors['failures']);
-            $message = implode('; ', $errors);
+        /** @var EmailSender $emailSender */
+        $emailSender = $this->get('mautic.email.mailer.email_sender');
+        $success     = 1;
+        $message     = $translator->trans('mautic.core.success');
+        try {
+            $emailSender->sendTestEmail(new Address($user->getEmail(), $userFullName));
+        } catch (\Exception $exception) {
+            $success = 0;
+            $message = $exception->getMessage();
         }
 
         return $this->sendJsonResponse(['success' => $success, 'message' => $message]);
