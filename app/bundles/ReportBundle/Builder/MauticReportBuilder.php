@@ -527,6 +527,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
         return "`{$tableAlias}`.`{$columnName}`";
     }
 
+    /**
+     * @param mixed[] $filter
+     * @param mixed[] $filterDefinitions
+     */
     private function doesColumnSupportEmptyValue(array $filter, array $filterDefinitions): bool
     {
         $type = $filterDefinitions[$filter['column']]['type'] ?? null;
