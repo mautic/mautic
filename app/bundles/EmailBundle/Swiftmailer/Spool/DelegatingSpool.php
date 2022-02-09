@@ -91,7 +91,7 @@ class DelegatingSpool extends \Swift_FileSpool
         $rootPath = realpath(__DIR__.'/../../../../');
 
         if (!$filePath) {
-            return $rootPath.'../var/spool';
+            return $rootPath.'/../var/spool';
         }
 
         return str_replace('%kernel.root_dir%', $rootPath, $filePath);

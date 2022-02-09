@@ -55,6 +55,13 @@ jobs:
         coverage: pcov
         ini-values: pcov.directory=., pcov.exclude="~tests|themes|vendor~"
     
+    - name: add MySQL config file
+      run: |
+        mysqldump --version
+        mysqldump --print-defaults
+        cp .github/ci-files/.my.cnf ~/.my.cnf
+        mysqldump --print-defaults
+
     - name: Set SYMFONY_ENV to test
       run: echo "SYMFONY_ENV=test" >> $GITHUB_ENV
 
@@ -62,17 +69,6 @@ jobs:
       run: |
         composer validate
         composer install --prefer-dist --no-progress --no-suggest
-
-    - name: Temp install Mautic first due to failing tests
-      env:
-        mysql_port: ${{ job.services.mysql.ports[3306] }}
-        mariadb_port: ${{ job.services.mariadb.ports[3306] }}
-      run: |
-        export DB_PORT_STRING="${{ matrix.db-types }}_port"
-        export DB_PORT=${!DB_PORT_STRING}
-
-        cp ./.github/ci-files/local.php ./app/config/local.php
-        php bin/console mautic:install --force http://localhost
 
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
@@ -87,13 +83,6 @@ jobs:
       env:
         mysql_port: ${{ job.services.mysql.ports[3306] }}
         mariadb_port: ${{ job.services.mariadb.ports[3306] }}
-
-    - name: Run Pipedrive tests separately due to bug
-      run: |
-        export DB_PORT_STRING="${{ matrix.db-types }}_port"
-        export DB_PORT=${!DB_PORT_STRING}
-
-        composer test -- plugins/MauticCrmBundle/Tests/Pipedrive
 
     - name: Upload coverage report
       if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' }}
