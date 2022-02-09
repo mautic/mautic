@@ -1,12 +1,6 @@
 <?php
 
-/*
- * @copyright  2019 Mautic Contributors. All rights reserved
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
@@ -21,14 +15,12 @@ use Mautic\CoreBundle\Event\CommonEvent;
 class SegmentDictionaryGenerationEvent extends CommonEvent
 {
     /**
-     * @var array
+     * @var array<string,mixed[]>
      */
-    private $translations;
+    private array $translations;
 
     /**
-     * SegmentDictionaryGenerationEvent constructor.
-     *
-     * @param array $translations
+     * @param array<string,mixed[]> $translations
      */
     public function __construct($translations = [])
     {
@@ -36,12 +28,11 @@ class SegmentDictionaryGenerationEvent extends CommonEvent
     }
 
     /**
-     * @param string $key
-     * @param array  $attributes
+     * @param mixed[] $attributes
      *
      * @return SegmentDictionaryGenerationEvent
      */
-    public function addTranslation($key, $attributes)
+    public function addTranslation(string $key, $attributes)
     {
         $this->translations[$key] = $attributes;
 
@@ -49,7 +40,7 @@ class SegmentDictionaryGenerationEvent extends CommonEvent
     }
 
     /**
-     * @return array
+     * @return array<string,mixed[]>
      */
     public function getTranslations()
     {

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -19,30 +10,18 @@ use Symfony\Component\Form\FormInterface;
 
 final class FormAdjustmentEvent extends Event
 {
-    /**
-     * @var FormInterface
-     */
-    private $form;
+    private FormInterface $form;
+
+    private string $fieldAlias;
+
+    private string $fieldObject;
+
+    private string $operator;
 
     /**
-     * @var string
+     * @var mixed[]
      */
-    private $fieldAlias;
-
-    /**
-     * @var string
-     */
-    private $fieldObject;
-
-    /**
-     * @var string
-     */
-    private $operator;
-
-    /**
-     * @var array
-     */
-    private $fieldDetails;
+    private array $fieldDetails;
 
     public function __construct(FormInterface $form, string $fieldAlias, string $fieldObject, string $operator, array $fieldDetails)
     {

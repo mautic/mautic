@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
@@ -33,52 +24,28 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class TypeOperatorSubscriber implements EventSubscriberInterface
 {
     use OperatorListTrait;
 
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private LeadModel $leadModel;
 
-    /**
-     * @var ListModel
-     */
-    private $listModel;
+    private ListModel $listModel;
 
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
+    private CampaignModel $campaignModel;
 
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
+    private EmailModel $emailModel;
 
-    /**
-     * @var StageModel
-     */
-    private $stageModel;
+    private StageModel $stageModel;
 
-    /**
-     * @var CategoryModel
-     */
-    private $categoryModel;
+    private CategoryModel $categoryModel;
 
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
+    private AssetModel $assetModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
 
     public function __construct(
         LeadModel $leadModel,

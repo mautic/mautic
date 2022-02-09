@@ -172,10 +172,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    protected function loadSegmentFilterFormAction(Request $request)
+    protected function loadSegmentFilterFormAction(Request $request): JsonResponse
     {
         $fieldAlias  = InputHelper::clean($request->request->get('fieldAlias'));
         $fieldObject = InputHelper::clean($request->request->get('fieldObject'));

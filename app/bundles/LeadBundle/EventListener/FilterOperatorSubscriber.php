@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\LeadField;
@@ -24,35 +15,19 @@ use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var OperatorOptions
-     */
-    private $operatorOptions;
+    private OperatorOptions $operatorOptions;
 
-    /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
+    private LeadFieldRepository $leadFieldRepository;
 
-    /**
-     * @var TypeOperatorProviderInterface
-     */
-    private $typeOperatorProvider;
+    private TypeOperatorProviderInterface $typeOperatorProvider;
 
-    /**
-     * @var FieldChoicesProviderInterface
-     */
-    private $fieldChoicesProvider;
+    private FieldChoicesProviderInterface $fieldChoicesProvider;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
 
     public function __construct(
         OperatorOptions $operatorOptions,

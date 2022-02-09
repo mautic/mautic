@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
@@ -20,7 +11,10 @@ use Symfony\Component\EventDispatcher\Event;
  */
 final class TypeOperatorsEvent extends Event
 {
-    private $operators = [];
+    /**
+     * @var array<string,array<string,string>>
+     */
+    private array $operators = [];
 
     /**
      * $operators example:
