@@ -40,7 +40,8 @@ class InstallController extends CommonController
             return $this->notFound();
         }
 
-        if (!$this->corePermissions->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) {
+        if (!$this->corePermissions->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)
+            || !$this->config->isComposerEnabled()) {
             return $this->accessDenied();
         }
 

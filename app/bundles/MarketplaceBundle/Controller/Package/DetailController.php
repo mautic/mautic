@@ -53,6 +53,7 @@ class DetailController extends CommonController
                 'viewParameters' => [
                     'packageDetail'  => $this->packageModel->getPackageDetail("{$vendor}/{$package}"),
                     'isInstalled'    => $isInstalled,
+                    'isComposerEnabled' => $this->config->isComposerEnabled()
                 ],
                 'contentTemplate' => 'MarketplaceBundle:Package:detail.html.php',
                 'passthroughVars' => [

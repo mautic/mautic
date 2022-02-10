@@ -10,6 +10,8 @@ use Mautic\MarketplaceBundle\Service\RouteProvider;
 $packageDetail = $packageDetail;
 /** @var bool $isInstalled */
 $isInstalled = $isInstalled;
+/** @var bool $isComposerEnabled */
+$isComposerEnabled = $isComposerEnabled;
 
 $view['slots']->set('headerTitle', $view->escape($packageDetail->packageBase->getHumanPackageName()));
 $view->extend('MauticCoreBundle:Default:content.html.php');
@@ -45,7 +47,7 @@ if (isset($latestVersion)) {
     ];
 }
 
-if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES) && !$isInstalled) {
+if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES) && !$isInstalled && $isComposerEnabled) {
     $installRoute = $view['router']->path(
         RouteProvider::ROUTE_INSTALL,
         ['vendor' => $packageDetail->packageBase->getVendorName(), 'package' => $packageDetail->packageBase->getPackageName()]
@@ -61,7 +63,7 @@ if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES) &
         'iconClass' => 'fa fa-download',
         'primary'   => true,
     ];
-} elseif ($view['security']->isGranted(MarketplacePermissions::CAN_REMOVE_PACKAGES)) {
+} elseif ($view['security']->isGranted(MarketplacePermissions::CAN_REMOVE_PACKAGES) && $isComposerEnabled) {
     $removeRoute = $view['router']->path(
         RouteProvider::ROUTE_REMOVE,
         ['vendor' => $packageDetail->packageBase->getVendorName(), 'package' => $packageDetail->packageBase->getPackageName()]

@@ -11,8 +11,10 @@ if ('index' === $tmpl) {
 }
 
 $buttons = [];
+/** @var bool $isComposerEnabled */
+$isComposerEnabled = $isComposerEnabled;
 
-if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) {
+if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES) && $isComposerEnabled) {
     $buttons[] = [
         'attr' => [
             'data-toggle'      => 'confirmation',

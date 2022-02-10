@@ -33,4 +33,9 @@ class Config
     {
         return (int) $this->coreParametersHelper->get(self::MARKETPLACE_ALLOWLIST_CACHE_TTL_SECONDS, 3600);
     }
+
+    public function isComposerEnabled(): bool
+    {
+        return $this->coreParametersHelper->get('composer_updates', false);
+    }
 }
