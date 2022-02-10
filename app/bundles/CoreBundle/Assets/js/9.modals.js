@@ -269,7 +269,6 @@ Mautic.showConfirmation = function (el) {
     var confirmText = mQuery(el).data('confirm-text');
     var confirmAction = mQuery(el).attr('href');
     var confirmCallback = mQuery(el).data('confirm-callback');
-    var confirmCallbackExtended = mQuery(el).data('confirm-callback-args');
     var cancelText = mQuery(el).data('cancel-text');
     var cancelCallback = mQuery(el).data('cancel-callback');
 
