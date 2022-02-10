@@ -3,9 +3,9 @@ import grapesjsmjml from 'grapesjs-mjml';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
-import contentService from 'grapesjs-preset-mautic/dist/content.service';
+import contentService from 'grapesjs-preset-mautic/src/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
-import mjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
+import mjmlService from 'grapesjs-preset-mautic/src/mjml/mjml.service';
 import 'grapesjs-plugin-ckeditor';
 
 // for local dev

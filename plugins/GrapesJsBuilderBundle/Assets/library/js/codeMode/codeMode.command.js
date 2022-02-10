@@ -37,7 +37,6 @@ export default class CodeModeCommand {
     if (!editor) {
       throw new Error('no editor');
     }
-    console.warn('stopCodeEditorModal');
     // Transform Token to Components
     editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
   }
