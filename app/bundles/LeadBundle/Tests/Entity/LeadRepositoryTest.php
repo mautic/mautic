@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -15,7 +17,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
@@ -23,6 +24,7 @@ use Mautic\LeadBundle\Entity\CustomFieldRepositoryTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -56,9 +58,11 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->classMetadata = $this->createMock(ClassMetadata::class);
         $this->connection    = $this->createMock(Connection::class);
         $this->repository    = new LeadRepository($this->entityManager, $this->classMetadata);
+
+        $this->entityManager->method('getConnection')->willReturn($this->connection);
     }
 
-    public function testBooleanWithPrepareDbalFieldsForSave()
+    public function testBooleanWithPrepareDbalFieldsForSave(): void
     {
         $trait  = $this->getMockForTrait(CustomFieldRepositoryTrait::class);
         $fields = [
@@ -81,7 +85,7 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
      * Ensure that the emails are bound separately as parameters according to
      * https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/query-builder.html#line-number-0a267d5a2c69797a7656aae33fcc140d16b0a566-72.
      */
-    public function testBuildQueryForGetLeadsByFieldValue()
+    public function testBuildQueryForGetLeadsByFieldValue(): void
     {
         $dbalMock = new DBALMocker($this);
 
@@ -107,7 +111,7 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
     /**
      * Ensure that the array_combine return value matches the old style.
      */
-    public function testGetLeadsByFieldValueArrayMapReturn()
+    public function testGetLeadsByFieldValueArrayMapReturn(): void
     {
         $mock = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
@@ -189,10 +193,6 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
             'somebody2@anywhere.com',
         ];
 
-        $entityManager = $this->createMock(EntityManager::class);
-        $classMetadata = $this->createMock(ClassMetadata::class);
-        $repo          = new LeadRepository($entityManager, $classMetadata);
-
         $query = $this->createMock(AbstractQuery::class);
         $query->expects(self::once())
             ->method('setParameter')
@@ -209,32 +209,46 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $entityManager->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('createQuery')
             ->willReturn($query);
 
         self::assertEquals(
             [1, 2],
-            $repo->getContactIdsByEmails($emails)
+            $this->repository->getContactIdsByEmails($emails)
         );
     }
 
-    public function testGetUniqueIdentifiersOperator()
+    public function testGetUniqueIdentifiersOperator(): void
     {
-        $mockEm       = $this->createMock(EntityManager::class);
-        $mockMetadata = $this->createMock(ClassMetadata::class);
-
-        $leadRepository = new LeadRepository($mockEm, $mockMetadata);
-        $leadRepository->setUniqueIdentifiersOperator(CompositeExpression::TYPE_AND);
+        $this->repository->setUniqueIdentifiersOperator(CompositeExpression::TYPE_AND);
 
         $reflection = new \ReflectionClass(LeadRepository::class);
         $refMethod  = $reflection->getMethod('getUniqueIdentifiersWherePart');
         $refMethod->setAccessible(true);
 
-        $this->assertEquals('andWhere', $refMethod->invoke($leadRepository));
+        $this->assertEquals('andWhere', $refMethod->invoke($this->repository));
 
-        $leadRepository->setUniqueIdentifiersOperator(CompositeExpression::TYPE_OR);
+        $this->repository->setUniqueIdentifiersOperator(CompositeExpression::TYPE_OR);
 
-        $this->assertEquals('orWhere', $refMethod->invoke($leadRepository));
+        $this->assertEquals('orWhere', $refMethod->invoke($this->repository));
+    }
+
+    public function testUpdateLastActiveWithId(): void
+    {
+        $this->entityManager->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($this->connection);
+
+        $this->repository->updateLastActive(1);
+    }
+
+    public function testUpdateLastActiveWithNoId(): void
+    {
+        $this->entityManager->expects($this->never())
+            ->method('getConnection')
+            ->willReturn($this->connection);
+
+        $this->repository->updateLastActive(null); // @phpstan-ignore-line this tests if we provide null instead which actually happens.
     }
 }
