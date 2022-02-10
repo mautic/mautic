@@ -4,6 +4,7 @@ import ButtonApply from './buttons/buttonApply';
 export default (editor, opts = {}) => {
   const { $ } = editor;
   const pm = editor.Panels;
+  const defaultPanel = opts.defaultPanel || 'open-blocks';
 
   // Disable Import code button
   if (!opts.showImportButton) {
@@ -114,45 +115,52 @@ export default (editor, opts = {}) => {
     }
 
     // Load and show settings and style manager
-    const openTmBtn = pm.getButton('views', 'open-tm');
-    const openSm = pm.getButton('views', 'open-sm');
-    if (openTmBtn) {
-      openTmBtn.set('active', 1);
-    }
-    if (openSm) {
-      openSm.set('active', 1);
-    }
+    if (!opts.combineSettingsAndSm) {
+      const openTmBtn = pm.getButton('views', 'open-tm');
+      const openSm = pm.getButton('views', 'open-sm');
+      if (openTmBtn) {
+        openTmBtn.set('active', 1);
+      }
+      if (openSm) {
+        openSm.set('active', 1);
+      }
 
-    pm.removeButton('views', 'open-tm');
+      pm.removeButton('views', 'open-tm');
 
-    // Add Settings Sector
-    const traitsSector = $(
-      '<div class="gjs-sm-sector no-select">' +
+      // Add Settings Sector
+      const traitsSector = $(
+        '<div class="gjs-sm-sector no-select">' +
         '<div class="gjs-sm-title"><span class="icon-settings fa fa-cog"></span> Settings</div>' +
         '<div class="gjs-sm-properties" style="display: none;"></div></div>'
-    );
-    const traitsProps = traitsSector.find('.gjs-sm-properties');
+      );
+      const traitsProps = traitsSector.find('.gjs-sm-properties');
 
-    traitsProps.append($('.gjs-trt-traits'));
-    $('.gjs-sm-sectors').before(traitsSector);
-    traitsSector.find('.gjs-sm-title').on('click', () => {
-      const traitStyle = traitsProps.get(0).style;
-      const hidden = traitStyle.display === 'none';
+      traitsProps.append($('.gjs-trt-traits'));
+      $('.gjs-sm-sectors').before(traitsSector);
+      traitsSector.find('.gjs-sm-title').on('click', () => {
+        const traitStyle = traitsProps.get(0).style;
+        const hidden = traitStyle.display === 'none';
 
-      if (hidden) {
-        traitStyle.display = 'block';
-      } else {
-        traitStyle.display = 'none';
-      }
-    });
+        if (hidden) {
+          traitStyle.display = 'block';
+        } else {
+          traitStyle.display = 'none';
+        }
+      });
 
-    // Open settings
-    traitsProps.get(0).style.display = 'block';
+      // Open settings
+      traitsProps.get(0).style.display = 'block';
+    }
 
-    // Open block manager
-    const openBlocksBtn = editor.Panels.getButton('views', 'open-blocks');
+    // Open the default panel
+    const openBlocksBtn = editor.Panels.getButton('views', defaultPanel);
     if (openBlocksBtn) {
       openBlocksBtn.set('active', 1);
     }
+  });
+  // Workaround to set the default panel when the editor is reopened. Missing a dedicated event for 'opening'.
+  editor.on('update', () => {
+    const btn = editor.Panels.getButton('views', defaultPanel);
+    btn.set('active', 1);
   });
 };
