@@ -13,18 +13,20 @@ namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 
 trait FormThemeTrait
 {
     /**
      * Sets a specific theme for the form.
      *
-     * @param string $template
-     * @param mixed  $themes
+     * @param FormInterface<FormInterface> $form
+     * @param string                       $template
+     * @param mixed                        $themes
      *
      * @return \Symfony\Component\Form\FormView
      */
-    protected function setFormTheme(Form $form, $template, $themes = null)
+    protected function setFormTheme(FormInterface $form, $template, $themes = null)
     {
         $formView = $form->createView();
 
