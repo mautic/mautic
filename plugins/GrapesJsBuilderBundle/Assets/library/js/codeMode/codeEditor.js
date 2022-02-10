@@ -90,7 +90,7 @@ class CodeEditor {
    * content from modals editor.
    * @todo show validation results in UI
    */
-  updateCode(editor) {
+  updateCode() {
     const code = this.codeEditor.editor.getValue();
     // validate MJML code
     if (ContentService.isMjmlMode(this.editor)) {
