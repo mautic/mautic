@@ -54,6 +54,8 @@ class BroadcastQuery
         $query = $this->getBasicQuery($sms);
         $query->select('DISTINCT l.id, ll.id as listId');
         $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
+        $query->groupBy('l.id');
+        $query->orderBy('l.id');
 
         return $query->execute()->fetchAll();
     }
