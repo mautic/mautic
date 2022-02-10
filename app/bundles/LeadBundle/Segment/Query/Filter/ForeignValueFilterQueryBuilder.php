@@ -13,18 +13,13 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-/**
- * Class ForeignValueFilterQueryBuilder.
- */
 class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    /** {@inheritdoc} */
     public static function getServiceId()
     {
         return 'mautic.lead.query.builder.foreign.value';
     }
 
-    /** {@inheritdoc} */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
         $filterOperator = $filter->getOperator();
