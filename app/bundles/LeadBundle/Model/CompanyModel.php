@@ -784,7 +784,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array $data
      * @param null  $owner
      *
-     * @return bool|null
+     * @return Company|null
      *
      * @throws \Exception
      */
