@@ -603,7 +603,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/169384?v=4",
       "profile": "https://github.com/biozshock",
       "contributions": [
-        "userTesting"
+        "userTesting",
+        "review"
       ]
     },
     {
@@ -683,6 +684,24 @@
       "name": "nick-vanpraet",
       "avatar_url": "https://avatars.githubusercontent.com/u/7923739?v=4",
       "profile": "https://github.com/nick-vanpraet",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "volha-pivavarchyk",
+      "name": "Volha Pivavarchyk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/96085911?v=4",
+      "profile": "https://github.com/volha-pivavarchyk",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "J-Light",
+      "name": "Nish Joseph",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2544660?v=4",
+      "profile": "https://github.com/J-Light",
       "contributions": [
         "code"
       ]
