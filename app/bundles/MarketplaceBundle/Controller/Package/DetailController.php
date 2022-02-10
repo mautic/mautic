@@ -51,9 +51,9 @@ class DetailController extends CommonController
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'packageDetail'  => $this->packageModel->getPackageDetail("{$vendor}/{$package}"),
-                    'isInstalled'    => $isInstalled,
-                    'isComposerEnabled' => $this->config->isComposerEnabled()
+                    'packageDetail'     => $this->packageModel->getPackageDetail("{$vendor}/{$package}"),
+                    'isInstalled'       => $isInstalled,
+                    'isComposerEnabled' => $this->config->isComposerEnabled(),
                 ],
                 'contentTemplate' => 'MarketplaceBundle:Package:detail.html.php',
                 'passthroughVars' => [

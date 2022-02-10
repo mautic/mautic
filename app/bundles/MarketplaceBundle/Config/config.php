@@ -40,7 +40,7 @@ return [
                     'request_stack',
                     'marketplace.service.route_provider',
                     'mautic.security',
-                    'marketplace.service.config'
+                    'marketplace.service.config',
                 ],
                 'methodCalls' => [
                     'setContainer' => [

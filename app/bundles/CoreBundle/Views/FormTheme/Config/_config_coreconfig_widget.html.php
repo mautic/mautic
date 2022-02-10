@@ -149,12 +149,12 @@ $template  = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists(
                 $fields,
                 'composer_updates',
-                '<div class="col-md-6">{content}<span style="color:red">'. $view['translator']->trans(
+                '<div class="col-md-6">{content}<span style="color:red">'.$view['translator']->trans(
                     'mautic.core.config.form.update.composer.warning',
                     [
                         '%url_start%' => '<a href="https://mau.tc/TODO" target="_blank" style="color: red; text-decoration: underline">',
-                        '%url_end%' => '</a>'
-                    ]) . '</div>'
+                        '%url_end%'   => '</a>',
+                    ]).'</div>'
             ); ?>
         </div>
     </div>
