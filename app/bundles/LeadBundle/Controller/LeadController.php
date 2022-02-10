@@ -83,6 +83,9 @@ class LeadController extends FormController
 
         //do some default filtering
         $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        // Add an id field to orderBy. Prevent Null-value ordering
+        $orderById =  $orderBy !== 'l.id' ? ', l.id' : '';
+        $orderBy    = $orderBy . $orderById;
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
 
         $filter      = ['string' => $search, 'force' => ''];
@@ -1958,6 +1961,9 @@ class LeadController extends FormController
         $session    = $this->get('session');
         $search     = $session->get('mautic.lead.filter', '');
         $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        // Add an id field to orderBy. Prevent Null-value ordering
+        $orderById =  $orderBy !== 'l.id' ? ', l.id' : '';
+        $orderBy    = $orderBy . $orderById;
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
         $ids        = $this->request->get('ids');
 
