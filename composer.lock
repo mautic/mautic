@@ -360,16 +360,16 @@
         },
         {
             "name": "composer/composer",
-            "version": "2.2.4",
+            "version": "2.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/composer.git",
-                "reference": "8a5ad75194f901e3b39ece4bbd22cbdabc79ae8f"
+                "reference": "ce785a18c0fb472421e52d958bab339247cb0e82"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/composer/zipball/8a5ad75194f901e3b39ece4bbd22cbdabc79ae8f",
-                "reference": "8a5ad75194f901e3b39ece4bbd22cbdabc79ae8f",
+                "url": "https://api.github.com/repos/composer/composer/zipball/ce785a18c0fb472421e52d958bab339247cb0e82",
+                "reference": "ce785a18c0fb472421e52d958bab339247cb0e82",
                 "shasum": ""
             },
             "require": {
@@ -439,7 +439,7 @@
             "support": {
                 "irc": "ircs://irc.libera.chat:6697/composer",
                 "issues": "https://github.com/composer/composer/issues",
-                "source": "https://github.com/composer/composer/tree/2.2.4"
+                "source": "https://github.com/composer/composer/tree/2.2.6"
             },
             "funding": [
                 {
@@ -455,7 +455,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-08T11:30:42+00:00"
+            "time": "2022-02-04T16:00:38+00:00"
         },
         {
             "name": "composer/installers",
@@ -5458,13 +5458,13 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "7f2263020f143e4e5d943d93a7ea85a94d304d61"
+                "reference": "74cc902ed05452f7f9a471a02dbf56cbf51b78e2"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
                 "bandwidth-throttle/token-bucket": "^2.0",
                 "barryvdh/elfinder-flysystem-driver": "^0.2.1",
-                "composer/composer": "2.2.4",
+                "composer/composer": "^2.2",
                 "composer/package-versions-deprecated": "1.11.99.1",
                 "doctrine/annotations": "^1.10.3",
                 "doctrine/data-fixtures": "~1.4.0",
@@ -5472,6 +5472,7 @@
                 "doctrine/doctrine-fixtures-bundle": "^3.3.2",
                 "doctrine/doctrine-migrations-bundle": "~2.1",
                 "doctrine/orm": "^2.8.0",
+                "ext-imap": "*",
                 "ext-zip": "*",
                 "ext-zlib": "*",
                 "friendsofsymfony/oauth-server-bundle": "dev-doctrine-fix",

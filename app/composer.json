@@ -19,6 +19,7 @@
     "php": ">=7.4.0 <8.1",
     "ext-zlib": "*",
     "ext-zip": "*",
+    "ext-imap": "*",
     "symfony/console": "~4.4.0",
     "symfony/debug": "~4.4.0",
     "symfony/form": "~4.4.0",
@@ -105,7 +106,7 @@
     "composer/package-versions-deprecated": "1.11.99.1",
     "phpoffice/phpspreadsheet": "^1.15",
     "predis/predis": "^1.1",
-    "composer/composer": "2.2.4"
+    "composer/composer": "^2.2"
   },
   "repositories": [
     {
