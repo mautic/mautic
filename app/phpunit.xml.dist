@@ -48,4 +48,7 @@
   <listeners>
     <listener class="\Mautic\CoreBundle\Test\Listeners\CleanupListener" />
   </listeners>
+  <extensions>
+    <extension class="\Mautic\CoreBundle\Test\Hooks\ExecuteTestAfterExtension" />
+  </extensions>
 </phpunit>
