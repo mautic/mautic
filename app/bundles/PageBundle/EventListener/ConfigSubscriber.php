@@ -64,7 +64,7 @@ class ConfigSubscriber implements EventSubscriberInterface
                 'google_tag_manager_id'                   => null,
                 'google_tag_manager_trackingpage_enabled' => false,
                 'google_tag_manager_landingpage_enabled'  => false,
-                'do_not_track_404_anonymous'            => false,
+                'do_not_track_404_anonymous'              => false,
             ],
         ]);
     }
