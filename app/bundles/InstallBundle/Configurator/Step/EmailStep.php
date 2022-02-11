@@ -117,6 +117,11 @@ class EmailStep implements StepInterface
      */
     public $mailer_dsn = 'null://null';
 
+    /**
+     * @var string
+     */
+    public $mailer_messenger_dsn = 'sync://';
+
     public function __construct(Session $session)
     {
         $user = $session->get('mautic.installer.user');
