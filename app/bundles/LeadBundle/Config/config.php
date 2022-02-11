@@ -597,6 +597,7 @@ return [
                     'mautic.stage.model.stage',
                     'mautic.category.model.category',
                     'mautic.asset.model.asset',
+                    'mautic.form.model.form',
                     'translator',
                 ],
             ],

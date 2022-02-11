@@ -10,6 +10,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
@@ -45,6 +46,8 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
     private AssetModel $assetModel;
 
+    private FormModel $formModel;
+
     private TranslatorInterface $translator;
 
     public function __construct(
@@ -55,6 +58,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         StageModel $stageModel,
         CategoryModel $categoryModel,
         AssetModel $assetModel,
+        FormModel $formModel,
         TranslatorInterface $translator
     ) {
         $this->leadModel     = $leadModel;
@@ -64,6 +68,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $this->stageModel    = $stageModel;
         $this->categoryModel = $categoryModel;
         $this->assetModel    = $assetModel;
+        $this->formModel     = $formModel;
         $this->translator    = $translator;
     }
 
@@ -122,6 +127,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->setChoicesForFieldAlias('globalcategory', $this->getCategoryChoices());
         $event->setChoicesForFieldAlias('lead_email_received', $emails);
         $event->setChoicesForFieldAlias('lead_email_sent', $emails);
+        $event->setChoicesForFieldAlias('forms', $this->getFormsChoices());
         $event->setChoicesForFieldAlias('device_type', array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames())));
         $event->setChoicesForFieldAlias('device_brand', array_flip(DeviceParser::$deviceBrands));
         $event->setChoicesForFieldAlias('device_os', array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())));
@@ -262,7 +268,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $data       = $form->getData();
         $multiple   = $event->operatorIsOneOf(OperatorOptions::IN, OperatorOptions::NOT_IN) || $event->fieldTypeIsOneOf('multiselect');
         $mustBeText = $event->operatorIsOneOf(OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP, OperatorOptions::STARTS_WITH, OperatorOptions::ENDS_WITH, OperatorOptions::CONTAINS, OperatorOptions::LIKE, OperatorOptions::NOT_LIKE);
-        $isSelect   = $event->fieldTypeIsOneOf('select', 'multiselect', 'boolean', 'country', 'locale', 'region', 'timezone', 'leadlist', 'campaign', 'device_type', 'device_brand', 'device_os', 'stage', 'globalcategory', 'assets', 'lead_email_received');
+        $isSelect   = $event->fieldTypeIsOneOf('select', 'multiselect', 'boolean', 'country', 'locale', 'region', 'timezone', 'leadlist', 'campaign', 'device_type', 'device_brand', 'device_os', 'stage', 'globalcategory', 'forms', 'assets', 'lead_email_received');
 
         if (!$mustBeText && $isSelect) {
             $filter = $data['filter'] ?? '';
@@ -358,6 +364,14 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     private function getAssetChoices(): array
     {
         return $this->makeChoices($this->assetModel->getLookupResults('asset'), 'title', 'id');
+    }
+
+    /**
+     * @return mixed[]
+     */
+    private function getFormsChoices(): array
+    {
+        return $this->makeChoices($this->formModel->getRepository()->getFormList('', 0, 0, true), 'name', 'id');
     }
 
     /**
