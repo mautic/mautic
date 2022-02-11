@@ -16,7 +16,6 @@ namespace Mautic\CoreBundle\Test\Hooks;
 use PHPUnit\Framework\TestFailure;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Runner\AfterTestHook;
-use PHPUnit\Runner\BeforeTestHook;
 
 /**
  * This extension allows you to run an arbitrary test after every test in the current suite which is
