@@ -284,7 +284,8 @@ class SchemaHelper
                     $oldIndex->getColumns(),
                     $oldIndex->isUnique(),
                     $oldIndex->isPrimary(),
-                    $oldIndex->getFlags()
+                    $oldIndex->getFlags(),
+                    $oldIndex->getOptions()
                 );
 
                 $newIndexes[] = $newIndex;

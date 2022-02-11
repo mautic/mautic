@@ -21,7 +21,7 @@ export default class CodeModeCommand {
       sender.set('active', 0);
     }
 
-    CodeModeCommand.codeEditor.showCodePopup();
+    CodeModeCommand.codeEditor.showCodePopup(editor);
 
     // Transform DC Component to token
     editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
