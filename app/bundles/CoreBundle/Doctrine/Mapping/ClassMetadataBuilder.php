@@ -467,10 +467,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      *
      * @param list<string>         $columns
      * @param array<string, mixed> $options
-     *
-     * @return $this
      */
-    public function addIndexWithOptions(array $columns, string $name, array $options)
+    public function addIndexWithOptions(array $columns, string $name, array $options): ClassMetadataBuilder
     {
         $cm = $this->getClassMetadata();
 
