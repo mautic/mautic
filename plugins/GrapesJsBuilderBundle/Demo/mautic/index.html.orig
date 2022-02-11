@@ -38,12 +38,7 @@
 </script>
 <script src="http://mautic.ddev.site/media/js/libraries.js"></script>
 <script src="http://mautic.ddev.site/media/js/app.js"></script>
-<<<<<<< HEAD
-<script src="http://mautic.ddev.site/app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js" data-source="mautic"></script>
-<script src="http://mautic.ddev.site/app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js" data-source="mautic"></script>
-=======
 <script src="http://mautic.ddev.site/app/bundles/CoreBundle/Assets/js/libraries/froala/froala_editor.js?v884a23a9"></script>
->>>>>>> features
 <script src="../../Assets/library/js/builder.js"></script>
 
 <html>
@@ -85,12 +80,7 @@
   </body>
   <script>
     // launchPageHtml();
-<<<<<<< HEAD
-    // launchEmailHtml();
-    launchEmailMjml();
-=======
     launchEmailHtml();
     // launchEmailMjml();
->>>>>>> features
   </script>
 </html>
