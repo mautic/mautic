@@ -341,7 +341,6 @@ class TagController extends FormController
                             break;
                         }
                     }
-                    //$found = $tagModel->getRepository()->countOccurrences($tag->getTag());
 
                     if (!$valid) {
                         $this->addFlash('mautic.tagmanager.tag.error.already_exists', [

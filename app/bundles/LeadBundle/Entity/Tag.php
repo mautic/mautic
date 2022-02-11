@@ -62,7 +62,6 @@ class Tag
                 [
                     'id',
                     'tag',
-                    'summary',
                     'description',
                 ]
             )
