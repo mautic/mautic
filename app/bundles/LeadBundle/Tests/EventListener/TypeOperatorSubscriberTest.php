@@ -8,6 +8,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
@@ -67,6 +68,11 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private $assetModel;
 
     /**
+     * @var MockObject&FormModel
+     */
+    private $formModel;
+
+    /**
      * @var MockObject&TranslatorInterface
      */
     private $translator;
@@ -93,6 +99,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->stageRepository = $this->createMock(StageRepository::class);
         $this->categoryModel   = $this->createMock(CategoryModel::class);
         $this->assetModel      = $this->createMock(AssetModel::class);
+        $this->formModel       = $this->createMock(FormModel::class);
         $this->translator      = $this->createMock(TranslatorInterface::class);
         $this->form            = $this->createMock(FormInterface::class);
         $this->subscriber      = new TypeOperatorSubscriber(
@@ -103,6 +110,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->stageModel,
             $this->categoryModel,
             $this->assetModel,
+            $this->formModel,
             $this->translator
         );
 
@@ -168,6 +176,11 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with('asset')
             ->willReturn([['title' => 'Asset G', 'id' => 88]]);
 
+        $this->formModel->expects($this->once())
+            ->method('getSimpleList')
+            ->with('', 0)
+            ->willReturn([['name' => 'Form H', 'id' => 75]]);
+
         $this->subscriber->onTypeListCollect($event);
 
         $choicesForAliases = $event->getChoicesForAllListFieldAliases();
@@ -183,6 +196,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['En' => ['Email F' => 77]], $choicesForAliases['lead_email_sent']);
         $this->assertSame('smartphone', $choicesForAliases['device_type']['smartphone']);
         $this->assertSame(['Asset G' => 88], $choicesForAliases['lead_asset_download']);
+        $this->assertSame(['Form H' => 75], $choicesForAliases['forms']);
         $this->assertSame('SA', $choicesForAliases['device_brand']['Samsung']);
         $this->assertSame('Android', $choicesForAliases['device_os']['Android']);
         $this->assertArrayHasKey('Europe', $choicesForTypes['timezone']);
