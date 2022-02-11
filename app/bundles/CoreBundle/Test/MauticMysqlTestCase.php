@@ -186,27 +186,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     private function createDatabase()
     {
-        $this->runCommand(
-            'doctrine:database:drop',
-            [
-                '--env'   => 'test',
-                '--force' => true,
-            ]
-        );
-
-        $this->runCommand(
-            'doctrine:database:create',
-            [
-                '--env' => 'test',
-            ]
-        );
-
-        $this->runCommand(
-            'doctrine:schema:create',
-            [
-                '--env' => 'test',
-            ]
-        );
+        $this->runCommand('doctrine:database:drop', ['--if-exists' => true, '--force' => true]);
+        $this->runCommand('doctrine:database:create');
+        $this->runCommand('doctrine:schema:create');
     }
 
     /**
