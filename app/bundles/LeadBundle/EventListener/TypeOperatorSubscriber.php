@@ -371,7 +371,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
      */
     private function getFormsChoices(): array
     {
-        return $this->makeChoices($this->formModel->getRepository()->getFormList('', 0, 0, true), 'name', 'id');
+        return $this->makeChoices($this->formModel->getSimpleList('', 0), 'name', 'id');
     }
 
     /**

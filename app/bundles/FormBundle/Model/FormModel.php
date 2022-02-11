@@ -965,6 +965,21 @@ class FormModel extends CommonFormModel
     }
 
     /**
+     * Get a list of forms for segments filter.
+     *
+     * @param string $search
+     * @param int    $limit
+     *
+     * @return array
+     */
+    public function getSimpleList($search = '', $limit = 10)
+    {
+        $repo = $this->getRepository();
+
+        return $repo->getFormList($search, $limit, 0, true);
+    }
+
+    /**
      * Load HTML consider Libxml < 2.7.8.
      *
      * @param $html
