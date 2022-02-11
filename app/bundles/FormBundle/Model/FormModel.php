@@ -970,7 +970,7 @@ class FormModel extends CommonFormModel
      * @param string $search
      * @param int    $limit
      *
-     * @return array
+     * @return array<mixed>
      */
     public function getSimpleList($search = '', $limit = 10)
     {

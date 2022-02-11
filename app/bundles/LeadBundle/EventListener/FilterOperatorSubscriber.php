@@ -308,7 +308,6 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             ],
             'submission_form' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.submission_form'),
-                'properties' => ['type' => 'forms'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
                 'properties' => [
