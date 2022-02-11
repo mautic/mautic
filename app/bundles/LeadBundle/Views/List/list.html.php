@@ -57,6 +57,37 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'segment',
+                        'orderBy'    => 'l.dateAdded',
+                        'text'       => 'mautic.lead.import.label.dateAdded',
+                        'class'      => 'visible-md visible-lg col-leadlist-dateAdded',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'segment',
+                        'orderBy'    => 'l.dateModified',
+                        'text'       => 'mautic.lead.import.label.dateModified',
+                        'class'      => 'visible-md visible-lg col-leadlist-dateModified',
+                        'default'    => true,
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'segment',
+                        'orderBy'    => 'l.createdByUser',
+                        'text'       => 'mautic.core.createdby',
+                        'class'      => 'visible-md visible-lg col-leadlist-createdByUser',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'segment',
                         'orderBy'    => 'l.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-leadlist-id',
@@ -144,6 +175,13 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             ); ?>
                         </a>
                     </td>
+                    <td class="visible-md visible-lg" title="<?php echo $item->getDateAdded() ? $view['date']->toFullConcat($item->getDateAdded()) : ''; ?>">
+                        <?php echo $item->getDateAdded() ? $view['date']->toDate($item->getDateAdded()) : ''; ?>
+                    </td>
+                    <td class="visible-md visible-lg" title="<?php echo $item->getDateModified() ? $view['date']->toFullConcat($item->getDateModified()) : ''; ?>">
+                        <?php echo $item->getDateModified() ? $view['date']->toDate($item->getDateModified()) : ''; ?>
+                    </td>
+                    <td class="visible-md visible-lg"><?php echo $view->escape($item->getCreatedByUser()); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
