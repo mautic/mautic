@@ -11,6 +11,7 @@
 
 namespace Mautic\SmsBundle\Broadcast;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\ContactLimiterTrait;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -51,11 +52,7 @@ class BroadcastQuery
      */
     public function getPendingContacts(Sms $sms, ContactLimiter $contactLimiter)
     {
-        $query = $this->getBasicQuery($sms);
-        $query->select('DISTINCT l.id, ll.id as listId');
-        $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
-        $query->groupBy('l.id');
-        $query->orderBy('l.id');
+        $query = $this->getPendingContactsQuery($sms, $contactLimiter);
 
         return $query->execute()->fetchAll();
     }
@@ -141,5 +138,16 @@ class BroadcastQuery
                 )
             );
         $this->query->andWhere(sprintf('NOT EXISTS (%s)', $mqQb->getSQL()));
+    }
+
+    public function getPendingContactsQuery(Sms $sms, ContactLimiter $contactLimiter): QueryBuilder
+    {
+        $query = $this->getBasicQuery($sms);
+        $query->select('DISTINCT l.id, ll.id as listId');
+        $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
+        $query->groupBy('l.id');
+        $query->orderBy('l.id');
+
+        return $query;
     }
 }
