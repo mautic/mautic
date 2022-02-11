@@ -34,7 +34,7 @@ try {
     $latestVersionException = $e;
 }
 
-if (isset($latestVersion)) {
+if (isset($latestVersion) && $latestVersion->issues) {
     $buttons[] = [
         'attr' => [
             'href'   => $latestVersion->issues,
