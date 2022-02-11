@@ -373,7 +373,7 @@ return [
         ],
         'other' => [
             'mautic.guzzle.client.factory' => [
-                'class' => \Mautic\EmailBundle\Swiftmailer\Guzzle\ClientFactory::class,
+                'class' => \Mautic\EmailBundle\Mailer\Guzzle\ClientFactory::class,
             ],
             /**
              * Needed for Sparkpost integration. Can be removed when this integration is moved to
@@ -698,6 +698,7 @@ return [
         'mailer_spool_time_limit'        => null,
         'mailer_spool_recover_timeout'   => 900,
         'mailer_dsn'                     => 'null://null',
+        'mailer_messenger_dsn'           => 'sync://',
         'unsubscribe_text'               => null,
         'webview_text'                   => null,
         'unsubscribe_message'            => null,
