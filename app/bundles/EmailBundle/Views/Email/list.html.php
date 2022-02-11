@@ -37,7 +37,6 @@ if ('index' == $tmpl) {
                         'orderBy'    => 'e.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-email-name',
-                        'default'    => true,
                     ]
                 );
 
@@ -73,6 +72,7 @@ if ('index' == $tmpl) {
                         'orderBy'    => 'e.dateModified',
                         'text'       => 'mautic.lead.import.label.dateModified',
                         'class'      => 'visible-lg col-email-dateModified',
+                        'default'    => true,
                     ]
                 );
                 ?>
