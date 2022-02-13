@@ -5,7 +5,7 @@ version: "3.6"
 services:
   redis:
     container_name: ddev-${DDEV_SITENAME}-redis
-    image: redis:4
+    image: redis:5
     ports:
       - 6379
     labels:
