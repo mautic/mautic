@@ -95,12 +95,12 @@ $container->loadFromExtension('framework', [
         'transports'  => [
             'email_transport' => [
                 'dsn' => '%env(MAUTIC_MESSENGER_EMAIL_TRANSPORT_DSN)%',
-            ]
+            ],
         ],
         'routing' => [
             'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
-        ]
-    ]
+        ],
+    ],
 
     /*'validation'           => array(
         'static_method' => array('loadValidatorMetadata')
