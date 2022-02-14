@@ -72,6 +72,8 @@ class PointSubscriber implements EventSubscriberInterface
         $addTags    = $properties['add_tags'] ?: [];
         $removeTags = $properties['remove_tags'] ?: [];
 
-        $this->leadModel->modifyTags($event->getLead(), $addTags, $removeTags);
+        if ($this->leadModel->modifyTags($event->getLead(), $addTags, $removeTags)) {
+            $event->setSucceded();
+        }
     }
 }

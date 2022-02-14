@@ -27,7 +27,7 @@ class TriggerEventRepository extends CommonRepository
         $q = $this->createQueryBuilder('a')
             ->select('partial a.{id, type, name, properties}, partial r.{id, name, points, color}')
             ->leftJoin('a.trigger', 'r')
-            ->orderBy('a.order');
+            ->orderBy('a.order,r.points');
 
         //make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q, 'r');
