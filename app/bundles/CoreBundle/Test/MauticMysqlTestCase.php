@@ -13,19 +13,14 @@ use Symfony\Component\Process\Process;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
-    /**
-     * @var bool
-     */
-    private static $databasePrepared = false;
+    private bool $databaseInstalled = false;
 
     /**
      * Use transaction rollback for cleanup. Sometimes it is not possible to use it because of the following:
      *     1. A query that alters a DB schema causes an open transaction being committed immediately.
      *     2. Full-text search does not see uncommitted changes.
-     *
-     * @var bool
      */
-    protected $useCleanupRollback = true;
+    protected bool $useCleanupRollback = true;
 
     /**
      * @param array<mixed> $data
@@ -46,9 +41,15 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         parent::setUp();
 
-        if (!self::$databasePrepared) {
+        if (!$this->isDatabasePrepared()) {
             $this->prepareDatabase();
-            self::$databasePrepared = true;
+
+            if ($this->databaseInstalled) {
+                // re-create client/container as some services can be already wired
+                parent::setUpSymfony($this->configParams);
+            }
+
+            $this->markDatabasePrepared();
         }
 
         if ($this->useCleanupRollback) {
@@ -194,6 +195,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $this->createDatabase();
         $this->applyMigrations();
         $this->installDatabaseFixtures([LeadFieldData::class, RoleData::class, LoadRoleData::class, LoadUserData::class]);
+        $this->databaseInstalled = true;
     }
 
     /**
@@ -245,5 +247,20 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         putenv('SHELL_VERBOSITY='.$defaultVerbosity);
         $_ENV['SHELL_VERBOSITY']    = $defaultVerbosity;
         $_SERVER['SHELL_VERBOSITY'] = $defaultVerbosity;
+    }
+
+    private function getSqlFilePath(string $name): string
+    {
+        return sprintf('%s/%s.sql', self::$container->getParameter('kernel.cache_dir'), $name);
+    }
+
+    private function isDatabasePrepared(): bool
+    {
+        return file_exists($this->getSqlFilePath('prepared'));
+    }
+
+    private function markDatabasePrepared(): void
+    {
+        touch($this->getSqlFilePath('prepared'));
     }
 }
