@@ -33,7 +33,7 @@ modified_files.txt
 node_modules/*
 package-lock.json
 package.json
-phpstan.neon
+phpstan*.neon
 rector.yaml
 tests/*
 vendor/babdev/*
