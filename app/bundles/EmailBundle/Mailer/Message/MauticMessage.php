@@ -16,29 +16,29 @@ use Symfony\Component\Mime\Email;
 class MauticMessage extends Email
 {
     /**
-     * @var array
+     * @var array<string, array<string, string>>
      */
     protected $metadata = [];
+
+    protected ?string $leadIdHash;
 
     /**
      * Create a new Message.
      *
      * @param string $subject
      * @param string $body
-     *
-     * @return Email
      */
-    public static function newInstance($subject = null, $body = null)
+    public static function newInstance(?string $subject = null, ?string $body = null): MauticMessage
     {
-        return (new Email())
+        return (new self())
             ->subject($subject)
             ->html($body);
     }
 
     /**
-     * @param $email
+     * @param array<string, string> $metadata
      */
-    public function addMetadata($email, array $metadata)
+    public function addMetadata(string $email, array $metadata): void
     {
         $this->metadata[$email] = $metadata;
     }
@@ -46,9 +46,9 @@ class MauticMessage extends Email
     /**
      * Get the metadata.
      *
-     * @return array
+     * @return array<string, array<string, string>>
      */
-    public function getMetadata()
+    public function getMetadata(): array
     {
         return $this->metadata;
     }
@@ -56,18 +56,18 @@ class MauticMessage extends Email
     /**
      * Clears the metadata.
      */
-    public function clearMetadata()
+    public function clearMetadata(): void
     {
         $this->metadata = [];
     }
 
     /**
-     * @param            $filePath
+     * @param string     $filePath
      * @param null       $fileName
      * @param null       $contentType
      * @param bool|false $inline
      */
-    public function addAttachment($filePath, $fileName = null, $contentType = null, $inline = false)
+    public function addAttachment($filePath, $fileName = null, $contentType = null, $inline = false): void
     {
         if (true === $inline) {
             $this->embedFromPath($filePath, $fileName, $contentType);
@@ -76,5 +76,15 @@ class MauticMessage extends Email
         }
 
         $this->attachFromPath($filePath, $fileName, $contentType);
+    }
+
+    public function updateLeadIdHash(?string $hash): void
+    {
+        $this->leadIdHash = $hash;
+    }
+
+    public function getLeadIdHash(): ?string
+    {
+        return $this->leadIdHash;
     }
 }

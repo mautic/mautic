@@ -118,10 +118,11 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     public function onEmailFailed(Events\QueueEmailEvent $event)
     {
-        $message = $event->getMessage();
+        $message    = $event->getMessage();
+        $leadIdHash = $message->getLeadIdHash();
 
-        if (isset($message->leadIdHash)) {
-            $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
+        if (isset($leadIdHash)) {
+            $stat = $this->emailModel->getEmailStatus($leadIdHash);
 
             if (null !== $stat) {
                 $reason = $this->translator->trans('mautic.email.dnc.failed', [
@@ -137,10 +138,11 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     public function onEmailResend(Events\QueueEmailEvent $event)
     {
-        $message = $event->getMessage();
+        $message    = $event->getMessage();
+        $leadIdHash = $message->getLeadIdHash();
 
-        if (isset($message->leadIdHash)) {
-            $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
+        if (isset($leadIdHash)) {
+            $stat = $this->emailModel->getEmailStatus($leadIdHash);
             if (null !== $stat) {
                 $stat->upRetryCount();
 

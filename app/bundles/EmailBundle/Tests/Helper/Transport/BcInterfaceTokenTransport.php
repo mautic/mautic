@@ -15,6 +15,7 @@ use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 
 class BcInterfaceTokenTransport implements TransportInterface
@@ -22,7 +23,6 @@ class BcInterfaceTokenTransport implements TransportInterface
     private $fromAddresses = [];
     private $metadatas     = [];
     private $validate      = false;
-    private $maxRecipients;
     private $numberToFail;
     private $message;
 
@@ -31,16 +31,18 @@ class BcInterfaceTokenTransport implements TransportInterface
      *
      * @param bool $validate
      */
-    public function __construct($validate = false, $maxRecipients = 4, $numberToFail = 1)
+    public function __construct($validate = false, $numberToFail = 1)
     {
         $this->validate      = $validate;
-        $this->maxRecipients = $maxRecipients;
         $this->numberToFail  = (int) $numberToFail;
     }
 
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
-        $address = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+        $address = null;
+        if ($message instanceof Email) {
+            $address = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+        }
 
         $this->message         = $message;
         $this->fromAddresses[] = $address;
@@ -49,23 +51,17 @@ class BcInterfaceTokenTransport implements TransportInterface
         return null;
     }
 
-    /**
-     * @return array
-     */
-    public function getFromAddresses()
+    public function getFromAddresses(): array
     {
         return $this->fromAddresses;
     }
 
-    /**
-     * @return array
-     */
-    public function getMetadatas()
+    public function getMetadatas(): array
     {
         return $this->metadatas;
     }
 
-    public function getMetadata()
+    public function getMetadata(): array
     {
         return ($this->message instanceof MauticMessage) ? $this->message->getMetadata() : [];
     }

@@ -24,7 +24,7 @@ use Symfony\Component\Mime\RawMessage;
 
 class TestTransport implements TransportInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
 {
-    private $nullTransport;
+    private NullTransport $nullTransport;
 
     public function __construct()
     {

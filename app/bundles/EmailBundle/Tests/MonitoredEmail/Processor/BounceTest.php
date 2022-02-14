@@ -72,7 +72,7 @@ class BounceTest extends \PHPUnit\Framework\TestCase
         $statRepo = $this->getMockBuilder(StatRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $statRepo->expects($this->never())
+        $statRepo->expects($this->once())
             ->method('saveEntity');
 
         $leadModel = $this->getMockBuilder(LeadModel::class)
@@ -92,7 +92,7 @@ class BounceTest extends \PHPUnit\Framework\TestCase
         $bouncer = new Bounce($transport, $contactFinder, $statRepo, $leadModel, $translator, $logger, $doNotContact);
 
         $message = new Message();
-        $this->assertFalse($bouncer->process($message));
+        $this->assertTrue($bouncer->process($message));
     }
 
     /**

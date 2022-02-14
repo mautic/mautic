@@ -19,9 +19,9 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
 use Mautic\EmailBundle\EventListener\EmailSubscriber;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailModel;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Mime\Email;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -52,7 +52,7 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
     private $em;
 
     /**
-     * @var MockObject|Email
+     * @var MockObject|MauticMessage
      */
     private $mockMessage;
 
@@ -70,13 +70,16 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->emailModel       = $this->createMock(EmailModel::class);
         $this->translator       = $this->createMock(TranslatorInterface::class);
         $this->em               = $this->createMock(EntityManager::class);
-        $this->mockMessage      = $this->createMock(Email::class);
+        $this->mockMessage      = $this->createMock(MauticMessage::class);
         $this->subscriber       = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator, $this->em);
     }
 
     public function testOnEmailResendWhenShouldTryAgain(): void
     {
-        $this->mockMessage->leadIdHash = 'idhash';
+        $this->mockMessage
+            ->expects($this->once())
+            ->method('getLeadIdHash')
+            ->willReturn('idhash');
 
         $queueEmailEvent = new QueueEmailEvent($this->mockMessage);
 
@@ -93,7 +96,10 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWhenShouldNotTryAgain(): void
     {
-        $this->mockMessage->leadIdHash = 'idhash';
+        $this->mockMessage
+            ->expects($this->once())
+            ->method('getLeadIdHash')
+            ->willReturn('idhash');
 
         $this->mockMessage->expects($this->once())
             ->method('getSubject')

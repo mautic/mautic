@@ -25,7 +25,6 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToContact;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stat\StatHelper;
-use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -325,8 +324,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     ->send();
             } catch (FailedToSendToContactException $exception) {
                 // We're good here
-            } catch (BatchQueueMaxException $exception) {
-                $this->fail('BatchQueueMaxException thrown');
             }
         }
 
@@ -478,8 +475,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     ->send();
             } catch (FailedToSendToContactException $exception) {
                 // We're good here
-            } catch (BatchQueueMaxException $exception) {
-                $this->fail('BatchQueueMaxException thrown');
             }
         }
 
@@ -623,8 +618,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     ->send();
             } catch (FailedToSendToContactException $exception) {
                 $this->fail('FailedToSendToContactException thrown: '.$exception->getMessage());
-            } catch (BatchQueueMaxException $exception) {
-                $this->fail('BatchQueueMaxException thrown: '.$exception->getMessage());
             }
         }
 
@@ -756,8 +749,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     ->send();
             } catch (FailedToSendToContactException $exception) {
                 // We're good here
-            } catch (BatchQueueMaxException $exception) {
-                $this->fail('BatchQueueMaxException thrown');
             }
         }
 
