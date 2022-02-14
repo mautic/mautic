@@ -45,7 +45,7 @@ class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
         });
 
         $email = new Email();
-        $email->setSubject("A unicorn spotted in Alaska");
+        $email->setSubject('A unicorn spotted in Alaska');
         $email->setLanguage($emailLocale);
 
         $emailSendEvent = new EmailSendEvent(null, ['email' => $email]);
@@ -60,52 +60,52 @@ class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
         yield [
             '<html><head></head></html>',
             '<html lang="en"><head><title>A unicorn spotted in Alaska</title></head></html>',
-            'en'
+            'en',
         ];
         yield [
             '<html><head></head></html>',
             '<html lang="es"><head><title>A unicorn spotted in Alaska</title></head></html>',
-            'es'
+            'es',
         ];
         yield [
             '<html><head></head></html>',
             '<html lang="default_locale"><head><title>A unicorn spotted in Alaska</title></head></html>',
-            null
+            null,
         ];
         yield [
             "<html>\n\n<head>\n</head>\n</html>",
             "<html lang=\"en\">\n\n<head>\n<title>A unicorn spotted in Alaska</title></head>\n</html>",
-            'en'
+            'en',
         ];
         yield [
             '<html lang="en"><head></head></html>',
             '<html lang="en"><head><title>A unicorn spotted in Alaska</title></head></html>',
-            'en'
+            'en',
         ];
         yield [
             '<html lang="en"><head></head></html>',
             '<html lang="en"><head><title>A unicorn spotted in Alaska</title></head></html>',
-            'es'
+            'es',
         ];
         yield [
             '<html lang="cs_CZ"><head></head></html>',
             '<html lang="cs_CZ"><head><title>A unicorn spotted in Alaska</title></head></html>',
-            'en'
+            'en',
         ];
         yield [
             '<html lang="en"><head><title>Existed Title</title></head></html>',
             '<html lang="en"><head><title>Existed Title</title></head></html>',
-            'en'
+            'en',
         ];
         yield [
             '<head><title>Existed Title</title></head>',
             '<head><title>Existed Title</title></head>',
-            'en'
+            'en',
         ];
         yield [
             '<html><body>xxx</body></html>',
             '<html lang="en"><head><title>A unicorn spotted in Alaska</title></head><body>xxx</body></html>',
-            'en'
+            'en',
         ];
     }
 }
