@@ -70,6 +70,7 @@ if ('index' == $tmpl) {
                     [
                         'sessionVar' => 'email',
                         'orderBy'    => 'e.dateModified',
+                        'defaultDir' => 'DESC',
                         'text'       => 'mautic.lead.import.label.dateModified',
                         'class'      => 'visible-lg col-email-dateModified',
                         'default'    => true,
