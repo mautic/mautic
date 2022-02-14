@@ -544,9 +544,13 @@ class CommonController extends Controller implements MauticController
         }
         $name = 'mautic.'.$name;
 
+        if (false === $this->request->query->has('orderby') && false === $session->has("$name.orderbydir")) {
+            $session->set("$name.orderbydir", method_exists($this, 'getDefaultOrderDirection') ? $this->getDefaultOrderDirection() : 'ASC');
+        }
+
         if ($this->request->query->has('orderby')) {
             $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
-            $dir     = $session->get("$name.orderbydir", method_exists($this, 'getDefaultOrderDirection') ? $this->getDefaultOrderDirection() : 'ASC');
+            $dir     = $session->get("$name.orderbydir", 'ASC');
             $dir     = ('ASC' == $dir) ? 'DESC' : 'ASC';
             $session->set("$name.orderby", $orderBy);
             $session->set("$name.orderbydir", $dir);
