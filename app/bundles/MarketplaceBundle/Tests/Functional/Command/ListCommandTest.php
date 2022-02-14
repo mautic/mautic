@@ -59,7 +59,7 @@ final class ListCommandTest extends AbstractMauticTestCase
         EOF;
 
         Assert::assertStringContainsString($expected, $result->getDisplay());
-        Assert::assertSame(Command::SUCCESS, $result->getStatusCode());
+        Assert::assertSame(0, $result->getStatusCode());
     }
 
     public function testCommmandWithAllowlist(): void
@@ -141,6 +141,6 @@ final class ListCommandTest extends AbstractMauticTestCase
         EOF;
 
         Assert::assertStringContainsString($expected, $result->getDisplay());
-        Assert::assertSame(Command::SUCCESS, $result->getStatusCode());
+        Assert::assertSame(0, $result->getStatusCode());
     }
 }

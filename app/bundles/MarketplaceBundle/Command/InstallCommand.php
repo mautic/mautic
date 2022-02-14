@@ -65,12 +65,12 @@ class InstallCommand extends Command
         $output->writeln('Installing '.$input->getArgument('package').', this might take a while...');
         $result = $this->composer->install($input->getArgument('package'), $dryRun);
 
-        if (Command::SUCCESS !== $result->exitCode) {
+        if (0 !== $result->exitCode) {
             throw new InstallException('Error while installing this plugin: '.$result->output);
         }
 
         $output->writeln('All done! '.$input->getArgument('package').' has successfully been installed.');
 
-        return Command::SUCCESS;
+        return 0;
     }
 }

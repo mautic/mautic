@@ -27,6 +27,6 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(Command::SUCCESS, $result->getStatusCode());
+        Assert::assertSame(0, $result->getStatusCode());
     }
 }
