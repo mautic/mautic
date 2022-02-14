@@ -251,36 +251,39 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function fixEmailAccessibility(EmailSendEvent $event)
+    public function fixEmailAccessibility(EmailSendEvent $event): void
     {
-        if ($event->isDynamicContentParsing()) {
+        if ($event->isDynamicContentParsing() || !$event->getEmail() instanceof Email) {
             // prevent a loop
             return;
         }
+
         $content = $event->getContent();
-        $content = preg_replace_callback(
-                "/<title>(.*?)<\/title>/is",
-                function ($matches) {
-                    if (empty(trim($matches[1]))) {
-                        return '<title>{subject}</title>';
-                    }
+        $subject = $event->getEmail()->getSubject();
 
-                    return $matches[0];
-                },
-                $content,
-                -1,
-                $fixed
-            );
-
-        if (!$fixed) {
-            $content = str_replace('</head>', '<title>{subject}</title></head>', $content);
+        // Add the empty <head/> tag if it's missing.
+        if (empty(preg_match('#<\s*?head\b[^>]*>(.*?)</head\b[^>]*>#s', $content, $matches))) {
+            $content = str_replace('<body', '<head></head><body', $content);
         }
 
-        if ($event->getEmail()) {
-            preg_match_all("~<html.*lang\s*=\s*[\"']([^\"']+)[\"'][^>]*>~i", $content, $matches);
-            if (empty($matches[1])) {
-                $content = str_replace('<html', '<html lang="'.$event->getEmail()->getLanguage().'"', $content);
-            }
+        // Add the <title/> tag with email subject value into the <head/> tag if it's missing.
+        $content = preg_replace_callback(
+            "/<title>(.*?)<\/title>/is",
+            fn ($matches) => empty(trim($matches[1])) ? "<title>{$subject}</title>" : $matches[0],
+            $content,
+            -1,
+            $fixed
+        );
+
+        if (!$fixed) {
+            $content = str_replace('</head>', "<title>{$subject}</title></head>", $content);
+        }
+
+        // Add the lang attribute to the <html/> tag if it's missing.
+        $locale = $event->getEmail()->getLanguage() ?? $this->coreParametersHelper->get('locale');
+        preg_match_all("~<html.*lang\s*=\s*[\"']([^\"']+)[\"'][^>]*>~i", $content, $matches);
+        if (empty($matches[1])) {
+            $content = str_replace('<html', '<html lang="'.$locale.'"', $content);
         }
 
         $event->setContent($content);
@@ -326,8 +329,6 @@ class BuilderSubscriber implements EventSubscriberInterface
         $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
         $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
-        $event->addToken('{lang}', $email instanceof Email ? $email->getLanguage() : $this->coreParametersHelper->get(
-            'locale'));
     }
 
     /**

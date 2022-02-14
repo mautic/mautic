@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
@@ -19,19 +12,20 @@ use Mautic\EmailBundle\EventListener\BuilderSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider fixEmailAccessibilityContent
      */
-    public function testFixEmailAccessibility(string $content, string $expectedContent)
+    public function testFixEmailAccessibility(string $content, string $expectedContent, ?string $emailLocale): void
     {
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $emailModel           = $this->createMock(EmailModel::class);
         $trackableModel       = $this->createMock(TrackableModel::class);
         $redirectModel        = $this->createMock(RedirectModel::class);
-        $translator           = $this->createMock(\Symfony\Component\Translation\TranslatorInterface::class);
+        $translator           = $this->createMock(TranslatorInterface::class);
         $entityManager        = $this->createMock(EntityManager::class);
         $builderSubscriber    = new BuilderSubscriber(
             $coreParametersHelper,
@@ -42,20 +36,76 @@ class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
             $entityManager
         );
 
+        $coreParametersHelper->method('get')->willReturnCallback(function ($key) {
+            if ('locale' === $key) {
+                return 'default_locale';
+            }
+
+            return false;
+        });
+
         $email = new Email();
-        $email->setLanguage('en');
-        $emailSendEvent = new EmailSendEvent(null, ['email'=>$email]);
+        $email->setSubject("A unicorn spotted in Alaska");
+        $email->setLanguage($emailLocale);
+
+        $emailSendEvent = new EmailSendEvent(null, ['email' => $email]);
         $emailSendEvent->setContent($content);
         $builderSubscriber->fixEmailAccessibility($emailSendEvent);
-        $this->assertSame($emailSendEvent->getContent(), $expectedContent);
+        $builderSubscriber->onEmailGenerate($emailSendEvent);
+        $this->assertSame($expectedContent, $emailSendEvent->getContent());
     }
 
     public function fixEmailAccessibilityContent(): iterable
     {
-        yield ['<html><head></head></html>', '<html lang="en"><head><title>{subject}</title></head></html>'];
-        yield ['<html lang="en"><head></head></html>', '<html lang="en"><head><title>{subject}</title></head></html>'];
-        yield ['<html lang="en"><head><title>Existed Title</title></head></html>', '<html lang="en"><head><title>Existed Title</title></head></html>'];
-        yield ['<head><title>Existed Title</title></head>', '<head><title>Existed Title</title></head>'];
-        yield ['<html><body>xxx</body></html>', '<html lang="en"><body>xxx</body></html>'];
+        yield [
+            '<html><head></head></html>',
+            '<html lang="en"><head><title>A unicorn spotted in Alaska</title></head></html>',
+            'en'
+        ];
+        yield [
+            '<html><head></head></html>',
+            '<html lang="es"><head><title>A unicorn spotted in Alaska</title></head></html>',
+            'es'
+        ];
+        yield [
+            '<html><head></head></html>',
+            '<html lang="default_locale"><head><title>A unicorn spotted in Alaska</title></head></html>',
+            null
+        ];
+        yield [
+            "<html>\n\n<head>\n</head>\n</html>",
+            "<html lang=\"en\">\n\n<head>\n<title>A unicorn spotted in Alaska</title></head>\n</html>",
+            'en'
+        ];
+        yield [
+            '<html lang="en"><head></head></html>',
+            '<html lang="en"><head><title>A unicorn spotted in Alaska</title></head></html>',
+            'en'
+        ];
+        yield [
+            '<html lang="en"><head></head></html>',
+            '<html lang="en"><head><title>A unicorn spotted in Alaska</title></head></html>',
+            'es'
+        ];
+        yield [
+            '<html lang="cs_CZ"><head></head></html>',
+            '<html lang="cs_CZ"><head><title>A unicorn spotted in Alaska</title></head></html>',
+            'en'
+        ];
+        yield [
+            '<html lang="en"><head><title>Existed Title</title></head></html>',
+            '<html lang="en"><head><title>Existed Title</title></head></html>',
+            'en'
+        ];
+        yield [
+            '<head><title>Existed Title</title></head>',
+            '<head><title>Existed Title</title></head>',
+            'en'
+        ];
+        yield [
+            '<html><body>xxx</body></html>',
+            '<html lang="en"><head><title>A unicorn spotted in Alaska</title></head><body>xxx</body></html>',
+            'en'
+        ];
     }
 }
