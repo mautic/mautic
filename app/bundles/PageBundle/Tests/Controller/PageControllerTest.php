@@ -51,8 +51,17 @@ class PageControllerTest extends MauticMysqlTestCase
     public function testIndexAction(): void
     {
         $this->client->request('GET', '/s/pages');
-        $clientResponse = $this->client->getResponse();
+        $clientResponse  = $this->client->getResponse();
+        $responseContent = $clientResponse->getContent();
+
+        $dom = new \DOMDocument('1.0', 'utf-8');
+        $dom->loadHTML(mb_convert_encoding($responseContent, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+        $xpath = new \DOMXPath($dom);
+
         $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertStringContainsString('col-page-dateAdded', $responseContent, 'The return must contain the created at date column');
+        $this->assertStringContainsString('col-page-dateModified', $responseContent, 'The return must contain the modified date column');
+        $this->assertEquals(1, $xpath->query("//th[contains(@class,'col-page-dateModified')]//i[contains(@class, 'fa-sort-amount-desc')]")->count(), 'The order of date modified must be desc');
     }
 
     public function testLandingPageTracking()
