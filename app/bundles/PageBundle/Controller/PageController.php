@@ -1214,4 +1214,9 @@ class PageController extends FormController
 
         return $model->exportResultsForPage($format, $activePage, $args);
     }
+
+    protected function getDefaultOrderDirection()
+    {
+        return 'DESC';
+    }
 }
