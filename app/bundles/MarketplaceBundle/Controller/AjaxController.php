@@ -7,6 +7,7 @@ namespace Mautic\MarketplaceBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\ComposerHelper;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -14,11 +15,13 @@ class AjaxController extends CommonAjaxController
 {
     private ComposerHelper $composer;
     private CacheHelper $cacheHelper;
+    private LoggerInterface $logger;
 
-    public function __construct(ComposerHelper $composer, CacheHelper $cacheHelper)
+    public function __construct(ComposerHelper $composer, CacheHelper $cacheHelper, LoggerInterface $logger)
     {
         $this->composer    = $composer;
         $this->cacheHelper = $cacheHelper;
+        $this->logger      = $logger;
     }
 
     public function installPackageAction(Request $request): JsonResponse
@@ -27,7 +30,7 @@ class AjaxController extends CommonAjaxController
 
         if (empty($data['vendor']) || empty($data['package'])) {
             return $this->sendJsonResponse([
-                'error' => $this->translator->trans('test'),
+                'error' => $this->translator->trans('marketplace.package.request.details.missing'),
             ], 400);
         }
 
@@ -35,7 +38,7 @@ class AjaxController extends CommonAjaxController
 
         if ($this->composer->isInstalled($packageName)) {
             return $this->sendJsonResponse([
-                'error' => 'TODO already installed',
+                'error' => $this->translator->trans('marketplace.package.install.already.installed'),
             ], 400);
         }
 
@@ -44,13 +47,28 @@ class AjaxController extends CommonAjaxController
          * and cache clearing fails, users very likely will get server errors. We'd rather be safe than
          * sorry and clear the cache before and after installing the plugin.
          */
-        $exitCode = $this->cacheHelper->clearSymfonyCache();
+        $clearCacheResult = $this->clearCacheOrReturnError();
 
-        // TODO error handling
-        $this->composer->install($packageName);
+        if (null !== $clearCacheResult) {
+            return $clearCacheResult;
+        }
 
-        // TODO error handling
-        $exitCode = $this->cacheHelper->clearSymfonyCache();
+        try {
+            $installResult = $this->composer->install($packageName);
+
+            if (0 !== $installResult->exitCode) {
+                $this->installError(new \Exception($installResult->output));
+            }
+        } catch (\Exception $e) {
+            return $this->installError($e);
+        }
+
+        // Note: do not do anything except returning a response after clearing the cache to prevent errors
+        $clearCacheResult = $this->clearCacheOrReturnError();
+
+        if (null !== $clearCacheResult) {
+            return $clearCacheResult;
+        }
 
         return new JsonResponse(['success' => true]);
     }
@@ -61,7 +79,7 @@ class AjaxController extends CommonAjaxController
 
         if (empty($data['vendor']) || empty($data['package'])) {
             return $this->sendJsonResponse([
-                'error' => $this->translator->trans('test'),
+                'error' => $this->translator->trans('marketplace.package.request.details.missing'),
             ], 400);
         }
 
@@ -69,7 +87,7 @@ class AjaxController extends CommonAjaxController
 
         if (!$this->composer->isInstalled($packageName)) {
             return $this->sendJsonResponse([
-                'error' => 'TODO plugin not installed, cant remove',
+                'error' => $this->translator->trans('marketplace.package.remove.not.installed'),
             ], 400);
         }
 
@@ -78,20 +96,70 @@ class AjaxController extends CommonAjaxController
          * and cache clearing fails, users very likely will get server errors. We'd rather be safe than
          * sorry and clear the cache before and after removing the plugin.
          */
-        $exitCode = $this->cacheHelper->clearSymfonyCache();
+        $clearCacheResult = $this->clearCacheOrReturnError();
 
-        $composerResult = $this->composer->remove($packageName);
+        if (null !== $clearCacheResult) {
+            return $clearCacheResult;
+        }
 
-        if (0 !== $composerResult->exitCode) {
+        try {
+            $removeResult = $this->composer->remove($packageName);
+
+            if (0 !== $removeResult->exitCode) {
+                return $this->removeError(new \Exception($removeResult->output));
+            }
+        } catch (\Exception $e) {
+            return $this->removeError($e);
+        }
+
+        // Note: do not do anything except returning a response after clearing the cache to prevent errors
+        $clearCacheResult = $this->clearCacheOrReturnError();
+
+        if (null !== $clearCacheResult) {
+            return $clearCacheResult;
+        }
+
+        return new JsonResponse(['success' => true]);
+    }
+
+    private function clearCacheOrReturnError(): ?JsonResponse
+    {
+        try {
+            $exitCode = $this->cacheHelper->clearSymfonyCache();
+
+            if (0 !== $exitCode) {
+                $this->logger->error('Could not clear Mautic\'s cache. Please try again.');
+
+                return $this->sendJsonResponse([
+                    'error' => $this->translator->trans('marketplace.package.cache.clear.failed'),
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            $this->logger->error('Could not clear Mautic\'s cache. Details: '.$e->getMessage());
+
             return $this->sendJsonResponse([
-                'error' => 'Error while removing package using Composer:'.$composerResult->output,
+                'error' => $this->translator->trans('marketplace.package.cache.clear.failed'),
             ], 500);
         }
 
-        // Note: do not do anything except returning a response after clearing the cache
-        // TODO error handling
-        $exitCode = $this->cacheHelper->clearSymfonyCache();
+        return null;
+    }
 
-        return new JsonResponse(['success' => true]);
+    private function installError(\Exception $e): JsonResponse
+    {
+        $this->logger->error('Installation of plugin through Composer has failed: '.$e->getMessage());
+
+        return $this->sendJsonResponse([
+            'error' => $this->translator->trans('marketplace.package.install.failed'),
+        ], 500);
+    }
+
+    private function removeError(\Exception $e): JsonResponse
+    {
+        $this->logger->error('Error while removing package through Composer: '.$e->getMessage());
+
+        return $this->sendJsonResponse([
+            'error' => $this->translator->trans('marketplace.package.remove.failed'),
+        ], 500);
     }
 }
