@@ -58,11 +58,11 @@ if (!empty($checkall)):
 </th>
 <?php
 else:
-$defaultOrder    = (!empty($default)) ? $orderBy : '';
-$order           = (!empty($order)) ? $order : $app->getSession()->get("mautic.{$sessionVar}.orderby", $defaultOrder);
-$dir             = (!empty($dir)) ? $dir : $app->getSession()->get("mautic.{$sessionVar}.orderbydir", 'ASC');
-$filters         = (!empty($filters)) ? $filters : $app->getSession()->get("mautic.{$sessionVar}.filters", []);
-$tmpl            = (!empty($tmpl)) ? $tmpl : 'list';
+$defaultOrder = (!empty($default)) ? $orderBy : '';
+$order        = (!empty($order)) ? $order : $app->getSession()->get("mautic.{$sessionVar}.orderby", $defaultOrder);
+$dir          = (!empty($dir)) ? $dir : $app->getSession()->get("mautic.{$sessionVar}.orderbydir", 'ASC');
+$filters      = (!empty($filters)) ? $filters : $app->getSession()->get("mautic.{$sessionVar}.filters", []);
+$tmpl         = (!empty($tmpl)) ? $tmpl : 'list';
 ?>
 <th<?php echo (!empty($class)) ? ' class="'.$class.'"' : ''; ?>>
     <div class="thead-filter">
