@@ -110,6 +110,16 @@ class ComposerHelper
     }
 
     /**
+     * Returns a list of installed Composer packages that are of type mautic-plugin.
+     *
+     * @return string[]
+     */
+    public function getMauticPluginPackages(): array
+    {
+        return \Composer\InstalledVersions::getInstalledPackagesByType('mautic-plugin');
+    }
+
+    /**
      * Updates one or multiple Composer packages.
      */
     public function update(?string $packageName = null, bool $dryRun = false): ConsoleOutputModel

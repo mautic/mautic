@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Controller\AjaxController;
 use Mautic\MarketplaceBundle\Model\ConsoleOutputModel;
 use PHPUnit\Framework\Assert;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 final class AjaxControllerTest extends AbstractMauticTestCase
@@ -46,9 +47,12 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $cacheHelper = $this->createMock(CacheHelper::class);
         $cacheHelper->method('clearSymfonyCache')->willReturn(0);
 
+        $logger = $this->createMock(LoggerInterface::class);
+
         $controller = new AjaxController(
             $composer,
-            $cacheHelper
+            $cacheHelper,
+            $logger
         );
         $controller->setContainer(self::$container);
 

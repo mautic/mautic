@@ -38,7 +38,7 @@ class RemoveCommand extends Command
         $packageVendorAndName = $input->getArgument('package');
 
         // Just checking the package type so that the user doesn't accidentially removes a core package
-        if (!in_array($packageVendorAndName, \Composer\InstalledVersions::getInstalledPackagesByType('mautic-plugin'))) {
+        if (!in_array($packageVendorAndName, $this->composer->getMauticPluginPackages())) {
             $output->writeln('This package cannot be removed, it must be of type mautic-plugin');
 
             return 1;
