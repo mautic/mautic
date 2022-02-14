@@ -1,0 +1,9 @@
+[mysqld]
+innodb_flush_log_at_trx_commit=0
+#innodb_doublewrite=0
+#innodb_flush_method=O_DIRECT
+#innodb_file_per_table=off
+#innodb_read_io_threads=4
+#innodb_log_file_size = 64M
+#innodb_thread_concurrency=8
+#innodb_stats_on_metadata=0
