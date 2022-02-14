@@ -114,13 +114,7 @@ class PageController extends FormController
         }
 
         $orderBy    = $this->get('session')->get('mautic.page.orderby', 'p.dateModified');
-
-        $orderByDir = $this->get('session')->get('mautic.page.orderbydir');
-        if (!$orderByDir) {
-            $orderByDir = 'DESC';
-            $this->get('session')->set('mautic.page.orderbydir', $orderByDir);
-        }
-
+        $orderByDir = $this->get('session')->get('mautic.page.orderbydir', 'DESC');
         $pages      = $model->getEntities(
             [
                 'start'      => $start,
