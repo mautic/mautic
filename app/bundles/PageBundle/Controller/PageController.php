@@ -1007,4 +1007,211 @@ class PageController extends FormController
 <?php
         $slotsHelper->stop();
     }
+
+    /**
+     * Show submissions inside page.
+     *
+     * @param int $objectId
+     * @param int $page
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function resultsAction($objectId, $page = 1)
+    {
+        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
+        $pageModel    = $this->getModel('page.page');
+        $activePage   = $pageModel->getEntity($objectId);
+        $session      = $this->get('session');
+        $pageListPage = $session->get('mautic.page.page', 1);
+        $returnUrl    = $this->generateUrl('mautic_page_index', ['page' => $pageListPage]);
+
+        if (null === $activePage) {
+            //redirect back to page list
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => ['page' => $pageListPage],
+                    'contentTemplate' => 'MauticPageBundle:Page:index',
+                    'passthroughVars' => [
+                        'activeLink'    => 'mautic_page_index',
+                        'mauticContent' => 'page',
+                    ],
+                    'flashes' => [
+                        [
+                            'type'    => 'error',
+                            'msg'     => 'mautic.page.error.notfound',
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
+                ]
+            );
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            'page:pages:viewown',
+            'page:pages:viewother',
+            $activePage->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+        if ('POST' == $this->request->getMethod()) {
+            $this->setListFilters($this->request->query->get('name'));
+        }
+
+        //set limits
+        $limit = $session->get('mautic.pageresult.'.$objectId.'.limit', $this->coreParametersHelper->get('default_pagelimit'));
+
+        $page  = $page ?: 0;
+        $start = ($page <= 1) ? 0 : (($page - 1) * $limit);
+
+        // Set order direction to desc if not set
+        if (!$session->get('mautic.pageresult.'.$objectId.'.orderbydir', null)) {
+            $session->set('mautic.pageresult.'.$objectId.'.orderbydir', 'DESC');
+        }
+
+        $orderBy    = $session->get('mautic.pageresult.'.$objectId.'.orderby', 's.date_submitted');
+        $orderByDir = $session->get('mautic.pageresult.'.$objectId.'.orderbydir', 'DESC');
+        $filters    = $session->get('mautic.pageresult.'.$objectId.'.filters', []);
+
+        /** @var \Mautic\FormBundle\Model\SubmissionModel $model */
+        $model = $this->getModel('form.submission');
+
+        if ($this->request->query->has('result')) {
+            // Force ID
+            $filters['s.id'] = ['column' => 's.id', 'expr' => 'like', 'value' => (int) $this->request->query->get('result'), 'strict' => false];
+            $session->set("mautic.pageresult.$objectId.filters", $filters);
+        }
+        //get the results
+        $entities = $model->getEntitiesByPage(
+            [
+                'start'          => $start,
+                'limit'          => $limit,
+                'filter'         => ['force' => $filters],
+                'orderBy'        => $orderBy,
+                'orderByDir'     => $orderByDir,
+                'withTotalCount' => true,
+                'simpleResults'  => true,
+                'activePage'     => $activePage,
+            ]
+        );
+
+        $count   = $entities['count'];
+        $results = $entities['results'];
+        unset($entities);
+
+        if ($count && $count < ($start + 1)) {
+            //the number of entities are now less then the current page so redirect to the last page
+            $lastPage = (1 === $count) ? 1 : (((ceil($count / $limit)) ?: 1) ?: 1);
+            $session->set('mautic.pageresult.page', $lastPage);
+            $returnUrl = $this->generateUrl('mautic_page_results', ['objectId' => $objectId, 'page' => $lastPage]);
+
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => ['page' => $lastPage],
+                    'contentTemplate' => 'MauticPageBundle:Page:results',
+                    'passthroughVars' => [
+                        'activeLink'    => 'mautic_page_index',
+                        'mauticContent' => 'pageresult',
+                    ],
+                ]
+            );
+        }
+
+        //set what page currently on so that we can return here if need be
+        $session->set('mautic.pageresult.page', $page);
+
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'items'      => $results,
+                    'filters'    => $filters,
+                    'activePage' => $activePage,
+                    'page'       => $page,
+                    'totalCount' => $count,
+                    'limit'      => $limit,
+                    'tmpl'       => $tmpl,
+                ],
+                'contentTemplate' => 'MauticPageBundle:Result:list.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => 'mautic_page_index',
+                    'mauticContent' => 'pageresult',
+                    'route'         => $this->generateUrl(
+                        'mautic_page_results',
+                        [
+                            'objectId' => $objectId,
+                            'page'     => $page,
+                        ]
+                    ),
+                ],
+            ]
+        );
+    }
+
+    /**
+     * Export submissions from a page.
+     *
+     * @param int    $objectId
+     * @param string $format
+     *
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Exception
+     */
+    public function exportAction($objectId, $format = 'csv')
+    {
+        $pageModel    = $this->getModel('page.page');
+        $activePage   = $pageModel->getEntity($objectId);
+        $session      = $this->get('session');
+        $pageListPage = $session->get('mautic.page.page', 1);
+        $returnUrl    = $this->generateUrl('mautic_page_index', ['page' => $pageListPage]);
+
+        if (null === $activePage) {
+            //redirect back to page list
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => ['page' => $pageListPage],
+                    'contentTemplate' => 'MauticPageBundle:Page:index',
+                    'passthroughVars' => [
+                        'activeLink'    => 'mautic_page_index',
+                        'mauticContent' => 'page',
+                    ],
+                    'flashes' => [
+                        [
+                            'type'    => 'error',
+                            'msg'     => 'mautic.page.error.notfound',
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
+                ]
+            );
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            'page:pages:viewown',
+            'page:pages:viewother',
+            $activePage->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+        $orderBy    = $session->get('mautic.pageresult.'.$objectId.'.orderby', 's.date_submitted');
+        $orderByDir = $session->get('mautic.pageresult.'.$objectId.'.orderbydir', 'DESC');
+        $filters    = $session->get('mautic.pageresult.'.$objectId.'.filters', []);
+
+        $args = [
+            'limit'      => false,
+            'filter'     => ['force' => $filters],
+            'orderBy'    => $orderBy,
+            'orderByDir' => $orderByDir,
+            'activePage' => $activePage,
+        ];
+
+        /** @var \Mautic\FormBundle\Model\SubmissionModel $model */
+        $model = $this->getModel('form.submission');
+
+        return $model->exportResultsForPage($format, $activePage, $args);
+    }
 }

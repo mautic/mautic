@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -673,7 +674,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Make a basic call using cURL to get the data.
      *
-     * @param        $url
+     * @param string $url
      * @param array  $parameters
      * @param string $method
      * @param array  $settings   Set $settings['return_raw'] to receive a ResponseInterface
@@ -788,14 +789,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $options[CURLOPT_SSL_VERIFYPEER] = $settings['ssl_verifypeer'];
         }
 
-        /**
-         * Because so many integrations extend this class and mautic.http.client is not in the
-         * constructor at the time of writing, let's just create a new client here. In addition,
-         * we add some custom cURL options.
-         */
-        $client = new Client(['handler' => HandlerStack::create(new CurlHandler([
-            'options' => $options,
-        ]))]);
+        $client = $this->makeHttpClient($options);
 
         $parseHeaders = (isset($settings['headers'])) ? array_merge($headers, $settings['headers']) : $headers;
         // HTTP library requires that headers are in key => value pairs
@@ -818,23 +812,24 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             switch ($method) {
                 case 'GET':
                     $result = $client->get($url, [
-                        \GuzzleHttp\RequestOptions::HEADERS => $headers,
-                        \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                        RequestOptions::HEADERS => $headers,
+                        RequestOptions::TIMEOUT => $timeout,
                     ]);
                     break;
                 case 'POST':
                 case 'PUT':
                 case 'PATCH':
-                    $result = $client->request($method, $url, [
-                        \GuzzleHttp\RequestOptions::FORM_PARAMS => $parameters,
-                        \GuzzleHttp\RequestOptions::HEADERS     => $headers,
-                        \GuzzleHttp\RequestOptions::TIMEOUT     => $timeout,
+                    $payloadKey = is_string($parameters) ? RequestOptions::BODY : RequestOptions::FORM_PARAMS;
+                    $result     = $client->request($method, $url, [
+                        $payloadKey             => $parameters,
+                        RequestOptions::HEADERS => $headers,
+                        RequestOptions::TIMEOUT => $timeout,
                     ]);
                     break;
                 case 'DELETE':
                     $result = $client->delete($url, [
-                        \GuzzleHttp\RequestOptions::HEADERS => $headers,
-                        \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                        RequestOptions::HEADERS => $headers,
+                        RequestOptions::TIMEOUT => $timeout,
                     ]);
                     break;
             }
@@ -2535,5 +2530,19 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function getLeadDoNotContactByDate($channel, $records, $object, $lead, $integrationData, $params = [])
     {
         return $records;
+    }
+
+    /**
+     * Because so many integrations extend this class and mautic.http.client is not in the
+     * constructor at the time of writing, let's just create a new client here. In addition,
+     * we add some custom cURL options.
+     *
+     * @param mixed[] $options
+     */
+    protected function makeHttpClient(array $options): Client
+    {
+        return new Client(['handler' => HandlerStack::create(new CurlHandler([
+            'options' => $options,
+        ]))]);
     }
 }

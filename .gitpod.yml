@@ -6,7 +6,6 @@ image:
 # when starting a workspace all docker images are ready
 tasks:
   - before: bash .ddev/gitpod-setup-ddev.sh
-    init: ddev ddev-setup-mautic
     command: gp await-port 8080 && gp preview $(gp url 8080) 
 
 # VScode xdebug extension
@@ -17,38 +16,25 @@ vscode:
     - ziyasal.vscode-open-in-github
 
 ports:
+  # Ddev db port
+  - port: 3306
+    onOpen: ignore
+  # phpmyadmin https port
+  - port: 8027
+    onOpen: ignore
+  # mailhog https port
+  - port: 8036
+    onOpen: ignore
   # Main web port
   - port: 8080
     onOpen: ignore
     visibility: public
-  # mailhog http port
-  - port: 8025
-    onOpen: ignore
-    visibility: private
-  # mailhog https port
-  - port: 8026
-    onOpen: ignore
-    visibility: private
-  # phpmyadmin http port
-  - port: 8036
-    onOpen: ignore
-    visibility: private
-  # phpmyadmin https port
-  - port: 8037
-    onOpen: ignore
-    visibility: private
-  # router http port that we're ignoring.
-  - port: 8888
-    onOpen: ignore
-    visibility: private
   # router https port that we're ignoring.
-  - port: 8889
+  - port: 8443
     onOpen: ignore
-    visibility: private
   # xdebug port
   - port: 9000
     onOpen: ignore
-    visibility: private
 
 github:
   prebuilds:
