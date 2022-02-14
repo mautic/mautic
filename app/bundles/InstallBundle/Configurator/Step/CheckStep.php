@@ -11,6 +11,7 @@
 
 namespace Mautic\InstallBundle\Configurator\Step;
 
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\FileHelper;
@@ -119,11 +120,11 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.config.unwritable';
         }
 
-        if (!is_writable(str_replace('%kernel.root_dir%', $this->kernelRoot, $this->cache_path))) {
+        if (!is_writable($this->getCacheDir())) {
             $messages[] = 'mautic.install.cache.unwritable';
         }
 
-        if (!is_writable(str_replace('%kernel.root_dir%', $this->kernelRoot, $this->log_path))) {
+        if (!is_writable($this->getLogDir())) {
             $messages[] = 'mautic.install.logs.unwritable';
         }
 
@@ -284,5 +285,35 @@ class CheckStep implements StepInterface
         }
 
         return $parameters;
+    }
+    
+    private function getParameterLoader(): ParameterLoader
+    {
+        if ($this->parameterLoader) {
+            return $this->parameterLoader;
+        }
+
+        return $this->parameterLoader = new ParameterLoader();
+    }
+
+    public function getCacheDir(): string
+    {
+
+        if ($cachePath = $this->getParameterLoader()->getLocalParameterBag()->get('cache_path')) {
+            return str_replace('%kernel.root_dir%', $this->kernelRoot, $cachePath);
+        }
+        return dirname(__DIR__).'/var/cache/';
+
+    }
+
+    public function getLogDir(): string
+    {
+
+        if ($logPath = $this->getParameterLoader()->getLocalParameterBag()->get('log_path')) {
+            return str_replace('%kernel.root_dir%', $this->kernelRoot, $logPath);
+        }
+
+        return dirname(__DIR__).'/var/logs';
+
     }
 }
