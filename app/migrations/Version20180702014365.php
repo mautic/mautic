@@ -20,7 +20,7 @@ final class Version20180702014365 extends AbstractMauticMigration
             throw new SkipMigration('Schema does not need this migration');
         }
 
-        if (false === $schema->getTable($this->prefix.'lead_fields')->getColumn('original_is_published_value')->getDefault()) {
+        if ('0' === $schema->getTable($this->prefix.'lead_fields')->getColumn('original_is_published_value')->getDefault()) {
             throw new SkipMigration('Schema includes this migration');
         }
     }

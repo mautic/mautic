@@ -20,7 +20,7 @@ final class Version20180702014364 extends AbstractMauticMigration
             throw new SkipMigration('Schema does not need this migration');
         }
 
-        if (false === $schema->getTable($this->prefix.'lead_fields')->getColumn('column_is_not_created')->getDefault()) {
+        if ('0' === $schema->getTable($this->prefix.'lead_fields')->getColumn('column_is_not_created')->getDefault()) {
             throw new SkipMigration('Schema includes this migration');
         }
     }
