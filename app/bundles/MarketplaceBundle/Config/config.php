@@ -96,6 +96,7 @@ return [
                 'arguments' => [
                     'mautic.helper.composer',
                     'mautic.helper.cache',
+                    'monolog.logger.mautic',
                 ],
             ],
         ],

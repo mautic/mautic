@@ -152,7 +152,7 @@ $template  = '<div class="col-md-6">{content}</div>';
                 '<div class="col-md-6">{content}<span style="color:red">'.$view['translator']->trans(
                     'mautic.core.config.form.update.composer.warning',
                     [
-                        '%url_start%' => '<a href="https://mau.tc/TODO" target="_blank" style="color: red; text-decoration: underline">',
+                        '%url_start%' => '<a href="https://mau.tc/switch-to-composer" target="_blank" style="color: red; text-decoration: underline">',
                         '%url_end%'   => '</a>',
                     ]).'</div>'
             ); ?>
