@@ -1,42 +1,31 @@
 <?php
 
-/*
- * @package     Mautic
- * @copyright   2019 Mautic Contributors. All rights reserved.
- * @author      Mautic
- * @link        http://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
-class Version20180702014365 extends AbstractMauticMigration
+final class Version20180702014365 extends AbstractMauticMigration
 {
     /**
-     * @param Schema $schema
-     *
-     * @throws SkipMigrationException
+     * @throws SkipMigration
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema): void
     {
         if (!$schema->getTable($this->prefix.'lead_fields')->hasColumn('original_is_published_value')) {
-            throw new SkipMigrationException('Schema does not need this migration');
+            throw new SkipMigration('Schema does not need this migration');
         }
 
         if (false === $schema->getTable($this->prefix.'lead_fields')->getColumn('original_is_published_value')->getDefault()) {
-            throw new SkipMigrationException('Schema includes this migration');
+            throw new SkipMigration('Schema includes this migration');
         }
     }
 
-    /**
-     * @param Schema $schema
-     */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $this->addSql("ALTER TABLE {$this->prefix}lead_fields MODIFY original_is_published_value TINYINT(1) NOT NULL DEFAULT 0");
     }
