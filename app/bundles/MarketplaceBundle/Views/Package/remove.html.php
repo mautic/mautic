@@ -16,18 +16,28 @@ try {
 
 ?>
 <div class="text-center" id="marketplace-removal-in-progress">
-    <p><strong><?php echo $packageDetail->packageBase->getHumanPackageName(); ?></strong> is being removed. This might take a while...</p>
+    <p><?php echo $view['translator']->trans(
+        'marketplace.package.remove.html.in.progress',
+        ['%packagename%' => $packageDetail->packageBase->getHumanPackageName()]
+        ); ?></p>
     <div class="spinner">
         <i class="fa fa-spin fa-spinner"></i>
     </div>
 </div>
 <div style="display: none" class="text-center" id="marketplace-removal-failed">
-    <p>Something went wrong while removing <strong><?php echo $packageDetail->packageBase->getHumanPackageName(); ?></strong>. This is the error:</p>
+    <p><?php echo $view['translator']->trans(
+        'marketplace.package.remove.html.failed',
+        ['%packagename%' => $packageDetail->packageBase->getHumanPackageName()]
+        ); ?></p>
     <textarea class="form-control" readonly id="marketplace-removal-failed-details"></textarea>
 </div>
 <div style="display: none" class="text-center" id="marketplace-removal-success">
-    <p>Successfully removed <strong><?php echo $packageDetail->packageBase->getHumanPackageName(); ?></strong>!</p>
-    <p><a class="btn btn-primary" href="<?php echo $view['router']->path(RouteProvider::ROUTE_LIST); ?>">Back to marketplace overview</a></p>
+    <p><?php echo $view['translator']->trans(
+        'marketplace.package.remove.html.success',
+        ['%packagename%' => $packageDetail->packageBase->getHumanPackageName()]
+        ); ?></p>
+    <p><a class="btn btn-primary" href="<?php echo $view['router']->path(RouteProvider::ROUTE_LIST); ?>"><?php echo $view['translator']->trans(
+        'marketplace.package.remove.html.success.continue'); ?></a></p>
 </div>
 
 <script>

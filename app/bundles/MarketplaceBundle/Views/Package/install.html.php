@@ -14,18 +14,28 @@ try {
 }
 ?>
 <div class="text-center" id="marketplace-installation-in-progress">
-    <p><strong><?php echo $packageDetail->packageBase->getHumanPackageName(); ?></strong> is being installed. This might take a while...</p>
+    <p><?php echo $view['translator']->trans(
+        'marketplace.package.install.html.in.progress',
+        ['%packagename%' => $packageDetail->packageBase->getHumanPackageName()]
+        ); ?></p>
     <div class="spinner">
         <i class="fa fa-spin fa-spinner"></i>
     </div>
 </div>
 <div style="display: none" class="text-center" id="marketplace-installation-failed">
-    <p>Something went wrong while installing <strong><?php echo $packageDetail->packageBase->getHumanPackageName(); ?></strong>. This is the error:</p>
+    <p><?php echo $view['translator']->trans(
+        'marketplace.package.install.html.failed',
+        ['%packagename%' => $packageDetail->packageBase->getHumanPackageName()]
+        ); ?></p>
     <textarea class="form-control" readonly id="marketplace-installation-failed-details"></textarea>
 </div>
 <div style="display: none" class="text-center" id="marketplace-installation-success">
-    <p>Successfully installed <strong><?php echo $packageDetail->packageBase->getHumanPackageName(); ?></strong>!</p>
-    <p><a class="btn btn-primary" href="<?php echo $view['router']->path('mautic_plugin_reload'); ?>">Go to the plugin page to activate the plugin</a></p>
+    <p><?php echo $view['translator']->trans(
+        'marketplace.package.install.html.success',
+        ['%packagename%' => $packageDetail->packageBase->getHumanPackageName()]
+        ); ?></p>
+    <p><a class="btn btn-primary" href="<?php echo $view['router']->path('mautic_plugin_reload'); ?>"><?php echo $view['translator']->trans(
+        'marketplace.package.install.html.success.continue'); ?></a></p>
 </div>
 
 <script>
