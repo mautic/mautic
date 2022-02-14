@@ -52,9 +52,7 @@ class InstallCommand extends Command
             }
         }
 
-        $type = $package->versions[0]->type ?? null;
-
-        if (empty($type) || 'mautic-plugin' !== $type) {
+        if (empty($type) || 'mautic-plugin' !== $package->type) {
             throw new Exception('Package type is not mautic-plugin. Cannot install this plugin.');
         }
 
