@@ -42,17 +42,6 @@ class AjaxController extends CommonAjaxController
             ], 400);
         }
 
-        /**
-         * We first try clearing the cache to be 100% sure we can clear without problems. If we install a plugin
-         * and cache clearing fails, users very likely will get server errors. We'd rather be safe than
-         * sorry and clear the cache before and after installing the plugin.
-         */
-        $clearCacheResult = $this->clearCacheOrReturnError();
-
-        if (null !== $clearCacheResult) {
-            return $clearCacheResult;
-        }
-
         try {
             $installResult = $this->composer->install($packageName);
 
@@ -89,17 +78,6 @@ class AjaxController extends CommonAjaxController
             return $this->sendJsonResponse([
                 'error' => $this->translator->trans('marketplace.package.remove.not.installed'),
             ], 400);
-        }
-
-        /**
-         * We first try clearing the cache to be 100% sure we can clear without problems. If we delete a plugin
-         * and cache clearing fails, users very likely will get server errors. We'd rather be safe than
-         * sorry and clear the cache before and after removing the plugin.
-         */
-        $clearCacheResult = $this->clearCacheOrReturnError();
-
-        if (null !== $clearCacheResult) {
-            return $clearCacheResult;
         }
 
         try {
