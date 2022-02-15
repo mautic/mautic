@@ -105,7 +105,7 @@ class ReloadHelper
 
                     $event = new PluginUpdateEvent($plugin, $oldVersion);
 
-                    $this->eventDispatcher->dispatch(PluginEvents::ON_PLUGIN_UPDATE, $event);
+                    $this->eventDispatcher->dispatch($event, PluginEvents::ON_PLUGIN_UPDATE);
 
                     unset($metadata, $installedSchema);
 
@@ -143,7 +143,7 @@ class ReloadHelper
 
                 $event = new PluginInstallEvent($entity);
 
-                $this->eventDispatcher->dispatch(PluginEvents::ON_PLUGIN_INSTALL, $event);
+                $this->eventDispatcher->dispatch($event, PluginEvents::ON_PLUGIN_INSTALL);
 
                 $installedPlugins[$entity->getBundle()] = $entity;
             }

@@ -162,7 +162,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $plugin->setVersion('1.0.1');
         $plugin->setDescription('Updated description');
         $event = new PluginUpdateEvent($plugin, '1.0');
-        $this->eventDispatcher->expects($this->once())->method('dispatch')->with(PluginEvents::ON_PLUGIN_UPDATE, $event);
+        $this->eventDispatcher->expects($this->once())->method('dispatch')->with($event, PluginEvents::ON_PLUGIN_UPDATE);
         $updatedPlugins = $this->helper->updatePlugins($this->sampleAllPlugins, $sampleInstalledPlugins, $this->sampleMetaData, $this->sampleSchemas);
 
         $this->assertEquals(1, count($updatedPlugins));
@@ -178,7 +178,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
             'MauticHappierBundle' => $this->createSampleHappierPlugin(),
         ];
         $event = new PluginInstallEvent($this->createSampleZapierPlugin());
-        $this->eventDispatcher->expects($this->once())->method('dispatch')->with(PluginEvents::ON_PLUGIN_INSTALL, $event);
+        $this->eventDispatcher->expects($this->once())->method('dispatch')->with($event, PluginEvents::ON_PLUGIN_INSTALL);
 
         $installedPlugins = $this->helper->installPlugins($this->sampleAllPlugins, $sampleInstalledPlugins, $this->sampleMetaData, $this->sampleSchemas);
 
