@@ -114,7 +114,7 @@ return [
             'marketplace.command.remove' => [
                 'class'     => \Mautic\MarketplaceBundle\Command\RemoveCommand::class,
                 'tag'       => 'console.command',
-                'arguments' => ['mautic.helper.composer'],
+                'arguments' => ['mautic.helper.composer', 'monolog.logger.mautic'],
             ],
         ],
         'events' => [
