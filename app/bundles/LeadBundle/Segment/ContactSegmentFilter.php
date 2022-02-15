@@ -99,6 +99,14 @@ class ContactSegmentFilter
     }
 
     /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->contactSegmentFilterCrate->getType();
+    }
+
+    /**
      * @return mixed
      */
     public function getTable()
@@ -218,11 +226,17 @@ class ContactSegmentFilter
         );
     }
 
+    /**
+     * @return string|null
+     */
     public function getRelationJoinTable()
     {
         return method_exists($this->filterDecorator, 'getRelationJoinTable') ? $this->filterDecorator->getRelationJoinTable() : null;
     }
 
+    /**
+     * @return string|null
+     */
     public function getRelationJoinTableField()
     {
         return method_exists($this->filterDecorator, 'getRelationJoinTableField') ?
