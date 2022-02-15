@@ -82,84 +82,88 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedValues, $params);
     }
 
-    public function testCleanFieldsBoolean(): void
+    /**
+     * @dataProvider boolProvider
+     *
+     * @param string|int|bool|null $value
+     */
+    public function testCleanFieldsBoolean(?bool $expected, $value): void
     {
-        $fieldData = [
-            'boolVal' => true,
-        ];
-
+        $fieldData = ['boolVal' => $value];
         $leadField = [
             'alias' => 'boolVal',
             'type'  => 'boolean',
         ];
-        $expectedValues =
-            [
-                'boolVal' => true,
-            ];
+
         $this->cleanFields($fieldData, $leadField);
-        $this->assertSame($expectedValues, $fieldData);
+        $this->assertSame(['boolVal' => $expected], $fieldData);
+    }
+
+    /**
+     * @return iterable<array<?int,int|bool|string|null>>
+     */
+    public function boolProvider(): iterable
+    {
+        yield [true, '1'];
+        yield [true, 1];
+        yield [true, true];
+        yield [true, 'Y'];
+        yield [true, 'y'];
+        yield [true, 'yES'];
+        yield [true, 'T'];
+        yield [true, 't'];
+        yield [true, 'true'];
+        yield [null, null];
+        yield [false, '0'];
+        yield [false, 0];
+        yield [false, false];
+        yield [false, 'N'];
+        yield [false, 'n'];
+        yield [false, 'No'];
+        yield [false, 'F'];
+        yield [false, 'f'];
+        yield [false, 'false'];
     }
 
     public function testCleanFieldsDateTime(): void
     {
-        $fieldData = [
-            'fieldDateTime' => '10/10/2022 05:10:25',
-        ];
-
+        $fieldData = ['fieldDateTime' => '10/10/2022 05:10:25'];
         $leadField = [
             'alias' => 'fieldDateTime',
             'type'  => 'datetime',
         ];
-        $expectedValues =
-            [
-                'fieldDateTime' => '2022-10-10 05:10:25',
-            ];
+        $expectedValues = ['fieldDateTime' => '2022-10-10 05:10:25'];
         $this->cleanFields($fieldData, $leadField);
         $this->assertSame($expectedValues, $fieldData);
     }
 
     public function testCleanFieldsDate(): void
     {
-        $fieldData = [
-            'fieldDate' => '10/10/2022',
-        ];
-
+        $fieldData = ['fieldDate' => '10/10/2022'];
         $leadField = [
             'alias' => 'fieldDate',
             'type'  => 'date',
         ];
-        $expectedValues =
-            [
-                'fieldDate' => '2022-10-10',
-            ];
+        $expectedValues = ['fieldDate' => '2022-10-10'];
         $this->cleanFields($fieldData, $leadField);
         $this->assertSame($expectedValues, $fieldData);
     }
 
     public function testCleanFieldsTime(): void
     {
-        $fieldData = [
-            'fieldTime' => '05:20:10',
-        ];
-
+        $fieldData = ['fieldTime' => '05:20:10'];
         $leadField = [
             'alias' => 'fieldTime',
             'type'  => 'time',
         ];
-        $expectedValues =
-            [
-                'fieldTime' => '05:20:10',
-            ];
+        $expectedValues = ['fieldTime' => '05:20:10'];
         $this->cleanFields($fieldData, $leadField);
         $this->assertSame($expectedValues, $fieldData);
     }
 
     public function testCleanFieldsWrongDateTime(): void
     {
-        $fieldData = [
-            'fieldTime' => 'string',
-        ];
-
+        $fieldData = ['fieldTime' => 'string'];
         $leadField = [
             'alias' => 'fieldTime',
             'type'  => 'time',
@@ -171,10 +175,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testCleanFieldsMultiSelectArray(): void
     {
-        $fieldData = [
-            'fieldMultiSelect' => ['o1', 'o2', 'o3'],
-        ];
-
+        $fieldData = ['fieldMultiSelect' => ['o1', 'o2', 'o3']];
         $leadField = [
             'alias' => 'fieldMultiSelect',
             'type'  => 'multiselect',
@@ -186,10 +187,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testCleanFieldsMultiSelectString(): void
     {
-        $fieldData = [
-            'fieldMultiSelect' => 'o1|o2|o3',
-        ];
-
+        $fieldData = ['fieldMultiSelect' => 'o1|o2|o3'];
         $leadField = [
             'alias' => 'fieldMultiSelect',
             'type'  => 'multiselect',
@@ -201,10 +199,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testCleanFieldsNumber(): void
     {
-        $fieldData = [
-            'fieldFloat' => '3.2',
-        ];
-
+        $fieldData = ['fieldFloat' => '3.2'];
         $leadField = [
             'alias' => 'fieldFloat',
             'type'  => 'number',
@@ -216,10 +211,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testCleanFieldsEmail(): void
     {
-        $fieldData = [
-            'fieldEmail' => 'email@domain.com',
-        ];
-
+        $fieldData = ['fieldEmail' => 'email@domain.com'];
         $leadField = [
             'alias' => 'fieldEmail',
             'type'  => 'email',
