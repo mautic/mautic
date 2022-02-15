@@ -113,7 +113,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPStan', 'PHP CS Fixer', 'Rector', 'scaffolded files mismatch', 'PHPStan baseline changes']
+        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'scaffolded files mismatch', 'PHPStan baseline changes']
 
     name: ${{ matrix.commands }}
 
@@ -139,11 +139,11 @@ jobs:
     
     - name: Run ${{ matrix.commands }}
       run: |
-        if [[ "${{ matrix.commands }}" == "PHPStan" ]]; then
+        if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
           composer phpstan
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           composer rector -- --dry-run --no-progress-bar
-        elif [[ "${{ matrix.commands }}" == "PHP CS Fixer" ]]; then
+        elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
           for file in ${{ steps.changed-files.outputs.all_modified_files }}; do
             if [[ $file == *.php ]]; then
               cs_fix_files="${cs_fix_files} $file"
