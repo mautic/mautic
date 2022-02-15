@@ -34,6 +34,7 @@ jobs:
           - /tmp/mysql_config:/etc/mysql/conf.d
         options: >-
           --name ${{ matrix.db-types }}
+          --mount type=tmpfs,destination=/var/lib/mysql
           --health-cmd="mysqladmin ping" 
           --health-interval=10s 
           --health-timeout=5s 
@@ -51,6 +52,8 @@ jobs:
         sudo docker restart ${{ matrix.db-types }}
         new_port=$(sudo docker port ${{ matrix.db-types }} 3306 | cut -d\: -f2)
         echo "mysql_port=${new_port}" >> $GITHUB_ENV
+        sudo docker exec -it ${{ matrix.db-types }} df -h
+        exit 1
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
