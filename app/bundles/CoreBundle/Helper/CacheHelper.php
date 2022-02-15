@@ -11,31 +11,26 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class CacheHelper
 {
-    /**
-     * @var string
-     */
-    private $cacheDir;
+    private string $cacheDir;
+    private ?Session $session;
+    private PathsHelper $pathsHelper;
+    private KernelInterface $kernel;
 
-    /**
-     * @var Session
-     */
-    private $session;
-
-    /**
-     * @var string
-     */
-    private $configFile;
-
-    public function __construct(string $cacheDir, ?Session $session, PathsHelper $pathsHelper)
+    public function __construct(string $cacheDir, ?Session $session, PathsHelper $pathsHelper, KernelInterface $kernel)
     {
-        $this->cacheDir   = $cacheDir;
-        $this->session    = $session;
-        $this->configFile = $pathsHelper->getLocalConfigurationFile();
+        $this->cacheDir    = $cacheDir;
+        $this->session     = $session;
+        $this->pathsHelper = $pathsHelper;
+        $this->kernel      = $kernel;
     }
 
     /**
@@ -60,6 +55,26 @@ class CacheHelper
     }
 
     /**
+     * Run the bin/console cache:clear command.
+     */
+    public function clearSymfonyCache(): int
+    {
+        $env = $this->kernel->getEnvironment();
+
+        $application = new Application($this->kernel);
+        $application->setAutoExit(false);
+
+        $input = new ArrayInput([
+            'command' => 'cache:clear',
+            '--env'   => $env,
+        ]);
+
+        $output = new BufferedOutput();
+
+        return $application->run($input, $output);
+    }
+
+    /**
      * Clear cache related session items.
      */
     protected function clearSessionItems(): void
@@ -79,7 +94,7 @@ class CacheHelper
             return;
         }
 
-        opcache_invalidate($this->configFile, true);
+        opcache_invalidate($this->pathsHelper->getLocalConfigurationFile(), true);
     }
 
     private function clearOpcache(): void

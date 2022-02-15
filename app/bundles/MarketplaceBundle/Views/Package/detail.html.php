@@ -8,6 +8,10 @@ use Mautic\MarketplaceBundle\Service\RouteProvider;
 
 /** @var PackageDetail $packageDetail */
 $packageDetail = $packageDetail;
+/** @var bool $isInstalled */
+$isInstalled = $isInstalled;
+/** @var bool $isComposerEnabled */
+$isComposerEnabled = $isComposerEnabled;
 
 $view['slots']->set('headerTitle', $view->escape($packageDetail->packageBase->getHumanPackageName()));
 $view->extend('MauticCoreBundle:Default:content.html.php');
@@ -30,7 +34,7 @@ try {
     $latestVersionException = $e;
 }
 
-if (isset($latestVersion)) {
+if (isset($latestVersion) && $latestVersion->issues) {
     $buttons[] = [
         'attr' => [
             'href'   => $latestVersion->issues,
@@ -39,18 +43,41 @@ if (isset($latestVersion)) {
         ],
         'btnText'   => $view['translator']->trans('marketplace.package.issue.tracker'),
         'iconClass' => 'fa fa-question',
+        'primary'   => true,
     ];
 }
 
-if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) {
+if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES) && !$isInstalled && $isComposerEnabled) {
+    $installRoute = $view['router']->path(
+        RouteProvider::ROUTE_INSTALL,
+        ['vendor' => $packageDetail->packageBase->getVendorName(), 'package' => $packageDetail->packageBase->getPackageName()]
+    );
+
     $buttons[] = [
         'attr' => [
-            'data-toggle'      => 'confirmation',
-            'data-message'     => $view['translator']->trans('marketplace.install.coming.soon'),
-            'data-cancel-text' => $view['translator']->trans('mautic.core.close'),
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#InstallationInProgressModal',
+            'href'        => $installRoute,
         ],
-        'btnText'   => $view['translator']->trans('mautic.core.theme.install'),
+        'btnText'   => $view['translator']->trans('marketplace.package.install'),
         'iconClass' => 'fa fa-download',
+        'primary'   => true,
+    ];
+} elseif ($view['security']->isGranted(MarketplacePermissions::CAN_REMOVE_PACKAGES) && $isComposerEnabled) {
+    $removeRoute = $view['router']->path(
+        RouteProvider::ROUTE_REMOVE,
+        ['vendor' => $packageDetail->packageBase->getVendorName(), 'package' => $packageDetail->packageBase->getPackageName()]
+    );
+
+    $buttons[] = [
+        'attr' => [
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#RemovalInProgressModal',
+            'href'        => $removeRoute,
+        ],
+        'btnText'   => $view['translator']->trans('marketplace.package.remove'),
+        'iconClass' => 'fa fa-trash',
+        'primary'   => true,
     ];
 }
 
@@ -231,4 +258,16 @@ $view['slots']->set(
     </table>
 </div>
 
+<?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', [
+    'id'            => 'InstallationInProgressModal',
+    'header'        => 'Installing '.$packageDetail->packageBase->getHumanPackageName(),
+    'size'          => 'md',
+    'footerButtons' => false,
+]); ?>
 
+<?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', [
+    'id'            => 'RemovalInProgressModal',
+    'header'        => 'Removing '.$packageDetail->packageBase->getHumanPackageName(),
+    'size'          => 'md',
+    'footerButtons' => false,
+]); ?>
