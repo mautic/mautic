@@ -114,7 +114,7 @@ class PageController extends FormController
         }
 
         $orderBy    = $this->get('session')->get('mautic.page.orderby', 'p.dateModified');
-        $orderByDir = $this->get('session')->get('mautic.page.orderbydir', 'DESC');
+        $orderByDir = $this->get('session')->get('mautic.page.orderbydir', $this->getDefaultOrderDirection());
         $pages      = $model->getEntities(
             [
                 'start'      => $start,
@@ -1214,6 +1214,11 @@ class PageController extends FormController
         $model = $this->getModel('form.submission');
 
         return $model->exportResultsForPage($format, $activePage, $args);
+    }
+
+    public function getModelName(): string
+    {
+        return 'page';
     }
 
     protected function getDefaultOrderDirection()
