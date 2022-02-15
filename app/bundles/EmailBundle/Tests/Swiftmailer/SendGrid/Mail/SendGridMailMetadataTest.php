@@ -31,7 +31,7 @@ class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
     {
         $sendGridMailMetadata = new SendGridMailMetadata();
 
-        $randomvalue = rand(-100, 100) . "";
+        $randomvalue = rand(-100, 100).'';
         $headers     = $this->createMock(\Swift_Mime_SimpleHeaderSet::class);
 
         $headers->expects($this->once())
