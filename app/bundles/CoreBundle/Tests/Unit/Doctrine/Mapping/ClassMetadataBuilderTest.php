@@ -64,4 +64,25 @@ class ClassMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->classMetadataBuilder->addNullableField('columnName', Types::STRING, 'column_name');
     }
+
+    public function testaddIndexWithOptions(): void
+    {
+        $columns = [
+            'column_1',
+            'column_2',
+        ];
+
+        $options = [
+            'lengths' => [
+                0 => 128,
+            ],
+        ];
+
+        $index_name = 'index';
+
+        $data = $this->classMetadataBuilder->addIndexWithOptions($columns, $index_name, $options);
+
+        $this->assertEquals($columns, $data->getClassMetadata()->table['indexes'][$index_name]['columns']);
+        $this->assertEquals($options, $data->getClassMetadata()->table['indexes'][$index_name]['options']);
+    }
 }

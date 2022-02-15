@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Tests\Tracker;
 
+use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
@@ -18,6 +20,9 @@ use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactor
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Monolog\Logger;
+use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
+use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
 {
@@ -48,10 +53,48 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->deviceCreatorService = new DeviceCreatorService();
+        $createCacheItem = \Closure::bind(
+          function ($key) {
+              $item = new CacheItem();
+              $item->key = $key;
+              $item->isHit = false;
 
-        $this->deviceDetectorFactory = new DeviceDetectorFactory();
+              return $item;
+          },
+          $this,
+          CacheItem::class
+        );
 
+        $cacheAdapter = $this->createMock(TagAwareAdapterInterface::class);
+        $cacheAdapter->expects($this->atLeastOnce())
+          ->method('getItem')
+          ->withAnyParameters()
+          ->willReturn($createCacheItem('test'));
+        $cacheAdapter->expects($this->atLeastOnce())
+          ->method('save')
+          ->willReturn(true);
+
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->expects($this->once())
+          ->method('get')
+          ->with($this->equalTo('cache_adapter'))
+          ->willReturn('mautic.cache.adapter.filesystem');
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+          ->expects($this->once())
+          ->method('has')
+          ->with($this->equalTo('mautic.cache.adapter.filesystem'))
+          ->willReturn(true);
+        $container
+          ->expects($this->once())
+          ->method('get')
+          ->with($this->equalTo('mautic.cache.adapter.filesystem'))
+          ->willReturn($cacheAdapter);
+
+        $cacheProvider               = new CacheProvider($coreParametersHelper, $container);
+        $this->deviceDetectorFactory = new DeviceDetectorFactory($cacheProvider);
+        $this->deviceCreatorService  = new DeviceCreatorService();
         $this->deviceTrackingService = $this->getMockBuilder(DeviceTrackingServiceInterface::class)
             ->disableOriginalConstructor()
             ->getMock();

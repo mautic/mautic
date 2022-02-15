@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class LeadListRepository extends CommonRepository
 {
-    use OperatorListTrait;
+    use OperatorListTrait; // @deprecated to be removed in Mautic 3. Not used inside this class.
     use ExpressionHelperTrait;
     use RegexTrait;
 
@@ -222,7 +222,7 @@ class LeadListRepository extends CommonRepository
             )
             ->setParameter('leadId', $lead->getId());
 
-        return  (bool) $q->execute()->fetchColumn();
+        return (bool) $q->execute()->fetchColumn();
     }
 
     /**

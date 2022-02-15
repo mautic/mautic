@@ -70,6 +70,7 @@ return [
                     'mautic.core.model.notification',
                     'doctrine.orm.entity_manager',
                     'mautic.helper.mailer',
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],

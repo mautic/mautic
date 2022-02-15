@@ -29,6 +29,10 @@ class ListController extends FormController
 {
     use EntityContactsTrait;
 
+    const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
+
+    const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
+
     /**
      * @var array
      */
@@ -39,7 +43,7 @@ class ListController extends FormController
      *
      * @param int $page
      *
-     * @return JsonResponse | Response
+     * @return JsonResponse|Response
      */
     public function indexAction($page = 1)
     {
@@ -74,8 +78,8 @@ class ListController extends FormController
         $session->set('mautic.segment.filter', $search);
 
         //do some default filtering
-        $orderBy    = $session->get('mautic.segment.orderby', 'l.name');
-        $orderByDir = $session->get('mautic.segment.orderbydir', 'ASC');
+        $orderBy    = $session->get('mautic.segment.orderby', 'l.dateModified');
+        $orderByDir = $session->get('mautic.segment.orderbydir', 'DESC');
 
         $filter = [
             'string' => $search,
@@ -123,15 +127,16 @@ class ListController extends FormController
         $leadCounts = (!empty($listIds)) ? $model->getRepository()->getLeadCount($listIds) : [];
 
         $parameters = [
-            'items'       => $items,
-            'leadCounts'  => $leadCounts,
-            'page'        => $page,
-            'limit'       => $limit,
-            'permissions' => $permissions,
-            'security'    => $this->get('mautic.security'),
-            'tmpl'        => $tmpl,
-            'currentUser' => $this->user,
-            'searchValue' => $search,
+            'items'                          => $items,
+            'leadCounts'                     => $leadCounts,
+            'page'                           => $page,
+            'limit'                          => $limit,
+            'permissions'                    => $permissions,
+            'security'                       => $this->get('mautic.security'),
+            'tmpl'                           => $tmpl,
+            'currentUser'                    => $this->user,
+            'searchValue'                    => $search,
+            'segmentRebuildWarningThreshold' => $this->coreParametersHelper->get('segment_rebuild_time_warning'),
         ];
 
         return $this->delegateView(
@@ -152,7 +157,7 @@ class ListController extends FormController
     /**
      * Generate's new form and processes post data.
      *
-     * @return JsonResponse | RedirectResponse | Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function newAction()
     {
@@ -179,6 +184,7 @@ class ListController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
+                    $list->setDateModified(new \DateTime());
                     $model->saveEntity($list);
 
                     $this->addFlash('mautic.core.notice.created', [
@@ -341,11 +347,6 @@ class ListController extends FormController
                             'objectId'     => $segment->getId(),
                         ]);
 
-                        // Re-create the form once more with the fresh segment and action.
-                        // The alias was empty on redirect after cloning.
-                        $editAction = $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $segment->getId()]);
-                        $form       = $segmentModel->createForm($segment, $this->get('form.factory'), $editAction);
-
                         $postActionVars['viewParameters'] = [
                             'objectAction' => 'edit',
                             'objectId'     => $segment->getId(),
@@ -451,7 +452,7 @@ class ListController extends FormController
      *
      * @param $objectId
      *
-     * @return JsonResponse | RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function deleteAction($objectId)
     {
@@ -529,7 +530,7 @@ class ListController extends FormController
     /**
      * Deletes a group of entities.
      *
-     * @return JsonResponse | RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function batchDeleteAction()
     {
@@ -609,7 +610,7 @@ class ListController extends FormController
     /**
      * @param $objectId
      *
-     * @return JsonResponse | RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function removeLeadAction($objectId)
     {
@@ -619,7 +620,7 @@ class ListController extends FormController
     /**
      * @param $objectId
      *
-     * @return JsonResponse | RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function addLeadAction($objectId)
     {
@@ -630,7 +631,7 @@ class ListController extends FormController
      * @param $listId
      * @param $action
      *
-     * @return array | JsonResponse | RedirectResponse
+     * @return array|JsonResponse|RedirectResponse
      */
     protected function changeList($listId, $action)
     {
