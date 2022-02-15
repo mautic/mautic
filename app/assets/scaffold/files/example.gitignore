@@ -4,7 +4,13 @@
 !.htaccess
 !.gitkeep
 !.ddev
+!.php-cs-fixer.php
+!.github/ci-files/.my.cnf
 .ddev/mautic-preference
+/.ddev/docker-compose.host-docker-internal.yaml
+!.gitpod.Dockerfile
+!.gitpod.yml
+!.ddev/commands/web/dd
 .php_cs.cache
 /.env
 /composer.phar
@@ -79,13 +85,29 @@
 !/media/images/.htaccess
 
 /plugins/*
+!/plugins/GrapesJsBuilderBundle
+!/plugins/MauticCitrixBundle
+!/plugins/MauticClearbitBundle
+!/plugins/MauticCloudStorageBundle
+!/plugins/MauticCrmBundle
+!/plugins/MauticDynamicsBundle
+!/plugins/MauticEmailMarketingBundle
+!/plugins/MauticFocusBundle
+!/plugins/MauticFullContactBundle
+!/plugins/MauticGmailBundle
+!/plugins/MauticOutlookBundle
+!/plugins/MauticSocialBundle
+!/plugins/MauticZapierBundle
+!/plugins/MauticTagManagerBundle
 !/plugins/index.html
+!/plugins/.gitkeep
 
 /themes/*
 !/themes/aurora
 !/themes/blank
 !/themes/cards
 !/themes/coffee
+!/themes/confirmme
 !/themes/fresh-center
 !/themes/fresh-fixed
 !/themes/fresh-left
