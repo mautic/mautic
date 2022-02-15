@@ -52,7 +52,7 @@ jobs:
         sudo docker restart ${{ matrix.db-types }}
         new_port=$(sudo docker port ${{ matrix.db-types }} 3306 | cut -d\: -f2)
         echo "mysql_port=${new_port}" >> $GITHUB_ENV
-        sudo docker exec -it ${{ matrix.db-types }} df -h
+        sudo docker exec ${{ matrix.db-types }} df -h
         exit 1
 
     - name: Setup PHP, with composer and extensions
