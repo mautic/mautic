@@ -55,6 +55,9 @@ class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedContent, $emailSendEvent->getContent());
     }
 
+    /**
+     * @return iterable<array<int,string>>
+     */
     public function fixEmailAccessibilityContent(): iterable
     {
         yield [
@@ -70,7 +73,7 @@ class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
         yield [
             '<html><head></head></html>',
             '<html lang="default_locale"><head><title>A unicorn spotted in Alaska</title></head></html>',
-            null,
+            '',
         ];
         yield [
             "<html>\n\n<head>\n</head>\n</html>",

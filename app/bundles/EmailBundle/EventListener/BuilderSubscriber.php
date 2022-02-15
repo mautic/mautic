@@ -280,7 +280,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
 
         // Add the lang attribute to the <html/> tag if it's missing.
-        $locale = $event->getEmail()->getLanguage() ?? $this->coreParametersHelper->get('locale');
+        $locale = empty($event->getEmail()->getLanguage()) ? $event->getEmail()->getLanguage() : $this->coreParametersHelper->get('locale');
         preg_match_all("~<html.*lang\s*=\s*[\"']([^\"']+)[\"'][^>]*>~i", $content, $matches);
         if (empty($matches[1])) {
             $content = str_replace('<html', '<html lang="'.$locale.'"', $content);
