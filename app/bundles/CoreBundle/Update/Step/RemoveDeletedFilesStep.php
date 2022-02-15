@@ -44,7 +44,7 @@ final class RemoveDeletedFilesStep implements StepInterface
 
     public function getOrder(): int
     {
-        return 10;
+        return 20;
     }
 
     public function shouldExecuteInFinalStage(): bool

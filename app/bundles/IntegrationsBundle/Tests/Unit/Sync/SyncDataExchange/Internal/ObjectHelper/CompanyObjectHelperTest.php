@@ -20,6 +20,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 class CompanyObjectHelperTest extends TestCase
@@ -102,6 +103,16 @@ class CompanyObjectHelperTest extends TestCase
             $this->assertTrue(isset($objects[$objectMapping->getIntegrationObjectId()]));
             $this->assertEquals($objects[$objectMapping->getIntegrationObjectId()]->getMappedObjectId(), $objectMapping->getIntegrationObjectId());
         }
+    }
+
+    public function testUpdateEmpty(): void
+    {
+        $this->model->expects($this->never())
+            ->method('getEntities');
+
+        $objectMappings = $this->getObjectHelper()->update([], []);
+
+        Assert::assertSame([], $objectMappings);
     }
 
     /**
