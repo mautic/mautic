@@ -551,7 +551,7 @@ class CommonController extends Controller implements MauticController
         if ($this->request->query->has('orderby')) {
             $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
             $dir     = $session->get("$name.orderbydir", 'ASC');
-            $dir     = ('ASC' == $dir) ? 'DESC' : 'ASC';
+            $dir     = $orderBy === $session->get("$name.orderby") ? (('ASC' == $dir) ? 'DESC' : 'ASC') : $dir;
             $session->set("$name.orderby", $orderBy);
             $session->set("$name.orderbydir", $dir);
         }
