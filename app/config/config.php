@@ -326,6 +326,7 @@ $container->loadFromExtension('fm_elfinder', [
                         'flysystem'     => [
                             'type'            => 'custom',
                             'adapter_service' => 'mautic.core.service.local_file_adapter',
+                            'options'         => [],
                         ],
                         'upload_allow'  => ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
                         'upload_deny'   => ['all'],

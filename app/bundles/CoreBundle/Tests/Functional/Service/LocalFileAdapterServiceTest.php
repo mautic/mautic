@@ -51,6 +51,7 @@ class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 
         $this->folderName = (string) time();
         $this->loginUser('admin');
+        $_SERVER['REQUEST_METHOD'] = Request::METHOD_POST;
         $this->client->request(
             Request::METHOD_POST,
             "efconnect?cmd=mkdir&name=$this->folderName&target=fls1_Lw"
