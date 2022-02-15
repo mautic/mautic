@@ -17,6 +17,11 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class ListLead
 {
     /**
+     * @var string
+     */
+    const TABLE_NAME = 'lead_lists_leads';
+
+    /**
      * @var LeadList
      **/
     private $list;

@@ -403,15 +403,21 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         $groupExpr->add(
                             $expr->isNotNull($filter['column'])
                         );
-                        $groupExpr->add(
-                            $expr->neq($filter['column'], $expr->literal(''))
-                        );
+                        if ($this->doesColumnSupportEmptyValue($filter, $filterDefinitions)) {
+                            $groupExpr->add(
+                                $expr->neq($filter['column'], $expr->literal(''))
+                            );
+                        }
                         break;
                     case 'empty':
                         $expression = $queryBuilder->expr()->orX(
-                            $queryBuilder->expr()->isNull($filter['column']),
-                            $queryBuilder->expr()->eq($filter['column'], $expr->literal(''))
+                            $queryBuilder->expr()->isNull($filter['column'])
                         );
+                        if ($this->doesColumnSupportEmptyValue($filter, $filterDefinitions)) {
+                            $expression->add(
+                                $queryBuilder->expr()->eq($filter['column'], $expr->literal(''))
+                            );
+                        }
 
                         $groupExpr->add(
                             $expression
@@ -519,5 +525,16 @@ final class MauticReportBuilder implements ReportBuilderInterface
         [$tableAlias, $columnName] = explode('.', $fullCollumnName);
 
         return "`{$tableAlias}`.`{$columnName}`";
+    }
+
+    /**
+     * @param mixed[] $filter
+     * @param mixed[] $filterDefinitions
+     */
+    private function doesColumnSupportEmptyValue(array $filter, array $filterDefinitions): bool
+    {
+        $type = $filterDefinitions[$filter['column']]['type'] ?? null;
+
+        return !in_array($type, ['date', 'datetime'], true);
     }
 }

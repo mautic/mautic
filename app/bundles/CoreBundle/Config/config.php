@@ -589,6 +589,9 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.helper.update_checks' => [
+                'class' => \Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class,
+            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -843,6 +846,7 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.http.client',
                     'mautic.helper.update.release_parser',
+                    'mautic.helper.update_checks',
                 ],
             ],
             'mautic.helper.update.release_parser' => [
@@ -1102,6 +1106,25 @@ return [
                     'monolog.logger.mautic',
                 ],
                 'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.step.checks' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\PreUpdateChecksStep::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.update',
+                ],
+                'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.checks.php' => [
+                'class' => \Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckPhpVersion::class,
+                'tag'   => 'mautic.update_check',
+            ],
+            'mautic.update.checks.database' => [
+                'class'     => \Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class,
+                'arguments' => [
+                    'doctrine.orm.default_entity_manager',
+                ],
+                'tag' => 'mautic.update_check',
             ],
         ],
         'models' => [

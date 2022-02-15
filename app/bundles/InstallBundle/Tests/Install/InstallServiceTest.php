@@ -233,7 +233,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     public function testValidateDatabaseParamsWhenPortNotValid(): void
     {
         $dbParams = [
-            'driver' => 'mysql',
+            'driver' => 'pdo_mysql',
             'host'   => 'localhost',
             'port'   => '-1',
             'name'   => 'mautic',
@@ -249,7 +249,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     public function testValidateDatabaseParamsWhenAllValid(): void
     {
         $dbParams = [
-            'driver' => 'mysql',
+            'driver' => 'pdo_mysql',
             'host'   => 'localhost',
             'port'   => '3306',
             'name'   => 'mautic',
@@ -257,6 +257,22 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->assertEquals([], $this->installer->validateDatabaseParams($dbParams));
+    }
+
+    public function testValidateDatabaseParamsWhenDriverNotValid(): void
+    {
+        $dbParams = [
+            'driver' => 'pdo_sqlite',
+            'host'   => 'localhost',
+            'port'   => '3306',
+            'name'   => 'mautic',
+            'user'   => 'mautic',
+        ];
+        $messages = [
+            'driver' => null,
+        ];
+
+        $this->assertEquals($messages, $this->installer->validateDatabaseParams($dbParams));
     }
 
     /**
