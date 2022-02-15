@@ -934,6 +934,10 @@ return [
             'mautic.helper.random' => [
                 'class' => \Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class,
             ],
+            'mautic.helper.command' => [
+                'class'     => \Mautic\CoreBundle\Helper\CommandHelper::class,
+                'arguments' => 'kernel',
+            ],
             'mautic.menu_renderer' => [
                 'class'     => \Mautic\CoreBundle\Menu\MenuRenderer::class,
                 'arguments' => [
