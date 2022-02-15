@@ -16,10 +16,6 @@ final class PackageDetail
     public \DateTimeInterface $time;
     public MaintainerCollection $maintainers;
     public VersionCollection $versions;
-    /**
-     * E.g. mautic-plugin.
-     */
-    public ?string $type;
 
     public function __construct(
         PackageBase $packageBase,
@@ -28,8 +24,7 @@ final class PackageDetail
         GitHubInfo $githubInfo,
         int $monthlyDownloads,
         int $dailyDownloads,
-        \DateTimeInterface $time,
-        ?string $type
+        \DateTimeInterface $time
     ) {
         $this->packageBase      = $packageBase;
         $this->versions         = $versions;
@@ -38,7 +33,6 @@ final class PackageDetail
         $this->monthlyDownloads = $monthlyDownloads;
         $this->dailyDownloads   = $dailyDownloads;
         $this->time             = $time;
-        $this->type             = $type;
     }
 
     public static function fromArray(array $array)
@@ -50,7 +44,8 @@ final class PackageDetail
                 $array['repository'],
                 $array['description'],
                 (int) $array['downloads']['total'],
-                (int) $array['favers']
+                (int) $array['favers'],
+                $array['type'] ?? null
             ),
             VersionCollection::fromArray($array['versions']),
             MaintainerCollection::fromArray($array['maintainers']),
@@ -62,8 +57,7 @@ final class PackageDetail
             ),
             $array['downloads']['monthly'],
             $array['downloads']['daily'],
-            new \DateTimeImmutable($array['time']),
-            $array['type'] ?? null
+            new \DateTimeImmutable($array['time'])
         );
     }
 }
