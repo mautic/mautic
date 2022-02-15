@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Mautic\MarketplaceBundle\Collection\PackageCollection;
-use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 
 if ('index' === $tmpl) {
@@ -13,19 +12,6 @@ if ('index' === $tmpl) {
 $buttons = [];
 /** @var bool $isComposerEnabled */
 $isComposerEnabled = $isComposerEnabled;
-
-if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES) && $isComposerEnabled) {
-    $buttons[] = [
-        'attr' => [
-            'data-toggle'      => 'confirmation',
-            'data-message'     => $view['translator']->trans('marketplace.install.coming.soon'),
-            'data-cancel-text' => $view['translator']->trans('mautic.core.close'),
-        ],
-        'btnText'   => $view['translator']->trans('mautic.core.theme.install'),
-        'iconClass' => 'fa fa-download',
-    ];
-}
-
 ?>
 <?php if (count($items)): ?>
     <div class="table-responsive">
