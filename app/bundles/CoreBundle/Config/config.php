@@ -159,6 +159,12 @@ return [
                     'mautic.core.model.notification',
                 ],
             ],
+            'mautic.core.service.local_file_adapter' => [
+                'class'     => \Mautic\CoreBundle\Service\LocalFileAdapterService::class,
+                'arguments' => [
+                    '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
+                ],
+            ],
         ],
         'events' => [
             'mautic.core.subscriber' => [
