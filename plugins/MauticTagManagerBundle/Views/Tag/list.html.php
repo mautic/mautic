@@ -120,6 +120,11 @@ $listCommand = $view['translator']->trans('mautic.tagmanager.tag.searchcommand.l
                                 <?php echo $item->getTag(); ?>
                             <?php endif; ?>
                         </div>
+                        <?php if ($description = $item->getDescription()): ?>
+                            <div class="text-muted mt-4">
+                                <small><?php echo $description; ?></small>
+                            </div>
+                        <?php endif; ?>
                     </td>
 
                     <td class="visible-md visible-lg">
