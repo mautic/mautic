@@ -481,8 +481,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if (!$flag || 'total_and_unique' === $flag) {
-            $filter['is_failed'] = 0;
-            $q                   = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+            $q                   = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', array_merge($filter, ['is_failed' => 0]));
 
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
