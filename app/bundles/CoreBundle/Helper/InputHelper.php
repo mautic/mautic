@@ -39,7 +39,7 @@ class InputHelper
      * Do not convert null to false.
      * Do not convert invalid values to false, but return null.
      *
-     * @param $value
+     * @param bool|int|string|null $value
      *
      * @return bool|null
      */
