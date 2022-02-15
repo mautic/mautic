@@ -1205,7 +1205,7 @@ class CampaignController extends AbstractStandardFormController
         return $campaignLogCountsProcessed;
     }
 
-    protected function getDefaultOrderDirection()
+    protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
     }
