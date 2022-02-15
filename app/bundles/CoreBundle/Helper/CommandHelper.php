@@ -21,6 +21,9 @@ class CommandHelper
         $this->kernel = $kernel;
     }
 
+    /**
+     * array<int|string> $params
+     */
     public function runCommand(string $name, array $params = []): CommandResponse
     {
         $params      = array_merge(['command' => $name], $params);
