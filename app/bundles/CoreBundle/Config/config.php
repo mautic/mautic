@@ -159,6 +159,12 @@ return [
                     'mautic.core.model.notification',
                 ],
             ],
+            'mautic.core.service.local_file_adapter' => [
+                'class'     => \Mautic\CoreBundle\Service\LocalFileAdapterService::class,
+                'arguments' => [
+                    '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
+                ],
+            ],
         ],
         'events' => [
             'mautic.core.subscriber' => [
@@ -855,6 +861,7 @@ return [
                     '%kernel.cache_dir%',
                     'session',
                     'mautic.helper.paths',
+                    'kernel',
                 ],
             ],
             'mautic.helper.templating' => [
@@ -908,6 +915,13 @@ return [
                 'class'     => \Mautic\CoreBundle\Helper\ExportHelper::class,
                 'arguments' => [
                     'translator',
+                ],
+            ],
+            'mautic.helper.composer' => [
+                'class'     => \Mautic\CoreBundle\Helper\ComposerHelper::class,
+                'arguments' => [
+                    'kernel',
+                    'monolog.logger.mautic',
                 ],
             ],
             // Menu
@@ -1748,5 +1762,6 @@ return [
                 'font' => 'メイリオ, Meiryo, ＭＳ Ｐゴシック, MS PGothic, ヒラギノ角ゴ Pro W3, Hiragino Kaku Gothic Pro,Osaka, sans-serif',
             ],
         ],
+        'composer_updates' => false,
     ],
 ];
