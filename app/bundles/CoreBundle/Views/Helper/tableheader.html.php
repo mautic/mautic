@@ -60,7 +60,7 @@ if (!empty($checkall)):
 else:
 $defaultOrder = (!empty($default)) ? $orderBy : '';
 $order        = (!empty($order)) ? $order : $app->getSession()->get("mautic.{$sessionVar}.orderby", $defaultOrder);
-$dir          = (!empty($dir)) ? $dir : $app->getSession()->get("mautic.{$sessionVar}.orderbydir", 'ASC');
+$dir          = (!empty($dir)) ? $dir : $app->getSession()->get("mautic.{$sessionVar}.orderbydir", $defaultDir ?? 'ASC');
 $filters      = (!empty($filters)) ? $filters : $app->getSession()->get("mautic.{$sessionVar}.filters", []);
 $tmpl         = (!empty($tmpl)) ? $tmpl : 'list';
 ?>
