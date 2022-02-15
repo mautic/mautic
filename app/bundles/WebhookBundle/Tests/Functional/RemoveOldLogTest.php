@@ -88,6 +88,9 @@ final class RemoveOldLogTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('There is 0 webhooks with logs more than defined limit.', $output);
     }
 
+    /**
+     * @param array<int> $expectedIds
+     */
     private function assertLogs(Webhook $webhook, int $expectedCount, array $expectedIds): void
     {
         $logs   = $this->em->getRepository(Log::class)->findBy(['webhook'=>$webhook]);

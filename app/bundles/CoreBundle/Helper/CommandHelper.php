@@ -22,7 +22,7 @@ class CommandHelper
     }
 
     /**
-     * array<int|string> $params
+     * @param array<int|string> $params
      */
     public function runCommand(string $name, array $params = []): CommandResponse
     {
