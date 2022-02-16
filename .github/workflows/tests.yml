@@ -46,16 +46,6 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: add config and restart db
-      run: |
-        sudo cp ${{ github.workspace }}/.github/ci-files/mysql_config/* /tmp/mysql_config/
-        sudo docker restart ${{ matrix.db-types }}
-        new_port=$(sudo docker port ${{ matrix.db-types }} 3306 | cut -d\: -f2)
-        echo "mysql_port=${new_port}" >> $GITHUB_ENV
-        sudo docker exec ${{ matrix.db-types }} df -h
-        sudo docker exec ${{ matrix.db-types }} ls -al /var/lib/mysql
-        sudo docker exec ${{ matrix.db-types }} du -sh /var/lib/mysql
-
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
       with:
