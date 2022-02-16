@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Helper\UpdateHelper;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class InstallNewFilesStep implements StepInterface
 {
@@ -58,7 +58,7 @@ final class InstallNewFilesStep implements StepInterface
 
     public function getOrder(): int
     {
-        return 0;
+        return 10;
     }
 
     public function shouldExecuteInFinalStage(): bool

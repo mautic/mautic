@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 
@@ -118,6 +119,21 @@ class LeadFieldRepository extends CommonRepository
                 ->setParameter('object', $object)
                 ->orderBy('f.field_order', 'ASC')
                 ->execute()->fetchAll();
+    }
+
+    /**
+     * @return ArrayCollection<int,LeadField>
+     */
+    public function getListablePublishedFields(): ArrayCollection
+    {
+        $queryBuilder = $this->_em->createQueryBuilder();
+        $queryBuilder->select($this->getTableAlias());
+        $queryBuilder->from($this->_entityName, $this->getTableAlias(), "{$this->getTableAlias()}.id");
+        $queryBuilder->where("{$this->getTableAlias()}.isListable = 1");
+        $queryBuilder->andWhere("{$this->getTableAlias()}.isPublished = 1");
+        $queryBuilder->orderBy("{$this->getTableAlias()}.object");
+
+        return new ArrayCollection($queryBuilder->getQuery()->execute());
     }
 
     /**

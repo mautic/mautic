@@ -24,12 +24,10 @@ body:
       label: Mautic Version
       description: What version of Mautic you are using? Please test to reproduce your bug with the [latest stable version of Mautic](https://www.mautic.org/mautic-releases) which might contain new fixes.  If you are able, please also check the latest development release.
       options:
-        - 4.0.0
-        - 3.3.4
-        - 3.3.x series
-        - 3.2.x series (not supported)
-        - 3.1.x series (not supported)
-        - 2.x series (not supported)
+        - 4.2.x series
+        - 4.1.x series
+        - 4.0.x series (not supported)
+        - 3.3.x series (not supported)
     validations:
       required: true
   - type: input
