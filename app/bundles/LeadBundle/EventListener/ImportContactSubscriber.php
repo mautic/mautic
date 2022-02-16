@@ -77,7 +77,6 @@ final class ImportContactSubscriber implements EventSubscriberInterface
                 'lastActive'     => 'mautic.lead.import.label.lastActive',
                 'dateIdentified' => 'mautic.lead.import.label.dateIdentified',
                 'ip'             => 'mautic.lead.import.label.ip',
-                'points'         => 'mautic.lead.import.label.points',
                 'stage'          => 'mautic.lead.import.label.stage',
                 'doNotEmail'     => 'mautic.lead.import.label.doNotEmail',
                 'ownerusername'  => 'mautic.lead.import.label.ownerusername',
