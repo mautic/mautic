@@ -20,6 +20,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\PageBundle\Tests\Controller\PageControllerTest;
 use PHPUnit\Framework\Assert;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,6 +54,15 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('February 7, 2020', $clientResponse->getContent());
         $this->assertStringContainsString('March 21, 2020', $clientResponse->getContent());
         $this->assertStringContainsString('Test User', $clientResponse->getContent());
+
+        $urlAlias   = 'emails';
+        $routeAlias = 'email';
+        $column     = 'dateModified';
+        $column2    = 'name';
+        $tableAlias = 'e.';
+        $client     = $this->client;
+
+        PageControllerTest::getColumnTests($client, $urlAlias, $routeAlias, $column, $tableAlias, $column2);
     }
 
     /**

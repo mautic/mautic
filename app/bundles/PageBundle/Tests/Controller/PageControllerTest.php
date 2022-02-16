@@ -7,6 +7,7 @@ use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageData;
 use Mautic\PageBundle\Entity\Page;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -21,6 +22,75 @@ class PageControllerTest extends MauticMysqlTestCase
      * @var int
      */
     private $id;
+
+    public static function getColumnTests(
+        KernelBrowser $client,
+        string $urlAlias,
+        string $routeAlias,
+        string $column,
+        string $tableAlias,
+        string $column2
+    ): void {
+        $crawler         = $client->request('GET', '/s/'.$urlAlias);
+        $clientResponse  = $client->getResponse();
+        $responseContent = $clientResponse->getContent();
+        self::assertTrue($clientResponse->isOk());
+
+        self::assertStringContainsString(
+            'col-'.$routeAlias.'-dateAdded',
+            $responseContent,
+            'The return must contain the created at date column'
+        );
+        self::assertStringContainsString(
+            'col-'.$routeAlias.'-'.$column,
+            $responseContent,
+            'The return must contain the modified date column'
+        );
+
+        self::assertEquals(
+            1,
+            $crawler->filterXPath(
+                "//th[contains(@class,'col-".$routeAlias.'-'.$column."')]//i[contains(@class, 'fa-sort-amount-desc')]"
+            )->count(),
+            'The order must be desc'
+        );
+
+        $crawler = $client->request(
+            'GET',
+            '/s/'.$urlAlias.'?tmpl=list&name='.$routeAlias.'&orderby='.$tableAlias.$column
+        );
+        self::assertEquals(
+            1,
+            $crawler->filterXPath(
+                "//th[contains(@class,'col-".$routeAlias.'-'.$column."')]//i[contains(@class, 'fa-sort-amount-asc')]"
+            )->count(),
+            'The order must be asc'
+        );
+
+        $crawler = $client->request(
+            'GET',
+            '/s/'.$urlAlias.'?tmpl=list&name='.$routeAlias.'&orderby='.$tableAlias.$column2
+        );
+        self::assertEquals(
+            1,
+            $crawler->filterXPath(
+                "//th[contains(@class,'col-".$routeAlias.'-'.$column2."')]//i[contains(@class, 'fa-sort-amount-asc')]"
+            )->count(),
+            'The order must be asc'
+        );
+
+        $crawler = $client->request(
+            'GET',
+            '/s/'.$urlAlias.'?tmpl=list&name='.$routeAlias.'&orderby='.$tableAlias.$column2
+        );
+        self::assertEquals(
+            1,
+            $crawler->filterXPath(
+                "//th[contains(@class,'col-".$routeAlias.'-'.$column2."')]//i[contains(@class, 'fa-sort-amount-desc')]"
+            )->count(),
+            'The order must be desc'
+        );
+    }
 
     /**
      * @throws \Exception
@@ -50,23 +120,14 @@ class PageControllerTest extends MauticMysqlTestCase
      */
     public function testIndexAction(): void
     {
-        $crawler         = $this->client->request('GET', '/s/pages');
-        $clientResponse  = $this->client->getResponse();
-        $responseContent = $clientResponse->getContent();
+        $urlAlias   = 'pages';
+        $routeAlias = 'page';
+        $column     = 'dateModified';
+        $column2    = 'title';
+        $tableAlias = 'p.';
+        $client     = $this->client;
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
-        $this->assertStringContainsString('col-page-dateAdded', $responseContent, 'The return must contain the created at date column');
-        $this->assertStringContainsString('col-page-dateModified', $responseContent, 'The return must contain the modified date column');
-        $this->assertEquals(1, $crawler->filterXPath("//th[contains(@class,'col-page-dateModified')]//i[contains(@class, 'fa-sort-amount-desc')]")->count(), 'The order of date modified must be desc');
-
-        $crawler = $this->client->request('GET', '/s/pages?tmpl=list&name=page&orderby=p.dateModified');
-        $this->assertEquals(1, $crawler->filterXPath("//th[contains(@class,'col-page-dateModified')]//i[contains(@class, 'fa-sort-amount-asc')]")->count(), 'The order of date modified must be asc');
-
-        $crawler = $this->client->request('GET', '/s/pages?tmpl=list&name=page&orderby=p.title');
-        $this->assertEquals(1, $crawler->filterXPath("//th[contains(@class,'col-page-title')]//i[contains(@class, 'fa-sort-amount-asc')]")->count(), 'The order of date modified must be asc');
-
-        $crawler = $this->client->request('GET', '/s/pages?tmpl=list&name=page&orderby=p.title');
-        $this->assertEquals(1, $crawler->filterXPath("//th[contains(@class,'col-page-title')]//i[contains(@class, 'fa-sort-amount-desc')]")->count(), 'The order of date modified must be desc');
+        self::getColumnTests($client, $urlAlias, $routeAlias, $column, $tableAlias, $column2);
     }
 
     public function testLandingPageTracking()
