@@ -72,7 +72,7 @@ jobs:
     - name: Install dependencies
       run: |
         composer validate
-        composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader --apcu-autoloader
+        composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader --classmap-authoritative
 
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
