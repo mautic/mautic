@@ -199,7 +199,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
     }
 
-    public function createAmazonClient(): SesV2Client
+    public function createAmazonClient()
     {
         $config  = [
             'version'     => '2019-09-27',
@@ -234,7 +234,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
      *
      * @throws \Exception
      */
-    public function send(\Swift_Mime_SimpleMessage $toSendMessage, &$failedRecipients = null): int
+    public function send(\Swift_Mime_SimpleMessage $toSendMessage, &$failedRecipients = null)
     {
         $this->message    = $toSendMessage;
         $failedRecipients = (array) $failedRecipients;
@@ -446,7 +446,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     /**
      * Set plain text to a message.
      */
-    private function setPlainTextToMessage(\Swift_Mime_SimpleMessage $message, $text): void
+    private function setPlainTextToMessage(\Swift_Mime_SimpleMessage $message, $text)
     {
         $children = (array) $message->getChildren();
 
@@ -458,7 +458,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
     }
 
-    public function getMaxBatchLimit(): int
+    public function getMaxBatchLimit()
     {
         return 0;
     }
@@ -482,7 +482,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     /**
      * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
      */
-    public function getCallbackPath(): string
+    public function getCallbackPath()
     {
         return 'amazon_api';
     }
@@ -495,7 +495,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->amazonCallback->processCallbackRequest($request);
     }
 
-    public function ping(): bool
+    public function ping()
     {
         return true;
     }
