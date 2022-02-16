@@ -563,8 +563,8 @@ class LeadControllerTest extends MauticMysqlTestCase
         $newCompany = (new Company())
             ->setName('New Co.');
         $companyModel->saveEntities([$company, $newCompany]);
-        $companyId    = (string) $company->getId();
-        $newCompanyId = (string) $newCompany->getId();
+        $companyId    = $company->getId();
+        $newCompanyId = $newCompany->getId();
 
         // Create contact with first 'Co.' company
         $contact = (new Lead())
@@ -573,33 +573,39 @@ class LeadControllerTest extends MauticMysqlTestCase
         $contactModel->saveEntity($contact);
 
         // Check contact detail view audit log
-        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/view/%d', $contact->getId()));
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        $tableContent     = $this->getContactViewAuditLogTableHtmlInArray($crawler);
-        $expectedAuditLog = [['firstname', 'C1', '', 'company', $companyId, '']];
-        Assert::assertSame($expectedAuditLog, $tableContent);
+        $createAuditLog        = $this->getContactAuditLogForSpecificAction($contact, 'create');
+        $createAuditLogDetails = $createAuditLog->getDetails();
+        // `dateIdentified` is added to the audit log when contact is identified, we want to remove this for easier comparison
+        unset($createAuditLogDetails['dateIdentified']);
+        Assert::assertSame(
+            [
+                'firstname' => [null, 'C1'],
+                'company'   => [null, $companyId],
+            ],
+            $createAuditLogDetails
+        );
 
         // Edit contact with second 'New Co.' company
         $contact->setCompany($newCompany);
         $contactModel->saveEntity($contact);
 
         // Check contact detail view audit log for old value
-        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/view/%d', $contact->getId()));
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        $tableContent     = $this->getContactViewAuditLogTableHtmlInArray($crawler);
-        $expectedAuditLog = [['company', $newCompanyId, $companyId]];
-        Assert::assertSame($expectedAuditLog, $tableContent);
+        $updateAuditLog = $this->getContactAuditLogForSpecificAction($contact, 'update');
+        Assert::assertSame(
+            [
+                'company' => [$companyId, $newCompanyId],
+            ],
+            $updateAuditLog->getDetails()
+        );
     }
 
-    /**
-     * @return array<mixed>
-     */
-    private function getContactViewAuditLogTableHtmlInArray(Crawler $crawler): array
+    private function getContactAuditLogForSpecificAction(Lead $contact, string $action): AuditLog
     {
-        return $crawler->filter('tr#auditlog-details-1')->filter('table')->each(function ($tr) {
-            return $tr->filter('td')->each(function ($td) {
-                return $td->text();
-            });
-        });
+        return $this->em->getRepository(AuditLog::class)->findOneBy([
+            'bundle'   => 'lead',
+            'object'   => 'lead',
+            'objectId' => $contact->getId(),
+            'action'   => $action,
+        ]);
     }
 }
