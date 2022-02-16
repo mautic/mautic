@@ -50,7 +50,7 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-versions }}
-        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql, apcu
         coverage: pcov
         ini-values: pcov.directory=., pcov.exclude="~tests|themes|vendor~"
     
@@ -62,6 +62,7 @@ jobs:
         mysqldump --print-defaults
         new_port=$(sudo docker port ${{ matrix.db-types }} 3306 | cut -d\: -f2)
         echo "mysql_port=${new_port}" >> $GITHUB_ENV
+        sudo mount -t tmpfs -o rw,size=512m tmpfs ${{ github.workspace }}/var
 
     - name: Set SYMFONY_ENV to test
       run: |
@@ -71,7 +72,7 @@ jobs:
     - name: Install dependencies
       run: |
         composer validate
-        composer install --prefer-dist --no-progress --no-suggest
+        composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader --apcu-autoloader
 
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
