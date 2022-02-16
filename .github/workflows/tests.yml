@@ -60,6 +60,8 @@ jobs:
         mysqldump --print-defaults
         cp .github/ci-files/.my.cnf ~/.my.cnf
         mysqldump --print-defaults
+        new_port=$(sudo docker port ${{ matrix.db-types }} 3306 | cut -d\: -f2)
+        echo "mysql_port=${new_port}" >> $GITHUB_ENV
 
     - name: Set SYMFONY_ENV to test
       run: |
