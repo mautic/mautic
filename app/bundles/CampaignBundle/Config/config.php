@@ -265,7 +265,7 @@ return [
                 ],
             ],
             'mautic.campaign.model.event_log' => [
-                'class'     => 'Mautic\CampaignBundle\Model\EventLogModel',
+                'class'     => \Mautic\CampaignBundle\Model\EventLogModel::class,
                 'arguments' => [
                     'mautic.campaign.model.event',
                     'mautic.campaign.model.campaign',

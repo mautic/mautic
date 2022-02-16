@@ -245,6 +245,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->translationChildren = new ArrayCollection();
         $this->variantChildren     = new ArrayCollection();
         $this->assetAttachments    = new ArrayCollection();
+        $this->setDateAdded(new \DateTime());
+        $this->setDateModified(new \DateTime());
     }
 
     /**
