@@ -27,8 +27,6 @@ jobs:
         image: ${{ matrix.db-types == 'mysql' && 'circleci/mysql:5.7-ram' || 'circleci/mariadb:10.3-ram' }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_USER: root
-          MYSQL_ROOT_PASSWORD: ''
           MYSQL_DATABASE: mautictest
         ports:
           - 3306
