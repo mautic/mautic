@@ -66,14 +66,14 @@ class DoctrineEventsSubscriber implements EventSubscriber
 
             // Prefix indexes
             $uniqueConstraints = [];
-            if (isset($classMetadata->table['uniqueConstraints'])) {
+            if (array_key_exists('uniqueConstraints', $classMetadata->table) && !empty($classMetadata->table['uniqueConstraints'])) {
                 foreach ($classMetadata->table['uniqueConstraints'] as $name => $uc) {
                     $uniqueConstraints[$this->tablePrefix.$name] = $uc;
                 }
             }
 
             $indexes = [];
-            if (isset($classMetadata->table['indexes'])) {
+            if (array_key_exists('indexes', $classMetadata->table) && !empty($classMetadata->table['indexes'])) {
                 foreach ($classMetadata->table['indexes'] as $name => $uc) {
                     $indexes[$this->tablePrefix.$name] = $uc;
                 }
@@ -111,7 +111,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
                             $classMetadata,
                             $em->getConnection()->getDatabasePlatform()
                         ),
-                        $newDefinition['allocationSize']
+                        (int) $newDefinition['allocationSize']
                     );
                     $classMetadata->setIdGenerator($sequenceGenerator);
                 }

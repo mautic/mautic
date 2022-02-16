@@ -62,7 +62,7 @@ class IntegrationEntity extends CommonEntity
     private $internalEntityId;
 
     /**
-     * @var array
+     * @var ArrayCollection<(int|string), mixed>
      */
     private $internal;
 
@@ -266,7 +266,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return array
+     * @return ArrayCollection<int|string, mixed>
      */
     public function getInternal()
     {
@@ -274,7 +274,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @param array $internal
+     * @param ArrayCollection<int|string, mixed>|ArrayCollection<string, mixed> $internal
      *
      * @return IntegrationEntity
      */

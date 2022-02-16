@@ -206,7 +206,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $utmtags;
 
     /**
-     * @var FrequencyRule[]
+     * @var ArrayCollection<(int|string), mixed>
      */
     private $frequencyRules;
 
@@ -1419,7 +1419,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Set frequency rules.
      *
-     * @param FrequencyRule[] $frequencyRules
+     * @param \Doctrine\Common\Collections\ArrayCollection<int|string, mixed> $frequencyRules
      *
      * @return Lead
      */

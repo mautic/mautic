@@ -11,6 +11,7 @@
 
 namespace Mautic\PluginBundle\Integration;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
@@ -874,7 +875,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             ->setIntegrationEntity($integrationEntity)
             ->setIntegrationEntityId($integrationEntityId)
             ->setInternalEntity($internalEntity)
-            ->setInternal($internal)
+            ->setInternal(new ArrayCollection($internal))
             ->setInternalEntityId($internalEntityId);
 
         if ($persist) {

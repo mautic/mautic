@@ -444,7 +444,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     {
         $cm = $this->getClassMetadata();
 
-        if (!isset($cm->table['indexes'])) {
+        if (!array_key_exists('indexes', $cm->table) || empty($cm->table['indexes'])) {
             $cm->table['indexes'] = [];
         }
 

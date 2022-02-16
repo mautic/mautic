@@ -34,11 +34,11 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param null $channel
-     * @param null $ids
-     * @param null $reason
-     * @param null $listId
-     * @param bool $combined
+     * @param null                          $channel
+     * @param array<(int|string)>|null      $ids
+     * @param null                          $reason
+     * @param array<(int|string)>|null|bool $listId
+     * @param bool                          $combined
      *
      * @return array|int
      */

@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\DecisionEvent;
@@ -69,7 +70,12 @@ class DecisionDispatcher
         return $event;
     }
 
-    public function dispatchDecisionResultsEvent(DecisionAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
+    /**
+     * @param Collection<int, LeadEventLog>|ArrayCollection<int, LeadEventLog> $logs
+     *
+     * @return void
+     */
+    public function dispatchDecisionResultsEvent(DecisionAccessor $config, Collection $logs, EvaluatedContacts $evaluatedContacts)
     {
         if (!$logs->count()) {
             return;

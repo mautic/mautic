@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
@@ -1683,7 +1684,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $integrationEntity->setIntegration($this->getName());
                         $integrationEntity->setIntegrationEntity($object);
                         $integrationEntity->setInternalEntity('lead-error');
-                        $integrationEntity->setInternal(['error' => $item['error']]);
+                        $integrationEntity->setInternal(new ArrayCollection(['error' => $item['error']]));
                         $integrationEntity->setInternalEntityId($contactId);
 
                         $persistEntities[] = $integrationEntity;

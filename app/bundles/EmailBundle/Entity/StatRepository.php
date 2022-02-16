@@ -212,9 +212,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param array<int,int>|null $emailIds
+     * @param array<int,int>|null $listId
+     * @param bool                $combined
      *
      * @return array|int
      */
@@ -224,9 +224,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param array<int,string>|array<int,int>|null      $emailIds
+     * @param array<int,string>|array<int,int>|bool|null $listId
+     * @param bool                                       $combined
      *
      * @return array|int
      */
@@ -236,9 +236,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param array<int,string>|null      $emailIds
+     * @param array<int,string>|bool|null $listId
+     * @param bool                        $combined
      *
      * @return array|int
      */
@@ -248,10 +248,10 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param      $column
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param                                             $column
+     * @param array<int, string>|array<int,int>|null      $emailIds
+     * @param array<int, string>|array<int,int>|bool|null $listId
+     * @param bool                                        $combined
      *
      * @return array|int
      */

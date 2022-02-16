@@ -71,7 +71,7 @@ class EventsToArrayTransformer implements DataTransformerInterface
                 // Create a new entity
                 $event = new Event();
                 $event->setWebhook($this->webhook)->setEventType($type);
-                $events[] = $event;
+                $events->add($event);
             }
         }
 

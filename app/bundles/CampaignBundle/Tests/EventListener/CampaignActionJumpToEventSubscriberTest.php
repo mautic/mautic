@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
@@ -50,13 +51,18 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $leadLog->setLead($contact);
 
         $eventRepository = new class($campaign) extends EventRepository {
-            private $campaign;
+            private Campaign $campaign;
 
             public function __construct(Campaign $campaign)
             {
                 $this->campaign = $campaign;
             }
 
+            /**
+             * @param array<string, string> $args
+             *
+             * @return array<string, string>
+             */
             public function getEntities(array $args = [])
             {
                 Assert::assertSame(
@@ -202,7 +208,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
 
-            public function executeForContacts(Event $event, ArrayCollection $contacts, ?Counter $counter = null, $isInactiveEvent = false)
+            public function executeForContacts(Event $event, Collection $contacts, ?Counter $counter = null, $isInactiveEvent = false)
             {
                 Assert::assertSame(222, $event->getId());
                 Assert::assertCount(1, $contacts);
