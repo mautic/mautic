@@ -24,7 +24,7 @@ jobs:
 
     services:
       database:
-        image: ${{ matrix.db-types == 'mysql' && 'mysql:5.7' || 'mariadb:10.3' }}
+        image: ${{ matrix.db-types == 'mysql' && 'circleci/mysql:5.7-ram' || 'circleci/mariadb:10.3-ram' }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: mautictest
@@ -54,7 +54,6 @@ jobs:
         sudo docker exec ${{ matrix.db-types }} df -h
         sudo docker exec ${{ matrix.db-types }} ls -al /var/lib/mysql
         sudo docker exec ${{ matrix.db-types }} du -sh /var/lib/mysql
-        exit 1
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
