@@ -164,7 +164,7 @@ class StagesChangeLog
      *
      * @return StagesChangeLog
      */
-    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function setLead(Lead $lead)
     {
         $this->lead = $lead;
 
@@ -186,7 +186,7 @@ class StagesChangeLog
      *
      * @return StagesChangeLog
      */
-    public function setStage(\Mautic\StageBundle\Entity\Stage $stage)
+    public function setStage(Stage $stage)
     {
         $this->stage = $stage;
 

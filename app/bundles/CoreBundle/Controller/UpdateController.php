@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -34,11 +35,14 @@ class UpdateController extends CommonController
         /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
         $updateHelper = $this->container->get('mautic.helper.update');
         $updateData   = $updateHelper->fetchData();
+        /** @var CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = $this->container->get('mautic.helper.core_parameters');
 
         return $this->delegateView([
             'viewParameters' => [
-                'updateData'     => $updateData,
-                'currentVersion' => MAUTIC_VERSION,
+                'updateData'        => $updateData,
+                'currentVersion'    => MAUTIC_VERSION,
+                'isComposerEnabled' => $coreParametersHelper->get('composer_updates', false),
             ],
             'contentTemplate' => 'MauticCoreBundle:Update:index.html.php',
             'passthroughVars' => [

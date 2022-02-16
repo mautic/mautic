@@ -33,11 +33,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EmailController extends FormController
 {
-    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
-
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
+    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
     /**
      * @param int $page
@@ -187,7 +186,7 @@ class EmailController extends FormController
             }
         }
 
-        $orderBy    = $session->get('mautic.email.orderby', 'e.subject');
+        $orderBy    = $session->get('mautic.email.orderby', 'e.dateModified');
         $orderByDir = $session->get('mautic.email.orderbydir', 'DESC');
 
         $emails = $model->getEntities(
@@ -382,7 +381,6 @@ class EmailController extends FormController
                 'viewParameters' => [
                     'email'        => $email,
                     'trackables'   => $trackableLinks,
-                    'pending'      => $model->getPendingLeads($email, null, true),
                     'logs'         => $logs,
                     'isEmbedded'   => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
                     'variants'     => [
