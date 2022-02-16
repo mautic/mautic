@@ -39,7 +39,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         $lastId = array_pop($logIds);
 
         // Wait 6 seconds to go past scheduled time
-        sleep(6);
+        sleep(4);;
 
         $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
 
