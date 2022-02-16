@@ -684,8 +684,10 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Provide the direction for default ordering.
+     *
+     * @return string
      */
-    protected function getDefaultOrderDirection(): string
+    protected function getDefaultOrderDirection()
     {
         return 'ASC';
     }
@@ -897,7 +899,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $orderBy    = $session->get('mautic.'.$this->getSessionBase().'.orderby', $repo->getTableAlias().'.'.$this->getDefaultOrderColumn());
         $orderByDir = $session->get('mautic.'.$this->getSessionBase().'.orderbydir', $this->getDefaultOrderDirection());
 
-        list($count, $items) = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
+        [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
