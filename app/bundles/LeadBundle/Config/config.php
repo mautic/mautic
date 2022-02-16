@@ -332,6 +332,8 @@ return [
                     'doctrine.orm.entity_manager',
                     'translator',
                     'router',
+                    'mautic.helper.core_parameters',
+                    'mautic.lead.repository.company_lead',
                 ],
                 'methodCalls' => [
                     'setModelFactory' => ['mautic.model.factory'],
@@ -618,6 +620,7 @@ return [
                     'translator',
                     'mautic.lead.model.company',
                     'doctrine.orm.entity_manager',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.form.type.leadlist' => [
@@ -1521,6 +1524,16 @@ return [
                 ],
                 'tag' => 'console.command',
             ],
+            'mautic.lead.command.delete_contact_secondary_companies' => [
+                'class'     => \Mautic\LeadBundle\Command\DeleteContactSecondaryCompaniesCommand::class,
+                'arguments' => [
+                    'monolog.logger.mautic',
+                    'translator',
+                    'mautic.helper.core_parameters',
+                    'mautic.lead.repository.company_lead',
+                ],
+                'tag' => 'console.command',
+            ],
         ],
         'fixtures' => [
             'mautic.lead.fixture.company' => [
@@ -1582,5 +1595,6 @@ return [
         'company_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
         'contact_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
         'segment_rebuild_time_warning'                                                          => 30,
+        'contact_allow_multiple_companies'                                                      => true,
     ],
 ];
