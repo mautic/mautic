@@ -35,6 +35,7 @@ jobs:
         volumes:
           - /tmp/mysql_config:/etc/mysql/conf.d
         options: >-
+          --shm-size=2gb
           --name ${{ matrix.db-types }}
           --health-cmd="mysqladmin ping" 
           --health-interval=10s 
