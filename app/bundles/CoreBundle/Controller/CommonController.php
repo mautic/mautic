@@ -545,7 +545,7 @@ class CommonController extends Controller implements MauticController
         $name = 'mautic.'.$name;
 
         if (false === $this->request->query->has('orderby') && false === $session->has("$name.orderbydir")) {
-            $session->set("$name.orderbydir", method_exists($this, 'getDefaultOrderDirection') ? $this->getDefaultOrderDirection() : 'ASC');
+            $session->set("$name.orderbydir", $this->getDefaultOrderDirection());
         }
 
         if ($this->request->query->has('orderby')) {
@@ -611,7 +611,7 @@ class CommonController extends Controller implements MauticController
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
         $model = $this->getModel('core.notification');
 
-        list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent($afterId, false, 200);
+        [$notifications, $showNewIndicator, $updateMessage] = $model->getNotificationContent($afterId, false, 200);
 
         $lastNotification = reset($notifications);
 
@@ -771,5 +771,13 @@ class CommonController extends Controller implements MauticController
         $data = new DataExporterHelper();
 
         return $data->getDataForExport($start, $model, $args, $resultsCallback);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultOrderDirection()
+    {
+        return 'ASC';
     }
 }
