@@ -621,11 +621,13 @@ class CitrixHelper
     public static function mergeWithFutureEvents($choices, $products)
     {
         $events = self::getCitrixChoices($products);
-
         foreach ($events as $key => $event) {
-            if (!in_array($event, $choices)) {
-                $choices['_#'.$key] = $event;
+            foreach ($choices as $eventId => $eventname) {
+                if (false !== strpos($eventId, '_#'.$key)) {
+                    continue 2;
+                }
             }
+            $choices[self::getCleanString($event).'_#'.$key] = $event;
         }
 
         return $choices;
