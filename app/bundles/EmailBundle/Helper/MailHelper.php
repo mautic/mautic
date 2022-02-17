@@ -1233,6 +1233,7 @@ class MailHelper
         try {
             $name = $this->cleanName($name);
             $this->message->setReplyTo($addresses, $name);
+            $this->replyTo=$addresses;
         } catch (\Exception $e) {
             $this->logError($e, 'reply to');
         }
