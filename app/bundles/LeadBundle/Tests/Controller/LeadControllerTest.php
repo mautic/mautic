@@ -20,8 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -425,6 +423,8 @@ class LeadControllerTest extends MauticMysqlTestCase
 
     public function testSimpleCompanyFeatureByDefault(): void
     {
+        $this->useCleanupRollback = false;
+
         $this->setUpSymfony(['contact_allow_multiple_companies' => 0]);
 
         $crawler     = $this->client->request('GET', 's/contacts/new/');
@@ -432,6 +432,8 @@ class LeadControllerTest extends MauticMysqlTestCase
         self::assertNull($multiple);
 
         self::assertEquals(1, count($this->getContactCompanies()));
+
+        $this->useCleanupRollback = true;
     }
 
     /**
