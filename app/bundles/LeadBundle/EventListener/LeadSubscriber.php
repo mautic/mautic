@@ -403,9 +403,9 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @throws Exception
      */
-    public function onLeadCompanyChange(LeadChangeCompanyEvent $event)
+    public function onLeadCompanyChange(LeadChangeCompanyEvent $event): void
     {
-        $leadId                 = $event->getLead()->getId() ?? null;
+        $leadId                 = $event->getLead()->getId();
         $allowMultipleCompanies = $this->coreParametersHelper->get('contact_allow_multiple_companies');
 
         if ($leadId && !$allowMultipleCompanies) {
