@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Executioner\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
@@ -44,13 +45,15 @@ class ActionExecutioner implements EventInterface
     }
 
     /**
+     * @param Collection<int, LeadEventLog>|ArrayCollection<int, LeadEventLog> $logs
+     *
      * @return EvaluatedContacts
      *
      * @throws CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      */
-    public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
+    public function execute(AbstractEventAccessor $config, Collection $logs)
     {
         /** @var LeadEventLog $firstLog */
         if (!$firstLog = $logs->first()) {

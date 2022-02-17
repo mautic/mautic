@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Executioner\Scheduler;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -95,9 +96,10 @@ class EventScheduler
     }
 
     /**
-     * @param bool $isInactiveEvent
+     * @param ArrayCollection<int, \Mautic\CampaignBundle\Entity\Lead>|Collection<int, Lead> $contacts
+     * @param bool                                                                           $isInactiveEvent
      */
-    public function schedule(Event $event, \DateTime $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
+    public function schedule(Event $event, \DateTime $executionDate, Collection $contacts, $isInactiveEvent = false)
     {
         $config = $this->collector->getEventConfig($event);
 
@@ -251,13 +253,13 @@ class EventScheduler
     }
 
     /**
-     * @param ArrayCollection|Event[] $events
+     * @param Collection<int, Event> $events
      *
      * @return array
      *
      * @throws NotSchedulableException
      */
-    public function getSortedExecutionDates(ArrayCollection $events, \DateTime $lastActiveDate)
+    public function getSortedExecutionDates(Collection $events, \DateTime $lastActiveDate)
     {
         $eventExecutionDates = [];
 

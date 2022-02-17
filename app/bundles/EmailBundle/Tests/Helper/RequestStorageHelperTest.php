@@ -13,8 +13,8 @@ namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\EmailBundle\Helper\RequestStorageHelper;
-use Mautic\EmailBundle\Swiftmailer\Transport\MomentumTransport;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\Transport\NullTransport;
 
 class RequestStorageHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -37,10 +37,10 @@ class RequestStorageHelperTest extends \PHPUnit\Framework\TestCase
             ->method('set')
             ->with($this->anything(), $payload);
 
-        $key = $this->helper->storeRequest(MomentumTransport::class, new Request([], $payload));
+        $key = $this->helper->storeRequest(NullTransport::class, new Request([], $payload));
 
-        $this->assertStringStartsWith(MomentumTransport::class, $key);
-        $this->assertEquals(98, strlen($key));
+        $this->assertStringStartsWith(NullTransport::class, $key);
+        $this->assertEquals(88, strlen($key));
     }
 
     public function testStoreRequestWithLongTansportName()
@@ -49,7 +49,7 @@ class RequestStorageHelperTest extends \PHPUnit\Framework\TestCase
         $longTransportName = '';
 
         for ($i = 0; $i < 5; ++$i) {
-            $longTransportName .= MomentumTransport::class;
+            $longTransportName .= NullTransport::class;
         }
 
         $this->cacheStorageMock->expects($this->never())
@@ -62,7 +62,7 @@ class RequestStorageHelperTest extends \PHPUnit\Framework\TestCase
     public function testGetRequest()
     {
         $payload = ['some' => 'values'];
-        $key     = MomentumTransport::class.':webhook_request:5b43832134cfb0.36545510';
+        $key     = NullTransport::class.':webhook_request:5b43832134cfb0.36545510';
 
         $this->cacheStorageMock->expects($this->once())
             ->method('get')
@@ -78,7 +78,7 @@ class RequestStorageHelperTest extends \PHPUnit\Framework\TestCase
     public function testGetRequestIfNotFound()
     {
         $payload = ['some' => 'values'];
-        $key     = MomentumTransport::class.':webhook_request:5b43832134cfb0.36545510';
+        $key     = NullTransport::class.':webhook_request:5b43832134cfb0.36545510';
 
         $this->cacheStorageMock->expects($this->once())
             ->method('get')
@@ -91,7 +91,7 @@ class RequestStorageHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTransportNameFromKey()
     {
-        $this->assertEquals(MomentumTransport::class, $this->helper->getTransportNameFromKey('Mautic\EmailBundle\Swiftmailer\Transport\MomentumTransport:webhook_request:5b43832134cfb0.36545510'));
+        $this->assertEquals(NullTransport::class, $this->helper->getTransportNameFromKey(NullTransport::class.':webhook_request:5b43832134cfb0.36545510'));
     }
 
     /**
@@ -99,6 +99,6 @@ class RequestStorageHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetTransportNameFromKeyWithGlobalPrefix()
     {
-        $this->assertEquals(MomentumTransport::class, $this->helper->getTransportNameFromKey('mautic:Mautic|EmailBundle|Swiftmailer|Transport|MomentumTransport:webhook_request:5bfbe8ce671198.00044461'));
+        $this->assertEquals(NullTransport::class, $this->helper->getTransportNameFromKey('mautic:Symfony|Component|Mailer|Transport|NullTransport:webhook_request:5bfbe8ce671198.00044461'));
     }
 }

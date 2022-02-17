@@ -51,6 +51,12 @@ trait FakeContainerTrait
                 return $this->container->hasParameter($name);
             }
 
+            /**
+             * Sets a parameter.
+             *
+             * @param string                                        $name  The parameter name
+             * @param array<int, string>|bool|string|int|float|null $value The parameter value
+             */
             public function setParameter($name, $value)
             {
                 $this->container->setParameter($name, $value);

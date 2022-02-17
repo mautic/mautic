@@ -24,13 +24,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class NotificationConfigType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface<int,FormBuilderInterface> $builder
-     * @param array<string,mixed>                            $options
-     *
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    /** @inerhitDoc */
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'campaign_send_notification_to_author',

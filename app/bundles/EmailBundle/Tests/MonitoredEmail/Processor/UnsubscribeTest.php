@@ -81,7 +81,7 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
         $processor = new Unsubscribe($transport, $contactFinder, $translator, $logger, $doNotContact);
 
         $message = new Message();
-        $this->assertFalse($processor->process($message));
+        $this->assertTrue($processor->process($message));
     }
 
     /**

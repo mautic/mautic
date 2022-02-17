@@ -32,13 +32,17 @@ class EmailSender
         );
     }
 
-    public function sendEmail(Address $from, Address $to, string $subject, string $body): void
+    public function sendEmail(Address $from, Address $to, string $subject, string $body, ?string $text = null): void
     {
         $emailMessage = (new Email())
             ->from($from)
             ->to($to)
             ->subject($subject)
             ->html($body);
+
+        if (!empty($text)) {
+            $emailMessage->text($text);
+        }
 
         $this->mailer->send($emailMessage);
     }

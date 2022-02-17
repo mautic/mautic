@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Executioner\Logger;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
@@ -160,9 +161,11 @@ class EventLogger
     }
 
     /**
+     * @param Collection<int, LeadEventLog>|ArrayCollection<int, LeadEventLog> $collection
+     *
      * @return $this
      */
-    public function persistCollection(ArrayCollection $collection)
+    public function persistCollection(Collection $collection)
     {
         if (!$collection->count()) {
             return $this;
@@ -175,9 +178,11 @@ class EventLogger
     }
 
     /**
+     * @param Collection<int, LeadEventLog>|ArrayCollection<int, LeadEventLog> $collection
+     *
      * @return $this
      */
-    public function clearCollection(ArrayCollection $collection)
+    public function clearCollection(Collection $collection)
     {
         $this->leadEventLogRepository->detachEntities($collection->getValues());
 
@@ -201,11 +206,12 @@ class EventLogger
     }
 
     /**
-     * @param bool $isInactiveEntry
+     * @param Collection<int, Lead>|ArrayCollection<int, Lead> $contacts
+     * @param bool                                             $isInactiveEntry
      *
-     * @return ArrayCollection
+     * @return Collection<int, LeadEventLog>
      */
-    public function fetchRotationAndGenerateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry = false)
+    public function fetchRotationAndGenerateLogsFromContacts(Event $event, AbstractEventAccessor $config, Collection $contacts, $isInactiveEntry = false)
     {
         $this->hydrateContactRotationsForNewLogs($contacts->getKeys(), $event->getCampaign()->getId());
 
@@ -213,11 +219,12 @@ class EventLogger
     }
 
     /**
-     * @param bool $isInactiveEntry
+     * @param Collection<int, Lead>|ArrayCollection<int, Lead> $contacts
+     * @param bool                                             $isInactiveEntry
      *
-     * @return ArrayCollection
+     * @return Collection<int, LeadEventLog>
      */
-    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry)
+    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, Collection $contacts, $isInactiveEntry)
     {
         $isDecision = Event::TYPE_DECISION === $event->getEventType();
 

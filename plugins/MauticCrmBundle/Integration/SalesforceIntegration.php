@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -2056,7 +2057,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     if ($integrationEntity) {
                         $integrationEntity->setInternalEntity('ENTITY_IS_DELETED' === $item['body'][0]['errorCode'] ? $internalObject.'-deleted' : $internalObject.'-error')
-                            ->setInternal(['error' => $item['body'][0]['message']]);
+                            ->setInternal(new ArrayCollection(['error' => $item['body'][0]['message']]));
                         $this->persistIntegrationEntities[] = $integrationEntity;
                     }
                     ++$totalErrored;

@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\EmailBundle\Mailer\Dsn\DsnGenerator;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
+use Mautic\InstallBundle\Configurator\Step\EmailStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
@@ -542,15 +543,17 @@ class InstallService
             return $messages;
         }
 
-        $step->mailer_dsn = DsnGenerator::getDsnString(
-            new Dsn(
-                $data['mailer_transport'],
-                $data['mailer_host'],
-                $data['mailer_user'],
-                $data['mailer_password'],
-                $data['mailer_port'] ? (int) $data['mailer_port'] : null
-            )
-        );
+        if ($step instanceof EmailStep) {
+            $step->mailer_dsn = DsnGenerator::getDsnString(
+                new Dsn(
+                    $data['mailer_transport'],
+                    $data['mailer_host'],
+                    $data['mailer_user'],
+                    $data['mailer_password'],
+                    $data['mailer_port'] ? (int) $data['mailer_port'] : null
+                )
+            );
+        }
 
         return $this->saveConfiguration($data, $step, true);
     }

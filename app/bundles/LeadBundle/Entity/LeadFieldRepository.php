@@ -58,7 +58,7 @@ class LeadFieldRepository extends CommonRepository
 
         if ($includeEntityFields) {
             //add lead main column names to prevent attempt to create a field with the same name
-            $leadRepo = $this->_em->getRepository('MauticLeadBundle:Lead')->getBaseColumns('Mautic\\LeadBundle\\Entity\\Lead', true);
+            $leadRepo = $this->_em->getRepository(Lead::class)->getBaseColumns('Mautic\\LeadBundle\\Entity\\Lead', true);
             $aliases  = array_merge($aliases, $leadRepo);
         }
 

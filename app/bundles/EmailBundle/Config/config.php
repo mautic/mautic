@@ -548,9 +548,6 @@ return [
             ],
             'mautic.email.mailer.factory' => [
                 'class'     => \Mautic\EmailBundle\Mailer\MailerFactory::class,
-                'arguments' => [
-                    'mailer',
-                ],
             ],
             'mautic.email.mailer.email_sender' => [
                 'class'     => \Mautic\EmailBundle\Mailer\EmailSender::class,

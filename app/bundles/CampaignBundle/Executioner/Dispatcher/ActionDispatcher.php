@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -73,12 +74,14 @@ class ActionDispatcher
     }
 
     /**
+     * @param Collection<int, LeadEventLog>|ArrayCollection<int, LeadEventLog> $logs
+     *
      * @return PendingEvent
      *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      */
-    public function dispatchEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, PendingEvent $pendingEvent = null)
+    public function dispatchEvent(ActionAccessor $config, Event $event, Collection $logs, PendingEvent $pendingEvent = null)
     {
         if (!$pendingEvent) {
             $pendingEvent = new PendingEvent($config, $event, $logs);

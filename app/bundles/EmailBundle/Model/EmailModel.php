@@ -2299,13 +2299,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             }
         }
 
-        //flush the message
-        if (!$mailer->flushQueue()) {
-            $errorArray = $mailer->getErrors();
-            unset($errorArray['failures']);
-            $errors[] = implode('; ', $errorArray);
-        }
-
         if (isset($saveEntities)) {
             $this->getStatRepository()->saveEntities($saveEntities);
         }
