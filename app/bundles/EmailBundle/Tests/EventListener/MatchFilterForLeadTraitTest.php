@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
-use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\TestCase;
 
@@ -48,162 +47,67 @@ class MatchFilterForLeadTraitTest extends TestCase
         self::assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
-    public function testIsContactSegmentRelationshipValidEmpty(): void
+    public function testDWCContactEndWidth(): void
     {
-        $lead['id'] = 1;
-        $segmentId  = 1;
-        $operator   = OperatorOptions::EMPTY;
+        $this->filter[0]['operator'] = 'endsWith';
+        $this->filter[0]['filter']   = 'text';
 
-        $segmentRepository = $this->createMock(LeadListRepository::class);
-        $segmentRepository->expects(self::once())
-            ->method('isNotContactInAnySegment')
-            ->with($lead['id'])
-            ->willReturn(true);
+        self::assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
 
-        $filter = [
-            0 => [
-                'display' => 'Segment Membership',
-                'field'   => 'leadlist',
-                'filter'  => [
-                    0 => $segmentId,
-                ],
-                'glue'     => 'and',
-                'object'   => 'lead',
-                'operator' => $operator,
-                'type'     => 'leadlist',
-            ],
-        ];
+        $this->lead['custom'] = 'another words';
 
-        $trait = new MatchFilterForLeadTraitTestable();
-        $trait->setRepository($segmentRepository);
-
-        self::assertSame(true, $trait->match($filter, $lead));
+        self::assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
-    public function testIsContactSegmentRelationshipValidNotEmpty(): void
+    public function testDWCContactContains(): void
     {
-        $lead['id'] = 1;
-        $segmentId  = 1;
-        $operator   = OperatorOptions::NOT_EMPTY;
+        $this->filter[0]['operator'] = 'contains';
+        $this->filter[0]['filter']   = 'custom';
 
-        $segmentRepository = $this->createMock(LeadListRepository::class);
-        $segmentRepository->expects(self::once())
-            ->method('isContactInAnySegment')
-            ->with($lead['id'])
-            ->willReturn(true);
+        self::assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
 
-        $filter = [
-            0 => [
-                'display' => 'Segment Membership',
-                'field'   => 'leadlist',
-                'filter'  => [
-                    0 => $segmentId,
-                ],
-                'glue'     => 'and',
-                'object'   => 'lead',
-                'operator' => $operator,
-                'type'     => 'leadlist',
-            ],
-        ];
+        $this->lead['custom'] = 'another words';
 
-        $trait = new MatchFilterForLeadTraitTestable();
-        $trait->setRepository($segmentRepository);
-
-        self::assertSame(true, $trait->match($filter, $lead));
+        self::assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
-    public function testIsContactSegmentRelationshipValidIn(): void
+    /**
+     * @dataProvider dateMatchTestProvider
+     */
+    public function testMatchFilterForLeadTraitForDate(?string $value, string $operator, bool $expect)
     {
-        $lead['id'] = 1;
-        $segmentId  = 1;
-        $operator   = OperatorOptions::IN;
-
-        $segmentRepository = $this->createMock(LeadListRepository::class);
-        $segmentRepository->expects(self::once())
-            ->method('isContactInSegments')
-            ->with($lead['id'], [0 => $segmentId])
-            ->willReturn(true);
-
-        $filter = [
-            0 => [
-                'display' => 'Segment Membership',
-                'field'   => 'leadlist',
-                'filter'  => [
-                    0 => $segmentId,
-                ],
+        $filters = [
+            [
                 'glue'     => 'and',
+                'field'    => 'date',
                 'object'   => 'lead',
+                'type'     => 'date',
+                'filter'   => '2021-05-01',
+                'display'  => null,
                 'operator' => $operator,
-                'type'     => 'leadlist',
             ],
         ];
 
-        $trait = new MatchFilterForLeadTraitTestable();
-        $trait->setRepository($segmentRepository);
+        $lead = [
+            'id'   => 1,
+            'date' => $value,
+        ];
 
-        self::assertSame(true, $trait->match($filter, $lead));
+        $this->assertEquals($expect, $this->matchFilterForLeadTrait->match($filters, $lead));
     }
 
-    public function testIsContactSegmentRelationshipValidNotIn(): void
+    public function dateMatchTestProvider(): iterable
     {
-        $lead['id'] = 1;
-        $segmentId  = 1;
-        $operator   = OperatorOptions::NOT_IN;
+        $date = '2021-05-01';
 
-        $segmentRepository = $this->createMock(LeadListRepository::class);
-        $segmentRepository->expects(self::once())
-            ->method('isNotContactInSegments')
-            ->with($lead['id'], [0 => $segmentId])
-            ->willReturn(true);
-
-        $filter = [
-            0 => [
-                'display' => 'Segment Membership',
-                'field'   => 'leadlist',
-                'filter'  => [
-                    0 => $segmentId,
-                ],
-                'glue'     => 'and',
-                'object'   => 'lead',
-                'operator' => $operator,
-                'type'     => 'leadlist',
-            ],
-        ];
-
-        $trait = new MatchFilterForLeadTraitTestable();
-        $trait->setRepository($segmentRepository);
-
-        self::assertSame(true, $trait->match($filter, $lead));
-    }
-
-    public function testIsContactSegmentRelationshipValidInvalidOperator(): void
-    {
-        $lead['id'] = 1;
-        $segmentId  = 1;
-        $operator   = 'invalid';
-
-        $segmentRepository = $this->createMock(LeadListRepository::class);
-
-        $filter = [
-            0 => [
-                'display' => 'Segment Membership',
-                'field'   => 'leadlist',
-                'filter'  => [
-                    0 => $segmentId,
-                ],
-                'glue'     => 'and',
-                'object'   => 'lead',
-                'operator' => $operator,
-                'type'     => 'leadlist',
-            ],
-        ];
-
-        $trait = new MatchFilterForLeadTraitTestable();
-        $trait->setRepository($segmentRepository);
-
-        $this->expectException(\InvalidArgumentException::class);
-
-        $trait->match($filter, $lead);
+        yield [$date, '=', true];
+        yield [$date, '!=', false];
+        yield ['2020-02-02', '!=', true];
+        yield [$date, '!=', false];
+        yield [null, 'empty', true];
+        yield [$date, 'empty', false];
+        yield [$date, '!empty', true];
+        yield [null, '!empty', false];
     }
 
     /**
@@ -308,11 +212,6 @@ class MatchFilterForLeadTraitTest extends TestCase
 class MatchFilterForLeadTraitTestable
 {
     use MatchFilterForLeadTrait;
-
-    public function setRepository($segmentRepository): void
-    {
-        $this->segmentRepository = $segmentRepository;
-    }
 
     public function match(array $filter, array $lead): bool
     {
