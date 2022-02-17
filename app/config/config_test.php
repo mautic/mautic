@@ -28,13 +28,6 @@ $container->loadFromExtension('framework', [
     'csrf_protection' => [
         'enabled' => true,
     ],
-    'cache' => [
-        'pools' => [
-            'doctrine.system_cache_pool' => [
-                'adapter' => 'cache.adapter.array',
-            ],
-        ],
-    ],
 ]);
 
 $container->setParameter('mautic.famework.csrf_protection', true);
@@ -71,20 +64,6 @@ $container->loadFromExtension('doctrine', [
                     'bit'   => 'string',
                 ],
             ],
-        ],
-    ],
-    'orm' => [
-        'metadata_cache_driver' => [
-            'type' => 'pool',
-            'id' => 'doctrine.system_cache_pool'
-        ],
-        'query_cache_driver' => [
-            'type' => 'pool',
-            'id' => 'doctrine.system_cache_pool'
-        ],
-        'result_cache_driver' => [
-            'type' => 'pool',
-            'id' => 'doctrine.system_cache_pool'
         ],
     ],
 ]);
