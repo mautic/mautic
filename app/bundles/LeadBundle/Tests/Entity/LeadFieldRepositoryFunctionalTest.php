@@ -23,7 +23,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         ]);
     }
 
-    public function testCompareValueEqualsOperator()
+    public function testCompareValueEqualsOperator(): void
     {
         $lead = new Lead();
         $lead->setFirstname('John');
@@ -36,7 +36,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($repository->compareValue(1, 'firstname', 'Jack', 'eq'));
     }
 
-    public function testCompareValueNotEqualsOperator()
+    public function testCompareValueNotEqualsOperator(): void
     {
         $lead = new Lead();
         $lead->setFirstname('Ada');
@@ -49,7 +49,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($repository->compareValue(1, 'firstname', 'Ada', 'neq'));
     }
 
-    public function testCompareValueEmptyOperator()
+    public function testCompareValueEmptyOperator(): void
     {
         $lead = new Lead();
         $this->em->persist($lead);
@@ -62,7 +62,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($repository->compareValue(1, 'firstname', null, 'empty'));
     }
 
-    public function testCompareValueNotEmptyOperator()
+    public function testCompareValueNotEmptyOperator(): void
     {
         $lead = new Lead();
         $this->em->persist($lead);
@@ -75,7 +75,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($repository->compareValue(1, 'lastname', null, 'notEmpty'));
     }
 
-    public function testCompareValueStartsWithOperator()
+    public function testCompareValueStartsWithOperator(): void
     {
         $lead = new Lead();
         $this->em->persist($lead);
@@ -88,7 +88,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($repository->compareValue(1, 'email', 'Unicorn', 'startsWith'));
     }
 
-    public function testCompareValueEndWithOperator()
+    public function testCompareValueEndWithOperator(): void
     {
         $lead = new Lead();
         $this->em->persist($lead);
@@ -101,7 +101,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($repository->compareValue(1, 'email', 'Unicorn', 'endsWith'));
     }
 
-    public function testCompareValueContainsOperator()
+    public function testCompareValueContainsOperator(): void
     {
         $lead = new Lead();
         $this->em->persist($lead);
@@ -114,7 +114,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($repository->compareValue(1, 'email', 'Unicorn', 'contains'));
     }
 
-    public function testCompareValueInOperator()
+    public function testCompareValueInOperator(): void
     {
         $lead = new Lead();
         $lead->setCountry('United Kingdom');
@@ -127,7 +127,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($repository->compareValue(1, 'country', ['Poland', 'Canada'], 'in'));
     }
 
-    public function testCompareValueNotInOperator()
+    public function testCompareValueNotInOperator(): void
     {
         $lead = new Lead();
         $lead->setCountry('United Kingdom');
