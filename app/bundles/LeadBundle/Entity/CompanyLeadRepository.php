@@ -45,10 +45,13 @@ class CompanyLeadRepository extends CommonRepository
     /**
      * Get companies by leadId.
      *
-     * @param $leadId
-     * @param $companyId
+     * @param int       $leadId
+     * @param int|null  $companyId
+     * @param bool|null $onlyPrimary
      *
      * @return array
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getCompaniesByLeadId($leadId, $companyId = null, $onlyPrimary = null)
     {
@@ -171,7 +174,7 @@ class CompanyLeadRepository extends CommonRepository
         }
     }
 
-    public function removeAllSecondaryCompanies()
+    public function removeAllSecondaryCompanies(): void
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
@@ -180,7 +183,7 @@ class CompanyLeadRepository extends CommonRepository
         )->execute();
     }
 
-    public function removeContactSecondaryCompanies(int $leadId)
+    public function removeContactSecondaryCompanies(int $leadId): void
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
