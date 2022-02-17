@@ -20,6 +20,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RouterInterface;
@@ -156,6 +157,8 @@ abstract class AbstractMauticTestCase extends WebTestCase
      * @return string Command's output
      *
      * @throws \Exception
+     *
+     * @deprecated use testSymfonyCommand() instead
      */
     protected function runCommand(string $name, array $params = [], Command $command = null, int $expectedStatusCode = 0): string
     {
@@ -199,5 +202,25 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $session->save();
         $cookie = new Cookie($session->getName(), $session->getId());
         $this->client->getCookieJar()->set($cookie);
+    }
+
+    /**
+     * @param array<mixed,mixed> $params
+     */
+    protected function testSymfonyCommand(string $name, array $params = [], Command $command = null): CommandTester
+    {
+        $kernel      = self::$container->get('kernel');
+        $application = new Application($kernel);
+
+        if ($command) {
+            // Register the command
+            $application->add($command);
+        }
+
+        $command       = $application->find($name);
+        $commandTester = new CommandTester($command);
+        $commandTester->execute($params);
+
+        return $commandTester;
     }
 }
