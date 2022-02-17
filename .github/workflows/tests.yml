@@ -62,7 +62,7 @@ jobs:
         mysqldump --print-defaults
         new_port=$(sudo docker port ${{ matrix.db-types }} 3306 | cut -d\: -f2)
         echo "mysql_port=${new_port}" >> $GITHUB_ENV
-        sudo mount -t tmpfs -o rw,size=512m tmpfs ${{ github.workspace }}/var/cache
+        sudo mount -t tmpfs -o rw,size=512m tmpfs ${{ github.workspace }}/var
         df -h
         ls -al ${{ github.workspace }}
 
