@@ -9,14 +9,19 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -407,5 +412,61 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $campaign;
+    }
+
+    public function testMultipleCompanyFeatureByDefault(): void
+    {
+        $crawler     = $this->client->request('GET', 's/contacts/new/');
+        $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
+        self::assertSame('multiple', $multiple);
+
+        self::assertEquals(2, count($this->getContactCompanies()));
+    }
+
+    public function testSimpleCompanyFeatureByDefault(): void
+    {
+        $this->setUpSymfony(['contact_allow_multiple_companies' => 0]);
+
+        $crawler     = $this->client->request('GET', 's/contacts/new/');
+        $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
+        self::assertNull($multiple);
+
+        self::assertEquals(1, count($this->getContactCompanies()));
+    }
+
+    /**
+     * @return mixed
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    protected function getContactCompanies()
+    {
+        $company = new Company();
+        $company->setName('Doe Corp');
+
+        $this->em->persist($company);
+
+        $company2 = new Company();
+        $company2->setName('Doe Corp 2');
+
+        $this->em->persist($company2);
+
+        $contact = new Lead();
+        $contact->setEmail('test@test.com');
+
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        /** @var LeadModel $leadModel */
+        $leadModel = self::$container->get('mautic.lead.model.lead');
+        $leadModel->addToCompany($contact, $company);
+        $leadModel->addToCompany($contact, $company2);
+
+        /** @var CompanyLeadRepository $companyLeadRepo */
+        $companyLeadRepo  = $this->em->getRepository(CompanyLead::class);
+        $contactCompanies = $companyLeadRepo->getCompaniesByLeadId($contact->getId());
+
+        return $contactCompanies;
     }
 }
