@@ -46,6 +46,13 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: add config and restart db
+      run: |
+        sudo cp ${{ github.workspace }}/.github/ci-files/mysql_config/* /tmp/mysql_config/
+        sudo docker restart ${{ matrix.db-types }}
+        new_port=$(sudo docker port ${{ matrix.db-types }} 3306 | cut -d\: -f2)
+        echo "mysql_port=${new_port}" >> $GITHUB_ENV
+
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
       with:
@@ -60,11 +67,6 @@ jobs:
         mysqldump --print-defaults
         cp .github/ci-files/.my.cnf ~/.my.cnf
         mysqldump --print-defaults
-        new_port=$(sudo docker port ${{ matrix.db-types }} 3306 | cut -d\: -f2)
-        echo "mysql_port=${new_port}" >> $GITHUB_ENV
-        sudo mount -t tmpfs -o rw,size=512m tmpfs ${{ github.workspace }}/var
-        df -h
-        ls -al ${{ github.workspace }}
 
     - name: Set SYMFONY_ENV to test
       run: |
