@@ -16,17 +16,19 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\PageBundle\Tests\Controller\PageControllerTest;
 use PHPUnit\Framework\Assert;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use ControllerTrait;
+
     public function setUp(): void
     {
         $this->clientOptions = ['debug' => true];
@@ -60,9 +62,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $column     = 'dateModified';
         $column2    = 'name';
         $tableAlias = 'e.';
-        $client     = $this->client;
 
-        PageControllerTest::getColumnTests($client, $urlAlias, $routeAlias, $column, $tableAlias, $column2);
+        $this->getControllerColumnTests($urlAlias, $routeAlias, $column, $tableAlias, $column2);
     }
 
     /**

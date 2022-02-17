@@ -3,16 +3,18 @@
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageData;
 use Mautic\PageBundle\Entity\Page;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PageControllerTest extends MauticMysqlTestCase
 {
+    use ControllerTrait;
+
     /**
      * @var string
      */
@@ -22,75 +24,6 @@ class PageControllerTest extends MauticMysqlTestCase
      * @var int
      */
     private $id;
-
-    public static function getColumnTests(
-        KernelBrowser $client,
-        string $urlAlias,
-        string $routeAlias,
-        string $column,
-        string $tableAlias,
-        string $column2
-    ): void {
-        $crawler         = $client->request('GET', '/s/'.$urlAlias);
-        $clientResponse  = $client->getResponse();
-        $responseContent = $clientResponse->getContent();
-        self::assertTrue($clientResponse->isOk());
-
-        self::assertStringContainsString(
-            'col-'.$routeAlias.'-dateAdded',
-            $responseContent,
-            'The return must contain the created at date column'
-        );
-        self::assertStringContainsString(
-            'col-'.$routeAlias.'-'.$column,
-            $responseContent,
-            'The return must contain the modified date column'
-        );
-
-        self::assertEquals(
-            1,
-            $crawler->filterXPath(
-                "//th[contains(@class,'col-".$routeAlias.'-'.$column."')]//i[contains(@class, 'fa-sort-amount-desc')]"
-            )->count(),
-            'The order must be desc'
-        );
-
-        $crawler = $client->request(
-            'GET',
-            '/s/'.$urlAlias.'?tmpl=list&name='.$routeAlias.'&orderby='.$tableAlias.$column
-        );
-        self::assertEquals(
-            1,
-            $crawler->filterXPath(
-                "//th[contains(@class,'col-".$routeAlias.'-'.$column."')]//i[contains(@class, 'fa-sort-amount-asc')]"
-            )->count(),
-            'The order must be asc'
-        );
-
-        $crawler = $client->request(
-            'GET',
-            '/s/'.$urlAlias.'?tmpl=list&name='.$routeAlias.'&orderby='.$tableAlias.$column2
-        );
-        self::assertEquals(
-            1,
-            $crawler->filterXPath(
-                "//th[contains(@class,'col-".$routeAlias.'-'.$column2."')]//i[contains(@class, 'fa-sort-amount-asc')]"
-            )->count(),
-            'The order must be asc'
-        );
-
-        $crawler = $client->request(
-            'GET',
-            '/s/'.$urlAlias.'?tmpl=list&name='.$routeAlias.'&orderby='.$tableAlias.$column2
-        );
-        self::assertEquals(
-            1,
-            $crawler->filterXPath(
-                "//th[contains(@class,'col-".$routeAlias.'-'.$column2."')]//i[contains(@class, 'fa-sort-amount-desc')]"
-            )->count(),
-            'The order must be desc'
-        );
-    }
 
     /**
      * @throws \Exception
@@ -125,9 +58,8 @@ class PageControllerTest extends MauticMysqlTestCase
         $column     = 'dateModified';
         $column2    = 'title';
         $tableAlias = 'p.';
-        $client     = $this->client;
 
-        self::getColumnTests($client, $urlAlias, $routeAlias, $column, $tableAlias, $column2);
+        $this->getControllerColumnTests($urlAlias, $routeAlias, $column, $tableAlias, $column2);
     }
 
     public function testLandingPageTracking()
