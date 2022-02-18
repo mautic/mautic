@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
@@ -25,7 +26,7 @@ class DecisionResultsEvent extends Event
     private $eventConfig;
 
     /**
-     * @var ArrayCollection|LeadEventLog[]
+     * @var Collection<int, LeadEventLog>|ArrayCollection<int, LeadEventLog>
      */
     private $eventLogs;
 
@@ -36,8 +37,10 @@ class DecisionResultsEvent extends Event
 
     /**
      * DecisionResultsEvent constructor.
+     *
+     * @param Collection<int, LeadEventLog>|ArrayCollection<int, LeadEventLog> $logs
      */
-    public function __construct(AbstractEventAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
+    public function __construct(AbstractEventAccessor $config, Collection $logs, EvaluatedContacts $evaluatedContacts)
     {
         $this->eventConfig       = $config;
         $this->eventLogs         = $logs;
@@ -53,7 +56,7 @@ class DecisionResultsEvent extends Event
     }
 
     /**
-     * @return ArrayCollection|LeadEventLog[]
+     * @return Collection<int, LeadEventLog>|ArrayCollection<int, LeadEventLog>
      */
     public function getLogs()
     {

@@ -190,9 +190,11 @@ class EventLogger
     }
 
     /**
-     * @return ArrayCollection
+     *
+     * @param Collection<int, LeadEventLog> $logs
+     * @return ArrayCollection<int, Lead>|Collection<int, Lead>
      */
-    public function extractContactsFromLogs(ArrayCollection $logs)
+    public function extractContactsFromLogs(Collection $logs)
     {
         $contacts = new ArrayCollection();
 

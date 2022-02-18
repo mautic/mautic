@@ -12,7 +12,9 @@
 namespace Mautic\CampaignBundle\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
 class ScheduledBatchEvent extends AbstractLogCollectionEvent
@@ -27,7 +29,7 @@ class ScheduledBatchEvent extends AbstractLogCollectionEvent
      *
      * @param bool $isReschedule
      */
-    public function __construct(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, $isReschedule = false)
+    public function __construct(AbstractEventAccessor $config, Event $event, Collection $logs, $isReschedule = false)
     {
         parent::__construct($config, $event, $logs);
 
@@ -35,7 +37,7 @@ class ScheduledBatchEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection<int,LeadEventLog>|Collection<int,LeadEventLog>
      */
     public function getScheduled()
     {

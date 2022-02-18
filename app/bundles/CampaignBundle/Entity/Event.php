@@ -622,7 +622,7 @@ class Event implements ChannelInterface
     /**
      * Get log.
      *
-     * @return Collection<int, LeadEventLog>
+     * @return ArrayCollection<int, LeadEventLog>
      */
     public function getLog()
     {

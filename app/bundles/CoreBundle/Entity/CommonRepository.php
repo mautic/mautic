@@ -146,7 +146,9 @@ class CommonRepository extends EntityRepository
 
                 if ($v && $meta->hasAssociation($property)) {
                     $map = $meta->getAssociationMapping($property);
-                    $v   = $this->_em->getRepository($map['targetEntity'])->find($v);
+                    /** @var class-string $targetEntityClass */
+                    $targetEntityClass = (string) $map['targetEntity'];
+                    $v   = $this->_em->getRepository($targetEntityClass)->find($v);
                     if (empty($v)) {
                         throw new \Exception('Associate data not found');
                     }
@@ -314,6 +316,7 @@ class CommonRepository extends EntityRepository
             return $baseCols[$returnColumnNames][$entityClass];
         }
 
+        /** @var class-string $entityClass */
         return $this->getEntityManager()->getRepository($entityClass)->getBaseColumns($entityClass, $returnColumnNames);
     }
 
@@ -778,10 +781,8 @@ class CommonRepository extends EntityRepository
      *
      * @param object $entity
      * @param bool   $flush  true by default; use false if persisting in batches
-     *
-     * @return int
      */
-    public function saveEntity($entity, $flush = true)
+    public function saveEntity($entity, $flush = true): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -1172,7 +1173,9 @@ class CommonRepository extends EntityRepository
         $joinAdded = false;
         foreach ($associations as $property => $association) {
             $subJoinAdded  = false;
-            $targetMetdata = $this->_em->getRepository($association['targetEntity'])->getClassMetadata();
+            $entityClass = $association['targetEntity'];
+            /** @var class-string $entityClass */
+            $targetMetdata = $this->_em->getRepository($entityClass)->getClassMetadata();
             if ($propertyAllowedJoins = preg_grep('/^'.$property.'\..*/', $allowed)) {
                 foreach ($propertyAllowedJoins as $key => $join) {
                     $propertyAllowedJoins[$key] = str_replace($property.'.', '', $join);

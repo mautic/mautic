@@ -167,7 +167,11 @@ class EventScheduler
         }
     }
 
-    public function rescheduleFailures(ArrayCollection $logs)
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     * @return void
+     */
+    public function rescheduleFailures(Collection $logs): void
     {
         if (!$logs->count()) {
             return;
@@ -365,9 +369,10 @@ class EventScheduler
     }
 
     /**
+     * @param Collection<int, LeadEventLog> $logs
      * @param bool $isReschedule
      */
-    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, $isReschedule = false)
+    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, Collection $logs, $isReschedule = false)
     {
         if (!$logs->count()) {
             return;
