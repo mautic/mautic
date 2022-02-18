@@ -117,11 +117,6 @@ class UserApiController extends CommonApiController
                 if (!empty($parameters['username'])) {
                     unset($parameters['username']);
                 }
-
-                //Changing the role via the API is forbidden
-                if (!empty($parameters['role'])) {
-                    unset($parameters['role']);
-                }
             } else {
                 //PUT requires the entire entity so overwrite the username with the original
                 $parameters['username'] = $entity->getUsername();

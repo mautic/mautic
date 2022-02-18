@@ -91,6 +91,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                     if (isset($reportData['graphs'][$graph])) {
                         $graphData = $reportData['graphs'][$graph];
+                        if (!isset($graphData['data']['data'])) {
+                            $graphData['data']['data'] = $graphData['data'];
+                        }
                         $event->setTemplateData(
                             [
                                 'chartData'   => $graphData['data'],

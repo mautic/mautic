@@ -8,7 +8,6 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__.'/app/migrations')
     ->in(__DIR__.'/plugins')
     ->in(__DIR__.'/.github/workflows/mautic-asset-upload');
-    
 
 return (new PhpCsFixer\Config())
     ->setRules([
@@ -16,8 +15,8 @@ return (new PhpCsFixer\Config())
         'binary_operator_spaces' => [
             'operators' => [
                 '=>' => 'align',
-                '=' => 'align'
-            ]
+                '='  => 'align',
+            ],
         ],
         'phpdoc_to_comment' => false,
         'ordered_imports'   => true,
@@ -28,8 +27,8 @@ return (new PhpCsFixer\Config())
         /**
          * Our templates rely heavily on things like endforeach, endif, etc.
          * This setting should be turned off at least until we've switched to Twig
-         * (which is required for Symfony 5)
+         * (which is required for Symfony 5).
          */
-        'no_alternative_syntax' => false
+        'no_alternative_syntax' => false,
     ])
     ->setFinder($finder);

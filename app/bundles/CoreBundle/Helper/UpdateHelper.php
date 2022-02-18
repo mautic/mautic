@@ -18,6 +18,9 @@ use Mautic\CoreBundle\Helper\Update\Exception\LatestVersionSupportedException;
 use Mautic\CoreBundle\Helper\Update\Exception\UpdateCacheDataNeedsToBeRefreshedException;
 use Mautic\CoreBundle\Helper\Update\Github\Release;
 use Mautic\CoreBundle\Helper\Update\Github\ReleaseParser;
+use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckError;
+use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckResult;
+use Mautic\CoreBundle\Release\Metadata;
 use Monolog\Logger;
 
 /**
@@ -60,18 +63,22 @@ class UpdateHelper
      */
     private $mauticVersion;
 
+    private PreUpdateCheckHelper $preUpdateCheckHelper;
+
     public function __construct(
         PathsHelper $pathsHelper,
         Logger $logger,
         CoreParametersHelper $coreParametersHelper,
         Client $client,
-        ReleaseParser $releaseParser
+        ReleaseParser $releaseParser,
+        PreUpdateCheckHelper $preUpdateCheckHelper
     ) {
         $this->pathsHelper          = $pathsHelper;
         $this->logger               = $logger;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->client               = $client;
         $this->releaseParser        = $releaseParser;
+        $this->preUpdateCheckHelper = $preUpdateCheckHelper;
 
         $this->mauticVersion = defined('MAUTIC_VERSION') ? MAUTIC_VERSION : 'unknown';
         $this->phpVersion    = defined('PHP_VERSION') ? PHP_VERSION : 'unknown';
@@ -191,11 +198,51 @@ class UpdateHelper
             'package'      => $release->getDownloadUrl(),
             'stability'    => $release->getStability(),
             'checkedTime'  => time(),
+            'metadata'     => $release->getMetadata(),
         ];
 
         file_put_contents($cacheFile, json_encode($data));
 
         return $data;
+    }
+
+    /**
+     * Runs all pre-update checks. This returns an array of PreUpdateCheckResult objects,
+     * which you can loop through to see if all checks passed.
+     *
+     * @return PreUpdateCheckResult[]
+     */
+    public function runPreUpdateChecks(): array
+    {
+        $checkResults = [];
+        $checks       = $this->preUpdateCheckHelper->getChecks();
+        $updateData   = $this->fetchData();
+
+        if (true === $updateData['error']) {
+            $checkResults[] = new PreUpdateCheckResult(false, null, [new PreUpdateCheckError($updateData['message'])]);
+        } elseif (false === $updateData['error'] && 'mautic.core.updater.running.latest.version' === $updateData['message']) {
+            // If we're already running the latest version, let's consider that an error so that the updater doesn't accidentally continue.
+            $checkResults[] = new PreUpdateCheckResult(false, null, [new PreUpdateCheckError('mautic.core.updater.running.latest.version')]);
+        } elseif (empty($updateData['metadata'])) {
+            $checkResults[] = new PreUpdateCheckResult(false, null, [new PreUpdateCheckError('mautic.core.update.check.error.release_data')]);
+        }
+
+        if (!empty($checkResults)) {
+            return $checkResults;
+        }
+
+        foreach ($checks as $check) {
+            $check->setUpdateCandidateMetadata($updateData['metadata']);
+
+            try {
+                $checkResults[] = $check->runCheck();
+            } catch (\Exception $e) {
+                // Checks are supposed to catch errors themselves and return them in their PreUpdateCheckResult, but we catch here just in case.
+                $checkResults[] = new PreUpdateCheckResult(false, $check, [new PreUpdateCheckError('Unknown error while running '.get_class($check).': '.$e->getMessage())]);
+            }
+        }
+
+        return $checkResults;
     }
 
     private function sendStats()
@@ -265,7 +312,11 @@ class UpdateHelper
     private function checkCachedUpdateData(string $cacheFile, string $updateStability): array
     {
         // Check if we have a cache file and try to return cached data if so
-        $update = (array) json_decode(file_get_contents($cacheFile));
+        $update = json_decode(file_get_contents($cacheFile), true);
+
+        if (!empty($update['metadata'])) {
+            $update['metadata'] = new Metadata($update['metadata']);
+        }
 
         // Check if the user has changed the update channel, if so the cache is invalidated
         $expiredAt = strtotime('-3 hours');
@@ -310,7 +361,7 @@ class UpdateHelper
             throw new CouldNotFetchLatestVersionException();
         }
 
-        return $this->releaseParser->getLatestSupportedRelease($releases, $this->phpVersion, $this->mauticVersion, $updateStability);
+        return $this->releaseParser->getLatestSupportedRelease($releases, $this->mauticVersion, $updateStability);
     }
 
     /**

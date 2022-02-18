@@ -586,9 +586,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get owner.
-     *
-     * @return User
+     * @return User|null
      */
     public function getOwner()
     {

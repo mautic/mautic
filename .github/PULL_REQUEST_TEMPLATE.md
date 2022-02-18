@@ -40,7 +40,7 @@ Please write a short README for your feature/bugfix. This will help people under
 <!--
 This part is really important. If you want your PR to be merged, take the time to write very clear, annotated and step by step test instructions. Do not assume any previous knowledge - testers may not be developers.
 -->
-1. Load up [this PR](https://mautibox.com)
+1. Open this PR on Gitpod or pull down for testing locally (see docs on testing PRs [here](https://contribute.mautic.org/contributing-to-mautic/tester))
 2.
 
 <!--

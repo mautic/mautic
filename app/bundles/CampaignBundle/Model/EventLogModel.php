@@ -19,36 +19,22 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class EventLogModel.
- */
 class EventLogModel extends AbstractCommonModel
 {
-    /**
-     * @var EventModel
-     */
-    protected $eventModel;
+    protected EventModel $eventModel;
 
-    /**
-     * @var CampaignModel
-     */
-    protected $campaignModel;
+    protected CampaignModel $campaignModel;
 
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    protected IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var EventScheduler
-     */
-    protected $eventScheduler;
+    protected EventScheduler $eventScheduler;
 
-    /**
-     * EventLogModel constructor.
-     */
-    public function __construct(EventModel $eventModel, CampaignModel $campaignModel, IpLookupHelper $ipLookupHelper, EventScheduler $eventScheduler)
-    {
+    public function __construct(
+        EventModel $eventModel,
+        CampaignModel $campaignModel,
+        IpLookupHelper $ipLookupHelper,
+        EventScheduler $eventScheduler
+    ) {
         $this->eventModel     = $eventModel;
         $this->campaignModel  = $campaignModel;
         $this->ipLookupHelper = $ipLookupHelper;
@@ -112,13 +98,21 @@ class EventLogModel extends AbstractCommonModel
         // Check that contact is part of the campaign
         $membership = $campaign->getContactMembership($contact);
         if (0 === count($membership)) {
-            return 'mautic.campaign.error.contact_not_in_campaign';
+            return $this->translator->trans(
+                'mautic.campaign.error.contact_not_in_campaign',
+                ['%campaign%' => $campaign->getId(), '%contact%' => $contact->getId()],
+                'flashes'
+            );
         }
 
         /** @var \Mautic\CampaignBundle\Entity\Lead $m */
         foreach ($membership as $m) {
             if ($m->getManuallyRemoved()) {
-                return 'mautic.campaign.error.contact_not_in_campaign';
+                return $this->translator->trans(
+                    'mautic.campaign.error.contact_not_in_campaign',
+                    ['%campaign%' => $campaign->getId(), '%contact%' => $contact->getId()],
+                    'flashes'
+                );
             }
         }
 
@@ -128,11 +122,28 @@ class EventLogModel extends AbstractCommonModel
         if (count($logs)) {
             $log = $logs[0];
             if ($log->getDateTriggered()) {
-                return 'mautic.campaign.error.event_already_executed';
+                return $this->translator->trans(
+                    'mautic.campaign.error.event_already_executed',
+                    [
+                        '%campaign%'      => $campaign->getId(),
+                        '%event%'         => $event->getId(),
+                        '%contact%'       => $contact->getId(),
+                        '%dateTriggered%' => $log->getDateTriggered()->format(\DateTimeInterface::ATOM),
+                    ],
+                    'flashes'
+                );
             }
         } else {
             if (!isset($parameters['triggerDate']) && !isset($parameters['dateTriggered'])) {
-                return 'mautic.campaign.error.event_must_be_scheduled';
+                return $this->translator->trans(
+                    'mautic.campaign.error.event_must_be_scheduled',
+                    [
+                        '%campaign%' => $campaign->getId(),
+                        '%event%'    => $event->getId(),
+                        '%contact%'  => $contact->getId(),
+                    ],
+                    'flashes'
+                );
             }
 
             $log = (new LeadEventLog())
@@ -150,7 +161,15 @@ class EventLogModel extends AbstractCommonModel
                     break;
                 case 'triggerDate':
                     if (Event::TYPE_DECISION === $event->getEventType()) {
-                        return 'mautic.campaign.error.decision_cannot_be_scheduled';
+                        return $this->translator->trans(
+                            'mautic.campaign.error.decision_cannot_be_scheduled',
+                            [
+                                '%campaign%' => $campaign->getId(),
+                                '%event%'    => $event->getId(),
+                                '%contact%'  => $contact->getId(),
+                            ],
+                            'flashes'
+                        );
                     }
                     $log->setTriggerDate(
                         new \DateTime($value)
