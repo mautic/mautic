@@ -113,43 +113,29 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetLeadsByFieldValueArrayMapReturn(): void
     {
-        $mock = $this->getMockBuilder(LeadRepository::class)
+        /** @var MockObject&LeadRepository */
+        $repository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getEntities', 'buildQueryForGetLeadsByFieldValue'])
             ->getMock();
 
-        // Mock the
-        $mockEntity = $this->getMockBuilder(Lead::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['loadMetadata'])
-            ->getMock();
+        $contact = new Lead();
+        $contact->setEmail('test@example.com');
 
-        $mockEntity->setEmail('test@example.com');
+        $contact2 = new Lead();
+        $contact2->setEmail('test2@example.com');
 
-        $mockEntity2 = clone $mockEntity;
-        $mockEntity2->setEmail('test2@example.com');
+        $entities = [$contact, $contact2];
 
-        $entities = [
-            $mockEntity,
-            $mockEntity2,
-        ];
+        $repository->method('getEntities')->will($this->returnValue($entities));
+        $repository->method('buildQueryForGetLeadsByFieldValue')->will($this->returnValue(null));
 
-        $mock->method('getEntities')
-            ->will($this->returnValue($entities));
-
-        $mock->method('buildQueryForGetLeadsByFieldValue')
-            ->will($this->returnValue(null));
-
-        $contacts = $mock->getLeadsByFieldValue('email', ['test@example.com', 'test2@example.com']);
+        $contacts = $repository->getLeadsByFieldValue('email', ['test@example.com', 'test2@example.com']);
 
         $this->assertSame($entities, $contacts, 'When getting leads without indexing by column, it should match the expected result.');
 
-        $contacts = $mock->getLeadsByFieldValue('email', ['test@example.com', 'test2@example.com'], null, true);
-
-        $expected = [
-            'test@example.com',
-            'test2@example.com',
-        ];
+        $contacts = $repository->getLeadsByFieldValue('email', ['test@example.com', 'test2@example.com'], null, true);
+        $expected = ['test@example.com', 'test2@example.com'];
 
         $this->assertSame($expected, array_keys($contacts), 'When getting leads with indexing by column, it should match the expected result.');
     }
