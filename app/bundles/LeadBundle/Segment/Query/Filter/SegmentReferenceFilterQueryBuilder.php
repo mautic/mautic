@@ -19,10 +19,8 @@ use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Class SegmentReferenceFilterQueryBuilder.
- */
 class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     /**
@@ -35,15 +33,14 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
      */
     private $entityManager;
 
-    /**
-     * SegmentReferenceFilterQueryBuilder constructor.
-     */
     public function __construct(
         RandomParameterName $randomParameterNameService,
         ContactSegmentQueryBuilder $leadSegmentQueryBuilder,
-        EntityManager $entityManager
+        EntityManager $entityManager,
+        ContactSegmentFilterFactory $leadSegmentFilterFactory,
+        EventDispatcherInterface $dispatcher
     ) {
-        parent::__construct($randomParameterNameService);
+        parent::__construct($randomParameterNameService, $dispatcher);
 
         $this->leadSegmentQueryBuilder  = $leadSegmentQueryBuilder;
         $this->entityManager            = $entityManager;

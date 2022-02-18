@@ -21,6 +21,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateLeadListsCommand extends ModeratedCommand
 {
+    public const NAME = 'mautic:segments:update';
+
     protected function configure()
     {
         $this
@@ -90,6 +92,11 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     $processed = 0;
                     try {
                         $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
+                        if (0 >= (int) $max) {
+                            // Only full segment rebuilds count
+                            $list->setLastBuiltDateToCurrentDatetime();
+                            $listModel->saveEntity($list);
+                        }
                     } catch (QueryException $e) {
                         $this->getContainer()->get('monolog.logger.mautic')->error('Query Builder Exception: '.$e->getMessage());
                     }
@@ -118,6 +125,12 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     ).'</info>'
                 );
 
+                    $processed                 = $listModel->rebuildListLeads($leadList, $batch, $max, $output);
+                    if (0 >= (int) $max) {
+                        // Only full segment rebuilds count
+                        $leadList->setLastBuiltDateToCurrentDatetime();
+                        $listModel->saveEntity($leadList);
+                    }
                 $startTimeForSingleSegment = microtime(true);
                 $processed                 = $listModel->rebuildListLeads($segment, $batch, $max, $output);
                 $output->writeln(
