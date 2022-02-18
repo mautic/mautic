@@ -13,9 +13,9 @@ namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\EventListener\SegmentFiltersSubscriber;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -30,6 +30,8 @@ class FieldAliasKeywordValidator extends ConstraintValidator
         'contact_id',
         'company_id',
     ];
+
+    private ContactSegmentFilterDictionary $contactSegmentFilterDictionary;
 
     /**
      * @var ListModel
@@ -51,17 +53,13 @@ class FieldAliasKeywordValidator extends ConstraintValidator
      */
     private $translator;
 
-    /**
-     * @var SegmentFiltersSubscriber
-     */
-    private $segmentFilter;
-
-    public function __construct(ListModel $listModel, FieldAliasHelper $aliasHelper, EntityManager $em, TranslatorInterface $translator)
+    public function __construct(ListModel $listModel, FieldAliasHelper $aliasHelper, EntityManager $em, TranslatorInterface $translator, ContactSegmentFilterDictionary $contactSegmentFilterDictionary)
     {
-        $this->listModel     = $listModel;
-        $this->aliasHelper   = $aliasHelper;
-        $this->em            = $em;
-        $this->translator    = $translator;
+        $this->listModel                      = $listModel;
+        $this->aliasHelper                    = $aliasHelper;
+        $this->em                             = $em;
+        $this->translator                     = $translator;
+        $this->contactSegmentFilterDictionary = $contactSegmentFilterDictionary;
     }
 
     /**
@@ -85,7 +83,8 @@ class FieldAliasKeywordValidator extends ConstraintValidator
 
                 return;
             }
-            $choices = array_merge($this->listModel->getChoiceFields()[$field->getObject()] ?? [], $this->segmentFilter->getSegmentFilters());
+            $choices = array_merge($this->listModel->getChoiceFields()[$field->getObject()] ?? [], $this->contactSegmentFilterDictionary->getFilters());
+
             if (isset($choices[$field->getAlias()])) {
                 $this->context->addViolation($constraint->message, ['%keyword%' => $field->getAlias()]);
             }

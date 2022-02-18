@@ -834,6 +834,7 @@ return [
                     'mautic.helper.field.alias',
                     '@doctrine.orm.entity_manager',
                     'translator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
                 ],
             ],
             \Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class => [
