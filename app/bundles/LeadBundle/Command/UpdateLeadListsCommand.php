@@ -70,7 +70,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $listModel = $container->get('mautic.lead.model.list');
 
         $id                    = $input->getOption('list-id');
-        $batch                 = $input->getOption('batch-limit');
+        $batch                 = (int) $input->getOption('batch-limit');
         $max                   = $input->getOption('max-contacts');
         $enableTimeMeasurement = (bool) $input->getOption('timing');
         $output                = ($input->getOption('quiet')) ? new NullOutput() : $output;
@@ -125,14 +125,15 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     ).'</info>'
                 );
 
-                    $processed                 = $listModel->rebuildListLeads($leadList, $batch, $max, $output);
-                    if (0 >= (int) $max) {
-                        // Only full segment rebuilds count
-                        $leadList->setLastBuiltDateToCurrentDatetime();
-                        $listModel->saveEntity($leadList);
-                    }
                 $startTimeForSingleSegment = microtime(true);
                 $processed                 = $listModel->rebuildListLeads($segment, $batch, $max, $output);
+
+                if (0 >= (int) $max) {
+                    // Only full segment rebuilds count
+                    $segment->setLastBuiltDateToCurrentDatetime();
+                    $listModel->saveEntity($segment);
+                }
+
                 $output->writeln(
                         '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
                     );

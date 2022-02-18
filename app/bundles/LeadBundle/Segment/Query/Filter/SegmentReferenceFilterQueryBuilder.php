@@ -37,7 +37,6 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
         RandomParameterName $randomParameterNameService,
         ContactSegmentQueryBuilder $leadSegmentQueryBuilder,
         EntityManager $entityManager,
-        ContactSegmentFilterFactory $leadSegmentFilterFactory,
         EventDispatcherInterface $dispatcher
     ) {
         parent::__construct($randomParameterNameService, $dispatcher);
