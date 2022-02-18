@@ -412,7 +412,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         return $campaign;
     }
 
-    public function testMultipleCompanyFeatureByDefault(): void
+    public function testMultipleCompanyFeature(): void
     {
         $crawler     = $this->client->request('GET', 's/contacts/new/');
         $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
@@ -421,11 +421,11 @@ class LeadControllerTest extends MauticMysqlTestCase
         self::assertEquals(2, count($this->getContactCompanies()));
     }
 
-    public function testSimpleCompanyFeatureByDefault(): void
+    public function testSimpleCompanyFeature(): void
     {
         $this->useCleanupRollback = false;
 
-        $this->setUpSymfony(['contact_allow_multiple_companies' => 0]);
+        $this->setUpSymfony(array_merge($this->configParams, ['contact_allow_multiple_companies' => 0]));
 
         $crawler     = $this->client->request('GET', 's/contacts/new/');
         $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
