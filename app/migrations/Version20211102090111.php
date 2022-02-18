@@ -45,7 +45,7 @@ final class Version20211102090111 extends AbstractMauticMigration
         $result = file_put_contents($confFile, "<?php\n".'$parameters = '.var_export($parameters, true).';');
 
         if (false === $result) {
-            throw new \Exception('Couldn\'t update configuration file with new db_server_version value (5.7).');
+            throw new \Exception('Couldn\'t update configuration file with new show_contact_channels to true');
         }
     }
 
