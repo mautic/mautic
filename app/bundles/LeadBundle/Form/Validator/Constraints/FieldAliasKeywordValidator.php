@@ -56,13 +56,12 @@ class FieldAliasKeywordValidator extends ConstraintValidator
      */
     private $segmentFilter;
 
-    public function __construct(ListModel $listModel, FieldAliasHelper $aliasHelper, EntityManager $em, TranslatorInterface $translator, SegmentFiltersSubscriber $segmentFilter)
+    public function __construct(ListModel $listModel, FieldAliasHelper $aliasHelper, EntityManager $em, TranslatorInterface $translator)
     {
         $this->listModel     = $listModel;
         $this->aliasHelper   = $aliasHelper;
         $this->em            = $em;
         $this->translator    = $translator;
-        $this->segmentFilter = $segmentFilter;
     }
 
     /**
