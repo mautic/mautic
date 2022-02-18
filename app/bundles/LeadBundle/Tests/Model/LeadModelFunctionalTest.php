@@ -13,6 +13,9 @@ namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -22,6 +25,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class LeadModelFunctionalTest extends MauticMysqlTestCase
 {
     private $pointsAdded = false;
+
+    protected $useCleanupRollback = false;
 
     public function testMergedContactFound()
     {
@@ -178,5 +183,54 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         /** @var LeadModel $model */
         $model = self::$container->get('mautic.lead.model.lead');
         $model->saveEntity($lead);
+    }
+
+    public function testMultipleAssignedCompany(): void
+    {
+        self::assertEquals(2, count($this->getContactWithAssignTwoCompanies()));
+    }
+
+    public function testSignleAssignedCompany(): void
+    {
+        $this->setUpSymfony(array_merge($this->configParams, ['contact_allow_multiple_companies' => 0]));
+
+        self::assertEquals(1, count($this->getContactWithAssignTwoCompanies()));
+    }
+
+    /**
+     * @return array<int,array<int|string>>
+     *
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    protected function getContactWithAssignTwoCompanies()
+    {
+        $company = new Company();
+        $company->setName('Doe Corp');
+
+        $this->em->persist($company);
+
+        $company2 = new Company();
+        $company2->setName('Doe Corp 2');
+
+        $this->em->persist($company2);
+
+        $contact = new Lead();
+        $contact->setEmail('test@test.com');
+
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        /** @var LeadModel $leadModel */
+        $leadModel = self::$container->get('mautic.lead.model.lead');
+        $leadModel->addToCompany($contact, $company);
+        $leadModel->addToCompany($contact, $company2);
+
+        /** @var CompanyLeadRepository $companyLeadRepo */
+        $companyLeadRepo  = $this->em->getRepository(CompanyLead::class);
+        $contactCompanies = $companyLeadRepo->getCompaniesByLeadId($contact->getId());
+
+        return $contactCompanies;
     }
 }
