@@ -160,7 +160,7 @@ class Calculator
         $yesterday = (new DateTime(CalculatorHelper::getWeekDateString($yesterday)))->modify('+1 week')->format('Y-W');
 
         if ($this->toDateTime) {
-            $tomorrow = $this->toDateTime;
+            $tomorrow = clone $this->toDateTime;
             CalculatorHelper::fillInMissingWeeks($statDAO, $yesterday, $tomorrow->modify('+1 week')->format('Y-W'), $labelFormat);
         }
 
