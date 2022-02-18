@@ -765,7 +765,6 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
 
     /**
      * @param        $parameters
-     * @param        $errors
      * @param bool   $prepareForSerialization
      * @param string $requestIdColumn
      * @param null   $model
@@ -900,7 +899,6 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before populating the form.
      *
-     * @param        $entity
      * @param        $parameters
      * @param string $action
      *
@@ -927,7 +925,6 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer.
      *
-     * @param        $entity
      * @param string $action
      *
      * @return mixed
@@ -978,9 +975,9 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     /**
      * Convert posted parameters into what the form needs in order to successfully bind.
      *
-     * @param $parameters
-     * @param $entity
-     * @param $action
+     * @param mixed[] $parameters
+     * @param object  $entity
+     * @param string  $action
      *
      * @return mixed
      */
@@ -1118,10 +1115,11 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
                 return $this->returnError($e->getMessage(), $e->getCode());
             }
 
-            $this->model->saveEntity($entity);
+            $statusCode = $this->saveEntity($entity, $statusCode);
+
             $headers = [];
             //return the newly created entities location if applicable
-            if (Response::HTTP_CREATED === $statusCode) {
+            if (in_array($statusCode, [Response::HTTP_CREATED, Response::HTTP_ACCEPTED])) {
                 $route = (null !== $this->get('router')->getRouteCollection()->get('mautic_api_'.$this->entityNameMulti.'_getone'))
                     ? 'mautic_api_'.$this->entityNameMulti.'_getone' : 'mautic_api_get'.$this->entityNameOne;
                 $headers['Location'] = $this->generateUrl(
@@ -1163,6 +1161,13 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
         }
 
         return $this->handleView($view);
+    }
+
+    protected function saveEntity($entity, int $statusCode): int
+    {
+        $this->model->saveEntity($entity);
+
+        return $statusCode;
     }
 
     /**
@@ -1242,7 +1247,6 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
      * @param       $key
      * @param       $msg
      * @param       $code
-     * @param       $errors
      * @param array $entities
      * @param null  $entity
      */
