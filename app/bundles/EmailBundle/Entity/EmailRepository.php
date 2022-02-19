@@ -616,7 +616,7 @@ class EmailRepository extends CommonRepository
         return $qb->getQuery()->iterate();
     }
 
-    public function setSegmentEmailOnceToEmailAddress($segmentEmailOnceToEmailAddress)
+    public function setSegmentEmailOnceToEmailAddress(bool $segmentEmailOnceToEmailAddress): void
     {
         $this->segmentEmailOnceToEmailAddress = $segmentEmailOnceToEmailAddress;
     }

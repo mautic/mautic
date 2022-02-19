@@ -14,7 +14,6 @@ namespace Mautic\EmailBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
-use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
@@ -169,11 +168,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     private $statsCollectionHelper;
 
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    private $generatedColumnsProvider;
-
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         ThemeHelper $themeHelper,
@@ -190,7 +184,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         CacheStorageHelper $cacheStorageHelper,
         ContactTracker $contactTracker,
         DNC $doNotContact,
-        GeneratedColumnsProviderInterface $generatedColumnsProvider,
         EmailRepository $emailRepository,
         StatsCollectionHelper $statsCollectionHelper,
         CorePermissions $corePermissions
@@ -210,7 +203,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->cacheStorageHelper       = $cacheStorageHelper;
         $this->contactTracker           = $contactTracker;
         $this->doNotContact             = $doNotContact;
-        $this->generatedColumnsProvider = $generatedColumnsProvider;
         $this->emailRepository          = $emailRepository;
         $this->statsCollectionHelper    = $statsCollectionHelper;
         $this->corePermissions          = $corePermissions;
@@ -450,7 +442,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param $action
      * @param $event
-     * @param $isNew
+     * @param bool $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
