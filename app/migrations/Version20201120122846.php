@@ -25,30 +25,36 @@ final class Version20201120122846 extends AbstractMauticMigration
     public function preUp(Schema $schema): void
     {
         $campaignSummaryTableName = $this->generateTableName(Summary::TABLE_NAME);
-        $campaignIdFK             = $this->getForeignKeyName($campaignSummaryTableName, 'campaign_id');
-        $eventIdFK                = $this->getForeignKeyName($campaignSummaryTableName, 'event_id');
-        if ($schema->hasTable($this->generateTableName(Summary::TABLE_NAME))
-            && $schema->getTable($campaignSummaryTableName)->hasForeignKey($campaignIdFK)
-            && $schema->getTable($campaignSummaryTableName)->hasForeignKey($eventIdFK)) {
-            throw new SkipMigration('Schema includes this migration');
+        if (false === $schema->hasTable($campaignSummaryTableName)) {
+            return;
         }
+
+        $table = $schema->getTable($campaignSummaryTableName);
+        if (false === $this->tableHasForeignKey($table, 'campaign_id')) {
+            return;
+        }
+
+        if (false === $this->tableHasForeignKey($table, 'event_id')) {
+            return;
+        }
+
+        throw new SkipMigration('Schema includes this migration');
     }
 
     public function up(Schema $schema): void
     {
-        $campaignIDX = $this->generatePropertyName(Summary::TABLE_NAME, 'idx', ['campaign_id']);
-        $campaignFK  = $this->generatePropertyName(Summary::TABLE_NAME, 'fk', ['campaign_id']);
-        $eventIDX    = $this->generatePropertyName(Summary::TABLE_NAME, 'idx', ['event_id']);
-        $eventFK     = $this->generatePropertyName(Summary::TABLE_NAME, 'fk', ['event_id']);
-
         $campaignSummaryTableName = $this->generateTableName(Summary::TABLE_NAME);
         $campaignsTableName       = $this->generateTableName('campaigns');
         $campaignEventsTableName  = $this->generateTableName('campaign_events');
 
-        $campaignIdDataType       = $this->getColumnDataType($schema->getTable($campaignsTableName), 'id');
-        $campaignEventsIdDataType = $this->getColumnDataType($schema->getTable($campaignEventsTableName), 'id');
+        if (false === $schema->hasTable($campaignSummaryTableName)) {
+            $campaignIdDataType       = $this->getColumnDataType($schema->getTable($campaignsTableName), 'id');
+            $campaignEventsIdDataType = $this->getColumnDataType($schema->getTable($campaignEventsTableName), 'id');
 
-        $this->addSql("
+            $campaignIDX = $this->generatePropertyName(Summary::TABLE_NAME, 'idx', ['campaign_id']);
+            $eventIDX    = $this->generatePropertyName(Summary::TABLE_NAME, 'idx', ['event_id']);
+
+            $this->addSql("
             CREATE TABLE {$campaignSummaryTableName} (
                 id INT UNSIGNED AUTO_INCREMENT NOT NULL,
                 campaign_id INT {$campaignIdDataType} DEFAULT NULL,
@@ -65,9 +71,17 @@ final class Version20201120122846 extends AbstractMauticMigration
                 PRIMARY KEY(id)
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB ROW_FORMAT = DYNAMIC;
         ");
+        }
 
-        $this->addSql("ALTER TABLE {$campaignSummaryTableName} ADD CONSTRAINT {$campaignFK} FOREIGN KEY (campaign_id) REFERENCES $campaignsTableName (id)");
-        $this->addSql("ALTER TABLE {$campaignSummaryTableName} ADD CONSTRAINT {$eventFK} FOREIGN KEY (event_id) REFERENCES $campaignEventsTableName (id) ON DELETE CASCADE");
+        if (false === $schema->hasTable($campaignSummaryTableName) || false === $this->tableHasForeignKey($schema->getTable($campaignSummaryTableName), 'campaign_id')) {
+            $campaignFK  = $this->generatePropertyName(Summary::TABLE_NAME, 'fk', ['campaign_id']);
+            $this->addSql("ALTER TABLE {$campaignSummaryTableName} ADD CONSTRAINT {$campaignFK} FOREIGN KEY (campaign_id) REFERENCES $campaignsTableName (id)");
+        }
+
+        if (false === $schema->hasTable($campaignSummaryTableName) || false === $this->tableHasForeignKey($schema->getTable($campaignSummaryTableName), 'campaign_id')) {
+            $eventFK = $this->generatePropertyName(Summary::TABLE_NAME, 'fk', ['event_id']);
+            $this->addSql("ALTER TABLE {$campaignSummaryTableName} ADD CONSTRAINT {$eventFK} FOREIGN KEY (event_id) REFERENCES $campaignEventsTableName (id) ON DELETE CASCADE");
+        }
     }
 
     public function down(Schema $schema): void
@@ -89,10 +103,5 @@ final class Version20201120122846 extends AbstractMauticMigration
         $column  = $table->getColumn($columnName);
 
         return $column->getUnsigned() ? self::UNSIGNED : self::SIGNED;
-    }
-
-    private function getForeignKeyName(string $tableName, string $column): string
-    {
-        return $this->generatePropertyName($this->generateTableName($tableName), 'fk', [$column]);
     }
 }

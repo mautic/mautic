@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Doctrine;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\AbortMigration;
 use Doctrine\ORM\EntityManagerInterface;
@@ -204,6 +205,21 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
             $this->generatePropertyName($table, 'idx', $columnNames),
             $this->generatePropertyName($table, 'fk', $columnNames),
         ];
+    }
+
+    protected function tableHasForeignKey(Table $table, string $column): bool
+    {
+        $foreignKeys = $table->getForeignKeys();
+
+        foreach ($foreignKeys as $foreignKey) {
+            $columns = $foreignKey->getColumns();
+
+            if (in_array($column, $columns)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
