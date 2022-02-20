@@ -36,6 +36,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'name'        => 'API segment',
             'description' => 'Segment created via API test',
             'filters'     => [
+                // Legacy structure.
                 [
                     'object'   => 'lead',
                     'glue'     => 'and',
@@ -44,6 +45,37 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
                     'filter'   => 'Prague',
                     'display'  => null,
                     'operator' => '=',
+                ],
+                [
+                    'object'   => 'lead',
+                    'glue'     => 'and',
+                    'field'    => 'owner_id',
+                    'type'     => 'lookup_id',
+                    'operator' => '=',
+                    'display'  => 'John Doe',
+                    'filter'   => '4',
+                ],
+                // Current structure.
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'city',
+                    'type'       => 'text',
+                    'properties' => ['filter' => 'Prague'],
+                    'operator'   => '=',
+                ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'owner_id',
+                    'type'       => 'lookup_id',
+                    'operator'   => '=',
+                    'display'    => 'outdated name',
+                    'filter'     => 'outdated_id',
+                    'properties' => [
+                        'display' => 'John Doe',
+                        'filter'  => '4',
+                    ],
                 ],
                 [
                     'glue'     => 'and',
@@ -71,6 +103,58 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertGreaterThan(0, $segmentId);
         $this->assertEquals($payload['name'], $response['list']['name']);
         $this->assertEquals($payload['description'], $response['list']['description']);
+        $this->assertEquals([
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'city',
+                    'type'       => 'text',
+                    'properties' => ['filter' => 'Prague'],
+                    'operator'   => '=',
+                ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'owner_id',
+                    'type'       => 'lookup_id',
+                    'operator'   => '=',
+                    'properties' => [
+                        'display' => 'John Doe',
+                        'filter'  => '4',
+                    ],
+                ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'city',
+                    'type'       => 'text',
+                    'properties' => ['filter' => 'Prague'],
+                    'operator'   => '=',
+                ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'owner_id',
+                    'type'       => 'lookup_id',
+                    'operator'   => '=',
+                    'properties' => [
+                        'display' => 'John Doe',
+                        'filter'  => '4',
+                    ],
+                ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'email',
+                    'type'       => 'email',
+                    'operator'   => '!empty',
+                    'properties' => [
+                        'filter'  => null,
+                    ],
+                ],
+            ],
+            $response['list']['filters']
+        );
 
         // Edit:
         $this->client->request('PATCH', "/api/segments/{$segmentId}/edit", ['name' => 'API segment renamed']);
@@ -117,6 +201,27 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             [
                 'name'        => 'API batch segment 1',
                 'description' => 'Segment created via API test',
+                'filters'     => [
+                    // Legacy structure.
+                    [
+                        'object'   => 'lead',
+                        'glue'     => 'and',
+                        'field'    => 'city',
+                        'type'     => 'text',
+                        'filter'   => 'Prague',
+                        'display'  => null,
+                        'operator' => '=',
+                    ],
+                    // Current structure.
+                    [
+                        'object'     => 'lead',
+                        'glue'       => 'and',
+                        'field'      => 'city',
+                        'type'       => 'text',
+                        'properties' => ['filter' => 'Prague'],
+                        'operator'   => '=',
+                    ],
+                ],
             ],
             [
                 'name'        => 'API batch segment 2',
@@ -169,8 +274,35 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertFalse($segment['isPreferenceCenter']);
             $this->assertSame($payload[$key]['name'], $segment['name']);
             $this->assertSame($payload[$key]['description'], $segment['description']);
-            $this->assertIsArray($segment['filters']);
         }
+
+        $this->assertSame(
+            [
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'city',
+                    'type'       => 'text',
+                    'operator'   => '=',
+                    'properties' => ['filter' => 'Prague'],
+                    'filter'     => 'Prague',
+                    'display'    => null,
+                ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'city',
+                    'type'       => 'text',
+                    'operator'   => '=',
+                    'properties' => ['filter' => 'Prague'],
+                    'filter'     => 'Prague',
+                    'display'    => null,
+                ],
+            ],
+            $response2['lists'][0]['filters']
+        );
+
+        $this->assertSame([], $response2['lists'][1]['filters']);
     }
 
     public function testUnpublishUsedSingleSegment(): void

@@ -125,6 +125,12 @@ EOT
         // Define this just in case
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', (isset($options['env'])) ? $options['env'] : 'prod');
 
+        if (true === $this->coreParametersHelper->get('composer_updates', false)) {
+            $output->writeln('<error>'.$this->translator->trans('mautic.core.command.update.composer').'</error>');
+
+            return 1;
+        }
+
         try {
             if (empty($options['finish'])) {
                 $returnCode = $this->startUpgrade();

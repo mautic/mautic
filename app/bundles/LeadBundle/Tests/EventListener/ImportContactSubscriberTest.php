@@ -39,7 +39,10 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
-                public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
+                /**
+                 * @param string $requestedPermission
+                 */
+                public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false): bool
                 {
                     Assert::assertSame('lead:imports:create', $requestedPermission);
 
@@ -62,7 +65,10 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
-                public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
+                /**
+                 * @param string $requestedPermission
+                 */
+                public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false): bool
                 {
                     Assert::assertSame('lead:imports:create', $requestedPermission);
 
@@ -100,6 +106,11 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
+                /**
+                 * @param array<bool|string> $filters
+                 *
+                 * @return string[]
+                 */
                 public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array
                 {
                     return ['some fields'];
@@ -128,7 +139,6 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
                     'lastActive'     => 'mautic.lead.import.label.lastActive',
                     'dateIdentified' => 'mautic.lead.import.label.dateIdentified',
                     'ip'             => 'mautic.lead.import.label.ip',
-                    'points'         => 'mautic.lead.import.label.points',
                     'stage'          => 'mautic.lead.import.label.stage',
                     'doNotEmail'     => 'mautic.lead.import.label.doNotEmail',
                     'ownerusername'  => 'mautic.lead.import.label.ownerusername',
@@ -163,7 +173,11 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
-                public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false)
+                /**
+                 * @param array<string> $fields
+                 * @param array<string> $data
+                 */
+                public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false): bool
                 {
                     return true;
                 }
