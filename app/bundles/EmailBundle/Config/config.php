@@ -558,6 +558,35 @@ return [
                     '%mautic.mailer_from_name%',
                 ],
             ],
+            'mautic.email.transport_wrapper' => [
+                'class'     => \Mautic\EmailBundle\Mailer\Transport\TransportWrapper::class,
+                'arguments' => [
+                    'mailer.default_transport',
+                ],
+            ],
+            'mautic.email.transport_extension.ses_api' => [
+                'class'     => \Mautic\EmailBundle\Mailer\Transport\SesApiTransportExtension::class,
+                'arguments' => [
+                    'mautic.email.amazon.callback',
+                ],
+                'tags' => ['mautic.email.transport_extension'],
+            ],
+            'mautic.email.transport_extension.ses_smtp' => [
+                'class'     => \Mautic\EmailBundle\Mailer\Transport\SesSmtpTransportExtension::class,
+                'arguments' => [
+                    'mautic.email.amazon.callback',
+                ],
+                'tags' => ['mautic.email.transport_extension'],
+            ],
+            'mautic.email.amazon.callback' => [
+                'class'     => \Mautic\EmailBundle\Mailer\Callback\AmazonCallback::class,
+                'arguments' => [
+                    'monolog.logger.mautic',
+                    'mautic.http.client',
+                    'translator',
+                    'mautic.email.model.transport_callback',
+                ],
+            ],
         ],
         'models' => [
             'mautic.email.model.email' => [

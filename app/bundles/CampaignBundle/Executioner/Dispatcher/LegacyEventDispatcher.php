@@ -165,6 +165,7 @@ class LegacyEventDispatcher
 
     /**
      * Execute the new ON_EVENT_FAILED and ON_EVENT_EXECUTED events for logs processed by BC code.
+     *
      * @param Collection<int, LeadEventLog> $success
      * @param Collection<int, LeadEventLog> $failures
      */

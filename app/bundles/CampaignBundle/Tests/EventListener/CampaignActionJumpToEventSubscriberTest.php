@@ -171,6 +171,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
 
             /**
              * @param array<string, string> $args
+             *
              * @return array<Event>|\Doctrine\ORM\Tools\Pagination\Paginator
              */
             public function getEntities(array $args = [])
@@ -213,10 +214,9 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             }
 
             /**
-             * @param Event $event
              * @param Collection<int, Lead> $contacts
-             * @param Counter|null $counter
-             * @param bool $isInactiveEvent
+             * @param bool                  $isInactiveEvent
+             *
              * @return void
              */
             public function executeForContacts(Event $event, Collection $contacts, ?Counter $counter = null, $isInactiveEvent = false)

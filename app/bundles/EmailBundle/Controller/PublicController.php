@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController as CommonFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -19,7 +19,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
-use Mautic\EmailBundle\Mailer\Transport\CallbackTransportInterface;
+use Mautic\EmailBundle\Mailer\Transport\TransportWrapper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -417,13 +417,13 @@ class PublicController extends CommonFormController
     {
         ignore_user_abort(true);
 
-        $realTransport = $this->container->get('mailer.default_transport');
-
-        if (!$realTransport instanceof CallbackTransportInterface || $realTransport->getCallbackPath() !== $transport) {
+        /** @var TransportWrapper $realTransport */
+        $realTransport = $this->container->get('mautic.email.transport_wrapper');
+        if (!$realTransport->isSupportCallback($transport)) {
             return $this->notFound();
         }
 
-        $event = new TransportWebhookEvent($realTransport, $this->request);
+        $event = new TransportWebhookEvent($realTransport->getTransportExtension($transport), $this->request);
         $this->dispatcher->dispatch(EmailEvents::ON_TRANSPORT_WEBHOOK, $event);
 
         return new Response('success');

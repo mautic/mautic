@@ -148,7 +148,7 @@ class CommonRepository extends EntityRepository
                     $map = $meta->getAssociationMapping($property);
                     /** @var class-string $targetEntityClass */
                     $targetEntityClass = (string) $map['targetEntity'];
-                    $v   = $this->_em->getRepository($targetEntityClass)->find($v);
+                    $v                 = $this->_em->getRepository($targetEntityClass)->find($v);
                     if (empty($v)) {
                         throw new \Exception('Associate data not found');
                     }
@@ -1173,7 +1173,7 @@ class CommonRepository extends EntityRepository
         $joinAdded = false;
         foreach ($associations as $property => $association) {
             $subJoinAdded  = false;
-            $entityClass = $association['targetEntity'];
+            $entityClass   = $association['targetEntity'];
             /** @var class-string $entityClass */
             $targetMetdata = $this->_em->getRepository($entityClass)->getClassMetadata();
             if ($propertyAllowedJoins = preg_grep('/^'.$property.'\..*/', $allowed)) {

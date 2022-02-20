@@ -47,8 +47,6 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
     private $logContactXref = [];
 
     /**
-     * @param AbstractEventAccessor $config
-     * @param Event $event
      * @param Collection<int,LeadEventLog> $logs
      */
     public function __construct(AbstractEventAccessor $config, Event $event, Collection $logs)

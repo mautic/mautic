@@ -169,7 +169,6 @@ class EventScheduler
 
     /**
      * @param Collection<int, LeadEventLog> $logs
-     * @return void
      */
     public function rescheduleFailures(Collection $logs): void
     {
@@ -370,7 +369,7 @@ class EventScheduler
 
     /**
      * @param Collection<int, LeadEventLog> $logs
-     * @param bool $isReschedule
+     * @param bool                          $isReschedule
      */
     private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, Collection $logs, $isReschedule = false)
     {

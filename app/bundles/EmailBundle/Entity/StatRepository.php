@@ -248,10 +248,10 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param string                                      $column
+     * @param string                                       $column
      * @param array<int, string>|array<int, int>|null      $emailIds
      * @param array<int, string>|array<int, int>|bool|null $listId
-     * @param bool                                        $combined
+     * @param bool                                         $combined
      *
      * @return array|int
      */

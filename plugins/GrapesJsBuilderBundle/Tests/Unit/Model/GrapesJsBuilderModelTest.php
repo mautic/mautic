@@ -31,7 +31,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $emailRepository                = new class() extends EmailRepository {
+        $emailRepository                    = new class() extends EmailRepository {
             public int $saveEntityCallCount = 0;
 
             public function __construct()
@@ -46,7 +46,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
 
         $emailModel = $this->getEmailModel($emailRepository);
 
-        $grapesJsBuilderRepository      = new class() extends GrapesJsBuilderRepository {
+        $grapesJsBuilderRepository          = new class() extends GrapesJsBuilderRepository {
             public int $saveEntityCallCount = 0;
 
             public function __construct()
@@ -119,7 +119,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $emailRepository  = new class() extends EmailRepository {
+        $emailRepository                    = new class() extends EmailRepository {
             public int $saveEntityCallCount = 0;
 
             public function __construct()
@@ -139,7 +139,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
 
         $emailModel = $this->getEmailModel($emailRepository);
 
-        $grapesJsBuilderRepository = new class() extends GrapesJsBuilderRepository {
+        $grapesJsBuilderRepository          = new class() extends GrapesJsBuilderRepository {
             public int $saveEntityCallCount = 0;
 
             public function __construct()

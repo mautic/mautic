@@ -11,7 +11,6 @@
 
 namespace Mautic\ChannelBundle\EventListener;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
@@ -194,7 +193,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * @param Collection<int, LeadEventLog> $logs
-     * @param string $channel
+     * @param string                        $channel
      *
      * @return bool|Collection<int, LeadEventLog>
      *
@@ -239,7 +238,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * @param Collection<int, LeadEventLog> $logs
-     * @param PreferenceBuilder $channelPreferences
+     *
      * @throws NoContactsFoundException
      */
     private function passExecutedLogs(Collection $logs, PreferenceBuilder $channelPreferences): void

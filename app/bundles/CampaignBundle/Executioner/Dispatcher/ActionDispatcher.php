@@ -116,9 +116,8 @@ class ActionDispatcher
     }
 
     /**
-     * @param AbstractEventAccessor $config
-     * @param Event $event
      * @param Collection<int, LeadEventLog> $logs
+     *
      * @return void
      */
     private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, Collection $logs)
@@ -141,8 +140,8 @@ class ActionDispatcher
     }
 
     /**
-     * @param AbstractEventAccessor $config
      * @param Collection<int, LeadEventLog> $logs
+     *
      * @return void
      */
     private function dispatchedFailedEvent(AbstractEventAccessor $config, Collection $logs)
