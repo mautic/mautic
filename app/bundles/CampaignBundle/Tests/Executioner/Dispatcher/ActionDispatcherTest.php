@@ -15,6 +15,7 @@ namespace Mautic\CampaignBundle\Tests\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ExecutedBatchEvent;
@@ -65,36 +66,24 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->legacyDispatcher   = $this->createMock(LegacyEventDispatcher::class);
     }
 
-    public function testActionBatchEventIsDispatchedWithSuccessAndFailedLogs()
+    public function testActionBatchEventIsDispatchedWithSuccessAndFailedLogs(): void
     {
         $event = new Event();
-        $lead1 = $this->createMock(Lead::class);
-        $lead1->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturn(1);
+        $event->setCampaign(new Campaign());
 
-        $lead2 = $this->createMock(Lead::class);
-        $lead2->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturn(2);
+        $lead1 = new Lead();
+        $lead1->setId(1);
 
-        $log1 = $this->createMock(LeadEventLog::class);
-        $log1->expects($this->exactly(2))
-            ->method('getLead')
-            ->willReturn($lead1);
-        $log1->method('setIsScheduled')
-            ->willReturn($log1);
-        $log1->method('getEvent')
-            ->willReturn($event);
+        $lead2 = new Lead();
+        $lead2->setId(2);
 
-        $log2 = $this->createMock(LeadEventLog::class);
-        $log2->expects($this->exactly(3))
-            ->method('getLead')
-            ->willReturn($lead2);
-        $log2->method('getMetadata')
-            ->willReturn([]);
-        $log2->method('getEvent')
-            ->willReturn($event);
+        $log1 = new LeadEventLog();
+        $log1->setLead($lead1);
+        $log1->setEvent($event);
+
+        $log2 = new LeadEventLog();
+        $log2->setLead($lead2);
+        $log2->setEvent($event);
 
         $logs = new ArrayCollection(
             [
@@ -151,38 +140,26 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 
-    public function testActionLogNotProcessedExceptionIsThrownIfLogNotProcessedWithSuccess()
+    public function testActionLogNotProcessedExceptionIsThrownIfLogNotProcessedWithSuccess(): void
     {
         $this->expectException(LogNotProcessedException::class);
 
         $event = new Event();
-        $lead1 = $this->createMock(Lead::class);
-        $lead1->expects($this->once())
-            ->method('getId')
-            ->willReturn(1);
+        $event->setCampaign(new Campaign());
 
-        $lead2 = $this->createMock(Lead::class);
-        $lead2->expects($this->once())
-            ->method('getId')
-            ->willReturn(2);
+        $lead1 = new Lead();
+        $lead1->setId(1);
 
-        $log1 = $this->createMock(LeadEventLog::class);
-        $log1->expects($this->once())
-            ->method('getLead')
-            ->willReturn($lead1);
-        $log1->method('setIsScheduled')
-            ->willReturn($log1);
-        $log1->method('getEvent')
-            ->willReturn($event);
+        $lead2 = new Lead();
+        $lead2->setId(2);
 
-        $log2 = $this->createMock(LeadEventLog::class);
-        $log2->expects($this->once())
-            ->method('getLead')
-            ->willReturn($lead2);
-        $log2->method('getMetadata')
-            ->willReturn([]);
-        $log2->method('getEvent')
-            ->willReturn($event);
+        $log1 = new LeadEventLog();
+        $log1->setLead($lead1);
+        $log1->setEvent($event);
+
+        $log2 = new LeadEventLog();
+        $log2->setLead($lead2);
+        $log2->setEvent($event);
 
         $logs = new ArrayCollection(
             [
@@ -210,39 +187,26 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 
-    public function testActionLogNotProcessedExceptionIsThrownIfLogNotProcessedWithFailed()
+    public function testActionLogNotProcessedExceptionIsThrownIfLogNotProcessedWithFailed(): void
     {
         $this->expectException(LogNotProcessedException::class);
 
         $event = new Event();
+        $event->setCampaign(new Campaign());
 
-        $lead1 = $this->createMock(Lead::class);
-        $lead1->expects($this->once())
-            ->method('getId')
-            ->willReturn(1);
+        $lead1 = new Lead();
+        $lead1->setId(1);
 
-        $lead2 = $this->createMock(Lead::class);
-        $lead2->expects($this->once())
-            ->method('getId')
-            ->willReturn(2);
+        $lead2 = new Lead();
+        $lead2->setId(2);
 
-        $log1 = $this->createMock(LeadEventLog::class);
-        $log1->expects($this->once())
-            ->method('getLead')
-            ->willReturn($lead1);
-        $log1->method('setIsScheduled')
-            ->willReturn($log1);
-        $log1->method('getEvent')
-            ->willReturn($event);
+        $log1 = new LeadEventLog();
+        $log1->setLead($lead1);
+        $log1->setEvent($event);
 
-        $log2 = $this->createMock(LeadEventLog::class);
-        $log2->expects($this->once())
-            ->method('getLead')
-            ->willReturn($lead2);
-        $log2->method('getMetadata')
-            ->willReturn([]);
-        $log2->method('getEvent')
-            ->willReturn($event);
+        $log2 = new LeadEventLog();
+        $log2->setLead($lead2);
+        $log2->setEvent($event);
 
         $logs = new ArrayCollection(
             [
@@ -270,7 +234,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 
-    public function testActionBatchEventIsIgnoredWithLegacy()
+    public function testActionBatchEventIsIgnoredWithLegacy(): void
     {
         $event  = new Event();
         $config = $this->createMock(ActionAccessor::class);
@@ -288,10 +252,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getEventDispatcher()->dispatchEvent($config, $event, new ArrayCollection());
     }
 
-    /**
-     * @return ActionDispatcher
-     */
-    private function getEventDispatcher()
+    private function getEventDispatcher(): ActionDispatcher
     {
         return new ActionDispatcher(
             $this->dispatcher,
