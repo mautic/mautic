@@ -108,10 +108,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param ImportValidateEvent
-     */
-    public function onValidateImport(ImportValidateEvent $event)
+    public function onValidateImport(ImportValidateEvent $event): void
     {
         if ($event->importIsForRouteObject('contacts') === false) {
             return;
@@ -123,9 +120,10 @@ final class ImportContactSubscriber implements EventSubscriberInterface
         $event->setList($this->handleValidateList($matchedFields));
         $event->setTags($this->handleValidateTags($matchedFields));
 
-        $matchedFields = array_map(function ($value) {
-            return is_string($value) ? trim($value) : $value;
-        }, array_filter($matchedFields));
+        $matchedFields = array_map(
+            fn ($value) => is_string($value) ? trim($value) : $value,
+            array_filter($matchedFields)
+        );
 
         if (empty($matchedFields)) {
             $event->getForm()->addError(
@@ -141,11 +139,9 @@ final class ImportContactSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $matchedFields
-     *
-     * @return ?int
+     * @param mixed[] $matchedFields
      */
-    private function handleValidateOwner(array &$matchedFields)
+    private function handleValidateOwner(array &$matchedFields): ?int
     {
         $owner = ArrayHelper::pickValue('owner', $matchedFields);
 
@@ -153,30 +149,26 @@ final class ImportContactSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $matchedFields
-     *
-     * @return ?int
+     * @param mixed[] $matchedFields
      */
-    private function handleValidateList(array &$matchedFields)
+    private function handleValidateList(array &$matchedFields): ?int
     {
         return ArrayHelper::pickValue('list', $matchedFields);
     }
 
     /**
-     * @param array $matchedFields
+     * @param mixed[] $matchedFields
      *
-     * @return array
+     * @return mixed[]
      */
-    private function handleValidateTags(array &$matchedFields)
+    private function handleValidateTags(array &$matchedFields): array
     {
         // In case $matchedFields['tags'] === null ...
         $tags = ArrayHelper::pickValue('tags', $matchedFields, []);
         // ...we must ensure we pass an [] to array_map
         $tags = is_array($tags) ? $tags : [];
 
-        return array_map(function (Tag $tag) {
-            return $tag->getTag();
-        }, $tags);
+        return array_map(fn (Tag $tag) => $tag->getTag(), $tags);
     }
 
     /**
@@ -186,10 +178,9 @@ final class ImportContactSubscriber implements EventSubscriberInterface
      * $matchedFields is a zero indexed array, so to calculate the
      * diff, we must array_flip($matchedFields) and compare on key.
      *
-     * @param ImportValidateEvent $event
-     * @param array               $matchedFields
+     * @param array $matchedFields
      */
-    private function handleValidateRequired(ImportValidateEvent $event, array &$matchedFields)
+    private function handleValidateRequired(ImportValidateEvent $event, array &$matchedFields): void
     {
         $requiredFields = $this->fieldList->getFieldList(false, false, [
             'isPublished' => true,
@@ -200,9 +191,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
         $missingRequiredFields = array_diff_key($requiredFields, array_flip($matchedFields));
 
         // Check for the presense of company mapped fields
-        $companyFields = array_filter($matchedFields, function ($fieldname) {
-            return strpos($fieldname, 'company') === 0;
-        });
+        $companyFields = array_filter($matchedFields, fn ($fieldname) => strpos($fieldname, 'company') === 0);
 
         // If we have any, ensure all required company fields are mapped.
         if (count($companyFields)) {

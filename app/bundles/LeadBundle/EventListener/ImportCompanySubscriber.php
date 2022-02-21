@@ -93,10 +93,7 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param ImportValidateEvent
-     */
-    public function onValidateImport(ImportValidateEvent $event)
+    public function onValidateImport(ImportValidateEvent $event): void
     {
         if ($event->importIsForRouteObject('companies') === false) {
             return;
@@ -108,9 +105,10 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
         $event->setList($this->handleValidateList($matchedFields));
         $event->setTags($this->handleValidateTags($matchedFields));
 
-        $matchedFields = array_map(function ($value) {
-            return is_string($value) ? trim($value) : $value;
-        }, array_filter($matchedFields));
+        $matchedFields = array_map(
+            fn ($value) => is_string($value) ? trim($value) : $value,
+            array_filter($matchedFields)
+        );
 
         if (empty($matchedFields)) {
             $event->getForm()->addError(
@@ -126,11 +124,9 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $matchedFields
-     *
-     * @return ?int
+     * @param mixed[] $matchedFields
      */
-    private function handleValidateOwner(array &$matchedFields)
+    private function handleValidateOwner(array &$matchedFields): ?int
     {
         $owner = ArrayHelper::pickValue('owner', $matchedFields);
 
@@ -138,30 +134,26 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $matchedFields
-     *
-     * @return ?int
+     * @param mixed[] $matchedFields
      */
-    private function handleValidateList(array &$matchedFields)
+    private function handleValidateList(array &$matchedFields): ?int
     {
         return ArrayHelper::pickValue('list', $matchedFields);
     }
 
     /**
-     * @param array $matchedFields
+     * @param mixed[] $matchedFields
      *
-     * @return array
+     * @return mixed[]
      */
-    private function handleValidateTags(array &$matchedFields)
+    private function handleValidateTags(array &$matchedFields): array
     {
         // In case $matchedFields['tags'] === null ...
         $tags = ArrayHelper::pickValue('tags', $matchedFields, []);
         // ...we must ensure we pass an [] to array_map
         $tags = is_array($tags) ? $tags : [];
 
-        return array_map(function (Tag $tag) {
-            return $tag->getTag();
-        }, $tags);
+        return array_map(fn (Tag $tag) => $tag->getTag(), $tags);
     }
 
     /**
@@ -171,10 +163,9 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
      * $matchedFields is a zero indexed array, so to calculate the
      * diff, we must array_flip($matchedFields) and compare on key.
      *
-     * @param ImportValidateEvent $event
-     * @param array               $matchedFields
+     * @param mixed[] $matchedFields
      */
-    private function handleValidateRequired(ImportValidateEvent $event, array &$matchedFields)
+    private function handleValidateRequired(ImportValidateEvent $event, array &$matchedFields): void
     {
         $requiredFields = $this->fieldList->getFieldList(false, false, [
             'isPublished' => true,

@@ -1,107 +1,49 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-use Mautic\LeadBundle\Entity\Import;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\Form;
 
 class ImportValidateEvent extends Event
 {
-    /**
-     * @var string
-     */
-    private $routeObjectName;
+    private string $routeObjectName;
+    private Form $form;
+    private array $matchedFields = [];
+    private ?int $ownerId;
+    private array $tags = [];
+    private ?int $list;
 
-    /**
-     * @var bool
-     */
-    private $objectSupported;
-
-    /**
-     * @var Form
-     */
-    private $form;
-
-    /**
-     * @var array
-     */
-    private $matchedFields = [];
-
-    /**
-     * @var ?int
-     */
-    private $ownerId;
-
-    /**
-     * @var array
-     */
-    private $tags = [];
-
-    /**
-     * @var ?int
-     */
-    private $list;
-
-    /**
-     * @param string $routeObjectName
-     * @param Form   $form
-     */
-    public function __construct($routeObjectName, Form $form)
+    public function __construct(string $routeObjectName, Form $form)
     {
         $this->routeObjectName = $routeObjectName;
         $this->form            = $form;
     }
 
-    /**
-     * @return Form
-     */
-    public function getForm()
+    public function getForm(): Form
     {
         return $this->form;
     }
 
     /**
      * Check if the form we're validating has errors.
-     *
-     * @return bool
      */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
-        return count($this->form->getErrors());
+        return (bool) count($this->form->getErrors());
     }
 
     /**
      * Check if the import is for said route object and notes if the object exist.
-     *
-     * @param string $routeObject
-     *
-     * @return bool
      */
-    public function importIsForRouteObject($routeObject)
+    public function importIsForRouteObject(string $routeObject): bool
     {
-        if ($this->getRouteObjectName() === $routeObject) {
-            $this->objectSupported = true;
-
-            return true;
-        }
-
-        return false;
+        return $this->getRouteObjectName() === $routeObject;
     }
 
-    /**
-     * @return string
-     */
-    public function getRouteObjectName()
+    public function getRouteObjectName(): string
     {
         return $this->routeObjectName;
     }
@@ -109,65 +51,53 @@ class ImportValidateEvent extends Event
     /**
      * Set the matchedFields in the event.
      *
-     * @param array $matchedFields
+     * @param mixed[] $matchedFields
      */
-    public function setMatchedFields(array $matchedFields)
+    public function setMatchedFields(array $matchedFields): void
     {
         $this->matchedFields = $matchedFields;
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public function getMatchedFields()
+    public function getMatchedFields(): array
     {
         return $this->matchedFields;
     }
 
-    /**
-     * @param ?int $ownerId
-     */
-    public function setOwnerId($ownerId = null)
+    public function setOwnerId(?int $ownerId = null): void
     {
         $this->ownerId = $ownerId;
     }
 
-    /**
-     * @return ?int
-     */
-    public function getOwnerId()
+    public function getOwnerId(): ?int
     {
         return $this->ownerId;
     }
 
-    /**
-     * @param ?int $list
-     */
-    public function setList($list = null)
+    public function setList(?int $list = null): void
     {
         $this->list = $list;
     }
 
-    /**
-     * @return ?int
-     */
-    public function getList()
+    public function getList(): ?int
     {
         return $this->list;
     }
 
     /**
-     * @param array $tags
+     * @param mixed[] $tags
      */
-    public function setTags(array $tags = [])
+    public function setTags(array $tags = []): void
     {
         $this->tags = $tags;
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public function getTags()
+    public function getTags(): array
     {
         return $this->tags;
     }
