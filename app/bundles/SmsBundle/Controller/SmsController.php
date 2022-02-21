@@ -79,7 +79,7 @@ class SmsController extends FormController
         }
 
         $orderBy    = $session->get('mautic.sms.orderby', 'e.name');
-        $orderByDir = $session->get('mautic.sms.orderbydir', 'DESC');
+        $orderByDir = $session->get('mautic.sms.orderbydir', $this->getDefaultOrderDirection());
 
         $smss = $model->getEntities([
             'start'      => $start,
@@ -745,5 +745,15 @@ class SmsController extends FormController
             'sms',
             'sms_id'
         );
+    }
+
+    protected function getModelName(): string
+    {
+        return 'sms';
+    }
+
+    protected function getDefaultOrderDirection(): string
+    {
+        return 'DESC';
     }
 }

@@ -366,13 +366,27 @@ class SearchSubscriber implements EventSubscriberInterface
 
         $config = [
             'column' => 'mq.channel_id',
-            'params' => [
-                'mq.channel' => 'email',
-                'mq.status'  => MessageQueue::STATUS_SENT,
-            ],
         ];
 
-        $this->buildJoinQuery($event, $tables, $config);
+        $alias = $event->getAlias();
+        $q     = $event->getQueryBuilder();
+        $expr  = $q->expr()->andX(sprintf('%s = :%s', $config['column'], $alias));
+
+        $expr->add(sprintf('%s = %s',
+            'mq.channel',
+            $q->createNamedParameter('email')
+        ));
+
+        $expr->add(sprintf('%s IN (%s, %s)',
+            'mq.status',
+            $q->createNamedParameter(MessageQueue::STATUS_PENDING),
+            $q->createNamedParameter(MessageQueue::STATUS_RESCHEDULED)
+        ));
+
+        $this->leadRepo->applySearchQueryRelationship($q, $tables, true, $expr);
+        $event->setReturnParameters(true);
+        $event->setStrict(true);
+        $event->setSearchStatus(true);
     }
 
     private function buildEmailSentQuery(LeadBuildSearchEvent $event)

@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -20,6 +21,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateLeadListsCommand extends ModeratedCommand
 {
+    public const NAME = 'mautic:segments:update';
+
     protected function configure()
     {
         $this
@@ -89,6 +92,11 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     $processed = 0;
                     try {
                         $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
+                        if (0 >= (int) $max) {
+                            // Only full segment rebuilds count
+                            $list->setLastBuiltDateToCurrentDatetime();
+                            $listModel->saveEntity($list);
+                        }
                     } catch (QueryException $e) {
                         $this->getContainer()->get('monolog.logger.mautic')->error('Query Builder Exception: '.$e->getMessage());
                     }
@@ -101,21 +109,27 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 $output->writeln('<error>'.$translator->trans('mautic.lead.list.rebuild.not_found', ['%id%' => $id]).'</error>');
             }
         } else {
-            $lists = $listModel->getEntities(
+            $leadLists = $listModel->getEntities(
                 [
                     'iterator_mode' => true,
                 ]
             );
 
-            while (false !== ($l = $lists->next())) {
+            while (false !== ($leadList = $leadLists->next())) {
                 // Get first item; using reset as the key will be the ID and not 0
-                $l = reset($l);
+                /** @var LeadList $leadList */
+                $leadList = reset($leadList);
 
-                if ($l->isPublished()) {
-                    $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $l->getId()]).'</info>');
+                if ($leadList->isPublished()) {
+                    $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $leadList->getId()]).'</info>');
 
                     $startTimeForSingleSegment = time();
-                    $processed                 = $listModel->rebuildListLeads($l, $batch, $max, $output);
+                    $processed                 = $listModel->rebuildListLeads($leadList, $batch, $max, $output);
+                    if (0 >= (int) $max) {
+                        // Only full segment rebuilds count
+                        $leadList->setLastBuiltDateToCurrentDatetime();
+                        $listModel->saveEntity($leadList);
+                    }
                     $output->writeln(
                         '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
                     );
@@ -125,10 +139,10 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     }
                 }
 
-                unset($l);
+                unset($leadList);
             }
 
-            unset($lists);
+            unset($leadLists);
         }
 
         $this->completeRun();
