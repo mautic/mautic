@@ -255,7 +255,7 @@ trait CustomFieldRepositoryTrait
      * @param $entity
      * @param $flush
      */
-    public function saveEntity($entity, $flush = true)
+    public function saveEntity($entity, $flush = true): void
     {
         $this->preSaveEntity($entity);
 

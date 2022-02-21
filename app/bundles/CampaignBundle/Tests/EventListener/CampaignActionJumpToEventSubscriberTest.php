@@ -59,9 +59,9 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             }
 
             /**
-             * @param array<string, string> $args
+             * @param array<string, array<string, array<int, array<string, mixed>>>|true> $args
              *
-             * @return array<string, string>
+             * @return array<Event>|\Doctrine\ORM\Tools\Pagination\Paginator
              */
             public function getEntities(array $args = [])
             {
@@ -162,13 +162,18 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $leadLog->setLead($contact);
 
         $eventRepository = new class($campaign) extends EventRepository {
-            private $campaign;
+            private Campaign $campaign;
 
             public function __construct(Campaign $campaign)
             {
                 $this->campaign = $campaign;
             }
 
+            /**
+             * @param array<string, string> $args
+             *
+             * @return array<Event>|\Doctrine\ORM\Tools\Pagination\Paginator
+             */
             public function getEntities(array $args = [])
             {
                 Assert::assertSame(
@@ -208,6 +213,12 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
 
+            /**
+             * @param Collection<int, Lead> $contacts
+             * @param bool                  $isInactiveEvent
+             *
+             * @return void
+             */
             public function executeForContacts(Event $event, Collection $contacts, ?Counter $counter = null, $isInactiveEvent = false)
             {
                 Assert::assertSame(222, $event->getId());

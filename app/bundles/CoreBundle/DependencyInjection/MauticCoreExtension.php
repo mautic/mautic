@@ -160,10 +160,6 @@ class MauticCoreExtension extends Extension
                                 }
 
                                 $definition->addTag($tag, $tagArguments[$k]);
-
-                                if ('mautic.email_transport' === $tag) {
-                                    $container->setAlias(sprintf('swiftmailer.mailer.transport.%s', $name), $alias);
-                                }
                             }
                         } else {
                             $tag          = (!empty($details['tag'])) ? $details['tag'] : $defaultTag;

@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -22,12 +23,12 @@ class PendingEvent extends AbstractLogCollectionEvent
     use ContextTrait;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, LeadEventLog>|Collection<int, LeadEventLog>
      */
     private $failures;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, LeadEventLog>|Collection<int, LeadEventLog>
      */
     private $successful;
 
@@ -49,7 +50,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @throws \Exception
      */
-    public function __construct(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    public function __construct(AbstractEventAccessor $config, Event $event, Collection $logs)
     {
         $this->failures   = new ArrayCollection();
         $this->successful = new ArrayCollection();
@@ -59,7 +60,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return LeadEventLog[]|ArrayCollection
+     * @return ArrayCollection<int, LeadEventLog>|Collection<int, LeadEventLog>
      */
     public function getPending()
     {
@@ -194,9 +195,9 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @param LeadEventLog[]|ArrayCollection $logs
+     * @param Collection<int, LeadEventLog> $logs
      */
-    public function passLogs(ArrayCollection $logs)
+    public function passLogs(Collection $logs)
     {
         foreach ($logs as $log) {
             $this->pass($log);
@@ -216,7 +217,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return LeadEventLog[]|ArrayCollection
+     * @return Collection<int, LeadEventLog>
      */
     public function getFailures()
     {
@@ -224,7 +225,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return LeadEventLog[]|ArrayCollection
+     * @return Collection<int, LeadEventLog>
      */
     public function getSuccessful()
     {

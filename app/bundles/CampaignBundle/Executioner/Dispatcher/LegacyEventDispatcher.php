@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignDecisionEvent;
@@ -90,10 +91,11 @@ class LegacyEventDispatcher
 
     /**
      * @param $wasBatchProcessed
+     * @param Collection<int, LeadEventLog>|ArrayCollection<int, LeadEventLog> $logs
      */
     public function dispatchCustomEvent(
         AbstractEventAccessor $config,
-        ArrayCollection $logs,
+        Collection $logs,
         $wasBatchProcessed,
         PendingEvent $pendingEvent
     ) {
@@ -163,8 +165,11 @@ class LegacyEventDispatcher
 
     /**
      * Execute the new ON_EVENT_FAILED and ON_EVENT_EXECUTED events for logs processed by BC code.
+     *
+     * @param Collection<int, LeadEventLog> $success
+     * @param Collection<int, LeadEventLog> $failures
      */
-    public function dispatchExecutionEvents(AbstractEventAccessor $config, ArrayCollection $success, ArrayCollection $failures)
+    public function dispatchExecutionEvents(AbstractEventAccessor $config, Collection $success, Collection $failures)
     {
         foreach ($success as $log) {
             $this->dispatchExecutionEvent($config, $log, true);

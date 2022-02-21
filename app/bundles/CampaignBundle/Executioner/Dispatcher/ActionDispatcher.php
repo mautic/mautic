@@ -115,7 +115,12 @@ class ActionDispatcher
         return $pendingEvent;
     }
 
-    private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     *
+     * @return void
+     */
+    private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, Collection $logs)
     {
         if (!$logs->count()) {
             return;
@@ -134,7 +139,12 @@ class ActionDispatcher
         );
     }
 
-    private function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs)
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     *
+     * @return void
+     */
+    private function dispatchedFailedEvent(AbstractEventAccessor $config, Collection $logs)
     {
         if (!$logs->count()) {
             return;
@@ -158,10 +168,14 @@ class ActionDispatcher
     }
 
     /**
+     * @param Collection<int, LeadEventLog> $pending
+     * @param Collection<int, LeadEventLog> $success
+     * @param Collection<int, LeadEventLog> $failed
+     *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      */
-    private function validateProcessedLogs(ArrayCollection $pending, ArrayCollection $success, ArrayCollection $failed)
+    private function validateProcessedLogs(Collection $pending, Collection $success, Collection $failed)
     {
         foreach ($pending as $log) {
             if (!$success->contains($log) && !$failed->contains($log)) {

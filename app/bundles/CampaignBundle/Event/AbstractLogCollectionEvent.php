@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
@@ -31,12 +32,12 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
     protected $event;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int,LeadEventLog>|Collection<int,LeadEventLog>
      */
     protected $logs;
 
     /**
-     * @var ArrayCollection|Lead[]
+     * @var ArrayCollection<int,Lead>|Collection<int,Lead>
      */
     private $contacts;
 
@@ -46,9 +47,9 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
     private $logContactXref = [];
 
     /**
-     * PendingEvent constructor.
+     * @param Collection<int,LeadEventLog> $logs
      */
-    public function __construct(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    public function __construct(AbstractEventAccessor $config, Event $event, Collection $logs)
     {
         $this->config   = $config;
         $this->event    = $event;
@@ -77,7 +78,7 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
     /**
      * Return an array of Lead entities keyed by LeadEventLog ID.
      *
-     * @return Lead[]|ArrayCollection
+     * @return Collection<int, Lead>|ArrayCollection<int, Lead>
      */
     public function getContacts()
     {

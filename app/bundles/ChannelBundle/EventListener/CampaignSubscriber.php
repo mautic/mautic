@@ -11,7 +11,7 @@
 
 namespace Mautic\ChannelBundle\EventListener;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -67,7 +67,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $pendingEvent;
 
     /**
-     * @var ArrayCollection
+     * @var Collection<int, LeadEventLog>
      */
     private $mmLogs;
 
@@ -192,15 +192,16 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param string $channel
+     * @param Collection<int, LeadEventLog> $logs
+     * @param string                        $channel
      *
-     * @return bool|ArrayCollection
+     * @return bool|Collection<int, LeadEventLog>
      *
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \ReflectionException
      */
-    private function sendChannelMessage(ArrayCollection $logs, $channel, array $messageChannel)
+    private function sendChannelMessage(Collection $logs, $channel, array $messageChannel)
     {
         /** @var ActionAccessor $config */
         $config = $this->eventCollector->getEventConfig($this->pseudoEvent);
@@ -235,7 +236,12 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $success;
     }
 
-    private function passExecutedLogs(ArrayCollection $logs, PreferenceBuilder $channelPreferences)
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     *
+     * @throws NoContactsFoundException
+     */
+    private function passExecutedLogs(Collection $logs, PreferenceBuilder $channelPreferences): void
     {
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
@@ -250,7 +256,10 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function removePsuedoFailures(ArrayCollection $success)
+    /**
+     * @param Collection<int, LeadEventLog> $success
+     */
+    private function removePsuedoFailures(Collection $success): void
     {
         /**
          * @var int

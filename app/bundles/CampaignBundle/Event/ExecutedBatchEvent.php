@@ -11,12 +11,13 @@
 
 namespace Mautic\CampaignBundle\Event;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 
 class ExecutedBatchEvent extends AbstractLogCollectionEvent
 {
     /**
-     * @return ArrayCollection
+     * @return Collection<int, LeadEventLog>
      */
     public function getExecuted()
     {
