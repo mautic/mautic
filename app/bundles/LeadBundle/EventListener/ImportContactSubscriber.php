@@ -17,21 +17,25 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 final class ImportContactSubscriber implements EventSubscriberInterface
 {
     private FieldList $fieldList;
     private CorePermissions $corePermissions;
     private LeadModel $contactModel;
+    private TranslatorInterface $translator;
 
     public function __construct(
         FieldList $fieldList,
         CorePermissions $corePermissions,
-        LeadModel $contactModel
+        LeadModel $contactModel,
+        TranslatorInterface $translator
     ) {
         $this->fieldList       = $fieldList;
         $this->corePermissions = $corePermissions;
         $this->contactModel    = $contactModel;
+        $this->translator      = $translator;
     }
 
     public static function getSubscribedEvents(): array

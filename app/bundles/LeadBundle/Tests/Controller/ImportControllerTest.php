@@ -9,6 +9,8 @@ use Mautic\LeadBundle\Command\ImportCommand;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -25,6 +27,27 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Please select a CSV file to upload', $crawler->html(), $crawler->html());
     }
 
+    /**
+     * Setting the phone field as required to test the validation.
+     * Phone is not part of the csv fixture so it won't be auto-mapped.
+    */
+    public function testImportMappingRequiredFieldValidation(): void
+    {
+        $this->setPhoneFieldIsRequired(true);
+
+        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
+        $uploadForm = $crawler->selectButton('Upload')->form();
+        $file       = new UploadedFile(dirname(__FILE__).'/../Fixtures/contacts.csv', 'contacs.csv', 'itext/csv');
+
+        $uploadForm['lead_import[file]']->setValue($file);
+
+        $crawler     = $this->client->submit($uploadForm);
+        $mappingForm = $crawler->selectButton('Import')->form();
+        $crawler     = $this->client->submit($mappingForm);
+
+        Assert::assertStringContainsString('Some required fields are missing. You must map the field "Phone."', $crawler->html());
+    }
+
     public function testImportMappingAndImport(): void
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
@@ -37,7 +60,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $mappingForm = $crawler->selectButton('Import')->form();
         $crawler     = $this->client->submit($mappingForm);
 
-        Assert::assertStringContainsString('Import process was successfully created. You will be notified when finished.', $crawler->html(), $crawler->html());
+        Assert::assertStringContainsString('Import process was successfully created. You will be notified when finished.', $crawler->html());
 
         /** @var ImportRepository $importRepository */
         $importRepository = $this->em->getRepository(Import::class);
@@ -73,5 +96,17 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $contacts = $leadRepository->findBy(['email' => ['john@doe.email', 'ferda@mravenec.email']]);
 
         Assert::assertCount(2, $contacts);
+    }
+
+    private function setPhoneFieldIsRequired(bool $required): void
+    {
+        /** @var LeadFieldRepository $fieldRepository */
+        $fieldRepository = $this->em->getRepository(LeadField::class);
+
+        /** @var LeadField $phoneField */
+        $phoneField = $fieldRepository->findOneBy(['alias' => 'phone']);
+
+        $phoneField->setIsRequired($required);
+        $fieldRepository->saveEntity($phoneField);
     }
 }
