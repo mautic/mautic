@@ -135,12 +135,12 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
 
         $this->client->request('GET', '/email/preview/'.$email->getId());
-        $this->assertTrue($this->client->getResponse()->isNotFound());
+        $this->assertTrue($this->client->getResponse()->isNotFound(), $this->client->getResponse()->getContent());
 
         $email->setPublicPreview(true);
         $this->em->persist($email);
 
         $this->client->request('GET', '/email/preview/'.$email->getId());
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
     }
 }
