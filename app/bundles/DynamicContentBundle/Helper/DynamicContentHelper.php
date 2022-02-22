@@ -45,7 +45,7 @@ class DynamicContentHelper
     }
 
     /**
-     * @param            $slot
+     * @param string     $slot
      * @param Lead|array $lead
      *
      * @return string
@@ -166,9 +166,8 @@ class DynamicContentHelper
     }
 
     /**
-     * @param $slot
-     * @param $lead
-     * @param $dwc
+     * @param string       $slot
+     * @param Lead|mixed[] $lead
      *
      * @return string
      */
