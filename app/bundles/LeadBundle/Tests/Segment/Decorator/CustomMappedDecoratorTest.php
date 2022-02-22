@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;

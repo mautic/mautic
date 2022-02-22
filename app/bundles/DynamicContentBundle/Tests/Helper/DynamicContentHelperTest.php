@@ -16,17 +16,15 @@ namespace Mautic\DynamicContentBundle\Tests\Helper;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetDwcBySlotNameWithPublished(): void
     {
-        $mockModel = $this->getMockBuilder(DynamicContentModel::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getEntities'])
-            ->getMock();
+        /** @var MockObject&DynamicContentModel $mockModel */
+        $mockModel = $this->createMock(DynamicContentModel::class);
 
         $mockModel->expects($this->exactly(2))
             ->method('getEntities')
@@ -67,11 +65,10 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $mockEventModel = $this->createMock(EventModel::class);
-        $mockDispatcher = $this->createMock(EventDispatcher::class);
-        $mockLeadModel  = $this->createMock(LeadModel::class);
+        $realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
+        $mockDispatcher      = $this->createMock(EventDispatcher::class);
 
-        $fixture = new DynamicContentHelper($mockModel, $mockEventModel, $mockDispatcher, $mockLeadModel);
+        $fixture = new DynamicContentHelper($mockModel, $realTimeExecutioner, $mockDispatcher);
 
         // Only get published
         $this->assertTrue($fixture->getDwcsBySlotName('test', true));

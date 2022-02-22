@@ -17,8 +17,6 @@ trait MatchFilterForLeadTrait
 {
     /**
      * @return bool
-     *
-     * @throws \Exception
      */
     protected function matchFilterForLead(array $filter, array $lead)
     {

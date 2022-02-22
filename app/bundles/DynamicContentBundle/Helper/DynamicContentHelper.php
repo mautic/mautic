@@ -15,44 +15,28 @@ use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
-use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
-use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
-    /**
-     * @var RealTimeExecutioner
-     */
-    protected $realTimeExecutioner;
+    protected RealTimeExecutioner $realTimeExecutioner;
+    protected EventDispatcherInterface $dispatcher;
+    protected DynamicContentModel $dynamicContentModel;
 
-    /**
-     * @var ContainerAwareEventDispatcher
-     */
-    protected $dispatcher;
-
-    /**
-     * @var DynamicContentModel
-     */
-    protected $dynamicContentModel;
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    public function __construct(DynamicContentModel $dynamicContentModel, RealTimeExecutioner $realTimeExecutioner, EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        DynamicContentModel $dynamicContentModel,
+        RealTimeExecutioner $realTimeExecutioner,
+        EventDispatcherInterface $dispatcher
+    ){
         $this->dynamicContentModel = $dynamicContentModel;
         $this->realTimeExecutioner = $realTimeExecutioner;
         $this->dispatcher          = $dispatcher;
-        $this->leadModel           = $leadModel;
     }
 
     /**
@@ -90,8 +74,6 @@ class DynamicContentHelper
      * @param Lead|array $lead
      *
      * @return string
-     *
-     * @throws \Exception
      */
     public function getDynamicContentSlotForLead($slotName, $lead)
     {
@@ -112,35 +94,6 @@ class DynamicContentHelper
         }
 
         return '';
-    }
-
-    /**
-     * @param array $filters
-     * @param array $contactArray
-     *
-     * @return bool
-     *
-     * @throws \Exception
-     */
-    private function filtersMatchContact(array $filters, array $contactArray)
-    {
-        if (empty($contactArray['id'])) {
-            return false;
-        }
-
-        //  We attempt even listeners first
-        if ($this->dispatcher->hasListeners(DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE)) {
-            /** @var Lead $contact */
-            $contact = $this->leadModel->getEntity($contactArray['id']);
-
-            $event = new ContactFiltersEvaluateEvent($filters, $contact);
-            $this->dispatcher->dispatch(DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE, $event);
-            if ($event->isMatch()) {
-                return true;
-            }
-        }
-
-        return $this->matchFilterForLead($filters, $contactArray);
     }
 
     /**
