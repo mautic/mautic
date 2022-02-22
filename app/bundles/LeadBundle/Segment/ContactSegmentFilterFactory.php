@@ -65,7 +65,7 @@ class ContactSegmentFilterFactory
     }
 
     /**
-     * @param array $filter
+     * @param mixed[] $filter
      *
      * @return ContactSegmentFilter
      *
