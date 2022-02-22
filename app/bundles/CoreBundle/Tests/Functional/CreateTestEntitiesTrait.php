@@ -72,6 +72,7 @@ trait CreateTestEntitiesTrait
         $segment = new LeadList();
         $segment->setAlias($alias);
         $segment->setName($alias);
+        $segment->setPublicName($alias);
         $segment->setFilters($filters);
         $this->em->persist($segment);
 
