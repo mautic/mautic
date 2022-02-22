@@ -36,7 +36,7 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $subscribedCats = $crawler->filter('select[id="lead_contact_frequency_rules_global_categories"]')->filter('option[selected="selected"]');
 
-        $this->assertCount(2, $subscribedCats);
+        $this->assertCount(2, $subscribedCats, $crawler->html());
     }
 
     /**

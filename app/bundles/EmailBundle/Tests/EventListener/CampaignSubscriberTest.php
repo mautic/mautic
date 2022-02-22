@@ -8,8 +8,6 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
-use Mautic\CategoryBundle\Entity\Category;
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\EventListener\CampaignSubscriber;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\EmailModel;
