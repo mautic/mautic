@@ -20,6 +20,7 @@ use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DynamicContentHelper
@@ -29,15 +30,18 @@ class DynamicContentHelper
     protected RealTimeExecutioner $realTimeExecutioner;
     protected EventDispatcherInterface $dispatcher;
     protected DynamicContentModel $dynamicContentModel;
+    protected LeadModel $leadModel;
 
     public function __construct(
         DynamicContentModel $dynamicContentModel,
         RealTimeExecutioner $realTimeExecutioner,
-        EventDispatcherInterface $dispatcher
-    ){
+        EventDispatcherInterface $dispatcher,
+        LeadModel $leadModel
+    ) {
         $this->dynamicContentModel = $dynamicContentModel;
         $this->realTimeExecutioner = $realTimeExecutioner;
         $this->dispatcher          = $dispatcher;
+        $this->leadModel           = $leadModel;
     }
 
     /**
