@@ -99,50 +99,6 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         ], $result);
     }
 
-    public function testGetEmailPendingQueryWithExcludedLists(): void
-    {
-        // create some leads
-        $leadOne   = $this->createLead('one');
-        $leadTwo   = $this->createLead('two');
-        $leadThree = $this->createLead('three');
-        $leadFour  = $this->createLead('four');
-        $leadFive  = $this->createLead('five');
-        $leadSix   = $this->createLead('six');
-
-        // add some leads in lists for inclusion
-        $sourceListOne  = $this->createLeadList('Source', $leadOne, $leadTwo, $leadThree);
-        $sourceListTwo  = $this->createLeadList('Source', $leadOne, $leadFour, $leadFive, $leadSix);
-
-        // add some leads in lists for exclusion
-        $excludeListOne = $this->createLeadList('Exclude', $leadTwo, $leadSix);
-        $excludeListTwo = $this->createLeadList('Exclude', $leadTwo, $leadThree);
-
-        // create an email with included/excluded lists
-        $email = new Email();
-        $email->setName('Email');
-        $email->setSubject('Subject');
-        $email->setEmailType('list');
-        $email->addList($sourceListOne);
-        $email->addList($sourceListTwo);
-        $email->addExcludedList($excludeListOne);
-        $email->addExcludedList($excludeListTwo);
-        $this->em->persist($email);
-
-        $this->em->flush();
-        $this->em->clear();
-
-        $result = $this->repository->getEmailPendingQuery($email->getId())
-            ->execute()
-            ->fetchAll();
-        $actualLeadIds  = array_column($result, 'id');
-        sort($actualLeadIds);
-
-        $expectedLeadIds = [$leadOne->getId(), $leadFour->getId(), $leadFive->getId()];
-        sort($expectedLeadIds);
-
-        Assert::assertSame($expectedLeadIds, $actualLeadIds);
-    }
-
     public function testGetEmailPendingQueryWithSubscribedCategory(): void
     {
         // create some leads
@@ -214,6 +170,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         $leadList = new LeadList();
         $leadList->setName($name);
+        $leadList->setPublicName($name);
         $leadList->setAlias(mb_strtolower($name));
         $this->em->persist($leadList);
 
