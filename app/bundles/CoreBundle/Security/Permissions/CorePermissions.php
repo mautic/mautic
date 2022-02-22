@@ -235,7 +235,7 @@ class CorePermissions
      * @param string          $mode                MATCH_ALL|MATCH_ONE|RETURN_ARRAY
      * @param User            $userEntity
      * @param bool            $allowUnknown        If the permission is not recognized, false will be returned.  Otherwise an
-     *                                          exception will be thrown
+     *                                             exception will be thrown
      *
      * @return mixed
      *

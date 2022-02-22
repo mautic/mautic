@@ -181,7 +181,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
      * Required fields come through as ['alias' => 'label'], and
      * $matchedFields is a zero indexed array, so to calculate the
      * diff, we must array_flip($matchedFields) and compare on key.
-     * 
+     *
      * @param mixed[] $matchedFields
      */
     private function handleValidateRequired(ImportValidateEvent $event, array &$matchedFields): void
