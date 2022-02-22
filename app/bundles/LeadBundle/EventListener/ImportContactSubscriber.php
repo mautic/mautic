@@ -114,7 +114,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
 
     public function onValidateImport(ImportValidateEvent $event): void
     {
-        if ($event->importIsForRouteObject('contacts') === false) {
+        if (false === $event->importIsForRouteObject('contacts')) {
             return;
         }
 
@@ -181,8 +181,6 @@ final class ImportContactSubscriber implements EventSubscriberInterface
      * Required fields come through as ['alias' => 'label'], and
      * $matchedFields is a zero indexed array, so to calculate the
      * diff, we must array_flip($matchedFields) and compare on key.
-     *
-     * @param array $matchedFields
      */
     private function handleValidateRequired(ImportValidateEvent $event, array &$matchedFields): void
     {
@@ -195,7 +193,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
         $missingRequiredFields = array_diff_key($requiredFields, array_flip($matchedFields));
 
         // Check for the presense of company mapped fields
-        $companyFields = array_filter($matchedFields, fn ($fieldname) => strpos($fieldname, 'company') === 0);
+        $companyFields = array_filter($matchedFields, fn ($fieldname) => 0 === strpos($fieldname, 'company'));
 
         // If we have any, ensure all required company fields are mapped.
         if (count($companyFields)) {
@@ -219,7 +217,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
                         'mautic.import.missing.required.fields',
                         [
                             '%requiredFields%' => implode(', ', $missingRequiredFields),
-                            '%fieldOrFields%'  => count($missingRequiredFields) === 1 ? 'field' : 'fields',
+                            '%fieldOrFields%'  => 1 === count($missingRequiredFields) ? 'field' : 'fields',
                         ],
                         'validators'
                     )

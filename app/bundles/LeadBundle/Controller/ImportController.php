@@ -389,7 +389,7 @@ class ImportController extends FormController
                     break;
                 case self::STEP_MATCH_FIELDS:
                     $validateEvent = new ImportValidateEvent($this->request->get('object'), $form);
-                        
+
                     $dispatcher->dispatch(LeadEvents::IMPORT_ON_VALIDATE, $validateEvent);
 
                     if ($validateEvent->hasErrors()) {

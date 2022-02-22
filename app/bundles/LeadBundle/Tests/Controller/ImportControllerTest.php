@@ -30,7 +30,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
     /**
      * Setting the phone field as required to test the validation.
      * Phone is not part of the csv fixture so it won't be auto-mapped.
-    */
+     */
     public function testImportMappingRequiredFieldValidation(): void
     {
         $this->setPhoneFieldIsRequired(true);
