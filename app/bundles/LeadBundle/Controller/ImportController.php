@@ -23,6 +23,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -60,6 +61,14 @@ class ImportController extends FormController
         parent::initialize($event);
     }
 
+    public function getModel($modelName): ImportModel
+    {
+        /** @var ImportModel $model */
+        $model = parent::getModel($modelName);
+
+        return $model;
+    }
+
     /**
      * @param int $page
      *
@@ -76,11 +85,12 @@ class ImportController extends FormController
     /**
      * Get items for index list.
      *
-     * @param int    $start
-     * @param int    $limit
-     * @param array  $filter
-     * @param string $orderBy
-     * @param string $orderByDir
+     * @param int     $start
+     * @param int     $limit
+     * @param mixed[] $filter
+     * @param string  $orderBy
+     * @param string  $orderByDir
+     * @param mixed[] $args
      *
      * @return array
      */
@@ -113,7 +123,7 @@ class ImportController extends FormController
     }
 
     /**
-     * @param $objectId
+     * @param int $objectId
      *
      * @return array|JsonResponse|RedirectResponse|Response
      */

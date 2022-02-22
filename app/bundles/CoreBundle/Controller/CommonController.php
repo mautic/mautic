@@ -132,7 +132,7 @@ class CommonController extends Controller implements MauticController
     /**
      * Get a model instance from the service container.
      *
-     * @param $modelNameKey
+     * @param string $modelNameKey
      *
      * @return AbstractCommonModel
      */

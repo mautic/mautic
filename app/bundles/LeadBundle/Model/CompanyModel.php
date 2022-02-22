@@ -746,10 +746,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array $fields
-     * @param array $data
-     * @param null  $owner
-     * @param bool  $skipIfExists
+     * @param mixed[] $fields
+     * @param mixed[] $data
+     * @param null    $owner
+     * @param bool    $skipIfExists
      *
      * @return bool|null
      *

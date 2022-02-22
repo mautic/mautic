@@ -816,7 +816,7 @@ class Import extends FormEntity
      * Set a default value to the defaults array.
      *
      * @param string $key
-     * @param string $value
+     * @param mixed  $value
      *
      * @return Import
      */

@@ -11,10 +11,18 @@ class ImportValidateEvent extends Event
 {
     private string $routeObjectName;
     private Form $form;
-    private array $matchedFields = [];
     private ?int $ownerId;
-    private array $tags = [];
     private ?int $list;
+
+    /**
+     * @var mixed[]
+     */
+    private array $matchedFields = [];
+
+    /**
+     * @var mixed[]
+     */
+    private array $tags = [];
 
     public function __construct(string $routeObjectName, Form $form)
     {
