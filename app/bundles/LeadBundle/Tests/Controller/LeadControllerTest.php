@@ -9,6 +9,7 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Assert;
@@ -343,6 +344,30 @@ class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertStringContainsString('firstname: This field is required.', $clientResponse->getContent());
+    }
+
+    public function testCompanyIdSearchCommand(): void
+    {
+        $companyName = 'Doe Corp';
+        $company     = new Company();
+        $company->setName($companyName);
+        $this->em->persist($company);
+
+        $lead = new Lead();
+        $lead->setEmail('xxx@xxx.com');
+        $lead->setCompany($companyName);
+        $this->em->persist($lead);
+
+        $leadCompany = new CompanyLead();
+        $leadCompany->setLead($lead);
+        $leadCompany->setCompany($company);
+        $leadCompany->setDateAdded(new \DateTime());
+        $this->em->persist($leadCompany);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=company_id:'.$company->getId());
+
+        $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
+        $this->assertEquals(1, $leadsTableRows->count(), $crawler->html());
     }
 
     private function createContact(string $email): Lead
