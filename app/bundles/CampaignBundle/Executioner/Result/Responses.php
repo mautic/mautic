@@ -11,7 +11,6 @@
 
 namespace Mautic\CampaignBundle\Executioner\Result;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -28,9 +27,6 @@ class Responses
      */
     private $conditionResponses = [];
 
-    /**
-     * @param Collection<int, LeadEventLog>|ArrayCollection<int, LeadEventLog> $logs
-     */
     public function setFromLogs(Collection $logs)
     {
         /** @var LeadEventLog $log */

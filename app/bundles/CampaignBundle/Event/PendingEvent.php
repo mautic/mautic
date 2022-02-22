@@ -23,12 +23,12 @@ class PendingEvent extends AbstractLogCollectionEvent
     use ContextTrait;
 
     /**
-     * @var ArrayCollection<int, LeadEventLog>|Collection<int, LeadEventLog>
+     * @var ArrayCollection
      */
     private $failures;
 
     /**
-     * @var ArrayCollection<int, LeadEventLog>|Collection<int, LeadEventLog>
+     * @var ArrayCollection
      */
     private $successful;
 
@@ -50,7 +50,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @throws \Exception
      */
-    public function __construct(AbstractEventAccessor $config, Event $event, Collection $logs)
+    public function __construct(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
     {
         $this->failures   = new ArrayCollection();
         $this->successful = new ArrayCollection();
@@ -60,7 +60,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return ArrayCollection<int, LeadEventLog>|Collection<int, LeadEventLog>
+     * @return Collection
      */
     public function getPending()
     {
@@ -217,7 +217,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return Collection<int, LeadEventLog>
+     * @return ArrayCollection
      */
     public function getFailures()
     {
@@ -225,7 +225,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return Collection<int, LeadEventLog>
+     * @return ArrayCollection
      */
     public function getSuccessful()
     {

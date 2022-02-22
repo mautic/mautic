@@ -92,17 +92,18 @@ $template  = '<div class="col-md-6">{content}</div>';
 
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_type', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_path', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_messenger_type', $template); ?>
             </div>
 
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_msg_limit', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_time_limit', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_messenger_host', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_messenger_port', $template); ?>
             </div>
 
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_recover_timeout', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_messenger_path', $template); ?>
             </div>
+
         </div>
     </div>
 <?php endif; ?>

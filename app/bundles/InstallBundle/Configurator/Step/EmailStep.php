@@ -106,13 +106,6 @@ class EmailStep implements StepInterface
     public $mailer_auth_mode; //  null|plain|login|cram-md5
 
     /**
-     * Spool path.
-     *
-     * @var string
-     */
-    public $mailer_spool_path = '%kernel.root_dir%/../var/spool';
-
-    /**
      * @var string
      */
     public $mailer_dsn = 'null://null';
@@ -121,6 +114,31 @@ class EmailStep implements StepInterface
      * @var string
      */
     public $mailer_messenger_dsn = 'sync://';
+
+    /**
+     * @var string
+     */
+    public $mailer_spool_type = 'sync';
+
+    /**
+     * @var string
+     */
+    public $mailer_messenger_type;
+
+    /**
+     * @var string
+     */
+    public $mailer_messenger_host;
+
+    /**
+     * @var string
+     */
+    public $mailer_messenger_port;
+
+    /**
+     * @var string
+     */
+    public $mailer_messenger_path;
 
     public function __construct(Session $session)
     {

@@ -317,7 +317,11 @@ class CommonRepository extends EntityRepository
         }
 
         /** @var class-string $entityClass */
-        return $this->getEntityManager()->getRepository($entityClass)->getBaseColumns($entityClass, $returnColumnNames);
+        $repository = $this->getEntityManager()->getRepository($entityClass);
+
+        return method_exists($repository, 'getBaseColumns') ?
+            $repository->getBaseColumns($entityClass, $returnColumnNames) :
+            [];
     }
 
     /**

@@ -23,9 +23,7 @@ interface BounceProcessorInterface
     /**
      * Get the email address that bounced.
      *
-     * @return BouncedEmail
-     *
      * @throws BounceNotFound
      */
-    public function processBounce(Message $message);
+    public function processBounce(Message $message): BouncedEmail;
 }

@@ -174,14 +174,12 @@ class EventExecutioner
     }
 
     /**
-     * @param Collection<int, LeadEventLog>|ArrayCollection<int, LeadEventLog> $logs
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeLogs(Event $event, Collection $logs, Counter $counter = null)
+    public function executeLogs(Event $event, ArrayCollection $logs, Counter $counter = null)
     {
         $this->logger->debug('CAMPAIGN: Executing '.$event->getType().' ID '.$event->getId());
 

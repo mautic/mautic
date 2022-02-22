@@ -5,6 +5,8 @@ includes:
 parameters:
 	level: 6
 	reportUnmatchedIgnoredErrors: false
+	checkMissingIterableValueType: false
+	checkGenericClassInNonGenericObjectType: false
 	parallel:
 		maximumNumberOfProcesses: 4
 		processTimeout: 1000.0
