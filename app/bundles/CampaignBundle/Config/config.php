@@ -196,7 +196,10 @@ return [
         'forms'        => [
             'mautic.campaign.type.form'                 => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignType',
-                'arguments' => 'mautic.security',
+                'arguments' => [
+                    'mautic.security',
+                    'translator',
+                ],
             ],
             'mautic.campaignrange.type.action'          => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventType',
@@ -262,7 +265,7 @@ return [
                 ],
             ],
             'mautic.campaign.model.event_log' => [
-                'class'     => 'Mautic\CampaignBundle\Model\EventLogModel',
+                'class'     => \Mautic\CampaignBundle\Model\EventLogModel::class,
                 'arguments' => [
                     'mautic.campaign.model.event',
                     'mautic.campaign.model.campaign',
