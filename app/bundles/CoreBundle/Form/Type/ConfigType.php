@@ -198,6 +198,19 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'composer_updates',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.form.update.composer',
+                'data'  => (array_key_exists('composer_updates', $options['data']) && !empty($options['data']['composer_updates'])),
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.update.composer.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
             'locale',
             ChoiceType::class,
             [

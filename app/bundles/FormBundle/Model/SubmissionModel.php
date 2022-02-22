@@ -492,6 +492,16 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
+     * @param array<string, mixed> $args
+     *
+     * @return array<mixed>
+     */
+    public function getEntitiesByPage(array $args = [])
+    {
+        return $this->getRepository()->getEntitiesByPage($args);
+    }
+
+    /**
      * @param $format
      * @param $form
      * @param $queryArgs
@@ -656,6 +666,140 @@ class SubmissionModel extends CommonFormModel
                     return $response;
                 }
                 throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
+            default:
+                return new Response();
+        }
+    }
+
+    /**
+     * @param string               $format
+     * @param object               $page
+     * @param array<string, mixed> $queryArgs
+     *
+     * @return StreamedResponse|Response
+     *
+     * @throws \Exception
+     */
+    public function exportResultsForPage($format, $page, $queryArgs)
+    {
+        $results    = $this->getEntitiesByPage($queryArgs);
+        $results    = $results['results'];
+        $translator = $this->translator;
+
+        $date = (new DateTimeHelper())->toLocalString();
+        $name = str_replace(' ', '_', $date).'_'.$page->getAlias();
+
+        switch ($format) {
+            case 'csv':
+                $response = new StreamedResponse(
+                    function () use ($results, $translator) {
+                        $handle = fopen('php://output', 'r+');
+
+                        //build the header row
+                        $header = [
+                            $translator->trans('mautic.core.id'),
+                            $translator->trans('mautic.lead.report.contact_id'),
+                            $translator->trans('mautic.form.report.form_id'),
+                            $translator->trans('mautic.form.result.thead.date'),
+                            $translator->trans('mautic.core.ipaddress'),
+                            $translator->trans('mautic.form.result.thead.referrer'),
+                        ];
+
+                        //write the row
+                        fputcsv($handle, $header);
+
+                        //build the data rows
+                        foreach ($results as $k => $s) {
+                            $row = [
+                                $s['id'],
+                                $s['leadId'],
+                                $s['formId'],
+                                $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
+                                $s['ipAddress'],
+                                $s['referer'],
+                            ];
+
+                            fputcsv($handle, $row);
+
+                            //free memory
+                            unset($row, $results[$k]);
+                        }
+
+                        fclose($handle);
+                    }
+                );
+
+                $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
+                $response->headers->set('Expires', 0);
+                $response->headers->set('Cache-Control', 'must-revalidate');
+                $response->headers->set('Pragma', 'public');
+
+                return $response;
+            case 'html':
+                $content = $this->templatingHelper->getTemplating()->renderResponse(
+                    'MauticPageBundle:Result:export.html.php',
+                    [
+                        'page'      => $page,
+                        'results'   => $results,
+                        'pageTitle' => $name,
+                    ]
+                )->getContent();
+
+                return new Response($content);
+            case 'xlsx':
+                if (!class_exists(Spreadsheet::class)) {
+                    throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
+                }
+                $response = new StreamedResponse(
+                    function () use ($results, $translator, $name) {
+                        $objPHPExcel = new Spreadsheet();
+                        $objPHPExcel->getProperties()->setTitle($name);
+
+                        $objPHPExcel->createSheet();
+
+                        $header = [
+                            $translator->trans('mautic.core.id'),
+                            $translator->trans('mautic.form.result.thead.date'),
+                            $translator->trans('mautic.core.ipaddress'),
+                            $translator->trans('mautic.form.result.thead.referrer'),
+                        ];
+
+                        //write the row
+                        $objPHPExcel->getActiveSheet()->fromArray($header, null, 'A1');
+
+                        //build the data rows
+                        $count = 2;
+                        foreach ($results as $k => $s) {
+                            $row = [
+                                $s['id'],
+                                $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
+                                $s['ipAddress'],
+                                $s['referer'],
+                            ];
+
+                            $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
+
+                            //free memory
+                            unset($row, $results[$k]);
+
+                            //increment letter
+                            ++$count;
+                        }
+
+                        $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
+                        $objWriter->setPreCalculateFormulas(false);
+
+                        $objWriter->save('php://output');
+                    }
+                );
+                $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
+                $response->headers->set('Expires', 0);
+                $response->headers->set('Cache-Control', 'must-revalidate');
+                $response->headers->set('Pragma', 'public');
+
+                return $response;
             default:
                 return new Response();
         }

@@ -150,6 +150,7 @@ return [
             'mautic.plugin.helper.reload' => [
                 'class'     => \Mautic\PluginBundle\Helper\ReloadHelper::class,
                 'arguments' => [
+                    'event_dispatcher',
                     'mautic.factory',
                 ],
             ],
