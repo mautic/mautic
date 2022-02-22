@@ -18,6 +18,20 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     */
+    protected function createLeadCompany(Lead $contactA, Company $company): CompanyLead
+    {
+        $leadCompany = new CompanyLead();
+        $leadCompany->setLead($contactA);
+        $leadCompany->setCompany($company);
+        $leadCompany->setDateAdded(new \DateTime());
+        $this->em->persist($leadCompany);
+
+        return $leadCompany;
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -348,26 +362,24 @@ class LeadControllerTest extends MauticMysqlTestCase
 
     public function testCompanyIdSearchCommand(): void
     {
+        $contactA = $this->createContact('contact@a.email');
+        $contactB = $this->createContact('contact@b.email');
+        $contactC = $this->createContact('contact@c.email');
+
         $companyName = 'Doe Corp';
         $company     = new Company();
         $company->setName($companyName);
         $this->em->persist($company);
 
-        $lead = new Lead();
-        $lead->setEmail('xxx@xxx.com');
-        $lead->setCompany($companyName);
-        $this->em->persist($lead);
+        $this->em->flush();
 
-        $leadCompany = new CompanyLead();
-        $leadCompany->setLead($lead);
-        $leadCompany->setCompany($company);
-        $leadCompany->setDateAdded(new \DateTime());
-        $this->em->persist($leadCompany);
+        $this->createLeadCompany($contactA, $company);
+        $this->createLeadCompany($contactB, $company);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=company_id:'.$company->getId());
 
         $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
-        $this->assertEquals(1, $leadsTableRows->count(), $crawler->html());
+        $this->assertEquals(2, $leadsTableRows->count(), $crawler->html());
     }
 
     private function createContact(string $email): Lead
