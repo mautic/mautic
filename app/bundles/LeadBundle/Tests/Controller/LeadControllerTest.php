@@ -376,6 +376,8 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->createLeadCompany($contactA, $company);
         $this->createLeadCompany($contactB, $company);
 
+        $this->em->flush();
+
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=company_id:'.$company->getId());
 
         $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
