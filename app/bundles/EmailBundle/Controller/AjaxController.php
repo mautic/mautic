@@ -16,8 +16,10 @@ use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
-use Mautic\EmailBundle\Mailer\Dsn\DsnGenerator;
 use Mautic\EmailBundle\Mailer\EmailSender;
+use Mautic\EmailBundle\Mailer\Exception\ConnectionErrorException;
+use Mautic\EmailBundle\Mailer\Transport\TestConnectionInterface;
+use Mautic\EmailBundle\Mailer\Transport\TransportWrapper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -196,67 +198,31 @@ class AjaxController extends CommonAjaxController
 
         if ($user->isAdmin()) {
             $settings      = $request->request->all();
-            $mailerFactory = $this->get('mautic.email.mailer.factory');
 
-            $transport = $settings['transport'];
+            /** @var TransportWrapper $transportWrapper */
+            $transportWrapper = $this->container->get('mautic.email.transport_wrapper');
 
-            switch ($transport) {
-//                case 'gmail':
-//                    $transport = $esmtpTransportFactory->create(new Dsn('smtp', 'smtp.gmail.com', null, null, 465));
-//                    $mailer = new Mailer($transport);
-//                    break;
-                case 'smtp':
-                    $mailer = $mailerFactory->getMailerByDsn(DsnGenerator::getDsnString(new Dsn('smtp', $settings['host'], null, null, $settings['port'])));
-                    break;
-                default:
-                    if ($this->container->has($transport)) {
-                        $mailer = $this->container->get($transport);
+            try {
+                /** @var TestConnectionInterface $extension */
+                $extension = $transportWrapper->getTransportExtension($settings['transport']);
+                if (!($extension instanceof TestConnectionInterface)) {
+                    $dataArray['message'] = 'Transport doesn\'t support testing connection.';
 
-                        if ('ses+smtp' == $transport) {
-                            $amazonHost = $mailer->buildHost($settings['amazon_region'], $settings['amazon_other_region']);
-                            $mailer->setHost($amazonHost, $settings['port']);
-                        }
+                    return $this->sendJsonResponse($dataArray);
+                }
+            } catch (\LogicException $exception) {
+                $dataArray['message'] = 'Transport is not found.';
 
-                        if ('ses+api' == $transport) {
-                            $mailer->setRegion($settings['amazon_region'], $settings['amazon_other_region']);
-                        }
-                    }
+                return $this->sendJsonResponse($dataArray);
             }
 
-            if (method_exists($mailer, 'setMauticFactory')) {
-                $mailer->setMauticFactory($this->factory);
-            }
-
-            if (!empty($mailer)) {
-                try {
-                    if (method_exists($mailer, 'setApiKey')) {
-                        if (empty($settings['api_key'])) {
-                            $settings['api_key'] = $this->get('mautic.helper.core_parameters')->get('mailer_api_key');
-                        }
-                        $mailer->setApiKey($settings['api_key']);
-                    }
-                } catch (\Exception $exception) {
-                    // Transport had magic method defined and threw an exception
-                }
-
-                try {
-                    if (is_callable([$mailer, 'setUsername']) && is_callable([$mailer, 'setPassword'])) {
-                        if (empty($settings['password'])) {
-                            $settings['password'] = $this->get('mautic.helper.core_parameters')->get('mailer_password');
-                        }
-                        $mailer->setUsername($settings['user']);
-                        $mailer->setPassword($settings['password']);
-                    }
-                } catch (\Exception $exception) {
-                    // Transport had magic method defined and threw an exception
-                }
-
-                try {
+            try {
+                if ($extension->testConnection(new Dsn($settings['transport'], $settings['host'], null, null, $settings['port']))) {
                     $dataArray['success'] = 1;
-                    $dataArray['message'] = $this->get('translator')->trans('mautic.core.success');
-                } catch (\Exception $e) {
-                    $dataArray['message'] = $e->getMessage();
+                    $dataArray['message'] = $this->translator->trans('mautic.core.success');
                 }
+            } catch (ConnectionErrorException $exception) {
+                $dataArray['message'] = $exception->getMessage();
             }
         }
 

@@ -576,6 +576,10 @@ return [
                 ],
                 'tags' => ['mautic.email.transport_extension'],
             ],
+            'mautic.email.transport_extension.smtp' => [
+                'class'     => \Mautic\EmailBundle\Mailer\Transport\SmtpTransportExtension::class,
+                'tags'      => ['mautic.email.transport_extension'],
+            ],
             'mautic.email.amazon.callback' => [
                 'class'     => \Mautic\EmailBundle\Mailer\Callback\AmazonCallback::class,
                 'arguments' => [
