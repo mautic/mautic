@@ -834,14 +834,6 @@ return [
                     'mautic.helper.field.alias',
                 ],
             ],
-            \Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class => [
-                'class'     => \Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class,
-                'tag'       => 'validator.constraint_validator',
-                'arguments' => [
-                    'mautic.lead.model.list',
-                    'mautic.helper.field.alias',
-                ],
-            ],
             'mautic.lead.constraint.alias' => [
                 'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator::class,
                 'arguments' => ['mautic.lead.repository.lead_list', 'mautic.helper.user'],
@@ -861,7 +853,7 @@ return [
                 'alias'     => 'segment_in_use',
             ],
             'mautic.lead.event.dispatcher'       => [
-                'class'     => LeadChangeEventDispatcher::class,
+                'class'     => \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::class,
                 'arguments' => [
                     'event_dispatcher',
                 ],
