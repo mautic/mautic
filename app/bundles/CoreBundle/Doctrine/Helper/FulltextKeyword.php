@@ -6,25 +6,10 @@ namespace Mautic\CoreBundle\Doctrine\Helper;
 
 class FulltextKeyword
 {
-    /**
-     * @var string
-     */
-    private $value;
-
-    /**
-     * @var bool
-     */
-    private $wordSearch;
-
-    /**
-     * @var bool
-     */
-    private $booleanMode;
-
-    /**
-     * @var bool
-     */
-    private $wordInflecting;
+    private string $value;
+    private bool $wordSearch;
+    private bool $booleanMode;
+    private bool $wordInflecting;
 
     public function __construct(string $value, bool $booleanMode = true, bool $wordSearch = true, bool $wordInflecting = false)
     {

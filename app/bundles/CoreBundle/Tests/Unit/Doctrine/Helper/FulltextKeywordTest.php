@@ -21,6 +21,9 @@ class FulltextKeywordTest extends TestCase
         Assert::assertSame($expected, (string) $fulltextKeyword);
     }
 
+    /**
+     * @return iterable<array<string>>
+     */
     public function dataDefault(): iterable
     {
         yield ['some word', '(+some* +word*) >"some word"'];
@@ -40,6 +43,9 @@ class FulltextKeywordTest extends TestCase
         Assert::assertSame($expected, (string) $fulltextKeyword);
     }
 
+    /**
+     * @return iterable<array<string>>
+     */
     public function dataInflectingEnabled(): iterable
     {
         yield ['some word', '(+(some* <som*) +(word* <wor*)) >"some word"'];
@@ -59,6 +65,9 @@ class FulltextKeywordTest extends TestCase
         Assert::assertSame($expected, (string) $fulltextKeyword);
     }
 
+    /**
+     * @return iterable<array<string>>
+     */
     public function dataWordSearchDisabled(): iterable
     {
         yield ['some word', '"some word"'];
@@ -78,6 +87,9 @@ class FulltextKeywordTest extends TestCase
         Assert::assertSame($expected, (string) $fulltextKeyword);
     }
 
+    /**
+     * @return iterable<array<string>>
+     */
     public function dataBooleanModeDisabled(): iterable
     {
         yield ['some word', 'some word'];

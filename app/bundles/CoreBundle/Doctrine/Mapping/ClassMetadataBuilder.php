@@ -433,7 +433,9 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
-     * @param string $name
+     * @param string  $name
+     * @param mixed[] $flags
+     * @param mixed[] $options
      */
     public function addIndex(array $columns, $name, array $flags = null, array $options = null): self
     {
@@ -464,13 +466,16 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * @param string $name
      * @param string $where
      *
-     * @return $this
+     * @return self
      */
     public function addPartialIndex(array $columns, $name, $where)
     {
         return $this->addIndex($columns, $name, null, ['where' => $where]);
     }
 
+    /**
+     * @param mixed[] $columns
+     */
     public function addFulltextIndex(array $columns, string $name): self
     {
         return $this->addIndex($columns, $name, ['fulltext']);
