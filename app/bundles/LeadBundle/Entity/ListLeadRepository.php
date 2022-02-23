@@ -54,4 +54,25 @@ class ListLeadRepository extends CommonRepository
             $q->execute();
         }
     }
+
+    /**
+     * @param mixed[] $filters
+     */
+    public function getContactsCountBySegment(int $segmentId, array $filters = []): int
+    {
+        $qb = $this->createQueryBuilder('ll');
+        $qb->select('count(ll.list) as count')
+            ->where('ll.list = :segmentId')
+            ->setParameter('segmentId', $segmentId);
+
+        if (!empty($filters)) {
+            foreach ($filters as $colName => $val) {
+                $entityFieldName = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $colName))));
+                $qb->andWhere(sprintf('ll.%s=:%s', $entityFieldName, $entityFieldName));
+                $qb->setParameter($entityFieldName, $val);
+            }
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
 }

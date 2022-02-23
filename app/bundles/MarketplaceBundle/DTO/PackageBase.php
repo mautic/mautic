@@ -15,8 +15,12 @@ final class PackageBase
     public string $description;
     public int $downloads;
     public int $favers;
+    /**
+     * E.g. mautic-plugin.
+     */
+    public ?string $type;
 
-    public function __construct(string $name, string $url, string $repository, string $description, int $downloads, int $favers)
+    public function __construct(string $name, string $url, string $repository, string $description, int $downloads, int $favers, ?string $type)
     {
         $this->name        = $name;
         $this->url         = $url;
@@ -24,6 +28,7 @@ final class PackageBase
         $this->description = $description;
         $this->downloads   = $downloads;
         $this->favers      = $favers;
+        $this->type        = $type;
     }
 
     public static function fromArray(array $array)
@@ -34,7 +39,8 @@ final class PackageBase
             $array['repository'],
             $array['description'],
             (int) $array['downloads'],
-            (int) $array['favers']
+            (int) $array['favers'],
+            $array['type'] ?? null
         );
     }
 
