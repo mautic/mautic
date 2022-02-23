@@ -504,6 +504,16 @@ class BuilderSubscriber implements EventSubscriberInterface
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
         }
 
+        $headCloseScripts = $page->getHeadScript();
+        if ($headCloseScripts) {
+            $content = str_ireplace('</head>', $headCloseScripts."\n</head>", $content);
+        }
+
+        $bodyCloseScripts = $page->getFooterScript();
+        if ($bodyCloseScripts) {
+            $content = str_ireplace('</body>', $bodyCloseScripts."\n</body>", $content);
+        }
+
         $event->setContent($content);
     }
 
