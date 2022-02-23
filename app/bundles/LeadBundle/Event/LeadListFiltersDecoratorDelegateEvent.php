@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
 final class LeadListFiltersDecoratorDelegateEvent extends CommonEvent
 {
-    private ?FilterDecoratorInterface $decorator;
+    private ?FilterDecoratorInterface $decorator = null;
     private ContactSegmentFilterCrate $crate;
 
     public function __construct(ContactSegmentFilterCrate $crate)
