@@ -54,19 +54,14 @@ class ImportController extends FormController
 
     public function initialize(FilterControllerEvent $event)
     {
+        /** @var ImportModel $model */
+        $model = $this->getModel($this->getModelName());
+
         $this->logger      = $this->container->get('monolog.logger.mautic');
         $this->session     = $this->container->get('session');
-        $this->importModel = $this->getModel($this->getModelName());
+        $this->importModel = $model;
 
         parent::initialize($event);
-    }
-
-    public function getModel($modelName): ImportModel
-    {
-        /** @var ImportModel $model */
-        $model = parent::getModel($modelName);
-
-        return $model;
     }
 
     /**
