@@ -47,12 +47,7 @@ class SegmentDictionaryGenerationEvent extends CommonEvent
         return $this->translations;
     }
 
-    /**
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function hasTranslation($key)
+    public function hasTranslation(string $key): bool
     {
         return isset($this->translations[$key]);
     }
