@@ -101,7 +101,7 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
     public function testDateDecoratorWhenNoSubscriberProvidesDecorator(): void
     {
         $filterDecoratorInterface  = $this->createMock(FilterDecoratorInterface::class);
-        $contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => 'date',]);
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => 'date']);
 
         $this->dateOptionFactory->expects($this->once())
             ->method('getDateOption')
@@ -131,7 +131,7 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
     public function testDateDecoratorWhenSubscriberProvidesDecorator(): void
     {
         $filterDecoratorInterface  = $this->createMock(FilterDecoratorInterface::class);
-        $contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => 'date',]);
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => 'date']);
 
         $this->dateOptionFactory->expects($this->never())
             ->method('getDateOption');
