@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Helper;
 
 /**
+ * @depreacated in Mautic 5. Use Symfony 4 RedisAdapter for multiple instances https://symfony.com/doc/current/components/cache/adapters/redis_adapter.html
+ *
  * Helper functions for simpler operations with arrays.
  */
 class PRedisConnectionHelper
