@@ -138,7 +138,6 @@
         "[web-root]/index_dev.php": "assets/scaffold/files/index_dev.php",
         "[web-root]/offline.php": "assets/scaffold/files/offline.php",
         "[web-root]/robots.txt": "assets/scaffold/files/robots.txt",
-        "[web-root]/upgrade.php": "assets/scaffold/files/upgrade.php",
         "[web-root]/translations/.htaccess": "assets/scaffold/files/translations.htaccess",
         "[web-root]/favicon.ico": "assets/scaffold/files/favicon.ico",
         "[web-root]/media/dashboards/alternative-default.json": "assets/scaffold/media/dashboards/alternative-default.json",
