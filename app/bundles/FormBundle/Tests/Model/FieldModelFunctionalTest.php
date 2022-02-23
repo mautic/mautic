@@ -3,6 +3,8 @@
 namespace Mautic\FormBundle\Tests\Model;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 
 class FieldModelFunctionalTest extends MauticMysqlTestCase
 {
@@ -12,10 +14,11 @@ class FieldModelFunctionalTest extends MauticMysqlTestCase
         $fieldModel   = self::$container->get('mautic.form.model.field');
         $fieldsBefore = $fieldModel->getObjectFields('lead');
 
-        $leadFieldModel = self::$container->get('mautic.lead.model.field');
-        $field          = $leadFieldModel->getRepository()->findOneBy(['alias' => 'firstname']);
+        /** @var LeadFieldRepository $leadFieldRepository */
+        $leadFieldRepository = $this->em->getRepository(LeadField::class);
+        $field               = $leadFieldRepository->findOneBy(['alias' => 'firstname']);
         $field->setIsPublished(false);
-        $leadFieldModel->saveEntity($field);
+        $leadFieldRepository->saveEntity($field);
 
         $fieldsAfter = $fieldModel->getObjectFields('lead');
 
