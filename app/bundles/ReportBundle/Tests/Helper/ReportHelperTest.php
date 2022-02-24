@@ -1,20 +1,13 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Helper;
 
 use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\TestCase;
 
-class ReportHelperTest extends TestCase
+final class ReportHelperTest extends TestCase
 {
     /**
      * @var ReportHelper
@@ -26,7 +19,7 @@ class ReportHelperTest extends TestCase
         $this->reportHelper = new ReportHelper();
     }
 
-    public function testGetStandardColumnsMethodReturnsCorrectColumns()
+    public function testGetStandardColumnsMethodReturnsCorrectColumns(): void
     {
         $columns = $this->reportHelper->getStandardColumns('somePrefix');
 

@@ -13,9 +13,6 @@ namespace Mautic\ReportBundle\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
 
-/**
- * Class ReportHelper.
- */
 class ReportHelper extends Helper
 {
     /**
@@ -54,12 +51,12 @@ class ReportHelper extends Helper
 
     /**
      * Returns standard form fields such as id, name, publish_up, etc.
+     * 
+     * @param string[] $removeColumns
      *
-     * @param $prefix
-     *
-     * @return array
+     * @return array<string,array<string,string>>
      */
-    public function getStandardColumns($prefix, $removeColumns = [], $idLink = null)
+    public function getStandardColumns(string $prefix, array $removeColumns = [], string $idLink = ''): array
     {
         $aliasPrefix = str_replace('.', '_', $prefix);
         $columns     = [
