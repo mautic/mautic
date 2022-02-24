@@ -43,6 +43,16 @@ export default class ButtonPreview {
         context: 'devices-c-preview',
       },
     ]);
+
+    this.editor.on('stop:preset-mautic:apply-email', () => {
+      if (this.editor.Panels.getButton('devices-c', 'devices-c-preview').get('disable') === true) {
+        this.editor.Panels.getButton('devices-c', 'devices-c-preview').set('disable', false);
+        this.editor.Panels.getButton('devices-c', 'devices-c-preview').set(
+          'command',
+          ButtonPreview.getCommand()
+        );
+      }
+    });
   }
 
   /**
