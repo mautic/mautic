@@ -1217,7 +1217,11 @@ Mautic.getLeadEmailContent = function (el) {
         var idPrefix = id.replace('templates', '');
         var bodyEl = (mQuery('#'+idPrefix+'message').length) ? '#'+idPrefix+'message' : '#'+idPrefix+'body';
 
-        mQuery(bodyEl).ckeditorGet().setData(response.body);
+        if (Mautic.getActiveBuilderName() === 'legacy') {
+            mQuery(bodyEl).froalaEditor('html.set', response.body);
+        } else {
+            mQuery(bodyEl).ckeditorGet().setData(response.body);
+        }
 
         mQuery(bodyEl).val(response.body);
         mQuery('#'+idPrefix+'subject').val(response.subject);
