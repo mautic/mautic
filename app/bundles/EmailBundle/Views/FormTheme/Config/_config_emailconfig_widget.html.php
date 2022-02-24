@@ -106,10 +106,6 @@ $template  = '<div class="col-md-6">{content}</div>';
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12">
-                    <?php echo $view['form']->rowIfExists($fields, 'messenger_transport_dsn'); ?>
-                </div>
-
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_msg_limit', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_time_limit', $template); ?>
             </div>

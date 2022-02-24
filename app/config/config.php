@@ -263,11 +263,7 @@ $container->loadFromExtension('framework', [
                 \Mautic\EmailBundle\Messenger\EmailMessage::class => '%mautic.messenger_transport_email_receiver%',
         ],
         'transports' => [
-            '%mautic.messenger_transport_email_receiver%' => [
-                'dsn'            => '%mautic.messenger_transport_dsn%',
-                'options'        => $configParameterBag->get('messenger_transport_email_options'),
-                'retry_strategy' => $configParameterBag->get('messenger_transport_email_retry_strategy'),
-            ],
+            '%mautic.messenger_transport_email_receiver%' => $configParameterBag->get('messenger_transport_email'),
         ],
     ],
 ]);
