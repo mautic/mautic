@@ -149,7 +149,7 @@ export default class BuilderService {
     // Launch GrapesJS with body part
     this.editor = grapesjs.init({
       clearOnRender: true,
-      container: '.builder-panel',
+      container: '.builder-panel2',
       components: contentService.getOriginalContentHtml().body.innerHTML,
       height: '100%',
       canvas: {
@@ -180,7 +180,7 @@ export default class BuilderService {
 
     this.editor = grapesjs.init({
       clearOnRender: true,
-      container: '.builder-panel',
+      container: '.builder-panel2',
       components,
       height: '100%',
       storageManager: false,
@@ -209,7 +209,7 @@ export default class BuilderService {
     // Launch GrapesJS with body part
     this.editor = grapesjs.init({
       clearOnRender: true,
-      container: '.builder-panel',
+      container: '.builder-panel2',
       components,
       height: '100%',
       storageManager: false,

@@ -31,6 +31,8 @@ function launchBuilderGrapesjs(formName) {
 
   // Initialize GrapesJS
   builder.initGrapesJS(formName);
+
+  Mautic.builder = builder;
 }
 
 /**
@@ -71,7 +73,8 @@ function setThemeHtml(theme) {
 }
 
 /**
- * Initialize original Mautic theme selection with grapejs specific modifications
+ * Initialize original Mautic theme selection with grapejs specific
+ * modifications
  */
 function initSelectThemeGrapesjs(parentInitSelectTheme) {
   function childInitSelectTheme(themeField) {
@@ -95,6 +98,25 @@ function initSelectThemeGrapesjs(parentInitSelectTheme) {
   return childInitSelectTheme;
 }
 
-Mautic.launchBuilder = launchBuilderGrapesjs;
+Mautic.reArrangeStyles = function () {
+  mQuery('.builder-active').removeClass('builder-active');
+  mQuery('.builder-panel').show();
+  mQuery('body').css('overflow-y', 'auto');
+  mQuery('section#app-wrapper').height('auto');
+};
+
+Mautic.launchBuilderCore = Mautic.launchBuilder;
+Mautic.launchBuilderGrapesjs = launchBuilderGrapesjs;
+
+function launchBuilderDistributor(formName) {
+  if (!mQuery('.builder').hasClass('code-mode')) {
+    return Mautic.launchBuilderGrapesjs(formName);
+  }
+  Mautic.builder.editor.destroy();
+  Mautic.reArrangeStyles();
+  return Mautic.launchBuilderCore(formName);
+}
+
+Mautic.launchBuilder = launchBuilderDistributor;
 Mautic.initSelectTheme = initSelectThemeGrapesjs(Mautic.initSelectTheme);
 Mautic.setThemeHtml = setThemeHtml;
