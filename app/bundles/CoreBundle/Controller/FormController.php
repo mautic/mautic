@@ -116,7 +116,7 @@ class FormController extends AbstractStandardFormController
      */
     protected function getSessionBase($objectId = null)
     {
-        return $this->deprecatedSessionBase;
+        return null !== $this->deprecatedSessionBase ? $this->deprecatedSessionBase : parent::getSessionBase($objectId);
     }
 
     /**

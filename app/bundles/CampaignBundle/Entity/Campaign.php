@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\PublishStatusIconAttributesInterface;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -26,7 +27,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * Class Campaign.
  */
-class Campaign extends FormEntity
+class Campaign extends FormEntity implements PublishStatusIconAttributesInterface
 {
     /**
      * @var int
@@ -639,5 +640,28 @@ class Campaign extends FormEntity
                     )
                     ->orderBy(['dateAdded' => Criteria::DESC])
         );
+    }
+
+    public function getOnclickMethod(): string
+    {
+        return 'Mautic.confirmationCampaignPublishStatus(mQuery(this));';
+    }
+
+    public function getDataAttributes(): array
+    {
+        return [
+            'data-toggle'           => 'confirmation',
+            'data-confirm-callback' => 'confirmCallbackCampaignPublishStatus',
+            'data-cancel-callback'  => 'dismissConfirmation',
+        ];
+    }
+
+    public function getTranslationKeysDataAttributes(): array
+    {
+        return [
+            'data-message'      => 'mautic.campaign.form.confirmation.message',
+            'data-confirm-text' => 'mautic.campaign.form.confirmation.confirm_text',
+            'data-cancel-text'  => 'mautic.campaign.form.confirmation.cancel_text',
+        ];
     }
 }

@@ -431,9 +431,9 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param $campaignId
+     * @param int $campaignId
      *
-     * @return int
+     * @return CountResult
      */
     public function getCountsForOrphanedContactsBySegments($campaignId, ContactLimiter $limiter)
     {

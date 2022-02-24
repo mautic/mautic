@@ -975,9 +975,9 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     /**
      * Convert posted parameters into what the form needs in order to successfully bind.
      *
-     * @param $parameters
-     * @param $entity
-     * @param $action
+     * @param mixed[] $parameters
+     * @param object  $entity
+     * @param string  $action
      *
      * @return mixed
      */
