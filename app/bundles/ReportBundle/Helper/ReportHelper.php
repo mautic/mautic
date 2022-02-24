@@ -51,7 +51,7 @@ class ReportHelper extends Helper
 
     /**
      * Returns standard form fields such as id, name, publish_up, etc.
-     * 
+     *
      * @param string[] $removeColumns
      *
      * @return array<string,array<string,string>>
