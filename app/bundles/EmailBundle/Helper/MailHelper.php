@@ -252,7 +252,7 @@ class MailHelper
     private $embedImagesReplaces = [];
 
     /**
-     * @var MessageBusInterface
+     * @var MessageBusInterface|bool
      */
     private $bus;
 

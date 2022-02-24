@@ -22,7 +22,7 @@ class EmailMessageHandler implements MessageHandlerInterface
         $this->mailer = $mailer;
     }
 
-    public function __invoke(EmailMessage $emailMessage)
+    public function __invoke(EmailMessage $emailMessage): void
     {
         $this->mailer->send($emailMessage->getMauticMessage());
     }
