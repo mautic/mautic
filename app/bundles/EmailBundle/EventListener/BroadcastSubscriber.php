@@ -14,12 +14,18 @@ namespace Mautic\EmailBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class BroadcastSubscriber implements EventSubscriberInterface
 {
+    private AuditLogModel $auditLogModel;
+
+    private IpLookupHelper $ipLookupHelper;
+
     /**
      * @var EmailModel
      */
@@ -35,11 +41,13 @@ class BroadcastSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    public function __construct(EmailModel $emailModel, EntityManager $em, TranslatorInterface $translator)
+    public function __construct(EmailModel $emailModel, EntityManager $em, TranslatorInterface $translator, AuditLogModel $auditLogModel, IpLookupHelper $ipLookupHelper)
     {
-        $this->model      = $emailModel;
-        $this->em         = $em;
-        $this->translator = $translator;
+        $this->model          = $emailModel;
+        $this->em             = $em;
+        $this->translator     = $translator;
+        $this->auditLogModel  = $auditLogModel;
+        $this->ipLookupHelper = $ipLookupHelper;
     }
 
     /**
@@ -63,7 +71,21 @@ class BroadcastSubscriber implements EventSubscriberInterface
 
         while (false !== ($email = $emails->next())) {
             $emailEntity                                            = $email[0];
-            list($sentCount, $failedCount, $failedRecipientsByList) = $this->model->sendEmailToLists(
+            $pending                                                = $this->model->getPendingLeads($emailEntity, null, true);
+            if ((int) $pending > 0) {
+                $log = [
+                    'bundle'    => 'email',
+                    'object'    => 'email',
+                    'objectId'  => $emailEntity->getId(),
+                    'action'    => 'broadcast-start-sending',
+                    'details'   => [
+                        'pending' => (int) $pending,
+                    ],
+                    'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+                ];
+                $this->auditLogModel->writeToLog($log);
+            }
+            [$sentCount, $failedCount, $failedRecipientsByList] = $this->model->sendEmailToLists(
                 $emailEntity,
                 null,
                 $event->getLimit(),

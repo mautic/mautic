@@ -277,8 +277,8 @@ return [
                     'mautic.email.model.email',
                     'doctrine.orm.entity_manager',
                     'translator',
-                    'mautic.lead.model.lead',
-                    'mautic.email.model.email',
+                    'mautic.core.model.auditlog',
+                    'mautic.helper.ip_lookup',
                 ],
             ],
             'mautic.email.messagequeue.subscriber' => [

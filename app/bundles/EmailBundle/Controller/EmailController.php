@@ -19,6 +19,8 @@ use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
@@ -1211,6 +1213,22 @@ class EmailController extends FormController
                 $batchlimit = $form['batchlimit']->getData();
 
                 $session->set('mautic.email.send.active', false);
+
+                /** @var AuditLogModel $auditLogModel */
+                $auditLogModel = $this->getModel('core.auditlog');
+                /** @var IpLookupHelper $ipLookupHelper */
+                $ipLookupHelper = $this->get('mautic.helper.ip_lookup');
+                $log            = [
+                    'bundle'    => 'email',
+                    'object'    => 'email',
+                    'objectId'  => $entity->getId(),
+                    'action'    => 'manually-start-sending',
+                    'details'   => [
+                            'pending' => (int) $pending,
+                    ],
+                    'ipAddress' => $ipLookupHelper->getIpAddressFromRequest(),
+                ];
+                $auditLogModel->writeToLog($log);
             } else {
                 $stats      = $session->get('mautic.email.send.stats');
                 $progress   = $session->get('mautic.email.send.progress');
