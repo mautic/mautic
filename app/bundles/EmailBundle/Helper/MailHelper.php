@@ -749,7 +749,13 @@ class MailHelper
      */
     public function attachFile($filePath, $fileName = null, $contentType = null, $inline = false)
     {
-        $this->message->addAttachment($filePath, $fileName, $contentType, $inline);
+        if (true === $inline) {
+            $this->message->embedFromPath($filePath, $fileName, $contentType);
+
+            return;
+        }
+
+        $this->message->attachFromPath($filePath, $fileName, $contentType);
     }
 
     /**
