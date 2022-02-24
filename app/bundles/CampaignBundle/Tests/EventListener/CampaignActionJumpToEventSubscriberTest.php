@@ -15,6 +15,7 @@ namespace Mautic\CampaignBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
@@ -170,9 +171,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             }
 
             /**
-             * @param array<string, string> $args
-             *
-             * @return array<Event>|\Doctrine\ORM\Tools\Pagination\Paginator
+             * @return array|\Doctrine\ORM\Internal\Hydration\IterableResult|Paginator
              */
             public function getEntities(array $args = [])
             {
@@ -236,7 +235,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
 
-            public function incrementCampaignRotationForContacts(array $contactIds, $campaignId)
+            public function incrementCampaignRotationForContacts(array $contactIds, $campaignId): void
             {
                 Assert::assertSame([789], $contactIds);
                 Assert::assertSame(111, $campaignId);

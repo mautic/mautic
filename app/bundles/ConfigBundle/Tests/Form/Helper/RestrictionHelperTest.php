@@ -24,6 +24,7 @@ use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredMailboxesType;
 use Mautic\EmailBundle\Form\Type\ConfigType as EmailConfigType;
+use Mautic\EmailBundle\Model\MessengerType;
 use Mautic\EmailBundle\Model\TransportType;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
@@ -88,11 +89,7 @@ class RestrictionHelperTest extends TypeTestCase
                 'mailer_encryption'            => null,
                 'mailer_auth_mode'             => null,
                 'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
-                'mailer_spool_type'            => 'memory',
-                'mailer_spool_path'            => '%kernel.root_dir%/../var/spool',
-                'mailer_spool_msg_limit'       => null,
-                'mailer_spool_time_limit'      => null,
-                'mailer_spool_recover_timeout' => 900,
+                'mailer_spool_type'            => 'sync',
                 'unsubscribe_text'             => null,
                 'webview_text'                 => null,
                 'unsubscribe_message'          => null,
@@ -273,6 +270,12 @@ class RestrictionHelperTest extends TypeTestCase
         $transportType->method('getTransportTypes')
             ->willReturn([]);
 
+        $messengerType = $this->getMockBuilder(MessengerType::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $messengerType->method('getMessengerTypes')
+            ->willReturn([]);
+
         // This is what we're really testing here
         $restrictionHelper = new RestrictionHelper($translator, $this->restrictedFields, $this->displayMode);
         $escapeTransformer = new EscapeTransformer([]);
@@ -289,7 +292,7 @@ class RestrictionHelperTest extends TypeTestCase
                     new NumberType(),
                     new FormButtonsType(),
                     new ButtonGroupType(),
-                    new \Mautic\EmailBundle\Form\Type\ConfigType($translator, $transportType),
+                    new \Mautic\EmailBundle\Form\Type\ConfigType($translator, $transportType, $messengerType),
                     new ConfigMonitoredEmailType($dispatcher),
                     new ConfigMonitoredMailboxesType($imapHelper),
                     new ConfigType($restrictionHelper, $escapeTransformer),

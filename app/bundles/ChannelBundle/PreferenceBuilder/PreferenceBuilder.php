@@ -36,9 +36,6 @@ class PreferenceBuilder
 
     /**
      * PreferenceBuilder constructor.
-     *
-     * @param Collection<int, LeadEventLog>     $logs
-     * @param array<string, ChannelPreferences> $channels
      */
     public function __construct(Collection $logs, Event $event, array $channels, LoggerInterface $logger)
     {

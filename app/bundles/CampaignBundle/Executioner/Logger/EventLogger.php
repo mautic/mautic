@@ -211,7 +211,7 @@ class EventLogger
      * @param Collection<int, Lead>|ArrayCollection<int, Lead> $contacts
      * @param bool                                             $isInactiveEntry
      *
-     * @return Collection<int, LeadEventLog>
+     * @return ArrayCollection
      */
     public function fetchRotationAndGenerateLogsFromContacts(Event $event, AbstractEventAccessor $config, Collection $contacts, $isInactiveEntry = false)
     {
@@ -224,7 +224,7 @@ class EventLogger
      * @param Collection<int, Lead>|ArrayCollection<int, Lead> $contacts
      * @param bool                                             $isInactiveEntry
      *
-     * @return Collection<int, LeadEventLog>
+     * @return ArrayCollection
      */
     public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, Collection $contacts, $isInactiveEntry)
     {

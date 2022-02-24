@@ -235,7 +235,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 function ($param) {
                     switch ($param) {
                         case 'mailer_spool_type':
-                            return 'memory';
+                            return 'sync';
                         default:
                             return '';
                     }
@@ -368,7 +368,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 function ($param) {
                     switch ($param) {
                         case 'mailer_spool_type':
-                            return 'memory';
+                            return 'sync';
                         default:
                             return '';
                     }
@@ -514,7 +514,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 function ($param) {
                     switch ($param) {
                         case 'mailer_spool_type':
-                            return 'memory';
+                            return 'sync';
                         default:
                             return '';
                     }
@@ -663,7 +663,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 function ($param) {
                     switch ($param) {
                         case 'mailer_spool_type':
-                            return 'memory';
+                            return 'sync';
                         default:
                             return '';
                     }
@@ -784,7 +784,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $this->returnValueMap(
                     [
                         ['mailer_return_path', false, null],
-                        ['mailer_spool_type', false, 'memory'],
+                        ['mailer_spool_type', false, 'sync'],
                     ]
                 )
             );

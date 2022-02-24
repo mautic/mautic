@@ -298,7 +298,6 @@ class EmailStepType extends AbstractType
             ]
         );
 
-        $builder->add('mailer_spool_path', HiddenType::class);
         $builder->add('mailer_dsn', HiddenType::class);
 
         $builder->add(

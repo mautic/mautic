@@ -25,6 +25,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Mailer\Transport\Dsn;
 
 /**
  * CLI Command to install Mautic.
@@ -225,13 +226,6 @@ class InstallCommand extends ContainerAwareCommand
                 'SMTP auth mode (null|plain|login|cram-md5).',
                 null
             )
-            ->addOption(
-                '--mailer_spool_path',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Spool path.',
-                null
-            )
         ;
         parent::configure();
     }
@@ -329,6 +323,24 @@ class InstallCommand extends ContainerAwareCommand
 
         if (empty($allParams['mailer_from_email']) && isset($adminParam['email'])) {
             $allParams['mailer_from_email'] = $adminParam['email'];
+        }
+
+        //parse dsn parameters to user friendly
+        if (!empty($allParams['mailer_dsn'])) {
+            $dsn                           = Dsn::fromString($allParams['mailer_dsn']);
+            $allParams['mailer_transport'] = $dsn->getScheme();
+            $allParams['mailer_host']      = $dsn->getHost();
+            $allParams['mailer_port']      = $dsn->getPort();
+            $allParams['mailer_user']      = $dsn->getUser();
+            $allParams['mailer_password']  = $dsn->getPassword();
+        }
+
+        if (!empty($allParams['mailer_messenger_dsn']) && 'async' === $allParams['mailer_spool_type']) {
+            $dsn                                = Dsn::fromString($allParams['mailer_messenger_dsn']);
+            $allParams['mailer_messenger_type'] = $dsn->getScheme();
+            $allParams['mailer_messenger_host'] = $dsn->getHost();
+            $allParams['mailer_messenger_port'] = $dsn->getPort();
+            $allParams['mailer_messenger_path'] = $dsn->getOption('path');
         }
 
         $step = (float) $input->getArgument('step');

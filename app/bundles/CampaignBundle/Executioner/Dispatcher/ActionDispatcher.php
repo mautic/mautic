@@ -74,14 +74,12 @@ class ActionDispatcher
     }
 
     /**
-     * @param Collection<int, LeadEventLog>|ArrayCollection<int, LeadEventLog> $logs
-     *
      * @return PendingEvent
      *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      */
-    public function dispatchEvent(ActionAccessor $config, Event $event, Collection $logs, PendingEvent $pendingEvent = null)
+    public function dispatchEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, PendingEvent $pendingEvent = null)
     {
         if (!$pendingEvent) {
             $pendingEvent = new PendingEvent($config, $event, $logs);

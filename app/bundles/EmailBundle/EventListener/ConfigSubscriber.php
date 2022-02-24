@@ -17,6 +17,7 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\ConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Mailer\Transport\Dsn;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
@@ -48,7 +49,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'formType'   => ConfigType::class,
             'formAlias'  => 'emailconfig',
             'formTheme'  => 'MauticEmailBundle:FormTheme\Config',
-            'parameters' => $event->getParametersFromConfig('MauticEmailBundle'),
+            'parameters' => $this->getParameters($event),
         ]);
     }
 
@@ -87,5 +88,30 @@ class ConfigSubscriber implements EventSubscriberInterface
         }
 
         $event->setConfig($data, 'emailconfig');
+    }
+
+    private function getParameters(ConfigBuilderEvent $event): array
+    {
+        $parameters = $event->getParametersFromConfig('MauticEmailBundle');
+
+        //parse dsn parameters to user friendly
+        if (!empty($parameters['mailer_dsn'])) {
+            $dsn                            = Dsn::fromString($parameters['mailer_dsn']);
+            $parameters['mailer_transport'] = $dsn->getScheme();
+            $parameters['mailer_host']      = $dsn->getHost();
+            $parameters['mailer_port']      = $dsn->getPort();
+            $parameters['mailer_user']      = $dsn->getUser();
+            $parameters['mailer_password']  = $dsn->getPassword();
+        }
+
+        if (!empty($parameters['mailer_messenger_dsn']) && 'async' === $parameters['mailer_spool_type']) {
+            $dsn                                 = Dsn::fromString($parameters['mailer_messenger_dsn']);
+            $parameters['mailer_messenger_type'] = $dsn->getScheme();
+            $parameters['mailer_messenger_host'] = $dsn->getHost();
+            $parameters['mailer_messenger_port'] = $dsn->getPort();
+            $parameters['mailer_messenger_path'] = $dsn->getOption('path');
+        }
+
+        return $parameters;
     }
 }

@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\EmailBundle\Model\MessengerType;
 use Mautic\EmailBundle\Model\TransportType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -39,10 +40,16 @@ class ConfigType extends AbstractType
      */
     private $transportType;
 
-    public function __construct(TranslatorInterface $translator, TransportType $transportType)
-    {
+    private MessengerType $messengerType;
+
+    public function __construct(
+        TranslatorInterface $translator,
+        TransportType $transportType,
+        MessengerType $messengerType
+    ) {
         $this->translator    = $translator;
         $this->transportType = $transportType;
+        $this->messengerType = $messengerType;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -602,15 +609,16 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $spoolConditions = '{"config_emailconfig_mailer_spool_type":["memory"]}';
+        $messengerConditions     = '{"config_emailconfig_mailer_spool_type":["async"]}';
+        $messengerHideConditions = '{"config_emailconfig_mailer_spool_type":["sync"]}';
 
         $builder->add(
             'mailer_spool_type',
             ChoiceType::class,
             [
                 'choices'           => [
-                    'mautic.email.config.mailer_spool_type.memory' => 'memory',
-                    'mautic.email.config.mailer_spool_type.file'   => 'file',
+                    'mautic.email.config.mailer_spool_type.memory' => 'sync',
+                    'mautic.email.config.mailer_spool_type.file'   => 'async',
                 ],
                 'label'       => 'mautic.email.config.mailer.spool.type',
                 'label_attr'  => ['class' => 'control-label'],
@@ -620,6 +628,74 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.email.config.mailer.spool.type.tooltip',
                 ],
                 'placeholder' => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_messenger_type',
+            ChoiceType::class,
+            [
+                'choices'           => $this->getMessengerTypeChoices(),
+                'label'             => 'mautic.email.config.mailer.messenger.transport',
+                'required'          => false,
+                'attr'              => [
+                    'class'        => 'form-control',
+                    'data-show-on' => $messengerConditions,
+                    'tooltip'      => 'mautic.email.config.mailer.messenger.transport.tooltip',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'placeholder' => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_messenger_host',
+            TextType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.messenger.host',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_emailconfig_mailer_messenger_type":['.$this->messengerType->getServiceRequiresPort().']}',
+                    'data-hide-on' => $messengerHideConditions,
+                    'tooltip'      => 'mautic.email.config.mailer.messenger.host.tooltip',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_messenger_port',
+            TextType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.messenger.port',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_emailconfig_mailer_messenger_type":['.$this->messengerType->getServiceRequiresHost().']}',
+                    'data-hide-on' => $messengerHideConditions,
+                    'tooltip'      => 'mautic.email.config.mailer.messenger.port.tooltip',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_messenger_path',
+            TextType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.messenger.path',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_emailconfig_mailer_messenger_type":['.$this->messengerType->getServiceRequiresPath().']}',
+                    'data-hide-on' => $messengerHideConditions,
+                    'tooltip'      => 'mautic.email.config.mailer.messenger.path.tooltip',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'required'   => false,
             ]
         );
 
@@ -636,66 +712,6 @@ class ConfigType extends AbstractType
                 'option_required' => false,
                 'with_labels'     => true,
                 'key_value_pairs' => true, // do not store under a `list` key and use label as the key
-            ]
-        );
-
-        $builder->add(
-            'mailer_spool_path',
-            TextType::class,
-            [
-                'label'      => 'mautic.email.config.mailer.spool.path',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'data-hide-on' => $spoolConditions,
-                    'tooltip'      => 'mautic.email.config.mailer.spool.path.tooltip',
-                ],
-                'required'   => false,
-            ]
-        );
-
-        $builder->add(
-            'mailer_spool_msg_limit',
-            TextType::class,
-            [
-                'label'      => 'mautic.email.config.mailer.spool.msg.limit',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'data-hide-on' => $spoolConditions,
-                    'tooltip'      => 'mautic.email.config.mailer.spool.msg.limit.tooltip',
-                ],
-                'required'   => false,
-            ]
-        );
-
-        $builder->add(
-            'mailer_spool_time_limit',
-            TextType::class,
-            [
-                'label'      => 'mautic.email.config.mailer.spool.time.limit',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'data-hide-on' => $spoolConditions,
-                    'tooltip'      => 'mautic.email.config.mailer.spool.time.limit.tooltip',
-                ],
-                'required'   => false,
-            ]
-        );
-
-        $builder->add(
-            'mailer_spool_recover_timeout',
-            TextType::class,
-            [
-                'label'      => 'mautic.email.config.mailer.spool.recover.timeout',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'data-hide-on' => $spoolConditions,
-                    'tooltip'      => 'mautic.email.config.mailer.spool.recover.timeout.tooltip',
-                ],
-                'required'   => false,
             ]
         );
 
@@ -855,6 +871,20 @@ class ConfigType extends AbstractType
     {
         $choices    = [];
         $transports = $this->transportType->getTransportTypes();
+
+        foreach ($transports as $value => $label) {
+            $choices[$this->translator->trans($label)] = $value;
+        }
+
+        ksort($choices, SORT_NATURAL);
+
+        return $choices;
+    }
+
+    private function getMessengerTypeChoices(): array
+    {
+        $choices    = [];
+        $transports = $this->messengerType->getMessengerTypes();
 
         foreach ($transports as $value => $label) {
             $choices[$this->translator->trans($label)] = $value;

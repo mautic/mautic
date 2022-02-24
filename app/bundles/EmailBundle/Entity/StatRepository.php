@@ -278,7 +278,7 @@ class StatRepository extends CommonRepository
                         ->groupBy('s.list_id');
                 } elseif (is_array($listId)) {
                     $q->andWhere(
-                        $q->expr()->in('s.list_id', array_map('intval', $listId))
+                        $q->expr()->in('s.list_id', $listId)
                     );
 
                     $q->addSelect('s.list_id')

@@ -11,6 +11,7 @@
 
 namespace Mautic\ChannelBundle\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
@@ -192,16 +193,15 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Collection<int, LeadEventLog> $logs
-     * @param string                        $channel
+     * @param string $channel
      *
-     * @return bool|Collection<int, LeadEventLog>
+     * @return bool|ArrayCollection
      *
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \ReflectionException
      */
-    private function sendChannelMessage(Collection $logs, $channel, array $messageChannel)
+    private function sendChannelMessage(ArrayCollection $logs, $channel, array $messageChannel)
     {
         /** @var ActionAccessor $config */
         $config = $this->eventCollector->getEventConfig($this->pseudoEvent);

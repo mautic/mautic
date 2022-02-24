@@ -23,9 +23,7 @@ interface UnsubscriptionProcessorInterface
     /**
      * Get the email address that unsubscribed.
      *
-     * @return UnsubscribedEmail
-     *
      * @throws UnsubscriptionNotFound
      */
-    public function processUnsubscription(Message $message);
+    public function processUnsubscription(Message $message): UnsubscribedEmail;
 }

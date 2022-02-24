@@ -553,6 +553,23 @@ class InstallService
                     $data['mailer_port'] ? (int) $data['mailer_port'] : null
                 )
             );
+
+            if ('sync' === $data['mailer_spool_type']) {
+                $step->mailer_messenger_dsn = 'sync://';
+            } else {
+                $step->mailer_messenger_dsn = DsnGenerator::getDsnString(
+                    new Dsn(
+                        $data['mailer_messenger_type'],
+                        $data['mailer_messenger_host'],
+                        null,
+                        null,
+                        $data['mailer_messenger_port'] ? (int) $data['mailer_messenger_port'] : null,
+                        [
+                            'path' => $data['mailer_messenger_path'],
+                        ]
+                    )
+                );
+            }
         }
 
         return $this->saveConfiguration($data, $step, true);

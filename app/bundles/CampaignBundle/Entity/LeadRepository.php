@@ -496,10 +496,8 @@ class LeadRepository extends CommonRepository
      * their current rotation in a campaign by 1.
      *
      * @param int $campaignId
-     *
-     * @return bool
      */
-    public function incrementCampaignRotationForContacts(array $contactIds, $campaignId)
+    public function incrementCampaignRotationForContacts(array $contactIds, $campaignId): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

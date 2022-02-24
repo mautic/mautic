@@ -19,6 +19,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Mailer\Transport\CallbackTransportInterface;
 use Mautic\EmailBundle\Mailer\Transport\TransportWrapper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
@@ -423,7 +424,10 @@ class PublicController extends CommonFormController
             return $this->notFound();
         }
 
-        $event = new TransportWebhookEvent($realTransport->getTransportExtension($transport), $this->request);
+        /** @var CallbackTransportInterface $callbackTransport */
+        $callbackTransport = $realTransport->getTransportExtension($transport);
+
+        $event = new TransportWebhookEvent($callbackTransport, $this->request);
         $this->dispatcher->dispatch(EmailEvents::ON_TRANSPORT_WEBHOOK, $event);
 
         return new Response('success');

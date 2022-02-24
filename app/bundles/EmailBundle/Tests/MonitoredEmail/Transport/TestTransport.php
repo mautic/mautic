@@ -41,12 +41,12 @@ class TestTransport implements TransportInterface, BounceProcessorInterface, Uns
         return (string) $this->nullTransport;
     }
 
-    public function processBounce(Message $message)
+    public function processBounce(Message $message): BouncedEmail
     {
         return new BouncedEmail();
     }
 
-    public function processUnsubscription(Message $message)
+    public function processUnsubscription(Message $message): UnsubscribedEmail
     {
         return new UnsubscribedEmail('contact@email.com', 'test+unsubscribe_123abc@test.com');
     }
