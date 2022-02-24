@@ -55,7 +55,6 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $translatorMock        = $this->createMock(TranslatorInterface::class);
         $channelListHelperMock = $this->createMock(ChannelListHelper::class);
-        $reportHelperMock      = $this->createMock(ReportHelper::class);
         $fieldsBuilderMock     = $this->createMock(FieldsBuilder::class);
 
         $leadColumns = [
