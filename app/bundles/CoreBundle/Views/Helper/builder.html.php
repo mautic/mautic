@@ -16,6 +16,7 @@
     <div class="builder-content">
         <input type="hidden" id="builder_url" value="<?php echo $view['router']->path('mautic_'.$type.'_action', ['objectAction' => 'builder', 'objectId' => $objectId]); ?>" />
     </div>
+    <div class="builder-panel2"></div>
     <div class="builder-panel">
         <div class="builder-panel-top">
             <?php echo $view->render('MauticCoreBundle:Helper:builder_buttons.html.php', [
