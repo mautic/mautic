@@ -84,7 +84,10 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         }
     }
 
-    private function provideSegments()
+    /**
+     * @return array<string,int>
+     */
+    private function provideSegments(): array
     {
         return [
             'segment-test-1'                                                     => 1,

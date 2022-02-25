@@ -1,12 +1,6 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+
+declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
@@ -14,22 +8,13 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-/**
- * Class ChannelClickQueryBuilder.
- */
 class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
 {
-    /**
-     * @return string
-     */
     public static function getServiceId()
     {
         return 'mautic.lead.query.builder.channel_click.value';
     }
 
-    /**
-     * @return QueryBuilder
-     */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
         $filterOperator = $filter->getOperator();
@@ -71,12 +56,7 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
         return $queryBuilder;
     }
 
-    /**
-     * @param $name
-     *
-     * @return mixed
-     */
-    private function getChannel($name)
+    private function getChannel(string $name): string
     {
         if ('email_id' === $name) {
             // BC for existing filter
@@ -86,12 +66,7 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
         return str_replace(['_clicked_link', '_date'], '', $name);
     }
 
-    /**
-     * @param $name
-     *
-     * @return bool
-     */
-    private function isDateBased($name)
+    private function isDateBased(string $name): bool
     {
         return false !== strpos($name, '_date');
     }

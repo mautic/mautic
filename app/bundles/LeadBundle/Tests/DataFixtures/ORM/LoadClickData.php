@@ -1,19 +1,12 @@
 <?php
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
@@ -21,7 +14,7 @@ use Mautic\SmsBundle\Entity\Sms;
 
 class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         // Create an email for clicks
         $email = new Email();
@@ -106,7 +99,10 @@ class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
         }
     }
 
-    protected function createHit($hitConfig, ObjectManager $manager)
+    /**
+     * @param array<string,mixed> $hitConfig
+     */
+    protected function createHit(array $hitConfig, ObjectManager $manager): void
     {
         $hit = new Hit();
 
