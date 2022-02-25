@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
@@ -20,25 +11,16 @@ use Symfony\Component\EventDispatcher\Event;
 
 final class SegmentOperatorQueryBuilderEvent extends Event
 {
-    /**
-     * @var QueryBuilder
-     */
-    private $queryBuilder;
+    private QueryBuilder $queryBuilder;
 
-    /**
-     * @var ContactSegmentFilter
-     */
-    private $filter;
+    private ContactSegmentFilter $filter;
 
     /**
      * @var string|string[]
      */
     private $parameterHolder;
 
-    /**
-     * @var bool
-     */
-    private $operatorHandled = false;
+    private bool $operatorHandled = false;
 
     /**
      * @param string|string[] $parameterHolder

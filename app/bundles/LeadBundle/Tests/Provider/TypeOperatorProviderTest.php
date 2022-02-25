@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Provider;
 
 use Mautic\LeadBundle\Event\FieldOperatorsEvent;
@@ -167,42 +158,36 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->with(
-                LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE,
-                $this->callback(function (TypeOperatorsEvent $event) {
-                    // Emulate a subscriber.
-                    $event->setOperatorsForFieldType('text', [
-                        'include' => [
-                            OperatorOptions::EQUAL_TO,
-                            OperatorOptions::NOT_EQUAL_TO,
-                        ],
-                    ]);
+            ->withConsecutive(
+                [
+                    LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE,
+                    $this->callback(function (TypeOperatorsEvent $event) {
+                        // Emulate a subscriber.
+                        $event->setOperatorsForFieldType('text', [
+                            'include' => [
+                                OperatorOptions::EQUAL_TO,
+                                OperatorOptions::NOT_EQUAL_TO,
+                            ],
+                        ]);
 
-                    return true;
-                })
-            );
+                        return true;
+                    }),
+                ],
+                [
+                    LeadEvents::COLLECT_OPERATORS_FOR_FIELD,
+                    $this->callback(function (FieldOperatorsEvent $event) {
+                        // Emulate a subscriber.
+                        $this->assertSame('text', $event->getType());
+                        $this->assertSame('email', $event->getField());
 
-        $this->dispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(
-                LeadEvents::COLLECT_OPERATORS_FOR_FIELD,
-                $this->callback(function (FieldOperatorsEvent $event) {
-                    // Emulate a subscriber.
-                    $this->assertSame('text', $event->getType());
-                    $this->assertSame('email', $event->getField());
-                    $this->assertSame([
-                        'equals'    => OperatorOptions::EQUAL_TO,
-                        'not equal' => OperatorOptions::NOT_EQUAL_TO,
-                        // 'starts with' => OperatorOptions::STARTS_WITH
-                    ], $event->getOperators());
+                        // This is the important stuff. The Starts with opearator will be added.
+                        $event->addOperator(OperatorOptions::STARTS_WITH);
 
-                    // This is the important stuff. The Starts with opearator will be added.
-                    $event->addOperator(OperatorOptions::STARTS_WITH);
-
-                    return true;
-                })
+                        return true;
+                    }),
+                ]
             );
 
         $this->assertSame(

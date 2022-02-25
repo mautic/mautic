@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
@@ -20,25 +11,43 @@ use Symfony\Component\EventDispatcher\Event;
  */
 final class ListFieldChoicesEvent extends Event
 {
-    private $choicesForTypes = [];
+    /**
+     * @var array<string,mixed[]>
+     */
+    private array $choicesForTypes = [];
 
-    private $choicesForAliases = [];
+    /**
+     * @var array<string,mixed[]>
+     */
+    private array $choicesForAliases = [];
 
+    /**
+     * @param mixed[] $choices
+     */
     public function setChoicesForFieldType(string $fieldType, array $choices): void
     {
         $this->choicesForTypes[$fieldType] = $choices;
     }
 
+    /**
+     * @param mixed[] $choices
+     */
     public function setChoicesForFieldAlias(string $fieldAlias, array $choices): void
     {
         $this->choicesForAliases[$fieldAlias] = $choices;
     }
 
+    /**
+     * @return array<string,mixed[]>
+     */
     public function getChoicesForAllListFieldTypes(): array
     {
         return $this->choicesForTypes;
     }
 
+    /**
+     * @return array<string,mixed[]>
+     */
     public function getChoicesForAllListFieldAliases(): array
     {
         return $this->choicesForAliases;

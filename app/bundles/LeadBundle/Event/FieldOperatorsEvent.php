@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
@@ -20,25 +11,19 @@ use Symfony\Component\EventDispatcher\Event;
  */
 final class FieldOperatorsEvent extends Event
 {
-    /**
-     * @var string
-     */
-    private $type;
+    private string $type;
+
+    private string $field;
 
     /**
-     * @var string
+     * @var array<string,string>
      */
-    private $field;
+    private array $operators;
 
     /**
-     * @var array
+     * @var array<string,array<string,string>>
      */
-    private $operators;
-
-    /**
-     * @var aray
-     */
-    private $allOperators;
+    private array $allOperators;
 
     /**
      * $allOperators example:
@@ -60,6 +45,9 @@ final class FieldOperatorsEvent extends Event
      *      'equals' => '=',
      *      'not equal' => '!='
      * ]
+     *
+     * @param array<string,string>               $defaultOperators
+     * @param array<string,array<string,string>> $allOperators
      */
     public function __construct(string $type, string $field, array $allOperators, array $defaultOperators)
     {
@@ -69,6 +57,9 @@ final class FieldOperatorsEvent extends Event
         $this->operators    = $defaultOperators;
     }
 
+    /**
+     * @return array<string,string>
+     */
     public function getOperators(): array
     {
         return $this->operators;

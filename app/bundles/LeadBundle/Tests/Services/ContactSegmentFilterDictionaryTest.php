@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Services;
 
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
@@ -20,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactSegmentFilterDictionaryTest extends TestCase
 {
-    public function testWorkflow()
+    public function testWorkflow(): void
     {
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dictionary = new ContactSegmentFilterDictionary($dispatcher);

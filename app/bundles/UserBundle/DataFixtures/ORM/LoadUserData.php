@@ -14,7 +14,7 @@ namespace Mautic\UserBundle\DataFixtures\ORM;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 

@@ -194,7 +194,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             ->method('setSubject')
             ->with($this->stringStartsWith(EmailController::EXAMPLE_EMAIL_SUBJECT_PREFIX));
 
-        $this->containerMock->expects($this->exactly(6))
+        $this->containerMock->expects($this->exactly(7))
             ->method('get')
             ->withConsecutive(
                 ['mautic.model.factory'],
@@ -202,6 +202,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
                 ['router'],
                 ['mautic.helper.user'],
                 ['form.factory'],
+                ['templating'],
                 ['templating']
             )
             ->willReturnOnConsecutiveCalls(
@@ -210,8 +211,12 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
                 $this->routerMock,
                 $this->helperUserMock,
                 $this->formFactoryMock,
+                $this->templatingMock,
                 $this->templatingMock
             );
+
+        $this->templatingMock->method('supports')
+            ->willReturn(true);
 
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')

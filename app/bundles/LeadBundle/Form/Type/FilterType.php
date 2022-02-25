@@ -107,7 +107,7 @@ class FilterType extends AbstractType
 
             $filterPropertiesType = $form->get('properties');
 
-            $this->setPropertiesFormData($filterPropertiesType, $data ?? []);
+            $this->setPropertiesFormData($filterPropertiesType, $data);
 
             if ($fieldAlias && $operator) {
                 $this->formAdjustmentsProvider->adjustForm(
@@ -154,6 +154,9 @@ class FilterType extends AbstractType
      * We have to ensure that the old data[filter] and data[display] will get to the properties form
      * to keep BC for segments created before the properties form was added and the fitler and display
      * fields were moved there.
+     *
+     * @param FormInterface<FormInterface> $filterPropertiesType
+     * @param mixed[]                      $data
      */
     private function setPropertiesFormData(FormInterface $filterPropertiesType, array $data): void
     {

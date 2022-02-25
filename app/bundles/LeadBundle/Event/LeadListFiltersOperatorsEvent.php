@@ -11,7 +11,6 @@
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadListFiltersOperatorsEvent extends CommonEvent

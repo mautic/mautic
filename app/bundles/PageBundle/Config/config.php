@@ -20,6 +20,17 @@ return [
                 'path'       => '/pages/{objectAction}/{objectId}',
                 'controller' => 'MauticPageBundle:Page:execute',
             ],
+            'mautic_page_results' => [
+                'path'       => '/pages/results/{objectId}/{page}',
+                'controller' => 'MauticPageBundle:Page:results',
+            ],
+            'mautic_page_export' => [
+                'path'       => '/pages/results/{objectId}/export/{format}',
+                'controller' => 'MauticPageBundle:Page:export',
+                'defaults'   => [
+                    'format' => 'csv',
+                ],
+            ],
         ],
         'public' => [
             'mautic_page_tracker' => [
@@ -323,6 +334,14 @@ return [
                     'mautic.tracker.contact',
                 ],
             ],
+            'mautic.page.model.tracking.404' => [
+                'class'     => \Mautic\PageBundle\Model\Tracking404Model::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.tracker.contact',
+                    'mautic.page.model.page',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.page.repository.hit' => [
@@ -397,5 +416,6 @@ return [
         'facebook_pixel_id'                     => null,
         'facebook_pixel_trackingpage_enabled'   => false,
         'facebook_pixel_landingpage_enabled'    => false,
+        'do_not_track_404_anonymous'            => false,
     ],
 ];

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Provider;
 
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
@@ -20,26 +11,26 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class FieldChoicesProvider implements FieldChoicesProviderInterface
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $cachedTypeChoices = [];
+    private array $cachedTypeChoices = [];
 
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $cachedAliasChoices = [];
+    private array $cachedAliasChoices = [];
 
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getChoicesForField(string $fieldType, string $fieldAlias): array
     {
         $aliasChoices = $this->getAllChoicesForListFieldAliases();
@@ -56,6 +47,9 @@ final class FieldChoicesProvider implements FieldChoicesProviderInterface
         throw new ChoicesNotFoundException("No choices for field type {$fieldType} nor alias {$fieldAlias} were found");
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getAllChoicesForListFieldTypes(): array
     {
         $this->lookForFieldChoices();
@@ -63,7 +57,10 @@ final class FieldChoicesProvider implements FieldChoicesProviderInterface
         return $this->cachedTypeChoices;
     }
 
-    private function getAllChoicesForListFieldAliases()
+    /**
+     * @return mixed[]
+     */
+    private function getAllChoicesForListFieldAliases(): array
     {
         $this->lookForFieldChoices();
 

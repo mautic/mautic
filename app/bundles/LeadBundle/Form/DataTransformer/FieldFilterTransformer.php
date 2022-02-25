@@ -21,7 +21,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class FieldFilterTransformer implements DataTransformerInterface
 {
     /**
-     * @var array
+     * @var string[]
      */
     private $relativeDateStrings;
 

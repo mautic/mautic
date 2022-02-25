@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
@@ -41,47 +32,47 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private $leadModel;
 
     /**
-     * @var MockObject|ListModel
+     * @var MockObject&ListModel
      */
     private $listModel;
 
     /**
-     * @var MockObject|campaignModel
+     * @var MockObject&campaignModel
      */
     private $campaignModel;
 
     /**
-     * @var MockObject|emailModel
+     * @var MockObject&emailModel
      */
     private $emailModel;
 
     /**
-     * @var MockObject|StageModel
+     * @var MockObject&StageModel
      */
     private $stageModel;
 
     /**
-     * @var MockObject|StageRepostory
+     * @var MockObject&StageRepository
      */
     private $stageRepository;
 
     /**
-     * @var MockObject|CategoryModel
+     * @var MockObject&CategoryModel
      */
     private $categoryModel;
 
     /**
-     * @var MockObject|AssetModel
+     * @var MockObject&AssetModel
      */
     private $assetModel;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private $translator;
 
     /**
-     * @var MockObject|FormInterface
+     * @var MockObject&FormInterface<FormInterface>
      */
     private $form;
 
@@ -265,6 +256,20 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onSegmentFilterFormHandleLookupId($event);
     }
 
+    public function testOnSegmentFilterFormHandleLookupIdIfLookupIdEmptyOperator(): void
+    {
+        $alias    = 'owner';
+        $object   = 'lead';
+        $operator = OperatorOptions::EMPTY;
+        $details  = ['properties' => ['type' => 'lookup_id']];
+        $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->expects($this->never())
+            ->method('add');
+
+        $this->subscriber->onSegmentFilterFormHandleLookupId($event);
+    }
+
     public function testOnSegmentFilterFormHandleLookupIdIfLookupId(): void
     {
         $alias    = 'owner';
@@ -284,10 +289,11 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                             $this->assertSame('', $options['data']);
                             $this->assertSame(
                                 [
-                                    'class'               => 'form-control',
-                                    'data-field-callback' => 'activateSegmentFilterTypeahead',
-                                    'data-target'         => 'owner',
-                                    'placeholder'         => 'mautic.lead.list.form.filtervalue',
+                                    'class'                 => 'form-control',
+                                    'data-field-callback'   => 'activateSegmentFilterTypeahead',
+                                    'data-target'           => 'owner',
+                                    'placeholder'           => 'mautic.lead.list.form.startTyping',
+                                    'data-no-record-message'=> 'mautic.core.form.nomatches',
                                 ],
                                 $options['attr']
                             );
@@ -339,11 +345,12 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                             $this->assertSame('', $options['data']);
                             $this->assertSame(
                                 [
-                                    'class'               => 'form-control',
-                                    'data-field-callback' => 'fooBarCallback',
-                                    'data-target'         => 'custom',
-                                    'placeholder'         => 'mautic.lead.list.form.filtervalue',
-                                    'data-action'         => 'foo.bar',
+                                    'class'                  => 'form-control',
+                                    'data-field-callback'    => 'fooBarCallback',
+                                    'data-target'            => 'custom',
+                                    'placeholder'            => 'mautic.lead.list.form.startTyping',
+                                    'data-no-record-message' => 'mautic.core.form.nomatches',
+                                    'data-action'            => 'foo.bar',
                                 ],
                                 $options['attr']
                             );

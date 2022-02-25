@@ -265,6 +265,7 @@ return [
                     'event_dispatcher',
                     '', // providerKey
                     'mautic.permission.repository',
+                    'doctrine.orm.default_entity_manager',
                 ],
                 'public' => false,
             ],

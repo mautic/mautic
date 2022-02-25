@@ -209,6 +209,16 @@ final class LeadEvents
     const LIST_POST_SAVE = 'mautic.lead_list_post_save';
 
     /**
+     * The mautic.lead_list_pre_unpublish event is dispatched before a lead_list is unpublished.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListEvent instance.
+     *
+     * @var string
+     */
+    const LIST_PRE_UNPUBLISH = 'mautic.lead_list_pre_unpublish';
+
+    /**
      * The mautic.lead_list_pre_delete event is dispatched before a lead_list is deleted.
      *
      * The event listener receives a
@@ -357,6 +367,36 @@ final class LeadEvents
      * @var string
      */
     const IMPORT_POST_DELETE = 'mautic.lead_import_post_delete';
+
+    /**
+     * The mautic.lead_import_on_initialize event is dispatched when the import is being initialized.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportInitEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_ON_INITIALIZE = 'mautic.lead_import_on_initialize';
+
+    /**
+     * The mautic.lead_import_on_field_mapping event is dispatched when the import needs the list of fields for mapping.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportMappingEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_ON_FIELD_MAPPING = 'mautic.lead_import_on_field_mapping';
+
+    /**
+     * The mautic.lead_import_on_process event is dispatched when the import batch is processing.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_ON_PROCESS = 'mautic.lead_import_on_process';
 
     /**
      * The mautic.lead_import_batch_processed event is dispatched after an import batch is processed.

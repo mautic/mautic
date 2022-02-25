@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Provider;
 
 use Mautic\LeadBundle\Entity\OperatorListTrait;
@@ -23,25 +14,19 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
 {
     use OperatorListTrait;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private EventDispatcherInterface $dispatcher;
+
+    private FilterOperatorProviderInterface $filterOperatorProvider;
 
     /**
-     * @var FilterOperatorProviderInterface
+     * @var array<string,mixed[]>
      */
-    private $filterOperatorProvider;
+    private array $cachedTypeOperators = [];
 
     /**
-     * @var array
+     * @var array<string,mixed[]>
      */
-    private $cachedTypeOperators = [];
-
-    /**
-     * @var array
-     */
-    private $cachedTypeOperatorsChoices = [];
+    private array $cachedTypeOperatorsChoices = [];
 
     public function __construct(
         EventDispatcherInterface $dispatcher,
@@ -95,6 +80,8 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     /**
      * This method will add the default operators for the $type like the getOperatorsForFieldType() method
      * but also allows plugins to add more operators.
+     *
+     * @return array<string,string>
      */
     public function getOperatorsForField(string $type, string $field): array
     {
@@ -115,7 +102,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
      *
      * @param string $operator
      *
-     * @return array
+     * @return array<string,mixed[]>
      */
     public function getFilterExpressionFunctions($operator = null)
     {

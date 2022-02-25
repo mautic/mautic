@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

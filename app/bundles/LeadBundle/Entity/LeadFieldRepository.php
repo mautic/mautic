@@ -121,6 +121,9 @@ class LeadFieldRepository extends CommonRepository
                 ->execute()->fetchAll();
     }
 
+    /**
+     * @return ArrayCollection<int,LeadField>
+     */
     public function getListablePublishedFields(): ArrayCollection
     {
         $queryBuilder = $this->_em->createQueryBuilder();
@@ -254,7 +257,7 @@ class LeadFieldRepository extends CommonRepository
                 );
 
                 $expr->add(
-                    'l.'.$field." $operator '\\\\|?$value\\\\|?'"
+                    $property." $operator '\\\\|?$value\\\\|?'"
                 );
 
                 $q->where($expr)

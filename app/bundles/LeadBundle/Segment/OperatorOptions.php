@@ -34,6 +34,9 @@ class OperatorOptions
     public const ENDS_WITH             = 'endsWith';
     public const CONTAINS              = 'contains';
 
+    /**
+     * @var array<string,array<string,string|bool>>
+     */
     private static $operatorOptions = [
         self::EQUAL_TO => [
             'label'       => 'mautic.lead.list.form.operator.equals',
@@ -140,11 +143,17 @@ class OperatorOptions
         ],
     ];
 
+    /**
+     * @return array<string,array<string,string>>
+     */
     public static function getFilterExpressionFunctions()
     {
         return self::$operatorOptions;
     }
 
+    /**
+     * @return array<string,array<string,string>>
+     */
     public function getFilterExpressionFunctionsNonStatic()
     {
         return self::$operatorOptions;

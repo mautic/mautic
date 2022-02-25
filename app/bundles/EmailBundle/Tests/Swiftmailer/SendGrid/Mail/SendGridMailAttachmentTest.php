@@ -17,7 +17,31 @@ use SendGrid\Mail;
 
 class SendGridMailAttachmentTest extends \PHPUnit\Framework\TestCase
 {
-    public function testNotMauticMessage()
+    public function testNotMauticMessageWithAttachment(): void
+    {
+        $sendGridMailAttachment = new SendGridMailAttachment();
+
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $message->expects($this->exactly(2))->method('getChildren')->will($this->onConsecutiveCalls([
+            new \Swift_Attachment('This is the plain text attachment.', 'hello.txt', 'text/plain'),
+        ], [
+            new \Swift_Attachment('This is the plain text attachment.', 'hello.txt', 'text/plain'),
+        ]));
+
+        $mail = $this->getMockBuilder(Mail::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mail->expects($this->once())
+            ->method('addAttachment');
+
+        $sendGridMailAttachment->addAttachmentsToMail($mail, $message);
+    }
+
+    public function testNotMauticMessageWithoutAttachment(): void
     {
         $sendGridMailAttachment = new SendGridMailAttachment();
 

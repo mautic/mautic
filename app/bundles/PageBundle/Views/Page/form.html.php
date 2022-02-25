@@ -114,7 +114,12 @@ if (!isset($previewUrl)) {
             <div class="template-fields<?php echo (!$template) ? ' hide"' : ''; ?>">
                 <?php echo $view['form']->row($form['metaDescription']); ?>
             </div>
-
+            <div class="template-fields<?php echo (!$template) ? ' hide"' : ''; ?>">
+                <?php echo $view['form']->row($form['headScript']); ?>
+            </div>
+            <div class="template-fields<?php echo (!$template) ? ' hide"' : ''; ?>">
+                <?php echo $view['form']->row($form['footerScript']); ?>
+            </div>
             <div class="hide">
                 <?php echo $view['form']->rest($form); ?>
             </div>

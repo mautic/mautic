@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Provider;
 
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
@@ -20,20 +11,14 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 final class FilterOperatorProvider implements FilterOperatorProviderInterface
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private EventDispatcherInterface $dispatcher;
+
+    private TranslatorInterface $translator;
 
     /**
-     * @var TranslatorInterface
+     * @var mixed[]
      */
-    private $translator;
-
-    /**
-     * @var array
-     */
-    private $cachedOperators = [];
+    private array $cachedOperators = [];
 
     public function __construct(
         EventDispatcherInterface $dispatcher,
@@ -43,6 +28,9 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
         $this->translator = $translator;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getAllOperators(): array
     {
         if (empty($this->cachedOperators)) {
@@ -56,6 +44,11 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
         return $this->cachedOperators;
     }
 
+    /**
+     * @param mixed[] $operators
+     *
+     * @return mixed[]
+     */
     private function translateOperatorLabels(array $operators): array
     {
         foreach ($operators as $key => $operatorSettings) {

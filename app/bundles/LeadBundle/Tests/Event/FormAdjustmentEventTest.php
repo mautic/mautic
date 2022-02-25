@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
@@ -21,7 +12,7 @@ use Symfony\Component\Form\FormInterface;
 final class FormAdjustmentEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|FormInterface
+     * @var MockObject&FormInterface<FormInterface>
      */
     private $form;
 

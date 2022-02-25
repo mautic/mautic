@@ -122,6 +122,22 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            '404_page',
+            PageListType::class,
+            [
+                'label'         => 'mautic.core.config.form.404_page',
+                'label_attr'    => ['class' => 'control-label'],
+                'attr'          => [
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.core.config.form.404_page.tooltip',
+                ],
+                'multiple'       => false,
+                'placeholder'    => '',
+                'published_only' => true,
+            ]
+        );
+
+        $builder->add(
             'cache_path',
             TextType::class,
             [
@@ -177,6 +193,19 @@ class ConfigType extends AbstractType
                             'message' => 'mautic.core.value.required',
                         ]
                     ),
+                ],
+            ]
+        );
+
+        $builder->add(
+            'composer_updates',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.form.update.composer',
+                'data'  => (array_key_exists('composer_updates', $options['data']) && !empty($options['data']['composer_updates'])),
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.update.composer.tooltip',
                 ],
             ]
         );

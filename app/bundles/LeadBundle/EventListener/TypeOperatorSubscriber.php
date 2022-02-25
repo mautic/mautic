@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
@@ -40,45 +31,21 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 {
     use OperatorListTrait;
 
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private LeadModel $leadModel;
 
-    /**
-     * @var ListModel
-     */
-    private $listModel;
+    private ListModel $listModel;
 
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
+    private CampaignModel $campaignModel;
 
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
+    private EmailModel $emailModel;
 
-    /**
-     * @var StageModel
-     */
-    private $stageModel;
+    private StageModel $stageModel;
 
-    /**
-     * @var CategoryModel
-     */
-    private $categoryModel;
+    private CategoryModel $categoryModel;
 
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
+    private AssetModel $assetModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
 
     public function __construct(
         LeadModel $leadModel,
@@ -200,7 +167,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
      */
     public function onSegmentFilterFormHandleLookupId(FormAdjustmentEvent $event): void
     {
-        if (!$event->fieldTypeIsOneOf('lookup_id')) {
+        if (!$event->fieldTypeIsOneOf('lookup_id') || !$event->operatorIsOneOf(OperatorOptions::EQUAL_TO, OperatorOptions::NOT_EQUAL_TO)) {
             return;
         }
 
@@ -211,7 +178,10 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             'data-field-callback' => isset($properties['callback']) ? $properties['callback'] : 'activateSegmentFilterTypeahead',
             'data-target'         => $event->getFieldAlias(),
             'placeholder'         => $this->translator->trans(
-                'mautic.lead.list.form.filtervalue'
+                'mautic.lead.list.form.startTyping'
+            ),
+            'data-no-record-message'=> $this->translator->trans(
+                'mautic.core.form.nomatches'
             ),
         ];
 
@@ -342,36 +312,59 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->stopPropagation();
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getCampaignChoices(): array
     {
         return $this->makeChoices($this->campaignModel->getPublishedCampaigns(true), 'name', 'id');
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getSegmentChoices(): array
     {
         return $this->makeChoices($this->listModel->getUserLists(), 'name', 'id');
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getTagChoices(): array
     {
         return $this->makeChoices($this->leadModel->getTagList(), 'label', 'value');
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getStageChoices(): array
     {
         return $this->makeChoices($this->stageModel->getRepository()->getSimpleList(), 'label', 'value');
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getCategoryChoices(): array
     {
         return $this->makeChoices($this->categoryModel->getLookupResults('global'), 'title', 'id');
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getAssetChoices(): array
     {
         return $this->makeChoices($this->assetModel->getLookupResults('asset'), 'title', 'id');
     }
 
+    /**
+     * @param mixed[] $items
+     *
+     * @return mixed[]
+     */
     private function makeChoices(array $items, string $labelName, string $keyName): array
     {
         $choices = [];

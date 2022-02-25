@@ -44,6 +44,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
@@ -272,6 +273,10 @@ class SubmissionModel extends CommonFormModel
                 }
             }
 
+            if (!$f->showForConditionalField($post)) {
+                continue;
+            }
+
             if ('' === $value && $f->isRequired()) {
                 //field is required, but hidden from form because of 'ShowWhenValueExists'
                 if (false === $f->getShowWhenValueExists() && !isset($post[$alias])) {
@@ -343,12 +348,12 @@ class SubmissionModel extends CommonFormModel
                 $leadFieldMatches[$leadField] = $leadValue;
             }
 
+            $tokens["{formfield={$alias}}"] = $this->normalizeValue($value, $f);
+
             //convert array from checkbox groups and multiple selects
             if (is_array($value)) {
                 $value = implode(', ', $value);
             }
-
-            $tokens["{formfield={$alias}}"] = $value;
 
             //save the result
             if (false !== $f->getSaveResult()) {
@@ -484,6 +489,16 @@ class SubmissionModel extends CommonFormModel
     public function getEntities(array $args = [])
     {
         return $this->getRepository()->getEntities($args);
+    }
+
+    /**
+     * @param array<string, mixed> $args
+     *
+     * @return array<mixed>
+     */
+    public function getEntitiesByPage(array $args = [])
+    {
+        return $this->getRepository()->getEntitiesByPage($args);
     }
 
     /**
@@ -651,6 +666,140 @@ class SubmissionModel extends CommonFormModel
                     return $response;
                 }
                 throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
+            default:
+                return new Response();
+        }
+    }
+
+    /**
+     * @param string               $format
+     * @param object               $page
+     * @param array<string, mixed> $queryArgs
+     *
+     * @return StreamedResponse|Response
+     *
+     * @throws \Exception
+     */
+    public function exportResultsForPage($format, $page, $queryArgs)
+    {
+        $results    = $this->getEntitiesByPage($queryArgs);
+        $results    = $results['results'];
+        $translator = $this->translator;
+
+        $date = (new DateTimeHelper())->toLocalString();
+        $name = str_replace(' ', '_', $date).'_'.$page->getAlias();
+
+        switch ($format) {
+            case 'csv':
+                $response = new StreamedResponse(
+                    function () use ($results, $translator) {
+                        $handle = fopen('php://output', 'r+');
+
+                        //build the header row
+                        $header = [
+                            $translator->trans('mautic.core.id'),
+                            $translator->trans('mautic.lead.report.contact_id'),
+                            $translator->trans('mautic.form.report.form_id'),
+                            $translator->trans('mautic.form.result.thead.date'),
+                            $translator->trans('mautic.core.ipaddress'),
+                            $translator->trans('mautic.form.result.thead.referrer'),
+                        ];
+
+                        //write the row
+                        fputcsv($handle, $header);
+
+                        //build the data rows
+                        foreach ($results as $k => $s) {
+                            $row = [
+                                $s['id'],
+                                $s['leadId'],
+                                $s['formId'],
+                                $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
+                                $s['ipAddress'],
+                                $s['referer'],
+                            ];
+
+                            fputcsv($handle, $row);
+
+                            //free memory
+                            unset($row, $results[$k]);
+                        }
+
+                        fclose($handle);
+                    }
+                );
+
+                $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
+                $response->headers->set('Expires', 0);
+                $response->headers->set('Cache-Control', 'must-revalidate');
+                $response->headers->set('Pragma', 'public');
+
+                return $response;
+            case 'html':
+                $content = $this->templatingHelper->getTemplating()->renderResponse(
+                    'MauticPageBundle:Result:export.html.php',
+                    [
+                        'page'      => $page,
+                        'results'   => $results,
+                        'pageTitle' => $name,
+                    ]
+                )->getContent();
+
+                return new Response($content);
+            case 'xlsx':
+                if (!class_exists(Spreadsheet::class)) {
+                    throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
+                }
+                $response = new StreamedResponse(
+                    function () use ($results, $translator, $name) {
+                        $objPHPExcel = new Spreadsheet();
+                        $objPHPExcel->getProperties()->setTitle($name);
+
+                        $objPHPExcel->createSheet();
+
+                        $header = [
+                            $translator->trans('mautic.core.id'),
+                            $translator->trans('mautic.form.result.thead.date'),
+                            $translator->trans('mautic.core.ipaddress'),
+                            $translator->trans('mautic.form.result.thead.referrer'),
+                        ];
+
+                        //write the row
+                        $objPHPExcel->getActiveSheet()->fromArray($header, null, 'A1');
+
+                        //build the data rows
+                        $count = 2;
+                        foreach ($results as $k => $s) {
+                            $row = [
+                                $s['id'],
+                                $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
+                                $s['ipAddress'],
+                                $s['referer'],
+                            ];
+
+                            $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
+
+                            //free memory
+                            unset($row, $results[$k]);
+
+                            //increment letter
+                            ++$count;
+                        }
+
+                        $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
+                        $objWriter->setPreCalculateFormulas(false);
+
+                        $objWriter->save('php://output');
+                    }
+                );
+                $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
+                $response->headers->set('Expires', 0);
+                $response->headers->set('Cache-Control', 'must-revalidate');
+                $response->headers->set('Pragma', 'public');
+
+                return $response;
             default:
                 return new Response();
         }
@@ -867,7 +1016,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Get data for the form submission
-        list($data, $uniqueFieldsWithData) = $getData($leadFieldMatches);
+        [$data, $uniqueFieldsWithData] = $getData($leadFieldMatches);
         $this->logger->debug('FORM: Unique fields submitted include '.implode(', ', $uniqueFieldsWithData));
 
         // Check for duplicate lead
@@ -891,7 +1040,7 @@ class SubmissionModel extends CommonFormModel
 
             // Get unique identifier fields for the found lead then compare with the lead currently tracked
             $uniqueFieldsFound             = $getData($foundLeadFields, true);
-            list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
+            [$hasConflict, $conflicts]     = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
 
             if ($inKioskMode || $hasConflict || !$lead->getId()) {
                 // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
@@ -916,7 +1065,7 @@ class SubmissionModel extends CommonFormModel
 
         if (!$inKioskMode) {
             // Check for conflicts with the submitted data and the currently tracked lead
-            list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
+            [$hasConflict, $conflicts] = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
 
             $this->logger->debug(
                 'FORM: Current unique contact fields '.implode(', ', array_keys($uniqueFieldsCurrent)).' = '.implode(', ', $uniqueFieldsCurrent)
@@ -980,7 +1129,7 @@ class SubmissionModel extends CommonFormModel
 
         $companyFieldMatches = $getCompanyData($leadFieldMatches);
         if (!empty($companyFieldMatches)) {
-            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
+            [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
             if ($leadAdded) {
                 $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             } elseif ($companyEntity instanceof Company) {
@@ -1032,5 +1181,19 @@ class SubmissionModel extends CommonFormModel
         }
 
         return true;
+    }
+
+    private function normalizeValue($value, Field $f): string
+    {
+        $value = !is_array($value) ? [$value] : $value;
+
+        // select and multiselect normalization
+        if ($properties = $f->getProperties()['list'] ?? null) {
+            foreach ($value as $key => $item) {
+                $value[$key] = CustomFieldValueHelper::setValueFromPropertiesList($properties, $item);
+            }
+        }
+
+        return implode(', ', $value);
     }
 }

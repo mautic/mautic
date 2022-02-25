@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -20,30 +11,25 @@ use Symfony\Component\Form\FormInterface;
 final class FormAdjustmentEvent extends Event
 {
     /**
-     * @var FormInterface
+     * @var FormInterface<FormInterface>
      */
-    private $form;
+    private FormInterface $form;
+
+    private string $fieldAlias;
+
+    private string $fieldObject;
+
+    private string $operator;
 
     /**
-     * @var string
+     * @var mixed[]
      */
-    private $fieldAlias;
+    private array $fieldDetails;
 
     /**
-     * @var string
+     * @param FormInterface<FormInterface> $form
+     * @param mixed[]                      $fieldDetails
      */
-    private $fieldObject;
-
-    /**
-     * @var string
-     */
-    private $operator;
-
-    /**
-     * @var array
-     */
-    private $fieldDetails;
-
     public function __construct(FormInterface $form, string $fieldAlias, string $fieldObject, string $operator, array $fieldDetails)
     {
         $this->form         = $form;
@@ -53,6 +39,9 @@ final class FormAdjustmentEvent extends Event
         $this->fieldDetails = $fieldDetails;
     }
 
+    /**
+     * @return FormInterface<FormInterface>
+     */
     public function getForm(): FormInterface
     {
         return $this->form;
@@ -94,11 +83,17 @@ final class FormAdjustmentEvent extends Event
         return $this->fieldDetails['properties']['type'];
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getFieldDetails(): array
     {
         return $this->fieldDetails;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getFieldChoices(): array
     {
         return $this->fieldDetails['properties']['list'] ?? [];
