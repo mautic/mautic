@@ -260,15 +260,16 @@ export default class BuilderService {
    */
   getAssetManagerConf() {
     return {
-      assets: this.assets,
-      noAssets: Mautic.translate('grapesjsbuilder.assetManager.noAssets'),
-      upload: this.uploadPath,
-      uploadName: 'files',
-      multiUpload: 1,
-      embedAsBase64: false,
-      openAssetsOnDrop: 1,
-      autoAdd: 1,
-      headers: { 'X-CSRF-Token': mauticAjaxCsrf }, // global variable
+      // ...
+      custom: {
+        open(props) {
+          Mautic.openMediaManager();
+          window.document.fileManagerInsertImageCallback = function(selector, url) {
+            props.options.target.set('src',  url);
+            props.close();
+          }
+        },
+      },
     };
   }
 
