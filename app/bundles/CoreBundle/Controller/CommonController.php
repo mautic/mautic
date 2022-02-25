@@ -19,8 +19,6 @@ use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
-use Sonata\Exporter\Source\ArraySourceIterator;
-use Sonata\Exporter\Source\IteratorSourceIterator;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -186,7 +184,7 @@ class CommonController extends Controller implements MauticController
             $args = [
                 'contentTemplate' => $args,
                 'passthroughVars' => [
-                    'mauticContent' => strtolower($this->request->get('bundle')),
+                    'mauticContent' => strtolower(InputHelper::alphanum($this->request->query->get('bundle'))),
                 ],
             ];
         }
@@ -203,7 +201,7 @@ class CommonController extends Controller implements MauticController
             if (isset($args['passthroughVars']['mauticContent'])) {
                 $mauticContent = $args['passthroughVars']['mauticContent'];
             } else {
-                $mauticContent = strtolower($this->request->get('bundle'));
+                $mauticContent = strtolower(InputHelper::alphanum($this->request->query->get('bundle')));
             }
             $args['viewParameters']['mauticContent'] = $mauticContent;
         }
@@ -546,10 +544,14 @@ class CommonController extends Controller implements MauticController
         }
         $name = 'mautic.'.$name;
 
+        if (false === $this->request->query->has('orderby') && false === $session->has("$name.orderbydir")) {
+            $session->set("$name.orderbydir", $this->getDefaultOrderDirection());
+        }
+
         if ($this->request->query->has('orderby')) {
             $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
             $dir     = $session->get("$name.orderbydir", 'ASC');
-            $dir     = ('ASC' == $dir) ? 'DESC' : 'ASC';
+            $dir     = $orderBy === $session->get("$name.orderby") || false == $session->has("$name.orderby") ? (('ASC' == $dir) ? 'DESC' : 'ASC') : $dir;
             $session->set("$name.orderby", $orderBy);
             $session->set("$name.orderbydir", $dir);
         }
@@ -609,7 +611,7 @@ class CommonController extends Controller implements MauticController
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
         $model = $this->getModel('core.notification');
 
-        list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent($afterId, false, 200);
+        [$notifications, $showNewIndicator, $updateMessage] = $model->getNotificationContent($afterId, false, 200);
 
         $lastNotification = reset($notifications);
 
@@ -769,5 +771,13 @@ class CommonController extends Controller implements MauticController
         $data = new DataExporterHelper();
 
         return $data->getDataForExport($start, $model, $args, $resultsCallback);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultOrderDirection()
+    {
+        return 'ASC';
     }
 }

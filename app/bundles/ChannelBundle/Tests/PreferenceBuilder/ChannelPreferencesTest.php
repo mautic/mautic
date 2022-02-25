@@ -15,7 +15,6 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\ChannelBundle\PreferenceBuilder\ChannelPreferences;
-use Psr\Log\NullLogger;
 
 class ChannelPreferencesTest extends \PHPUnit\Framework\TestCase
 {

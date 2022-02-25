@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TagController extends FormController
 {
@@ -29,7 +28,7 @@ class TagController extends FormController
      *
      * @param int $page
      *
-     * @return JsonResponse | Response
+     * @return JsonResponse|Response
      */
     public function indexAction($page = 1)
     {
@@ -150,7 +149,7 @@ class TagController extends FormController
     /**
      * Generate's new form and processes post data.
      *
-     * @return JsonResponse | RedirectResponse | Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function newAction()
     {
@@ -333,9 +332,17 @@ class TagController extends FormController
         if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
-                    $found = $tagModel->getRepository()->countOccurrences($tag->getTag());
-                    if (0 !== $found) {
-                        $valid = false;
+                    // We are editing existing tag.in the database.
+                    $valid        = true;
+                    $existingTags = $tagModel->getRepository()->getTagsByName([$tag->getTag()]);
+                    foreach ($existingTags as $e) {
+                        if ($e->getId() != $tag->getId()) {
+                            $valid = false;
+                            break;
+                        }
+                    }
+
+                    if (!$valid) {
                         $this->addFlash('mautic.tagmanager.tag.error.already_exists', [
                             '%name%'      => $tag->getTag(),
                             '%menu_link%' => 'mautic_tagmanager_index',
@@ -522,7 +529,7 @@ class TagController extends FormController
      *
      * @param $objectId
      *
-     * @return JsonResponse | RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function deleteAction($objectId)
     {
@@ -593,7 +600,7 @@ class TagController extends FormController
     /**
      * Deletes a group of entities.
      *
-     * @return JsonResponse | RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function batchDeleteAction()
     {

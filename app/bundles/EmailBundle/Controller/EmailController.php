@@ -22,8 +22,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
-use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
-use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
@@ -35,11 +33,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EmailController extends FormController
 {
-    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
-
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
+    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
     /**
      * @param int $page
@@ -189,8 +186,8 @@ class EmailController extends FormController
             }
         }
 
-        $orderBy    = $session->get('mautic.email.orderby', 'e.subject');
-        $orderByDir = $session->get('mautic.email.orderbydir', 'DESC');
+        $orderBy    = $session->get('mautic.email.orderby', 'e.dateModified');
+        $orderByDir = $session->get('mautic.email.orderbydir', $this->getDefaultOrderDirection());
 
         $emails = $model->getEntities(
             [
@@ -384,7 +381,6 @@ class EmailController extends FormController
                 'viewParameters' => [
                     'email'        => $email,
                     'trackables'   => $trackableLinks,
-                    'pending'      => $model->getPendingLeads($email, null, true),
                     'logs'         => $logs,
                     'isEmbedded'   => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
                     'variants'     => [
@@ -1535,5 +1531,15 @@ class EmailController extends FormController
             'email',
             'email_id'
         );
+    }
+
+    public function getModelName(): string
+    {
+        return 'email';
+    }
+
+    protected function getDefaultOrderDirection(): string
+    {
+        return 'DESC';
     }
 }
