@@ -53,7 +53,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testIsTrackableIfTracking404OptionEnabled(): void
     {
-        $this->mockCoreParametersHelper->expects($this->at(0))
+        $this->mockCoreParametersHelper->expects($this->once())
             ->method('get')
             ->with('do_not_track_404_anonymous')
             ->willReturn(true);
@@ -64,7 +64,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testIsTrackableIfTracking404OptionDisable(): void
     {
-        $this->mockCoreParametersHelper->expects($this->at(0))
+        $this->mockCoreParametersHelper->expects($this->once())
             ->method('get')
             ->with('do_not_track_404_anonymous')
             ->willReturn(false);
@@ -75,7 +75,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testIsTrackableForIdentifiedContacts(): void
     {
-        $this->mockCoreParametersHelper->expects($this->at(0))
+        $this->mockCoreParametersHelper->expects($this->once())
             ->method('get')
             ->with('do_not_track_404_anonymous')
             ->willReturn(true);
@@ -91,7 +91,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testIsTrackableForAnonymouse(): void
     {
-        $this->mockCoreParametersHelper->expects($this->at(0))
+        $this->mockCoreParametersHelper->expects($this->once())
             ->method('get')
             ->with('do_not_track_404_anonymous')
             ->willReturn(true);

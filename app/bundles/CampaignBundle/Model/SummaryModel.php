@@ -42,6 +42,12 @@ class SummaryModel extends AbstractCommonModel
 
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
+            if (!$log->getDateTriggered()) {
+                // This shouldn't normally happen but it's possible to have a log without a date triggered
+                // as it is a nullable field and it can be created without date triggered for example via API.
+                continue;
+            }
+
             $timestamp = $log->getDateTriggered()->getTimestamp();
             $timestamp -= ($timestamp % 3600);
             $dateFrom = ($now)->setTimestamp($timestamp);

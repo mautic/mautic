@@ -1341,9 +1341,9 @@ class CommonRepository extends EntityRepository
                 } else {
                     if (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
                         $q->select($newSelect);
-                    } elseif (false !== strpos($select, $this->getTableAlias().',')) {
+                    } elseif (is_string($select) && false !== strpos($select, $this->getTableAlias().',')) {
                         $q->select(str_replace($this->getTableAlias().',', $newSelect.',', $select));
-                    } elseif (false !== strpos($select, $this->getTableAlias().'.*,')) {
+                    } elseif (is_string($select) && false !== strpos($select, $this->getTableAlias().'.*,')) {
                         $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.',', $select));
                     }
                 }
