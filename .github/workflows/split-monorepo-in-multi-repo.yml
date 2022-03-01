@@ -46,13 +46,6 @@ jobs:
                     user_name: 'Mautic CI'
                     user_email: 'ci@mautic.org'
 
-            # Cache the splitsh executable to speedup future runs
-            -   name: Cache splitsh-lite
-                uses: actions/cache@v2
-                with:
-                    path: './splitsh'
-                    key: '${{ runner.os }}-splitsh-v101'
-
             # Sync commits and tags for the configured subtree splits
             -   name: subtree split
                 uses: acrobat/subtree-splitter@main
