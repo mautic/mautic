@@ -10,17 +10,6 @@ use Symfony\Component\Translation\Translator;
 
 class TranslatorHelperTest extends TestCase
 {
-    public function testGetJsLang(): void
-    {
-        $translator = $this->createMock(Translator::class);
-        $translator->expects($this->exactly(2))->method('getCatalogue')->willReturnCallback(
-            fn () => new TranslatorCatalogue($translator)
-        );
-
-        $translatorHelper = new TranslatorHelper($translator);
-        $translatorHelper->getJsLang();
-    }
-
     public function testGetJsLangBasedOnLocale(): void
     {
         $translator = $this->createMock(Translator::class);
