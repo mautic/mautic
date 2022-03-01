@@ -32,45 +32,7 @@ jobs:
     sync:
         if: github.repository_owner == 'mautic'
         runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                config:
-                    - core-lib
-                    - plugin-citrix
-                    - plugin-clearbit
-                    - plugin-cloudstorage
-                    - plugin-crm
-                    - plugin-emailmarketing
-                    - plugin-focus
-                    - plugin-fullcontact
-                    - plugin-gmail
-                    - plugin-grapesjs
-                    - plugin-outlook
-                    - plugin-social
-                    - plugin-tagmanager
-                    - plugin-zapier
-                    - theme-aurora
-                    - theme-blank
-                    - theme-brienz
-                    - theme-cards
-                    - theme-coffee
-                    - theme-confirmme
-                    - theme-fresh-center
-                    - theme-fresh-fixed
-                    - theme-fresh-left
-                    - theme-fresh-wide
-                    - theme-goldstar
-                    - theme-mauve
-                    - theme-nature
-                    - theme-neopolitan
-                    - theme-oxygen
-                    - theme-paprika
-                    - theme-skyline
-                    - theme-sparse
-                    - theme-sunday
-                    - theme-trulypersonal
-                    - theme-vibrant
-        name: Sync commits into mautic/${{ matrix.config }}
+        name: Sync commits into separate repos
         steps:
             -   uses: actions/checkout@v2
                 with:
@@ -89,10 +51,10 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: './splitsh'
-                    key: '${{ runner.os }}-${{ matrix.config }}-splitsh-v101'
+                    key: '${{ runner.os }}-splitsh-v101'
 
             # Sync commits and tags for the configured subtree splits
             -   name: subtree split
                 uses: acrobat/subtree-splitter@v1.0.0
                 with:
-                    config-path: .github/workflows/gitsplit/${{ matrix.config }}.json # Reference the location where you saved your config file
+                    config-path: .github/subtree-splitter-config.json
