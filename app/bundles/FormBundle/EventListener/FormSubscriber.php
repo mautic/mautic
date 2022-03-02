@@ -32,35 +32,17 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var MailHelper
-     */
-    private $mailer;
+    private MailHelper $mailer;
+    
+    private AuditLogModel $auditLogModel;
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
+    private CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private TranslatorInterface $translator;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private RouterInterface $router;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,

@@ -32,7 +32,7 @@ class FormSubscriberTest extends TestCase
     /**
      * @var FormSubscriber
      */
-    private $subscriber;
+    private FormSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -95,7 +95,7 @@ class FormSubscriberTest extends TestCase
      */
     private function getFormFields(): array
     {
-        return  [
+        return [
             1 => [
                 'id'    => '1',
                 'type'  => 'text',
