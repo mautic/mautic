@@ -30,7 +30,7 @@ on:
 
 jobs:
     sync:
-        if: github.repository_owner == 'mautic'
+        if: github.repository == 'mautic/mautic'
         runs-on: ubuntu-latest
         strategy:
             matrix:
@@ -66,6 +66,7 @@ jobs:
                     - theme-oxygen
                     - theme-paprika
                     - theme-skyline
+                    - theme-sparse
                     - theme-sunday
                     - theme-trulypersonal
                     - theme-vibrant

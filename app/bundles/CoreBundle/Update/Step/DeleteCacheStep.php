@@ -37,7 +37,7 @@ final class DeleteCacheStep implements StepInterface
 
     public function getOrder(): int
     {
-        return 20;
+        return 30;
     }
 
     public function shouldExecuteInFinalStage(): bool

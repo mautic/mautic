@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Mautic\ConfigBundle\Tests\Controller;
 
 use Mautic\ConfigBundle\Model\SysinfoModel;
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class SysinfoControllerTest extends AbstractMauticTestCase
+class SysinfoControllerTest extends MauticMysqlTestCase
 {
     public function testDbInfoIsShown(): void
     {

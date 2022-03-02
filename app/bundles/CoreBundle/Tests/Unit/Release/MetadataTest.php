@@ -79,6 +79,8 @@ class MetadataTest extends TestCase
             'show_php_version_warning_if_under' => '7.3.0',
             'minimum_mautic_version'            => '3.0.0-alpha',
             'announcement_url'                  => '',
+            'minimum_mysql_version'             => '5.7.14',
+            'minimum_mariadb_version'           => '10.3.5',
         ];
 
         $metadata = new Metadata($releaseMetadata);
@@ -94,5 +96,7 @@ class MetadataTest extends TestCase
         $this->assertEquals($releaseMetadata['show_php_version_warning_if_under'], $metadata->getShowPHPVersionWarningIfUnder());
         $this->assertEquals($releaseMetadata['minimum_mautic_version'], $metadata->getMinSupportedMauticVersion());
         $this->assertEquals($releaseMetadata['announcement_url'], $metadata->getAnnouncementUrl());
+        $this->assertEquals($releaseMetadata['minimum_mysql_version'], $metadata->getMinSupportedMySqlVersion());
+        $this->assertEquals($releaseMetadata['minimum_mariadb_version'], $metadata->getMinSupportedMariaDbVersion());
     }
 }

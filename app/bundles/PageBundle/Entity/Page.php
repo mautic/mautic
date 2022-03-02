@@ -99,6 +99,16 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @var string
      */
+    private $headScript;
+
+    /**
+     * @var string
+     */
+    private $footerScript;
+
+    /**
+     * @var string
+     */
     private $redirectType;
 
     /**
@@ -185,6 +195,16 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
         $builder->createField('metaDescription', 'string')
             ->columnName('meta_description')
+            ->nullable()
+            ->build();
+
+        $builder->createField('headScript', 'text')
+            ->columnName('head_script')
+            ->nullable()
+            ->build();
+
+        $builder->createField('footerScript', 'text')
+            ->columnName('footer_script')
             ->nullable()
             ->build();
 
@@ -519,6 +539,54 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     public function getMetaDescription()
     {
         return $this->metaDescription;
+    }
+
+    /**
+     * Set headScript.
+     *
+     * @param string $headScript
+     *
+     * @return Page
+     */
+    public function setHeadScript($headScript)
+    {
+        $this->headScript = $headScript;
+
+        return $this;
+    }
+
+    /**
+     * Get headScript.
+     *
+     * @return string
+     */
+    public function getHeadScript()
+    {
+        return $this->headScript;
+    }
+
+    /**
+     * Set footerScript.
+     *
+     * @param string $footerScript
+     *
+     * @return Page
+     */
+    public function setFooterScript($footerScript)
+    {
+        $this->footerScript = $footerScript;
+
+        return $this;
+    }
+
+    /**
+     * Get footerScript.
+     *
+     * @return string
+     */
+    public function getFooterScript()
+    {
+        return $this->footerScript;
     }
 
     /**
