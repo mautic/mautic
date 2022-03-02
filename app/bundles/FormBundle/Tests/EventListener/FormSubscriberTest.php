@@ -42,6 +42,10 @@ class FormSubscriberTest extends TestCase
         $translator           = $this->createMock(TranslatorInterface::class);
         $router               = $this->createMock(RouterInterface::class);
 
+        $mailer->expects($this->once())
+            ->method('getMailer')
+            ->willReturnSelf();
+
         $this->subscriber = new FormSubscriber(
             $ipLookupHelper,
             $auditLogModel,
