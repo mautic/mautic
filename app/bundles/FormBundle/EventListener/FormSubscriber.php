@@ -33,7 +33,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class FormSubscriber implements EventSubscriberInterface
 {
     private MailHelper $mailer;
-    
+
     private AuditLogModel $auditLogModel;
 
     private IpLookupHelper $ipLookupHelper;
