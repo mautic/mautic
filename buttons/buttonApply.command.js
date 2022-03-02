@@ -1,12 +1,13 @@
 import ContentService from '../content.service';
 import MjmlService from '../mjml/mjml.service';
 import ButtonCloseCommands from './buttonClose.command';
+import ButtonsService from './buttons.service';
 
 export default class ButtonApplyCommand {
   /**
    * The command name
    */
-  static name = 'preset-mautic:apply-email';
+  static name = 'preset-mautic:apply-form';
 
   /**
    * Command saves the email into Database
@@ -14,7 +15,7 @@ export default class ButtonApplyCommand {
    * @param editor
    * @param sender
    */
-  static applyEmail(editor, sender) {
+  static applyForm(editor, sender) {
     editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
 
     if (ContentService.isMjmlMode(editor)) {
@@ -42,24 +43,14 @@ export default class ButtonApplyCommand {
    * @param sender
    */
   static postForm(editor, sender) {
-    const emailForm = ButtonApplyCommand.getEmailForm();
-
-    const emailFormSubject = ButtonApplyCommand.getEmailFormSubject(emailForm);
-    const emailFormName = ButtonApplyCommand.getEmailFormName(emailForm);
+    const mauticForm = ButtonsService.getMauticForm();
 
     sender.set('className', 'fa fa-spinner fa-spin');
-    if (emailFormSubject.val() === '') {
-      emailFormSubject.val(ButtonApplyCommand.getDefaultEmailName());
-    }
-    if (emailFormName.val() === '') {
-      emailFormName.val(ButtonApplyCommand.getDefaultEmailName());
-    }
 
-    Mautic.inBuilderSubmissionOn(emailForm);
-    Mautic.postForm(
-      emailForm,
-      ButtonApplyCommand.postFormResponse.bind(this, editor, sender, emailForm)
-    );
+    ButtonApplyCommand.setDefaultValues();
+
+    Mautic.inBuilderSubmissionOn(mauticForm);
+    Mautic.postForm(mauticForm, ButtonApplyCommand.postFormResponse.bind(this, editor, sender));
     Mautic.inBuilderSubmissionOff();
   }
 
@@ -69,10 +60,11 @@ export default class ButtonApplyCommand {
    *
    * @param editor
    * @param sender
-   * @param emailForm
    * @param response
    */
-  static postFormResponse(editor, sender, emailForm, response) {
+  static postFormResponse(editor, sender, response) {
+    const mauticForm = ButtonsService.getMauticForm();
+
     if (response.validationError !== null) {
       const title = Mautic.translate('grapesjsbuilder.panelsViewsCommandModalTitleError');
       ButtonApplyCommand.showModal(editor, title, response.validationError);
@@ -87,8 +79,8 @@ export default class ButtonApplyCommand {
       }
 
       // update form action
-      if (ButtonApplyCommand.strcmp(emailForm[0].baseURI, emailForm[0].action) !== 0) {
-        emailForm[0].action = emailForm[0].baseURI;
+      if (ButtonsService.strcmp(mauticForm[0].baseURI, mauticForm[0].action) !== 0) {
+        mauticForm[0].action = mauticForm[0].baseURI;
       }
     }
 
@@ -104,12 +96,12 @@ export default class ButtonApplyCommand {
    */
   static showModal(editor, title, text) {
     const modal = editor.Modal;
-    modal.setTitle(`<h4 class="text-danger">${title}</h4>`);
-
     const body = document.createElement('div');
     const content = document.createElement('div');
     const footer = document.createElement('div');
     const btnClose = document.createElement('button');
+
+    modal.setTitle(`<h4 class="text-danger">${title}</h4>`);
 
     content.classList.add('panel-body');
     content.innerText = text;
@@ -132,36 +124,25 @@ export default class ButtonApplyCommand {
     });
   }
 
-  static getEmailForm() {
-    return mQuery('form[name=emailform]');
-  }
+  static setDefaultValues() {
+    const type = ButtonsService.getType();
 
-  static getEmailFormSubject(emailForm) {
-    return emailForm.find('#emailform_subject');
-  }
+    if (type === 'email') {
+      const formEmailSubject = ButtonsService.getFormItemById('emailform_subject');
+      const formEmailName = ButtonsService.getFormItemById('emailform_name');
 
-  static getEmailFormName(emailForm) {
-    return emailForm.find('#emailform_name');
-  }
+      if (formEmailSubject.value === '') {
+        formEmailSubject.value = ButtonsService.getDefaultValue(type);
+      }
+      if (formEmailName.value === '') {
+        formEmailName.value = ButtonsService.getDefaultValue(type);
+      }
+    } else {
+      const formPageTitle = ButtonsService.getFormItemById('page_title');
 
-  static getDefaultEmailName() {
-    return `E-Mail ${moment().format('YYYY-MM-D hh:mm:ss')}`;
-  }
-
-  /**
-   * Compares two strings and returns an integer value that represents the result of the comparison:
-   *  1 - string 1 less than string 2
-   *  0 - string 1 equal string 2
-   * -1 - string 1 greater than string 2
-   *
-   * @param string1
-   * @param string2
-   *
-   * @returns Integer
-   */
-  static strcmp(string1, string2) {
-    if (string1.toString() < string2.toString()) return -1;
-    if (string1.toString() > string2.toString()) return 1;
-    return 0;
+      if (formPageTitle.value === '') {
+        formPageTitle.value = ButtonsService.getDefaultValue(type);
+      }
+    }
   }
 }
