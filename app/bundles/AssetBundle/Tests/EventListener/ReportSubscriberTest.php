@@ -199,7 +199,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('groupBy')
-            ->with('ad.asset_id');
+            ->with('ad.id');
 
         $this->assertFalse($event->hasGroupBy());
 
