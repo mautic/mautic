@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class MetadataTest extends TestCase
 {
-    public function testStableRelease()
+    public function testStableRelease(): void
     {
         $releaseMetadata = [
             'version'                           => '3.2.1',
@@ -43,7 +43,7 @@ class MetadataTest extends TestCase
         $this->assertEquals($releaseMetadata['announcement_url'], $metadata->getAnnouncementUrl());
     }
 
-    public function testStableReleaseWithoutPhpVersionWarning()
+    public function testStableReleaseWithoutPhpVersionWarning(): void
     {
         $releaseMetadata = [
             'version'                           => '3.2.1',
@@ -69,7 +69,7 @@ class MetadataTest extends TestCase
         $this->assertEquals($releaseMetadata['announcement_url'], $metadata->getAnnouncementUrl());
     }
 
-    public function testExtraVersionFound()
+    public function testExtraVersionFound(): void
     {
         $releaseMetadata = [
             'version'                           => '3.2.1-beta',
@@ -100,7 +100,7 @@ class MetadataTest extends TestCase
         $this->assertEquals($releaseMetadata['minimum_mariadb_version'], $metadata->getMinSupportedMariaDbVersion());
     }
 
-    public function testLongerExtraVersionFound()
+    public function testLongerExtraVersionFound(): void
     {
         $releaseMetadata = [
             'version'                           => '3.2.1-xxx-yyy',
