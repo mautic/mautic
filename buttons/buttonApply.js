@@ -1,4 +1,5 @@
 import ButtonApplyCommand from './buttonApply.command';
+import ButtonsService from './buttons.service';
 
 export default class ButtonApply {
   editor;
@@ -15,19 +16,22 @@ export default class ButtonApply {
    * Add the save button before the close button
    */
   addButton() {
-    const emailForm = ButtonApply.getEmailForm();
-    const emailFormList = ButtonApply.getEmailFormList(emailForm);
-    const emailType = ButtonApply.getEmailType(emailForm);
-    const emailTypeSegment = 'list';
+    const type = ButtonsService.getType();
 
     let title = Mautic.translate('grapesjsbuilder.panelsViewsButtonsApplyTitle');
     let disable = false;
-    let command = this.getCommand();
+    let command = ButtonApply.getCommand();
 
-    if (emailType.val() === emailTypeSegment && !emailFormList.val().length) {
-      title = Mautic.translate('grapesjsbuilder.panelsViewsButtonsApplyTitleError');
-      disable = true;
-      command = '';
+    if (type === 'email') {
+      const emailFormList = ButtonsService.getFormItemById('emailform_lists');
+      const emailType = ButtonsService.getFormItemById('emailform_emailType');
+      const emailTypeSegment = 'list';
+
+      if (emailType.value === emailTypeSegment && !emailFormList.value.length) {
+        title = Mautic.translate('grapesjsbuilder.panelsViewsButtonsApplyTitleError');
+        disable = true;
+        command = '';
+      }
     }
 
     this.editor.Panels.addButton('views', [
@@ -48,7 +52,7 @@ export default class ButtonApply {
 
   addCommand() {
     this.editor.Commands.add(ButtonApplyCommand.name, {
-      run: this.getCallback(),
+      run: ButtonApply.getCallback(),
     });
   }
 
@@ -57,7 +61,7 @@ export default class ButtonApply {
    *
    * @returns String
    */
-  getCommand() {
+  static getCommand() {
     return ButtonApplyCommand.name;
   }
 
@@ -66,19 +70,7 @@ export default class ButtonApply {
    *
    * @returns Function
    */
-  getCallback() {
-    return ButtonApplyCommand.applyEmail;
-  }
-
-  static getEmailForm() {
-    return mQuery('form[name=emailform]');
-  }
-
-  static getEmailFormList(emailForm) {
-    return emailForm.find('#emailform_lists');
-  }
-
-  static getEmailType(emailForm) {
-    return emailForm.find('#emailform_emailType');
+  static getCallback() {
+    return ButtonApplyCommand.applyForm;
   }
 }
