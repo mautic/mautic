@@ -178,7 +178,7 @@ class TagController extends FormController
                     $found = $model->getRepository()->countOccurrences($tag->getTag());
                     if (0 !== $found) {
                         $valid = false;
-                        $this->addFlash('mautic.tagmanager.tag.error.already_exists', [
+                        $this->addFlash('mautic.core.notice.updated', [
                             '%name%'      => $tag->getTag(),
                             '%menu_link%' => 'mautic_tagmanager_index',
                             '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
@@ -343,7 +343,7 @@ class TagController extends FormController
                     }
 
                     if (!$valid) {
-                        $this->addFlash('mautic.tagmanager.tag.error.already_exists', [
+                        $this->addFlash('mautic.core.notice.updated', [
                             '%name%'      => $tag->getTag(),
                             '%menu_link%' => 'mautic_tagmanager_index',
                             '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
