@@ -8,6 +8,8 @@ jobs:
   release:
     name: Create draft release
     runs-on: ubuntu-latest
+    if: github.repository == 'mautic/mautic'
+
     steps:
     - uses: actions/checkout@v2
       # Our build script needs access to all previous tags, so we add fetch-depth: 0
@@ -248,6 +250,8 @@ jobs:
   upload-release-asset:
     name: Upload release asset to m.mautic.org
     needs: [release, test-fresh-install, test-update-install]
+    # We only want this job to run in Mautic's repo, not in forks
+    if: github.repository_owner == 'mautic'
     runs-on: ubuntu-latest
 
     steps:
@@ -279,5 +283,5 @@ jobs:
         "${{ secrets.MAUTIC_INSTANCE_USER }}" \
         "${{ secrets.MAUTIC_INSTANCE_PASSWORD }}" \
         "${{ env.MAUTIC_VERSION }}" \
-        2 \
+        4 \
         "${{ github.workspace }}/${{ env.MAUTIC_VERSION }}.zip"

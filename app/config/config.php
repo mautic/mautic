@@ -34,7 +34,9 @@ $container->setParameter('mautic.ip_lookup_services', $bundleMetadataBuilder->ge
 // Load parameters
 include __DIR__.'/parameters.php';
 $container->loadFromExtension('mautic_core');
-$configParameterBag = (new \Mautic\CoreBundle\Loader\ParameterLoader())->getParameterBag();
+$parameterLoader         = new \Mautic\CoreBundle\Loader\ParameterLoader();
+$configParameterBag      = $parameterLoader->getParameterBag();
+$localConfigParameterBag = $parameterLoader->getLocalParameterBag();
 
 // Set template engines
 $engines = ['php', 'twig'];
@@ -114,7 +116,8 @@ $dbalSettings = [
         'point' => 'string',
         'bit'   => 'string',
     ],
-    'server_version' => '%mautic.db_server_version%',
+    'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
+    'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
 ];
 
 $container->loadFromExtension('doctrine', [
@@ -318,15 +321,12 @@ $container->loadFromExtension('fm_elfinder', [
                 ],
                 'roots' => [
                     'local' => [
-                        'driver'    => 'Flysystem',
-                        'path'      => '',
-                        'flysystem' => [
-                            'type'    => 'local',
-                            'options' => [
-                                'local' => [
-                                    'path' => '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
-                                ],
-                            ],
+                        'driver'        => 'Flysystem',
+                        'path'          => '',
+                        'flysystem'     => [
+                            'type'            => 'custom',
+                            'adapter_service' => 'mautic.core.service.local_file_adapter',
+                            'options'         => [],
                         ],
                         'upload_allow'  => ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
                         'upload_deny'   => ['all'],

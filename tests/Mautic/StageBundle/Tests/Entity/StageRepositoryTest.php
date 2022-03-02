@@ -18,7 +18,7 @@ use Doctrine\ORM\QueryBuilder;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
 
-class StageRepositoryTest extends \PHPUnit_Framework_TestCase
+class StageRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
@@ -82,7 +82,7 @@ class StageRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $query = $this->getMockBuilder(AbstractQuery::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getOneOrNullResult'])
+            ->onlyMethods(['getOneOrNullResult'])
             ->getMockForAbstractClass();
 
         $queryBuilder->expects($this->once())
@@ -128,7 +128,7 @@ class StageRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $query = $this->getMockBuilder(AbstractQuery::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getOneOrNullResult'])
+            ->onlyMethods(['getOneOrNullResult'])
             ->getMockForAbstractClass();
 
         $queryBuilder->expects($this->once())

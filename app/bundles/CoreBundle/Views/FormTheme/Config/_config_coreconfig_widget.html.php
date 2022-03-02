@@ -13,7 +13,7 @@ $fieldKeys = array_keys($fields);
 $template  = '<div class="col-md-6">{content}</div>';
 ?>
 
-<?php if (count(array_intersect($fieldKeys, ['site_url', 'webroot', 'update_stability', 'cache_path', 'log_path', 'theme', 'image_path']))): ?>
+<?php if (count(array_intersect($fieldKeys, ['site_url', 'webroot', '404_page', 'cache_path', 'log_path', 'theme', 'image_path']))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.general'); ?></h3>
@@ -22,7 +22,7 @@ $template  = '<div class="col-md-6">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'site_url', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'webroot', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'update_stability', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, '404_page', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'cache_path', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'log_path', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'theme', $template); ?>
@@ -134,6 +134,29 @@ $template  = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists($fields, 'transliterate_page_title', $template); ?>
         </div>
         <?php endif; ?>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php if (count(array_intersect($fieldKeys, ['update_stability', 'composer_updates']))): ?>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.update'); ?></h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'update_stability', $template); ?>
+            <?php echo $view['form']->rowIfExists(
+                $fields,
+                'composer_updates',
+                '<div class="col-md-6">{content}<span style="color:red">'.$view['translator']->trans(
+                    'mautic.core.config.form.update.composer.warning',
+                    [
+                        '%url_start%' => '<a href="https://mau.tc/switch-to-composer" target="_blank" style="color: red; text-decoration: underline">',
+                        '%url_end%'   => '</a>',
+                    ]).'</div>'
+            ); ?>
+        </div>
     </div>
 </div>
 <?php endif; ?>

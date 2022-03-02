@@ -33,7 +33,7 @@ class EventModelTest extends TestCase
     {
         $this->eventModel = $this->getMockBuilder(EventModel::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'getRepository',
                 'getLeadEventLogRepository',
                 'deleteEntities',
