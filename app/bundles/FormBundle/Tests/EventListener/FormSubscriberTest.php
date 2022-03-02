@@ -29,9 +29,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class FormSubscriberTest extends TestCase
 {
-    /**
-     * @var FormSubscriber
-     */
     private FormSubscriber $subscriber;
 
     protected function setUp(): void
