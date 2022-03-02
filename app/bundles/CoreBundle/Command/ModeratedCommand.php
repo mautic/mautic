@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -186,11 +187,11 @@ abstract class ModeratedCommand extends Command
     {
         switch ($this->moderationMode) {
             case self::MODE_REDIS:
-                $dsn   = $this->getContainer()->get('mautic.helper.core_parameters')->get('cache_adapter_redis')['dsn'] ?? null;
-                $redis = new \Redis();
-                $redis->connect(parse_url($dsn, PHP_URL_HOST));
-                $store = new RedisStore($redis);
-
+                $cacheAdapterConfig = $this->getContainer()->get('mautic.helper.core_parameters')->get('cache_adapter_redis');
+                $redisDsn           = $cacheAdapterConfig['dsn'] ?? null;
+                $redisOptions       = $cacheAdapterConfig['options'] ?? [];
+                $redis              = RedisAdapter::createConnection($redisDsn, $redisOptions);
+                $store              = new RedisStore($redis, $this->lockExpiration ?? 3600);
                 break;
             default:
                 $store = new FlockStore($this->runDirectory);
