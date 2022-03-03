@@ -183,7 +183,6 @@ class ReportSubscriber implements EventSubscriberInterface
                     'l.stage_id'           => [
                         'label' => 'mautic.lead.report.attribution.stage_id',
                         'type'  => 'int',
-                        'link'  => 'mautic_stage_action',
                     ],
                     'ss.name'               => [
                         'alias' => 'stage_name',
@@ -793,7 +792,6 @@ class ReportSubscriber implements EventSubscriberInterface
             'l.stage_id' => [
                 'label' => 'mautic.lead.report.attribution.stage_id',
                 'type'  => 'int',
-                'link'  => 'mautic_stage_action',
             ],
             'ss.name' => [
                 'alias' => 'stage_name',
