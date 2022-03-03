@@ -69,8 +69,9 @@ export default class ButtonService {
    */
   static getDefaultValue(value) {
     const item = ButtonService.capitalizeFirstLetter(value);
+    const date = ButtonService.getCurrentDate();
 
-    return `${item} ${moment().format('YYYY-MM-D hh:mm:ss')}`;
+    return `${item} ${date}`;
   }
 
   /**
@@ -98,5 +99,23 @@ export default class ButtonService {
     if (string1.toString() > string2.toString()) return 1;
 
     return 0;
+  }
+
+  /**
+   * Get the current date in format yyyy-mm-dd h:m:s
+   *
+   * @return string
+   */
+  static getCurrentDate() {
+    const today = new Date();
+
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+    const yyyy = today.getFullYear();
+
+    const date = `${yyyy}-${mm}-${dd}`;
+    const time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+
+    return `${date} ${time}`;
   }
 }
