@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\UpgradeEvent;
 use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -98,11 +99,12 @@ class AjaxController extends CommonController
                     $bundleName = $parts[0];
                     $bundle     = ucfirst($bundleName);
                     $action     = $parts[1];
+
                     if (!$classExists = class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController')) {
                         // Check if a plugin is prefixed with Mautic
                         $bundle      = 'Mautic'.$bundle;
                         $classExists = class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController');
-                    } elseif (!$isPlugin) {
+                    } elseif (!$isPlugin && 'Marketplace' !== $bundle) {
                         $bundle = 'Mautic'.$bundle;
                     }
 
@@ -387,13 +389,19 @@ class AjaxController extends CommonController
         $cookieHelper = $this->container->get('mautic.helper.cookie');
         /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
         $updateHelper = $this->container->get('mautic.helper.update');
+        /** @var CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = $this->container->get('mautic.helper.core_parameters');
+        $errors               = [];
 
-        $results = $updateHelper->runPreUpdateChecks();
-        $errors  = [];
+        if (true === $coreParametersHelper->get('composer_updates', false)) {
+            $errors = [$translator->trans('mautic.core.update.composer')];
+        } else {
+            $results = $updateHelper->runPreUpdateChecks();
 
-        foreach ($results as $result) {
-            if (!$result->success) {
-                $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error) => $translator->trans($error->key, $error->parameters), $result->errors));
+            foreach ($results as $result) {
+                if (!$result->success) {
+                    $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error) => $translator->trans($error->key, $error->parameters), $result->errors));
+                }
             }
         }
 
