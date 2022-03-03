@@ -48,6 +48,6 @@ jobs:
 
             # Sync commits and tags for the configured subtree splits
             -   name: subtree split
-                uses: acrobat/subtree-splitter@main
+                uses: acrobat/subtree-splitter@144cc01712e8912defa9124679b190bf5a79e177
                 with:
                     config-path: .github/subtree-splitter-config.json
