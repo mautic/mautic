@@ -24,12 +24,7 @@ final class Version20201120122846 extends AbstractMauticMigration
 
     public function preUp(Schema $schema): void
     {
-        $campaignSummaryTableName = $this->generateTableName(Summary::TABLE_NAME);
-        $campaignIdFK             = $this->getForeignKeyName($campaignSummaryTableName, 'campaign_id');
-        $eventIdFK                = $this->getForeignKeyName($campaignSummaryTableName, 'event_id');
-        if ($schema->hasTable($this->generateTableName(Summary::TABLE_NAME))
-            && $schema->getTable($campaignSummaryTableName)->hasForeignKey($campaignIdFK)
-            && $schema->getTable($campaignSummaryTableName)->hasForeignKey($eventIdFK)) {
+        if ($schema->hasTable($this->generateTableName(Summary::TABLE_NAME))) {
             throw new SkipMigration('Schema includes this migration');
         }
     }
