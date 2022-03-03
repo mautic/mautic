@@ -1,10 +1,10 @@
 export default class ButtonService {
   /**
-   * Get form type
+   * Get form type. There are email and page form types
    *
-   * @return object
+   * @return string
    */
-  static getType() {
+  static getFormType() {
     return document.getElementsByName('emailform').length ? 'email' : 'page';
   }
 
@@ -35,10 +35,10 @@ export default class ButtonService {
    */
   static getInstanceId(form) {
     const url = form[0].action;
-    const regexpEmailId = /(emails|pages)\/edit\/(\d+)$/g;
+    const regexpEmailId = /\/edit\/(\d+)$/g;
     const match = regexpEmailId.exec(url);
 
-    return match ? match[2] : null;
+    return match ? match[1] : null;
   }
 
   /**
@@ -54,16 +54,16 @@ export default class ButtonService {
   }
 
   /**
-   * Get the mautic form item
+   * Check if the the entity ID is temporary (for new entities)
    *
-   * @return object
+   * @return array|null
    */
-  static getMauticFormItem(form, item) {
-    return form.find(item);
+  static isNewEntity() {
+    return Mautic.isNewEntity('#page_sessionId, #emailform_sessionId');
   }
 
   /**
-   * Generate a default value for the required form item
+   * Generate a default value
    *
    * @return string
    */
@@ -96,6 +96,7 @@ export default class ButtonService {
   static strcmp(string1, string2) {
     if (string1.toString() < string2.toString()) return -1;
     if (string1.toString() > string2.toString()) return 1;
+
     return 0;
   }
 }

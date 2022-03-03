@@ -124,24 +124,31 @@ export default class ButtonApplyCommand {
     });
   }
 
+  /**
+   * Set a default value for the required form items.
+   * The email form has subject and internal name fields as a required.
+   * The page form has a title field as a required.
+   */
   static setDefaultValues() {
-    const type = ButtonsService.getType();
+    const formType = ButtonsService.getFormType();
 
-    if (type === 'email') {
+    if (formType === 'email') {
       const formEmailSubject = ButtonsService.getFormItemById('emailform_subject');
       const formEmailName = ButtonsService.getFormItemById('emailform_name');
 
       if (formEmailSubject.value === '') {
-        formEmailSubject.value = ButtonsService.getDefaultValue(type);
+        formEmailSubject.value = ButtonsService.getDefaultValue(formType);
       }
       if (formEmailName.value === '') {
-        formEmailName.value = ButtonsService.getDefaultValue(type);
+        formEmailName.value = ButtonsService.getDefaultValue(formType);
       }
-    } else {
+    }
+
+    if (formType === 'page') {
       const formPageTitle = ButtonsService.getFormItemById('page_title');
 
       if (formPageTitle.value === '') {
-        formPageTitle.value = ButtonsService.getDefaultValue(type);
+        formPageTitle.value = ButtonsService.getDefaultValue(formType);
       }
     }
   }

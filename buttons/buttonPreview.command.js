@@ -22,8 +22,8 @@ export default class ButtonPreviewCommand {
    * @param emailId
    */
   static openPreview(emailId) {
-    const type = ButtonsService.getType();
-    const url = `${window.location.origin}${mauticBaseUrl}${type}/preview/${emailId}`;
+    const formType = ButtonsService.getFormType();
+    const url = `${window.location.origin}${mauticBaseUrl}${formType}/preview/${emailId}`;
 
     window.open(url, '_blank');
   }

@@ -16,13 +16,13 @@ export default class ButtonApply {
    * Add the save button before the close button
    */
   addButton() {
-    const type = ButtonsService.getType();
+    const formType = ButtonsService.getFormType();
 
     let title = Mautic.translate('grapesjsbuilder.panelsViewsButtonsApplyTitle');
     let disable = false;
     let command = ButtonApply.getCommand();
 
-    if (type === 'email') {
+    if (formType === 'email') {
       const emailFormList = ButtonsService.getFormItemById('emailform_lists');
       const emailType = ButtonsService.getFormItemById('emailform_emailType');
       const emailTypeSegment = 'list';
