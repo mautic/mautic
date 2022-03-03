@@ -293,7 +293,7 @@ Mautic.showConfirmation = function (el) {
             .addClass("btn btn-primary")
             .click(function () {
                 if (cancelCallback && typeof Mautic[cancelCallback] === "function") {
-                    window["Mautic"][cancelCallback].apply('window', []);
+                    window["Mautic"][cancelCallback].apply('window', [el]);
                 } else {
                     Mautic.dismissConfirmation();
                 }
@@ -304,8 +304,10 @@ Mautic.showConfirmation = function (el) {
     if (typeof cancelButton != 'undefined') {
         confirmFooterDiv.append(cancelButton);
     }
-
-    confirmFooterDiv.append(confirmButton);
+    
+    if (confirmText) {
+        confirmFooterDiv.append(confirmButton);
+    }
 
     confirmContentDiv.append(confirmHeaderDiv);
     confirmContentDiv.append(confirmFooterDiv);

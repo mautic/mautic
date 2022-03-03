@@ -95,20 +95,27 @@ class ThemeHelper
      * @var array
      */
     protected $defaultThemes = [
+        'Mauve',
         'aurora',
         'blank',
+        'brienz',
         'cards',
+        'coffee',
+        'confirmme',
         'fresh-center',
         'fresh-fixed',
         'fresh-left',
         'fresh-wide',
         'goldstar',
+        'nature',
         'neopolitan',
         'oxygen',
+        'paprika',
         'skyline',
         'sparse',
         'sunday',
         'system',
+        'trulypersonal',
         'vibrant',
     ];
 
@@ -628,6 +635,11 @@ class ThemeHelper
             $this->themesInfo[$key][$theme->getBasename()]           = [];
             $this->themesInfo[$key][$theme->getBasename()]['name']   = $config['name'];
             $this->themesInfo[$key][$theme->getBasename()]['key']    = $theme->getBasename();
+
+            // fix for legacy themes who do not have a builder configured
+            if (empty($config['builder']) || !is_array($config['builder'])) {
+                $config['builder'] = ['legacy'];
+            }
             $this->themesInfo[$key][$theme->getBasename()]['config'] = $config;
 
             if (!$includeDirs) {
@@ -661,8 +673,13 @@ class ThemeHelper
             $builderName = 'legacy';
         }
 
-        $builderRequested = $config['builder'] ?? 'legacy';
+        $builderRequested = $config['builder'] ?? ['legacy'];
 
-        return $builderName === $builderRequested;
+        // is the theme configured to be used with the current builder
+        if (!is_array($builderRequested)) {
+            throw new BadConfigurationException(sprintf('Theme %s not configured properly: builder property in the config.json', $config['name']));
+        }
+
+        return in_array($builderName, $builderRequested);
     }
 }

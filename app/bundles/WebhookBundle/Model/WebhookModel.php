@@ -43,6 +43,10 @@ class WebhookModel extends FormModel
     const COMMAND_PROCESS   = 'command_process';
     const IMMEDIATE_PROCESS = 'immediate_process';
 
+    private const DELETE_BATCH_LIMIT = 5000;
+
+    public const WEBHOOK_LOG_MAX = 1000;
+
     /**
      * Whet queue mode is turned on.
      *
@@ -317,14 +321,18 @@ class WebhookModel extends FormModel
             return false;
         }
 
-        $start = microtime(true);
+        $start            = microtime(true);
+        $webhookQueueRepo = $this->getQueueRepository();
 
         try {
             $response = $this->httpClient->post($webhook->getWebhookUrl(), $payload, $webhook->getSecret());
 
             // remove successfully processed queues from the Webhook object so they won't get stored again
-            foreach ($this->webhookQueueIdList as $queue) {
-                $webhook->removeQueue($queue);
+            $queueIds        = array_keys($this->webhookQueueIdList);
+            $chunkedQueueIds = array_chunk($queueIds, self::DELETE_BATCH_LIMIT);
+
+            foreach ($chunkedQueueIds as $queueIds) {
+                $webhookQueueRepo->deleteQueuesById($queueIds);
             }
 
             $responseBody = $response->getBody()->getContents();
@@ -334,7 +342,7 @@ class WebhookModel extends FormModel
 
             $responseStatusCode = $response->getStatusCode();
 
-            $this->addLog($webhook, $response->getStatusCode(), (microtime(true) - $start), $responseBody);
+            $this->addLog($webhook, $responseStatusCode, (microtime(true) - $start), $responseBody);
 
             // throw an error exception if we don't get a 200 back
             if ($responseStatusCode >= 300 || $responseStatusCode < 200) {
@@ -365,9 +373,6 @@ class WebhookModel extends FormModel
         // Run this on command as well as immediate send because if switched from queue to immediate
         // it can have some rows in the queue which will be send in every webhook forever
         if (!empty($this->webhookQueueIdList)) {
-            /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
-            $webhookQueueRepo = $this->getQueueRepository();
-
             // delete all the queued items we just processed
             $webhookQueueRepo->deleteQueuesById(array_keys($this->webhookQueueIdList));
             $queueCount = $webhookQueueRepo->getQueueCountByWebhookId($webhook->getId());
@@ -429,25 +434,26 @@ class WebhookModel extends FormModel
      * @param int    $statusCode
      * @param float  $runtime    in seconds
      * @param string $note
+     *                           $runtime variable unit is in seconds
      */
     public function addLog(Webhook $webhook, $statusCode, $runtime, $note = null)
     {
-        $log = new Log();
-
-        if ($webhook->getId()) {
-            $log->setWebhook($webhook);
-            $this->getLogRepository()->removeOldLogs($webhook->getId(), $this->logMax);
+        if (!$webhook->getId()) {
+            return;
         }
 
+        if (!$this->coreParametersHelper->get('clean_webhook_logs_in_background')) {
+            $this->getLogRepository()->removeLimitExceedLogs($webhook->getId(), $this->logMax);
+        }
+
+        $log = new Log();
+        $log->setWebhook($webhook);
         $log->setNote($note);
         $log->setRuntime($runtime);
         $log->setStatusCode($statusCode);
         $log->setDateAdded(new \DateTime());
         $webhook->addLog($log);
-
-        if ($webhook->getId()) {
-            $this->saveEntity($webhook);
-        }
+        $this->saveEntity($webhook);
     }
 
     /**
@@ -673,7 +679,7 @@ class WebhookModel extends FormModel
         $this->webhookTimeLimit = (int) $coreParametersHelper->get('webhook_time_limit', 600);
         $this->disableLimit     = (int) $coreParametersHelper->get('webhook_disable_limit', 100);
         $this->webhookTimeout   = (int) $coreParametersHelper->get('webhook_timeout', 15);
-        $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', 1000);
+        $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', self::WEBHOOK_LOG_MAX);
         $this->queueMode        = $coreParametersHelper->get('queue_mode');
         $this->eventsOrderByDir = $coreParametersHelper->get('events_orderby_dir', Criteria::ASC);
     }

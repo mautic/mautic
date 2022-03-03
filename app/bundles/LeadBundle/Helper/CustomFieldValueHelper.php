@@ -89,7 +89,7 @@ class CustomFieldValueHelper
      *
      * @return string
      */
-    private static function setValueFromPropertiesList(array $properties, $value)
+    public static function setValueFromPropertiesList(array $properties, $value)
     {
         if (isset($properties['list']) && is_array($properties['list'])) {
             $list = $properties['list'];
@@ -97,8 +97,10 @@ class CustomFieldValueHelper
                 return $value;
             }
             foreach ($list as $property) {
-                if ($property['value'] == $value) {
-                    $value = $property['label'];
+                if (isset($property[$value])) {
+                    return $property[$value];
+                } elseif (isset($property['value']) && $property['value'] == $value) {
+                    return $property['label'];
                 }
             }
         }

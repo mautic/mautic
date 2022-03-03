@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
 use PharData;
 use PharFileInfo;
@@ -73,11 +72,10 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
      */
     public function downloadRemoteDataStore()
     {
-        $connector = HttpFactory::getHttp();
         $package   = $this->getRemoteDateStoreDownloadUrl();
 
         try {
-            $data = $connector->get($package);
+            $data = $this->client->get($package);
         } catch (\Exception $exception) {
             $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
         }
@@ -92,7 +90,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
             switch (true) {
                 case $localTargetExt === $tempExt:
-                    $success = (bool) file_put_contents($localTarget, $data->body);
+                    $success = (bool) file_put_contents($localTarget, $data->getBody());
 
                     break;
 
@@ -107,7 +105,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                         // dir doesn't exist, make it
                         mkdir($tempTargetFolder);
                     }
-                    file_put_contents($temporaryPhar, $data->body);
+                    file_put_contents($temporaryPhar, $data->getBody());
                     $pharData = new PharData($temporaryPhar);
                     foreach (new RecursiveIteratorIterator($pharData) as $file) {
                         /** @var PharFileInfo $file */
@@ -124,10 +122,10 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                     $freeMem  = $memLimit - memory_get_peak_usage();
                     //check whether there is enough memory to handle large iplookp DB
                     // or will throw iplookup exception
-                    if (function_exists('gzdecode') && strlen($data->body) < ($freeMem / 3)) {
-                        $success = (bool) file_put_contents($localTarget, gzdecode($data->body));
+                    if (function_exists('gzdecode') && strlen($data->getBody()) < ($freeMem / 3)) {
+                        $success = (bool) file_put_contents($localTarget, gzdecode($data->getBody()));
                     } elseif (function_exists('gzopen')) {
-                        if (file_put_contents($tempTarget, $data->body)) {
+                        if (file_put_contents($tempTarget, $data->getBody())) {
                             $bufferSize = 4096; // read 4kb at a time
                             $file       = gzopen($tempTarget, 'rb');
                             $outFile    = fopen($localTarget, 'wb');
@@ -144,7 +142,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                     break;
 
                 case 'zip' == $tempExt:
-                    file_put_contents($tempTarget, $data->body);
+                    file_put_contents($tempTarget, $data->getBody());
 
                     $zipper = new \ZipArchive();
 

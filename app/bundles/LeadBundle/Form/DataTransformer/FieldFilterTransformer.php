@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -14,9 +16,13 @@ namespace Mautic\LeadBundle\Form\DataTransformer;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class FieldFilterTransformer implements DataTransformerInterface
 {
+    /**
+     * @var string[]
+     */
     private $relativeDateStrings;
 
     /**
@@ -24,11 +30,7 @@ class FieldFilterTransformer implements DataTransformerInterface
      */
     private $default;
 
-    /**
-     * @param       $translator
-     * @param array $default
-     */
-    public function __construct($translator, $default = [])
+    public function __construct(TranslatorInterface $translator, array $default = [])
     {
         $this->relativeDateStrings = LeadListRepository::getRelativeDateTranslationKeys();
         foreach ($this->relativeDateStrings as &$string) {
@@ -54,13 +56,16 @@ class FieldFilterTransformer implements DataTransformerInterface
             if (!empty($this->default)) {
                 $rawFilters[$k] = array_merge($this->default, $rawFilters[$k]);
             }
-            if ('datetime' == $f['type']) {
-                if (in_array($f['filter'], $this->relativeDateStrings) or stristr($f['filter'][0], '-') or stristr($f['filter'][0], '+')) {
+            if ('datetime' === $f['type']) {
+                $bcFilter = $f['filter'] ?? '';
+                $filter   = $f['properties']['filter'] ?? $bcFilter;
+                if (in_array($filter, $this->relativeDateStrings) or stristr($filter[0], '-') or stristr($filter[0], '+')) {
                     continue;
                 }
 
-                $dt                       = new DateTimeHelper($f['filter'], 'Y-m-d H:i');
-                $rawFilters[$k]['filter'] = $dt->toLocalString();
+                $dt = new DateTimeHelper($filter, 'Y-m-d H:i');
+
+                $rawFilters[$k]['properties']['filter'] = $dt->toLocalString();
             }
         }
 
@@ -84,12 +89,15 @@ class FieldFilterTransformer implements DataTransformerInterface
 
         foreach ($rawFilters as $k => $f) {
             if ('datetime' == $f['type']) {
-                if (in_array($f['filter'], $this->relativeDateStrings) or stristr($f['filter'][0], '-') or stristr($f['filter'][0], '+')) {
+                $bcFilter = $f['filter'] ?? '';
+                $filter   = $f['properties']['filter'] ?? $bcFilter;
+                if (in_array($filter, $this->relativeDateStrings) or stristr($filter[0], '-') or stristr($filter[0], '+')) {
                     continue;
                 }
 
-                $dt                       = new DateTimeHelper($f['filter'], 'Y-m-d H:i', 'local');
-                $rawFilters[$k]['filter'] = $dt->toUtcString();
+                $dt = new DateTimeHelper($filter, 'Y-m-d H:i', 'local');
+
+                $rawFilters[$k]['properties']['filter'] = $dt->toUtcString();
             }
         }
 

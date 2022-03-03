@@ -19,10 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class UploadController extends DropzoneController
 {
-    /**
-     * @return JsonResponse
-     */
-    public function upload()
+    public function upload(): JsonResponse
     {
         /** @var Request $request */
         $request  = $this->container->get('request_stack')->getCurrentRequest();
