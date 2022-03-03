@@ -1,14 +1,5 @@
 export default class ButtonService {
   /**
-   * Get form type. There are email and page form types
-   *
-   * @return string
-   */
-  static getFormType() {
-    return document.getElementsByName('emailform').length ? 'email' : 'page';
-  }
-
-  /**
    * Get NodeList form object
    *
    * @return NodeListOf<HTMLElement>
@@ -110,7 +101,7 @@ export default class ButtonService {
     const today = new Date();
 
     const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
     const yyyy = today.getFullYear();
 
     const date = `${yyyy}-${mm}-${dd}`;

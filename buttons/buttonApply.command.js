@@ -47,7 +47,7 @@ export default class ButtonApplyCommand {
 
     sender.set('className', 'fa fa-spinner fa-spin');
 
-    ButtonApplyCommand.setDefaultValues();
+    ButtonApplyCommand.setDefaultValues(editor);
 
     Mautic.inBuilderSubmissionOn(mauticForm);
     Mautic.postForm(mauticForm, ButtonApplyCommand.postFormResponse.bind(this, editor, sender));
@@ -129,26 +129,26 @@ export default class ButtonApplyCommand {
    * The email form has subject and internal name fields as a required.
    * The page form has a title field as a required.
    */
-  static setDefaultValues() {
-    const formType = ButtonsService.getFormType();
+  static setDefaultValues(editor) {
+    const mode = ContentService.getMode(editor);
 
-    if (formType === 'email') {
+    if (mode === ContentService.modeEmailHtml || mode === ContentService.modeEmailMjml) {
       const formEmailSubject = ButtonsService.getFormItemById('emailform_subject');
       const formEmailName = ButtonsService.getFormItemById('emailform_name');
 
       if (formEmailSubject.value === '') {
-        formEmailSubject.value = ButtonsService.getDefaultValue(formType);
+        formEmailSubject.value = ButtonsService.getDefaultValue(mode.split('-')[0]);
       }
       if (formEmailName.value === '') {
-        formEmailName.value = ButtonsService.getDefaultValue(formType);
+        formEmailName.value = ButtonsService.getDefaultValue(mode.split('-')[0]);
       }
     }
 
-    if (formType === 'page') {
+    if (mode === ContentService.modePageHtml) {
       const formPageTitle = ButtonsService.getFormItemById('page_title');
 
       if (formPageTitle.value === '') {
-        formPageTitle.value = ButtonsService.getDefaultValue(formType);
+        formPageTitle.value = ButtonsService.getDefaultValue(mode.split('-')[0]);
       }
     }
   }
