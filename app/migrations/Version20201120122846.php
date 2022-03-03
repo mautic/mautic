@@ -24,7 +24,13 @@ final class Version20201120122846 extends AbstractMauticMigration
 
     public function preUp(Schema $schema): void
     {
-        if ($schema->hasTable($this->generateTableName(Summary::TABLE_NAME))) {
+        $campaignSummaryTableName = $this->generateTableName(Summary::TABLE_NAME);
+        $campaignIdFK             = $this->getForeignKeyName(Summary::TABLE_NAME, 'campaign_id');
+        $eventIdFK                = $this->getForeignKeyName(Summary::TABLE_NAME, 'event_id');
+
+        if ($schema->hasTable($this->generateTableName(Summary::TABLE_NAME))
+            && $schema->getTable($campaignSummaryTableName)->hasForeignKey($campaignIdFK)
+            && $schema->getTable($campaignSummaryTableName)->hasForeignKey($eventIdFK)) {
             throw new SkipMigration('Schema includes this migration');
         }
     }
@@ -32,9 +38,9 @@ final class Version20201120122846 extends AbstractMauticMigration
     public function up(Schema $schema): void
     {
         $campaignIDX = $this->generatePropertyName(Summary::TABLE_NAME, 'idx', ['campaign_id']);
-        $campaignFK  = $this->generatePropertyName(Summary::TABLE_NAME, 'fk', ['campaign_id']);
+        $campaignFK  = $this->getForeignKeyName(Summary::TABLE_NAME, 'campaign_id');
         $eventIDX    = $this->generatePropertyName(Summary::TABLE_NAME, 'idx', ['event_id']);
-        $eventFK     = $this->generatePropertyName(Summary::TABLE_NAME, 'fk', ['event_id']);
+        $eventFK     = $this->getForeignKeyName(Summary::TABLE_NAME, 'event_id');
 
         $campaignSummaryTableName = $this->generateTableName(Summary::TABLE_NAME);
         $campaignsTableName       = $this->generateTableName('campaigns');
@@ -44,7 +50,7 @@ final class Version20201120122846 extends AbstractMauticMigration
         $campaignEventsIdDataType = $this->getColumnDataType($schema->getTable($campaignEventsTableName), 'id');
 
         $this->addSql("
-            CREATE TABLE {$campaignSummaryTableName} (
+            CREATE TABLE IF NOT EXISTS {$campaignSummaryTableName} (
                 id INT UNSIGNED AUTO_INCREMENT NOT NULL,
                 campaign_id INT {$campaignIdDataType} DEFAULT NULL,
                 event_id INT {$campaignEventsIdDataType} NOT NULL,
