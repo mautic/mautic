@@ -231,50 +231,6 @@ class TagController extends FormController
     }
 
     /**
-     * Generate's clone form and processes post data.
-     *
-     * @param int  $objectId
-     * @param bool $ignorePost
-     *
-     * @return Response
-     */
-    public function cloneAction($objectId, $ignorePost = false)
-    {
-        if (!$this->get('mautic.security')->isGranted('tagManager:tagManager:create')) {
-            return $this->accessDenied();
-        }
-
-        $postActionVars = $this->getPostActionVars();
-
-        try {
-            $tag   = $this->getTag($objectId);
-            $clone = new Tag();
-            $clone->setTag($tag->getTag());
-
-            return $this->createTagModifyResponse(
-                $clone,
-                $postActionVars,
-                $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
-                $ignorePost
-            );
-        } catch (AccessDeniedException $exception) {
-            return $this->accessDenied();
-        } catch (EntityNotFoundException $exception) {
-            return $this->postActionRedirect(
-                array_merge($postActionVars, [
-                    'flashes' => [
-                        [
-                            'type'    => 'error',
-                            'msg'     => 'mautic.tagmanager.tag.error.notfound',
-                            'msgVars' => ['%id%' => $objectId],
-                        ],
-                    ],
-                ])
-            );
-        }
-    }
-
-    /**
      * Generate's edit form and processes post data.
      *
      * @param int  $objectId
@@ -313,7 +269,7 @@ class TagController extends FormController
     }
 
     /**
-     * Create modifying response for tags - edit/clone.
+     * Create modifying response for tags - edit.
      *
      * @param string $action
      * @param bool   $ignorePost
