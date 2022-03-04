@@ -569,13 +569,6 @@ return [
                 ],
                 'tags' => ['mautic.email.transport_extension'],
             ],
-            'mautic.email.transport_extension.ses_smtp' => [
-                'class'     => \Mautic\EmailBundle\Mailer\Transport\SesSmtpTransportExtension::class,
-                'arguments' => [
-                    'mautic.email.amazon.callback',
-                ],
-                'tags' => ['mautic.email.transport_extension'],
-            ],
             'mautic.email.transport_extension.smtp' => [
                 'class'     => \Mautic\EmailBundle\Mailer\Transport\SmtpTransportExtension::class,
                 'tags'      => ['mautic.email.transport_extension'],
