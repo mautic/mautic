@@ -113,7 +113,8 @@ class DateTimeHelper
     public function toUtcString($format = null)
     {
         if ($this->datetime) {
-            $utc = ('UTC' == $this->timezone) ? $this->datetime : $this->datetime->setTimezone($this->utc);
+            $dateTime = clone $this->datetime;
+            $utc      = ('UTC' == $this->timezone) ? $dateTime : $dateTime->setTimezone($this->utc);
             if (empty($format)) {
                 $format = $this->format;
             }
