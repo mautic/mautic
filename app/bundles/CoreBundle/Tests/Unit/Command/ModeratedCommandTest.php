@@ -226,7 +226,7 @@ class ModeratedCommandTest extends TestCase
         rmdir($runDir);
     }
 
-    public function testRedisLock()
+    public function testRedisLock(): void
     {
         if (!class_exists('\Redis')) {
             $this->markTestSkipped('Php Redis client not installed');
@@ -240,7 +240,10 @@ class ModeratedCommandTest extends TestCase
             ->with('mautic.helper.core_parameters')
             ->willReturnCallback(function (string $key) {
                 return new class() {
-                    public function get()
+                    /**
+                     * @return string[]
+                     */
+                    public function get(): array
                     {
                         return ['dsn' => 'redis://localhost'];
                     }
@@ -261,7 +264,7 @@ class ModeratedCommandTest extends TestCase
                 }
             );
 
-        $this->expectException(\RedisException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $command->run($this->input, $this->output);
     }
