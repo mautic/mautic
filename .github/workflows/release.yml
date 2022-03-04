@@ -8,6 +8,8 @@ jobs:
   release:
     name: Create draft release
     runs-on: ubuntu-latest
+    if: github.repository == 'mautic/mautic'
+
     steps:
     - uses: actions/checkout@v2
       # Our build script needs access to all previous tags, so we add fetch-depth: 0
