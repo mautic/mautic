@@ -42,7 +42,7 @@ final class UpdateSchemaStep implements StepInterface
 
     public function getOrder(): int
     {
-        return 40;
+        return 50;
     }
 
     public function shouldExecuteInFinalStage(): bool

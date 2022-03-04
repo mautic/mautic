@@ -34,7 +34,7 @@ class ReleaseParser
      * @throws LatestVersionSupportedException
      * @throws UpdatePackageNotFoundException
      */
-    public function getLatestSupportedRelease(array $releases, string $phpVersion, string $mauticVersion, string $allowedStability): Release
+    public function getLatestSupportedRelease(array $releases, string $mauticVersion, string $allowedStability): Release
     {
         foreach ($releases as $release) {
             try {
@@ -48,14 +48,6 @@ class ReleaseParser
                 ('stable' !== $metadata->getStability() && version_compare($allowedStability, $metadata->getStability(), 'gt'))
             ) {
                 // This Mautic does support the given release's stability so continue
-                continue;
-            }
-
-            if (
-                version_compare($phpVersion, $metadata->getMinSupportedPHPVersion(), 'lt') ||
-                version_compare($phpVersion, $metadata->getMaxSupportedPHPVersion(), 'gt')
-            ) {
-                // This PHP version is not supported by the given release so continue
                 continue;
             }
 
