@@ -15,6 +15,8 @@ namespace Mautic\InstallBundle\Command;
 
 use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper;
+use Mautic\EmailBundle\Mailer\Dsn\MailerDsnConvertor;
+use Mautic\EmailBundle\Mailer\Dsn\MessengerDsnConvertor;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;
@@ -25,7 +27,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Symfony\Component\Mailer\Transport\Dsn;
 
 /**
  * CLI Command to install Mautic.
@@ -327,20 +328,13 @@ class InstallCommand extends ContainerAwareCommand
 
         //parse dsn parameters to user friendly
         if (!empty($allParams['mailer_dsn'])) {
-            $dsn                           = Dsn::fromString($allParams['mailer_dsn']);
-            $allParams['mailer_transport'] = $dsn->getScheme();
-            $allParams['mailer_host']      = $dsn->getHost();
-            $allParams['mailer_port']      = $dsn->getPort();
-            $allParams['mailer_user']      = $dsn->getUser();
-            $allParams['mailer_password']  = $dsn->getPassword();
+            $parameters = MailerDsnConvertor::convertDsnToArray($allParams['mailer_dsn']);
+            $allParams  = array_merge($allParams, $parameters);
         }
 
         if (!empty($allParams['mailer_messenger_dsn']) && 'async' === $allParams['mailer_spool_type']) {
-            $dsn                                = Dsn::fromString($allParams['mailer_messenger_dsn']);
-            $allParams['mailer_messenger_type'] = $dsn->getScheme();
-            $allParams['mailer_messenger_host'] = $dsn->getHost();
-            $allParams['mailer_messenger_port'] = $dsn->getPort();
-            $allParams['mailer_messenger_path'] = $dsn->getOption('path');
+            $parameters = MessengerDsnConvertor::convertDsnToArray($allParams['mailer_messenger_dsn']);
+            $allParams  = array_merge($allParams, $parameters);
         }
 
         $step = (float) $input->getArgument('step');

@@ -101,9 +101,12 @@ $template  = '<div class="col-md-6">{content}</div>';
             </div>
 
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_messenger_path', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_messenger_stream', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_messenger_auto_setup', $template); ?>
             </div>
-
+            <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_messenger_tls', $template); ?>
+            </div>
         </div>
     </div>
 <?php endif; ?>
