@@ -228,10 +228,6 @@ class ModeratedCommandTest extends TestCase
 
     public function testRedisLock(): void
     {
-        if (!class_exists('\Redis')) {
-            $this->markTestSkipped('Php Redis client not installed');
-        }
-
         $command = new FakeModeratedCommand();
         $command->setContainer($this->container);
 
