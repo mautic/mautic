@@ -126,7 +126,8 @@ jobs:
           - enhancement
       - title: 🐛 Bugs
         labels:
-          - "bug"
+          - bug
+          - regression
 
   test-fresh-install:
     name: Test a fresh installation
