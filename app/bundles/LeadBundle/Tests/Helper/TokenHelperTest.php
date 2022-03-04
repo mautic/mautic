@@ -67,7 +67,12 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
                 'lastname'  => 'Smith',
                 'companies' => [
                     [
+                        'companyzip' => '77009',
+                        'is_primary' => 0,
+                    ],
+                    [
                         'companyzip' => '77008',
+                        'is_primary' => 1,
                     ],
                 ],
             ],
