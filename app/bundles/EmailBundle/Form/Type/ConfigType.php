@@ -683,19 +683,74 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'mailer_messenger_path',
+            'mailer_messenger_stream',
             TextType::class,
             [
-                'label'      => 'mautic.email.config.mailer.messenger.path',
+                'label'      => 'mautic.email.config.mailer.messenger.stream',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'data-show-on' => '{"config_emailconfig_mailer_messenger_type":['.$this->messengerType->getServiceRequiresPath().']}',
+                    'data-show-on' => '{"config_emailconfig_mailer_messenger_type":['.$this->messengerType->getServiceRequiresStream().']}',
                     'data-hide-on' => $messengerHideConditions,
-                    'tooltip'      => 'mautic.email.config.mailer.messenger.path.tooltip',
+                    'tooltip'      => 'mautic.email.config.mailer.messenger.stream.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
                 'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_messenger_group',
+            TextType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.messenger.group',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_emailconfig_mailer_messenger_type":['.$this->messengerType->getServiceRequiresGroup().']}',
+                    'data-hide-on' => $messengerHideConditions,
+                    'tooltip'      => 'mautic.email.config.mailer.messenger.group.tooltip',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_messenger_auto_setup',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.messenger.auto_setup',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.email.config.mailer.messenger.auto_setup.tooltip',
+                    'data-show-on' => '{"config_emailconfig_mailer_messenger_type":['.$this->messengerType->getServiceRequiresAutoSetup().']}',
+                    'data-hide-on' => $messengerHideConditions,
+                ],
+                'data'       => empty($options['data']['mailer_messenger_auto_setup']) ? 'false' : 'true',
+                'required'   => false,
+                'no_value'   => 'false',
+                'yes_value'  => 'true',
+            ]
+        );
+
+        $builder->add(
+            'mailer_messenger_tls',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.messenger.tls',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.email.config.mailer.messenger.tls.tooltip',
+                    'data-show-on' => '{"config_emailconfig_mailer_messenger_type":['.$this->messengerType->getServiceRequiresTls().']}',
+                    'data-hide-on' => $messengerHideConditions,
+                ],
+                'data'       => empty($options['data']['mailer_messenger_tls']) ? 'false' : 'true',
+                'required'   => false,
+                'no_value'   => 'false',
+                'yes_value'  => 'true',
             ]
         );
 

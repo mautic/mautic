@@ -138,7 +138,22 @@ class EmailStep implements StepInterface
     /**
      * @var string
      */
-    public $mailer_messenger_path;
+    public $mailer_messenger_stream = 'messages';
+
+    /**
+     * @var string
+     */
+    public $mailer_messenger_group = 'symfony';
+
+    /**
+     * @var string
+     */
+    public $mailer_messenger_auto_setup = 'true';
+
+    /**
+     * @var string
+     */
+    public $mailer_messenger_tls = 'false';
 
     public function __construct(Session $session)
     {

@@ -13,7 +13,8 @@ use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Release\ThisRelease;
-use Mautic\EmailBundle\Mailer\Dsn\DsnGenerator;
+use Mautic\EmailBundle\Mailer\Dsn\MailerDsnConvertor;
+use Mautic\EmailBundle\Mailer\Dsn\MessengerDsnConvertor;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
@@ -26,7 +27,6 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -544,32 +544,8 @@ class InstallService
         }
 
         if ($step instanceof EmailStep) {
-            $step->mailer_dsn = DsnGenerator::getDsnString(
-                new Dsn(
-                    $data['mailer_transport'],
-                    $data['mailer_host'],
-                    $data['mailer_user'],
-                    $data['mailer_password'],
-                    $data['mailer_port'] ? (int) $data['mailer_port'] : null
-                )
-            );
-
-            if ('sync' === $data['mailer_spool_type']) {
-                $step->mailer_messenger_dsn = 'sync://';
-            } else {
-                $step->mailer_messenger_dsn = DsnGenerator::getDsnString(
-                    new Dsn(
-                        $data['mailer_messenger_type'],
-                        $data['mailer_messenger_host'],
-                        null,
-                        null,
-                        $data['mailer_messenger_port'] ? (int) $data['mailer_messenger_port'] : null,
-                        [
-                            'path' => $data['mailer_messenger_path'],
-                        ]
-                    )
-                );
-            }
+            $step->mailer_dsn           = MailerDsnConvertor::convertArrayToDsnString($data);
+            $step->mailer_messenger_dsn = MessengerDsnConvertor::convertArrayToDsnString($data);
         }
 
         return $this->saveConfiguration($data, $step, true);

@@ -18,17 +18,23 @@ class MessengerType
         'redis',
     ];
 
-    /**
-     * @var string[]
-     */
-    private $showPort = [
+    private array $showPort = [
         'redis',
     ];
 
-    /**
-     * @var string[]
-     */
-    private $showPath = [
+    private array $showStream = [
+        'redis',
+    ];
+
+    private array $showGroup = [
+        'redis',
+    ];
+
+    private array $showAutoSetup = [
+        'redis',
+    ];
+
+    private array $showTls = [
         'redis',
     ];
 
@@ -50,9 +56,24 @@ class MessengerType
         return $this->getString($this->showPort);
     }
 
-    public function getServiceRequiresPath(): string
+    public function getServiceRequiresStream(): string
     {
-        return $this->getString($this->showPath);
+        return $this->getString($this->showStream);
+    }
+
+    public function getServiceRequiresGroup(): string
+    {
+        return $this->getString($this->showGroup);
+    }
+
+    public function getServiceRequiresAutoSetup(): string
+    {
+        return $this->getString($this->showAutoSetup);
+    }
+
+    public function getServiceRequiresTls(): string
+    {
+        return $this->getString($this->showTls);
     }
 
     /**

@@ -16,6 +16,8 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\ConfigType;
+use Mautic\EmailBundle\Mailer\Dsn\MailerDsnConvertor;
+use Mautic\EmailBundle\Mailer\Dsn\MessengerDsnConvertor;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mailer\Transport\Dsn;
 
@@ -25,6 +27,22 @@ class ConfigSubscriber implements EventSubscriberInterface
      * @var CoreParametersHelper
      */
     private $coreParametersHelper;
+
+    private array $tempFields = [
+        'mailer_transport',
+        'mailer_host',
+        'mailer_port',
+        'mailer_user',
+        'mailer_password',
+        'mailer_spool_type',
+        'mailer_messenger_type',
+        'mailer_messenger_host',
+        'mailer_messenger_port',
+        'mailer_messenger_stream',
+        'mailer_messenger_group',
+        'mailer_messenger_auto_setup',
+        'mailer_messenger_tls',
+    ];
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
@@ -44,6 +62,7 @@ class ConfigSubscriber implements EventSubscriberInterface
 
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
+        $event->addTemporaryFields($this->tempFields);
         $event->addForm([
             'bundle'     => 'EmailBundle',
             'formType'   => ConfigType::class,
@@ -87,29 +106,30 @@ class ConfigSubscriber implements EventSubscriberInterface
             }
         }
 
+        $data['mailer_dsn']           = MailerDsnConvertor::convertArrayToDsnString($data);
+        $data['mailer_messenger_dsn'] = MessengerDsnConvertor::convertArrayToDsnString($data);
+
+        foreach ($this->tempFields as $tempField) {
+            unset($data[$tempField]);
+        }
+
         $event->setConfig($data, 'emailconfig');
     }
 
     private function getParameters(ConfigBuilderEvent $event): array
     {
-        $parameters = $event->getParametersFromConfig('MauticEmailBundle');
+        $parameters       = $event->getParametersFromConfig('MauticEmailBundle');
+        $loadedParameters = $this->coreParametersHelper->all();
 
         //parse dsn parameters to user friendly
-        if (!empty($parameters['mailer_dsn'])) {
-            $dsn                            = Dsn::fromString($parameters['mailer_dsn']);
-            $parameters['mailer_transport'] = $dsn->getScheme();
-            $parameters['mailer_host']      = $dsn->getHost();
-            $parameters['mailer_port']      = $dsn->getPort();
-            $parameters['mailer_user']      = $dsn->getUser();
-            $parameters['mailer_password']  = $dsn->getPassword();
+        if (!empty($loadedParameters['mailer_dsn'])) {
+            $mailerParameters = MailerDsnConvertor::convertDsnToArray($loadedParameters['mailer_dsn']);
+            $parameters       = array_merge($parameters, $mailerParameters);
         }
 
-        if (!empty($parameters['mailer_messenger_dsn']) && 'async' === $parameters['mailer_spool_type']) {
-            $dsn                                 = Dsn::fromString($parameters['mailer_messenger_dsn']);
-            $parameters['mailer_messenger_type'] = $dsn->getScheme();
-            $parameters['mailer_messenger_host'] = $dsn->getHost();
-            $parameters['mailer_messenger_port'] = $dsn->getPort();
-            $parameters['mailer_messenger_path'] = $dsn->getOption('path');
+        if (!empty($loadedParameters['mailer_messenger_dsn'])) {
+            $messengerParameters = MessengerDsnConvertor::convertDsnToArray($loadedParameters['mailer_messenger_dsn']);
+            $parameters          = array_merge($parameters, $messengerParameters);
         }
 
         return $parameters;

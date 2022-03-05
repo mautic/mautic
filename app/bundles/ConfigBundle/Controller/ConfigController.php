@@ -40,11 +40,13 @@ class ConfigController extends FormController
         $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
-        $fileFields  = $event->getFileFields();
-        $formThemes  = $event->getFormThemes();
-        $formConfigs = $this->get('mautic.config.mapper')->bindFormConfigsWithRealValues($event->getForms());
 
-        $this->mergeParamsWithLocal($formConfigs);
+        $fileFields       = $event->getFileFields();
+        $formThemes       = $event->getFormThemes();
+        $temporaryFields  = $event->getTemporaryFields();
+        $formConfigs      = $this->get('mautic.config.mapper')->bindFormConfigsWithRealValues($event->getForms());
+
+        $this->mergeParamsWithLocal($formConfigs, $temporaryFields);
 
         // Create the form
         $action = $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']);
@@ -265,7 +267,7 @@ class ConfigController extends FormController
     /**
      * Merges default parameters from each subscribed bundle with the local (real) params.
      */
-    private function mergeParamsWithLocal(array &$forms): void
+    private function mergeParamsWithLocal(array &$forms, array $temporaryFields): void
     {
         $doNotChange = $this->getParameter('mautic.security.restrictedConfigFields');
         /** @var PathsHelper $pathsHelper */
@@ -284,7 +286,7 @@ class ConfigController extends FormController
             foreach ($form['parameters'] as $key => $value) {
                 if (in_array($key, $doNotChange)) {
                     unset($form['parameters'][$key]);
-                } elseif (array_key_exists($key, $localParams)) {
+                } elseif (array_key_exists($key, $localParams) || array_key_exists($key, $temporaryFields)) {
                     $paramValue               = $localParams[$key];
                     $form['parameters'][$key] = $paramValue;
                 }
