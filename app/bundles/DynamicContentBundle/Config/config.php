@@ -163,6 +163,7 @@ return [
                     'mautic.dynamicContent.model.dynamicContent',
                     'mautic.campaign.executioner.realtime',
                     'event_dispatcher',
+                    'mautic.lead.model.lead',
                 ],
             ],
         ],
