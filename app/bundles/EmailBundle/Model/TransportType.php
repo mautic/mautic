@@ -114,19 +114,6 @@ class TransportType
     /**
      * @return string
      */
-    public function getServiceDoNotNeedAmazonRegion()
-    {
-        $tempTransports     = $this->transportTypes;
-
-        $transports               = array_keys($tempTransports);
-        $doNotRequireAmazonRegion = array_diff($transports, $this->showAmazonRegion);
-
-        return $this->getString($doNotRequireAmazonRegion);
-    }
-
-    /**
-     * @return string
-     */
     public function getServiceDoNotNeedUser()
     {
         // The auth_mode data-show-on will handle smtp
