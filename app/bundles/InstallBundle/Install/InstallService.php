@@ -543,7 +543,7 @@ class InstallService
             return $messages;
         }
 
-        if ($step instanceof EmailStep) {
+        if ($step instanceof EmailStep && !empty($data['mailer_transport'])) {
             $step->mailer_dsn           = MailerDsnConvertor::convertArrayToDsnString($data);
             $step->mailer_messenger_dsn = MessengerDsnConvertor::convertArrayToDsnString($data);
         }

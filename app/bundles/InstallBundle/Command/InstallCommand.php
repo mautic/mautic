@@ -15,8 +15,6 @@ namespace Mautic\InstallBundle\Command;
 
 use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper;
-use Mautic\EmailBundle\Mailer\Dsn\MailerDsnConvertor;
-use Mautic\EmailBundle\Mailer\Dsn\MessengerDsnConvertor;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;
@@ -179,53 +177,11 @@ class InstallCommand extends ContainerAwareCommand
                 null
             )
             ->addOption(
-                '--mailer_transport',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Mail transport.',
-                null
-            )
-            ->addOption(
-                '--mailer_host',
+                '--mailer_dsn',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'SMTP host.',
-                null
-            )
-            ->addOption(
-                '--mailer_port',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'SMTP port.',
-                null
-            )
-            ->addOption(
-                '--mailer_user',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'SMTP username.',
-                null
-            )
-            ->addOption(
-                '--mailer_password',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'SMTP password.',
-                null
-            )
-            ->addOption(
-                '--mailer_encryption',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'SMTP encryption (null|tls|ssl).',
-                null
-            )
-            ->addOption(
-                '--mailer_auth_mode',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'SMTP auth mode (null|plain|login|cram-md5).',
-                null
+                'Mail DSN Sting.',
+                'smtp://localhost:1025'
             )
         ;
         parent::configure();
@@ -324,17 +280,6 @@ class InstallCommand extends ContainerAwareCommand
 
         if (empty($allParams['mailer_from_email']) && isset($adminParam['email'])) {
             $allParams['mailer_from_email'] = $adminParam['email'];
-        }
-
-        //parse dsn parameters to user friendly
-        if (!empty($allParams['mailer_dsn'])) {
-            $parameters = MailerDsnConvertor::convertDsnToArray($allParams['mailer_dsn']);
-            $allParams  = array_merge($allParams, $parameters);
-        }
-
-        if (!empty($allParams['mailer_messenger_dsn']) && 'async' === $allParams['mailer_spool_type']) {
-            $parameters = MessengerDsnConvertor::convertDsnToArray($allParams['mailer_messenger_dsn']);
-            $allParams  = array_merge($allParams, $parameters);
         }
 
         $step = (float) $input->getArgument('step');
@@ -553,6 +498,7 @@ class InstallCommand extends ContainerAwareCommand
                         }
                     }
                 }
+
                 $messages = $installer->setupEmailStep($step, $params);
                 break;
 

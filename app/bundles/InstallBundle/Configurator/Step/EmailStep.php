@@ -17,6 +17,26 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class EmailStep implements StepInterface
 {
+    private const SKIP_PARAMETERS = [
+        'mailer_transport',
+        'mailer_host',
+        'mailer_port',
+        'mailer_user',
+        'mailer_password',
+        'mailer_amazon_region',
+        'mailer_api_key',
+        'mailer_encryption',
+        'mailer_auth_mode',
+        'mailer_spool_type',
+        'mailer_messenger_type',
+        'mailer_messenger_host',
+        'mailer_messenger_port',
+        'mailer_messenger_stream',
+        'mailer_messenger_group',
+        'mailer_messenger_auto_setup',
+        'mailer_messenger_tls',
+    ];
+
     /**
      * From name for email sent from Mautic.
      *
@@ -197,7 +217,9 @@ class EmailStep implements StepInterface
         $parameters = [];
 
         foreach ($data as $key => $value) {
-            $parameters[$key] = $value;
+            if (!in_array($key, self::SKIP_PARAMETERS)) {
+                $parameters[$key] = $value;
+            }
         }
 
         return $parameters;
