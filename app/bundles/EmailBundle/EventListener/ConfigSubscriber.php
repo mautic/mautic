@@ -35,6 +35,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         'mailer_user',
         'mailer_password',
         'mailer_spool_type',
+        'mailer_amazon_region',
         'mailer_messenger_type',
         'mailer_messenger_host',
         'mailer_messenger_port',
