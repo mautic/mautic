@@ -34,6 +34,11 @@ class FormApiController extends CommonApiController
         $this->entityNameMulti  = 'forms';
         $this->serializerGroups = ['formDetails', 'categoryList', 'publishDetails'];
 
+        $this->dataInputMasks  = [
+            'text'    => 'html',
+            'message' => 'html',
+        ];
+
         parent::initialize($event);
     }
 

@@ -11,6 +11,7 @@
 
 namespace Mautic\InstallBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -62,7 +63,7 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
         $this->formMock             = $this->createMock(Form::class);
         $this->templatingMock       = $this->createMock(DelegatingEngine::class);
 
-        $this->configurator         = $this->createMock(Form::class);
+        $this->configurator         = $this->createMock(Configurator::class);
         $this->installer            = $this->createMock(InstallService::class);
 
         $this->controller           = new InstallController();

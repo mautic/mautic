@@ -444,12 +444,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     {
         $cm = $this->getClassMetadata();
 
-        if (!isset($cm->table['indexes'])) {
-            $cm->table['indexes'] = [];
-        }
-
-        $cm->table['indexes'][$name] = ['
-            columns'  => $columns,
+        $cm->table['indexes'][$name] = [
+            'columns' => $columns,
             'options' => [
                 'where' => $where,
             ],
@@ -464,5 +460,23 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     public function isIndexedVarchar(string $name, string $type): bool
     {
         return Types::STRING === $type || isset($this->getClassMetadata()->table['indexes'][$name]);
+    }
+
+    /**
+     * Adds Index with options.
+     *
+     * @param list<string>         $columns
+     * @param array<string, mixed> $options
+     */
+    public function addIndexWithOptions(array $columns, string $name, array $options): ClassMetadataBuilder
+    {
+        $cm = $this->getClassMetadata();
+
+        $cm->table['indexes'][$name] = [
+            'columns' => $columns,
+            'options' => $options,
+        ];
+
+        return $this;
     }
 }

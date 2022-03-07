@@ -127,7 +127,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getConfigPath(): string
     {
-        return self::$container->getParameter('kernel.project_dir').'/app/config/local.php';
+        return self::$container->get('kernel')->getLocalConfigFile();
     }
 
     private function getConfigParameters(): array
@@ -223,7 +223,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form          = $buttonCrawler->form();
         Assert::assertEquals($page3, $form['config[coreconfig][404_page]']->getValue());
         // re-create the Symfony client to make config changes applied
-        $this->setUpSymfony();
+        $this->setUpSymfony($this->configParams);
 
         // Request not found url page3 page content should be rendered
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/editnotfoundurlblablabla');
