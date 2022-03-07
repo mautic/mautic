@@ -453,12 +453,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                     'link'  => 'mautic_stage_action',
                     'alias' => 'stage_id',
                 ];
-                $expected['leads']['columns']['s.name'] = [
+                $expected['leads']['columns']['ss.name'] = [
                     'alias' => 'stage_name',
                     'label' => '',
                     'type'  => 'string',
                 ];
-                $expected['leads']['columns']['s.date_added'] = [
+                $expected['leads']['columns']['ss.date_added'] = [
                     'alias'   => 'stage_date_added',
                     'label'   => '',
                     'type'    => 'string',
@@ -714,7 +714,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                                 'link'  => 'mautic_stage_action',
                                 'alias' => 'stage_id',
                             ],
-                            's.name' => [
+                            'ss.name' => [
                                 'alias' => 'stage_name',
                                 'label' => '',
                                 'type'  => 'string',
@@ -783,7 +783,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                                 ],
                                 'alias' => 'stage_id',
                             ],
-                            's.name' => [
+                            'ss.name' => [
                                 'alias' => 'stage_name',
                                 'label' => '',
                                 'type'  => 'string',

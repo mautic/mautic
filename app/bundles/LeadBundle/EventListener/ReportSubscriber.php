@@ -155,12 +155,12 @@ class ReportSubscriber implements EventSubscriberInterface
                         'type'  => 'int',
                         'link'  => 'mautic_stage_action',
                     ],
-                    's.name'               => [
+                    'ss.name'               => [
                         'alias' => 'stage_name',
                         'label' => 'mautic.lead.report.attribution.stage_name',
                         'type'  => 'string',
                     ],
-                    's.date_added' => [
+                    'ss.date_added' => [
                         'alias'   => 'stage_date_added',
                         'label'   => 'mautic.lead.report.attribution.stage_date_added',
                         'type'    => 'string',
@@ -254,8 +254,8 @@ class ReportSubscriber implements EventSubscriberInterface
                     $event->addLeadIpAddressLeftJoin($qb);
                 }
 
-                if ($event->hasColumn(['s.name']) || $event->hasFilter(['s.name'])) {
-                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'stages', 's', 's.id = l.stage_id');
+                if ($event->usesColumn('ss.name')) {
+                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'stages', 'ss', 'ss.id = l.stage_id');
                 }
 
                 if ($event->hasFilter('s.leadlist_id')) {
@@ -280,7 +280,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $event->addLeadIpAddressLeftJoin($qb);
                 }
 
-                if ($event->hasFilter('s.leadlist_id')) {
+                if ($event->usesColumn('s.leadlist_id')) {
                     $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
                 }
 
@@ -298,6 +298,10 @@ class ReportSubscriber implements EventSubscriberInterface
                     $event->addLeadIpAddressLeftJoin($qb);
                 }
 
+                if ($event->usesColumn('s.leadlist_id')) {
+                    $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
+                }
+
                 break;
 
             case self::CONTEXT_CONTACT_ATTRIBUTION_MULTI:
@@ -307,7 +311,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 $event->applyDateFilters($qb, 'attribution_date', 'l', true);
                 $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
                     ->join('l', MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log', 'l.id = log.lead_id')
-                    ->leftJoin('l', MAUTIC_TABLE_PREFIX.'stages', 's', 'l.stage_id = s.id')
+                    ->leftJoin('l', MAUTIC_TABLE_PREFIX.'stages', 'ss', 'l.stage_id = ss.id')
                     ->join('log', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'log.event_id = e.id')
                     ->join('log', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'log.campaign_id = c.id')
                     ->andWhere(
@@ -330,6 +334,10 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 if ($event->usesColumn(['cat.id', 'cat.title'])) {
                     $event->addCategoryLeftJoin($qb, 'c', 'cat');
+                }
+
+                if ($event->usesColumn('s.leadlist_id')) {
+                    $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
                 }
 
                 $subQ = clone $qb;
@@ -449,8 +457,8 @@ class ReportSubscriber implements EventSubscriberInterface
                     $groupBy = str_replace('mautic.lead.graph.pie.attribution_', '', $g);
                     switch ($groupBy) {
                         case 'stages':
-                            $attributionQb->select('CONCAT_WS(\':\', s.id, s.name) as slice, l.attribution as contact_attribution')
-                                ->groupBy('l.id, s.id');
+                            $attributionQb->select('CONCAT_WS(\':\', ss.id, ss.name) as slice, l.attribution as contact_attribution')
+                                ->groupBy('l.id, ss.id');
                             break;
                         case 'campaigns':
                             $attributionQb->select(
@@ -787,7 +795,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 'type'  => 'int',
                 'link'  => 'mautic_stage_action',
             ],
-            's.name' => [
+            'ss.name' => [
                 'alias' => 'stage_name',
                 'label' => 'mautic.lead.report.attribution.stage_name',
                 'type'  => 'string',
