@@ -1016,9 +1016,17 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Updates lead's lastActive with now date/time.
      *
      * @param int $leadId
+     *
+     * @return void
      */
     public function updateLastActive($leadId)
     {
+        if (!$leadId) {
+            // Prevent unnecessary queries like:
+            // `UPDATE leads SET last_active = ... WHERE id IS NULL`
+            return;
+        }
+
         $dt     = new DateTimeHelper();
         $fields = ['last_active' => $dt->toUtcString()];
 

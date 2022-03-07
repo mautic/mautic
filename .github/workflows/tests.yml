@@ -85,7 +85,7 @@ jobs:
         mariadb_port: ${{ job.services.mariadb.ports[3306] }}
 
     - name: Upload coverage report
-      if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' }}
+      if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' && github.repository == 'mautic/mautic' }}
       uses: codecov/codecov-action@v2
       with:
         files: ./coverage.xml
