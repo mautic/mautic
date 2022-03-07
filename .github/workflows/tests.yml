@@ -85,7 +85,7 @@ jobs:
         mariadb_port: ${{ job.services.mariadb.ports[3306] }}
 
     - name: Upload coverage report
-      if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' }}
+      if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' && github.repository == 'mautic/mautic' }}
       uses: codecov/codecov-action@v2
       with:
         files: ./coverage.xml
@@ -113,7 +113,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'CS Fixer', 'Rector']
+        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'scaffolded files mismatch', 'PHPStan baseline changes']
 
     name: ${{ matrix.commands }}
 
@@ -151,6 +151,27 @@ jobs:
           done
           if [[ $cs_fix_files ]]; then
             bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --using-cache=no --show-progress=dots --diff $cs_fix_files
+          fi
+        elif [[ "${{ matrix.commands }}" == "scaffolded files mismatch" ]]; then
+          wget -q -O /tmp/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && chmod 755 /tmp/jq
+          /tmp/jq -r '.extra["mautic-scaffold"]["file-mapping"] | to_entries[] | "diff -q \(.key | sub("\\[(project|web)-root\\]";".")) app/\(.value)"' app/composer.json > diff_commands.sh
+          bash diff_commands.sh | tee /tmp/diff_command_output.txt
+          rm diff_commands.sh
+          if [[ $(wc -l </tmp/diff_command_output.txt) -ge 1 ]]; then
+            echo "some scaffolded files were not updated"
+            echo "Please apply the same changes in the files mentioned above"
+            exit 1
+          fi
+        elif [[ "${{ matrix.commands }}" == "PHPStan baseline changes" ]]; then
+          if [[ "${{ steps.changed-files.outputs.modified_files }}" == *"phpstan-baseline.neon"* ]]; then
+            stat=$(git diff --shortstat "origin/${{ github.base_ref }}" ${{ github.sha }} -- phpstan-baseline.neon)
+            echo $stat
+            regex="[0-9]+[[:space:]]insertion"
+            if [[ $stat =~ $regex ]]; then
+              echo "There are modifications (added or changed lines) to the phpstan-baseline.neon"
+              echo "Please fix the PHPStan errors instead of altering the baseline file"
+              exit 1
+            fi
           fi
         else
           echo "Invalid command"
