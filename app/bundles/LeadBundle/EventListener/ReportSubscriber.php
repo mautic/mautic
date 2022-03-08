@@ -148,6 +148,36 @@ class ReportSubscriber implements EventSubscriberInterface
                 $companyColumns
             );
 
+            if ($event->checkContext([self::CONTEXT_CONTACT_FREQUENCYRULES])) {
+                $this->injectFrequencyReportData($event, $columns, $filters);
+            }
+
+            $attributionTypes = [
+                self::CONTEXT_CONTACT_ATTRIBUTION_MULTI,
+                self::CONTEXT_CONTACT_ATTRIBUTION_FIRST,
+                self::CONTEXT_CONTACT_ATTRIBUTION_LAST,
+            ];
+
+            if ($event->checkContext($attributionTypes)) {
+                $context = $event->getContext();
+                foreach ($attributionTypes as $attributionType) {
+                    if (empty($context) || $event->checkContext($attributionType)) {
+                        $type = str_replace('contact.attribution.', '', $attributionType);
+                        $this->injectAttributionReportData($event, $columns, $filters, $type);
+                    }
+                }
+            }
+
+            if ($event->checkContext([self::CONTEXT_LEADS, self::CONTEXT_LEAD_POINT_LOG])) {
+                // Add shared graphs
+                $event->addGraph(self::CONTEXT_LEADS, 'line', 'mautic.lead.graph.line.leads');
+                $event->addGraph(self::CONTEXT_LEAD_POINT_LOG, 'line', 'mautic.lead.graph.line.leads');
+
+                if ($event->checkContext(self::CONTEXT_LEAD_POINT_LOG)) {
+                    $this->injectPointsReportData($event, $columns, $filters);
+                }
+            }
+
             if ($event->checkContext([self::CONTEXT_LEADS])) {
                 $stageColumns = [
                     'l.stage_id'           => [
@@ -177,36 +207,6 @@ class ReportSubscriber implements EventSubscriberInterface
             ];
 
             $event->addTable(self::CONTEXT_LEADS, $data, self::GROUP_CONTACTS);
-
-            $attributionTypes = [
-                self::CONTEXT_CONTACT_ATTRIBUTION_MULTI,
-                self::CONTEXT_CONTACT_ATTRIBUTION_FIRST,
-                self::CONTEXT_CONTACT_ATTRIBUTION_LAST,
-            ];
-
-            if ($event->checkContext($attributionTypes)) {
-                $context = $event->getContext();
-                foreach ($attributionTypes as $attributionType) {
-                    if (empty($context) || $event->checkContext($attributionType)) {
-                        $type = str_replace('contact.attribution.', '', $attributionType);
-                        $this->injectAttributionReportData($event, $columns, $filters, $type);
-                    }
-                }
-            }
-
-            if ($event->checkContext([self::CONTEXT_LEADS, self::CONTEXT_LEAD_POINT_LOG])) {
-                // Add shared graphs
-                $event->addGraph(self::CONTEXT_LEADS, 'line', 'mautic.lead.graph.line.leads');
-                $event->addGraph(self::CONTEXT_LEAD_POINT_LOG, 'line', 'mautic.lead.graph.line.leads');
-
-                if ($event->checkContext(self::CONTEXT_LEAD_POINT_LOG)) {
-                    $this->injectPointsReportData($event, $columns, $filters);
-                }
-            }
-
-            if ($event->checkContext([self::CONTEXT_CONTACT_FREQUENCYRULES])) {
-                $this->injectFrequencyReportData($event, $columns, $filters);
-            }
         }
 
         if ($event->checkContext($this->companyContexts)) {
