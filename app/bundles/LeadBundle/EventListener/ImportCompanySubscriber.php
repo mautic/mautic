@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Event\ImportInitEvent;
 use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
@@ -104,10 +103,10 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
         }
 
         $matchedFields = $event->getForm()->getData();
-
+        $skipIfExists  = ArrayHelper::pickValue('skip_if_exists', $matchedFields, false);
+        $event->setSkipIfExists((bool) $skipIfExists);
+        unset($matchedFields['skip_if_exists']);
         $event->setOwnerId($this->handleValidateOwner($matchedFields));
-        $event->setList($this->handleValidateList($matchedFields));
-        $event->setTags($this->handleValidateTags($matchedFields));
 
         $matchedFields = array_map(
             fn ($value) => is_string($value) ? trim($value) : $value,
@@ -135,29 +134,6 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
         $owner = ArrayHelper::pickValue('owner', $matchedFields);
 
         return $owner ? $owner->getId() : null;
-    }
-
-    /**
-     * @param mixed[] $matchedFields
-     */
-    private function handleValidateList(array &$matchedFields): ?int
-    {
-        return ArrayHelper::pickValue('list', $matchedFields);
-    }
-
-    /**
-     * @param mixed[] $matchedFields
-     *
-     * @return mixed[]
-     */
-    private function handleValidateTags(array &$matchedFields): array
-    {
-        // In case $matchedFields['tags'] === null ...
-        $tags = ArrayHelper::pickValue('tags', $matchedFields, []);
-        // ...we must ensure we pass an [] to array_map
-        $tags = is_array($tags) ? $tags : [];
-
-        return array_map(fn (Tag $tag) => $tag->getTag(), $tags);
     }
 
     /**
