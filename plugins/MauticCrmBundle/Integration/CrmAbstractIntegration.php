@@ -387,11 +387,17 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $uniqueLeadFieldData = [];
         $leadFieldTypes      = $this->fieldModel->getFieldListWithProperties();
 
+        // cleanup unique fields
         foreach ($matchedFields as $leadField => $value) {
             if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
                 if (isset($leadFieldTypes[$leadField]['type'])) {
                     $this->cleanFields($matchedFields, $leadFieldTypes[$leadField]);
                 }
+            }
+        }
+
+        foreach ($matchedFields as $leadField => $value) {
+            if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
                 $uniqueLeadFieldData[$leadField] = $value;
             }
 
