@@ -677,14 +677,14 @@ class ThemeHelper
             $themeDirectory = $this->pathsHelper->getSystemPath('themes').DIRECTORY_SEPARATOR.$themeDirname;
             $configFile     = $realPath.'/config.json';
 
-            $thumbnailFileEvent = new StorageThemeFileEvent($configFile);
-            $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $thumbnailFileEvent);
-            $isFileValid = $thumbnailFileEvent->existsInStorage() ?? $this->filesystem->exists($configFile);
+            $configFileEvent = new StorageThemeFileEvent($configFile);
+            $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $configFileEvent);
+            $isFileValid = $configFileEvent->existsInStorage() ?? $this->filesystem->exists($configFile);
             if (!$isFileValid) {
                 continue;
             }
 
-            $configContent = $thumbnailFileEvent->existsInStorage() ? $thumbnailFileEvent->getContents() : $this->filesystem->readFile($configFile);
+            $configContent = $configFileEvent->existsInStorage() ? $configFileEvent->getContents() : $this->filesystem->readFile($configFile);
             $config        = json_decode($configContent, true);
 
             if (!$this->shouldLoadTheme($config, $specificFeature)) {
