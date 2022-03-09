@@ -104,6 +104,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $this->setIncludeExcludeOperatorsToTextFilters($event);
         $staticFields = [
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
@@ -320,6 +321,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $this->setIncludeExcludeOperatorsToTextFilters($event);
         $choices = [
             'lead_asset_download' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_asset_download'),
@@ -565,5 +567,39 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
         // something else such as dynanmic content
         return false;
+    }
+
+    private function setIncludeExcludeOperatorsToTextFilters(LeadListFiltersChoicesEvent $event): void
+    {
+        $choices = $event->getChoices();
+
+        foreach ($choices as $group=>$groups) {
+            foreach ($groups as $alias => $choice) {
+                $type = $choice['properties']['type'] ?? null;
+                if ('text' === $type) {
+                    $choices[$group][$alias]['operators'] = $this->typeOperatorProvider->getOperatorChoiceList(
+                        [
+                            'include' => [
+                                '=',
+                                '!=',
+                                'empty',
+                                '!empty',
+                                'like',
+                                '!like',
+                                'regexp',
+                                '!regexp',
+                                'in',
+                                '!in',
+                                'startsWith',
+                                'endsWith',
+                                'contains',
+                            ],
+                        ]
+                    );
+                }
+            }
+        }
+
+        $event->setChoices($choices);
     }
 }

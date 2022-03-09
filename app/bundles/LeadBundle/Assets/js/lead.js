@@ -487,6 +487,7 @@ Mautic.convertLeadFilterInput = function(el) {
     var fieldAlias = mQuery('#leadlist_filters_'+filterNum+'_field');
     var fieldObject = mQuery('#leadlist_filters_'+filterNum+'_object');
     var filterValue = mQuery('#leadlist_filters_'+filterNum+'_properties_filter').val();
+    var filterId  = '#leadlist_filters_' + filterNum + '_properties_filter';
 
     Mautic.loadFilterForm(filterNum, fieldObject.val(), fieldAlias.val(), operatorSelect.val(), function(propertiesFields) {
         var selector = '#leadlist_filters_'+filterNum;
@@ -495,7 +496,7 @@ Mautic.convertLeadFilterInput = function(el) {
         Mautic.triggerOnPropertiesFormLoadedEvent(selector, filterValue);
     });
 
-    Mautic.setProcessorForFilterValue(filterId, operator);
+    Mautic.setProcessorForFilterValue(filterId, operatorSelect.val());
 };
 
 Mautic.setFilterValuesProcessor = function () {
