@@ -93,20 +93,13 @@ export default class ButtonService {
   }
 
   /**
-   * Get the current date in format yyyy-mm-dd h:m:s
+   * Get the current date
    *
    * @return string
    */
   static getCurrentDate() {
     const today = new Date();
 
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const yyyy = today.getFullYear();
-
-    const date = `${yyyy}-${mm}-${dd}`;
-    const time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
-
-    return `${date} ${time}`;
+    return today.toLocaleString();
   }
 }
