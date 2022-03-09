@@ -593,13 +593,19 @@ class ThemeHelper
                 $absolutePathToFile = $this->pathsHelper->getSystemPath('themes_root', true).DIRECTORY_SEPARATOR.$file;
                 $fileEvent          = new StorageThemeFileEvent($absolutePathToFile);
                 $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $fileEvent);
-                $zipper->addFromString(str_replace($themePath, '', $absolutePathToFile), $fileEvent->getContents());
+                if ($fileEvent->existsInStorage()) {
+                    $zipper->addFromString(str_replace($themePath, '', $absolutePathToFile), $fileEvent->getContents());
+                }
             }
 
-            foreach ($this->finder as $file) {
-                $filePath  = $file->getRealPath();
-                $localPath = $file->getRelativePathname();
-                $zipper->addFile($filePath, $localPath);
+            // If not from storage
+            if (!$zipper->count()) {
+                $this->finder->files()->in($themePath);
+                foreach ($this->finder as $file) {
+                    $filePath  = $file->getRealPath();
+                    $localPath = $file->getRelativePathname();
+                    $zipper->addFile($filePath, $localPath);
+                }
             }
             $zipper->close();
 
