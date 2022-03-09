@@ -397,23 +397,6 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'mailer_amazon_other_region',
-            TextType::class,
-            [
-                'label'      => 'mautic.email.config.mailer.amazon_region.other',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'data-show-on' => '{"config_emailconfig_mailer_amazon_region":["other"]}',
-                    'data-hide-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedAmazonRegion().']}',
-                    'tooltip'      => 'mautic.email.config.mailer.amazon_region.other.tooltip',
-                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
-                ],
-                'required'   => false,
-            ]
-        );
-
-        $builder->add(
             'mailer_port',
             TextType::class,
             [
@@ -479,14 +462,13 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_password',
-            PasswordType::class,
+            TextType::class,
             [
                 'label'      => 'mautic.email.config.mailer.password',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'placeholder'  => 'mautic.user.user.form.passwordplaceholder',
-                    'preaddon'     => 'fa fa-lock',
                     'data-show-on' => '{
                         "config_emailconfig_mailer_auth_mode":[
                             "plain",

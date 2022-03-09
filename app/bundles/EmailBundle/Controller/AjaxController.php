@@ -217,7 +217,7 @@ class AjaxController extends CommonAjaxController
             }
 
             try {
-                if ($extension->testConnection(new Dsn($settings['transport'], $settings['host'], null, null, $settings['port']))) {
+                if ($extension->testConnection(new Dsn($settings['transport'], $settings['host'], null, null, $settings['port'] ? (int) $settings['port'] : null))) {
                     $dataArray['success'] = 1;
                     $dataArray['message'] = $this->translator->trans('mautic.core.success');
                 }

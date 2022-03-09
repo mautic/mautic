@@ -60,9 +60,6 @@ if ('index' === $tmpl) {
             <div class="col-sm-6">
                 <?php echo $view['form']->row($form['mailer_amazon_region']); ?>
             </div>
-            <div class="col-sm-6">
-                <?php echo $view['form']->row($form['mailer_amazon_other_region']); ?>
-            </div>
         </div>
     </div>
     <div id="authDetails">

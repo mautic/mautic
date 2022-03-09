@@ -710,7 +710,6 @@ return [
         'mailer_encryption'              => null, //tls or ssl,
         'mailer_auth_mode'               => null, //plain, login or cram-md5
         'mailer_amazon_region'           => 'us-east-1',
-        'mailer_amazon_other_region'     => null,
         'mailer_custom_headers'          => [],
         'mailer_dsn'                     => 'null://null',
         'mailer_messenger_dsn'           => 'sync://',

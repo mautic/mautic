@@ -80,40 +80,6 @@ class TransportType
     ];
 
     /**
-     * @param $serviceId
-     * @param $translatableAlias
-     * @param $showHost
-     * @param $showPort
-     * @param $showUser
-     * @param $showPassword
-     * @param $showApiKey
-     */
-    public function addTransport($serviceId, $translatableAlias, $showHost, $showPort, $showUser, $showPassword, $showApiKey)
-    {
-        $this->transportTypes[$serviceId] = $translatableAlias;
-
-        if ($showHost) {
-            $this->showHost[] = $serviceId;
-        }
-
-        if ($showPort) {
-            $this->showPort[] = $serviceId;
-        }
-
-        if ($showUser) {
-            $this->showUser[] = $serviceId;
-        }
-
-        if ($showPassword) {
-            $this->showPassword[] = $serviceId;
-        }
-
-        if ($showApiKey) {
-            $this->showApiKey[] = $serviceId;
-        }
-    }
-
-    /**
      * @return array
      */
     public function getTransportTypes()
@@ -143,19 +109,6 @@ class TransportType
     public function getServiceRequiresUser()
     {
         return $this->getString($this->showUser);
-    }
-
-    /**
-     * @return string
-     */
-    public function getServiceDoNotNeedAmazonRegion()
-    {
-        $tempTransports     = $this->transportTypes;
-
-        $transports               = array_keys($tempTransports);
-        $doNotRequireAmazonRegion = array_diff($transports, $this->showAmazonRegion);
-
-        return $this->getString($doNotRequireAmazonRegion);
     }
 
     /**
