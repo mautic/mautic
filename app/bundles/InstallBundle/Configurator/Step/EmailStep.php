@@ -168,6 +168,11 @@ class EmailStep implements StepInterface
      */
     public $mailer_messenger_tls = 'false';
 
+    public ?int $messenger_retry_strategy_max_retries = 3;
+    public ?int $messenger_retry_strategy_delay       = 1000;
+    public ?int $messenger_retry_strategy_multiplier  = 2;
+    public ?int $messenger_retry_strategy_max_delay   = 0;
+
     public function __construct(Session $session)
     {
         $user = $session->get('mautic.installer.user');

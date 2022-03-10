@@ -772,5 +772,9 @@ return [
         'mailer_mailjet_sandbox_default_mail' => null,
         'disable_trackable_urls'              => false,
         'theme_email_default'                 => 'blank',
+        'messenger_retry_strategy_max_retries'=> 3,
+        'messenger_retry_strategy_delay'      => 1000,
+        'messenger_retry_strategy_multiplier' => 2,
+        'messenger_retry_strategy_max_delay'  => 0,
     ],
 ];

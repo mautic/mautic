@@ -106,6 +106,26 @@ $template  = '<div class="col-md-6">{content}</div>';
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_messenger_tls', $template); ?>
             </div>
+
+            <?php if (isset($fields['mailer_transport'])): ?>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.mailer.messenger.retry_strategy'); ?></h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <?php echo $view['form']->rowIfExists($fields, 'messenger_retry_strategy_max_retries', $template); ?>
+                            <?php echo $view['form']->rowIfExists($fields, 'messenger_retry_strategy_delay', $template); ?>
+                        </div>
+                        <div class="col-md-6">
+                            <?php echo $view['form']->rowIfExists($fields, 'messenger_retry_strategy_multiplier', $template); ?>
+                            <?php echo $view['form']->rowIfExists($fields, 'messenger_retry_strategy_max_delay', $template); ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 <?php endif; ?>
