@@ -465,9 +465,9 @@ class InstallService
 
         $encoder = $this->encoder;
 
-        $user->setFirstName(InputHelper::filter($data['firstname']));
-        $user->setLastName(InputHelper::filter($data['lastname']));
-        $user->setUsername(InputHelper::filter($data['username']));
+        $user->setFirstName(InputHelper::clean($data['firstname']));
+        $user->setLastName(InputHelper::clean($data['lastname']));
+        $user->setUsername(InputHelper::clean($data['username']));
         $user->setEmail(InputHelper::email($data['email']));
         $user->setPassword($encoder->encodePassword($user, $data['password']));
 
