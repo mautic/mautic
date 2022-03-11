@@ -117,6 +117,7 @@ $dbalSettings = [
         'bit'   => 'string',
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
+    'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
 ];
 
 $container->loadFromExtension('doctrine', [
@@ -320,15 +321,12 @@ $container->loadFromExtension('fm_elfinder', [
                 ],
                 'roots' => [
                     'local' => [
-                        'driver'    => 'Flysystem',
-                        'path'      => '',
-                        'flysystem' => [
-                            'type'    => 'local',
-                            'options' => [
-                                'local' => [
-                                    'path' => '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
-                                ],
-                            ],
+                        'driver'        => 'Flysystem',
+                        'path'          => '',
+                        'flysystem'     => [
+                            'type'            => 'custom',
+                            'adapter_service' => 'mautic.core.service.local_file_adapter',
+                            'options'         => [],
                         ],
                         'upload_allow'  => ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
                         'upload_deny'   => ['all'],

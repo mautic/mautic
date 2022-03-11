@@ -33,7 +33,6 @@ use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Form\Type\ListType;
-use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
@@ -64,6 +63,11 @@ class ListModel extends FormModel
      * @var ContactSegmentService
      */
     private $leadSegmentService;
+
+    /**
+     * @var mixed[]
+     */
+    private $choiceFieldsCache = [];
 
     /**
      * @var SegmentChartQueryFactory
@@ -275,62 +279,30 @@ class ListModel extends FormModel
      */
     public function getChoiceFields()
     {
+        if ($this->choiceFieldsCache) {
+            return $this->choiceFieldsCache;
+        }
+
         $choices = [];
 
-        //get list of custom fields
-        $fields = $this->em->getRepository(LeadField::class)->getEntities(
+        $choices['lead']['tags'] =
             [
-                'filter' => [
-                    'where'         => [
-                        [
-                            'expr' => 'eq',
-                            'col'  => 'f.isListable',
-                            'val'  => true,
-                        ],
-                        [
-                            'expr' => 'eq',
-                            'col'  => 'f.isPublished',
-                            'val'  => true,
-                        ],
-                    ],
+                'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
+                'properties' => [
+                    'type' => 'tags',
                 ],
-            ]
-        );
-        foreach ($fields as $field) {
-            $type               = $field->getType();
-            $properties         = $field->getProperties();
-            $properties['type'] = $type;
-            if (in_array($type, ['select', 'multiselect', 'boolean'])) {
-                if ('boolean' == $type) {
-                    //create a lookup list with ID
-                    $properties['list'] = [
-                        0 => $properties['no'],
-                        1 => $properties['yes'],
-                    ];
-                } else {
-                    $properties['callback'] = 'activateLeadFieldTypeahead';
-                    $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(
-                        FormFieldHelper::FORMAT_ARRAY,
-                        FormFieldHelper::parseList($properties['list'])
-                    ) : '';
-                }
-            }
-            $choices[$field->getObject()][$field->getAlias()] = [
-                'label'      => $field->getLabel(),
-                'properties' => $properties,
-                'object'     => $field->getObject(),
+                'operators'  => $this->getOperatorsForFieldType('multiselect'),
+                'object'     => 'lead',
             ];
-
-            $choices[$field->getObject()][$field->getAlias()]['operators'] = $this->getOperatorsForFieldType($type);
-        }
 
         // Add custom choices
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
-            $event = new LeadListFiltersChoicesEvent($choices, $this->getOperatorsForFieldType(), $this->translator, $this->requestStack->getCurrentRequest());
+            $event = new LeadListFiltersChoicesEvent([], $this->getOperatorsForFieldType(), $this->translator, $this->requestStack->getCurrentRequest());
             $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE, $event);
             $choices = $event->getChoices();
         }
 
+        // Order choices by label.
         foreach ($choices as $key => $choice) {
             $cmp = function ($a, $b) {
                 return strcmp($a['label'], $b['label']);
@@ -338,6 +310,8 @@ class ListModel extends FormModel
             uasort($choice, $cmp);
             $choices[$key] = $choice;
         }
+
+        $this->choiceFieldsCache = $choices;
 
         return $choices;
     }
@@ -1231,7 +1205,7 @@ class ListModel extends FormModel
         ];
         $entities = $this->getEntities(
             [
-                'filter'     => $filter,
+                'filter' => $filter,
             ]
         );
         $dependents = [];
@@ -1239,7 +1213,9 @@ class ListModel extends FormModel
         foreach ($entities as $entity) {
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {
-                if ('leadlist' === $eachFilter['type'] && in_array($segmentId, $eachFilter['filter'])) {
+                // BC support for old filters where the field existed outside of properties.
+                $filter = $eachFilter['properties']['filter'] ?? $eachFilter['filter'];
+                if ($filter && 'leadlist' === $eachFilter['type'] && in_array($segmentId, $filter)) {
                     if ($returnProperty && $value = $accessor->getValue($entity, $returnProperty)) {
                         $dependents[] = $value;
                     } else {
@@ -1262,15 +1238,13 @@ class ListModel extends FormModel
      */
     public function canNotBeDeleted($segmentIds)
     {
-        $filter = [
-            'force'  => [
-                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],
-            ],
-        ];
-
         $entities = $this->getEntities(
             [
-                'filter'     => $filter,
+                'filter' => [
+                    'force'  => [
+                        ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],
+                    ],
+                ],
             ]
         );
 
@@ -1286,7 +1260,9 @@ class ListModel extends FormModel
                 }
 
                 $idsNotToBeDeleted = array_unique(array_merge($idsNotToBeDeleted, $eachFilter['filter']));
-                foreach ($eachFilter['filter'] as $val) {
+                $bcFilterValue     = $eachFilter['filter'] ?? [];
+                $filterValue       = $eachFilter['properties']['filter'] ?? $bcFilterValue;
+                foreach ($filterValue as $val) {
                     if (!empty($dependency[$val])) {
                         $dependency[$val] = array_merge($dependency[$val], [$entity->getId()]);
                         $dependency[$val] = array_unique($dependency[$val]);

@@ -109,7 +109,7 @@ if (!$isEmbedded) {
                                 ['entity' => $entity]
                             ); ?>
                             <tr>
-                                <td width="20%"><span class="fw-b">
+                                <td width="20%"><span class="fw-b textTitle">
                                     <?php echo $view['translator']->trans('mautic.dynamicContent.slot.campaign'); ?>
                                 </td>
                                 <td>
@@ -118,7 +118,7 @@ if (!$isEmbedded) {
                             </tr>
                             <?php if (!$entity->getIsCampaignBased()) : ?>
                             <tr>
-                                <td width="20%"><span class="fw-b">
+                                <td width="20%"><span class="fw-b textTitle">
                                     <?php echo $view['translator']->trans('mautic.dynamicContent.label.slot_name'); ?>
                                 </td>
                                 <td>

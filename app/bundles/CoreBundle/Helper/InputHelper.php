@@ -35,6 +35,31 @@ class InputHelper
     private static $strictHtmlFilter;
 
     /**
+     * Adjust the boolean values from text to boolean.
+     * Do not convert null to false.
+     * Do not convert invalid values to false, but return null.
+     *
+     * @param bool|int|string|null $value
+     *
+     * @return bool|null
+     */
+    public static function boolean($value)
+    {
+        // Common strings used that filter_var does not parse yet.
+        switch (strtoupper((string) $value)) {
+            case 'T':
+            case 'Y':
+                return true;
+
+            case 'F':
+            case 'N':
+                return false;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    }
+
+    /**
      * @param bool $html
      * @param bool $strict
      *
