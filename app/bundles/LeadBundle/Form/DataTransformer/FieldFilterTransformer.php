@@ -59,7 +59,7 @@ class FieldFilterTransformer implements DataTransformerInterface
             if ('datetime' === $f['type']) {
                 $bcFilter = $f['filter'] ?? '';
                 $filter   = $f['properties']['filter'] ?? $bcFilter;
-                if (in_array($filter, $this->relativeDateStrings) or stristr($filter[0], '-') or stristr($filter[0], '+')) {
+                if (empty($filter) || in_array($filter, $this->relativeDateStrings) || stristr($filter[0], '-') || stristr($filter[0], '+')) {
                     continue;
                 }
 
@@ -91,7 +91,7 @@ class FieldFilterTransformer implements DataTransformerInterface
             if ('datetime' == $f['type']) {
                 $bcFilter = $f['filter'] ?? '';
                 $filter   = $f['properties']['filter'] ?? $bcFilter;
-                if (in_array($filter, $this->relativeDateStrings) or stristr($filter[0], '-') or stristr($filter[0], '+')) {
+                if (empty($filter) || in_array($filter, $this->relativeDateStrings) || stristr($filter[0], '-') || stristr($filter[0], '+')) {
                     continue;
                 }
 

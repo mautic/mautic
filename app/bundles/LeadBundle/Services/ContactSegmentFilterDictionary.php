@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\Exception\FilterNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
@@ -146,6 +147,9 @@ class ContactSegmentFilterDictionary
         $this->filters['dnc_unsubscribed_sms']          = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
+        $this->filters['dnc_manual_sms']     = [
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
+        ];
         $this->filters['leadlist']                      = [
             'type' => SegmentReferenceFilterQueryBuilder::getServiceId(),
         ];
@@ -226,10 +230,17 @@ class ContactSegmentFilterDictionary
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
         ];
-        $this->filters['email_id'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table' => 'page_hits',
-            'foreign_field' => 'email_id',
+        $this->filters['email_id'] = [ // kept as email_id for BC
+            'type' => ChannelClickQueryBuilder::getServiceId(),
+        ];
+        $this->filters['email_clicked_link_date'] = [
+            'type' => ChannelClickQueryBuilder::getServiceId(),
+        ];
+        $this->filters['sms_clicked_link'] = [
+            'type'  => ChannelClickQueryBuilder::getServiceId(),
+        ];
+        $this->filters['sms_clicked_link_date'] = [
+            'type'  => ChannelClickQueryBuilder::getServiceId(),
         ];
         $this->filters['sessions']              = [
             'type' => SessionsFilterQueryBuilder::getServiceId(),
