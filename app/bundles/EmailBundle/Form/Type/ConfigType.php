@@ -737,6 +737,59 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'messenger_retry_strategy_max_retries',
+            NumberType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.messenger.retry_strategy.max_retries',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'messenger_retry_strategy_delay',
+            NumberType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.messenger.retry_strategy.delay',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'messenger_retry_strategy_multiplier',
+            NumberType::class,
+            [
+                'scale'      => 0,
+                'label'      => 'mautic.email.config.mailer.messenger.retry_strategy.multiplier',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'messenger_retry_strategy_max_delay',
+            NumberType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.messenger.retry_strategy.max_delay',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+            ]
+        );
+
+        $builder->add(
             'mailer_custom_headers',
             SortableListType::class,
             [

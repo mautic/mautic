@@ -28,6 +28,10 @@ class MessengerDsnConvertor
             return 'sync://';
         }
 
+        if (empty($parameters['mailer_messenger_host'])) {
+            return '';
+        }
+
         return DsnGenerator::getDsnString(
             new Dsn(
                 $parameters['mailer_messenger_type'],

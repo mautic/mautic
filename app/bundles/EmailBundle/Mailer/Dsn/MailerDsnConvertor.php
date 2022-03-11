@@ -35,6 +35,11 @@ class MailerDsnConvertor
 
     public static function convertArrayToDsnString(array $parameters): string
     {
+        $host = self::getDefaultHost($parameters);
+        if (empty($host)) {
+            return '';
+        }
+
         $options = [];
         foreach (self::SUPPORTED_OPTIONS as $option => $parameterName) {
             if (array_key_exists($parameterName, $parameters) && !empty($parameters[$parameterName])) {
@@ -45,7 +50,7 @@ class MailerDsnConvertor
         return DsnGenerator::getDsnString(
             new Dsn(
                 $parameters['mailer_transport'],
-                self::getDefaultHost($parameters),
+                $host,
                 $parameters['mailer_user'],
                 $parameters['mailer_password'],
                 self::getPort($parameters),
