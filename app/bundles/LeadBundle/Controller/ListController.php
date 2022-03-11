@@ -68,7 +68,7 @@ class ListController extends FormController
         $this->setListFilters();
 
         //set limits
-        $limit = $session->get('mautic.segment.limit', $this->coreParametersHelper->get('default_pagelimit'));
+        $limit = $session->get('mautic.lead.list.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -78,8 +78,8 @@ class ListController extends FormController
         $session->set('mautic.segment.filter', $search);
 
         //do some default filtering
-        $orderBy    = $session->get('mautic.segment.orderby', 'l.dateModified');
-        $orderByDir = $session->get('mautic.segment.orderbydir', 'DESC');
+        $orderBy    = $session->get('mautic.lead.list.orderby', 'l.dateModified');
+        $orderByDir = $session->get('mautic.lead.list.orderbydir', $this->getDefaultOrderDirection());
 
         $filter = [
             'string' => $search,
@@ -996,5 +996,10 @@ class ListController extends FormController
             'leadlist_id',
             $listFilters
         );
+    }
+
+    protected function getDefaultOrderDirection()
+    {
+        return 'DESC';
     }
 }
