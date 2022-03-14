@@ -416,7 +416,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 if (!$event->hasGroupBy()) {
-                    $qb->groupBy('es.id');
+                    $qb->groupBy('es.lead_id');
                 }
 
                 break;
