@@ -75,24 +75,6 @@ export default class ButtonService {
   }
 
   /**
-   * Compares two strings and returns an integer value that represents the result of the comparison:
-   *  1 - string 1 less than string 2
-   *  0 - string 1 equal string 2
-   * -1 - string 1 greater than string 2
-   *
-   * @param string1
-   * @param string2
-   *
-   * @returns Integer
-   */
-  static strcmp(string1, string2) {
-    if (string1.toString() < string2.toString()) return -1;
-    if (string1.toString() > string2.toString()) return 1;
-
-    return 0;
-  }
-
-  /**
    * Get the current date
    *
    * @return string
