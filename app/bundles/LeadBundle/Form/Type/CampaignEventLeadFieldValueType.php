@@ -100,7 +100,11 @@ class CampaignEventLeadFieldValueType extends AbstractType
                                 $fieldValues = FormFieldHelper::getCountryChoices();
                                 break;
                             case 'region':
-                                $fieldValues = FormFieldHelper::getRegionChoices();
+                                $fieldValues          = [];
+                                $countriesWithRegions = FormFieldHelper::getRegionChoices();
+                                foreach ($countriesWithRegions as $regions) {
+                                    $fieldValues += $regions;
+                                }
                                 break;
                             case 'timezone':
                                 $fieldValues = FormFieldHelper::getTimezonesChoices();
