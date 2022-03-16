@@ -9,7 +9,9 @@ class EventRepository extends CommonRepository
     /**
      * Get a list of entities.
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @param mixed[] $args
+     *
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<object>|object[]|mixed[]
      */
     public function getEntities(array $args = [])
     {

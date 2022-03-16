@@ -486,7 +486,8 @@ class LeadRepository extends CommonRepository
      * Takes an array of contact ID's and increments
      * their current rotation in a campaign by 1.
      *
-     * @param int $campaignId
+     * @param int[] $contactIds
+     * @param int   $campaignId
      *
      * @return bool
      */

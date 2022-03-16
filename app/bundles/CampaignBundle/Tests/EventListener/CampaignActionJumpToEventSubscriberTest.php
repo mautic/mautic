@@ -41,7 +41,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $leadLog->setLead($contact);
 
         $eventRepository = new class($campaign) extends EventRepository {
-            private $campaign;
+            private Campaign $campaign;
 
             public function __construct(Campaign $campaign)
             {
@@ -85,6 +85,9 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
 
+            /**
+             * @param mixed[] $parameters
+             */
             public function trans($id, array $parameters = [], $domain = null, $locale = null)
             {
                 Assert::assertSame('mautic.campaign.campaign.jump_to_event.target_not_exist', $id);
@@ -147,7 +150,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $leadLog->setLead($contact);
 
         $eventRepository = new class($campaign) extends EventRepository {
-            private $campaign;
+            private Campaign $campaign;
 
             public function __construct(Campaign $campaign)
             {
@@ -214,6 +217,8 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
                 Assert::assertSame([789], $contactIds);
                 Assert::assertSame(111, $campaignId);
+
+                return true;
             }
         };
         $subscriber = new CampaignActionJumpToEventSubscriber(

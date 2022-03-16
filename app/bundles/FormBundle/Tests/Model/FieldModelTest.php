@@ -14,16 +14,16 @@ class FieldModelTest extends TestCase
         $connection = $this->createMock(Connection::class);
 
         $platform = new class() {
-            public function getReservedKeywordsList()
+            public function getReservedKeywordsList(): object
             {
                 return new class() {
-                    public function isKeyword()
+                    public function isKeyword(): void
                     {
                     }
                 };
             }
 
-            public function isKeyword()
+            public function isKeyword(): void
             {
             }
         };

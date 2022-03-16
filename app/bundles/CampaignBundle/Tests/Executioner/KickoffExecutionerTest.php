@@ -82,9 +82,15 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $event    = new Event();
         $event2   = new Event();
         $campaign = new class() extends Campaign {
-            public $rootEvents;
+            /**
+             * @var ArrayCollection<int,Event>
+             */
+            public ArrayCollection $rootEvents;
 
-            public function getRootEvents()
+            /**
+             * @return ArrayCollection<int,Event>
+             */
+            public function getRootEvents(): ArrayCollection
             {
                 return $this->rootEvents;
             }

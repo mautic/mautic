@@ -62,6 +62,9 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
                 return new Response('hi');
             }
 
+            /**
+             * @return ArrayCollection<int,Lead>
+             */
             public function getContacts(Request $request)
             {
                 return new ArrayCollection([new Lead()]);
