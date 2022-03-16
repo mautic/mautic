@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 
 use Doctrine\DBAL\Connection;
@@ -51,6 +42,9 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
         Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
+    /**
+     * @return iterable<array<string>>
+     */
     public function dataApplyQuery(): iterable
     {
         yield ['eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
