@@ -85,7 +85,7 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
 
             public function getDoNotContactParts()
             {
-                return new DoNotContactParts('some');
+                return new DoNotContactParts('dnc_unsubscribed');
             }
 
             public function getOperator()
