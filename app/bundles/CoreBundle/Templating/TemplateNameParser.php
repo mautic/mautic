@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Templating;
 
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser as BaseTemplateNameParser;

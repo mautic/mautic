@@ -1,18 +1,6 @@
 <?php
 
 
-/*
- * @author   "Sebastián Grignoli" <grignoli@gmail.com>
- *
- * @version  2.0
- *
- * @link     https://github.com/neitanod/forceutf8
- *
- * @example  https://github.com/neitanod/forceutf8
- *
- * @license  Revised BSD
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 class UTF8Helper
