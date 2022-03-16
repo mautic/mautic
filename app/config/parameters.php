@@ -1,6 +1,5 @@
 <?php
 
-
 $root = $container->getParameter('kernel.root_dir');
 include __DIR__.'/paths_helper.php';
 

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Deduplicate\Exception;
 
 class ValueNotMergeableException extends \Exception

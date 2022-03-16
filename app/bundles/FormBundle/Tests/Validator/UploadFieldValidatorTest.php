@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\FormBundle\Tests\Validator;
 
 use Mautic\CoreBundle\Exception\FileInvalidException;

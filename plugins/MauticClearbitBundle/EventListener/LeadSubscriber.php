@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticClearbitBundle\EventListener;
 
 use Mautic\LeadBundle\Event\CompanyEvent;

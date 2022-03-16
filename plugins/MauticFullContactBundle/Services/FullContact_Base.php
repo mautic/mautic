@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticFullContactBundle\Services;
 
 use MauticPlugin\MauticFullContactBundle\Exception\NoCreditException;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Event;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;

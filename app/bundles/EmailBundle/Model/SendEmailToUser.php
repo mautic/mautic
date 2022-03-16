@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Model;
 
 use Doctrine\ORM\ORMException;

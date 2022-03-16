@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Integration;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;

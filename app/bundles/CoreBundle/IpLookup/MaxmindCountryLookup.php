@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\IpLookup;
 
 class MaxmindCountryLookup extends AbstractMaxmindLookup

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;

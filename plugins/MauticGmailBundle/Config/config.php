@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'name'        => 'Gmail',
     'description' => 'Enables integrations with Gmail for email tracking',

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;

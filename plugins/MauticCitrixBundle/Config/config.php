@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'name'        => 'Citrix',
     'description' => 'Enables integration with Mautic supported Citrix collaboration products.',

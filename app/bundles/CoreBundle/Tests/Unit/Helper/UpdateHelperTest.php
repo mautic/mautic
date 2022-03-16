@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use GuzzleHttp\Client;

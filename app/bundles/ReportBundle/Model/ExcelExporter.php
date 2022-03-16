@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;

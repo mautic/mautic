@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Swiftmailer\Message;
 
 class MauticMessage extends \Swift_Message

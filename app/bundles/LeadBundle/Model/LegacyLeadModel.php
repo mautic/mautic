@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\LeadBundle\Deduplicate\ContactMerger;

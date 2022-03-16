@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PointBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;

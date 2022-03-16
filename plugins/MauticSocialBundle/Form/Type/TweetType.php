@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;

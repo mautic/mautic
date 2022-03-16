@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Validator\Constraints;
 
 use Mautic\LeadBundle\Helper\FormFieldHelper;

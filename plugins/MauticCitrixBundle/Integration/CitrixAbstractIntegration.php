@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCitrixBundle\Integration;
 
 use Mautic\PluginBundle\Entity\Integration;

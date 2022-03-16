@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Executioner\Scheduler;
 
 use Doctrine\Common\Collections\ArrayCollection;

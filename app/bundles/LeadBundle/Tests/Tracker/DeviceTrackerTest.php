@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Tests\Tracker;
 
 use Mautic\CacheBundle\Cache\CacheProvider;

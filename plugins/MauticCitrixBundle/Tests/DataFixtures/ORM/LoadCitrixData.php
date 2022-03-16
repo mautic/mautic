@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCitrixBundle\Tests\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;

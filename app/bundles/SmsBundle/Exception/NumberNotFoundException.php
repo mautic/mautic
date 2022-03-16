@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Exception;
 
 use Throwable;

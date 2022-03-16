@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\CacheStorageHelper;

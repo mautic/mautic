@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\NotificationBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\CategoryNotFound;

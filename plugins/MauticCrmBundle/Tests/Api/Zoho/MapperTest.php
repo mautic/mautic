@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Api\Zoho;
 
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;

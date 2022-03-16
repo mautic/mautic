@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticFullContactBundle\EventListener;
 
 use Mautic\LeadBundle\Event\CompanyEvent;

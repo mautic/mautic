@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Facade;
 
 use Mautic\EmailBundle\Swiftmailer\SwiftmailerFacadeInterface;

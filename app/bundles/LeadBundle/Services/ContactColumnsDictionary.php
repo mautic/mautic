@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Services;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

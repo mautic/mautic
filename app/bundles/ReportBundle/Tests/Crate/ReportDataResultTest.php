@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Tests\Crate;
 
 use Mautic\ReportBundle\Crate\ReportDataResult;

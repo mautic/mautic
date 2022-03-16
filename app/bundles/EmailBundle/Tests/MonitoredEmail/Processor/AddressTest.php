@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Mautic\EmailBundle\MonitoredEmail\Processor\Address;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\FormBundle\Entity\FormRepository;

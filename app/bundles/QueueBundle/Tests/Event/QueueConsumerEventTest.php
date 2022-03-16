@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\QueueBundle\Tests\Event;
 
 use Mautic\QueueBundle\Event\QueueConsumerEvent;

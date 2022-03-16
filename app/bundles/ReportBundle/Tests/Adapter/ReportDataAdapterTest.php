@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Tests\Adapter;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

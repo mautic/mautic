@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\StatsBundle\Aggregate;
 
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;

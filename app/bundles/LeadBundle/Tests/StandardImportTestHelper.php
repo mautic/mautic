@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Tests;
 
 use Mautic\CoreBundle\Helper\UserHelper;

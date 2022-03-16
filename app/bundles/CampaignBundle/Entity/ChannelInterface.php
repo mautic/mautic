@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Entity;
 
 interface ChannelInterface

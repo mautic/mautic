@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 // This is loaded by \Mautic\CoreBundle\DependencyInjection\MauticCoreExtension to auto-wire Commands

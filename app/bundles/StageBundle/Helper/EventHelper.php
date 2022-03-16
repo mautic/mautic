@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\StageBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Lead;

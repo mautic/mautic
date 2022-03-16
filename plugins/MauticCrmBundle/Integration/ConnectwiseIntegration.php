@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;

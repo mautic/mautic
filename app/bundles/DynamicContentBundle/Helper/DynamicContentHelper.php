@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\DynamicContentBundle\Helper;
 
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\StageBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;

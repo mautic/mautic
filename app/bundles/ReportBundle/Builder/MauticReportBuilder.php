@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Builder;
 
 use Doctrine\DBAL\Connection;

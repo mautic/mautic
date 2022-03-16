@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\QueueBundle\Tests;
 
 use Leezy\PheanstalkBundle\DependencyInjection\LeezyPheanstalkExtension;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\AssetBundle\Controller;
 
 use Gaufrette\Filesystem;

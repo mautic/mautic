@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Exception;
 
 use Mautic\CoreBundle\Exception\InvalidValueException;

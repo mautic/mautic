@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PageBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;

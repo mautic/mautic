@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\DependencyInjection\Firewall\Factory;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;

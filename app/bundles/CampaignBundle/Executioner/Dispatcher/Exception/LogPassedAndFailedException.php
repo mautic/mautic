@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Executioner\Dispatcher\Exception;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;

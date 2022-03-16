@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticOutlookBundle\Integration;
 
 use Mautic\CoreBundle\Helper\UrlHelper;

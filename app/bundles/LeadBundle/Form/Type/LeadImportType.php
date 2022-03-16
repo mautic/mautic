@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Validator\Constraints\FileEncoding as EncodingValidation;

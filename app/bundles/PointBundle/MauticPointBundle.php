@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PointBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;

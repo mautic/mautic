@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Callback;
 
 use Doctrine\Common\Collections\ArrayCollection;

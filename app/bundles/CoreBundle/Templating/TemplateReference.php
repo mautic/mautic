@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Templating;
 
 use Mautic\CoreBundle\Helper\PathsHelper;

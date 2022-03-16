@@ -1,6 +1,5 @@
 <?php
 
-
 use Symfony\Component\Routing\RouteCollection;
 
 //loads Mautic's custom routing in src/Mautic/BaseBundle/Routing/MauticLoader.php which

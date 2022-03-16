@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ApiBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;

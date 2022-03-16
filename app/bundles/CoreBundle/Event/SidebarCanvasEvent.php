@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Helper\Language;
 
 use Symfony\Component\Filesystem\Filesystem;

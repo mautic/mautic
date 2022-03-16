@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection;
 
 use Mautic\StatsBundle\Aggregate\Collector;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Service;
 
 use Mautic\CoreBundle\Model\NotificationModel;

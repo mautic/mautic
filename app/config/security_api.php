@@ -1,7 +1,5 @@
 <?php
 
-
-//oAuth 2.0
 $container->loadFromExtension('fos_oauth_server', [
     'db_driver'           => 'orm',
     'client_class'        => 'Mautic\ApiBundle\Entity\oAuth2\Client',

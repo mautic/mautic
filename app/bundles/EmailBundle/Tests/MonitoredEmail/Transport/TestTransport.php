@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Transport;
 
 use Mautic\EmailBundle\MonitoredEmail\Message;

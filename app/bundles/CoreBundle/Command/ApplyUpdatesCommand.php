@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Exception\UpdateFailedException;

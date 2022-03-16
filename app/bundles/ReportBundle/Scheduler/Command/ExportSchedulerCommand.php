@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Scheduler\Command;
 
 use Mautic\ReportBundle\Exception\FileIOException;

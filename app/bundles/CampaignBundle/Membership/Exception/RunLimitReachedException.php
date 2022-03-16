@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Membership\Exception;
 
 class RunLimitReachedException extends \Exception

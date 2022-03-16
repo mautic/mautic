@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\WebhookBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;

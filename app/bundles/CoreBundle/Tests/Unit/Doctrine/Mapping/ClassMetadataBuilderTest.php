@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Mapping;
 
 use Doctrine\DBAL\Types\Types;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\AssetBundle\Model;
 
 use Doctrine\ORM\PersistentCollection;

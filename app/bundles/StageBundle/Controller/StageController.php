@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\StageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;

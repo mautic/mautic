@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\QueueBundle\Helper;
 
 use OldSound\RabbitMqBundle\RabbitMq\Producer;

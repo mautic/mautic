@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\Stat;
 
 use Mautic\EmailBundle\Entity\Email;

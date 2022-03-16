@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticClearbitBundle\Integration;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;

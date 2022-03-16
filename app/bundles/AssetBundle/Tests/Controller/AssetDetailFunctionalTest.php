@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;

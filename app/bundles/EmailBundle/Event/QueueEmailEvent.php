@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;

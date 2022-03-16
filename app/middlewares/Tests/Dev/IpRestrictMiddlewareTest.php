@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\Middleware\Tests\Dev;
 
 use Mautic\Middleware\Dev\IpRestrictMiddleware;

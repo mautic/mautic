@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;

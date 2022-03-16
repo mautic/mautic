@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticFocusBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;

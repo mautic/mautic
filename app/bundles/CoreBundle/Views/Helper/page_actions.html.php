@@ -1,6 +1,5 @@
 <?php
 
-
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 
 if (!isset($item)) {

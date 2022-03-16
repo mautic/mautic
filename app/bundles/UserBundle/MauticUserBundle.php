@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle;
 
 use Mautic\UserBundle\DependencyInjection\Firewall\Factory\PluginFactory;

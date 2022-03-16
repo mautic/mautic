@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;

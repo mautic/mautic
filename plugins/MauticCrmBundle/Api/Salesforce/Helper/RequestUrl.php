@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCrmBundle\Api\Salesforce\Helper;
 
 /**

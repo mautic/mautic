@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
 use Mautic\PluginBundle\Model\IntegrationEntityModel;

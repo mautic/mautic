@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;

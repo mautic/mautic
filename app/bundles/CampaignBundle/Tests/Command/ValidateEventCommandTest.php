@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Tests\Command;
 
 class ValidateEventCommandTest extends AbstractCampaignCommand

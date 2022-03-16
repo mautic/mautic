@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\ConstantContactType;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Entity\Integration;

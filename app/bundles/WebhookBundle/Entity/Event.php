@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;

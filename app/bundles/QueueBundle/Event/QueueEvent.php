@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\QueueBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Test\Session;
 
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Segment;
 
 use Symfony\Component\Translation\TranslatorInterface;

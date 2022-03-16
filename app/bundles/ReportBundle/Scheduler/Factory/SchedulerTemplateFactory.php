@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Scheduler\Factory;
 
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerDailyBuilder;

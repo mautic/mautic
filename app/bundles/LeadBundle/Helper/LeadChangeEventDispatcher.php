@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\LeadBundle\Entity\DoNotContact;

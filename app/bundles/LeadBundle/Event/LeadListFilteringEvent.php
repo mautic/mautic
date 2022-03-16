@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Event;
 
 use Doctrine\DBAL\Query\QueryBuilder;

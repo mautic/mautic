@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Helper;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;

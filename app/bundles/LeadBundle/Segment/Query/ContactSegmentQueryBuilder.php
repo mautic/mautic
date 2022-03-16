@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;

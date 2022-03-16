@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Callback;
 
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\CallbackEnum;

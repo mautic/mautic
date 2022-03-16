@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Api;
 
 use Mautic\SmsBundle\Integration\Twilio\TwilioTransport;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Model;
 
 use Debril\RssAtomBundle\Protocol\Parser\Item;

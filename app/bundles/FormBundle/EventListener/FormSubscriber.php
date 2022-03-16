@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\FormBundle\EventListener;
 
 use GuzzleHttp\Client;

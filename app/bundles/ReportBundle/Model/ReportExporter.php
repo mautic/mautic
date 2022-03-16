@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\ReportBundle\Adapter\ReportDataAdapter;

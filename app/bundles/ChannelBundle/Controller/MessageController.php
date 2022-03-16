@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ChannelBundle\Controller;
 
 use Mautic\ChannelBundle\Entity\Channel;

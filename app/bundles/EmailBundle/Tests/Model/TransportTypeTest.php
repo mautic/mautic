@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Mautic\EmailBundle\Model\TransportType;

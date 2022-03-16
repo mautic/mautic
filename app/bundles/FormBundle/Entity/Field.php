@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;

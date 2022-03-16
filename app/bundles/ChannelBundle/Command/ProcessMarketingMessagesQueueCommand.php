@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ChannelBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;

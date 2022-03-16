@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ApiBundle\Serializer\Driver;
 
 use JMS\Serializer\Metadata\ClassMetadata;

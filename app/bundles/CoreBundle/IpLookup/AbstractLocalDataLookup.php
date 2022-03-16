@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\IpLookup;
 
 use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;

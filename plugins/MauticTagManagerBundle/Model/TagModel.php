@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticTagManagerBundle\Model;
 
 use Mautic\LeadBundle\Model\TagModel as BaseTagModel;

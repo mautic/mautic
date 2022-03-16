@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Security\Authenticator;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\WebhookBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\SortableListType;

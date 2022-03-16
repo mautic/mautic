@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticFocusBundle\Event;
 
 use MauticPlugin\MauticFocusBundle\Entity\Stat;

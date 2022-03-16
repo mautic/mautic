@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Update\Step;
 
 use Symfony\Component\Console\Helper\ProgressBar;

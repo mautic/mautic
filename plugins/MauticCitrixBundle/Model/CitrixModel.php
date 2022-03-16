@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCitrixBundle\Model;
 
 use Mautic\CampaignBundle\Model\EventModel;

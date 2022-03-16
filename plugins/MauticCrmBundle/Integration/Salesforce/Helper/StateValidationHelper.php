@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce\Helper;
 
 class StateValidationHelper

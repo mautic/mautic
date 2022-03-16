@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Segment\Stat;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;

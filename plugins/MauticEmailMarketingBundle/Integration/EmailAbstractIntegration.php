@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;

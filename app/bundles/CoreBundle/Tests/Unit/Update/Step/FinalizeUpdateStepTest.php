@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Helper\AppVersion;

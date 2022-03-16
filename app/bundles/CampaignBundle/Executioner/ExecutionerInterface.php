@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Executioner;
 
 use Mautic\CampaignBundle\Entity\Campaign;

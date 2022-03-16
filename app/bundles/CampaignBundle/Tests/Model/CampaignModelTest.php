@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Tests\Model;
 
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;

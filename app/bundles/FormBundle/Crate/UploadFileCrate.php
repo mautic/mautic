@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\FormBundle\Crate;
 
 use Mautic\FormBundle\Entity\Field;

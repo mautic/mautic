@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
 use Swift_Mime_SimpleMessage;

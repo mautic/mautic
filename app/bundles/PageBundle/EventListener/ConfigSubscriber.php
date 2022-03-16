@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\DashboardBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;

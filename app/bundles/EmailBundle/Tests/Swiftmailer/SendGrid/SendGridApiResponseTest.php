@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid;
 
 use Mautic\EmailBundle\Swiftmailer\Exception\SendGridBadLoginException;

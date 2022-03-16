@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PluginBundle\Facade;
 
 use Mautic\PluginBundle\Helper\ReloadHelper;

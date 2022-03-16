@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Templating\Engine;
 
 use Mautic\CoreBundle\CoreEvents;

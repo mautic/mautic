@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Segment\Stat;
 
 use Doctrine\ORM\EntityManager;

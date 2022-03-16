@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\FormBundle\Model;
 
 use DOMDocument;

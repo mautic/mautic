@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember;
 
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Contact;

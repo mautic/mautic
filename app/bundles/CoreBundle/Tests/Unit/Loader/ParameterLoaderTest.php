@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Loader;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;

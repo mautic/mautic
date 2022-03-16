@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\InstallBundle\Tests\Command;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;

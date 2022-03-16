@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ChannelBundle\Event;
 
 use Symfony\Component\Console\Output\OutputInterface;

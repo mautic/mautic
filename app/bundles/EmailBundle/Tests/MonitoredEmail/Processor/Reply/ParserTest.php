@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Reply;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\ReplyNotFound;

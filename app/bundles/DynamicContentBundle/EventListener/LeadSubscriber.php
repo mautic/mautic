@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\DynamicContentBundle\Entity\StatRepository;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Language;
 
 use Mautic\CoreBundle\Helper\Language\Installer;

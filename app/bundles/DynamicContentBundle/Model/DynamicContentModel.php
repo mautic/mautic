@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\DynamicContentBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;

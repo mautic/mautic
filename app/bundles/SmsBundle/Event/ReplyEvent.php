@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;

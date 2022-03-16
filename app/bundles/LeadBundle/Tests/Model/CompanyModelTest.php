@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\EmailBundle\Helper\EmailValidator;

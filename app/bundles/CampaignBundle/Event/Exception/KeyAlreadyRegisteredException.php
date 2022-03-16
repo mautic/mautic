@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Event\Exception;
 
 use Symfony\Component\Process\Exception\InvalidArgumentException;

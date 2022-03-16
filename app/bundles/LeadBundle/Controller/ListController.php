@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;

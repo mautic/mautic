@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Form\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;

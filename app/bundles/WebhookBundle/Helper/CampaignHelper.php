@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\WebhookBundle\Helper;
 
 use Doctrine\Common\Collections\Collection;

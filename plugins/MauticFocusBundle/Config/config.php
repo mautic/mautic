@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'name'        => 'Mautic Focus',
     'description' => 'Drive visitor\'s focus on your website with Mautic Focus',

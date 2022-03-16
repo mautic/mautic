@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;

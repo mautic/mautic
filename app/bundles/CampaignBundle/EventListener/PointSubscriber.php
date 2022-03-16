@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType;

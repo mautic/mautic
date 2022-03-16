@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\DashboardBundle\Model;
 
 use Mautic\CoreBundle\Helper\CacheStorageHelper;

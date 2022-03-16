@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PageBundle\Helper;
 
 use Mautic\PageBundle\Model\PageModel;

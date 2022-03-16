@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Helper;
 
 use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;

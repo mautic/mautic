@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\Swiftmailer\Momentum\Callback;
 
 use Mautic\EmailBundle\Model\TransportCallback;

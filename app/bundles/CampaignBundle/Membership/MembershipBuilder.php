@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Membership;
 
 use Mautic\CampaignBundle\Entity\Campaign;

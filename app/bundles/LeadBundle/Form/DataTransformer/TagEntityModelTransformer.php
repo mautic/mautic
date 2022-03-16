@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Form\DataTransformer;
 
 use Doctrine\ORM\EntityManager;

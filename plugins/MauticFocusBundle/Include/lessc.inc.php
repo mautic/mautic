@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * The LESS compiler and parser.
  *

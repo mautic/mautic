@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PluginBundle\Command;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;

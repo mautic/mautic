@@ -1,6 +1,5 @@
 <?php
 
-
 $listType = '';
 if (isset($field['customParameters']['listType'])) {
     $listType = $field['customParameters']['listType'];

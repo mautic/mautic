@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use PHPUnit\Framework\MockObject\MockObject;

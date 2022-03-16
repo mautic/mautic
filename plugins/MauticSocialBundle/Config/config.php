@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'name'        => 'Social Media',
     'description' => 'Enables integrations with Mautic supported social media services.',

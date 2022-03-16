@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\Middleware;
 
 use Symfony\Component\HttpFoundation\Request;

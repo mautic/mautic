@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PluginBundle\Tests;
 
 use Doctrine\ORM\EntityManager;

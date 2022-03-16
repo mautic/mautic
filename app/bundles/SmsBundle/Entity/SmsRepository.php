@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\ORM\Query;

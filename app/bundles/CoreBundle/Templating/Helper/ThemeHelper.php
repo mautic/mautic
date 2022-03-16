@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Exception\BadConfigurationException;

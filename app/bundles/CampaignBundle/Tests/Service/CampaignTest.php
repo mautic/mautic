@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Tests\Service;
 
 use Mautic\CampaignBundle\Entity\CampaignRepository;

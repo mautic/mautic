@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\WebhookBundle\Form\Type;
 
 use Doctrine\Common\Collections\Criteria;

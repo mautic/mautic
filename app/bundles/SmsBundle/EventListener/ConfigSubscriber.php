@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;

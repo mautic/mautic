@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\AssetBundle\Helper;
 
 use Mautic\AssetBundle\Model\AssetModel;

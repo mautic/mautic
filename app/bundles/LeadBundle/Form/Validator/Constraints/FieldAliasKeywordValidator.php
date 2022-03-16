@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Doctrine\ORM\EntityManager;

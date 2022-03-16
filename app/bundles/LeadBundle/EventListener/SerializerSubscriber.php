@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\EventListener;
 
 use JMS\Serializer\EventDispatcher\Events;

@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;

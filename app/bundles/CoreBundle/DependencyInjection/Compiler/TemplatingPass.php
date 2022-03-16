@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Mautic\CoreBundle\Templating\Engine\PhpEngine;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Executioner\Helper;
 
 use Mautic\CampaignBundle\Entity\Event;

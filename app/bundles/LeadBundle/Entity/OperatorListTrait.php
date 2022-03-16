@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\LeadBundle\Segment\OperatorOptions;

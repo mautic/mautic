@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\DependencyInjection\EnvProcessor;
 
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;

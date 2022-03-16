@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ApiBundle\Security\OAuth2\Firewall;
 
 /**

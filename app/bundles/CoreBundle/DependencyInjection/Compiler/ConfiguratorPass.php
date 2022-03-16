@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

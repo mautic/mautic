@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ApiBundle;
 
 use Mautic\ApiBundle\DependencyInjection\Compiler\SerializerPass;

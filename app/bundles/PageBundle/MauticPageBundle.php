@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PageBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;

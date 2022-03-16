@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Tracker\Service\DeviceTrackingService;
 
 use Mautic\LeadBundle\Entity\LeadDevice;

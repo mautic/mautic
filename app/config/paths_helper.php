@@ -1,7 +1,5 @@
 <?php
 
-
-// Include local paths
 include 'paths.php';
 
 // Closure to replace %kernel.root_dir% placeholders

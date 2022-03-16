@@ -1,7 +1,5 @@
 <?php
 
-
-// Defaults
 $appendAttribute = function (&$attributes, $attributeName, $append) {
     if (false === stripos($attributes, "{$attributeName}=")) {
         $attributes .= ' '.$attributeName.'="'.$append.'"';

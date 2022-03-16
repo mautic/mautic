@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticFocusBundle\Helper;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Scheduler\Validator;
 
 use Symfony\Component\Validator\Constraint;

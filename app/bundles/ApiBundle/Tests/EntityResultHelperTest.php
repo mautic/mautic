@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ApiBundle\Tests;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;

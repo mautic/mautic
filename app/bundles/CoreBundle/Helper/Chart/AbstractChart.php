@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\ColorHelper;

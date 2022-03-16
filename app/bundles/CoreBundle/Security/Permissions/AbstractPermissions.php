@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Security\Permissions;
 
 use Mautic\UserBundle\Form\Type\PermissionListType;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Search;
 
 use Mautic\EmailBundle\Entity\Email;

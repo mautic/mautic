@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Integration\Twilio;
 
 use Mautic\SmsBundle\Callback\CallbackInterface;

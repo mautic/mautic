@@ -1,6 +1,5 @@
 <?php
 
-
 $container->loadFromExtension(
     'old_sound_rabbit_mq',
     [

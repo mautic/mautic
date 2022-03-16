@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Exception;

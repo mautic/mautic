@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCloudStorageBundle\Integration;
 
 use Aws\S3\S3Client;

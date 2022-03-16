@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Controller\Api;
 
 use Doctrine\ORM\EntityNotFoundException;

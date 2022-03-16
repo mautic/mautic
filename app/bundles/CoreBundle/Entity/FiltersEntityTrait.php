@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Entity;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;

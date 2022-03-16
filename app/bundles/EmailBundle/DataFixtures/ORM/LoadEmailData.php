@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;

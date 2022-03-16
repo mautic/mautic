@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ApiBundle\Model;
 
 use Mautic\ApiBundle\ApiEvents;

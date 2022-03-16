@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CalendarBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;

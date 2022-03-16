@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;

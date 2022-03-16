@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PluginBundle\Exception;
 
 use Mautic\LeadBundle\Entity\Lead;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric;
 
 /**

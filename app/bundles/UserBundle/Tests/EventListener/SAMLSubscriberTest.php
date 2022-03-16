@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

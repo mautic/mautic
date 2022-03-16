@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Broadcast;
 
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;

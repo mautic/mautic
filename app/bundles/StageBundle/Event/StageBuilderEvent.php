@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\StageBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;

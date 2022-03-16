@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Event;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;

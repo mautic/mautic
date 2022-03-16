@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ApiBundle\Serializer\Exclusion;
 
 use JMS\Serializer\Context;

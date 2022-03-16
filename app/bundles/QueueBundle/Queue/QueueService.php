@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\QueueBundle\Queue;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

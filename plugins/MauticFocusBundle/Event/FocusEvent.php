@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticFocusBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;

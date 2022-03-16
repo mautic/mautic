@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Factory;
 
 use Mautic\CoreBundle\Exception\BadConfigurationException;

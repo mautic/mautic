@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ConfigBundle\Mapper;
 
 use Mautic\ConfigBundle\Exception\BadFormConfigException;

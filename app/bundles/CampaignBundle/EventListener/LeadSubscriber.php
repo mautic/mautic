@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Hash;
 
 class UserHash

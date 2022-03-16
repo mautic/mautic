@@ -1,6 +1,5 @@
 <?php
 
-
 $firewalls = [
     'install' => [
         'pattern'   => '^/installer',

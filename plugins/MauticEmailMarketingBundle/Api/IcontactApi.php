@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;

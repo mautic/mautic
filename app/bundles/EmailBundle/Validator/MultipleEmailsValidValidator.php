@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Validator;
 
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;

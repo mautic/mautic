@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\DependencyInjection\Builder\Metadata;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;

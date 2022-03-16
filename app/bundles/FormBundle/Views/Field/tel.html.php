@@ -1,6 +1,5 @@
 <?php
 
-
 echo $view->render(
     'MauticFormBundle:Field:text.html.php',
     [

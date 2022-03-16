@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CategoryBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;

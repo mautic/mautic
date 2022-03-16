@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticFullContactBundle\Helper;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;

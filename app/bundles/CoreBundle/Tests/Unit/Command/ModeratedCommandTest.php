@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;

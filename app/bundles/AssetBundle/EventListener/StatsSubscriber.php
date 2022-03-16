@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;

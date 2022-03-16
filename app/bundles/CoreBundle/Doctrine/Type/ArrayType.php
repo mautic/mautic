@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Doctrine\Type;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Tracker;
 
 use Mautic\CoreBundle\Entity\IpAddress;

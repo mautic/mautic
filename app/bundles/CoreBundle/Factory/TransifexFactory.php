@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Factory;
 
 use Http\Factory\Guzzle\RequestFactory;

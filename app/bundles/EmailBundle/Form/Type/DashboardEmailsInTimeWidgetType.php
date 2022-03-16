@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CampaignBundle\Form\Type\CampaignListType;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Update;
 
 use Mautic\CoreBundle\Update\Step\StepInterface;

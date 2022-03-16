@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\IpLookup;
 
 abstract class AbstractRemoteDataLookup extends AbstractLookup

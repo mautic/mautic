@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Tests\EventListener;
 
 use Mautic\ReportBundle\Entity\Report;

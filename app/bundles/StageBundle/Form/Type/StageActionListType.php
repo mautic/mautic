@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\StageBundle\Form\Type;
 
 use Mautic\StageBundle\Model\StageModel;

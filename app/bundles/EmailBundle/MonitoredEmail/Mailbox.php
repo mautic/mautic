@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\MonitoredEmail;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

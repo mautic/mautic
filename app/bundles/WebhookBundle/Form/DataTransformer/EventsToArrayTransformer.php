@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\WebhookBundle\Form\DataTransformer;
 
 use Doctrine\ORM\PersistentCollection;

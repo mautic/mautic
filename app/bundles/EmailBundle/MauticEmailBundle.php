@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle;
 
 use Mautic\EmailBundle\DependencyInjection\Compiler\EmailTransportPass;

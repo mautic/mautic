@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\Middleware\ConfigAwareTrait;

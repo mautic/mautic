@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Tests\Entity;
 
 use Mautic\UserBundle\Entity\User;

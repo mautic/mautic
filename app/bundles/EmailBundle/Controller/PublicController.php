@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;

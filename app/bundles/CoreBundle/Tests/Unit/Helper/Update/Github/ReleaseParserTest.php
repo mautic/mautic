@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Update\Github;
 
 use GuzzleHttp\Client;

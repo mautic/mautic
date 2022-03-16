@@ -1,6 +1,5 @@
 <?php
 
-
 $details = $event['details'];
 $type    = $event['eventType'];
 $text    = '';

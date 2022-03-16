@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Exception;
 
 class InvalidDecodedStringException extends \InvalidArgumentException

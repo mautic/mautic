@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;

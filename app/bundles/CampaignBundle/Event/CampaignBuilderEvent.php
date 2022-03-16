@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Event\Exception\KeyAlreadyRegisteredException;

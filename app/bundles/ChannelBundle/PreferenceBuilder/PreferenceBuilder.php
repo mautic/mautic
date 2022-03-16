@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ChannelBundle\PreferenceBuilder;
 
 use Doctrine\Common\Collections\ArrayCollection;

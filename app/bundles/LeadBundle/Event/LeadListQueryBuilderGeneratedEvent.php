@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\LeadList;

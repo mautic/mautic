@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Test\EventListener;
 
 use Doctrine\DBAL\Connection;

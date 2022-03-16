@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Form\DataTransformer;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;

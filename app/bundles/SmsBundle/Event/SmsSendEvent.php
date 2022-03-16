@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;

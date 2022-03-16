@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCloudStorageBundle\EventListener;
 
 use Mautic\AssetBundle\AssetEvents;

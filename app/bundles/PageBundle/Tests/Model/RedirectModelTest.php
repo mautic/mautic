@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PageBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\UrlHelper;

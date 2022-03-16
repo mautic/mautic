@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\AssetBundle\Controller;
 
 use Oneup\UploaderBundle\Controller\DropzoneController;

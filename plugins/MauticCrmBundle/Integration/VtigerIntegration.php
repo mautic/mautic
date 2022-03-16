@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

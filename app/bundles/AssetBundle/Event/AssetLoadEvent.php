@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\AssetBundle\Event;
 
 use Mautic\AssetBundle\Entity\Download;

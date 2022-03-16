@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Broadcast;
 
 use Doctrine\ORM\EntityManager;

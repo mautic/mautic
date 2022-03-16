@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticClearbitBundle\Helper;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;

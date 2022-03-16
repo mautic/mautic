@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType;

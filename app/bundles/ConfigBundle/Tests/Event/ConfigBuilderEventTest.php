@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ConfigBundle\Tests\Event;
 
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;

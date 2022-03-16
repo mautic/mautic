@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\StatsBundle\Aggregate\Collection;
 
 use DateTime;

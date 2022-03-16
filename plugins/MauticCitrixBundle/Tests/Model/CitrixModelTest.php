@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCitrixBundle\Tests\Model;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;

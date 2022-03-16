@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\DashboardBundle\Tests\Entity;
 
 use Mautic\DashboardBundle\Entity\Widget;

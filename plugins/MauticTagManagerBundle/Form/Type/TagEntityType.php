@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticTagManagerBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;

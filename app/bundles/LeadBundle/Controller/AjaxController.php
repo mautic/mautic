@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CampaignBundle\Membership\MembershipManager;

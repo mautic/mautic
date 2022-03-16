@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticFullContactBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;

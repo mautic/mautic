@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Tests\EventCollector\Accessor;
 
 use Mautic\CampaignBundle\Entity\Event;

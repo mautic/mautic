@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Scheduler\Builder;
 
 use Mautic\ReportBundle\Scheduler\BuilderInterface;

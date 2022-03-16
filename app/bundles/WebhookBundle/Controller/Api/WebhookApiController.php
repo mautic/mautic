@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\WebhookBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;

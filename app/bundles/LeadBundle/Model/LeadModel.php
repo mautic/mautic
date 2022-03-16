@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\NonUniqueResultException;

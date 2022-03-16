@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;

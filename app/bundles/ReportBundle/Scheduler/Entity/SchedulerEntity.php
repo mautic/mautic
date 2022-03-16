@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Scheduler\Entity;
 
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\FormBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;

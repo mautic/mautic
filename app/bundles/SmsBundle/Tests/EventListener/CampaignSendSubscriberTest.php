@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;

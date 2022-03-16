@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\StageBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;

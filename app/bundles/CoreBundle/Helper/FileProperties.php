@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Exception\FileInvalidException;

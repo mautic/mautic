@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Service;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;

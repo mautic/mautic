@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;

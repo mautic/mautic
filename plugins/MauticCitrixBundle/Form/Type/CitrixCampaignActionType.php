@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCitrixBundle\Form\Type;
 
 use Mautic\EmailBundle\Form\Type\EmailListType;

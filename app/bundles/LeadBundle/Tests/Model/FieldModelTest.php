@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;

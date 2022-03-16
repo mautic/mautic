@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\InstallBundle\Helper;
 
 use Doctrine\DBAL\Connection;

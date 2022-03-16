@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Tests\Event;
 
 use Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType;

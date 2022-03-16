@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PluginBundle\Bundle;
 
 use Doctrine\DBAL\Schema\Schema;

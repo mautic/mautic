@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;

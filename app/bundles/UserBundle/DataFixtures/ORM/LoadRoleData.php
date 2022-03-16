@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\DataFixtures\ORM;
 
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;

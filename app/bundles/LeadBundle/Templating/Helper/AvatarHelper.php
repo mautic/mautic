@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Exception\FileNotFoundException;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\WebhookBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;

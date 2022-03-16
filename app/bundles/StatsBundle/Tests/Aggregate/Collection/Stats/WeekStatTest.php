@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection\Stats;
 
 use Mautic\StatsBundle\Aggregate\Collection\Stats\WeekStat;

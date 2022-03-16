@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Exception\FilePathException;

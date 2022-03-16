@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\NotificationBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;

@@ -1,6 +1,5 @@
 <?php
 
-
 use Mautic\CoreBundle\Helper\InputHelper;
 
 $containerType     = "{$type}grp";

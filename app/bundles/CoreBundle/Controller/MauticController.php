@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;

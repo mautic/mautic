@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;

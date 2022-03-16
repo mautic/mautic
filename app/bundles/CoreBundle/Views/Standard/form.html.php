@@ -1,6 +1,5 @@
 <?php
 
-
 $view->extend('MauticCoreBundle:FormTheme:form_simple.html.php');
 
 // Parse standard fields

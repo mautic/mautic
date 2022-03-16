@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PageBundle\Tests\EventListener;
 
 use DateTime;

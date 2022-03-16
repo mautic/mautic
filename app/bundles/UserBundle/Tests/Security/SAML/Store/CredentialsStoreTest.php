@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
 use LightSaml\Credential\X509Credential;

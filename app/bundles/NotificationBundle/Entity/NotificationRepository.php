@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Query;

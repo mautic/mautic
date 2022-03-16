@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;

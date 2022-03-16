@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ApiBundle\DependencyInjection\Factory;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;

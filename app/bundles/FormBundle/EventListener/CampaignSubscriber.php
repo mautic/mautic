@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;

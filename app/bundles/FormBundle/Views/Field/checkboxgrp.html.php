@@ -1,6 +1,5 @@
 <?php
 
-
 if (isset($field['defaultValue']) && '' !== $field['defaultValue']) {
     $hiddenDefault = $view->render(
         'MauticFormBundle:Field:hidden.html.php',

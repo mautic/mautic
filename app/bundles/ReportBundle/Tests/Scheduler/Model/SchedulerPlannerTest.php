@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
 use Doctrine\ORM\EntityManager;

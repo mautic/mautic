@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticSocialBundle\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

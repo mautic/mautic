@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'name'        => 'Clearbit',
     'description' => 'Enables integration with Clearbit for contact and company lookup',

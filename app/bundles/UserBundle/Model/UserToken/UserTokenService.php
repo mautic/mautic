@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Model\UserToken;
 
 use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;

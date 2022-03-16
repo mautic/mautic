@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CalendarBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;

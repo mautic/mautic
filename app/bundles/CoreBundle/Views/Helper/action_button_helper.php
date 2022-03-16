@@ -1,6 +1,5 @@
 <?php
 
-
 if (isset($customButtons)) {
     $view['buttons']->addButtons($customButtons);
 }

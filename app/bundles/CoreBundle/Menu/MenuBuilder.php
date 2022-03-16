@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Menu;
 
 use Knp\Menu\FactoryInterface;

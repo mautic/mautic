@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

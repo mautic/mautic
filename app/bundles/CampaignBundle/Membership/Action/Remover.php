@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Membership\Action;
 
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;

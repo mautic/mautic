@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ApiBundle\Form\Type;
 
 use Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallback;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticClearbitBundle\Controller;
 
 use Mautic\FormBundle\Controller\FormController;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ApiBundle\Controller;
 
 use Mautic\ApiBundle\Model\ClientModel;

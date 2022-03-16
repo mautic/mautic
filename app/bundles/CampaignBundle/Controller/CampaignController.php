@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\DBAL\Cache\CacheException;

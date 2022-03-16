@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ChannelBundle\Entity;
 
 use Doctrine\ORM\Mapping\ClassMetadata;

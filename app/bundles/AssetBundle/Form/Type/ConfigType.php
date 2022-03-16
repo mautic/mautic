@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\AssetBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;

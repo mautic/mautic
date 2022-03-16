@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CategoryBundle\Controller;
 
 use Mautic\CategoryBundle\CategoryEvents;

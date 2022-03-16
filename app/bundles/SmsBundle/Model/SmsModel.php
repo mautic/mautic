@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;

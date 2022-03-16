@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Form\DataTransformer;
 
 use Mautic\LeadBundle\Entity\LeadField;

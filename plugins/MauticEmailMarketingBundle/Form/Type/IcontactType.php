@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

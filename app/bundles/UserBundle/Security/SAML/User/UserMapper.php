@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Security\SAML\User;
 
 use LightSaml\Model\Assertion\Assertion;

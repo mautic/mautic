@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticFocusBundle;
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;

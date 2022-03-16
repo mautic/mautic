@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Tests\Event;
 
 use Mautic\UserBundle\Entity\User;

@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'name'        => 'CRM',
     'description' => 'Enables integration with Mautic supported CRMs.',

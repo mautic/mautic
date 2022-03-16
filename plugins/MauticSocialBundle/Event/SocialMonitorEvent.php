@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticSocialBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;

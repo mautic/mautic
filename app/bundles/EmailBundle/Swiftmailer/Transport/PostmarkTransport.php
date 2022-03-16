@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 class PostmarkTransport extends \Swift_SmtpTransport

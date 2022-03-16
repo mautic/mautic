@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ChannelBundle\Tests\Model;
 
 use Doctrine\Common\Collections\AbstractLazyCollection;

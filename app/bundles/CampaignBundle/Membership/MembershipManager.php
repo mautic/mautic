@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Membership;
 
 use Doctrine\Common\Collections\ArrayCollection;

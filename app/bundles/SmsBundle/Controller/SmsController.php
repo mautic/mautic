@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;

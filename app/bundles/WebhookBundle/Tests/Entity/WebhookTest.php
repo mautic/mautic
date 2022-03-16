@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\WebhookBundle\Tests\Entity;
 
 use Mautic\WebhookBundle\Entity\Webhook;

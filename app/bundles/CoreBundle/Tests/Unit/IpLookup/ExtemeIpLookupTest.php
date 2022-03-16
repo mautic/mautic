@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use GuzzleHttp\Client;

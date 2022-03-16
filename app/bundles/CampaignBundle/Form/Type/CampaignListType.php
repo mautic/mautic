@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CampaignBundle\Model\CampaignModel;

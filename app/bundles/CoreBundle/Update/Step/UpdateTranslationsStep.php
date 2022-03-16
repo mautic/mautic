@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Update\Step;
 
 use Mautic\CoreBundle\Helper\LanguageHelper;

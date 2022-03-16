@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\DynamicContentBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\EntityLookupType;

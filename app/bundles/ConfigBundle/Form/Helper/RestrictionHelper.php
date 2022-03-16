@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ConfigBundle\Form\Helper;
 
 use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper as FieldHelper;

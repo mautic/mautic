@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\AssetBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;

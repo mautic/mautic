@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Helper\EmojiMap;
 
 class UnicodeToHtmlEmojiMap

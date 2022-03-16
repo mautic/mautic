@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;

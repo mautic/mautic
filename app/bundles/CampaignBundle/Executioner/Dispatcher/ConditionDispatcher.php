@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
 use Mautic\CampaignBundle\CampaignEvents;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
 use Mautic\EmailBundle\Helper\MailHelper;

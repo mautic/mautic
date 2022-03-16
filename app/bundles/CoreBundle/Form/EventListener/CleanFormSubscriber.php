@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Form\EventListener;
 
 use Mautic\CoreBundle\Helper\InputHelper;

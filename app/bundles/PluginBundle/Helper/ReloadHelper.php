@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PluginBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;

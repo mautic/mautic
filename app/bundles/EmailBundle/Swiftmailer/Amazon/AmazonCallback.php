@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Swiftmailer\Amazon;
 
 use GuzzleHttp\Client;

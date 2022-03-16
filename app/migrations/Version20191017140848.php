@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;

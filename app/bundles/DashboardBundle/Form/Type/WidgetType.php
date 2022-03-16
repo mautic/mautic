@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\DashboardBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;

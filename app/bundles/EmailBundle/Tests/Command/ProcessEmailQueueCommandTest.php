@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

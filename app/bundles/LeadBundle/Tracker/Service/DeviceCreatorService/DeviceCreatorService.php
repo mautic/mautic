@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Tracker\Service\DeviceCreatorService;
 
 use DeviceDetector\DeviceDetector;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PluginBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;

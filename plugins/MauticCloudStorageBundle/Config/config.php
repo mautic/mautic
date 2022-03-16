@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'name'        => 'Cloud Storage',
     'description' => 'Enables integrations with Mautic supported cloud storage services.',

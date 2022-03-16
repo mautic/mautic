@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\FormBundle\Event\SubmissionEvent;

@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'name'        => 'Outlook',
     'description' => 'Enables integrations with Outlook for email tracking',

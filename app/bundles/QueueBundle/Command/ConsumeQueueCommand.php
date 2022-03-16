@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\QueueBundle\Command;
 
 use Mautic\QueueBundle\Queue\QueueService;

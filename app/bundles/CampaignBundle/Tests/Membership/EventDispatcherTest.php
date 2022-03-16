@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Tests\Membership;
 
 use Mautic\CampaignBundle\CampaignEvents;

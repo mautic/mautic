@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Security\Permissions;
 
 use Symfony\Component\Form\FormBuilderInterface;

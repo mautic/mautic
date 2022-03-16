@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Security\Provider;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;

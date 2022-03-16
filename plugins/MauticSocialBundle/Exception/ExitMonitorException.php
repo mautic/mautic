@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticSocialBundle\Exception;
 
 class ExitMonitorException extends \Exception

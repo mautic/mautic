@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ConfigBundle\Mapper\Helper;
 
 class ConfigHelper

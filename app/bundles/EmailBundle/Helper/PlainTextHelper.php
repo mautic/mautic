@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Helper;
 
 class PlainTextHelper

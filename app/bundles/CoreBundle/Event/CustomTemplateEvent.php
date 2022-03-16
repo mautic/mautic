@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Component\HttpFoundation\Request;

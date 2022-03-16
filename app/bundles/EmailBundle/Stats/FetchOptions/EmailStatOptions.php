@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Stats\FetchOptions;
 
 use Mautic\StatsBundle\Event\Options\FetchOptions;

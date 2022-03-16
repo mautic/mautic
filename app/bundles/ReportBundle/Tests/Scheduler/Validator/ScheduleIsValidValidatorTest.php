@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Tests\Scheduler\Validator;
 
 use Mautic\ReportBundle\Entity\Report;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Types\StringType;

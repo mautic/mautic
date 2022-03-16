@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Callback;
 
 use Mautic\EmailBundle\Model\TransportCallback;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;

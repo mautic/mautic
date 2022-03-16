@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Release;
 
 class Metadata implements \JsonSerializable

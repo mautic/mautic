@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\InstallBundle\Controller;
 
 use Doctrine\DBAL\DBALException;

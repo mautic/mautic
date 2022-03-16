@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Stats;
 
 use Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException;

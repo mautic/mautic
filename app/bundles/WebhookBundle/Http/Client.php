@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\WebhookBundle\Http;
 
 use GuzzleHttp\Psr7\Request;

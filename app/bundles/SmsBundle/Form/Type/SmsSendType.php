@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;

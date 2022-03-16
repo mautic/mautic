@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ChannelBundle\Tests\PreferenceBuilder;
 
 use Mautic\CampaignBundle\Entity\Campaign;

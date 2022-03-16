@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ChannelBundle\Tests\Model;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;

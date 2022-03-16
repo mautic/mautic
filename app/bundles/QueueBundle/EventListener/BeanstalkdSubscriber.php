@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\QueueBundle\EventListener;
 
 use Leezy\PheanstalkBundle\Proxy\PheanstalkProxy;

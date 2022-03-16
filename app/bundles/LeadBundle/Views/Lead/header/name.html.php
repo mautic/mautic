@@ -1,6 +1,5 @@
 <?php
 
-
 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
     'sessionVar' => 'lead',
     'orderBy'    => 'l.lastname, l.firstname, l.company, l.email',

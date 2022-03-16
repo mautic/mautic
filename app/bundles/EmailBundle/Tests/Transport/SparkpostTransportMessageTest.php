@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\Transport;
 
 use Mautic\CoreBundle\Translation\Translator;

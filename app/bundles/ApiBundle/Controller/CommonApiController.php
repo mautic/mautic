@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\ORM\Mapping\ClassMetadata;

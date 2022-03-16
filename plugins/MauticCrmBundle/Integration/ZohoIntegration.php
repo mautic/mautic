@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\FormBundle\Entity\Form;

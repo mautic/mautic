@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\NotificationBundle\Api;
 
 use Mautic\NotificationBundle\Entity\Notification;

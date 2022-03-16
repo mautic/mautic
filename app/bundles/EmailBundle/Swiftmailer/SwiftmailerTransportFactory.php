@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Swiftmailer;
 
 use Symfony\Bundle\SwiftmailerBundle\DependencyInjection\SwiftmailerTransportFactory as TransportFactory;

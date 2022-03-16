@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Deduplicate;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;

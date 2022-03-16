@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\CampaignMember;
 
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer;

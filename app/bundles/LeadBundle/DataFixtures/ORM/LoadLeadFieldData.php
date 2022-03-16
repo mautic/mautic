@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\DataFixtures\ORM;
 
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;

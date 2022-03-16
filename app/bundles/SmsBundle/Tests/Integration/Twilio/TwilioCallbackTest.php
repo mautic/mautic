@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
 use Mautic\SmsBundle\Helper\ContactHelper;

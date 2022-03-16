@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Security\Authentication;
 
 use Mautic\CoreBundle\Helper\UserHelper;

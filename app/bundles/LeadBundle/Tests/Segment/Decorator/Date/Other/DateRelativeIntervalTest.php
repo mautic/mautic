@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Other;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;

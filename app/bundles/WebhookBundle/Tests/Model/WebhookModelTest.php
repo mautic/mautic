@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\WebhookBundle\Tests\Model;
 
 use DateTime;

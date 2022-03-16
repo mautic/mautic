@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Form;
 
 use Mautic\CoreBundle\Form\Type\BooleanType;

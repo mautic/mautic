@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PluginBundle\Tests\Entity;
 
 use Mautic\PluginBundle\Entity\Plugin;

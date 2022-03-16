@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Scheduler\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

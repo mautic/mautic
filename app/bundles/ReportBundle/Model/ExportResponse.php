@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Model;
 
 use Symfony\Component\HttpFoundation\Response;

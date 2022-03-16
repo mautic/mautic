@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Stubs;
 
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;

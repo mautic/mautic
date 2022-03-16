@@ -1,6 +1,5 @@
 <?php
 
-
 if (!isset($idPrefix)) {
     // Used by JS to create new properties array for the form
     $idPrefix = '';

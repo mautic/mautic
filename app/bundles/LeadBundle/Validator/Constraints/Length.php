@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraints\Length as SymfonyLength;

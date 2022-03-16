@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Release;
 
 use Mautic\CoreBundle\Release\Metadata;

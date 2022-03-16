@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\SmsBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;

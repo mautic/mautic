@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\NotificationBundle\Helper;
 
 use Doctrine\ORM\EntityManager;

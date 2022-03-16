@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Tests\Entity;
 
 use Doctrine\ORM\AbstractQuery;

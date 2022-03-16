@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PluginBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;

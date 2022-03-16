@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;

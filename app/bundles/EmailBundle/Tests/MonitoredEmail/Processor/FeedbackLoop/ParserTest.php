@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\FeedbackLoop;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\FeedbackLoopNotFound;

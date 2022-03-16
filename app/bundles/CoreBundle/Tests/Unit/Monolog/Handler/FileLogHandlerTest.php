@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Monolog\Handler;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

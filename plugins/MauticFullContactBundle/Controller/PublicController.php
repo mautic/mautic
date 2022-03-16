@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticFullContactBundle\Controller;
 
 use Mautic\FormBundle\Controller\FormController;

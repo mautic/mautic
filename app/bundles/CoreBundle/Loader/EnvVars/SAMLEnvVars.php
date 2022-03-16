@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Loader\EnvVars;
 
 use Symfony\Component\HttpFoundation\ParameterBag;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;

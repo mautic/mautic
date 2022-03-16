@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'menu' => [
         'admin' => [

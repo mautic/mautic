@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Event;
 
 use Mautic\CoreBundle\Event\CustomTemplateEvent;

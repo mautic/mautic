@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Metadata;
 
 use Mautic\EmailBundle\Helper\MailHelper;

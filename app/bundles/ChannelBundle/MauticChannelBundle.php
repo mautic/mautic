@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ChannelBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;

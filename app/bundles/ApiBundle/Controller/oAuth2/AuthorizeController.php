@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ApiBundle\Controller\oAuth2;
 
 use FOS\OAuthServerBundle\Event\OAuthEvent;

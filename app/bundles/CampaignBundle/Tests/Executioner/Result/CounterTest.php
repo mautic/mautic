@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Tests\Executioner\Result;
 
 use Mautic\CampaignBundle\Executioner\Result\Counter;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;

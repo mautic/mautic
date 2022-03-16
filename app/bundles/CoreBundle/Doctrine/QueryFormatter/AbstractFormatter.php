@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Doctrine\QueryFormatter;
 
 use Doctrine\DBAL\Connection;

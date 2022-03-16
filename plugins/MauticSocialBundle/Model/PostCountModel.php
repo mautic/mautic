@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticSocialBundle\Model;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;

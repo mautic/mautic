@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Configurator;
 
 use Mautic\CoreBundle\Configurator\Step\StepInterface;

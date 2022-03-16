@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ConfigBundle\Tests\Mapper\Helper;
 
 use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper;

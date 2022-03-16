@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Security\SAML\Store;
 
 use LightSaml\Credential\KeyHelper;

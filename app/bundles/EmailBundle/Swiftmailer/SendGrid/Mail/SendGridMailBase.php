@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Helper\PlainTextMessageHelper;

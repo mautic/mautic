@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CalendarBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;

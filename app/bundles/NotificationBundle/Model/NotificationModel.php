@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\NotificationBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;

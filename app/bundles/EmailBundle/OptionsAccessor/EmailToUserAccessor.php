@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\OptionsAccessor;
 
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;

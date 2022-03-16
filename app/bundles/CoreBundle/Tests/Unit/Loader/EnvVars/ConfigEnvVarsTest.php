@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Loader\EnvVars;
 
 use Mautic\CoreBundle\Loader\EnvVars\ConfigEnvVars;

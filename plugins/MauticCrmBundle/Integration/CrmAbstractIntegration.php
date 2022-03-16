@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\LeadBundle\DataObject\LeadManipulator;

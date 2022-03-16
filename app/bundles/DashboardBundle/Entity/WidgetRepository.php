@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\DashboardBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;

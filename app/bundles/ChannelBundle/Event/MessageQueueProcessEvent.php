@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ChannelBundle\Event;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;

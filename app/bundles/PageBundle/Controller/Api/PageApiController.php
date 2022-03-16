@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PageBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;

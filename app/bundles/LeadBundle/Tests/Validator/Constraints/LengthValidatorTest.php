@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Tests\Validator\Constraints;
 
 use Mautic\LeadBundle\Validator\Constraints\Length;

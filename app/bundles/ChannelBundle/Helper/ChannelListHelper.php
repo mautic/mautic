@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ChannelBundle\Helper;
 
 use Mautic\ChannelBundle\ChannelEvents;

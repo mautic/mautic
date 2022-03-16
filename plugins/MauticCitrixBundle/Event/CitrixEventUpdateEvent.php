@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCitrixBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\Swiftmailer\Spool;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

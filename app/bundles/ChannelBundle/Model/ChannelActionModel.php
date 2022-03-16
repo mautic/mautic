@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ChannelBundle\Model;
 
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;

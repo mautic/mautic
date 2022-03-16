@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\StageBundle\Model;
 
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;

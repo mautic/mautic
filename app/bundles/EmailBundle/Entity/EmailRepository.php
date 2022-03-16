@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\DBALException;

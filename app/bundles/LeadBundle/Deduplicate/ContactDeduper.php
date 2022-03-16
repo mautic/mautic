@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Deduplicate;
 
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
 use Doctrine\Persistence\ObjectManager;

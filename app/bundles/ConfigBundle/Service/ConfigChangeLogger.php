@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ConfigBundle\Service;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCitrixBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;

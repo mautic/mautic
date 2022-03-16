@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Services;
 
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ConfigBundle\Tests\Service;
 
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\DBAL\ParameterType;

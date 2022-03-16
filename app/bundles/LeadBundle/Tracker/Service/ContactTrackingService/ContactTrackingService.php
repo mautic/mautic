@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Tracker\Service\ContactTrackingService;
 
 use Mautic\CoreBundle\Helper\CookieHelper;

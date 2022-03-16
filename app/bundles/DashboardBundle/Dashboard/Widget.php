@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\DashboardBundle\Dashboard;
 
 use Mautic\CoreBundle\Helper\UserHelper;

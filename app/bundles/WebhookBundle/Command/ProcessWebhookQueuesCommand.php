@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\WebhookBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;

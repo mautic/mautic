@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;

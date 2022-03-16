@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\InstallBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Configurator\Configurator;

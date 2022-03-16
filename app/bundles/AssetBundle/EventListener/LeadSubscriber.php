@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Entity\DownloadRepository;

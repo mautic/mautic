@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Tracker;
 
 use Mautic\LeadBundle\Entity\Lead;

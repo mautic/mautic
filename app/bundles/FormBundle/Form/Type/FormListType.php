@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\UserHelper;

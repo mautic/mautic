@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
 use Doctrine\ORM\EntityNotFoundException;

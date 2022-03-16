@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PointBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;

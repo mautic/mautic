@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;

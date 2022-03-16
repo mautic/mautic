@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'name'        => 'FullContact',
     'description' => 'Enables integration with FullContact for contact and company lookup',

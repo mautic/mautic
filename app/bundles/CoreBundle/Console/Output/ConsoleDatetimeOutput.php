@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Console\Output;
 
 use Symfony\Component\Console\Output\ConsoleOutput;

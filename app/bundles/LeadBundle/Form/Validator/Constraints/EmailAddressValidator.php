@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Mautic\EmailBundle\Exception\InvalidEmailException;

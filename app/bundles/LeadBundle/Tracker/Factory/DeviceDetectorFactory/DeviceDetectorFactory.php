@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory;
 
 use DeviceDetector\Cache\PSR6Bridge;

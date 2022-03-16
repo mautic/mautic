@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CampaignBundle\Model;
 
 use Doctrine\ORM\PersistentCollection;

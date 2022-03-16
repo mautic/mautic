@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\DataObject;
 
 class LeadManipulator

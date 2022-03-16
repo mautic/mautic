@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;

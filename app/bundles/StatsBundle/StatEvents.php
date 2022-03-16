@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\StatsBundle;
 
 final class StatEvents

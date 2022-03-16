@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;

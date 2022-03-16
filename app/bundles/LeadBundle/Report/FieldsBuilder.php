@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Report;
 
 use Mautic\LeadBundle\Entity\LeadField;

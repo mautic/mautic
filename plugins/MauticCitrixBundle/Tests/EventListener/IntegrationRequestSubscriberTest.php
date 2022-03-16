@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCitrixBundle\Tests\EventListener;
 
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;

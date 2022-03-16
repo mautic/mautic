@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\FormBundle\Validator\Constraint;
 
 use libphonenumber\NumberParseException;

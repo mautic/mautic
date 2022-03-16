@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Tests\Deduplicate\Helper;
 
 use Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException;

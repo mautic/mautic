@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticTagManagerBundle\Entity;
 
 use Doctrine\ORM\Mapping\ClassMetadata;

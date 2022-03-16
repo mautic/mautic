@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Stats\Helper;
 
 use Doctrine\DBAL\Connection;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\MauticCitrixBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;

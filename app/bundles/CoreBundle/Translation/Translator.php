@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Translation;
 
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;

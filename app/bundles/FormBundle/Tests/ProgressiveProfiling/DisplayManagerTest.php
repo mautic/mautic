@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\FormBundle\Tests\ProgressiveProfiling;
 
 use Mautic\FormBundle\Entity\Field;

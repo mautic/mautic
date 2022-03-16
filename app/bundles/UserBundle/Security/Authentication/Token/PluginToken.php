@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\UserBundle\Security\Authentication\Token;
 
 use Symfony\Component\HttpFoundation\Response;

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
