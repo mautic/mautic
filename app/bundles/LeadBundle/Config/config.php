@@ -852,7 +852,7 @@ return [
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'segment_in_use',
             ],
-            'mautic.lead.event.dispatcher'       => [
+            'mautic.lead.event.dispatcher' => [
                 'class'     => \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::class,
                 'arguments' => [
                     'event_dispatcher',
