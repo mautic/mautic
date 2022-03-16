@@ -41,7 +41,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
                         'orderBy'    => 'l.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-leadlist-name',
@@ -51,7 +51,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
                         'text'       => 'mautic.lead.list.thead.leadcount',
                         'class'      => 'visible-md visible-lg col-leadlist-leadcount',
                     ]
@@ -60,7 +60,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
                         'orderBy'    => 'l.dateAdded',
                         'text'       => 'mautic.lead.import.label.dateAdded',
                         'class'      => 'visible-md visible-lg col-leadlist-dateAdded',
@@ -70,7 +70,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
                         'orderBy'    => 'l.dateModified',
                         'text'       => 'mautic.lead.import.label.dateModified',
                         'class'      => 'visible-md visible-lg col-leadlist-dateModified',
@@ -81,7 +81,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
                         'orderBy'    => 'l.createdByUser',
                         'text'       => 'mautic.core.createdby',
                         'class'      => 'visible-md visible-lg col-leadlist-createdByUser',
@@ -91,7 +91,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
                         'orderBy'    => 'l.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-leadlist-id',
@@ -214,7 +214,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                     'page'       => $page,
                     'limit'      => $limit,
                     'baseUrl'    => $view['router']->path('mautic_segment_index'),
-                    'sessionVar' => 'segment',
+                    'sessionVar' => 'lead.list',
                 ]
             ); ?>
         </div>
