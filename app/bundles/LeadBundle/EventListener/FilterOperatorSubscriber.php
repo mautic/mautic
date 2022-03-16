@@ -235,6 +235,15 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'     => 'lead',
             ],
+            'dnc_unsubscribed_manually'     => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_manually'),
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_unsubscribed_manually'),
+                ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
+                'object'     => 'lead',
+            ],
             'dnc_bounced_sms' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced_sms'),
                 'properties' => [
@@ -252,6 +261,15 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
+            ],
+            'dnc_unsubscribed_sms_manually' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_sms_manually'),
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_unsubscribed_sms_manually'),
+                ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
+                'object'     => 'lead',
             ],
             'dnc_manual_sms' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_manual_sms'),
