@@ -71,10 +71,41 @@ function setThemeHtml(theme) {
 }
 
 /**
+ * The builder button to launch GrapesJS will be disabled when the code mode theme is selected
+ *
+ * @param theme
+ */
+function switchBuilderButton(theme) {
+  const builderButton = mQuery('.btn-builder');
+  const isCodeMode = theme === 'mautic_code_mode';
+
+  builderButton.attr('disabled', isCodeMode);
+}
+
+/**
+ * The textarea with the HTML source will be displayed if the code mode theme is selected
+ *
+ * @param theme
+ */
+function switchCustomHtml(theme) {
+  const isCodeMode = theme === 'mautic_code_mode';
+  const customHtmlRow = mQuery('#custom-html-row');
+
+  if (isCodeMode === true) {
+    customHtmlRow.removeClass('hide');
+  } else {
+    customHtmlRow.addClass('hide');
+  }
+}
+
+/**
  * Initialize original Mautic theme selection with grapejs specific modifications
  */
 function initSelectThemeGrapesjs(parentInitSelectTheme) {
   function childInitSelectTheme(themeField) {
+    switchBuilderButton(themeField.val());
+    switchCustomHtml(themeField.val());
+
     const builderUrl = mQuery('#builder_url');
     let url;
 
@@ -91,6 +122,13 @@ function initSelectThemeGrapesjs(parentInitSelectTheme) {
 
     // Launch original Mautic.initSelectTheme function
     parentInitSelectTheme(themeField);
+
+    mQuery('[data-theme]').click((event) => {
+      const theme = mQuery(event.target).attr('data-theme');
+
+      switchBuilderButton(theme);
+      switchCustomHtml(theme);
+    });
   }
   return childInitSelectTheme;
 }
