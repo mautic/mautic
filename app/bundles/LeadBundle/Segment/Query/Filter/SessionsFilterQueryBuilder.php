@@ -5,18 +5,14 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-/**
- * Class SessionsFilterQueryBuilder.
- */
 class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    /** {@inheritdoc} */
     public static function getServiceId()
     {
         return 'mautic.lead.query.builder.special.sessions';
     }
 
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
         $leadsTableAlias      = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $pageHitsAlias        = $this->generateRandomParameterName();

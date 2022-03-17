@@ -6,14 +6,8 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 
-/**
- * Class IntegrationCampaignFilterQueryBuilder.
- */
 class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function getServiceId()
     {
         return 'mautic.lead.query.builder.special.integration';
@@ -22,7 +16,7 @@ class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
     /**
      * @throws QueryException
      */
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
         $leadsTableAlias          = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $integrationCampaignParts = $filter->getIntegrationCampaignParts();

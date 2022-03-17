@@ -22,10 +22,7 @@ final class SegmentOperatorQueryBuilderEvent extends Event
 
     private bool $operatorHandled = false;
 
-    /**
-     * @var string
-     */
-    private $leadsTableAlias;
+    private string $leadsTableAlias;
 
     /**
      * @param string|string[] $parameterHolder

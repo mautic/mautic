@@ -36,10 +36,12 @@ class ContactSegmentService
     }
 
     /**
+     * @return array<int,mixed[]>
+     *
      * @throws Exception\SegmentQueryException
      * @throws DBALException
      */
-    public function getNewLeadListLeadsCount(LeadList $segment, array $batchLimiters): array
+    public function getNewLeadListLeadsCount(LeadList $segment, array $batchLimiters)
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
@@ -113,10 +115,12 @@ class ContactSegmentService
     /**
      * @param int $limit
      *
+     * @return array<int,mixed[]>
+     *
      * @throws DBALException
      * @throws Exception\SegmentQueryException
      */
-    public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, $limit = 1000): array
+    public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, $limit = 1000)
     {
         $queryBuilder    = $this->getNewSegmentContactsQuery($segment);
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');

@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListQueryBuilderGeneratedEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 use Mautic\LeadBundle\Segment\Exception\PluginHandledFilterException;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -33,9 +34,6 @@ class ContactSegmentQueryBuilder
     /** @var array Contains segment edges mapping */
     private $dependencyMap = [];
 
-    /**
-     * ContactSegmentQueryBuilder constructor.
-     */
     public function __construct(EntityManager $entityManager, RandomParameterName $randomParameterName, EventDispatcherInterface $dispatcher)
     {
         $this->entityManager       = $entityManager;
@@ -44,12 +42,14 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param $segmentId
-     * @param $segmentFilters
+     * @param int                   $segmentId
+     * @param ContactSegmentFilters $segmentFilters
+     *
+     * @return QueryBuilder
      *
      * @throws SegmentQueryException
      */
-    public function assembleContactsSegmentQueryBuilder($segmentId, $segmentFilters, bool $changeAlias = false): QueryBuilder
+    public function assembleContactsSegmentQueryBuilder($segmentId, $segmentFilters, bool $changeAlias = false)
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
@@ -139,11 +139,13 @@ class ContactSegmentQueryBuilder
     /**
      * Restrict the query to NEW members of segment.
      *
-     * @param $segmentId
+     * @param int $segmentId
+     *
+     * @return QueryBuilder
      *
      * @throws QueryException
      */
-    public function addNewContactsRestrictions(QueryBuilder $queryBuilder, $segmentId): QueryBuilder
+    public function addNewContactsRestrictions(QueryBuilder $queryBuilder, $segmentId)
     {
         $leadsTableAlias    = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $expr               = $queryBuilder->expr();
@@ -162,9 +164,11 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param $leadListId
+     * @param int $leadListId
+     *
+     * @return QueryBuilder
      */
-    public function addManuallySubscribedQuery(QueryBuilder $queryBuilder, $leadListId): QueryBuilder
+    public function addManuallySubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $tableAlias      = $this->generateRandomParameterName();
@@ -194,11 +198,13 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param $leadListId
+     * @param int $leadListId
+     *
+     * @return QueryBuilder
      *
      * @throws QueryException
      */
-    public function addManuallyUnsubscribedQuery(QueryBuilder $queryBuilder, $leadListId): QueryBuilder
+    public function addManuallyUnsubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $tableAlias      = $this->generateRandomParameterName();

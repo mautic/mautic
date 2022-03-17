@@ -7,14 +7,8 @@ use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 
-/**
- * Class ForeignFuncFilterQueryBuilder.
- */
 class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function getServiceId()
     {
         return 'mautic.lead.query.builder.foreign.func';
@@ -24,7 +18,7 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
      * @throws FieldNotFoundException
      * @throws QueryException
      */
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $filterOperator  = $filter->getOperator();
