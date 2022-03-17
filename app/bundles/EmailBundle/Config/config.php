@@ -960,7 +960,7 @@ return [
         'mailer_spool_time_limit'        => null,
         'mailer_spool_recover_timeout'   => 900,
         'mailer_spool_clear_timeout'     => 1800,
-        'mailer_batch_limit'             => 40,
+        'mailer_memory_msg_limit'        => 100,
         'unsubscribe_text'               => null,
         'webview_text'                   => null,
         'unsubscribe_message'            => null,

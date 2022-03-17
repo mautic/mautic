@@ -602,7 +602,23 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $spoolConditions = '{"config_emailconfig_mailer_spool_type":["memory"]}';
+        $spoolConditions  = '{"config_emailconfig_mailer_spool_type":["memory"]}';
+        $memoryConditions = '{"config_emailconfig_mailer_spool_type":["file"]}';
+
+        $builder->add(
+            'mailer_memory_msg_limit',
+            TextType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.memory.msg.limit',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'data-hide-on' => $memoryConditions,
+                    'tooltip'      => 'mautic.email.config.mailer.memory.msg.limit.tooltip',
+                ],
+                'required'   => false,
+            ]
+        );
 
         $builder->add(
             'mailer_spool_type',

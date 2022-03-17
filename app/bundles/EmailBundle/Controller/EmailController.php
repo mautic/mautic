@@ -1198,7 +1198,7 @@ class EmailController extends FormController
         $pending  = $model->getPendingLeads($entity, null, true);
         $data     = [
             'action' => $action,
-            'data'   => ['batchlimit' => $this->coreParametersHelper->get('mailer_batch_limit')],
+            'data'   => ['batchlimit' => $this->coreParametersHelper->get('mailer_memory_msg_limit')],
         ];
         $form     = $this->get('form.factory')->create(BatchSendType::class, [], $data);
         $complete = $this->request->request->get('complete', false);
