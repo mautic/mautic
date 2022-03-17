@@ -6,30 +6,25 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 
 class DoNotContactParts
 {
-    /**
-     * @var string
-     */
-    private $channel;
+    private string $channel = 'email';
 
-    /**
-     * @var string
-     */
-    private $type;
+    private int $type = DoNotContact::UNSUBSCRIBED;
 
     /**
      * @param string $field
      */
     public function __construct($field)
     {
-        $parts = explode('_', $field);
-        switch (true) {
-            case preg_match('/_manually$/', $field):
-                $this->type    = DoNotContact::MANUAL;
-                $this->channel = 4 === count($parts) ? $parts[2] : 'email';
-                break;
-            default:
-                $this->type    = 'bounced' === $parts[1] ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
-                $this->channel = 3 === count($parts) ? $parts[2] : 'email';
+        if (false !== strpos($field, '_manual')) {
+            $this->type = DoNotContact::MANUAL;
+        }
+
+        if (false !== strpos($field, '_bounced')) {
+            $this->type = DoNotContact::BOUNCED;
+        }
+
+        if (false !== strpos($field, '_sms')) {
+            $this->channel = 'sms';
         }
     }
 
@@ -46,15 +41,6 @@ class DoNotContactParts
      */
     public function getParameterType()
     {
-        switch ($this->type) {
-            case 'bounced':
-            case DoNotContact::BOUNCED:
-                return DoNotContact::BOUNCED;
-            case 'manual':
-            case DoNotContact::MANUAL:
-                return DoNotContact::MANUAL;
-            default:
-                return DoNotContact::UNSUBSCRIBED;
-        }
+        return $this->type;
     }
 }
