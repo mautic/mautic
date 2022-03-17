@@ -10,7 +10,7 @@ export default class BlocksMjml {
 
   addBlocks() {
     this.blockManager.add('mj-37-columns', {
-      label: this.editor.I18n.t('grapesjs-mjml.components.names.twoColumnThirdSevens'),
+      label: Mautic.translate('grapesjsbuilder.components.names.twoColumnThirdSevens'),
       category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
       attributes: { class: 'gjs-fonts gjs-f-b37' },
       content: `<mj-section>
@@ -20,7 +20,7 @@ export default class BlocksMjml {
     });
 
     this.blockManager.add('text-sect', {
-      label: this.editor.I18n.t('grapesjs-mjml.components.names.textSectionBlkLabel'),
+      label: Mautic.translate('grapesjsbuilder.components.names.textSectionBlkLabel'),
       category: Mautic.translate('grapesjsbuilder.reusableDynamicContentBlockLabel'),
       attributes: { class: 'gjs-fonts gjs-f-h1p' },
       content: `<mj-section>
@@ -51,7 +51,7 @@ export default class BlocksMjml {
       </mj-group>`;
 
     this.blockManager.add('grid-items', {
-      label: this.editor.I18n.t('grapesjs-mjml.components.names.gridItemsBlkLabel'),
+      label: Mautic.translate('grapesjsbuilder.components.names.gridItemsBlkLabel'),
       category: Mautic.translate('grapesjsbuilder.reusableDynamicContentBlockLabel'),
       attributes: { class: 'fa fa-th' },
       content: `<section>${gridItem}</section>`,
@@ -70,7 +70,7 @@ export default class BlocksMjml {
       </mj-group>`;
 
     this.blockManager.add('list-items', {
-      label: this.editor.I18n.t('grapesjs-mjml.components.names.listItemsBlkLabel'),
+      label: Mautic.translate('grapesjsbuilder.components.names.listItemsBlkLabel'),
       category: Mautic.translate('grapesjsbuilder.reusableDynamicContentBlockLabel'),
       attributes: { class: 'fa fa-th-list' },
       content: `<section>${listItem}</section>`,

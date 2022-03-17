@@ -2,7 +2,6 @@ import DynamicContentBlocks from './dynamicContent/dynamicContent.blocks';
 import ContentService from './content.service';
 import ButtonBlock from './buttonBlock';
 import BlocksMjml from './blocks/blocks.mjml';
-import Locale from './locale/locale';
 
 export default (editor, opts = {}) => {
   const bm = editor.BlockManager;
@@ -11,9 +10,6 @@ export default (editor, opts = {}) => {
   const mode = ContentService.getMode(editor);
 
   if (mode === ContentService.modeEmailMjml) {
-    const locale = new Locale(editor);
-    locale.addMessages();
-
     const blockMjml = new BlocksMjml(editor);
     blockMjml.addBlocks();
   }
