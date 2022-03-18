@@ -95,6 +95,9 @@ $container->loadFromExtension('framework', [
         'transports'  => [
             'email_transport' => [
                 'dsn'            => '%env(MAUTIC_MESSENGER_EMAIL_TRANSPORT_DSN)%',
+                'options'        => [
+                    'consumer'    => '%env(MAUTIC_MESSENGER_CONSUMER_NAME)',
+                ],
                 'retry_strategy' => [
                     'max_retries' => $configParameterBag->get('messenger_retry_strategy_max_retries', 3),
                     'delay'       => $configParameterBag->get('messenger_retry_strategy_delay', 1000),
