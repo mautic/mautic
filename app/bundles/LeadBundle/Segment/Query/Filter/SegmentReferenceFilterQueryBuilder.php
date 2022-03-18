@@ -89,10 +89,10 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 
             //  If the segment contains no filters; it means its for manually subscribed only
             if (count($filters)) {
-                $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
+                $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubscribedQuery($segmentQueryBuilder, (int) $contactSegment->getId());
             }
 
-            $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
+            $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, (int) $contactSegment->getId());
 
             $parameters = $segmentQueryBuilder->getParameters();
             foreach ($parameters as $key => $value) {
@@ -105,21 +105,17 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
             $segmentQueryBuilder->where("$leadsTableAlias.id = $subSegmentLeadsTableAlias.id");
             $segmentQueryBuilder->andWhere($segmentQueryWherePart);
 
-            $segmentAlias = $this->generateRandomParameterName();
             if ($exclusion) {
                 $expression = $queryBuilder->expr()->notExists($segmentQueryBuilder->getSQL());
             } else {
                 $expression = $queryBuilder->expr()->exists($segmentQueryBuilder->getSQL());
             }
-            $queryBuilder->addSelect($segmentAlias.'.id as '.$segmentAlias.'_id');
 
             $logic[] = $expression;
         }
 
-        if ($exclusion) {
-            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_AND, $logic), $filter->getGlue());
-        } else {
-            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_OR, $logic), $filter->getGlue());
+        if (count($orLogic)) {
+            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_OR, $orLogic), CompositeExpression::TYPE_AND);
         }
 
         return $queryBuilder;

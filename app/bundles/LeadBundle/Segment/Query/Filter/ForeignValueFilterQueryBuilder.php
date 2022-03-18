@@ -32,10 +32,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $tableAlias = $this->generateRandomParameterName();
 
-        $subQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
-        $subQueryBuilder
-            ->select('NULL')->from($filter->getTable(), $tableAlias)
-            ->andWhere($tableAlias.'.lead_id = l.id');
+        $subQueryBuilder = $queryBuilder->createQueryBuilder($queryBuilder->getConnection());
 
         if (!is_null($filter->getWhere())) {
             $subQueryBuilder->andWhere(str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $filter->getWhere()));
@@ -101,6 +98,9 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             case 'regexp':
             case 'notRegexp':
+                $subQueryBuilder->select('NULL')
+                    ->from($filter->getTable(), $tableAlias);
+
                 $not        = ('notRegexp' === $filterOperator) ? ' NOT' : '';
                 $expression = $tableAlias.'.'.$filter->getField().$not.' REGEXP '.$filterParametersHolder;
 
@@ -109,6 +109,9 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             default:
+                $subQueryBuilder->select($tableAlias.'.lead_id')
+                    ->from($filter->getTable(), $tableAlias);
+
                 $expression = $subQueryBuilder->expr()->$filterOperator(
                     $tableAlias.'.'.$filter->getField(),
                     $filterParametersHolder
