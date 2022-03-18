@@ -47,7 +47,7 @@ export default class ButtonApplyCommand {
 
     sender.set('className', 'fa fa-spinner fa-spin');
 
-    ButtonApplyCommand.setDefaultValues();
+    ButtonApplyCommand.setDefaultValues(editor);
 
     Mautic.inBuilderSubmissionOn(mauticForm);
     Mautic.postForm(mauticForm, ButtonApplyCommand.postFormResponse.bind(this, editor, sender));
@@ -79,7 +79,7 @@ export default class ButtonApplyCommand {
       }
 
       // update form action
-      if (ButtonsService.strcmp(mauticForm[0].baseURI, mauticForm[0].action) !== 0) {
+      if (mauticForm[0].baseURI !== mauticForm[0].action) {
         mauticForm[0].action = mauticForm[0].baseURI;
       }
     }
@@ -124,24 +124,31 @@ export default class ButtonApplyCommand {
     });
   }
 
-  static setDefaultValues() {
-    const type = ButtonsService.getType();
+  /**
+   * Set a default value for the required form items.
+   * The email form has subject and internal name fields as a required.
+   * The page form has a title field as a required.
+   */
+  static setDefaultValues(editor) {
+    const mode = ContentService.getMode(editor);
 
-    if (type === 'email') {
+    if (mode === ContentService.modeEmailHtml || mode === ContentService.modeEmailMjml) {
       const formEmailSubject = ButtonsService.getFormItemById('emailform_subject');
       const formEmailName = ButtonsService.getFormItemById('emailform_name');
 
       if (formEmailSubject.value === '') {
-        formEmailSubject.value = ButtonsService.getDefaultValue(type);
+        formEmailSubject.value = ButtonsService.getDefaultValue(mode.split('-')[0]);
       }
       if (formEmailName.value === '') {
-        formEmailName.value = ButtonsService.getDefaultValue(type);
+        formEmailName.value = ButtonsService.getDefaultValue(mode.split('-')[0]);
       }
-    } else {
+    }
+
+    if (mode === ContentService.modePageHtml) {
       const formPageTitle = ButtonsService.getFormItemById('page_title');
 
       if (formPageTitle.value === '') {
-        formPageTitle.value = ButtonsService.getDefaultValue(type);
+        formPageTitle.value = ButtonsService.getDefaultValue(mode.split('-')[0]);
       }
     }
   }

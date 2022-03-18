@@ -17,15 +17,11 @@ export default class ButtonPreview {
    * Add the preview button
    */
   addButton() {
-    const form = ButtonsService.getForm();
-    const url = form[0].action;
-    const regexp = /(emails|pages)\/new/g;
-
     let title = Mautic.translate('grapesjsbuilder.buttons.buttonPreview.title');
     let disable = false;
     let command = ButtonPreview.getCommand();
 
-    if (url.match(regexp)) {
+    if (ButtonsService.isNewEntity()) {
       title = Mautic.translate('grapesjsbuilder.buttons.buttonPreview.titleDisabled');
       disable = true;
       command = '';
