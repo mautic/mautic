@@ -116,6 +116,7 @@ return [
                     'translator',
                     'doctrine.dbal.default_connection',
                     'mautic.helper.templating',
+                    'router',
                 ],
             ],
             'mautic.pagetoken.subscriber' => [

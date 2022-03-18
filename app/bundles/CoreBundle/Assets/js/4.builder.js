@@ -84,7 +84,8 @@ Mautic.launchBuilder = function (formName, actionName) {
             'preferredchannel',
             'channelfrequency',
             'saveprefsbutton',
-            'successmessage'
+            'successmessage',
+            'donotcontact'
         ];
         mQuery.each(slots, function(i, s){
             if (isPrefCenterEnabled) {
@@ -1737,6 +1738,8 @@ Mautic.initSlotListeners = function() {
             params.slot.css(fieldParam, params.field.val() + 'px');
         } else if ('label-text' === fieldParam) {
             params.slot.find('label.control-label').text(params.field.val());
+        } else if ('label-text0' === fieldParam) {
+            params.slot.find('label.label0').text(params.field.val());
         } else if ('label-text1' === fieldParam) {
             params.slot.find('label.label1').text(params.field.val());
         } else if ('label-text2' === fieldParam) {
@@ -2056,7 +2059,8 @@ Mautic.prepareBuilderIframe = function(themeHtml, btnCloseBuilder, applyBtn) {
             'preferredchannel',
             'channelfrequency',
             'saveprefsbutton',
-            'successmessage'
+            'successmessage',
+            'donotcontact'
         ];
         mQuery.each(slots, function (i, s) {
             // delete existing tokens

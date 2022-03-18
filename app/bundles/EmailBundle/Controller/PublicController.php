@@ -9,6 +9,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
+use Mautic\EmailBundle\Form\Type\ConfigType;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Swiftmailer\Transport\CallbackTransportInterface;
@@ -24,6 +25,8 @@ use Symfony\Component\HttpFoundation\Response;
 class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
+
+    const MAUTIC_EMAIL_PREFSCENTER_SUCCESS = 'mautic.email.prefscenter.success';
 
     /**
      * @param $idHash
@@ -159,7 +162,7 @@ class PublicController extends CommonFormController
         }
         $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
         if (!empty($stat)) {
-            $successSessionName = 'mautic.email.prefscenter.success';
+            $successSessionName = self::MAUTIC_EMAIL_PREFSCENTER_SUCCESS;
 
             if ($lead = $stat->getLead()) {
                 // Set the lead as current lead
@@ -178,16 +181,39 @@ class PublicController extends CommonFormController
             if (!$this->get('mautic.helper.core_parameters')->get('show_contact_preferences')) {
                 $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $translator);
             } elseif ($lead) {
-                $action = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
+                $action           = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
+                $doNotContactText = str_replace(
+                    [
+                        '|URL|',
+                    ],
+                    [
+                        $this->generateUrl('mautic_email_dnc', ['idHash' => $idHash]),
+                    ],
+                    $this->coreParametersHelper->get('do_not_contact_text')
+                );
+
+                $isLandingPagePreferenceCenter = ($email && $prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter());
+
+                if (false === $isLandingPagePreferenceCenter) {
+                    /** @var Page $prefCenter */
+                    if ($defaultPreferenceCenterPageId = $this->coreParametersHelper->get(ConfigType::DEFAULT_PREFERENCE_CENTER_PAGE)) {
+                        $pageModel                     = $this->getModel('page.page');
+                        $prefCenter                    = $pageModel->getEntity($defaultPreferenceCenterPageId);
+                        $isLandingPagePreferenceCenter =  ($prefCenter instanceof Page && $prefCenter->getIsPreferenceCenter());
+                    }
+                }
 
                 $viewParameters = [
                     'lead'                         => $lead,
                     'idHash'                       => $idHash,
+                    'showContactChannels'          => $this->get('mautic.helper.core_parameters')->get('show_contact_channels'),
                     'showContactFrequency'         => $this->get('mautic.helper.core_parameters')->get('show_contact_frequency'),
                     'showContactPauseDates'        => $this->get('mautic.helper.core_parameters')->get('show_contact_pause_dates'),
                     'showContactPreferredChannels' => $this->get('mautic.helper.core_parameters')->get('show_contact_preferred_channels'),
                     'showContactCategories'        => $this->get('mautic.helper.core_parameters')->get('show_contact_categories'),
                     'showContactSegments'          => $this->get('mautic.helper.core_parameters')->get('show_contact_segments'),
+                    'showContactDnc'               => $this->get('mautic.helper.core_parameters')->get('show_contact_dnc'),
+                    'doNotContactText'             => $doNotContactText,
                 ];
 
                 $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);
@@ -203,9 +229,9 @@ class PublicController extends CommonFormController
                     );
                 }
 
-                $formView = $form->createView();
-                /** @var Page $prefCenter */
-                if ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())) {
+                $formView                = $form->createView();
+
+                if ($email && $isLandingPagePreferenceCenter) {
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
                     $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"') ||
@@ -221,10 +247,12 @@ class PublicController extends CommonFormController
                                 'form'                         => $formView,
                                 'startform'                    => $formHelper->start($formView),
                                 'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
+                                'showContactChannels'          => false !== strpos($html, 'data-slot="channelfrequency"') || false !== strpos($html, BuilderSubscriber::channels),
                                 'showContactFrequency'         => false !== strpos($html, 'data-slot="channelfrequency"') || false !== strpos($html, BuilderSubscriber::channelfrequency),
                                 'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
                                 'showContactCategories'        => false !== strpos($html, 'data-slot="categorylist"') || false !== strpos($html, BuilderSubscriber::categoryListRegex),
                                 'showContactPreferredChannels' => false !== strpos($html, 'data-slot="preferredchannel"') || false !== strpos($html, BuilderSubscriber::preferredchannel),
+                                'showContactDnc'               => false !== strpos($html, 'data-slot="donotcontact"') || false !== strpos($html, BuilderSubscriber::doNotContactToken),
                             ]
                         );
                         // Replace tokens in preference center page
@@ -258,7 +286,6 @@ class PublicController extends CommonFormController
                         unset($html);
                     }
                 }
-
                 if (empty($html)) {
                     $html = $this->get('mautic.helper.templating')->getTemplating()->render(
                         'MauticEmailBundle:Lead:preference_options.html.php',
@@ -303,6 +330,45 @@ class PublicController extends CommonFormController
         }
 
         return $this->render($contentTemplate, $viewParams);
+    }
+
+    /**
+     * @param $idHash
+     *
+     * @return Response
+     *
+     * @throws \Exception
+     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     */
+    public function doNotContactAction($idHash)
+    {
+        //find the email
+        $model             = $this->getModel('email');
+        $messageModel      = $this->get('mautic.channel.model.message');
+        $doNotContactModel = $this->get('mautic.lead.model.dnc');
+        $stat              = $model->getEmailStatus($idHash);
+
+        if (!empty($stat)) {
+            $email = $stat->getEmail();
+            $lead  = $stat->getLead();
+
+            if ($lead) {
+                // Set the lead as current lead
+                $this->get('mautic.tracker.contact')->setTrackedContact($lead);
+
+                // Set lead lang
+                if ($lead->getPreferredLocale()) {
+                    $this->translator->setLocale($lead->getPreferredLocale());
+                }
+            }
+            foreach (array_keys($messageModel->getChannels()) as $channel) {
+                $channel = $email->getId() && 'email' === $channel ? [$channel => $email->getId()] : $channel;
+                $doNotContactModel->addDncForContact($lead->getId(), $channel, DoNotContact::UNSUBSCRIBED, $this->translator->trans('mautic.email.dnc.unsubscribed'));
+            }
+            $this->get('session')->set(self::MAUTIC_EMAIL_PREFSCENTER_SUCCESS.'.'.$lead->getId(), 1);
+        }
+
+        return $this->redirect($this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]));
     }
 
     /**
