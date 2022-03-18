@@ -231,11 +231,11 @@ class CorePermissions
     /**
      * Determines if the user has permission to access the given area.
      *
-     * @param array|string $requestedPermission
-     * @param string       $mode                MATCH_ALL|MATCH_ONE|RETURN_ARRAY
-     * @param User         $userEntity
-     * @param bool         $allowUnknown        If the permission is not recognized, false will be returned.  Otherwise an
-     *                                          exception will be thrown
+     * @param string[]|string $requestedPermission
+     * @param string          $mode                MATCH_ALL|MATCH_ONE|RETURN_ARRAY
+     * @param User            $userEntity
+     * @param bool            $allowUnknown        If the permission is not recognized, false will be returned.  Otherwise an
+     *                                             exception will be thrown
      *
      * @return mixed
      *

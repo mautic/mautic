@@ -152,7 +152,13 @@ class LeadImportFieldType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['all_fields', 'import_fields', 'object']);
-        $resolver->setDefaults(['line_count_limit' => 0]);
+        $resolver->setDefaults([
+            'line_count_limit'  => 0,
+            'validation_groups' => [
+                User::class,
+                'determineValidationGroups',
+            ],
+        ]);
     }
 
     /**
