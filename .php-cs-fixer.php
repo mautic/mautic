@@ -30,5 +30,8 @@ return (new PhpCsFixer\Config())
          * (which is required for Symfony 5).
          */
         'no_alternative_syntax' => false,
+        'header_comment'        => [
+            'header' => '',
+        ],
     ])
     ->setFinder($finder);
