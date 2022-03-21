@@ -76,7 +76,6 @@ if ('index' == $tmpl) {
                     [
                         'sessionVar' => 'page',
                         'orderBy'    => 'p.dateModified',
-                        'defaultDir' => 'DESC',
                         'text'       => 'mautic.lead.import.label.dateModified',
                         'class'      => 'col-page-dateModified visible-md visible-lg',
                         'default'    => true,
