@@ -573,29 +573,25 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
     {
         $choices = $event->getChoices();
 
-        foreach ($choices as $group=>$groups) {
+        foreach ($choices as $group => $groups) {
             foreach ($groups as $alias => $choice) {
                 $type = $choice['properties']['type'] ?? null;
                 if ('text' === $type) {
-                    $choices[$group][$alias]['operators'] = $this->typeOperatorProvider->getOperatorChoiceList(
-                        [
-                            'include' => [
-                                '=',
-                                '!=',
-                                'empty',
-                                '!empty',
-                                'like',
-                                '!like',
-                                'regexp',
-                                '!regexp',
-                                'in',
-                                '!in',
-                                'startsWith',
-                                'endsWith',
-                                'contains',
-                            ],
-                        ]
-                    );
+                    $choices[$group][$alias]['operators'] = $this->typeOperatorProvider->getOperatorsIncluding([
+                        OperatorOptions::EQUAL_TO,
+                        OperatorOptions::NOT_EQUAL_TO,
+                        OperatorOptions::EMPTY,
+                        OperatorOptions::NOT_EMPTY,
+                        OperatorOptions::LIKE,
+                        OperatorOptions::NOT_LIKE,
+                        OperatorOptions::REGEXP,
+                        OperatorOptions::NOT_REGEXP,
+                        OperatorOptions::IN,
+                        OperatorOptions::NOT_IN,
+                        OperatorOptions::STARTS_WITH,
+                        OperatorOptions::ENDS_WITH,
+                        OperatorOptions::CONTAINS,
+                    ]);
                 }
             }
         }
