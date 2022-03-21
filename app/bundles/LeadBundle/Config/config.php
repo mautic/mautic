@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
@@ -508,6 +499,7 @@ return [
                     'mautic.lead.field.field_list',
                     'mautic.security',
                     'mautic.lead.model.lead',
+                    'translator',
                 ],
             ],
             'mautic.lead.import.company.subscriber' => [
@@ -516,6 +508,7 @@ return [
                     'mautic.lead.field.field_list',
                     'mautic.security',
                     'mautic.lead.model.company',
+                    'translator',
                 ],
             ],
             'mautic.lead.import.subscriber' => [
@@ -1078,6 +1071,13 @@ return [
                     'event_dispatcher',
                 ],
             ],
+            'mautic.lead.query.builder.channel_click.value' => [
+                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder::class,
+                'arguments' => [
+                    'mautic.lead.model.random_parameter_name',
+                    'event_dispatcher',
+                ],
+            ],
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [
@@ -1560,6 +1560,18 @@ return [
             ],
             'mautic.lead.fixture.test.segment' => [
                 'class'     => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
+                'optional'  => true,
+            ],
+            'mautic.lead.fixture.test.click' => [
+                'class'     => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
+                'optional'  => true,
+            ],
+            'mautic.lead.fixture.test.dnc' => [
+                'class'     => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadDncData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
                 'optional'  => true,
