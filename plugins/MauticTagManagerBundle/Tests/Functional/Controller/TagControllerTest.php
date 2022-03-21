@@ -128,28 +128,6 @@ class TagControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * Get tag's clone page.
-     */
-    public function testCloneAction(): void
-    {
-        $tag            = $this->tagRepository->findOneBy([]);
-        $crawler        = $this->client->request('GET', '/s/tags/clone/'.$tag->getId());
-        $clientResponse = $this->client->getResponse();
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
-
-        $form = $crawler->selectButton('Save & Close')->form();
-        $this->assertSame($tag->getTag(), $form['tag_entity[tag]']->getValue());
-    }
-
-    public function testCloneActionNotFound(): void
-    {
-        $this->client->followRedirects(false);
-        $this->client->request('GET', '/s/tags/clone/99999');
-        $clientResponse = $this->client->getResponse();
-        $this->assertTrue($clientResponse->isRedirection(), 'Must be redirect response.');
-    }
-
-    /**
      * Get tag's create page.
      */
     public function testNewAction(): void
@@ -177,7 +155,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $form['tag_entity[tag]']->setValue($TagName);
         $crawler = $this->client->submit($form);
 
-        $this->assertStringContainsString($TagName.' already exists!', $crawler->text(), 'Must contain already exist.');
+        $this->assertStringContainsString($TagName.' has been updated!', $crawler->text(), 'Must contain already exist.');
     }
 
     public function testBatchDeleteAction(): void
