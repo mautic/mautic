@@ -262,7 +262,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onSegmentChange(ListChangeEvent $changeEvent)
+    public function onSegmentChange(ListChangeEvent $changeEvent): void
     {
         $contacts = null !== $changeEvent->getLeads() ? $changeEvent->getLeads() : [$changeEvent->getLead()];
         foreach ($contacts as $contact) {

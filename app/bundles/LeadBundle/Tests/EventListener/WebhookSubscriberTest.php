@@ -15,11 +15,12 @@ use Mautic\LeadBundle\EventListener\WebhookSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EventDispatcher|MockObject
+     * @var EventDispatcherInterface
      */
     private $dispatcher;
 
@@ -188,7 +189,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $dispatcher->dispatch(LeadEvents::COMPANY_POST_DELETE, $event);
     }
 
-    public function testOnSegmentChange()
+    public function testOnSegmentChange(): void
     {
         $mockModel  = $this->createMock(WebhookModel::class);
 
