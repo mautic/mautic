@@ -16,8 +16,8 @@ class MailerEnvLoader implements EnvVarsInterface
     {
         $envVars->set('MAUTIC_MAILER_DNS', $config->get('mailer_dsn'));
         $envVars->set('MAUTIC_MESSENGER_EMAIL_TRANSPORT_DSN', $config->get('mailer_messenger_dsn'));
-        if (empty($envVars->get('MAUTIC_MESSENGER_CONSUMER_NAME'))) {
-            $envVars->set('MAUTIC_MESSENGER_CONSUMER_NAME', 'consumer');
-        }
+
+        $consumerValue = getenv('MAUTIC_MESSENGER_CONSUMER_NAME');
+        $envVars->set('MAUTIC_MESSENGER_CONSUMER_NAME', !empty($consumerValue) ? $consumerValue : 'consumer');
     }
 }
