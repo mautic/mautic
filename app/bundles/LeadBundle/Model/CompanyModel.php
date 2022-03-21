@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
@@ -534,10 +525,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * Get list of entities for autopopulate fields.
      *
-     * @param $type
-     * @param $filter
-     * @param $limit
-     * @param $start
+     * @param string         $type
+     * @param mixed[]|string $filter
+     * @param int            $limit
+     * @param int            $start
      *
      * @return array
      */
@@ -755,10 +746,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array $fields
-     * @param array $data
-     * @param null  $owner
-     * @param bool  $skipIfExists
+     * @param mixed[] $fields
+     * @param mixed[] $data
+     * @param null    $owner
+     * @param bool    $skipIfExists
      *
      * @return bool|null
      *
@@ -784,7 +775,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array $data
      * @param null  $owner
      *
-     * @return bool|null
+     * @return Company|null
      *
      * @throws \Exception
      */

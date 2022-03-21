@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\LeadBundle\Segment;
 
@@ -96,6 +88,14 @@ class ContactSegmentFilter
     public function getField()
     {
         return $this->filterDecorator->getField($this->contactSegmentFilterCrate);
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->contactSegmentFilterCrate->getType();
     }
 
     /**
@@ -218,11 +218,17 @@ class ContactSegmentFilter
         );
     }
 
+    /**
+     * @return string|null
+     */
     public function getRelationJoinTable()
     {
         return method_exists($this->filterDecorator, 'getRelationJoinTable') ? $this->filterDecorator->getRelationJoinTable() : null;
     }
 
+    /**
+     * @return string|null
+     */
     public function getRelationJoinTableField()
     {
         return method_exists($this->filterDecorator, 'getRelationJoinTableField') ?

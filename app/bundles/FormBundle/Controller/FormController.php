@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
@@ -68,8 +59,8 @@ class FormController extends CommonFormController
             $filter['force'][] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
-        $orderBy    = $session->get('mautic.form.orderby', 'f.name');
-        $orderByDir = $session->get('mautic.form.orderbydir', 'ASC');
+        $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
+        $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());
         $forms      = $this->getModel('form.form')->getEntities(
             [
                 'start'      => $start,
@@ -432,6 +423,7 @@ class FormController extends CommonFormController
             [
                 'viewParameters' => [
                     'fields'         => $fieldHelper->getChoiceList($customComponents['fields']),
+                    'viewOnlyFields' => $customComponents['viewOnlyFields'],
                     'actions'        => $customComponents['choices'],
                     'actionSettings' => $customComponents['actions'],
                     'formFields'     => $modifiedFields,
@@ -736,7 +728,7 @@ class FormController extends CommonFormController
 
                 $modifiedFields[$id] = $field;
 
-                if (!empty($field['leadField'])) {
+                if (!empty($field['leadField']) && empty($field['parent'])) {
                     $usedLeadFields[$id] = $field['leadField'];
                 }
             }
@@ -808,6 +800,7 @@ class FormController extends CommonFormController
             [
                 'viewParameters' => [
                     'fields'             => $availableFields,
+                    'viewOnlyFields'     => $customComponents['viewOnlyFields'],
                     'actions'            => $customComponents['choices'],
                     'actionSettings'     => $customComponents['actions'],
                     'formFields'         => $modifiedFields,
@@ -1190,5 +1183,15 @@ class FormController extends CommonFormController
                 ]
             )
         );
+    }
+
+    public function getModelName(): string
+    {
+        return 'form';
+    }
+
+    protected function getDefaultOrderDirection(): string
+    {
+        return 'DESC';
     }
 }

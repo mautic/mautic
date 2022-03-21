@@ -1,30 +1,17 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-/**
- * Class ForeignValueFilterQueryBuilder.
- */
 class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    /** {@inheritdoc} */
     public static function getServiceId()
     {
         return 'mautic.lead.query.builder.foreign.value';
     }
 
-    /** {@inheritdoc} */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
         $filterOperator = $filter->getOperator();

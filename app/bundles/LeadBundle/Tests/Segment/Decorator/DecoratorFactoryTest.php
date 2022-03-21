@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
@@ -19,6 +10,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -63,7 +55,7 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
      */
     public function testDateDecorator()
     {
-        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary();
+        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary($this->createMock(EventDispatcherInterface::class));
         $baseDecorator                  = $this->createMock(BaseDecorator::class);
         $customMappedDecorator          = $this->createMock(CustomMappedDecorator::class);
         $companyDecorator               = $this->createMock(CompanyDecorator::class);
@@ -92,7 +84,7 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
      */
     private function getDecoratorFactory()
     {
-        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary();
+        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary($this->createMock(EventDispatcherInterface::class));
         $baseDecorator                  = $this->createMock(BaseDecorator::class);
         $customMappedDecorator          = $this->createMock(CustomMappedDecorator::class);
         $companyDecorator               = $this->createMock(CompanyDecorator::class);

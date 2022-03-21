@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
@@ -20,10 +12,8 @@ use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Class SegmentReferenceFilterQueryBuilder.
- */
 class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     /**
@@ -41,16 +31,14 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
      */
     private $entityManager;
 
-    /**
-     * SegmentReferenceFilterQueryBuilder constructor.
-     */
     public function __construct(
         RandomParameterName $randomParameterNameService,
         ContactSegmentQueryBuilder $leadSegmentQueryBuilder,
         EntityManager $entityManager,
-        ContactSegmentFilterFactory $leadSegmentFilterFactory
+        ContactSegmentFilterFactory $leadSegmentFilterFactory,
+        EventDispatcherInterface $dispatcher
     ) {
-        parent::__construct($randomParameterNameService);
+        parent::__construct($randomParameterNameService, $dispatcher);
 
         $this->leadSegmentQueryBuilder  = $leadSegmentQueryBuilder;
         $this->leadSegmentFilterFactory = $leadSegmentFilterFactory;

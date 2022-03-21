@@ -5,7 +5,7 @@
 .env.dist
 .github/*
 .gitignore
-.php_cs
+.php-cs-fixer.php
 .travis.yml
 codecov.yml
 Gruntfile.js
@@ -33,7 +33,7 @@ modified_files.txt
 node_modules/*
 package-lock.json
 package.json
-phpstan.neon
+phpstan*.neon
 rector.yaml
 tests/*
 vendor/babdev/*

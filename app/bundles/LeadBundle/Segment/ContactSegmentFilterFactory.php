@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
@@ -58,18 +49,28 @@ class ContactSegmentFilterFactory
 
         $filters = $leadList->getFilters();
         foreach ($filters as $filter) {
-            $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
-
-            $decorator = $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate);
-
-            $filterQueryBuilder = $this->getQueryBuilderForFilter($decorator, $contactSegmentFilterCrate);
-
-            $contactSegmentFilter = new ContactSegmentFilter($contactSegmentFilterCrate, $decorator, $this->schemaCache, $filterQueryBuilder);
-
-            $contactSegmentFilters->addContactSegmentFilter($contactSegmentFilter);
+            $contactSegmentFilters->addContactSegmentFilter($this->factorSegmentFilter($filter));
         }
 
         return $contactSegmentFilters;
+    }
+
+    /**
+     * @param mixed[] $filter
+     *
+     * @return ContactSegmentFilter
+     *
+     * @throws \Exception
+     */
+    public function factorSegmentFilter(array $filter)
+    {
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $decorator = $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate);
+
+        $filterQueryBuilder = $this->getQueryBuilderForFilter($decorator, $contactSegmentFilterCrate);
+
+        return new ContactSegmentFilter($contactSegmentFilterCrate, $decorator, $this->schemaCache, $filterQueryBuilder);
     }
 
     /**

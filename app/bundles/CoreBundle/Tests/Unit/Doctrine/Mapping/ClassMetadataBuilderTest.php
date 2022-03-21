@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Mapping;
 
 use Doctrine\DBAL\Types\Types;
@@ -63,5 +54,26 @@ class ClassMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->classMetadataBuilder->addNullableField('columnName', Types::STRING, 'column_name');
+    }
+
+    public function testaddIndexWithOptions(): void
+    {
+        $columns = [
+            'column_1',
+            'column_2',
+        ];
+
+        $options = [
+            'lengths' => [
+                0 => 128,
+            ],
+        ];
+
+        $index_name = 'index';
+
+        $data = $this->classMetadataBuilder->addIndexWithOptions($columns, $index_name, $options);
+
+        $this->assertEquals($columns, $data->getClassMetadata()->table['indexes'][$index_name]['columns']);
+        $this->assertEquals($options, $data->getClassMetadata()->table['indexes'][$index_name]['options']);
     }
 }

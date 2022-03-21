@@ -1,15 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Aws\CommandPool;
@@ -67,7 +57,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $concurrency;
 
     /**
-     * @var Aws\CommandInterface | Psr\Http\Message\RequestInterface
+     * @var Aws\CommandInterface|Psr\Http\Message\RequestInterface
      */
     private $handler;
 
@@ -337,7 +327,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             $fromEmail = current(array_keys($from));
             $fromName  = $from[$fromEmail];
 
-            $sesArray['FromEmailAddress'] =  (!empty($fromName)) ? mb_encode_mimeheader($fromName).' <'.$fromEmail.'>' : $fromEmail;
+            $sesArray['FromEmailAddress'] =  (!empty($fromName)) ? '"'.mb_encode_mimeheader($fromName).'" <'.$fromEmail.'>' : $fromEmail;
             $to                           = $message->getTo();
             if (!empty($to)) {
                 $sesArray['Destination']['ToAddresses'] = array_keys($to);
@@ -380,7 +370,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 $toSendMessage                                   = (new \Swift_Message());
                 $toSendMessage->setSubject($tokenizedMessage['subject']);
                 $toSendMessage->setFrom([$tokenizedMessage['from']['email'] => $tokenizedMessage['from']['name']]);
-                $sesArray['FromEmailAddress'] =  (!empty($tokenizedMessage['from']['name'])) ? mb_encode_mimeheader($tokenizedMessage['from']['name']).' <'.$tokenizedMessage['from']['email'].'>' : $tokenizedMessage['from']['email'];
+                $sesArray['FromEmailAddress'] =  (!empty($tokenizedMessage['from']['name'])) ? '"'.mb_encode_mimeheader($tokenizedMessage['from']['name']).'" <'.$tokenizedMessage['from']['email'].'>' : $tokenizedMessage['from']['email'];
                 $toSendMessage->setTo([$recipient]);
                 $sesArray['Destination']['ToAddresses'] = [$recipient];
                 if (isset($tokenizedMessage['text']) && strlen($tokenizedMessage['text']) > 0) {
@@ -393,6 +383,11 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 if (isset($tokenizedMessage['headers'])) {
                     $headers = $toSendMessage->getHeaders();
                     foreach ($tokenizedMessage['headers'] as $key => $value) {
+                        if ('List-Unsubscribe' === $key) {
+                            $listUnsubscribe = array_map('trim', explode(',', $value));
+                            $listUnsubscribe = array_filter($listUnsubscribe, fn ($el) => strpos($el, $mailData['hashId']));
+                            $value           = implode(',', $listUnsubscribe);
+                        }
                         $headers->addTextHeader($key, $value);
                     }
                 }

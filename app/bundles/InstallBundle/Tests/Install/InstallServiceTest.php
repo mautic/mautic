@@ -2,18 +2,10 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\Tests\Install;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
@@ -30,13 +22,16 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
 
     private $cacheHelper;
     private $pathsHelper;
+
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
+
     private $translator;
     private $kernel;
     private $validator;
     private $encoder;
 
-    private $installer;
+    private InstallService $installer;
 
     public function setUp(): void
     {
@@ -229,7 +224,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     public function testValidateDatabaseParamsWhenPortNotValid(): void
     {
         $dbParams = [
-            'driver' => 'mysql',
+            'driver' => 'pdo_mysql',
             'host'   => 'localhost',
             'port'   => '-1',
             'name'   => 'mautic',
@@ -245,7 +240,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     public function testValidateDatabaseParamsWhenAllValid(): void
     {
         $dbParams = [
-            'driver' => 'mysql',
+            'driver' => 'pdo_mysql',
             'host'   => 'localhost',
             'port'   => '3306',
             'name'   => 'mautic',
@@ -253,6 +248,22 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->assertEquals([], $this->installer->validateDatabaseParams($dbParams));
+    }
+
+    public function testValidateDatabaseParamsWhenDriverNotValid(): void
+    {
+        $dbParams = [
+            'driver' => 'pdo_sqlite',
+            'host'   => 'localhost',
+            'port'   => '3306',
+            'name'   => 'mautic',
+            'user'   => 'mautic',
+        ];
+        $messages = [
+            'driver' => null,
+        ];
+
+        $this->assertEquals($messages, $this->installer->validateDatabaseParams($dbParams));
     }
 
     /**
@@ -271,5 +282,43 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
 
         $step = $this->createMock(StepInterface::class);
         $this->assertEquals(['error' => null], $this->installer->createDatabaseStep($step, $dbParams));
+    }
+
+    /**
+     * When an exception is raised while creating the schema, there must be an array returned.
+     */
+    public function testCreateSchemaStepWithErrors(): void
+    {
+        $dbParams = [
+            'driver'       => 'pdo_mysql',
+            'host'         => 'localhost',
+            'port'         => '3306',
+            'name'         => 'mautic',
+            'user'         => 'mautic',
+            'table_prefix' => 'mautic_',
+        ];
+
+        $this->assertEquals(['error' => null], $this->installer->createSchemaStep($dbParams));
+    }
+
+    public function testCreateAdminUserStepWhenPasswordIsMissing(): void
+    {
+        $mockRepo = $this->createMock(EntityRepository::class);
+        $mockRepo->expects($this->once())
+            ->method('find')
+            ->willReturn(0);
+
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($mockRepo);
+
+        $data = [
+            'firstname' => 'Demo',
+            'lastname'  => 'User',
+            'username'  => 'admin',
+            'email'     => 'demo@demo.com',
+        ];
+
+        $this->assertEquals(['password' => null], $this->installer->createAdminUserStep($data));
     }
 }
