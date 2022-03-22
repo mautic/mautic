@@ -713,7 +713,7 @@ class ThemeHelper
             $thumbnailFileEvent                                      = new StorageThemeFileEvent($thumbnailFile);
             $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $thumbnailFileEvent);
             $this->themesInfo[$key][$themeDirname]['hasThumbnail']  = $thumbnailFileEvent->existsInStorage() ?? file_exists($realPath.'/thumbnail.png');
-            $this->themesInfo[$key][$themeDirname]['thumbnailUrl']  = $thumbnailFileEvent->existsInStorage() ? $thumbnailFileEvent->getUrl() : $this->assetsHelper->getUrl($themeDirectory, null, null, true);
+            $this->themesInfo[$key][$themeDirname]['thumbnailUrl']  = $thumbnailFileEvent->existsInStorage() ? $thumbnailFileEvent->getUrl() : $this->assetsHelper->getUrl($themeDirectory.'/thumbnail.png', null, null, true);
         }
     }
 
