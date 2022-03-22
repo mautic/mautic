@@ -132,7 +132,7 @@ class CommonController extends Controller implements MauticController
     /**
      * Get a model instance from the service container.
      *
-     * @param $modelNameKey
+     * @param string $modelNameKey
      *
      * @return AbstractCommonModel
      */
@@ -639,8 +639,6 @@ class CommonController extends Controller implements MauticController
      * @param string|null $level
      * @param string|null $domain
      * @param bool|null   $addNotification
-     *
-     * @deprecated Will be removed in Mautic 3.0. Use CommonController::flashBag->addFlash() instead.
      */
     public function addFlash($message, $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false)
     {
