@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment;
 
+use Doctrine\DBAL\Schema\Column;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
@@ -47,7 +48,7 @@ class ContactSegmentFilter
     }
 
     /**
-     * @return \Doctrine\DBAL\Schema\Column
+     * @return Column
      *
      * @throws FieldNotFoundException
      */
@@ -210,7 +211,7 @@ class ContactSegmentFilter
     {
         return sprintf(
             'table: %s,  %s on %s %s %s',
-                $this->getTable(),
+            $this->getTable(),
             $this->getField(),
             $this->getQueryType(),
             $this->getOperator(),

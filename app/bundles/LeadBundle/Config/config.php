@@ -380,8 +380,8 @@ return [
             'mautic.lead.campaignbundle.action_delete_contacts.subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\CampaignActionDeleteContactSubscriber::class,
                 'arguments' => [
-                   'mautic.lead.model.lead',
-                   'mautic.campaign.helper.removed_contact_tracker',
+                    'mautic.lead.model.lead',
+                    'mautic.campaign.helper.removed_contact_tracker',
                 ],
             ],
             'mautic.lead.campaignbundle.action_dnc.subscriber' => [
@@ -1219,6 +1219,7 @@ return [
                     'mautic.lead.model.lead_segment_decorator_custom_mapped',
                     'mautic.lead.model.lead_segment.decorator.date.optionFactory',
                     'mautic.lead.model.lead_segment_decorator_company',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.lead.model.lead_segment_decorator_base' => [
