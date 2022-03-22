@@ -82,7 +82,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Used for notifications.
      */
-    protected ?array $adminUsers;
+    protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
     protected array $notifications = [];
     protected ?string $lastIntegrationError;
