@@ -190,7 +190,7 @@ class ReportSubscriber implements EventSubscriberInterface
             }
 
             if (!$event->hasGroupBy()) {
-                $queryBuilder->groupBy('ad.asset_id');
+                $queryBuilder->groupBy('ad.id');
             }
         }
 

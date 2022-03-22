@@ -27,6 +27,8 @@ abstract class PluginBundleBase extends Bundle
      * @param null $installedSchema
      *
      * @throws \Exception
+     *
+     * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_INSTALL instead
      */
     public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null)
     {
@@ -74,6 +76,8 @@ abstract class PluginBundleBase extends Bundle
      * @param Schema $installedSchema
      *
      * @throws \Exception
+     *
+     * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_UPDATE instead
      */
     public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null)
     {

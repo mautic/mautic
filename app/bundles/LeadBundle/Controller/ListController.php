@@ -68,7 +68,7 @@ class ListController extends FormController
         $this->setListFilters();
 
         //set limits
-        $limit = $session->get('mautic.segment.limit', $this->coreParametersHelper->get('default_pagelimit'));
+        $limit = $session->get('mautic.lead.list.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -78,8 +78,8 @@ class ListController extends FormController
         $session->set('mautic.segment.filter', $search);
 
         //do some default filtering
-        $orderBy    = $session->get('mautic.segment.orderby', 'l.name');
-        $orderByDir = $session->get('mautic.segment.orderbydir', 'ASC');
+        $orderBy    = $session->get('mautic.lead.list.orderby', 'l.dateModified');
+        $orderByDir = $session->get('mautic.lead.list.orderbydir', $this->getDefaultOrderDirection());
 
         $filter = [
             'string' => $search,
@@ -127,15 +127,16 @@ class ListController extends FormController
         $leadCounts = (!empty($listIds)) ? $model->getRepository()->getLeadCount($listIds) : [];
 
         $parameters = [
-            'items'       => $items,
-            'leadCounts'  => $leadCounts,
-            'page'        => $page,
-            'limit'       => $limit,
-            'permissions' => $permissions,
-            'security'    => $this->get('mautic.security'),
-            'tmpl'        => $tmpl,
-            'currentUser' => $this->user,
-            'searchValue' => $search,
+            'items'                          => $items,
+            'leadCounts'                     => $leadCounts,
+            'page'                           => $page,
+            'limit'                          => $limit,
+            'permissions'                    => $permissions,
+            'security'                       => $this->get('mautic.security'),
+            'tmpl'                           => $tmpl,
+            'currentUser'                    => $this->user,
+            'searchValue'                    => $search,
+            'segmentRebuildWarningThreshold' => $this->coreParametersHelper->get('segment_rebuild_time_warning'),
         ];
 
         return $this->delegateView(
@@ -183,6 +184,7 @@ class ListController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
+                    $list->setDateModified(new \DateTime());
                     $model->saveEntity($list);
 
                     $this->addFlash('mautic.core.notice.created', [
@@ -990,5 +992,10 @@ class ListController extends FormController
             'leadlist_id',
             $listFilters
         );
+    }
+
+    protected function getDefaultOrderDirection()
+    {
+        return 'DESC';
     }
 }

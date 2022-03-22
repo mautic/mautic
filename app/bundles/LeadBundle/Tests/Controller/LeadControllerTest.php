@@ -356,6 +356,21 @@ class LeadControllerTest extends MauticMysqlTestCase
         return $lead;
     }
 
+    public function testLookupTypeFieldOnError(): void
+    {
+        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues(
+            [
+                'lead[title]' => 'Custom title longer like 191 characters Custom title longer like 191 characters Custom title longer like 191 characters Custom title longer like 191 characters Custom title longer like 191 characters Custom title longer like 191 characters ',
+            ]
+        );
+
+        $this->client->submit($form);
+        $clientResponse = $this->client->getResponse();
+        $this->assertStringContainsString('title: This value is too long. It should have 191 characters or less', $clientResponse->getContent());
+    }
+
     private function createCampaign(): Campaign
     {
         $campaign = new Campaign();
