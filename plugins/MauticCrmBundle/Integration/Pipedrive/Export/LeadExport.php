@@ -138,6 +138,21 @@ class LeadExport extends AbstractPipedrive
         $accessor = PropertyAccess::createPropertyAccessor();
 
         foreach ($leadFields as $externalField => $internalField) {
+            if ('mauticContactTimelineLink' === $internalField) {
+                $mappedData[$externalField] = $this->getIntegration()->getContactTimelineLink($lead->getId());
+                continue;
+            }
+
+            if ('mauticContactIsContactableByEmail' === $internalField) {
+                $mappedData[$externalField] = $this->getIntegration()->getLeadDoNotContact($lead->getId());
+                continue;
+            }
+
+            if ('mauticContactId' === $internalField) {
+                $mappedData[$externalField] = $lead->getId();
+                continue;
+            }
+
             if (in_array($externalField, self::NO_ALLOWED_FIELDS_TO_EXPORT)) {
                 continue;
             }
