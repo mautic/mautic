@@ -82,7 +82,6 @@ $listCommand = $view['translator']->trans('mautic.tagmanager.tag.searchcommand.l
                                 'item'            => $item,
                                 'templateButtons' => [
                                     'edit'   => $permissions['tagManager:tagManager:edit'],
-                                    'clone'  => $permissions['tagManager:tagManager:create'],
                                     'delete' => $permissions['tagManager:tagManager:delete'],
                                 ],
                                 'routeBase'  => 'tagmanager',
