@@ -21,11 +21,6 @@ class GTMHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetCodeAndHasLandingEnabledEmpty()
     {
-        $expected = [
-            'google_tag_manager_id'                  => '',
-            'google_tag_manager_landingpage_enabled' => '',
-        ];
-
         $helper = new \Mautic\CoreBundle\Templating\Helper\GTMHelper($this->parametersHelper);
 
         $this->assertEquals(null, $helper->getCode());
@@ -37,12 +32,11 @@ class GTMHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetCodeAndHasLandingEnabled()
     {
-        $this->parametersHelper->expects($this->at(0))
+        $this->parametersHelper->expects($this->exactly(2))
             ->method('get')
-            ->will($this->returnValue('gtm_id'));
-        $this->parametersHelper->expects($this->at(1))
-            ->method('get')
-            ->will($this->returnValue(true));
+            ->willReturnOnConsecutiveCalls(
+                'gtm_id', true
+            );
 
         $helper = new \Mautic\CoreBundle\Templating\Helper\GTMHelper($this->parametersHelper);
         $this->assertEquals('gtm_id', $helper->getCode());
@@ -64,9 +58,11 @@ class GTMHelperTest extends \PHPUnit\Framework\TestCase
     public function testGetBodyGTMCodeWithCorrectCode()
     {
         $code = 'gtm_id';
-        $this->parametersHelper->expects($this->at(0))
+        $this->parametersHelper->expects($this->exactly(2))
             ->method('get')
-            ->will($this->returnValue($code));
+            ->willReturnOnConsecutiveCalls(
+                $code
+            );
 
         $helper = new \Mautic\CoreBundle\Templating\Helper\GTMHelper($this->parametersHelper);
 
@@ -83,9 +79,12 @@ class GTMHelperTest extends \PHPUnit\Framework\TestCase
     {
         $correctCode = 'gtm_id';
         $wrongCode   = 'gtm_wrong_id';
-        $this->parametersHelper->expects($this->at(0))
+
+        $this->parametersHelper->expects($this->exactly(2))
             ->method('get')
-            ->will($this->returnValue($correctCode));
+            ->willReturnOnConsecutiveCalls(
+                $correctCode
+            );
 
         $helper = new \Mautic\CoreBundle\Templating\Helper\GTMHelper($this->parametersHelper);
 
@@ -111,9 +110,11 @@ class GTMHelperTest extends \PHPUnit\Framework\TestCase
     public function testGetHeadGTMCodeWithCorrectCode()
     {
         $code = 'gtm_id';
-        $this->parametersHelper->expects($this->at(0))
-            ->method('get')
-            ->will($this->returnValue($code));
+        $this->parametersHelper->expects($this->exactly(2))
+        ->method('get')
+        ->willReturnOnConsecutiveCalls(
+            $code
+        );
 
         $helper = new \Mautic\CoreBundle\Templating\Helper\GTMHelper($this->parametersHelper);
 
@@ -134,9 +135,11 @@ class GTMHelperTest extends \PHPUnit\Framework\TestCase
     {
         $correctCode = 'gtm_id';
         $wrongCode   = 'gtm_wrong_id';
-        $this->parametersHelper->expects($this->at(0))
-            ->method('get')
-            ->will($this->returnValue($correctCode));
+        $this->parametersHelper->expects($this->exactly(2))
+        ->method('get')
+        ->willReturnOnConsecutiveCalls(
+            $correctCode
+        );
 
         $helper = new \Mautic\CoreBundle\Templating\Helper\GTMHelper($this->parametersHelper);
 
