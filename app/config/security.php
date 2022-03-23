@@ -1,5 +1,17 @@
 <?php
 
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+$parameterLoader    = new \Mautic\CoreBundle\Loader\ParameterLoader();
+$configParameterBag = $parameterLoader->getParameterBag();
+
 $firewalls = [
     'install' => [
         'pattern'   => '^/installer',
@@ -82,10 +94,10 @@ $firewalls = [
             'target' => '/s/login',
         ],
         'remember_me' => [
-            'secret'   => '%mautic.rememberme_key%',
-            'lifetime' => (int) $container->getParameter('mautic.rememberme_lifetime'),
-            'path'     => '%mautic.rememberme_path%',
-            'domain'   => '%mautic.rememberme_domain%',
+            'secret'   => $configParameterBag->get('rememberme_key'),
+            'lifetime' => $configParameterBag->get('rememberme_lifetime'),
+            'path'     => $configParameterBag->get('rememberme_path'),
+            'domain'   => $configParameterBag->get('rememberme_domain'),
         ],
         'fos_oauth'     => true,
         'context'       => 'mautic',
