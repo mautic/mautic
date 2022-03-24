@@ -2,13 +2,10 @@
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
-use Mautic\CampaignBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use DateTime;
 use DateTimeZone;
 use Doctrine\DBAL\Connection;
 use Mautic\CampaignBundle\Entity\Lead;
-use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
 use Mautic\LeadBundle\Entity\Lead as Contact;
@@ -16,7 +13,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository as ContactRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
-use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
 class TriggerCampaignCommandTest extends AbstractCampaignCommand
@@ -503,38 +499,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertFalse(isset($tags['EmailNotOpen']));
     }
 
-    /**
-     * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \Exception
-     */
-    public function testSegmentCacheCountInBackground(): void
-    {
-        // remove redis key if exist
-        $this->segmentCountCacheHelper->deleteSegmentContactCount(1);
-
-        // Execute the command again to trigger related events.
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1]);
-
-        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertEquals(0, $count);
-
-        $this->runCommand(SegmentCountCacheCommand::COMMAND_NAME);
-
-        // Segment cache count should be 50.
-        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertEquals(50, $count);
-    }
-
-    public function testSegmentCacheCount(): void
-    {
-        // Execute the command again to trigger related events.
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1]);
-
-        // Segment cache count should be 50.
-        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertEquals(50, $count);
-    }
-
     public function testNonRepeatableCampaignBcForQueryOptimization(): void
     {
         /** @var ListLeadRepository $segmentContactsRepository */
@@ -622,7 +586,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->createEvent('Remove 1 point', $campaign, 'lead.changepoints', 'action', ['points' => -1]);
 
         $campaign->addList($segment);
-        $campaign->setAllowRestart(1);
+        $campaign->setAllowRestart(true);
 
         $this->em->flush();
         $this->em->clear();
@@ -695,9 +659,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @return array
+     * @return int[]
      */
-    private function getTagCounts()
+    private function getTagCounts(): array
     {
         $tags = $this->db->createQueryBuilder()
             ->select('t.tag, count(*) as the_count')
@@ -746,6 +710,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->em->clear();
     }
 
+    /**
+     * @param int[] $ids
+     */
     private function shiftEventsToThePast(array $ids): void
     {
         $this->db->createQueryBuilder()->update(MAUTIC_TABLE_PREFIX.'campaign_events')
@@ -759,6 +726,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->em->clear();
     }
 
+    /**
+     * @param mixed[] $filters
+     */
     protected function createSegment(string $alias, array $filters): LeadList
     {
         $segment = new LeadList();

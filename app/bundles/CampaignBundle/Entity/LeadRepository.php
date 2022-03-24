@@ -529,7 +529,7 @@ class LeadRepository extends CommonRepository
         return $segments;
     }
 
-    private function updateQueryWithExistingMembershipExclusion(int $campaignId, QueryBuilder $qb, bool $campaignCanBeRestarted = false)
+    private function updateQueryWithExistingMembershipExclusion(int $campaignId, QueryBuilder $qb, bool $campaignCanBeRestarted = false): void
     {
         $qb->leftJoin(
             'll',
