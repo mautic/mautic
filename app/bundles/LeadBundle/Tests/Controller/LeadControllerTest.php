@@ -5,8 +5,6 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
-use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
@@ -14,8 +12,6 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
-use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -303,9 +299,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     public function testContactsAreAddedAndRemovedFromCompanies(): void
     {
         // Running all these in one test to avoid having to re-load fixtures multiple time
-        $this->loadFixtures(
-            [LeadFieldData::class, RoleData::class, LoadRoleData::class, LoadUserData::class, LoadLeadData::class, LoadCompanyData::class]
-        );
+        $this->loadFixtures([LoadLeadData::class, LoadCompanyData::class]);
 
         $this->client->catchExceptions(false);
 
