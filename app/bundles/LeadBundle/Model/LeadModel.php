@@ -1818,6 +1818,8 @@ class LeadModel extends FormModel
 
     /**
      * Modify companies for lead.
+     *
+     * @param int[] $companies
      */
     public function modifyCompanies(Lead $lead, array $companies)
     {
@@ -1840,10 +1842,8 @@ class LeadModel extends FormModel
 
         // Add companies that are not in the array of found companies
         $addCompanies = $requestedCompanies->reject(
-            function ($companyId) use ($currentCompanies) {
-                // Reject if the lead is already in the given company
-                return $currentCompanies->has($companyId);
-            }
+            // Reject if the lead is already in the given company
+            fn ($companyId) => $currentCompanies->has($companyId)
         );
         if ($addCompanies->count()) {
             $this->companyModel->addLeadToCompany($addCompanies->toArray(), $lead);

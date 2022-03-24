@@ -5,24 +5,22 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
-use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
-use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
-use Illuminate\Support\Collection;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Tightenco\Collect\Support\Collection;
 
-/**
- * @IgnoreAnnotation("covers")
- */
 class LeadControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
@@ -302,13 +300,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertEquals(true, (strlen($content) > 10000));
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Model\CompanyModel::addLeadToCompany
-     * @covers \Mautic\LeadBundle\Model\CompanyModel::removeLeadFromCompany
-     * @covers \Mautic\LeadBundle\Model\CompanyModel::updateContactAfterPrimaryCompanyWasRemoved
-     * @covers \Mautic\LeadBundle\Model\LeadModel::modifyCompanies
-     */
-    public function testContactsAreAddedAndRemovedFromCompanies()
+    public function testContactsAreAddedAndRemovedFromCompanies(): void
     {
         // Running all these in one test to avoid having to re-load fixtures multiple time
         $this->loadFixtures(
@@ -366,7 +358,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     {
         return $this->connection->createQueryBuilder()
             ->select('ll.id', 'll.name', 'll.category_id')
-            ->from('lead_lists', 'll')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'll')
             ->execute()
             ->fetchAllAssociative();
     }
@@ -467,6 +459,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         return $campaign;
     }
 
+    /**
+     * @return Lead[]
+     */
     private function getCompanyLeads(int $leadId): array
     {
         return $this->connection->createQueryBuilder()
@@ -489,7 +484,10 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->fetchColumn();
     }
 
-    private function assertCompanyAssociation(array $expectedCompanies, int $leadId)
+    /**
+     * @param int[] $expectedCompanies
+     */
+    private function assertCompanyAssociation(array $expectedCompanies, int $leadId): void
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
         $saveButton = $crawler->selectButton('lead[buttons][save]');
@@ -513,6 +511,6 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertEquals($primary->first()['companyname'], $primaryCompanyName);
         // Primary company should be in the UI of the details dropdown tray
         $details = $crawler->filter('#lead-details')->html();
-        $this->assertContains($primaryCompanyName, $details);
+        $this->assertStringContainsString($primaryCompanyName, $details);
     }
 }
