@@ -88,13 +88,18 @@ function switchBuilderButton(theme) {
  * @param theme
  */
 function switchCustomHtml(theme) {
-  const isCodeMode = theme === 'mautic_code_mode';
   const customHtmlRow = mQuery('#custom-html-row');
+  const isPageMode = mQuery('[name="page"]').length !== 0;
+  // const isPageMode = document.getElementsByName('page').length !== 0;
+  const isCodeMode = theme === 'mautic_code_mode';
+  const advancedTab = isPageMode ? mQuery('#advanced-tab') : null;
 
   if (isCodeMode === true) {
-    customHtmlRow.removeClass('hide');
+    customHtmlRow.removeClass('hidden');
+    isPageMode && advancedTab.removeClass('hidden');
   } else {
-    customHtmlRow.addClass('hide');
+    customHtmlRow.addClass('hidden');
+    isPageMode && advancedTab.addClass('hidden');
   }
 }
 

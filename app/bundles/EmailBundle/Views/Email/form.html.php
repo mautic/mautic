@@ -136,7 +136,7 @@ if (!isset($previewUrl)) {
                         </div>
 
                         <br>
-                        <div class="row hide" id="custom-html-row">
+                        <div class="row hidden" id="custom-html-row">
                             <div class="col-md-12">
                                 <?php echo $view['form']->label($form['customHtml']); ?>
                                 <?php echo $view['form']->widget($form['customHtml']); ?>
