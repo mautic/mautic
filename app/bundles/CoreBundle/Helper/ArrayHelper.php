@@ -108,9 +108,7 @@ class ArrayHelper
         }
 
         return array_map(
-            function (array $subArray) {
-                return array_flip($subArray);
-            },
+            fn (array $subArray) => array_flip($subArray),
             $masterArrays
         );
     }
