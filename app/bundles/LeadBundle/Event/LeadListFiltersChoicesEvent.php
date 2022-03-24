@@ -38,7 +38,7 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
      */
     protected $translator;
 
-    protected $search;
+    private string $search;
 
     /**
      * @param mixed[] $choices
