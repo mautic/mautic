@@ -14,7 +14,9 @@ namespace Mautic\PageBundle\Controller;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
+use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+use Mautic\CoreBundle\Event\StorageThemeFileEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -839,9 +841,15 @@ class PageController extends FormController
 
         $this->processSlots($slots, $entity);
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.php');
+        $templateName      = ':'.$template.':page.html.php';
 
-        return $this->render($logicalName, [
+        /** @var ThemeHelper $themeHelper */
+        $themeHelper    = $this->factory->getHelper('theme');
+        $theme          = $themeHelper->parseTheme($templateName);
+
+        $logicalName               = $themeHelper->checkForTwigTemplate($templateName);
+
+        $viewParameters = [
             'isNew'       => $isNew,
             'slots'       => $slots,
             'formFactory' => $this->get('form.factory'),
@@ -849,7 +857,16 @@ class PageController extends FormController
             'page'        => $entity,
             'template'    => $template,
             'basePath'    => $this->request->getBasePath(),
-        ]);
+        ];
+
+        $fileStorageEvent = new StorageThemeFileEvent($theme->getPath());
+        $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $fileStorageEvent);
+
+        if ($fileStorageEvent->existsInStorage()) {
+            return new JsonResponse($this->get('twig')->createTemplate($fileStorageEvent->getContents())->render($viewParameters));
+        }
+
+        return $this->render($logicalName, $viewParameters);
     }
 
     /**

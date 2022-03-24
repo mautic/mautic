@@ -982,7 +982,7 @@ class EmailController extends FormController
         $theme          = $themeHelper->parseTheme($templateName);
 
         $logicalName               = $themeHelper->checkForTwigTemplate($templateName);
-        $viewparameters            = [
+        $viewParameters            = [
             'isNew'    => $isNew,
             'slots'    => $slots,
             'content'  => $content,
@@ -995,12 +995,12 @@ class EmailController extends FormController
         $this->dispatcher->dispatch(CoreEvents::STORAGE_FILE_READ, $fileStorageEvent);
 
         if ($fileStorageEvent->existsInStorage()) {
-            return new JsonResponse($this->get('twig')->createTemplate($fileStorageEvent->getContents())->render($viewparameters));
+            return new JsonResponse($this->get('twig')->createTemplate($fileStorageEvent->getContents())->render($viewParameters));
         }
 
         return $this->render(
             $logicalName,
-            $viewparameters
+            $viewParameters
         );
     }
 
