@@ -36,6 +36,8 @@ class Release
      */
     private $stability;
 
+    private Metadata $metadata;
+
     /**
      * @throws UpdatePackageNotFoundException
      */
@@ -45,6 +47,7 @@ class Release
         $this->downloadUrl     = $this->parseUpdatePackage($release['assets']);
         $this->announcementUrl = $metadata->getAnnouncementUrl() ? $metadata->getAnnouncementUrl() : $release['html_url'];
         $this->stability       = $metadata->getStability();
+        $this->metadata        = $metadata;
     }
 
     public function getVersion(): string
@@ -65,6 +68,11 @@ class Release
     public function getStability(): string
     {
         return $this->stability;
+    }
+
+    public function getMetadata(): Metadata
+    {
+        return $this->metadata;
     }
 
     /**

@@ -306,7 +306,8 @@ class PublicController extends CommonFormController
             if (in_array('form', $config['features'])) {
                 $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':form.html.php');
             } else {
-                $contentTemplate = 'MauticFormBundle::form.html.php';
+                $viewParams['content'] = '';
+                $viewParams['message'] = $message.$formContent;
             }
         }
 
@@ -446,7 +447,7 @@ class PublicController extends CommonFormController
         }
 
         if (
-            ($this->get('mautic.security')->isAnonymous() && (!$emailEntity->isPublished() || !$emailEntity->isPublicPreview()))
+            ($this->get('mautic.security')->isAnonymous() && (!$emailEntity->getIsPublished() || !$emailEntity->isPublicPreview()))
             || (!$this->get('mautic.security')->isAnonymous()
                 && !$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',

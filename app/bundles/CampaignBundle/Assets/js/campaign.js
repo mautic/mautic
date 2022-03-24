@@ -2065,5 +2065,64 @@ Mautic.highlightJumpTarget = function(event, el) {
     }
 };
 
+/**
+ * Display confirmation modal if user wishes to unpublish the campaign.
+ */
+Mautic.showCampaignConfirmation = function (el) {
+    let element = mQuery(el);
+    if (element.prop('checked') && element.val() !== "1") {
+        Mautic.showConfirmation(element);
+    }
+};
 
+/**
+ * Cancel Callback to trigger the yes button and dismiss the confirmation modal.
+ */
+Mautic.setPublishedButtonToYes = function (el) {
+    // Dismiss the confirmation
+    Mautic.dismissConfirmation();
 
+    // Find the yes button id and trigger click event
+    var yesButton  = mQuery(el).parent('.btn-no').siblings('.btn-yes').children('input');
+    var yesButtonId = mQuery(yesButton).attr('id');
+    if (yesButtonId !== undefined) {
+        mQuery('#' + yesButtonId).trigger('click');
+        mQuery(el).parent('.btn-no').removeClass('active');
+        mQuery(el).parent('.btn-no').siblings('.btn-yes').addClass('active');
+    }
+};
+
+/**
+ * Onclick Callback to show the confirmation modal during toggling campaign status.
+ */
+Mautic.confirmationCampaignPublishStatus = function (el) {
+    let element = mQuery(el);
+
+    // Add the confirmation modal, if current status is published
+    if (element.data('status') === 'published') {
+        Mautic.showConfirmation(element);
+    }
+    else {
+        // Otherwise just change the status.
+        Mautic.confirmCallbackCampaignPublishStatus('', el);
+    }
+}
+
+/**
+ * Confirm Callback to toggling campaign status if user chooses Yes.
+ */
+Mautic.confirmCallbackCampaignPublishStatus = function (action, el) {
+    let element = mQuery(el);
+
+    let idClass = element.data('id-class');
+    let model = element.data('model');
+    let itemId = element.data('item-id');
+    let query = element.data('query');
+    let backdrop = element.data('backdrop');
+
+    // Toggles published status of an campaign
+    Mautic.togglePublishStatus(event, idClass, model, itemId, query, backdrop);
+
+    // Dismiss the confirmation
+    Mautic.dismissConfirmation();
+}

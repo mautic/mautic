@@ -841,6 +841,30 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => false,
             ],
+            [ // ID 40
+                'name'    => 'Include segment membership with or',
+                'alias'   => 'segment-test-include-segment-with-or',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'country',
+                        'operator' => '=',
+                        'filter'   => 'United Kingdom',
+                        'display'  => '',
+                    ],
+                    [
+                        'glue'     => 'or',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => 'in',
+                        'filter'   => [8],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => false,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {
