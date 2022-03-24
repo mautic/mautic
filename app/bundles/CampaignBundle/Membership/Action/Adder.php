@@ -48,7 +48,7 @@ class Adder
         // Start the new rotation at 2
         if ($this->leadEventLogRepository->hasBeenInCampaignRotation($contact->getId(), $campaign->getId(), 1)) {
             if (!$campaign->allowRestart()) {
-                $campaignMember->setManuallyRemoved(1);
+                $campaignMember->setManuallyRemoved(true);
                 $campaignMember->setDateLastExited(new \DateTime());
             } else {
                 $campaignMember->setRotation(2);
