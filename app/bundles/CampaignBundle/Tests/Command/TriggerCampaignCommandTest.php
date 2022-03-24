@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository as ContactRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
 class TriggerCampaignCommandTest extends AbstractCampaignCommand
@@ -44,7 +45,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     /**
      * @throws Exception
      */
-    public function testCampaignExecutionForAll()
+    public function testCampaignExecutionForAll(): void
     {
         // Process in batches of 10 to ensure batching is working as expected
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
@@ -803,6 +804,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $segment = new LeadList();
         $segment->setAlias($alias);
         $segment->setName($alias);
+        $segment->setPublicName($alias);
         $segment->setFilters($filters);
         $this->em->persist($segment);
 
