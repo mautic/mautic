@@ -90,7 +90,6 @@ function switchBuilderButton(theme) {
 function switchCustomHtml(theme) {
   const customHtmlRow = mQuery('#custom-html-row');
   const isPageMode = mQuery('[name="page"]').length !== 0;
-  // const isPageMode = document.getElementsByName('page').length !== 0;
   const isCodeMode = theme === 'mautic_code_mode';
   const advancedTab = isPageMode ? mQuery('#advanced-tab') : null;
 
