@@ -45,7 +45,7 @@ class Interval implements ScheduleModeInterface
      */
     public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime)
     {
-        $interval = $event->getTriggerInterval();
+        $interval = min($event->getTriggerInterval(), 1);
         $unit     = $event->getTriggerIntervalUnit();
 
         try {
