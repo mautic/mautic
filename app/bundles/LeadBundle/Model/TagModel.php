@@ -56,7 +56,6 @@ class TagModel extends FormModel
      * {@inheritdoc}
      *
      * @param Tag    $entity
-     * @param        $formFactory
      * @param string $action
      * @param array  $options
      *
