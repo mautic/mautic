@@ -51,11 +51,6 @@ class AssetModel extends FormModel
     protected $leadModel;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
-     */
-    protected $request;
-
-    /**
      * @var IpLookupHelper
      */
     protected $ipLookupHelper;
@@ -90,9 +85,6 @@ class AssetModel extends FormModel
      */
     private $requestStack;
 
-    /**
-     * AssetModel constructor.
-     */
     public function __construct(
         LeadModel $leadModel,
         CategoryModel $categoryModel,
@@ -471,11 +463,13 @@ class AssetModel extends FormModel
         switch ($type) {
             case 'asset':
                 $viewOther = $this->security->isGranted('asset:assets:viewother');
+                $request   = $this->requestStack->getCurrentRequest();
                 $repo      = $this->getRepository();
                 $repo->setCurrentUser($this->userHelper->getUser());
                 // During the form submit & edit, make sure that the data is checked against available assets
-                if ('mautic_segment_action' == $this->request->get('_route') &&
-                    (Request::METHOD_POST == $this->request->getMethod() || 'edit' == $this->request->get('objectAction'))) {
+                if ('mautic_segment_action' === $request->get('_route') &&
+                    (Request::METHOD_POST === $request->getMethod() || 'edit' === $request->get('objectAction'))
+                ) {
                     $limit = 0;
                 }
                 $results = $repo->getAssetList($filter, $limit, 0, $viewOther);
