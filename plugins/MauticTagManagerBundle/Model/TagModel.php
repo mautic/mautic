@@ -26,10 +26,10 @@ class TagModel extends BaseTagModel
     /**
      * {@inheritdoc}
      *
-     * @param Tag   $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param Tag    $entity
+     * @param        $formFactory
+     * @param string $action
+     * @param array  $options
      *
      * @return mixed
      *

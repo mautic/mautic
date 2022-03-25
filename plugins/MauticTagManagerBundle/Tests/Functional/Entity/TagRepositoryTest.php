@@ -41,9 +41,9 @@ class TagRepositoryTest extends MauticMysqlTestCase
         }
     }
 
-    public function testCountOccurencesReturnsCorrectQuantityOfTags(): void
+    public function testGetTagByName(): void
     {
-        $count = $this->tagRepository->countOccurrences('tag2');
-        Assert::assertSame(1, $count);
+        $tag = $this->tagRepository->getTagByName('tag2');
+        Assert::assertInstanceOf(Tag::class, $tag);
     }
 }

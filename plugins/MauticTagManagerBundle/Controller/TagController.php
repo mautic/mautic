@@ -5,8 +5,9 @@ namespace MauticPlugin\MauticTagManagerBundle\Controller;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\LeadBundle\Entity\Tag;
-use Mautic\LeadBundle\Model\TagModel;
+use Mautic\LeadBundle\Entity\Tag as LeadTag;
+use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
+use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -150,6 +151,8 @@ class TagController extends FormController
 
         //retrieve the entity
         $tag   = new Tag();
+
+        /** @var TagModel $model */
         $model = $this->getModel('tagmanager.tag');
         //set the page we came from
         $page = $this->get('session')->get('mautic.tagmanager.page', 1);
@@ -166,9 +169,9 @@ class TagController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
-                    $found = $model->getRepository()->countOccurrences($tag->getTag());
-                    if (0 !== $found) {
-                        $valid = false;
+                    $existingTag = $model->getRepository()->getTagByName($tag->getTag());
+                    if (!empty($existingTag)) {
+                        $tag = $existingTag;
                         $this->addFlash('mautic.core.notice.updated', [
                             '%name%'      => $tag->getTag(),
                             '%menu_link%' => 'mautic_tagmanager_index',
@@ -267,7 +270,7 @@ class TagController extends FormController
      *
      * @return Response
      */
-    private function createTagModifyResponse(Tag $tag, array $postActionVars, $action, $ignorePost)
+    private function createTagModifyResponse(LeadTag $tag, array $postActionVars, $action, $ignorePost)
     {
         /** @var TagModel $tagModel */
         $tagModel = $this->getModel('tagmanager.tag');
@@ -279,17 +282,9 @@ class TagController extends FormController
         if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
-                    // We are editing existing tag.in the database.
-                    $valid        = true;
-                    $existingTags = $tagModel->getRepository()->getTagsByName([$tag->getTag()]);
-                    foreach ($existingTags as $e) {
-                        if ($e->getId() != $tag->getId()) {
-                            $valid = false;
-                            break;
-                        }
-                    }
-
-                    if (!$valid) {
+                    $existingTag = $tagModel->getRepository()->getTagByName($tag->getTag());
+                    if (!empty($existingTag)) {
+                        $tag = $existingTag;
                         $this->addFlash('mautic.core.notice.updated', [
                             '%name%'      => $tag->getTag(),
                             '%menu_link%' => 'mautic_tagmanager_index',
@@ -376,7 +371,7 @@ class TagController extends FormController
         $tag = $this->getModel('lead.tag')->getEntity($tagId);
 
         // Check if exists
-        if (!$tag) {
+        if (!$tag instanceof LeadTag) {
             throw new EntityNotFoundException(sprintf('Tag with id %d not found.', $tagId));
         }
 
@@ -429,7 +424,7 @@ class TagController extends FormController
         $model    = $this->getModel('lead.tag');
         $security = $this->get('mautic.security');
 
-        /** @var Tag $tag */
+        /** @var LeadTag $tag */
         $tag = $model->getEntity($objectId);
 
         //set the page we came from

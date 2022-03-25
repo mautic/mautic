@@ -2,6 +2,8 @@
 
 namespace MauticPlugin\MauticTagManagerBundle\Entity;
 
+use Doctrine\ORM\NoResultException;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository as BaseTagRepository;
 
 /**
@@ -27,18 +29,20 @@ class TagRepository extends BaseTagRepository
         return 'lt';
     }
 
-    public function countOccurrences($tag)
+    public function getTagByName(string $tag): ?Tag
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q = $this->createQueryBuilder($this->getTableAlias());
+        $q->where($this->getTableAlias().'.tag = :tag');
+        $q->setParameter('tag', $tag);
+        $q->setMaxResults(1);
 
-        $q->select('lt.tag')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_tags', 'lt')
-            ->where('lt.tag = :tag')
-            ->setParameter('tag', $tag);
+        try {
+            $result = $q->getQuery()->getSingleResult();
+        } catch (NoResultException $e) {
+            $result = null;
+        }
 
-        $result = $q->execute()->fetchAll();
-
-        return count($result);
+        return $result;
     }
 
     /**
