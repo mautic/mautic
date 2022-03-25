@@ -61,7 +61,8 @@ class FilterType extends AbstractType
             $form        = $event->getForm();
             $fieldAlias  = $data['field'] ?? null;
             $fieldObject = $data['object'] ?? 'behaviors';
-            $field       = $fieldChoices[$fieldObject][$fieldAlias] ?? null;
+            // Looking for behaviors for BC reasons as some filters were moved from 'lead' to 'behaviors'.
+            $field       = $fieldChoices[$fieldObject][$fieldAlias] ?? $fieldChoices['behaviors'][$fieldAlias] ?? null;
             $operators   = $field['operators'] ?? [];
             $operator    = $data['operator'] ?? null;
 
