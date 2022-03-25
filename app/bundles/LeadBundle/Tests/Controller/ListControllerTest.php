@@ -103,6 +103,9 @@ class ListControllerTest extends MauticMysqlTestCase
         return $list;
     }
 
+    /**
+     * @return Lead[]
+     */
     private function createContacts(): array
     {
         $contact1 = new Lead();
@@ -122,6 +125,9 @@ class ListControllerTest extends MauticMysqlTestCase
         return [$contact1, $contact2];
     }
 
+    /**
+     * @param Lead[] $contacts
+     */
     private function addContactsToSegment(array $contacts, string $segmentName): LeadList
     {
         $filters = [
@@ -139,6 +145,7 @@ class ListControllerTest extends MauticMysqlTestCase
 
         $segment = new LeadList();
         $segment->setName($segmentName);
+        $segment->setPublicName($segmentName);
         $segment->setAlias(strtolower($segmentName));
         $segment->isPublished(true);
         $segment->setDateAdded(new \DateTime());
@@ -152,8 +159,8 @@ class ListControllerTest extends MauticMysqlTestCase
             $segmentContacts->setList($segment);
             $segmentContacts->setLead($contact);
             $segmentContacts->setDateAdded(new \DateTime());
-            $segmentContacts->setManuallyAdded(0);
-            $segmentContacts->setManuallyRemoved(0);
+            $segmentContacts->setManuallyAdded(false);
+            $segmentContacts->setManuallyRemoved(false);
             $this->em->persist($segmentContacts);
         }
 
