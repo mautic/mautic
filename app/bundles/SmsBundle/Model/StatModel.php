@@ -52,6 +52,10 @@ class StatModel
 
         $this->sms = $this->stat->getSms();
 
+        if (!$this->sms) {
+            return;
+        }
+
         if ($deliveryEvent->isDelivered()) {
             $this->setAsDeliveredAndUpCount();
         } elseif ($deliveryEvent->isRead()) {
