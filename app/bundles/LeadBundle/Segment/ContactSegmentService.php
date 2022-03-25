@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
@@ -64,7 +55,7 @@ class ContactSegmentService
             ];
         }
 
-        $qb = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
+        $qb = $this->getNewSegmentContactsQuery($segment);
 
         $this->addMinMaxLimiters($qb, $batchLimiters);
         $this->addLeadLimiter($qb, $batchLimiters);
@@ -128,7 +119,7 @@ class ContactSegmentService
      */
     public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, $limit = 1000)
     {
-        $queryBuilder = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
+        $queryBuilder = $this->getNewSegmentContactsQuery($segment);
 
         // Prepend the DISTINCT to the beginning of the select array
         $select = $queryBuilder->getQueryPart('select');
@@ -206,14 +197,14 @@ class ContactSegmentService
      * @throws Exception\SegmentQueryException
      * @throws \Exception
      */
-    private function getNewSegmentContactsQuery(LeadList $segment, $batchLimiters)
+    private function getNewSegmentContactsQuery(LeadList $segment)
     {
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder(
             $segment->getId(),
             $this->contactSegmentFilterFactory->getSegmentFilters($segment)
         );
 
-        $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId(), $batchLimiters);
+        $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId());
 
         $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
 
@@ -257,7 +248,7 @@ class ContactSegmentService
         $qbO->select('orp.lead_id as id, orp.leadlist_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp');
         $qbO->leftJoin('orp', '('.$queryBuilder->getSQL().')', 'members', 'members.id=orp.lead_id');
-        $qbO->setParameters($queryBuilder->getParameters());
+        $qbO->setParameters($queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
         $qbO->andWhere($qbO->expr()->eq('orp.leadlist_id', ':orpsegid'));
         $qbO->andWhere($qbO->expr()->isNull('members.id'));
         $qbO->andWhere($qbO->expr()->eq('orp.manually_added', $qbO->expr()->literal(0)));

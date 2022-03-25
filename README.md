@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-73-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-74-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -169,6 +169,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/nick-vanpraet"><img src="https://avatars.githubusercontent.com/u/7923739?v=4?s=100" width="100px;" alt=""/><br /><sub><b>nick-vanpraet</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=nick-vanpraet" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/volha-pivavarchyk"><img src="https://avatars.githubusercontent.com/u/96085911?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Volha Pivavarchyk</b></sub></a><br /><a href="#userTesting-volha-pivavarchyk" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/J-Light"><img src="https://avatars.githubusercontent.com/u/2544660?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nish Joseph</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=J-Light" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Damzoneuh"><img src="https://avatars.githubusercontent.com/u/44919863?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Damzoneuh</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=Damzoneuh" title="Code">💻</a></td>
   </tr>
 </table>
 
