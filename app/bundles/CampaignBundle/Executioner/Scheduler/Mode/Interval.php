@@ -45,8 +45,8 @@ class Interval implements ScheduleModeInterface
      */
     public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime)
     {
-        $interval = min($event->getTriggerInterval(), 1);
-        $unit     = $event->getTriggerIntervalUnit();
+        $interval = max($event->getTriggerInterval(), 1);
+        $unit     = $event->getTriggerInterval() ? $event->getTriggerIntervalUnit() : 'I';
 
         try {
             $this->logger->debug(
@@ -150,16 +150,16 @@ class Interval implements ScheduleModeInterface
             return false;
         }
 
-        // Restrict just for daily scheduling
-        if (!in_array($event->getTriggerIntervalUnit(), ['d', 'm', 'y'])) {
-            return false;
-        }
-
         if (
             null === $event->getTriggerHour() &&
             (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour()) &&
             empty($event->getTriggerRestrictedDaysOfWeek())
         ) {
+            return false;
+        }
+
+        // Restrict just for daily scheduling unless there are day of week restrictions
+        if (!in_array($event->getTriggerIntervalUnit(), ['d', 'm', 'y']) && empty($event->getTriggerRestrictedDaysOfWeek())) {
             return false;
         }
 
