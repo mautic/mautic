@@ -45,7 +45,7 @@ class Interval implements ScheduleModeInterface
      */
     public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime)
     {
-        $interval = $event->getTriggerInterval() ?? 0;
+        $interval = $event->getTriggerInterval();
         $unit     = $event->getTriggerIntervalUnit();
 
         if ($this->isContactSpecificExecutionDateRequired($event)) {
