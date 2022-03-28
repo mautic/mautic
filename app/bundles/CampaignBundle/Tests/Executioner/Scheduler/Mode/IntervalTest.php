@@ -347,6 +347,8 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
             ->willReturn(Event::TRIGGER_MODE_INTERVAL);
         $event->method('getTriggerIntervalUnit')
             ->willReturn('S');
+        $event->method('getTriggerInterval')
+            ->willReturn(0);
         $event->method('getTriggerHour')
             ->willReturn(new \DateTime('now'));
         $event->method('getTriggerRestrictedDaysOfWeek')
