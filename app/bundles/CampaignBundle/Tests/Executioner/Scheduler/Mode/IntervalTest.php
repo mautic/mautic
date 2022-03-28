@@ -5,6 +5,7 @@ namespace Mautic\CampaignBundle\Tests\Executioner\Scheduler\Mode;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -301,10 +302,186 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return Interval
-     */
-    private function getInterval()
+    public function testValidateExecutionDateTimeWhenIsContactSpecificExecutionDateRequiredIsTrue(): void
+    {
+        $expectedDateTime    = new \DateTime('now');
+        $compareFromDateTime = new \DateTime('now');
+
+        $event = $this->createMock(Event::class);
+        $event->method('getId')
+            ->willReturn(1);
+        $event->method('getTriggerMode')
+            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event->method('getTriggerIntervalUnit')
+            ->willReturn('d');
+        $event->method('getTriggerHour')
+            ->willReturn(new \DateTime('now'));
+        $event->method('getTriggerRestrictedDaysOfWeek')
+            ->willReturn([]);
+        $lead = $this->createMock(Lead::class);
+        $lead->method('getTimezone')
+            ->willReturn('UTC');
+        $log = $this->createMock(LeadEventLog::class);
+        $log->method('getEvent')
+            ->willReturn($event);
+        $log->method('getDateTriggered')
+            ->willReturn(new \DateTime('now'));
+        $log->method('getLead')
+            ->willReturn($lead);
+
+        $interval = $this->getInterval();
+
+        Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
+        Assert::assertEquals($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
+    }
+
+    public function testValidateExecutionDateTimeWhenIsContactSpecificExecutionDateRequiredIsFalse(): void
+    {
+        $expectedDateTime    = new \DateTime('now');
+        $compareFromDateTime = new \DateTime('now');
+
+        $event = $this->createMock(Event::class);
+        $event->method('getId')
+            ->willReturn(1);
+        $event->method('getTriggerMode')
+            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event->method('getTriggerIntervalUnit')
+            ->willReturn('S');
+        $event->method('getTriggerHour')
+            ->willReturn(new \DateTime('now'));
+        $event->method('getTriggerRestrictedDaysOfWeek')
+            ->willReturn([]);
+
+        $lead = $this->createMock(Lead::class);
+        $lead->method('getTimezone')
+            ->willReturn('UTC');
+
+        $log = $this->createMock(LeadEventLog::class);
+        $log->method('getEvent')
+            ->willReturn($event);
+        $log->method('getDateTriggered')
+            ->willReturn(new \DateTime('now'));
+        $log->method('getLead')
+            ->willReturn($lead);
+
+        $interval = $this->getInterval();
+
+        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event));
+        Assert::assertEquals($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
+    }
+
+    public function testIsContactSpecificExecutionDateRequiredIsFalseWhenNotCorrectTriggerMode(): void
+    {
+        $event = $this->createMock(Event::class);
+        $event->method('getId')
+            ->willReturn(1);
+        $event->method('getTriggerMode')
+            ->willReturn(Event::TRIGGER_MODE_DATE);
+        $event2 = $this->createMock(Event::class);
+        $event2->method('getId')
+            ->willReturn(2);
+        $event2->method('getTriggerMode')
+            ->willReturn(Event::TRIGGER_MODE_IMMEDIATE);
+
+        $interval = $this->getInterval();
+
+        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event));
+        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event2));
+    }
+
+    public function testIsContactSpecificExecutionDateRequiredIsFalseWhenNotCorrectIntervalUnit(): void
+    {
+        $event = $this->createMock(Event::class);
+        $event->method('getId')
+            ->willReturn(1);
+        $event->method('getTriggerMode')
+            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event->method('getTriggerIntervalUnit')
+            ->willReturn('i');
+
+        $event2 = $this->createMock(Event::class);
+        $event2->method('getId')
+            ->willReturn(1);
+        $event2->method('getTriggerMode')
+            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event2->method('getTriggerIntervalUnit')
+            ->willReturn('h');
+
+        $event3 = $this->createMock(Event::class);
+        $event3->method('getId')
+            ->willReturn(1);
+        $event3->method('getTriggerMode')
+            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event3->method('getTriggerIntervalUnit')
+            ->willReturn('s');
+
+        $interval = $this->getInterval();
+
+        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event));
+        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event2));
+        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event3));
+    }
+
+    public function testIsContactSpecificExecutionDateRequiredIsTrueWithValidTriggerHour(): void
+    {
+        $event = $this->createMock(Event::class);
+        $event->method('getId')
+            ->willReturn(1);
+        $event->method('getTriggerMode')
+            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event->method('getTriggerIntervalUnit')
+            ->willReturn('d');
+        $event->method('getTriggerHour')
+            ->willReturn(new \DateTime('now'));
+
+        $interval = $this->getInterval();
+
+        Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
+    }
+
+    public function testIsContactSpecificExecutionDateRequiredIsTrueWithDayOfWeekRestrictions(): void
+    {
+        $event = $this->createMock(Event::class);
+        $event->method('getId')
+            ->willReturn(1);
+        $event->method('getTriggerMode')
+            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event->method('getTriggerIntervalUnit')
+            ->willReturn('d');
+        $event->method('getTriggerHour')
+            ->willReturn(null);
+        $event->method('getTriggerRestrictedDaysOfWeek')
+            ->willReturn([0, 1, 2]);
+
+        $interval = $this->getInterval();
+
+        Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
+    }
+
+    public function testIsContactSpecificExecutionDateRequiredIsTrueWithStartAndStopHours(): void
+    {
+        $event = $this->createMock(Event::class);
+        $event->method('getId')
+            ->willReturn(1);
+        $event->method('getTriggerMode')
+            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event->method('getTriggerIntervalUnit')
+            ->willReturn('d');
+        $event->method('getTriggerHour')
+            ->willReturn(null);
+        $event->method('getTriggerRestrictedDaysOfWeek')
+            ->willReturn([]);
+        $event->method('getTriggerRestrictedStartHour')
+            ->willReturn(new \DateTime('now'));
+        $event->method('getTriggerRestrictedStopHour')
+            ->willReturn(new \DateTime('now'));
+
+        $interval = $this->getInterval();
+
+        Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
+    }
+
+    private function getInterval(): Interval
     {
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->method('get')

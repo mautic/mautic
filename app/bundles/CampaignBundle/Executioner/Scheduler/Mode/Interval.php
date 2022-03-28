@@ -45,7 +45,7 @@ class Interval implements ScheduleModeInterface
      */
     public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime)
     {
-        $interval = $event->getTriggerInterval();
+        $interval = $event->getTriggerInterval() ?? 0;
         $unit     = $event->getTriggerIntervalUnit();
 
         if ($this->isContactSpecificExecutionDateRequired($event)) {
@@ -61,7 +61,7 @@ class Interval implements ScheduleModeInterface
         } catch (\Exception $exception) {
             $this->logger->error('CAMPAIGN: Determining interval scheduled failed with "'.$exception->getMessage().'"');
 
-            throw new NotSchedulableException();
+            throw new NotSchedulableException($exception->getMessage());
         }
 
         if ($comparedToDateTime > $compareFromDateTime) {
