@@ -151,24 +151,32 @@ class Interval implements ScheduleModeInterface
      */
     public function isContactSpecificExecutionDateRequired(Event $event)
     {
-        if (Event::TRIGGER_MODE_INTERVAL !== $event->getTriggerMode()) {
-            return false;
-        }
-
-        if (
-            null === $event->getTriggerHour() &&
-            (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour()) &&
-            empty($event->getTriggerRestrictedDaysOfWeek())
-        ) {
-            return false;
-        }
-
-        // Restrict just for daily scheduling unless there are day of week restrictions
-        if (!in_array($event->getTriggerIntervalUnit(), ['d', 'm', 'y']) && empty($event->getTriggerRestrictedDaysOfWeek())) {
+        if (!$this->isTriggerModeEvent($event) || $this->hasTimeRelatedRestrictions($event) || $this->isRestrictedToDailyScheduling($event)) {
             return false;
         }
 
         return true;
+    }
+
+    private function isTriggerModeEvent(Event $event): bool
+    {
+        return Event::TRIGGER_MODE_INTERVAL === $event->getTriggerMode();
+    }
+
+    private function hasTimeRelatedRestrictions(Event $event): bool
+    {
+        return null === $event->getTriggerHour() &&
+            (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour()) &&
+            empty($event->getTriggerRestrictedDaysOfWeek());
+    }
+
+    private function isRestrictedToDailyScheduling(Event $event): bool
+    {
+        if (!in_array($event->getTriggerIntervalUnit(), ['d', 'm', 'y']) && empty($event->getTriggerRestrictedDaysOfWeek())) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
