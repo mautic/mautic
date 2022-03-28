@@ -114,7 +114,7 @@ jobs:
       authors:
         - github-actions
     categories:
-      - title: 🛠 Breaking Changes 
+      - title: 🛠 Breaking Changes
         labels:
           - bc-break
       - title: 🔒 Security
