@@ -215,7 +215,7 @@ $view['slots']->set(
                                     <table class="table table-bordered table-striped mb-0">
                                         <tbody>
                                         <?php foreach ($fields[$group] as $field): ?>
-                                            <?php if (null !== $field['value'] && "null" !== $field['value']): ?>
+                                            <?php if (!empty($fields[$g])): ?>
                                                 <tr>
                                                     <td width="20%"><span class="fw-b textTitle"><?php echo $view->escape($field['label']); ?></span>
                                                     </td>
