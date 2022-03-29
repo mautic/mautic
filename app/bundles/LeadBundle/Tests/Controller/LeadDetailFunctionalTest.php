@@ -46,6 +46,7 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
+        // initialize lead fields to adjust the expected core labels
         $lead->setFields([
             'core' => [
                 'First Name' => [
@@ -58,13 +59,13 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
                     'value' => 'john@his-site.com',
                 ],
                 'Primary company' => [
-                    'value' => ''
+                    'value' => '',
                 ],
             ],
         ]);
         $leadFields = array_filter(
             $lead->getFields(true),
-            function($value) {
+            function ($value) {
                 return !empty($value['value']);
             },
             ARRAY_FILTER_USE_BOTH
