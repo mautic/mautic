@@ -151,14 +151,14 @@ class Interval implements ScheduleModeInterface
      */
     public function isContactSpecificExecutionDateRequired(Event $event)
     {
-        if (!$this->isTriggerModeEvent($event) || $this->hasTimeRelatedRestrictions($event) || $this->isRestrictedToDailyScheduling($event)) {
+        if (!$this->isTriggerModeInterval($event) || $this->hasTimeRelatedRestrictions($event) || $this->isRestrictedToDailyScheduling($event)) {
             return false;
         }
 
         return true;
     }
 
-    private function isTriggerModeEvent(Event $event): bool
+    private function isTriggerModeInterval(Event $event): bool
     {
         return Event::TRIGGER_MODE_INTERVAL === $event->getTriggerMode();
     }
@@ -172,11 +172,8 @@ class Interval implements ScheduleModeInterface
 
     private function isRestrictedToDailyScheduling(Event $event): bool
     {
-        if (!in_array($event->getTriggerIntervalUnit(), ['d', 'm', 'y']) && empty($event->getTriggerRestrictedDaysOfWeek())) {
-            return true;
-        }
-
-        return false;
+        return !in_array($event->getTriggerIntervalUnit(), ['d', 'm', 'y']) &&
+            empty($event->getTriggerRestrictedDaysOfWeek());
     }
 
     /**
