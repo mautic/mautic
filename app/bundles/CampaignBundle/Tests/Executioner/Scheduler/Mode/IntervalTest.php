@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Executioner\Scheduler\Mode;
 
 use Doctrine\Common\Collections\ArrayCollection;

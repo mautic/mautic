@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Functional\Executioner\Scheduler\Mode;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -14,7 +15,6 @@ use PHPUnit\Framework\Assert;
 
 class IntervalTest extends MauticMysqlTestCase
 {
-
     public function testBatchReschedulingOneDayAhead(): void
     {
         $campaign = new Campaign();
