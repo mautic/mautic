@@ -408,6 +408,7 @@ class ReportSubscriber implements EventSubscriberInterface
                             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
                             ->where(sprintf('%1$s BETWEEN :dateFrom AND :dateTo', 'ph.date_hit'))
                             ->andWhere('ph.email_id IS NOT NULL')
+                            ->andWhere('ph.redirect_id IS NOT NULL')
                             ->groupBy('ph.email_id');
                         $qb->leftJoin('e', sprintf('(%s)', $subQuery->getSQL()), 'hits', 'e.id = hits.email_id');
                         $event->setColumnFormula('hits', 'IFNULL(hits.hits, 0)');
