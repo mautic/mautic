@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Form\Type\FormListType;
@@ -60,22 +59,18 @@ class EmailType extends AbstractType
 
     private CoreParametersHelper $coreParametersHelper;
 
-    private UserHelper $userHelper;
-
     public function __construct(
         TranslatorInterface $translator,
         EntityManager $entityManager,
         StageModel $stageModel,
         CoreParametersHelper $coreParametersHelper,
-        CorePermissions $security,
-        UserHelper $userHelper
+        CorePermissions $security
     ) {
         $this->translator           = $translator;
         $this->em                   = $entityManager;
         $this->stageModel           = $stageModel;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->security             = $security;
-        $this->userHelper           = $userHelper;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

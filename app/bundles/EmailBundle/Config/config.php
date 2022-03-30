@@ -311,7 +311,6 @@ return [
                     'mautic.stage.model.stage',
                     'mautic.helper.core_parameters',
                     'mautic.security',
-                    'mautic.helper.user',
                 ],
             ],
             'mautic.form.type.email.utm_tags' => [
