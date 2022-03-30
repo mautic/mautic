@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
@@ -779,10 +770,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array $fields
-     * @param array $data
-     * @param null  $owner
-     * @param bool  $skipIfExists
+     * @param mixed[] $fields
+     * @param mixed[] $data
+     * @param null    $owner
+     * @param bool    $skipIfExists
      *
      * @return bool|null
      *
