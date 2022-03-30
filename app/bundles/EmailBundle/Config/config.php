@@ -310,6 +310,8 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.stage.model.stage',
                     'mautic.helper.core_parameters',
+                    'mautic.security',
+                    'mautic.helper.user',
                 ],
             ],
             'mautic.form.type.email.utm_tags' => [

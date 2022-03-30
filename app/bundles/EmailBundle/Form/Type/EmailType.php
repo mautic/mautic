@@ -15,6 +15,8 @@ use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Form\Type\FormListType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
@@ -39,6 +41,8 @@ class EmailType extends AbstractType
 {
     use DynamicContentTrait;
 
+    private CorePermissions $security;
+
     /**
      * @var TranslatorInterface
      */
@@ -56,16 +60,22 @@ class EmailType extends AbstractType
 
     private CoreParametersHelper $coreParametersHelper;
 
+    private UserHelper $userHelper;
+
     public function __construct(
         TranslatorInterface $translator,
         EntityManager $entityManager,
         StageModel $stageModel,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        CorePermissions $security,
+        UserHelper $userHelper
     ) {
         $this->translator           = $translator;
         $this->em                   = $entityManager;
         $this->stageModel           = $stageModel;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->security             = $security;
+        $this->userHelper           = $userHelper;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -213,7 +223,24 @@ class EmailType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', YesNoButtonGroupType::class);
+        if (!empty($options['data']) && $options['data'] instanceof Email) {
+            $readonly = !$this->security->hasEntityAccess(
+                'email:emails:publishown',
+                'email:emails:publishother',
+                $options['data']->getCreatedBy()
+            );
+            $data = !$readonly && $options['data']->isPublished(false);
+        } else {
+            $data     = $options['data']->isPublished(false);
+            $readonly = false;
+        }
+
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'data' => $data,
+            'attr' => [
+                'readonly' => $readonly,
+            ],
+        ]);
 
         $builder->add(
             'publishUp',

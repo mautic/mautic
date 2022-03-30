@@ -360,6 +360,11 @@ class CorePermissions
             return false;
         }
 
+        // assume logged user is owner for new entity
+        if (null === $ownerId) {
+            $ownerId = $user;
+        }
+
         if ($ownerId instanceof User) {
             $ownerId = $ownerId->getId();
         }

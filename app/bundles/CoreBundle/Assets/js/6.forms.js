@@ -488,6 +488,10 @@ Mautic.toggleYesNoButtonClass = function (changedId) {
     var isYesButton   = mQuery(changedId).parent().hasClass('btn-yes');
     var isExtraButton = mQuery(changedId).parent().hasClass('btn-extra');
 
+    if (mQuery(changedId).attr('readonly') == "readonly") {
+        return;
+    }
+
     if (isExtraButton) {
         mQuery(changedId).parents('.btn-group').find('.btn').removeClass('btn-success btn-danger').addClass('btn-default');
     } else {
@@ -548,7 +552,8 @@ Mautic.createOption = function (value, label) {
 }
 
 /**
- * Updates operator select and value input format based on selected field and operator
+ * Updates operator select and value input format based on selected field and
+ * operator
  *
  * @param field
  * @param action
