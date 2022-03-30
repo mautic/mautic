@@ -12,14 +12,14 @@ use Symfony\Component\Translation\TranslatorInterface;
 class SysinfoModel
 {
     /**
-     * @var string
+     * @var string|null
      */
-    protected $phpInfo = '';
+    protected $phpInfo;
 
     /**
-     * @var array<string,bool>
+     * @var array<string,bool>|null
      */
-    protected $folders = [];
+    protected $folders;
 
     protected PathsHelper $pathsHelper;
     protected CoreParametersHelper $coreParametersHelper;

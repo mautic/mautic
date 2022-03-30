@@ -56,7 +56,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.sysinfo.he
                 <div class="pt-md pr-md pl-md pb-md">
                     <?php if (empty($recommendations) && empty($requirement)) : ?>
                         <div class="alert alert-info">
-                            <?php echo $view['translator']->trans('mautic.sysinfo.no.recommendations') ?>
+                            <?php echo $view['translator']->trans('mautic.sysinfo.no.recommendations'); ?>
                         </div>
                     <?php endif; ?>
                     <?php foreach ($requirements as $requirement): ?>
