@@ -213,7 +213,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertMatchesRegularExpression('/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/', $fetchedStatData['stats'][0]['date_read']);
     }
 
-    public function testSendEmailToDNCLead()
+    public function testSendEmailToDNCLead(): void
     {
         // Create a couple of segments first:
         $payload = [
@@ -264,7 +264,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST',
             "/api/emails/{$emailId}/contact/{$contactId}/send",
             [
-                "ignoreDNC" => true,
+                'ignoreDNC' => true,
             ]
         );
         $response     = $this->client->getResponse();
