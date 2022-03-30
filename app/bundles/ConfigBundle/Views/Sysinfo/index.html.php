@@ -54,6 +54,11 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.sysinfo.he
             </div>
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="recommendations">
                 <div class="pt-md pr-md pl-md pb-md">
+                    <?php if (empty($recommendations)) : ?>
+                        <div class="alert alert-info">
+                            <?php echo $view['translator']->trans('mautic.sysinfo.no.recommendations') ?>
+                        </div>
+                    <?php endif; ?>
                     <?php foreach ($recommendations as $recommendation): ?>
                         <div class="alert alert-warning">
                             <?php echo $recommendation; ?>
