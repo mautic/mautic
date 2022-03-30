@@ -91,6 +91,14 @@ class SysinfoModel
     }
 
     /**
+     * @return string[]
+     */
+    public function getRequirements(): array
+    {
+        return $this->installService->checkRequirements($this->checkStep);
+    }
+
+    /**
      * Method to get important folders with a writable flag.
      *
      * @return array

@@ -22,6 +22,7 @@ class SysinfoController extends FormController
         return $this->delegateView([
             'viewParameters' => [
                 'phpInfo'         => $model->getPhpInfo(),
+                'requirements'    => $model->getRequirements(),
                 'recommendations' => $model->getRecommendations(),
                 'folders'         => $model->getFolders(),
                 'log'             => $model->getLogTail(200),
