@@ -166,7 +166,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             '--env' => 'test',
         ]);
 
-        $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest40Ref);
+        $segmentContacts = $this->contactSegmentService->getTotalLeadListLeadsCount($segmentTest40Ref);
 
         $this->assertEquals(
             11,

@@ -854,6 +854,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                         'display'  => '',
                     ],
                 ],
+                'populate' => false,
             ],
             [ // ID 41
                 'name'     => 'Manually unsubscribed SMS',
