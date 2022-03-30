@@ -166,7 +166,7 @@ export default (editor, opts = {}) => {
   });
   // Workaround to set the default panel when the editor is reopened. Missing a dedicated event for 'opening'.
   editor.on('update', () => {
-    const btn = editor.Panels.getButton('views', defaultPanel);
-    btn.set('active', 1);
+    // const btn = editor.Panels.getButton('views', defaultPanel);
+    // btn.set('active', 1);
   });
 };
