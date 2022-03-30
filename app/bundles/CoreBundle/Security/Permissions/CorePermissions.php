@@ -346,9 +346,9 @@ class CorePermissions
     /**
      * Checks if the user has access to the requested entity.
      *
-     * @param string|bool $ownPermission
-     * @param string|bool $otherPermission
-     * @param User|int    $ownerId
+     * @param string|bool   $ownPermission
+     * @param string|bool   $otherPermission
+     * @param User|int|null $ownerId
      *
      * @return bool
      */
