@@ -59,14 +59,17 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
                     'value' => 'john@his-site.com',
                 ],
                 'Primary company' => [
-                    'value' => '',
+                    'value' => null,
+                ],
+                'Points' => [
+                    'value' => 0,
                 ],
             ],
         ]);
         $leadFields = array_filter(
             $lead->getFields(true),
             function ($value) {
-                return !empty($value['value']);
+                return isset($value['value']);
             },
             ARRAY_FILTER_USE_BOTH
         );
