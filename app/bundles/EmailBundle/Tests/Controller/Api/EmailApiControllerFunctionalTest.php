@@ -260,7 +260,6 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-
         $this->client->request('POST',
             "/api/emails/{$emailId}/contact/{$contactId}/send",
             [
