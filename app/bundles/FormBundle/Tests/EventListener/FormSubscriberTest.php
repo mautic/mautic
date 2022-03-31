@@ -1,6 +1,5 @@
 <?php
 
-
 namespace FormBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
