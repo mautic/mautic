@@ -104,6 +104,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $this->setIncludeExcludeOperatorsToTextFilters($event);
         $staticFields = [
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
@@ -148,7 +149,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
                 'properties' => [
                     'type' => 'leadlist',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist', $event->getSearch()),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
@@ -329,12 +330,13 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $this->setIncludeExcludeOperatorsToTextFilters($event);
         $choices = [
             'lead_asset_download' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_asset_download'),
                 'properties' => [
                     'type' => 'assets',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_asset_download'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_asset_download', $event->getSearch()),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
@@ -612,5 +614,35 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
         // something else such as dynanmic content
         return false;
+    }
+
+    private function setIncludeExcludeOperatorsToTextFilters(LeadListFiltersChoicesEvent $event): void
+    {
+        $choices = $event->getChoices();
+
+        foreach ($choices as $group => $groups) {
+            foreach ($groups as $alias => $choice) {
+                $type = $choice['properties']['type'] ?? null;
+                if ('text' === $type) {
+                    $choices[$group][$alias]['operators'] = $this->typeOperatorProvider->getOperatorsIncluding([
+                        OperatorOptions::EQUAL_TO,
+                        OperatorOptions::NOT_EQUAL_TO,
+                        OperatorOptions::EMPTY,
+                        OperatorOptions::NOT_EMPTY,
+                        OperatorOptions::LIKE,
+                        OperatorOptions::NOT_LIKE,
+                        OperatorOptions::REGEXP,
+                        OperatorOptions::NOT_REGEXP,
+                        OperatorOptions::IN,
+                        OperatorOptions::NOT_IN,
+                        OperatorOptions::STARTS_WITH,
+                        OperatorOptions::ENDS_WITH,
+                        OperatorOptions::CONTAINS,
+                    ]);
+                }
+            }
+        }
+
+        $event->setChoices($choices);
     }
 }

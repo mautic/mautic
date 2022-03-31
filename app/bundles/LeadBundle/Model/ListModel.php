@@ -268,7 +268,7 @@ class ListModel extends FormModel
      *
      * @return array
      */
-    public function getChoiceFields()
+    public function getChoiceFields(string $search = '')
     {
         if ($this->choiceFieldsCache) {
             return $this->choiceFieldsCache;
@@ -288,7 +288,7 @@ class ListModel extends FormModel
 
         // Add custom choices
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
-            $event = new LeadListFiltersChoicesEvent([], $this->getOperatorsForFieldType(), $this->translator, $this->requestStack->getCurrentRequest());
+            $event = new LeadListFiltersChoicesEvent([], $this->getOperatorsForFieldType(), $this->translator, $this->requestStack->getCurrentRequest(), $search);
             $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE, $event);
             $choices = $event->getChoices();
         }
