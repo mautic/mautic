@@ -552,8 +552,7 @@ Mautic.createOption = function (value, label) {
 }
 
 /**
- * Updates operator select and value input format based on selected field and
- * operator
+ * Updates operator select and value input format based on selected field and operator
  *
  * @param field
  * @param action
