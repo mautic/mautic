@@ -22,13 +22,20 @@ class CompanyLeadRepository extends CommonRepository
     {
         // Get a list of contacts and set primary to 0
         if ($new) {
-            $contacts = [];
+            $contacts  = [];
+            $contactId = null;
             foreach ($entities as $entity) {
-                $contactId            = $entity->getLead()->getId();
+                $contactId = $entity->getLead()->getId();
+                if (!isset($contacts[$contactId])) {
+                    // Set one company from the batch as as primary
+                    $entity->setPrimary(true);
+                }
+
                 $contacts[$contactId] = $contactId;
-                $entity->setPrimary(true);
             }
+
             if ($contactId) {
+                // Only one company should be set as primary so reset all in order to let the entity update the one
                 $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->update(MAUTIC_TABLE_PREFIX.'companies_leads')
                     ->set('is_primary', 0);
