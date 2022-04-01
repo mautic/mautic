@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\DBALException;
@@ -921,6 +912,7 @@ class FieldModel extends FormModel
                 'group_label'  => $this->translator->trans('mautic.lead.field.group.'.$contactField['group']),
                 'defaultValue' => $contactField['defaultValue'],
                 'properties'   => $contactField['properties'],
+                'isPublished'  => $contactField['isPublished'],
             ];
         }
 

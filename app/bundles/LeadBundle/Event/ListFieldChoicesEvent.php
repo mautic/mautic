@@ -21,6 +21,8 @@ final class ListFieldChoicesEvent extends Event
      */
     private array $choicesForAliases = [];
 
+    private string $searchTerm = '';
+
     /**
      * @param mixed[] $choices
      */
@@ -51,5 +53,15 @@ final class ListFieldChoicesEvent extends Event
     public function getChoicesForAllListFieldAliases(): array
     {
         return $this->choicesForAliases;
+    }
+
+    public function setSearchTerm(string $searchTerm): void
+    {
+        $this->searchTerm = $searchTerm;
+    }
+
+    public function getSearchTerm(): string
+    {
+        return $this->searchTerm;
     }
 }

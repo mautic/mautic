@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CampaignBundle\Membership\MembershipManager;
@@ -177,6 +168,7 @@ class AjaxController extends CommonAjaxController
         $fieldAlias  = InputHelper::clean($request->request->get('fieldAlias'));
         $fieldObject = InputHelper::clean($request->request->get('fieldObject'));
         $operator    = InputHelper::clean($request->request->get('operator'));
+        $search      = InputHelper::clean($request->request->get('search'));
         $filterNum   = (int) $request->request->get('filterNum');
 
         /** @var FormFactoryInterface $formFactory */
@@ -196,7 +188,7 @@ class AjaxController extends CommonAjaxController
                 $fieldAlias,
                 $fieldObject,
                 $operator,
-                $listModel->getChoiceFields()[$fieldObject][$fieldAlias]
+                $listModel->getChoiceFields($search)[$fieldObject][$fieldAlias]
             );
         }
 

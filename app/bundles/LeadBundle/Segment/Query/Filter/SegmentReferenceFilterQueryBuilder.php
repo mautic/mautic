@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
@@ -76,8 +68,8 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
             $segmentIds = [intval($segmentIds)];
         }
 
-        $orLogic = [];
-
+        $logic     = [];
+        $exclusion = false;
         foreach ($segmentIds as $segmentId) {
             $exclusion = in_array($filter->getOperator(), ['notExists', 'notIn']);
 
@@ -115,15 +107,13 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
             }
             $queryBuilder->addSelect($segmentAlias.'.id as '.$segmentAlias.'_id');
 
-            if (!$exclusion && count($segmentIds) > 1) {
-                $orLogic[] = $expression;
-            } else {
-                $queryBuilder->addLogic($expression, $filter->getGlue());
-            }
+            $logic[] = $expression;
         }
 
-        if (count($orLogic)) {
-            $queryBuilder->andWhere(new CompositeExpression(CompositeExpression::TYPE_OR, $orLogic));
+        if ($exclusion) {
+            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_AND, $logic), $filter->getGlue());
+        } else {
+            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_OR, $logic), $filter->getGlue());
         }
 
         return $queryBuilder;
