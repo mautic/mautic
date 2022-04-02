@@ -99,7 +99,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                         <div class="available-filters mb-md pl-0"
                                              data-prototype="<?php echo $view->escape($view['form']->widget($form['filters']->vars['prototype'])); ?>"
                                              data-index="<?php echo $index + 1; ?>">
-                                            <select class="chosen form-control" id="available_filters">
+                                            <select class="chosen form-control" id="available_filters" aria-label="Available filters">
                                                 <option value=""></option>
                                                 <?php
                                                 foreach ($fields as $object => $field):

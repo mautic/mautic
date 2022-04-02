@@ -82,7 +82,7 @@ echo $view['form']->start($form);
                                 <?php echo $view['translator']->trans('mautic.focus.website_placeholder'); ?>
                             </p>
                             <div class="input-group">
-                                <input id="websiteUrlPlaceholderInput" disabled type="text" class="form-control" placeholder="https://example.com">
+                                <input id="websiteUrlPlaceholderInput" disabled type="text" class="form-control" placeholder="https://example.com" aria-label="Website URL">
                                 <span class="input-group-btn">
                                     <button class="btn btn-default btn-fetch" type="button"><?php echo $view['translator']->trans(
                                             'mautic.focus.fetch_snapshot'
@@ -316,7 +316,7 @@ echo $view['form']->start($form);
                                     <div class="input-group">
                                         <?php echo $view['form']->widget($form['properties']['colors']['primary']); ?>
                                         <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_primary" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="fa fa-eyedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_primary" class="btn btn-default btn-nospin btn-dropper" type="button" aria-label="Color properties"><i class="fa fa-eyedropper" aria-label="Color properties"></i></button>
                                     </span>
                                     </div>
                                     <div class="mt-xs site-color-list hide" id="primary_site_colors"></div>
@@ -330,7 +330,7 @@ echo $view['form']->start($form);
                                     <div class="input-group">
                                         <?php echo $view['form']->widget($form['properties']['colors']['text']); ?>
                                         <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_text" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="fa fa-eyedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_text" class="btn btn-default btn-nospin btn-dropper" type="button" aria-label="Color properties"><i class="fa fa-eyedropper"></i></button>
                                     </span>
                                     </div>
                                     <div class="mt-xs site-color-list hide" id="text_site_colors"></div>
@@ -347,7 +347,7 @@ echo $view['form']->start($form);
                                         <div class="input-group">
                                             <?php echo $view['form']->widget($form['properties']['colors']['button']); ?>
                                             <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_button" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="fa fa-eyedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_button" class="btn btn-default btn-nospin btn-dropper" type="button" aria-label="Color properties"><i class="fa fa-eyedropper"></i></button>
                                     </span>
                                         </div>
                                         <div class="mt-xs site-color-list hide" id="button_site_colors"></div>
@@ -361,7 +361,7 @@ echo $view['form']->start($form);
                                         <div class="input-group">
                                             <?php echo $view['form']->widget($form['properties']['colors']['button_text']); ?>
                                             <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_button_text" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="fa fa-eyedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_button_text" class="btn btn-default btn-nospin btn-dropper" type="button" aria-label="Color properties"><i class="fa fa-eyedropper"></i></button>
                                     </span>
                                         </div>
                                         <div class="mt-xs site-color-list hide" id="button_text_site_colors"></div>

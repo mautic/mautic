@@ -46,29 +46,29 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
             [
                 $this->getField('First Name', 'text'),
                 '%22%2F%3E%3Cscript%3Ealert%280%29%3C%2Fscript%3E',
-                '<input id="mauticform_input_mautic_firstname" value="" />',
-                '<input id="mauticform_input_mautic_firstname" value="&quot;/&gt;alert(0)" />',
+                '<input id="mauticform_input_mautic_firstname" value="" aria-label="Firstname" />',
+                '<input id="mauticform_input_mautic_firstname" value="&quot;/&gt;alert(0)" aria-label="Firstname" />',
                 'Tags should be stripped from text field values submitted via GET to prevent XSS.',
             ],
             [
                 $this->getField('First Name', 'text'),
                 '%22%20onfocus=%22alert(123)',
-                '<input id="mauticform_input_mautic_firstname" value="" />',
-                '<input id="mauticform_input_mautic_firstname" value="&quot; onfocus=&quot;alert(123)" />',
+                '<input id="mauticform_input_mautic_firstname" value="" aria-label="Firstname" />',
+                '<input id="mauticform_input_mautic_firstname" value="&quot; onfocus=&quot;alert(123)" aria-label="Firstname" />',
                 'Inline JS values should not be allowed via GET to prevent XSS.',
             ],
             [
                 $this->getField('Description', 'textarea'),
                 '%22%2F%3E%3Cscript%3Ealert%280%29%3C%2Fscript%3E',
-                '<textarea id="mauticform_input_mautic_description"></textarea>',
-                '<textarea id="mauticform_input_mautic_description">&quot;/&gt;alert(0)</textarea>',
+                '<textarea id="mauticform_input_mautic_description" aria-label="Description"></textarea>',
+                '<textarea id="mauticform_input_mautic_description" aria-label="Description">&quot;/&gt;alert(0)</textarea>',
                 'Tags should be stripped from textarea field values submitted via GET to prevent XSS.',
             ],
             [
                 $this->getField('Description', 'textarea'),
                 '%22%20onfocus=%22alert(123)',
-                '<textarea id="mauticform_input_mautic_description"></textarea>',
-                '<textarea id="mauticform_input_mautic_description">&quot; onfocus=&quot;alert(123)</textarea>',
+                '<textarea id="mauticform_input_mautic_description" aria-label="Description"></textarea>',
+                '<textarea id="mauticform_input_mautic_description" aria-label="Description">&quot; onfocus=&quot;alert(123)</textarea>',
                 'Tags should be stripped from textarea field values submitted via GET to prevent XSS.',
             ],
             [
@@ -95,8 +95,8 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
             [
                 $this->getField('Select', 'select'),
                 'myvalue',
-                '<select id="mauticform_input_mautic_select"><option value="myvalue">My Value</option></select>',
-                '<select id="mauticform_input_mautic_select"><option value="myvalue" selected="selected">My Value</option></select>',
+                '<select id="mauticform_input_mautic_select" aria-label="Select value"><option value="myvalue">My Value</option></select>',
+                '<select id="mauticform_input_mautic_select" aria-label="Select value"><option value="myvalue" selected="selected">My Value</option></select>',
                 'Select lists should have their values set appropriately via GET.',
             ],
         ];

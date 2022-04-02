@@ -319,7 +319,7 @@ $showActions = count($activeFormActions);
                 <div class="modal-body">
                     <p><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy'); ?></p>
                     <h3><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy.js'); ?></h3>
-                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;script type="text/javascript" src="<?php echo $view['router']->url(
+                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);" aria-label="Generate form">&lt;script type="text/javascript" src="<?php echo $view['router']->url(
                             'mautic_form_generateform',
                             ['id' => $activeForm->getId()],
                             true
@@ -327,7 +327,7 @@ $showActions = count($activeFormActions);
                     <h3 class="pt-lg"><?php echo $view['translator']->trans(
                             'mautic.form.form.help.automaticcopy.iframe'
                         ); ?></h3>
-                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;iframe src="<?php echo $view['router']->url(
+                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);" aria-label="Preview form">&lt;iframe src="<?php echo $view['router']->url(
                             'mautic_form_preview',
                             ['id' => $activeForm->getId()],
                             true
@@ -360,13 +360,13 @@ $showActions = count($activeFormActions);
                             'mautic.form.form.help.manualcopy.script'
                         ); ?></h4>
                     <textarea class="form-html form-control" readonly
-                              onclick="this.setSelectionRange(0, this.value.length);"><?php echo $formScript; ?></textarea>
+                              onclick="this.setSelectionRange(0, this.value.length);" aria-label="Copy and Paste"><?php echo $formScript; ?></textarea>
 
                     <h4 class="mt-sm mb-sm"><?php echo $view['translator']->trans(
                             'mautic.form.form.help.manualcopy.body'
                         ); ?></h4>
                     <textarea class="form-html form-control" readonly
-                              onclick="this.setSelectionRange(0, this.value.length);"><?php echo $formContent; ?></textarea>
+                              onclick="this.setSelectionRange(0, this.value.length);" aria-label="Copy and Paste"><?php echo $formContent; ?></textarea>
                 </div>
                 <div class="panel-footer text-right">
                     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $view['translator']->trans(

@@ -15,7 +15,7 @@
         <h4><?php echo $view->escape($widget->getName()); ?></h4>
         <?php if ($widget->getId()) : ?>
         <div class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false" aria-label="Dropdown toggle">
                 <i class="fa fa-ellipsis-v"></i>
             </a>
             <ul class="dropdown-menu dropdown-menu-right">

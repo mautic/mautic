@@ -149,7 +149,7 @@ $baseUrl = isset($lead) ? $view['router']->path(
                 <span class="timeline-icon">
                     <a href="javascript:void(0);" class="btn btn-xs btn-nospin btn-default" data-toggle="tooltip"
                        onclick="mQuery(this).toggleClass('btn-warning')"
-                       title="Mute notifications">
+                       title="Mute notifications" aria-label="Mute notifications">
                         <span class="fa fa-fw fa-bell-slash-o"></span>
                     </a>
                 </span>

@@ -27,7 +27,7 @@
                     <a href="javascript:void(0);" class="btn" data-toggle="tooltip" onclick="Mautic.refreshLeadSocialProfile('<?php echo $integrationName; ?>', '<?php echo $lead->getId(); ?>', event);" title="<?php echo $view['translator']->trans('mautic.lead.lead.social.lastupdate', ['%datetime%' => $view['date']->toFullConcat($details['lastRefresh'], 'utc')]); ?>">
                         <i class="text-white fa fa-refresh"></i>
                     </a>
-                    <!--<a href="javascript:void(0);" class="btn" data-toggle="panelcollapse"><i class="text-white fa fa-angle-up"></i></a>-->
+                    <!--<a href="javascript:void(0);" class="btn" data-toggle="panelcollapse" aria-label="Collapse panel"><i class="text-white fa fa-angle-up"></i></a>-->
                     <a href="javascript:void(0);" class="btn" onclick="Mautic.clearLeadSocialProfile('<?php echo $integrationName; ?>', '<?php echo $lead->getId(); ?>', event);" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.lead.lead.social.removecache'); ?>">
                         <i class="text-white fa fa-times"></i>
                     </a>
@@ -52,7 +52,7 @@
 <?php
 $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', [
     'id'      => 'socialImageModal',
-    'body'    => '<img class="img-responsive img-thumbnail" />',
+    'body'    => '<img class="img-responsive img-thumbnail" alt="Thumbnail image"/>',
     'header'  => false,
     'padding' => 'np',
 ]));

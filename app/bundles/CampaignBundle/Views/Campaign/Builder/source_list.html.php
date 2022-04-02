@@ -14,7 +14,7 @@
     <h4 class="mb-xs">
         <span><?php echo $view['translator']->trans('mautic.campaign.leadsource.header'); ?></span>
     </h4>
-    <select id="SourceList" class="campaign-event-selector">
+    <select id="SourceList" class="campaign-event-selector" aria-label="Source list">
         <option value=""></option>
         <?php foreach (['lists', 'forms'] as $option): ?>
 

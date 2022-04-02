@@ -30,7 +30,7 @@
                     <span class="input-group-addon preaddon">
                         <i class="symbol-hashtag"></i>
                     </span>
-                    <input autocomplete="false" type="number" id="lead-field-custom-date-interval" class="form-control" value="1" onchange="Mautic.updateLeadFieldValueOptions(mQuery('#campaignevent_properties_value'), true)">
+                    <input autocomplete="false" type="number" id="lead-field-custom-date-interval" class="form-control" value="1" onchange="Mautic.updateLeadFieldValueOptions(mQuery('#campaignevent_properties_value'), true)" aria-label="Custom date interval">
                 </div>
             </div>
         </div>
@@ -38,7 +38,7 @@
     <div class="col-sm-4">
         <div class="row">
             <div class="form-group col-xs-12 ">
-                <select id="lead-field-custom-date-unit" class="form-control chosen" autocomplete="false" onchange="Mautic.updateLeadFieldValueOptions(mQuery('#campaignevent_properties_value'), true)">
+                <select id="lead-field-custom-date-unit" class="form-control chosen" autocomplete="false" onchange="Mautic.updateLeadFieldValueOptions(mQuery('#campaignevent_properties_value'), true)" aria-label="Custom date unit">
                     <?php foreach (['i', 'h', 'd', 'm', 'y'] as $interval): ?>
                     <?php $selected = ('d' === $interval) ? ' selected' : ''; ?>
                     <option<?php echo $selected; ?> value="<?php echo $view->escape($interval); ?>">

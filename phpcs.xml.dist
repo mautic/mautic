@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="FreshConsulting">
+    <rule ref="FreshConsulting.WCAG20.Violations"/>
+    <exclude-pattern>*/bundles/*/Tests/*\.(css|js|php)$</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+</ruleset>

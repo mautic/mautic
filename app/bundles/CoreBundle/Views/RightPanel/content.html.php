@@ -28,12 +28,12 @@ if ('Main' == $canvas) {
         <h4><?php echo $view['translator']->trans($canvasContent['header']); ?></h4>
     </div>
     <div class="col-xs-1 pt-lg text-right">
-        <a href="javascript:void(0);" class="offcanvas-closer"><span class="fa fa-arrow-right fs-16"></span></a>
+        <a href="javascript:void(0);" class="offcanvas-closer" aria-label="Close sidebar"><span class="fa fa-arrow-right fs-16"></span></a>
     </div>
 
     <?php elseif ('Right' == $canvas): ?>
     <div class="col-xs-1 pt-lg text-left">
-        <a href="javascript:void(0);" class="offcanvas-closer"><span class="fa fa-arrow-left fs-16"></span></a>
+        <a href="javascript:void(0);" class="offcanvas-closer" aria-label="Close sidebar"><span class="fa fa-arrow-left fs-16"></span></a>
     </div>
     <div class="col-xs-11 pt-lg text-center">
         <h4><?php echo $view['translator']->trans($canvasContent['header']); ?></h4>
@@ -43,7 +43,7 @@ if ('Main' == $canvas) {
         <?php if ($hasLeft): ?>
             <?php $icon = ('mautic.core.settings' != $canvasContent['header']) ? 'fa-gears' : 'fa-arrow-left'; ?>
             <div class="col-xs-1 pt-lg text-left">
-                <a href="javascript:void(0);" class="offcanvas-opener offcanvas-open-ltr"><span class="fa <?php echo $icon; ?> fs-16"></span></a>
+                <a href="javascript:void(0);" class="offcanvas-opener offcanvas-open-ltr" aria-label="Open sidebar"><span class="fa <?php echo $icon; ?> fs-16"></span></a>
             </div>
         <?php endif; ?>
 
@@ -53,7 +53,7 @@ if ('Main' == $canvas) {
 
         <?php if ($hasRight): ?>
             <div class="col-xs-1 pt-lg text-right">
-                <a href="javascript:void(0);" class="offcanvas-opener offcanvas-open-rtl"><span class="fa fa-arrow-right fs-16"></span></a>
+                <a href="javascript:void(0);" class="offcanvas-opener offcanvas-open-rtl" aria-label="Open sidebar"><span class="fa fa-arrow-right fs-16"></span></a>
             </div>
         <?php endif; ?>
 

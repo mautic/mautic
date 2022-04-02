@@ -173,7 +173,7 @@ class InputHelperTest extends TestCase
         yield ['https://www.mautic.org/somewhere/something?foo=bar#abc123', 'https://www.mautic.org/somewhere/something?foo=bar#abc123'];
 
         // non URL is simply cleaned
-        yield ['<img src="hello.png" />', '&#60;imgsrc=&#34;hello.png&#34;/&#62;'];
+        yield ['<img src="hello.png" alt="Greeting" />', '&#60;imgsrc=&#34;hello.png&#34;/&#62;'];
 
         // disallowed protocol changed to default
         yield ['foo://www.mautic.org', 'http://www.mautic.org'];

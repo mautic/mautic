@@ -32,7 +32,7 @@
         <div class="col-xs-5">
             <div class="form-group">
                 <div class="available-filters pl-0">
-                    <select class="chosen form-control" data-mautic="available_filters">
+                    <select class="chosen form-control" data-mautic="available_filters" aria-label="Available filters">
                         <option value=""></option>
                         <?php
                         foreach ($fields as $object => $field):

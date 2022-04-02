@@ -24,7 +24,7 @@
             <tr >
                 <th>
                     <input type="checkbox" id="lead_contact_frequency_rules_subscribed_channels_0" name="check_all"
-                           onclick="Mautic.togglePreferredChannel('all');" value="all">
+                           onclick="Mautic.togglePreferredChannel('all');" value="all" aria-label="Preferred channels" >
                 </th>
                 <th>
                     <?php echo $view['translator']->trans('mautic.lead.contact.channels'); ?>

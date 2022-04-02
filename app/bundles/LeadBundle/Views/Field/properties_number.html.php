@@ -28,7 +28,7 @@ $options = [
         <div class="form-group col-xs-12 col-sm-8 col-md-6">
             <label class="control-label"><?php echo $view['translator']->trans('mautic.lead.field.form.properties.numberrounding'); ?></label>
             <div class="input-group">
-                <select class="form-control not-chosen" autocomplete="false" name="leadfield[properties][roundmode]">
+                <select class="form-control not-chosen" autocomplete="false" name="leadfield[properties][roundmode]" aria-label="Rounding mode">
                     <?php foreach ($options as $v => $l): ?>
                     <option value="<?php echo $view->escape($v); ?>"<?php if ($roundMode == $v) {
     echo ' selected="selected"';
