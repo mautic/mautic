@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 
 /**
- * @deprecated since M4, will be removed in M5 because it's not used.
+ * @deprecated since M4, will be removed in M5 because it's not used
  */
 class CustomFormExtension extends AbstractTypeExtension
 {
