@@ -1965,10 +1965,10 @@ class LeadModel extends FormModel
      * Get leads count per country name.
      * Can't use entity, because country is a custom field.
      *
-     * @param \DateTimeInterface $dateFrom
-     * @param \DateTimeInterface $dateTo
-     * @param mixed[]            $filters
-     * @param bool               $canViewOthers
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param mixed[]   $filters
+     * @param bool      $canViewOthers
      *
      * @return array
      */
