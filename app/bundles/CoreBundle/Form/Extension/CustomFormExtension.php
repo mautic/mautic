@@ -56,6 +56,9 @@ class CustomFormExtension extends AbstractTypeExtension
         }
     }
 
+    /**
+     * @return iterable<string>
+     */
     public static function getExtendedTypes(): iterable
     {
         return [FormType::class];
