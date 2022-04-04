@@ -10,6 +10,9 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 
+/**
+ * @deprecated since M4, will be removed in M5 because it's not used.
+ */
 class CustomFormExtension extends AbstractTypeExtension
 {
     /**
@@ -17,9 +20,6 @@ class CustomFormExtension extends AbstractTypeExtension
      */
     protected $dispatcher;
 
-    /**
-     * FormTypeCaptchaExtension constructor.
-     */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -56,11 +56,8 @@ class CustomFormExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return FormType::class;
+        return [FormType::class];
     }
 }

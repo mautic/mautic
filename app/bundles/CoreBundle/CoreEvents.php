@@ -149,6 +149,8 @@ final class CoreEvents
      * The event listener receives a Mautic\CoreBundle\Event\CustomFormEvent instance.
      *
      * @var string
+     * 
+     * @deprecated since Mautic 4 because it is not used anywhere.
      */
     const ON_FORM_TYPE_BUILD = 'mautic.on_form_type_build';
 

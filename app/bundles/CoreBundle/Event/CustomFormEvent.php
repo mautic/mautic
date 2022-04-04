@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class CustomFormEvent.
+ * @deprecated since M4, will be removed in M5 because it's not used.
  */
 class CustomFormEvent extends Event
 {
@@ -37,8 +37,6 @@ class CustomFormEvent extends Event
     private $formBuilder;
 
     /**
-     * CustomFormEvent constructor.
-     *
      * @param string $formName
      * @param string $formType
      */
