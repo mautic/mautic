@@ -1532,7 +1532,7 @@ class EmailController extends FormController
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            permissions,
+            $permissions,
             'email',
             'email_stats',
             'email',
