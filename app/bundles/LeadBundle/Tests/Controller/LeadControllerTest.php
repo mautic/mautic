@@ -366,6 +366,12 @@ class LeadControllerTest extends MauticMysqlTestCase
         $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
         $expectedPlaceholder = self::$container->get('translator')->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
+
+        // Test that a locale option is present correctly.
+        $this->assertStringContainsString(
+            '<option value="cs_CZ" >Czech (Czechia)</option>',
+            $this->client->getResponse()->getContent()
+        );
     }
 
     public function testAddContactsErrorMessage(): void
