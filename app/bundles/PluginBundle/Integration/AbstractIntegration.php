@@ -81,6 +81,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Used for notifications.
+     *
+     * @var \Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\UserBundle\Entity\User>
      */
     protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
