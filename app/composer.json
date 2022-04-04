@@ -132,6 +132,7 @@
         "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
         "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
         "[project-root]/app/.htaccess": "assets/scaffold/files/deny.htaccess",
+        "[project-root]/autoload.php": "assets/scaffold/files/autoload.php",
         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
         "[web-root]/index.php": "assets/scaffold/files/index.php",
         "[web-root]/index_dev.php": "assets/scaffold/files/index_dev.php",

@@ -113,7 +113,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'scaffolded files mismatch', 'PHPStan baseline changes']
+        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install']
 
     name: ${{ matrix.commands }}
 
@@ -173,6 +173,13 @@ jobs:
               exit 1
             fi
           fi
+        elif [[ "${{ matrix.commands }}" == "composer install" ]]; then
+          mkdir test_composer
+          cd test_composer
+          cp ../.github/ci-files/composer.json ./
+          composer install
+          php ./bin/console mautic:assets:generate
+          php ./bin/console cache:clear
         else
           echo "Invalid command"
           exit 1
