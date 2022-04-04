@@ -10,7 +10,7 @@ trait EntityContactsTrait
     /**
      * @param string|int              $entityId
      * @param int                     $page
-     * @param string                  $permission
+     * @param string|array            $permission
      * @param string                  $sessionVar
      * @param string                  $entityJoinTable    Table to join to obtain list of related contacts or a DBAL QueryBuilder object defining custom joins
      * @param string|null             $dncChannel         Channel for this entity to get do not contact records for
@@ -48,7 +48,26 @@ trait EntityContactsTrait
         \DateTimeInterface $dateTo = null
     ) {
         if ($permission && !$this->get('mautic.security')->isGranted($permission)) {
-            return $this->accessDenied();
+            return $this->delegateView(
+                [
+                    'viewParameters' => [
+                        'page'            => $page,
+                        'items'           => [], // return 0 contacts if user has no permissions
+                        'totalItems'      => 0,
+                        'tmpl'            => $sessionVar.'Contacts',
+                        'indexMode'       => 'grid',
+                        'routeParameters' => $routeParameters,
+                        'sessionVar'      => $sessionVar.'.contact',
+                        'objectId'        => $entityId,
+                        'target'          => $paginationTarget,
+                    ],
+                    'contentTemplate' => 'MauticLeadBundle:Lead:grid.html.php',
+                    'passthroughVars' => [
+                        'mauticContent' => $sessionVar.'Contacts',
+                        'route'         => false,
+                    ],
+                ]
+            );
         }
 
         // Set the route if not standardized

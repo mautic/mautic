@@ -1522,10 +1522,17 @@ class EmailController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
+        $permissions = [
+            'lead:leads:viewown',
+            'lead:leads:viewother',
+            'email:emails:viewown',
+            'email:emails:viewother',
+        ];
+
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            ['email:emails:viewown', 'email:emails:viewother'],
+            permissions,
             'email',
             'email_stats',
             'email',
