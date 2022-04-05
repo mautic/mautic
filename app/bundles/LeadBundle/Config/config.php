@@ -1558,7 +1558,7 @@ return [
             'mautic.lead.command.update_lead_lists' => [
                 'class'     => \Mautic\LeadBundle\Command\UpdateLeadListsCommand::class,
                 'arguments' => [
-                    'mautic.lead.model.lead',
+                    'mautic.lead.model.list',
                     'translator',
                     'mautic.helper.paths',
                     'monolog.logger.mautic',
