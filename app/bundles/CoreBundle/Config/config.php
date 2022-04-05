@@ -668,6 +668,13 @@ return [
                     'event_dispatcher',
                 ],
             ],
+            'mautic.core.command.convert_config' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\ConvertConfigCommand::class,
+                'arguments' => [
+                    'mautic.helper.paths',
+                ],
+            ],
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [
