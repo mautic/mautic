@@ -55,8 +55,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             $this->beforeBeginTransaction();
             try {
                 $this->connection->beginTransaction();
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $a = 'b';
             }
         }
@@ -68,8 +67,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             if ($this->connection->isTransactionActive()) {
                 try {
                     $this->connection->rollback();
-                }
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                     $a = 'b';
                 }
             }
