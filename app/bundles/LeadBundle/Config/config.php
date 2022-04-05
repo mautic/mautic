@@ -1565,6 +1565,14 @@ return [
                 ],
                 'tag' => 'console.command',
             ],
+            'mautic.lead.command.import' => [
+                'class'     => \Mautic\LeadBundle\Command\ImportCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.lead.model.import',
+                ],
+                'tag' => 'console.command',
+            ],
         ],
         'fixtures' => [
             'mautic.lead.fixture.company' => [
