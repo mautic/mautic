@@ -708,6 +708,13 @@ return [
                     'mautic.lead.model.ipaddress',
                 ],
             ],
+            'mautic.core.command.update_ip_data_store' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\UpdateIpDataStoreCommand::class,
+                'arguments' => [
+                    'mautic.ip_lookup',
+                ],
+            ],
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [
