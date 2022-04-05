@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -18,7 +9,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class LeadListRepository extends CommonRepository
 {
-    use OperatorListTrait;
+    use OperatorListTrait; // @deprecated to be removed in Mautic 3. Not used inside this class.
     use ExpressionHelperTrait;
     use RegexTrait;
 

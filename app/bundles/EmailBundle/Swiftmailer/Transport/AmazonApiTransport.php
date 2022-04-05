@@ -1,15 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Aws\CommandPool;
@@ -245,7 +235,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 return 0;
             }
         }
-        $count = $this->getBatchRecipientCount($toSendMessage);
 
         try {
             $this->start();
@@ -257,7 +246,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 'concurrency' => $this->concurrency,
                 'fulfilled'   => function (ResultInterface $result, $iteratorId) use ($evt, $failedRecipients) {
                     if ($evt) {
-                        // $this->logger->info("SES Result: " . $result->get('MessageId'));
                         $evt->setResult(\Swift_Events_SendEvent::RESULT_SUCCESS);
                         $evt->setFailedRecipients($failedRecipients);
                         $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
@@ -294,11 +282,9 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             array_keys((array) $this->message->getBcc())
         );
 
-        if ($evt) {
-            $evt->setResult(\Swift_Events_SendEvent::RESULT_FAILED);
-            $evt->setFailedRecipients($failedRecipients);
-            $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
-        }
+        $evt->setResult(\Swift_Events_SendEvent::RESULT_FAILED);
+        $evt->setFailedRecipients($failedRecipients);
+        $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
     }
 
     /*
@@ -366,7 +352,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             /**
              * This is a message with tokens.
              */
-            $mauticTokens  = [];
             $metadataSet   = reset($metadata);
             $tokens        = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
             $mauticTokens  = array_keys($tokens);
@@ -418,6 +403,12 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                     $toSendMessage->setReplyTo([$tokenizedMessage['replyTo']['email']]);
                     $sesArray['ReplyToAddresses'] = [$tokenizedMessage['replyTo']['email']];
                 }
+
+                if (isset($tokenizedMessage['returnPath'])) {
+                    $toSendMessage->setReturnPath($tokenizedMessage['returnPath']);
+                    $sesArray['ReturnPath'] = $tokenizedMessage['returnPath'];
+                }
+
                 if (isset($tokenizedMessage['headers']['X-SES-CONFIGURATION-SET'])) {
                     $sesArray['ConfigurationSetName'] = $tokenizedMessage['headers']['X-SES-CONFIGURATION-SET'];
                 }
@@ -444,10 +435,8 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * Set plain text to a message.
-     *
-     * @return bool
      */
-    private function setPlainTextToMessage(\Swift_Mime_SimpleMessage $message, $text)
+    private function setPlainTextToMessage(\Swift_Mime_SimpleMessage $message, $text): void
     {
         $children = (array) $message->getChildren();
 
@@ -459,32 +448,29 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
     }
 
-    /**
-     * @return int
-     */
     public function getMaxBatchLimit()
     {
         return 0;
     }
 
     /**
+     * Get the count for the max number of recipients per batch.
+     *
      * @param int    $toBeAdded
      * @param string $type
      */
-    public function getBatchRecipientCount(\Swift_Message $toSendMessage, $toBeAdded = 1, $type = 'to'): int
+    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to'): int
     {
         // These getters could return null
-        $toCount  = $toSendMessage->getTo() ? count($toSendMessage->getTo()) : 0;
-        $ccCount  = $toSendMessage->getCc() ? count($toSendMessage->getCc()) : 0;
-        $bccCount = $toSendMessage->getBcc() ? count($toSendMessage->getBcc()) : 0;
+        $toCount  = $message->getTo() ? count($message->getTo()) : 0;
+        $ccCount  = $message->getCc() ? count($message->getCc()) : 0;
+        $bccCount = $message->getBcc() ? count($message->getBcc()) : 0;
 
         return $toCount + $ccCount + $bccCount + $toBeAdded;
     }
 
     /**
      * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
-     *
-     * @return mixed
      */
     public function getCallbackPath()
     {
@@ -499,9 +485,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->amazonCallback->processCallbackRequest($request);
     }
 
-    /**
-     * @return bool
-     */
     public function ping()
     {
         return true;

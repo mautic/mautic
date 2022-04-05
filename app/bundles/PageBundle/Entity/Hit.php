@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -155,10 +146,8 @@ class Hit
             ->addIndex(['tracking_id'], 'page_hit_tracking_search')
             ->addIndex(['code'], 'page_hit_code_search')
             ->addIndex(['source', 'source_id'], 'page_hit_source_search')
-            ->addIndex(['date_hit', 'date_left'], 'date_hit_left_index');
-        // There should be a 128 char prefix index but it cannot be created here
-        // created in fixtures instead
-        //->addIndex(['url'], 'page_hit_url');
+            ->addIndex(['date_hit', 'date_left'], 'date_hit_left_index')
+            ->addIndexWithOptions(['url'], 'page_hit_url', ['lengths' => [0 => 128]]);
 
         $builder->addBigIntIdField();
 
@@ -669,9 +658,7 @@ class Hit
     }
 
     /**
-     * Set trackingId.
-     *
-     * @param int $trackingId
+     * @param string $trackingId
      *
      * @return Page
      */
@@ -683,9 +670,7 @@ class Hit
     }
 
     /**
-     * Get trackingId.
-     *
-     * @return int
+     * @return string
      */
     public function getTrackingId()
     {

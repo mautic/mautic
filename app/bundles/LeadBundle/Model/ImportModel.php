@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\ORMException;
@@ -369,9 +360,16 @@ class ImportModel extends FormModel
             }
 
             if ($errorMessage) {
+                // Log the error first
                 $import->increaseIgnoredCount();
-                $this->logImportRowError($eventLog, $errorMessage);
                 $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
+                if (!$this->em->isOpen()) {
+                    // Something bad must have happened if the entity manager is closed.
+                    // We will not be able to save any entities.
+                    throw new ORMException($errorMessage);
+                }
+                // This should be called only if the entity manager is open
+                $this->logImportRowError($eventLog, $errorMessage);
             } else {
                 $this->leadEventLogRepo->saveEntity($eventLog);
             }

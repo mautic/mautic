@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -209,10 +200,12 @@ class LeadField extends FormEntity
 
         $builder->createField('columnIsNotCreated', 'boolean')
             ->columnName('column_is_not_created')
+            ->option('default', false)
             ->build();
 
         $builder->createField('originalIsPublishedValue', 'boolean')
             ->columnName('original_is_published_value')
+            ->option('default', false)
             ->build();
     }
 

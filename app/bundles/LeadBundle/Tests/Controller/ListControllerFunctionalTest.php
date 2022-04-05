@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,10 +27,10 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        /* @var ListModel $listModel */
         $this->listModel = self::$container->get('mautic.lead.model.list');
-        /* @var LeadListRepository listRepo */
+        \assert($this->listModel instanceof ListModel);
         $this->listRepo = $this->listModel->getRepository();
+        \assert($this->listRepo instanceof LeadListRepository);
     }
 
     public function testUnpublishUsedSegment(): void
@@ -97,6 +98,31 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(2, $rows);
         $this->assertFalse($rows[0]->isPublished());
         $this->assertFalse($rows[1]->isPublished());
+    }
+
+    public function testBCSegmentWithPageHitInLeadObject(): void
+    {
+        $segment = $this->saveSegment(
+            'Legacy Url Hit segment',
+            's1',
+            [
+                [
+                    'glue'     => 'and',
+                    'field'    => 'hit_url',
+                    'object'   => 'lead',
+                    'type'     => 'text',
+                    'filter'   => 'unicorn',
+                    'display'  => null,
+                    'operator' => '=',
+                ],
+            ]
+        );
+
+        $this->em->clear();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertGreaterThan(0, $crawler->filter('#leadlist_filters_0_operator option')->count());
     }
 
     private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList

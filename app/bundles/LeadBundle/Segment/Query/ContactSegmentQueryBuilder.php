@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;
@@ -138,7 +129,8 @@ class ContactSegmentQueryBuilder
 
         $queryBuilder->select('count(leadIdPrimary) count, max(leadIdPrimary) maxId, min(leadIdPrimary) minId')
             ->from('('.$qb->getSQL().')', 'sss');
-        $queryBuilder->setParameters($qb->getParameters());
+
+        $queryBuilder->setParameters($qb->getParameters(), $qb->getParameterTypes());
 
         return $queryBuilder;
     }
@@ -147,32 +139,24 @@ class ContactSegmentQueryBuilder
      * Restrict the query to NEW members of segment.
      *
      * @param $segmentId
-     * @param $batchRestrictions
      *
      * @return QueryBuilder
      *
      * @throws QueryException
      */
-    public function addNewContactsRestrictions(QueryBuilder $queryBuilder, $segmentId, $batchRestrictions)
+    public function addNewContactsRestrictions(QueryBuilder $queryBuilder, $segmentId)
     {
-        $parts     = $queryBuilder->getQueryParts();
-        $setHaving = (count($parts['groupBy']) || !is_null($parts['having']));
+        $expr               = $queryBuilder->expr();
+        $tableAlias         = $this->generateRandomParameterName();
+        $segmentIdParameter = ":{$tableAlias}segmentId";
 
-        $tableAlias = $this->generateRandomParameterName();
-        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias, $tableAlias.'.lead_id = l.id');
-        $queryBuilder->addSelect($tableAlias.'.lead_id AS '.$tableAlias.'_lead_id');
+        $segmentQueryBuilder = $queryBuilder->createQueryBuilder()
+            ->select($tableAlias.'.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias)
+            ->andWhere($expr->eq($tableAlias.'.leadlist_id', $segmentIdParameter));
 
-        $expression = $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId);
-
-        $queryBuilder->addJoinCondition($tableAlias, $expression);
-
-        if ($setHaving) {
-            $restrictionExpression = $queryBuilder->expr()->isNull($tableAlias.'_lead_id');
-            $queryBuilder->andHaving($restrictionExpression);
-        } else {
-            $restrictionExpression = $queryBuilder->expr()->isNull($tableAlias.'.lead_id');
-            $queryBuilder->andWhere($restrictionExpression);
-        }
+        $queryBuilder->setParameter($segmentIdParameter, $segmentId);
+        $queryBuilder->andWhere($expr->notIn('l.id', $segmentQueryBuilder->getSQL()));
 
         return $queryBuilder;
     }
@@ -322,7 +306,8 @@ class ContactSegmentQueryBuilder
 
         foreach ($segmentFilters as $segmentFilter) {
             if (isset($segmentFilter['field']) && 'leadlist' === $segmentFilter['field']) {
-                $filterEdges  = $segmentFilter['filter'];
+                $bcFilter     = $segmentFilter['filter'] ?? [];
+                $filterEdges  = $segmentFilter['properties']['filter'] ?? $bcFilter;
                 $segmentEdges = array_merge($segmentEdges, $filterEdges);
             }
         }

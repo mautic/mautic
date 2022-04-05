@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -764,11 +755,12 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     }
 
     /**
-     * @param        $parameters
-     * @param bool   $prepareForSerialization
-     * @param string $requestIdColumn
-     * @param null   $model
-     * @param bool   $returnWithOriginalKeys
+     * @param mixed[] $parameters
+     * @param mixed[] $errors
+     * @param bool    $prepareForSerialization
+     * @param string  $requestIdColumn
+     * @param null    $model
+     * @param bool    $returnWithOriginalKeys
      *
      * @return array|mixed
      */
@@ -975,9 +967,9 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     /**
      * Convert posted parameters into what the form needs in order to successfully bind.
      *
-     * @param $parameters
-     * @param $entity
-     * @param $action
+     * @param mixed[] $parameters
+     * @param object  $entity
+     * @param string  $action
      *
      * @return mixed
      */

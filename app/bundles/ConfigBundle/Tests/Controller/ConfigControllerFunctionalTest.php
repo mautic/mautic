@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Tests\Controller;
 
 use DateTime;
@@ -223,7 +214,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form          = $buttonCrawler->form();
         Assert::assertEquals($page3, $form['config[coreconfig][404_page]']->getValue());
         // re-create the Symfony client to make config changes applied
-        $this->setUpSymfony();
+        $this->setUpSymfony($this->configParams);
 
         // Request not found url page3 page content should be rendered
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/editnotfoundurlblablabla');

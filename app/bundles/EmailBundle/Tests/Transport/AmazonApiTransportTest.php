@@ -1,15 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- */
-
 namespace Mautic\EmailBundle\Tests\Transport;
 
 use Aws\MockHandler;
@@ -40,16 +30,22 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|AmazonCallback
      */
     private $amazonCallback;
+
     private $amazonMock;
+
     private $amazonTransport;
+
     private $logger;
+
     private $headers;
+
     private $request;
 
     /**
      * @var MockObject|Client
      */
     private $mockHttp;
+
     /**
      * @var MockObject|TransportCallback
      */
@@ -64,19 +60,19 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator         = $this->createMock(TranslatorInterface::class);
-        $this->amazonCallback     = $this->createMock(AmazonCallback::class);
-        $this->logger             = $this->createMock(LoggerInterface::class);
-        $this->message            = $this->createMock(MauticMessage::class);
-        $this->headers            = $this->createMock(\Swift_Mime_SimpleHeaderSet::class);
-        $this->request            =  $this->createMock(Request::class);
+        $this->translator     = $this->createMock(TranslatorInterface::class);
+        $this->amazonCallback = $this->createMock(AmazonCallback::class);
+        $this->logger         = $this->createMock(LoggerInterface::class);
+        $this->message        = $this->createMock(MauticMessage::class);
+        $this->headers        = $this->createMock(\Swift_Mime_SimpleHeaderSet::class);
+        $this->request        = $this->createMock(Request::class);
 
         // Mock http connector
         $this->mockHttp          = $this->createMock(Client::class);
         $this->transportCallback = $this->createMock(TransportCallback::class);
         $this->amazonMock        = new MockHandler();
 
-        $this->amazonTransport   = new AmazonApiTransport(
+        $this->amazonTransport = new AmazonApiTransport(
             $this->translator,
             $this->amazonCallback,
             $this->logger
@@ -136,6 +132,7 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
         $this->message->method('getTo')->willReturn(['jane@doe.email' => 'Jane']);
         $this->message->method('getCc')->willReturn(['cc@doe.email' => 'Jane']);
         $this->message->method('getBcc')->willReturn(['bcc@doe.email' => 'Jane']);
+        $this->message->method('getReturnPath')->willReturn('john+return@doe.email');
         $this->message->method('getHeaders')->willReturn($this->headers);
         $this->headers->method('getAll')->willReturn([]);
         $this->message->method('getBody')->willReturn('Test Body');
@@ -165,6 +162,20 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
         $this->amazonTransport->start();
         $sent = $this->amazonTransport->send($this->message);
         $this->assertEquals(1, $sent);
+    }
+
+    public function testGetAmazonMessage(): void
+    {
+        foreach ($this->amazonTransport->getAmazonMessage($this->message) as $rawEmail) {
+            $this->assertEquals('"John" <john@doe.email>', $rawEmail['FromEmailAddress']);
+            $this->assertEquals([
+                'ToAddresses'  => ['success227@simulator.amazonses.com'],
+                'CcAddresses'  => ['cc@doe.email'],
+                'BccAddresses' => ['bcc@doe.email'],
+            ], $rawEmail['Destination']);
+            $this->assertEquals('john+return@doe.email', $rawEmail['ReturnPath']);
+            $this->assertStringContainsString('Test Body', $rawEmail['Content']['Raw']['Data']);
+        }
     }
 
     public function testGetAmazonMessageBatch()
@@ -293,7 +304,12 @@ EOD;
         $this->assertStringContainsString('List-Unsubscribe: <mailto:return+unsubscribe_6f86a61cc415555ecf6412@teleworm.us>,<http://mautic.local/email/unsubscribe/6f86a61cc415555ecf6412>', $amazonMessages[1]['Content']['Raw']['Data']);
     }
 
-    public function testprocessInvalidJsonRequest()
+    public function testGetBatchRecipientCount(): void
+    {
+        $this->assertEquals(3, $this->amazonTransport->getBatchRecipientCount($this->message, 0));
+    }
+
+    public function testProcessInvalidJsonRequest(): void
     {
         $payload = <<< 'PAYLOAD'
 {
@@ -316,7 +332,7 @@ PAYLOAD;
         $amazonCallback->processCallbackRequest($request);
     }
 
-    public function testprocessValidJsonWithoutTypeRequest()
+    public function testProcessValidJsonWithoutTypeRequest(): void
     {
         $payload = <<< 'PAYLOAD'
 {
@@ -339,7 +355,7 @@ PAYLOAD;
         $amazonCallback->processCallbackRequest($request);
     }
 
-    public function testprocessSubscriptionConfirmationRequest()
+    public function testProcessSubscriptionConfirmationRequest(): void
     {
         $payload = <<< 'PAYLOAD'
 {
@@ -373,7 +389,7 @@ PAYLOAD;
         $amazonCallback->processCallbackRequest($request);
     }
 
-    public function testprocessNotificationBounceRequest()
+    public function testProcessNotificationBounceRequest(): void
     {
         $payload = <<< 'PAYLOAD'
 {
@@ -409,7 +425,7 @@ PAYLOAD;
         $amazonCallback->processCallbackRequest($request);
     }
 
-    public function testprocessNotificationComplaintRequest()
+    public function testProcessNotificationComplaintRequest(): void
     {
         $payload = <<< 'PAYLOAD'
 {
@@ -445,7 +461,7 @@ PAYLOAD;
         $amazonCallback->processCallbackRequest($request);
     }
 
-    public function testprocessBounce()
+    public function testProcessBounce(): void
     {
         $messageMock = $this->getMockBuilder(Message::class)
                         ->disableOriginalConstructor()
@@ -464,7 +480,7 @@ PAYLOAD;
         $this->assertEquals($bounce, $amazonCallback->processBounce($messageMock));
     }
 
-    public function testprocessUnsubscription()
+    public function testProcessUnsubscription(): void
     {
         $messageMock = $this->getMockBuilder(Message::class)
                         ->disableOriginalConstructor()
@@ -476,7 +492,7 @@ PAYLOAD;
         $this->assertEquals($unsubscribe, $amazonCallback->processUnsubscription($messageMock));
     }
 
-    public function testprocessNotificationBounceRequestConfigSet()
+    public function testProcessNotificationBounceRequestConfigSet(): void
     {
         $payload = <<< 'PAYLOAD'
         {"eventType":"Bounce","bounce":{"bounceType":"Permanent","bounceSubType":"General","bouncedRecipients":[{"emailAddress":"recipient@example.com","action":"failed","status":"5.1.1","diagnosticCode":"smtp; 550 5.1.1 user unknown"}],"timestamp":"2017-08-05T00:41:02.669Z","feedbackId":"01000157c44f053b-61b59c11-9236-11e6-8f96-7be8aexample-000000","reportingMTA":"dsn; mta.example.com"},"mail":{"timestamp":"2017-08-05T00:40:02.012Z","source":"Sender Name <sender@example.com>","sourceArn":"arn:aws:ses:us-east-1:123456789012:identity/sender@example.com","sendingAccountId":"123456789012","messageId":"EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000","destination":["recipient@example.com"],"headersTruncated":false,"headers":[{"name":"From","value":"Sender Name <sender@example.com>"},{"name":"To","value":"recipient@example.com"},{"name":"Subject","value":"Message sent from Amazon SES"},{"name":"MIME-Version","value":"1.0"},{"name":"Content-Type","value":"multipart/alternative; boundary=\"----=_Part_7307378_1629847660.1516840721503\""}],"commonHeaders":{"from":["Sender Name <sender@example.com>"],"to":["recipient@example.com"],"messageId":"EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000","subject":"Message sent from Amazon SES"},"tags":{"ses:configuration-set":["ConfigSet"],"ses:source-ip":["192.0.2.0"],"ses:from-domain":["example.com"],"ses:caller-identity":["ses_user"]}}}
@@ -502,7 +518,7 @@ PAYLOAD;
         $amazonCallback->processCallbackRequest($request);
     }
 
-    public function testprocessNotificationComplaintRequestConfigSet()
+    public function testProcessNotificationComplaintRequestConfigSet(): void
     {
         $payload = <<< 'PAYLOAD'
         {"eventType":"Complaint","complaint":{"complainedRecipients":[{"emailAddress":"recipient@example.com"}],"timestamp":"2017-08-05T00:41:02.669Z","feedbackId":"01000157c44f053b-61b59c11-9236-11e6-8f96-7be8aexample-000000","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36","complaintFeedbackType":"abuse","arrivalDate":"2017-08-05T00:41:02.669Z"},"mail":{"timestamp":"2017-08-05T00:40:01.123Z","source":"Sender Name <sender@example.com>","sourceArn":"arn:aws:ses:us-east-1:123456789012:identity/sender@example.com","sendingAccountId":"123456789012","messageId":"EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000","destination":["recipient@example.com"],"headersTruncated":false,"headers":[{"name":"From","value":"Sender Name <sender@example.com>"},{"name":"To","value":"recipient@example.com"},{"name":"Subject","value":"Message sent from Amazon SES"},{"name":"MIME-Version","value":"1.0"},{"name":"Content-Type","value":"multipart/alternative; boundary=\"----=_Part_7298998_679725522.1516840859643\""}],"commonHeaders":{"from":["Sender Name <sender@example.com>"],"to":["recipient@example.com"],"messageId":"EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000","subject":"Message sent from Amazon SES"},"tags":{"ses:configuration-set":["ConfigSet"],"ses:source-ip":["192.0.2.0"],"ses:from-domain":["example.com"],"ses:caller-identity":["ses_user"]}}}
@@ -528,7 +544,7 @@ PAYLOAD;
         $amazonCallback->processCallbackRequest($request);
     }
 
-    public function testprocessBounceConfigSet()
+    public function testProcessBounceConfigSet(): void
     {
         $messageMock = $this->getMockBuilder(Message::class)
                         ->disableOriginalConstructor()
@@ -547,7 +563,7 @@ PAYLOAD;
         $this->assertEquals($bounce, $amazonCallback->processBounce($messageMock));
     }
 
-    public function testprocessUnsubscriptionConfigSet()
+    public function testProcessUnsubscriptionConfigSet(): void
     {
         $messageMock = $this->getMockBuilder(Message::class)
                         ->disableOriginalConstructor()
