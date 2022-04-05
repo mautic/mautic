@@ -61,11 +61,7 @@ class FlashBag
             //message is already translated
             $translatedMessage = $message;
         } else {
-            if (isset($messageVars['pluralCount'])) {
-                $translatedMessage = $this->translator->transChoice($message, $messageVars['pluralCount'], $messageVars, $domain);
-            } else {
-                $translatedMessage = $this->translator->trans($message, $messageVars, $domain);
-            }
+            $translatedMessage = $this->translator->trans($message, $messageVars, $domain);
         }
 
         $this->session->getFlashBag()->add($level, $translatedMessage);

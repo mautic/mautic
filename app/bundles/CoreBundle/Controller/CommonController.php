@@ -668,11 +668,7 @@ class CommonController extends Controller implements MauticController
             //message is already translated
             $translatedMessage = $message;
         } else {
-            if (isset($messageVars['pluralCount'])) {
-                $translatedMessage = $translator->transChoice($message, $messageVars['pluralCount'], $messageVars, $domain);
-            } else {
-                $translatedMessage = $translator->trans($message, $messageVars, $domain);
-            }
+            $translatedMessage = $translator->trans($message, $messageVars, $domain);
         }
 
         if (null !== $title) {

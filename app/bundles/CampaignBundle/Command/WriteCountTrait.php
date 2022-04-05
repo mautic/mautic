@@ -12,17 +12,15 @@ trait WriteCountTrait
     {
         $output->writeln('');
         $output->writeln(
-            '<comment>'.$translator->transChoice(
+            '<comment>'.$translator->trans(
                 'mautic.campaign.trigger.events_executed',
-                $counter->getTotalExecuted(),
                 ['%events%' => $counter->getTotalExecuted()]
             )
             .'</comment>'
         );
         $output->writeln(
-            '<comment>'.$translator->transChoice(
+            '<comment>'.$translator->trans(
                 'mautic.campaign.trigger.events_scheduled',
-                $counter->getTotalScheduled(),
                 ['%events%' => $counter->getTotalScheduled()]
             )
             .'</comment>'
