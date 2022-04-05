@@ -574,6 +574,7 @@ return [
                     'mautic.helper.template.formatter',
                     'mautic.lead.model.list',
                     'mautic.helper.segment.count.cache',
+                    'mautic.helper.paths',
                 ],
                 'tag' => 'console.command',
             ],
@@ -603,6 +604,7 @@ return [
                     'mautic.campaign.membership.builder',
                     'monolog.logger.mautic',
                     'mautic.helper.template.formatter',
+                    'mautic.helper.paths',
                 ],
                 'tag' => 'console.command',
             ],
@@ -611,6 +613,7 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.campaign.model.summary',
+                    'mautic.helper.paths',
                 ],
                 'tag' => 'console.command',
             ],

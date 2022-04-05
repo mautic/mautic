@@ -498,7 +498,7 @@ return [
                 'alias' => 'translator',
             ],
             'mautic.helper.paths' => [
-                'class'     => 'Mautic\CoreBundle\Helper\PathsHelper',
+                'class'     => \Mautic\CoreBundle\Helper\PathsHelper::class,
                 'arguments' => [
                     'mautic.helper.user',
                     'mautic.helper.core_parameters',
