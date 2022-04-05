@@ -2738,16 +2738,16 @@
         },
         {
             "name": "friendsofphp/proxy-manager-lts",
-            "version": "v1.0.5",
+            "version": "v1.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/proxy-manager-lts.git",
-                "reference": "006aa5d32f887a4db4353b13b5b5095613e0611f"
+                "reference": "c828ced1f932094ab79e4120a106a666565e4d9c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/proxy-manager-lts/zipball/006aa5d32f887a4db4353b13b5b5095613e0611f",
-                "reference": "006aa5d32f887a4db4353b13b5b5095613e0611f",
+                "url": "https://api.github.com/repos/FriendsOfPHP/proxy-manager-lts/zipball/c828ced1f932094ab79e4120a106a666565e4d9c",
+                "reference": "c828ced1f932094ab79e4120a106a666565e4d9c",
                 "shasum": ""
             },
             "require": {
@@ -2764,7 +2764,7 @@
             },
             "require-dev": {
                 "ext-phar": "*",
-                "symfony/phpunit-bridge": "^5.2|^6.0"
+                "symfony/phpunit-bridge": "^5.4|^6.0"
             },
             "type": "library",
             "extra": {
@@ -2786,7 +2786,7 @@
                 {
                     "name": "Marco Pivetta",
                     "email": "ocramius@gmail.com",
-                    "homepage": "http://ocramius.github.io/"
+                    "homepage": "https://ocramius.github.io/"
                 },
                 {
                     "name": "Nicolas Grekas",
@@ -2804,7 +2804,7 @@
             ],
             "support": {
                 "issues": "https://github.com/FriendsOfPHP/proxy-manager-lts/issues",
-                "source": "https://github.com/FriendsOfPHP/proxy-manager-lts/tree/v1.0.5"
+                "source": "https://github.com/FriendsOfPHP/proxy-manager-lts/tree/v1.0.7"
             },
             "funding": [
                 {
@@ -2816,7 +2816,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-05-22T16:11:15+00:00"
+            "time": "2022-03-02T09:29:19+00:00"
         },
         {
             "name": "friendsofsymfony/oauth-server-bundle",
@@ -4201,35 +4201,36 @@
         },
         {
             "name": "joomla/string",
-            "version": "2.0.0",
+            "version": "dev-2.0-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/string.git",
-                "reference": "778682c04a1909323da6a453a5b3030d7a7a2fa9"
+                "reference": "9d60fbfbed56aff4b1afe0203237f2ba0e001894"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/string/zipball/778682c04a1909323da6a453a5b3030d7a7a2fa9",
-                "reference": "778682c04a1909323da6a453a5b3030d7a7a2fa9",
+                "url": "https://api.github.com/repos/joomla-framework/string/zipball/9d60fbfbed56aff4b1afe0203237f2ba0e001894",
+                "reference": "9d60fbfbed56aff4b1afe0203237f2ba0e001894",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2.5",
+                "php": "^7.2.5|^8.0",
                 "symfony/deprecation-contracts": "^2.1"
             },
             "conflict": {
                 "doctrine/inflector": "<1.2"
             },
             "require-dev": {
-                "doctrine/inflector": "1.2",
+                "doctrine/inflector": "^1.2",
                 "joomla/coding-standards": "^3.0@dev",
-                "joomla/test": "^2.0",
+                "joomla/test": "^2.0.1",
                 "phpunit/phpunit": "^8.5|^9.0"
             },
             "suggest": {
                 "doctrine/inflector": "To use the string inflector",
                 "ext-mbstring": "For improved processing"
             },
+            "default-branch": true,
             "type": "joomla-package",
             "extra": {
                 "branch-alias": {
@@ -4271,7 +4272,7 @@
             ],
             "support": {
                 "issues": "https://github.com/joomla-framework/string/issues",
-                "source": "https://github.com/joomla-framework/string/tree/2.0.0"
+                "source": "https://github.com/joomla-framework/string/tree/2.0-dev"
             },
             "funding": [
                 {
@@ -4283,7 +4284,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-08-10T18:57:12+00:00"
+            "time": "2021-09-23T16:44:29+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -4632,40 +4633,39 @@
         },
         {
             "name": "laminas/laminas-code",
-            "version": "4.4.2",
+            "version": "4.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-code.git",
-                "reference": "54251ab2b16c41c6980387839496b235f5f6e10b"
+                "reference": "6fd96d4d913571a2cd056a27b123fa28cb90ac4e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-code/zipball/54251ab2b16c41c6980387839496b235f5f6e10b",
-                "reference": "54251ab2b16c41c6980387839496b235f5f6e10b",
+                "url": "https://api.github.com/repos/laminas/laminas-code/zipball/6fd96d4d913571a2cd056a27b123fa28cb90ac4e",
+                "reference": "6fd96d4d913571a2cd056a27b123fa28cb90ac4e",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.4 || ~8.0.0"
-            },
-            "conflict": {
-                "phpspec/prophecy": "<1.9.0"
+                "php": ">=7.4, <8.2"
             },
             "require-dev": {
-                "doctrine/annotations": "^1.10.4",
+                "doctrine/annotations": "^1.13.2",
                 "ext-phar": "*",
-                "laminas/laminas-coding-standard": "^2.1.4",
-                "laminas/laminas-stdlib": "^3.3.0",
-                "phpunit/phpunit": "^9.4.2",
-                "psalm/plugin-phpunit": "^0.14.0",
-                "vimeo/psalm": "^4.3.1"
+                "laminas/laminas-coding-standard": "^2.3.0",
+                "laminas/laminas-stdlib": "^3.6.1",
+                "phpunit/phpunit": "^9.5.10",
+                "psalm/plugin-phpunit": "^0.16.1",
+                "vimeo/psalm": "^4.13.1"
             },
             "suggest": {
                 "doctrine/annotations": "Doctrine\\Common\\Annotations >=1.0 for annotation features",
-                "laminas/laminas-stdlib": "Laminas\\Stdlib component",
-                "laminas/laminas-zendframework-bridge": "A bridge with Zend Framework"
+                "laminas/laminas-stdlib": "Laminas\\Stdlib component"
             },
             "type": "library",
             "autoload": {
+                "files": [
+                    "polyfill/ReflectionEnumPolyfill.php"
+                ],
                 "psr-4": {
                     "Laminas\\Code\\": "src/"
                 }
@@ -4695,7 +4695,7 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2021-07-09T11:58:40+00:00"
+            "time": "2021-12-19T18:06:55+00:00"
         },
         {
             "name": "league/flysystem",
@@ -5537,7 +5537,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "120197e383eec7e96f6bb32753b0b32c72fed752"
+                "reference": "1d855e6ac5b5cc58ed8ea56b56d113bee42e1e52"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5567,7 +5567,7 @@
                 "jbroadway/urlify": "^1.0",
                 "jms/serializer-bundle": "^3.8.0",
                 "joomla/filter": "dev-1.x-dev",
-                "joomla/string": "~2.0",
+                "joomla/string": "dev-2.0-dev",
                 "kamermans/guzzle-oauth2-subscriber": "^1.0",
                 "knplabs/gaufrette": "~0.9.0",
                 "knplabs/knp-menu-bundle": "^3.0",
@@ -5578,7 +5578,7 @@
                 "mrclay/minify": "2.2.0",
                 "noxlogic/ratelimit-bundle": "^1.11",
                 "oneup/uploader-bundle": "^3.1.0",
-                "php": ">=7.4.0 <8.1",
+                "php": ">=7.4.0 <8.2",
                 "php-amqplib/rabbitmq-bundle": "^2.5.1",
                 "php-http/guzzle7-adapter": "^1.0",
                 "phpoffice/phpspreadsheet": "^1.15",

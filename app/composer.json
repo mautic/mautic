@@ -16,7 +16,7 @@
     ]
   },
   "require": {
-    "php": ">=7.4.0 <8.1",
+    "php": ">=7.4.0 <8.2",
     "ext-zlib": "*",
     "ext-zip": "*",
     "ext-imap": "*",
@@ -72,7 +72,7 @@
     "friendsofsymfony/oauth-server-bundle": "dev-master",
     "jms/serializer-bundle": "^3.8.0",
     "joomla/filter": "dev-1.x-dev",
-    "joomla/string": "~2.0",
+    "joomla/string": "dev-2.0-dev",
     "oneup/uploader-bundle": "^3.1.0",
     "mrclay/minify": "2.2.0",
     "jbroadway/urlify": "^1.0",
