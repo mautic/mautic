@@ -701,6 +701,13 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.core.command.unused_ip_delete' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\UnusedIpDeleteCommand::class,
+                'arguments' => [
+                    'mautic.lead.model.ipaddress',
+                ],
+            ],
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [
