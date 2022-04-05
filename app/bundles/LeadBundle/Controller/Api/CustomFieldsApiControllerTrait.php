@@ -180,8 +180,12 @@ trait CustomFieldsApiControllerTrait
         }
 
         $overwriteWithBlank = !$isPostOrPatch;
-        if (isset($parameters['overwriteWithBlank']) && !empty($parameters['overwriteWithBlank'])) {
-            $overwriteWithBlank = true;
+        if (isset($parameters['overwriteWithBlank'])) {
+            if (true === $parameters['overwriteWithBlank']) {
+                $overwriteWithBlank = true;
+            } elseif (false === $parameters['overwriteWithBlank']) {
+                $overwriteWithBlank = false;
+            }
             unset($parameters['overwriteWithBlank']);
         }
 
