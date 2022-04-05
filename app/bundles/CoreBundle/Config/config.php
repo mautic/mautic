@@ -683,6 +683,15 @@ return [
                     'mautic.helper.update',
                 ],
             ],
+            'mautic.core.command.generate_assets' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\GenerateProductionAssetsCommand::class,
+                'arguments' => [
+                    'mautic.helper.assetgeneration',
+                    'mautic.helper.paths',
+                    'translator',
+                ],
+            ],
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [
