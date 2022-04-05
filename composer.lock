@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "208a832a3ef0565f8e3a23eba62235cb",
+    "content-hash": "4ca154710a404a56f027083e607967ee",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2704,12 +2704,12 @@
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "HTMLPurifier": "library/"
-                },
                 "files": [
                     "library/HTMLPurifier.composer.php"
                 ],
+                "psr-0": {
+                    "HTMLPurifier": "library/"
+                },
                 "exclude-from-classmap": [
                     "/library/HTMLPurifier/Language/"
                 ]
@@ -4161,7 +4161,6 @@
             "suggest": {
                 "joomla/language": "Required only if you want to use `OutputFilter::stringURLSafe`."
             },
-            "default-branch": true,
             "type": "joomla-package",
             "extra": {
                 "branch-alias": {
@@ -4238,9 +4237,6 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Joomla\\String\\": "src/"
-                },
                 "files": [
                     "src/phputf8/utf8.php",
                     "src/phputf8/ord.php",
@@ -4257,7 +4253,10 @@
                     "src/phputf8/ucwords.php",
                     "src/phputf8/utils/ascii.php",
                     "src/phputf8/utils/validation.php"
-                ]
+                ],
+                "psr-4": {
+                    "Joomla\\String\\": "src/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -5319,9 +5318,6 @@
             },
             "type": "library",
             "autoload": {
-                "psr-4": {
-                    "Complex\\": "classes/src/"
-                },
                 "files": [
                     "classes/src/functions/abs.php",
                     "classes/src/functions/acos.php",
@@ -5365,7 +5361,10 @@
                     "classes/src/operations/multiply.php",
                     "classes/src/operations/divideby.php",
                     "classes/src/operations/divideinto.php"
-                ]
+                ],
+                "psr-4": {
+                    "Complex\\": "classes/src/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -5418,9 +5417,6 @@
             },
             "type": "library",
             "autoload": {
-                "psr-4": {
-                    "Matrix\\": "classes/src/"
-                },
                 "files": [
                     "classes/src/Functions/adjoint.php",
                     "classes/src/Functions/antidiagonal.php",
@@ -5438,7 +5434,10 @@
                     "classes/src/Operations/multiply.php",
                     "classes/src/Operations/divideby.php",
                     "classes/src/Operations/divideinto.php"
-                ]
+                ],
+                "psr-4": {
+                    "Matrix\\": "classes/src/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -5538,7 +5537,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "d019e9a8b79ac272f5cb840165fb11bd88325ff1"
+                "reference": "120197e383eec7e96f6bb32753b0b32c72fed752"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -7964,12 +7963,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Ramsey\\Uuid\\": "src/"
-                },
                 "files": [
                     "src/functions.php"
-                ]
+                ],
+                "psr-4": {
+                    "Ramsey\\Uuid\\": "src/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -11259,12 +11258,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Ctype\\": ""
-                },
                 "files": [
                     "bootstrap.php"
-                ]
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Ctype\\": ""
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -12864,12 +12863,12 @@
             },
             "type": "library",
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\String\\": ""
-                },
                 "files": [
                     "Resources/functions.php"
                 ],
+                "psr-4": {
+                    "Symfony\\Component\\String\\": ""
+                },
                 "exclude-from-classmap": [
                     "/Tests/"
                 ]
@@ -13800,12 +13799,12 @@
             },
             "type": "symfony-bundle",
             "autoload": {
-                "psr-4": {
-                    "Fidry\\PsyshBundle\\": "src"
-                },
                 "files": [
                     "src/psysh.php"
-                ]
+                ],
+                "psr-4": {
+                    "Fidry\\PsyshBundle\\": "src"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
