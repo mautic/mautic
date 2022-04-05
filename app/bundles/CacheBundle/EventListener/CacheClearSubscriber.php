@@ -34,7 +34,7 @@ class CacheClearSubscriber implements CacheClearerInterface
     public function clear($cacheDir): void
     {
         try {
-            $reflect = new \ReflectionClass($this->cacheProvider->getCacheAdapter() ?? "");
+            $reflect = new \ReflectionClass($this->cacheProvider->getCacheAdapter() ?? '');
             $adapter = $reflect->getShortName();
         } catch (\ReflectionException $e) {
             $adapter = 'unknown';
