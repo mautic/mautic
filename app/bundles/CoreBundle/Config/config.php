@@ -712,6 +712,7 @@ return [
                 'tag'       => 'console.command',
                 'class'     => \Mautic\CoreBundle\Command\UpdateIpDataStoreCommand::class,
                 'arguments' => [
+                    'translator',
                     'mautic.ip_lookup',
                 ],
             ],
