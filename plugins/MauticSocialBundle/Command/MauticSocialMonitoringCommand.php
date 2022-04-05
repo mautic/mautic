@@ -3,7 +3,6 @@
 namespace MauticPlugin\MauticSocialBundle\Command;
 
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;

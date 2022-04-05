@@ -9,14 +9,14 @@ use MauticPlugin\MauticSocialBundle\Event\SocialMonitorEvent;
 use MauticPlugin\MauticSocialBundle\Helper\TwitterCommandHelper;
 use MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
+abstract class MonitorTwitterBaseCommand extends Command
 {
     /**
      * @var TwitterIntegration
@@ -68,9 +68,6 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
      */
     protected $queryCount = 100;
 
-    /**
-     * MonitorTwitterBaseCommand constructor.
-     */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         TranslatorInterface $translator,
