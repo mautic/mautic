@@ -675,6 +675,14 @@ return [
                     'mautic.helper.paths',
                 ],
             ],
+            'mautic.core.command.find_updates' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\FindUpdatesCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.update',
+                ],
+            ],
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [
