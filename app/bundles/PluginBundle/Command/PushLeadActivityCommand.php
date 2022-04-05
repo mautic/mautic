@@ -18,10 +18,10 @@ class PushLeadActivityCommand extends Command
     {
         parent::__construct();
 
-        $this->translator = $translator;
+        $this->translator        = $translator;
         $this->integrationHelper = $integrationHelper;
     }
-    
+
     protected function configure()
     {
         $this

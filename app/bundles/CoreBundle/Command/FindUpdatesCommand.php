@@ -20,7 +20,7 @@ class FindUpdatesCommand extends Command
     {
         parent::__construct();
 
-        $this->translator = $translator;
+        $this->translator   = $translator;
         $this->updateHelper = $updateHelper;
     }
 

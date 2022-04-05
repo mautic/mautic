@@ -25,7 +25,7 @@ class ImportCommand extends Command
     {
         parent::__construct();
 
-        $this->translator = $translator;
+        $this->translator  = $translator;
         $this->importModel = $importModel;
     }
 

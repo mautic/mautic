@@ -26,7 +26,7 @@ class UpdateIpDataStoreCommand extends Command
 
         parent::__construct();
     }
-    
+
     protected function configure()
     {
         $this->setName('mautic:iplookup:download')

@@ -19,7 +19,7 @@ class FetchLeadsCommand extends Command
     {
         parent::__construct();
 
-        $this->translator = $translator;
+        $this->translator        = $translator;
         $this->integrationHelper = $integrationHelper;
     }
 

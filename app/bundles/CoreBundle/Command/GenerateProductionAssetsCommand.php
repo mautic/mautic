@@ -22,12 +22,12 @@ class GenerateProductionAssetsCommand extends Command
         AssetGenerationHelper $assetGenerationHelper,
         PathsHelper $pathsHelper,
         TranslatorInterface $translator
-    ){
+    ) {
         parent::__construct();
 
         $this->assetGenerationHelper = $assetGenerationHelper;
-        $this->pathsHelper = $pathsHelper;
-        $this->translator = $translator;
+        $this->pathsHelper           = $pathsHelper;
+        $this->translator            = $translator;
     }
 
     protected function configure()

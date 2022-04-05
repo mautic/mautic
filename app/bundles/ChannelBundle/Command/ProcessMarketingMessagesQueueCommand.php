@@ -17,7 +17,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 
     public function __construct(TranslatorInterface $translator, MessageQueueModel $messageQueueModel, PathsHelper $pathsHelper)
     {
-        $this->translator = $translator;
+        $this->translator        = $translator;
         $this->messageQueueModel = $messageQueueModel;
 
         parent::__construct($pathsHelper);

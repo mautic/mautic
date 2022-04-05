@@ -36,7 +36,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     private InactiveExecutioner $inactiveExecutioner;
     private LoggerInterface $logger;
     private FormatterHelper $formatterHelper;
-    private bool $kickoffOnly = false;
+    private bool $kickoffOnly  = false;
     private bool $inactiveOnly = false;
     private bool $scheduleOnly = false;
 

@@ -3,8 +3,8 @@
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
-use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Psr\Log\LoggerInterface;

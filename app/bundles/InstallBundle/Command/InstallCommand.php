@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\InstallBundle\Command;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\DBAL\Exception;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;
@@ -29,7 +28,7 @@ class InstallCommand extends Command
 
     public function __construct(InstallService $installer, Registry $doctrineRegistry)
     {
-        $this->installer = $installer;
+        $this->installer        = $installer;
         $this->doctrineRegistry = $doctrineRegistry;
 
         parent::__construct();
@@ -563,7 +562,7 @@ class InstallCommand extends Command
 
     /**
      * Handle install command errors.
-     * 
+     *
      * @param array<string,string> $messages
      */
     private function handleInstallerErrors(OutputInterface $output, array $messages)
