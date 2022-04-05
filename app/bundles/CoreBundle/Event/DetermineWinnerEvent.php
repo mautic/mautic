@@ -8,10 +8,10 @@ class DetermineWinnerEvent extends Event
 {
     /**
      * @var array{
-     *             parent?: Mautic\PageBundle\Entity\Page|Mautic\EmailBundle\Entity\Email,
-     *             children?: Doctrine\Common\Collections\ArrayCollection,
-     *             page?: Mautic\PageBundle\Entity\Page,
-     *             email?: Mautic\EmailBundle\Entity\Email
+     *             parent?: \Mautic\PageBundle\Entity\Page|\Mautic\EmailBundle\Entity\Email,
+     *             children?: \Doctrine\Common\Collections\ArrayCollection,
+     *             page?: \Mautic\PageBundle\Entity\Page,
+     *             email?: \Mautic\EmailBundle\Entity\Email
      *             }
      */
     private $parameters;
@@ -27,10 +27,10 @@ class DetermineWinnerEvent extends Event
 
     /**
      * @param array{
-     *   parent?: Mautic\PageBundle\Entity\Page|Mautic\EmailBundle\Entity\Email,
-     *   children?: Doctrine\Common\Collections\ArrayCollection,
-     *   page?: Mautic\PageBundle\Entity\Page,
-     *   email?: Mautic\EmailBundle\Entity\Email
+     *   parent?: \Mautic\PageBundle\Entity\Page|\Mautic\EmailBundle\Entity\Email,
+     *   children?: \Doctrine\Common\Collections\ArrayCollection,
+     *   page?: \Mautic\PageBundle\Entity\Page,
+     *   email?: \Mautic\EmailBundle\Entity\Email
      * } $parameters
      */
     public function __construct(array $parameters)
@@ -40,10 +40,10 @@ class DetermineWinnerEvent extends Event
 
     /**
      * @return array{
-     *                parent?: Mautic\PageBundle\Entity\Page|Mautic\EmailBundle\Entity\Email,
-     *                children?: Doctrine\Common\Collections\ArrayCollection,
-     *                page?: Mautic\PageBundle\Entity\Page,
-     *                email?: Mautic\EmailBundle\Entity\Email
+     *                parent?: \Mautic\PageBundle\Entity\Page|\Mautic\EmailBundle\Entity\Email,
+     *                children?: \Doctrine\Common\Collections\ArrayCollection,
+     *                page?: \Mautic\PageBundle\Entity\Page,
+     *                email?: \Mautic\EmailBundle\Entity\Email
      *                }
      */
     public function getParameters()
