@@ -692,6 +692,13 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.core.command.install_data' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\InstallDataCommand::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [
