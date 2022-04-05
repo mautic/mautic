@@ -9,7 +9,7 @@ class DetermineWinnerEvent extends Event
     /**
      * @var array{
      *             parent?: \Mautic\PageBundle\Entity\Page|\Mautic\EmailBundle\Entity\Email,
-     *             children?: \Doctrine\Common\Collections\ArrayCollection,
+     *             children?: array<mixed>,
      *             page?: \Mautic\PageBundle\Entity\Page,
      *             email?: \Mautic\EmailBundle\Entity\Email
      *             }
@@ -28,7 +28,7 @@ class DetermineWinnerEvent extends Event
     /**
      * @param array{
      *   parent?: \Mautic\PageBundle\Entity\Page|\Mautic\EmailBundle\Entity\Email,
-     *   children?: \Doctrine\Common\Collections\ArrayCollection,
+     *   children?: array<mixed>,
      *   page?: \Mautic\PageBundle\Entity\Page,
      *   email?: \Mautic\EmailBundle\Entity\Email
      * } $parameters
@@ -41,7 +41,7 @@ class DetermineWinnerEvent extends Event
     /**
      * @return array{
      *                parent?: \Mautic\PageBundle\Entity\Page|\Mautic\EmailBundle\Entity\Email,
-     *                children?: \Doctrine\Common\Collections\ArrayCollection,
+     *                children?: array<mixed>,
      *                page?: \Mautic\PageBundle\Entity\Page,
      *                email?: \Mautic\EmailBundle\Entity\Email
      *                }
