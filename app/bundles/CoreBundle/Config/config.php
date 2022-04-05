@@ -649,7 +649,6 @@ return [
                 'class'     => \Mautic\CoreBundle\Command\ApplyUpdatesCommand::class,
                 'arguments' => [
                     'translator',
-                    'mautic.helper.core_parameters',
                     'mautic.update.step_provider',
                 ],
             ],
