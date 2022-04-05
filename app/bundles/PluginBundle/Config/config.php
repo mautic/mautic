@@ -179,6 +179,14 @@ return [
                     'mautic.helper.integration',
                 ],
             ],
+            'mautic.plugin.command.push_activity' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\PluginBundle\Command\PushLeadActivityCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.integration',
+                ],
+            ],
         ],
     ],
 ];
