@@ -170,5 +170,15 @@ return [
                 'class' => Mautic\PluginBundle\Model\IntegrationEntityModel::class,
             ],
         ],
+        'commands' => [
+            'mautic.plugin.command.fetch_leads' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\PluginBundle\Command\FetchLeadsCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.integration',
+                ],
+            ],
+        ],
     ],
 ];
