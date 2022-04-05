@@ -124,7 +124,7 @@ trait CustomFieldEntityTrait
         $setter   = 'set'.ucfirst($property);
 
         if (null == $oldValue) {
-            $oldValue = $this->${alias};
+            $oldValue = $this->{$alias};
         } elseif ($field) {
             $oldValue = CustomFieldHelper::fixValueType($field['type'], $oldValue);
         }
