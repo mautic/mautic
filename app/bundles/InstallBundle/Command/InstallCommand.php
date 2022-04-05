@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Command;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\DBAL\Exception;
-use Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;
 use Mautic\InstallBundle\Install\InstallService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,16 +19,24 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
  * CLI Command to install Mautic.
- * Class InstallCommand.
  */
-class InstallCommand extends ContainerAwareCommand
+class InstallCommand extends Command
 {
     public const COMMAND = 'mautic:install';
 
+    private InstallService $installer;
+    private Registry $doctrineRegistry;
+
+    public function __construct(InstallService $installer, Registry $doctrineRegistry)
+    {
+        $this->installer = $installer;
+        $this->doctrineRegistry = $doctrineRegistry;
+
+        parent::__construct();
+    }
+
     /**
      * Note: in every option (addOption()), please leave the default value empty to prevent problems with values from local.php being overwritten.
-     *
-     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -234,19 +242,10 @@ class InstallCommand extends ContainerAwareCommand
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws Exception
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
-        /** @var \Mautic\InstallBundle\Install\InstallService $installer */
-        $installer = $container->get('mautic.install.service');
-
         // Check Mautic is not already installed
-        if ($installer->checkIfInstalled()) {
+        if ($this->installer->checkIfInstalled()) {
             $output->writeln('Mautic already installed');
 
             return 0;
@@ -290,7 +289,7 @@ class InstallCommand extends ContainerAwareCommand
             'lastname'  => 'Mautic',
             'username'  => 'admin',
         ];
-        $allParams  = $installer->localConfigParameters();
+        $allParams  = $this->installer->localConfigParameters();
 
         // Initialize DB and admin params from local.php
         foreach ((array) $allParams as $opt => $value) {
@@ -338,7 +337,7 @@ class InstallCommand extends ContainerAwareCommand
             default:
             case InstallService::CHECK_STEP:
                 $output->writeln($step.' - Checking installation requirements...');
-                $messages = $this->stepAction($installer, ['site_url' => $siteUrl], $step);
+                $messages = $this->stepAction($this->installer, ['site_url' => $siteUrl], $step);
                 if (!empty($messages)) {
                     if (isset($messages['requirements']) && !empty($messages['requirements'])) {
                         // Stop install if requirements not met
@@ -372,13 +371,11 @@ class InstallCommand extends ContainerAwareCommand
 
                 /**
                  * This is needed for installations with database prefixes to work correctly.
-                 *
-                 * @var ConnectionWrapper $connectionWrapper
                  */
-                $connectionWrapper = $container->get('doctrine')->getConnection();
+                $connectionWrapper = $this->doctrineRegistry->getConnection();
                 $connectionWrapper->initConnection($dbParams);
 
-                $messages = $this->stepAction($installer, $dbParams, $step);
+                $messages = $this->stepAction($this->installer, $dbParams, $step);
                 if (!empty($messages)) {
                     $output->writeln('Errors in database configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
@@ -390,7 +387,7 @@ class InstallCommand extends ContainerAwareCommand
 
                 $step = InstallService::DOCTRINE_STEP + .1;
                 $output->writeln($step.' - Creating schema...');
-                $messages = $this->stepAction($installer, $dbParams, $step);
+                $messages = $this->stepAction($this->installer, $dbParams, $step);
                 if (!empty($messages)) {
                     $output->writeln('Errors in schema configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
@@ -402,7 +399,7 @@ class InstallCommand extends ContainerAwareCommand
 
                 $step = InstallService::DOCTRINE_STEP + .2;
                 $output->writeln($step.' - Loading fixtures...');
-                $messages = $this->stepAction($installer, $dbParams, $step);
+                $messages = $this->stepAction($this->installer, $dbParams, $step);
                 if (!empty($messages)) {
                     $output->writeln('Errors in fixtures configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
@@ -418,7 +415,7 @@ class InstallCommand extends ContainerAwareCommand
                 // no break
             case InstallService::USER_STEP:
                 $output->writeln($step.' - Creating admin user...');
-                $messages = $this->stepAction($installer, $adminParam, $step);
+                $messages = $this->stepAction($this->installer, $adminParam, $step);
                 if (!empty($messages)) {
                     $output->writeln('Errors in admin user configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
@@ -433,7 +430,7 @@ class InstallCommand extends ContainerAwareCommand
                 // no break
             case InstallService::EMAIL_STEP:
                 $output->writeln($step.' - Email configuration...');
-                $messages = $this->stepAction($installer, $allParams, $step);
+                $messages = $this->stepAction($this->installer, $allParams, $step);
                 if (!empty($messages)) {
                     $output->writeln('Errors in email configuration:');
                     $this->handleInstallerErrors($output, $messages);
@@ -448,7 +445,7 @@ class InstallCommand extends ContainerAwareCommand
                 // no break
             case InstallService::FINAL_STEP:
                 $output->writeln($step.' - Final steps...');
-                $messages = $this->stepAction($installer, $allParams, $step);
+                $messages = $this->stepAction($this->installer, $allParams, $step);
                 if (!empty($messages)) {
                     $output->writeln('Errors in final step:');
                     $this->handleInstallerErrors($output, $messages);
@@ -527,7 +524,7 @@ class InstallCommand extends ContainerAwareCommand
 
                     case 2:
                         // Install fixtures
-                        $messages = $installer->createFixturesStep($this->getContainer());
+                        $messages = $installer->createFixturesStep();
                         break;
                 }
                 break;
@@ -566,6 +563,8 @@ class InstallCommand extends ContainerAwareCommand
 
     /**
      * Handle install command errors.
+     * 
+     * @param array<string,string> $messages
      */
     private function handleInstallerErrors(OutputInterface $output, array $messages)
     {

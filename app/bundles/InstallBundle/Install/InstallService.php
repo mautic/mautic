@@ -38,42 +38,36 @@ class InstallService
     const EMAIL_STEP    = 3;
     const FINAL_STEP    = 4;
 
-    private $configurator;
+    private Configurator $configurator;
+    private CacheHelper $cacheHelper;
+    protected PathsHelper $pathsHelper;
+    private EntityManager $entityManager;
+    private TranslatorInterface $translator;
+    private KernelInterface $kernel;
+    private ValidatorInterface $validator;
+    private UserPasswordEncoder $encoder;
+    private ContainerInterface $container;
 
-    private $cacheHelper;
-
-    protected $pathsHelper;
-
-    private $entityManager;
-
-    private $translator;
-
-    private $kernel;
-
-    private $validator;
-
-    private $encoder;
-
-    /**
-     * InstallService constructor.
-     */
-    public function __construct(Configurator $configurator,
-                                CacheHelper $cacheHelper,
-                                PathsHelper $pathsHelper,
-                                EntityManager $entityManager,
-                                TranslatorInterface $translator,
-                                KernelInterface $kernel,
-                                ValidatorInterface $validator,
-                                UserPasswordEncoder $encoder)
-    {
-        $this->configurator             = $configurator;
-        $this->cacheHelper              = $cacheHelper;
-        $this->pathsHelper              = $pathsHelper;
-        $this->entityManager            = $entityManager;
-        $this->translator               = $translator;
-        $this->kernel                   = $kernel;
-        $this->validator                = $validator;
-        $this->encoder                  = $encoder;
+    public function __construct(
+        Configurator $configurator,
+        CacheHelper $cacheHelper,
+        PathsHelper $pathsHelper,
+        EntityManager $entityManager,
+        TranslatorInterface $translator,
+        KernelInterface $kernel,
+        ValidatorInterface $validator,
+        UserPasswordEncoder $encoder,
+        ContainerInterface $container
+    ) {
+        $this->configurator  = $configurator;
+        $this->cacheHelper   = $cacheHelper;
+        $this->pathsHelper   = $pathsHelper;
+        $this->entityManager = $entityManager;
+        $this->translator    = $translator;
+        $this->kernel        = $kernel;
+        $this->validator     = $validator;
+        $this->encoder       = $encoder;
+        $this->container     = $container;
     }
 
     /**
@@ -346,12 +340,12 @@ class InstallService
     /**
      * Load the database fixtures in the database.
      */
-    public function createFixturesStep(ContainerInterface $container): array
+    public function createFixturesStep(): array
     {
         $messages = [];
 
         try {
-            $this->installDatabaseFixtures($container);
+            $this->installDatabaseFixtures();
         } catch (\Exception $exception) {
             $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.adding.fixtures',
@@ -368,11 +362,11 @@ class InstallService
      *
      * @throws \InvalidArgumentException
      */
-    public function installDatabaseFixtures(ContainerInterface $container): void
+    public function installDatabaseFixtures(): void
     {
         $paths  = [dirname(__DIR__).'/InstallFixtures/ORM'];
         /** @phpstan-ignore-next-line */
-        $loader = new ContainerAwareLoader($container);
+        $loader = new ContainerAwareLoader($this->container);
 
         foreach ($paths as $path) {
             if (is_dir($path)) {
