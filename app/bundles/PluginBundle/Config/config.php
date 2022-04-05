@@ -187,6 +187,13 @@ return [
                     'mautic.helper.integration',
                 ],
             ],
+            'mautic.plugin.command.reload' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\PluginBundle\Command\ReloadCommand::class,
+                'arguments' => [
+                    'mautic.plugin.facade.reload',
+                ],
+            ],
         ],
     ],
 ];
