@@ -661,6 +661,14 @@ return [
                     'mautic.maxmind.doNotSellList',
                 ],
             ],
+            'mautic.core.command.cleanup_maintenance' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\CleanupMaintenanceCommand::class,
+                'arguments' => [
+                    'translator',
+                    'event_dispatcher',
+                ],
+            ],
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [

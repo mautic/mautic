@@ -4,21 +4,31 @@ namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CLI Command to purge old data per settings.
  */
-class CleanupMaintenanceCommand extends ContainerAwareCommand
+class CleanupMaintenanceCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    private TranslatorInterface $translator;
+    private EventDispatcherInterface $dispatcher;
+
+    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
+    {
+        parent::__construct();
+
+        $this->translator = $translator;
+        $this->dispatcher = $dispatcher;
+    }
+
     protected function configure()
     {
         $this->setName('mautic:maintenance:cleanup')
@@ -53,15 +63,8 @@ EOT
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
-        $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->getParameter('mautic.locale', 'en_US'));
-
         $daysOld       = $input->getOption('days-old');
         $dryRun        = $input->getOption('dry-run');
         $noInteraction = $input->getOption('no-interaction');
@@ -80,7 +83,7 @@ EOT
             /** @var \Symfony\Component\Console\Helper\SymfonyQuestionHelper $helper */
             $helper   = $this->getHelperSet()->get('question');
             $question = new ConfirmationQuestion(
-                '<info>'.$translator->trans('mautic.maintenance.confirm_data_purge', ['%days%' => $daysOld]).'</info> ', false
+                '<info>'.$this->translator->trans('mautic.maintenance.confirm_data_purge', ['%days%' => $daysOld]).'</info> ', false
             );
 
             if (!$helper->ask($input, $output, $question)) {
@@ -88,9 +91,8 @@ EOT
             }
         }
 
-        $dispatcher = $this->getContainer()->get('event_dispatcher');
-
-        $event = $dispatcher->dispatch(CoreEvents::MAINTENANCE_CLEANUP_DATA, new MaintenanceEvent($daysOld, !empty($dryRun), !empty($gdpr)));
+        $event = new MaintenanceEvent($daysOld, !empty($dryRun), !empty($gdpr));
+        $this->dispatcher->dispatch(CoreEvents::MAINTENANCE_CLEANUP_DATA, $event);
         $stats = $event->getStats();
 
         $rows = [];
@@ -100,7 +102,7 @@ EOT
 
         $table = new Table($output);
         $table
-            ->setHeaders([$translator->trans('mautic.maintenance.header.key'), $translator->trans('mautic.maintenance.header.records_affected')])
+            ->setHeaders([$this->translator->trans('mautic.maintenance.header.key'), $this->translator->trans('mautic.maintenance.header.records_affected')])
             ->setRows($rows);
         $table->render();
 
