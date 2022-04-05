@@ -105,20 +105,6 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         }
     }
 
-    protected function createAnotherClient(string $username = 'admin', string $password = 'mautic'): Client
-    {
-        // turn off rollback cleanup as this client creates a separate DB connection
-        $this->useCleanupRollback = false;
-
-        return self::createClient(
-            $this->clientOptions,
-            [
-                'PHP_AUTH_USER' => $username,
-                'PHP_AUTH_PW'   => $password,
-            ]
-        );
-    }
-
     /**
      * Warning: To perform Truncate on tables with foreign keys we have to turn off the foreign keys temporarily.
      * This may lead to corrupted data. Make sure you know what you are doing.
