@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Mail;
 
+use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use SendGrid\BccSettings;
 use SendGrid\Mail;
 use SendGrid\MailSettings;
@@ -13,14 +14,16 @@ class SendGridMailMetadata
     {
         $mail_settings = new MailSettings();
 
-        $metadata = $message->getMetadata();
-        $list = [];
-        foreach ($message->getTo() as $recipientEmail => $recipientName) {
-            if (isset($metadata[$recipientEmail]['emailId'])) {
-                $list[$recipientEmail]['emailId'] = $metadata[$recipientEmail]['emailId'];
+        if ($message instanceof MauticMessage) {
+            $metadata = $message->getMetadata();
+            $list     = [];
+            foreach ($message->getTo() as $recipientEmail => $recipientName) {
+                if (isset($metadata[$recipientEmail]['emailId'])) {
+                    $list[$recipientEmail]['emailId'] = $metadata[$recipientEmail]['emailId'];
+                }
             }
+            $mail->addCustomArg('mautic_metadata', serialize($list));
         }
-        $mail->addCustomArg('mautic_metadata', serialize($list));
 
         if ($message->getReplyTo()) {
             $replyTo = new ReplyTo(key($message->getReplyTo()));

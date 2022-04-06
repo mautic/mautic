@@ -22,7 +22,7 @@ class ResponseItem
     private $dncReason;
 
     /**
-     * @var string|null
+     * @var int|null
      */
     private $channel;
 
@@ -68,7 +68,7 @@ class ResponseItem
     }
 
     /**
-     * @return string|null
+     * @return int|null
      */
     public function getChannel()
     {
