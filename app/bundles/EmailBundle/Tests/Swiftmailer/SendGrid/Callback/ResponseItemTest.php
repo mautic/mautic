@@ -11,10 +11,10 @@ class ResponseItemTest extends \PHPUnit\Framework\TestCase
     public function testFullResponseItem()
     {
         $item = [
-            'email'  => 'info@example.com',
-            'reason' => 'My reason',
-            'event'  => 'bounce',
-            'mautic_metadata' => 'a:1:{s:16:"example@test.com";a:1:{s:7:"emailId";i:1;}}',
+            'email'           => 'info@example.com',
+            'reason'          => 'My reason',
+            'event'           => 'bounce',
+            'mautic_metadata' => 'a:1:{s:16:"info@example.com";a:1:{s:7:"emailId";i:1;}}',
         ];
 
         $responseItem = new ResponseItem($item);

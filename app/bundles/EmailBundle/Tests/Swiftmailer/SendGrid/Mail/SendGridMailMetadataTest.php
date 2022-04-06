@@ -32,12 +32,12 @@ class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
         $message->expects($this->exactly(1))
             ->method('getTo')
             ->with()
-            ->willReturn(['email@example.com']);
+            ->willReturn(['to@example.com' => 'to@example.com']);
 
         $message->expects($this->exactly(1))
             ->method('getMetadata')
             ->with()
-            ->willReturn(['email@example.com' => ['emailId' => 123]]);
+            ->willReturn(['to@example.com' => ['emailId' => 123]]);
 
         $mail = new Mail('from', 'subject', 'to', 'content');
 
