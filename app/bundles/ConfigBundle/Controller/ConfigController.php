@@ -129,6 +129,13 @@ class ConfigController extends FormController
                         } catch (\RuntimeException $exception) {
                             $this->addFlash('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
                         }
+
+                        $me     = $this->get('security.token_storage')->getToken()->getUser();
+                        $locale = $me->getLocale();
+                        if (empty($locale)) {
+                            $locale = $params['locale'] ?? $this->get('mautic.helper.core_parameters')->get('locale');
+                        }
+                        $this->get('session')->set('_locale', $locale);
                     }
                 } elseif (!$isWritabale) {
                     $form->addError(
