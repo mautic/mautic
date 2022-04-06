@@ -31,8 +31,8 @@ class ApplyUpdatesCommand extends Command
     ) {
         parent::__construct();
 
-        $this->translator   = $translator;
-        $this->stepProvider = $stepProvider;
+        $this->translator           = $translator;
+        $this->stepProvider         = $stepProvider;
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
