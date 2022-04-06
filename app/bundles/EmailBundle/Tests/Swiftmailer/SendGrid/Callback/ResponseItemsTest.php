@@ -173,7 +173,7 @@ class ResponseItemsTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($responseItems->valid());
     }
 
-    private function checkResponseItem(ResponseItem $responseItem, $email, $reason, $DncReason, $channel)
+    private function checkResponseItem(ResponseItem $responseItem, $email, $reason, $DncReason, ?int $channel)
     {
         $this->assertSame($email, $responseItem->getEmail());
         $this->assertSame($reason, $responseItem->getReason());
