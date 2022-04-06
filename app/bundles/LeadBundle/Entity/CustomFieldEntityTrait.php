@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
-use Mautic\LeadBundle\Model\FieldModel;
 
 trait CustomFieldEntityTrait
 {
@@ -310,7 +309,7 @@ trait CustomFieldEntityTrait
             );
 
             if ('text' !== $schemaDefinition['type']) {
-               $builder->addIndex([$field], $field.'_search');
+                $builder->addIndex([$field], $field.'_search');
             }
         }
     }

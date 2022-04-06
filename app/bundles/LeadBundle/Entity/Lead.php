@@ -203,7 +203,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     private $primaryCompany;
 
-
     /**
      * @return mixed
      */
