@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Validator\Constraints\FileEncoding as EncodingValidation;
@@ -18,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class LeadImportType extends AbstractType
 {
@@ -45,13 +37,16 @@ class LeadImportType extends AbstractType
                             'encodingFormatMessage' => 'mautic.core.invalid_file_encoding',
                         ]
                     ),
+                    new NotBlank(
+                        ['message' => 'mautic.import.file.required']
+                    ),
                 ],
                 'error_bubbling' => true,
             ]
         );
 
         $constraints = [
-            new \Symfony\Component\Validator\Constraints\NotBlank(
+            new NotBlank(
                 ['message' => 'mautic.core.value.required']
             ),
         ];

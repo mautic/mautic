@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -141,7 +132,7 @@ class CommonController extends Controller implements MauticController
     /**
      * Get a model instance from the service container.
      *
-     * @param $modelNameKey
+     * @param string $modelNameKey
      *
      * @return AbstractCommonModel
      */
@@ -648,8 +639,6 @@ class CommonController extends Controller implements MauticController
      * @param string|null $level
      * @param string|null $domain
      * @param bool|null   $addNotification
-     *
-     * @deprecated Will be removed in Mautic 3.0. Use CommonController::flashBag->addFlash() instead.
      */
     public function addFlash($message, $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false)
     {

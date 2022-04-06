@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\DBALException;
@@ -277,7 +268,7 @@ class ListModel extends FormModel
      *
      * @return array
      */
-    public function getChoiceFields()
+    public function getChoiceFields(string $search = '')
     {
         if ($this->choiceFieldsCache) {
             return $this->choiceFieldsCache;
@@ -297,7 +288,7 @@ class ListModel extends FormModel
 
         // Add custom choices
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
-            $event = new LeadListFiltersChoicesEvent([], $this->getOperatorsForFieldType(), $this->translator, $this->requestStack->getCurrentRequest());
+            $event = new LeadListFiltersChoicesEvent([], $this->getOperatorsForFieldType(), $this->translator, $this->requestStack->getCurrentRequest(), $search);
             $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE, $event);
             $choices = $event->getChoices();
         }

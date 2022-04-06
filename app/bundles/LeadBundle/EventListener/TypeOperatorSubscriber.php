@@ -119,7 +119,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
         $emails = $this->emailModel->getLookupResults('email', '', 0, 0, ['name_is_key' => true]);
 
-        $event->setChoicesForFieldAlias('lead_asset_download', $this->getAssetChoices());
+        $event->setChoicesForFieldAlias('lead_asset_download', $this->getAssetChoices($event->getSearchTerm()));
         $event->setChoicesForFieldAlias('campaign', $this->getCampaignChoices());
         $event->setChoicesForFieldAlias('leadlist', $this->getSegmentChoices());
         $event->setChoicesForFieldAlias('tags', $this->getTagChoices());
@@ -361,9 +361,9 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     /**
      * @return mixed[]
      */
-    private function getAssetChoices(): array
+    private function getAssetChoices(string $filter = ''): array
     {
-        return $this->makeChoices($this->assetModel->getLookupResults('asset'), 'title', 'id');
+        return $this->makeChoices($this->assetModel->getLookupResults('asset', $filter), 'title', 'id');
     }
 
     /**
