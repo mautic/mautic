@@ -13,7 +13,7 @@ use Mautic\StageBundle\Model\StageModel;
 use Mautic\UserBundle\Form\Type\UserListType;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase

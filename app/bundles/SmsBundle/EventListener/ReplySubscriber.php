@@ -11,7 +11,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReplySubscriber implements EventSubscriberInterface
 {

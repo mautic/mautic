@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Tests\Form\DataTransformer;
 
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
 {

@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase

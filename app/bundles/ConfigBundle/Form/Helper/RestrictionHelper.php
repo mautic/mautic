@@ -4,7 +4,7 @@ namespace Mautic\ConfigBundle\Form\Helper;
 
 use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper as FieldHelper;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RestrictionHelper
 {
