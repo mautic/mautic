@@ -10,24 +10,24 @@ return [
         'main' => [
             'mautic_integration_config' => [
                 'path'       => '/integration/{integration}/config',
-                'controller' => 'IntegrationsBundle:Config:edit',
+                'controller' => 'Mautic\IntegrationsBundle\Controller\ConfigController::editAction',
             ],
             'mautic_integration_config_field_pagination' => [
                 'path'       => '/integration/{integration}/config/{object}/{page}',
-                'controller' => 'IntegrationsBundle:FieldPagination:paginate',
+                'controller' => 'Mautic\IntegrationsBundle\Controller\FieldPaginationController::paginateAction',
                 'defaults'   => [
                     'page' => 1,
                 ],
             ],
             'mautic_integration_config_field_update' => [
                 'path'       => '/integration/{integration}/config/{object}/field/{field}',
-                'controller' => 'IntegrationsBundle:UpdateField:update',
+                'controller' => 'Mautic\IntegrationsBundle\Controller\UpdateFieldController::updateAction',
             ],
         ],
         'public' => [
             'mautic_integration_public_callback' => [
                 'path'       => '/integration/{integration}/callback',
-                'controller' => 'IntegrationsBundle:Auth:callback',
+                'controller' => 'Mautic\IntegrationsBundle\Controller\AuthController::callbackAction',
             ],
         ],
     ],

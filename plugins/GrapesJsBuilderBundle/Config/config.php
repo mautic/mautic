@@ -11,15 +11,15 @@ return [
         'main'   => [
             'grapesjsbuilder_upload' => [
                 'path'       => '/grapesjsbuilder/upload',
-                'controller' => 'GrapesJsBuilderBundle:FileManager:upload',
+                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::uploadAction',
             ],
             'grapesjsbuilder_delete' => [
                 'path'       => '/grapesjsbuilder/delete',
-                'controller' => 'GrapesJsBuilderBundle:FileManager:delete',
+                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::deleteAction',
             ],
             'grapesjsbuilder_builder' => [
                 'path'       => '/grapesjsbuilder/{objectType}/{objectId}',
-                'controller' => 'GrapesJsBuilderBundle:GrapesJs:builder',
+                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\GrapesJsController::builderAction',
             ],
         ],
         'public' => [],

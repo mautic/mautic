@@ -5,15 +5,15 @@ return [
         'main' => [
             'mautic_asset_index' => [
                 'path'       => '/assets/{page}',
-                'controller' => 'MauticAssetBundle:Asset:index',
+                'controller' => 'Mautic\AssetBundle\Controller\AssetController::indexAction',
             ],
             'mautic_asset_remote' => [
                 'path'       => '/assets/remote',
-                'controller' => 'MauticAssetBundle:Asset:remote',
+                'controller' => 'Mautic\AssetBundle\Controller\AssetController::remoteAction',
             ],
             'mautic_asset_action' => [
                 'path'       => '/assets/{objectAction}/{objectId}',
-                'controller' => 'MauticAssetBundle:Asset:execute',
+                'controller' => 'Mautic\AssetBundle\Controller\AssetController::executeAction',
             ],
         ],
         'api' => [
@@ -21,13 +21,13 @@ return [
                 'standard_entity' => true,
                 'name'            => 'assets',
                 'path'            => '/assets',
-                'controller'      => 'MauticAssetBundle:Api\AssetApi',
+                'controller'      => 'Mautic\AssetBundle\Controller\Api\AssetApiController',
             ],
         ],
         'public' => [
             'mautic_asset_download' => [
                 'path'       => '/asset/{slug}',
-                'controller' => 'MauticAssetBundle:Public:download',
+                'controller' => 'Mautic\AssetBundle\Controller\PublicController::downloadAction',
                 'defaults'   => [
                     'slug' => '',
                 ],

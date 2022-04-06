@@ -20,49 +20,49 @@ return [
         'main' => [
             'login' => [
                 'path'       => '/login',
-                'controller' => 'MauticUserBundle:Security:login',
+                'controller' => 'Mautic\UserBundle\Controller\SecurityController::loginAction',
             ],
             'mautic_user_logincheck' => [
                 'path'       => '/login_check',
-                'controller' => 'MauticUserBundle:Security:loginCheck',
+                'controller' => 'Mautic\UserBundle\Controller\SecurityController::loginCheckAction',
             ],
             'mautic_user_logout' => [
                 'path' => '/logout',
             ],
             'mautic_sso_login' => [
                 'path'       => '/sso_login/{integration}',
-                'controller' => 'MauticUserBundle:Security:ssoLogin',
+                'controller' => 'Mautic\UserBundle\Controller\SecurityController::ssoLoginAction',
             ],
             'mautic_sso_login_check' => [
                 'path'       => '/sso_login_check/{integration}',
-                'controller' => 'MauticUserBundle:Security:ssoLoginCheck',
+                'controller' => 'Mautic\UserBundle\Controller\SecurityController::ssoLoginCheckAction',
             ],
             'lightsaml_sp.login' => [
                 'path'       => '/saml/login',
-                'controller' => 'LightSamlSpBundle:Default:login',
+                'controller' => 'LightSaml\SpBundle\Controller\DefaultController::loginAction',
             ],
             'lightsaml_sp.login_check' => [
                 'path' => '/saml/login_check',
             ],
             'mautic_user_index' => [
                 'path'       => '/users/{page}',
-                'controller' => 'MauticUserBundle:User:index',
+                'controller' => 'Mautic\UserBundle\Controller\UserController::indexAction',
             ],
             'mautic_user_action' => [
                 'path'       => '/users/{objectAction}/{objectId}',
-                'controller' => 'MauticUserBundle:User:execute',
+                'controller' => 'Mautic\UserBundle\Controller\UserController::executeAction',
             ],
             'mautic_role_index' => [
                 'path'       => '/roles/{page}',
-                'controller' => 'MauticUserBundle:Role:index',
+                'controller' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
             ],
             'mautic_role_action' => [
                 'path'       => '/roles/{objectAction}/{objectId}',
-                'controller' => 'MauticUserBundle:Role:execute',
+                'controller' => 'Mautic\UserBundle\Controller\RoleController::executeAction',
             ],
             'mautic_user_account' => [
                 'path'       => '/account',
-                'controller' => 'MauticUserBundle:Profile:index',
+                'controller' => 'Mautic\UserBundle\Controller\ProfileController::indexAction',
             ],
         ],
 
@@ -71,44 +71,44 @@ return [
                 'standard_entity' => true,
                 'name'            => 'users',
                 'path'            => '/users',
-                'controller'      => 'MauticUserBundle:Api\UserApi',
+                'controller'      => 'Mautic\UserBundle\Controller\Api\UserApiController',
             ],
             'mautic_api_getself' => [
                 'path'       => '/users/self',
-                'controller' => 'MauticUserBundle:Api\UserApi:getSelf',
+                'controller' => 'Mautic\UserBundle\Controller\Api\UserApiController::getSelfAction',
             ],
             'mautic_api_checkpermission' => [
                 'path'       => '/users/{id}/permissioncheck',
-                'controller' => 'MauticUserBundle:Api\UserApi:isGranted',
+                'controller' => 'Mautic\UserBundle\Controller\Api\UserApiController::isGrantedAction',
                 'method'     => 'POST',
             ],
             'mautic_api_getuserroles' => [
                 'path'       => '/users/list/roles',
-                'controller' => 'MauticUserBundle:Api\UserApi:getRoles',
+                'controller' => 'Mautic\UserBundle\Controller\Api\UserApiController::getRolesAction',
             ],
             'mautic_api_rolesstandard' => [
                 'standard_entity' => true,
                 'name'            => 'roles',
                 'path'            => '/roles',
-                'controller'      => 'MauticUserBundle:Api\RoleApi',
+                'controller'      => 'Mautic\UserBundle\Controller\Api\RoleApiController',
             ],
         ],
         'public' => [
             'mautic_user_passwordreset' => [
                 'path'       => '/passwordreset',
-                'controller' => 'MauticUserBundle:Public:passwordReset',
+                'controller' => 'Mautic\UserBundle\Controller\PublicController::passwordResetAction',
             ],
             'mautic_user_passwordresetconfirm' => [
                 'path'       => '/passwordresetconfirm',
-                'controller' => 'MauticUserBundle:Public:passwordResetConfirm',
+                'controller' => 'Mautic\UserBundle\Controller\PublicController::passwordResetConfirmAction',
             ],
             'lightsaml_sp.metadata' => [
                 'path'       => '/saml/metadata.xml',
-                'controller' => 'LightSamlSpBundle:Default:metadata',
+                'controller' => 'LightSaml\SpBundle\Controller\DefaultController::metadataAction',
             ],
             'lightsaml_sp.discovery' => [
                 'path'       => '/saml/discovery',
-                'controller' => 'LightSamlSpBundle:Default:discovery',
+                'controller' => 'LightSaml\SpBundle\Controller\DefaultController::discoveryAction',
             ],
         ],
     ],
