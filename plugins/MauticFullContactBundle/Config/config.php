@@ -10,13 +10,13 @@ return [
         'public' => [
             'mautic_plugin_fullcontact_index' => [
                 'path'       => '/fullcontact/callback',
-                'controller' => 'MauticFullContactBundle:Public:callback',
+                'controller' => 'MauticPlugin\MauticFullContactBundle\Controller\PublicController::callbackAction',
             ],
         ],
         'main' => [
             'mautic_plugin_fullcontact_action' => [
                 'path'       => '/fullcontact/{objectAction}/{objectId}',
-                'controller' => 'MauticFullContactBundle:FullContact:execute',
+                'controller' => 'MauticPlugin\MauticFullContactBundle\Controller\FullContactController::executeAction',
             ],
         ],
     ],

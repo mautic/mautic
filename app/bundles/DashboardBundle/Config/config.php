@@ -5,25 +5,25 @@ return [
         'main' => [
             'mautic_dashboard_index' => [
                 'path'       => '/dashboard',
-                'controller' => 'MauticDashboardBundle:Dashboard:index',
+                'controller' => 'Mautic\DashboardBundle\Controller\DashboardController::indexAction',
             ],
             'mautic_dashboard_widget' => [
                 'path'       => '/dashboard/widget/{widgetId}',
-                'controller' => 'MauticDashboardBundle:Dashboard:widget',
+                'controller' => 'Mautic\DashboardBundle\Controller\DashboardController::widgetAction',
             ],
             'mautic_dashboard_action' => [
                 'path'       => '/dashboard/{objectAction}/{objectId}',
-                'controller' => 'MauticDashboardBundle:Dashboard:execute',
+                'controller' => 'Mautic\DashboardBundle\Controller\DashboardController::executeAction',
             ],
         ],
         'api' => [
             'mautic_widget_types' => [
                 'path'       => '/data',
-                'controller' => 'MauticDashboardBundle:Api\WidgetApi:getTypes',
+                'controller' => 'Mautic\DashboardBundle\Controller\Api\WidgetApiController::getTypesAction',
             ],
             'mautic_widget_data' => [
                 'path'       => '/data/{type}',
-                'controller' => 'MauticDashboardBundle:Api\WidgetApi:getData',
+                'controller' => 'Mautic\DashboardBundle\Controller\Api\WidgetApiController::getDataAction',
             ],
         ],
     ],

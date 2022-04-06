@@ -9,21 +9,21 @@ return [
         'public' => [
             'mautic_integration_contacts' => [
                 'path'         => '/plugin/{integration}/contact_data',
-                'controller'   => 'MauticCrmBundle:Public:contactData',
+                'controller'   => 'MauticPlugin\MauticCrmBundle\Controller\PublicController::contactDataAction',
                 'requirements' => [
                     'integration' => '.+',
                 ],
             ],
             'mautic_integration_companies' => [
                 'path'         => '/plugin/{integration}/company_data',
-                'controller'   => 'MauticCrmBundle:Public:companyData',
+                'controller'   => 'MauticPlugin\MauticCrmBundle\Controller\PublicController::companyDataAction',
                 'requirements' => [
                     'integration' => '.+',
                 ],
             ],
             'mautic_integration.pipedrive.webhook' => [
                 'path'       => '/plugin/pipedrive/webhook',
-                'controller' => 'MauticCrmBundle:Pipedrive:webhook',
+                'controller' => 'MauticPlugin\MauticCrmBundle\Controller\PipedriveController::webhookAction',
                 'method'     => 'POST',
             ],
         ],

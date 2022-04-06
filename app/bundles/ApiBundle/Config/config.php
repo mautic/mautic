@@ -11,17 +11,17 @@ return [
             ],
             'fos_oauth_server_authorize' => [
                 'path'       => '/oauth/v2/authorize',
-                'controller' => 'MauticApiBundle:oAuth2/Authorize:authorize',
+                'controller' => 'Mautic\ApiBundle\Controller\oAuth2\AuthorizeController::authorizeAction',
                 'method'     => 'GET|POST',
             ],
             'mautic_oauth2_server_auth_login' => [
                 'path'       => '/oauth/v2/authorize_login',
-                'controller' => 'MauticApiBundle:oAuth2/Security:login',
+                'controller' => 'Mautic\ApiBundle\Controller\oAuth2\SecurityController::loginAction',
                 'method'     => 'GET|POST',
             ],
             'mautic_oauth2_server_auth_login_check' => [
                 'path'       => '/oauth/v2/authorize_login_check',
-                'controller' => 'MauticApiBundle:oAuth2/Security:loginCheck',
+                'controller' => 'Mautic\ApiBundle\Controller\oAuth2\SecurityController::loginCheckAction',
                 'method'     => 'GET|POST',
             ],
         ],
@@ -29,11 +29,11 @@ return [
             // Clients
             'mautic_client_index' => [
                 'path'       => '/credentials/{page}',
-                'controller' => 'MauticApiBundle:Client:index',
+                'controller' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
             ],
             'mautic_client_action' => [
                 'path'       => '/credentials/{objectAction}/{objectId}',
-                'controller' => 'MauticApiBundle:Client:execute',
+                'controller' => 'Mautic\ApiBundle\Controller\ClientController::executeAction',
             ],
         ],
     ],
