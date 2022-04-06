@@ -236,8 +236,7 @@ class InstallCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Spool path.',
                 null
-            )
-        ;
+            );
         parent::configure();
     }
 
