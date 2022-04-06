@@ -1174,6 +1174,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * Get total clicks and total unique clicks of email.
      *
      * @param Array<int, array<string,int>> $trackables Array of email's link
+     *
+     * @return Array<int>
      */
     public function getEmailClickCounters($trackables): array
     {
