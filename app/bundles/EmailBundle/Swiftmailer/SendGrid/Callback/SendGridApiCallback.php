@@ -21,7 +21,7 @@ class SendGridApiCallback
     {
         $responseItems = new ResponseItems($request);
         foreach ($responseItems as $item) {
-            $this->transportCallback->addFailureByAddress($item->getEmail(), $item->getReason(), $item->getDncReason());
+            $this->transportCallback->addFailureByAddress($item->getEmail(), $item->getReason(), $item->getDncReason(), $item->getChannel());
         }
     }
 }

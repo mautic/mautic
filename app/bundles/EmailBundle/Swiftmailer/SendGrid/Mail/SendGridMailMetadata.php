@@ -13,6 +13,15 @@ class SendGridMailMetadata
     {
         $mail_settings = new MailSettings();
 
+        $metadata = $message->getMetadata();
+        $list = [];
+        foreach ($message->getTo() as $recipientEmail => $recipientName) {
+            if (isset($metadata[$recipientEmail]['emailId'])) {
+                $list[$recipientEmail]['emailId'] = $metadata[$recipientEmail]['emailId'];
+            }
+        }
+        $mail->addCustomArg('mautic_metadata', serialize($list));
+
         if ($message->getReplyTo()) {
             $replyTo = new ReplyTo(key($message->getReplyTo()));
             $mail->setReplyTo($replyTo);
