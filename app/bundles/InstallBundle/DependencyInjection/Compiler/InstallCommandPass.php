@@ -6,7 +6,6 @@ namespace Mautic\InstallBundle\DependencyInjection\Compiler;
 
 use Mautic\InstallBundle\Command\InstallCommand;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

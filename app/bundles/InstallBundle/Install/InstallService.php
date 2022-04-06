@@ -18,6 +18,7 @@ use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
@@ -401,12 +402,13 @@ class InstallService
 
         //ensure the username and email are unique
         try {
-            $existingUser = $entityManager->getRepository('MauticUserBundle:User')->find(1);
+            /** @var User $existingUser */
+            $existingUser = $entityManager->getRepository(User::class)->find(1);
         } catch (\Exception $e) {
             $existingUser = null;
         }
 
-        if (null != $existingUser) {
+        if (null !== $existingUser) {
             $user = $existingUser;
         } else {
             $user = new User();
@@ -467,7 +469,7 @@ class InstallService
 
         $adminRole = null;
         try {
-            $adminRole = $entityManager->getReference('MauticUserBundle:Role', 1);
+            $adminRole = $entityManager->getReference(Role::class, 1);
         } catch (\Exception $exception) {
             $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.getting.role',

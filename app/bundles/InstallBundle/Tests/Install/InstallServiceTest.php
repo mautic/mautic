@@ -11,6 +11,8 @@ use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Install\InstallService;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -32,6 +34,11 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     private $validator;
     private $encoder;
 
+    /**
+     * @var MockObject&ContainerInterface
+     */
+    private $container;
+
     private InstallService $installer;
 
     public function setUp(): void
@@ -46,6 +53,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->kernel               = $this->createMock(KernelInterface::class);
         $this->validator            = $this->createMock(ValidatorInterface::class);
         $this->encoder              = $this->createMock(UserPasswordEncoder::class);
+        $this->container            = $this->createMock(ContainerInterface::class);
 
         $this->installer = new InstallService(
             $this->configurator,
@@ -55,7 +63,8 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->kernel,
             $this->validator,
-            $this->encoder
+            $this->encoder,
+            $this->container
         );
     }
 

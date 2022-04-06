@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Exception\UpdateFailedException;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Update\StepProvider;
 use Symfony\Component\Console\Command\Command;
@@ -21,13 +22,18 @@ class ApplyUpdatesCommand extends Command
 {
     private TranslatorInterface $translator;
     private StepProvider $stepProvider;
+    private CoreParametersHelper $coreParametersHelper;
 
-    public function __construct(TranslatorInterface $translator, StepProvider $stepProvider)
-    {
+    public function __construct(
+        TranslatorInterface $translator,
+        StepProvider $stepProvider,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         parent::__construct();
 
         $this->translator   = $translator;
         $this->stepProvider = $stepProvider;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     protected function configure()

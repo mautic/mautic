@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
+use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -54,9 +55,9 @@ class MauticSocialMonitoringCommand extends Command
         $maxPerIterations = ceil($batchSize / count($monitorList));
 
         foreach ($monitorList as $monitor) {
-            $this->output->writeln('Executing Monitor Item '.$monitor->getId());
+            $output->writeln('Executing Monitor Item '.$monitor->getId());
             $resultCode = $this->processMonitorListItem($monitor, $maxPerIterations, $input, $output);
-            $this->output->writeln('Result Code: '.$resultCode);
+            $output->writeln('Result Code: '.$resultCode);
         }
 
         return 0;
@@ -74,11 +75,14 @@ class MauticSocialMonitoringCommand extends Command
             'limit' => 100,
         ];
 
+        /** @var MonitoringRepository $repository */
+        $repository = $this->monitoringModel->getRepository();
+
         if (null !== $id) {
             $filter['filter'] = [
                 'force' => [
                     [
-                        'column' => $this->monitoringModel->getRepository()->getTableAlias().'.id',
+                        'column' => $repository->getTableAlias().'.id',
                         'expr'   => 'eq',
                         'value'  => (int) $id,
                     ],
@@ -86,7 +90,7 @@ class MauticSocialMonitoringCommand extends Command
             ];
         }
 
-        return $this->monitoringModel->getRepository()->getPublishedEntities($filter);
+        return $repository->getPublishedEntities($filter);
     }
 
     /**

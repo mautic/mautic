@@ -652,6 +652,7 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.update.step_provider',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.core.command.maxmind.purge' => [

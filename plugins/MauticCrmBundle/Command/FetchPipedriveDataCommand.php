@@ -116,15 +116,15 @@ class FetchPipedriveDataCommand extends Command
                 return;
             }
 
-            $this->io->text('Pulled '.$result['processed']);
-            $this->io->note('Using '.memory_get_peak_usage(true) / 1000000 .' megabytes of ram.');
+            $io->text('Pulled '.$result['processed']);
+            $io->note('Using '.memory_get_peak_usage(true) / 1000000 .' megabytes of ram.');
 
             if (!$result['more_items_in_collection']) {
                 return;
             }
 
             $start += $limit;
-            $this->io->text('Pulling more...');
+            $io->text('Pulling more...');
         }
     }
 

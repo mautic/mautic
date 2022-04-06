@@ -25,7 +25,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     private FormatterHelper $formatterHelper;
     private int $runLimit = 0;
     private ContactLimiter $contactLimiter;
-    private $quiet = false;
+    private bool $quiet = false;
 
     public function __construct(
         CampaignRepository $campaignRepository,
