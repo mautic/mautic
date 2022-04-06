@@ -67,7 +67,7 @@ class EnvironmentSubscriberTest extends TestCase
         $requestMock->expects($this->once())
             ->method('hasPreviousSession')
             ->willReturn(true);
-        $requestMock->expects($this->once())
+        $requestMock->expects($this->exactly(2))
             ->method('getSession')
             ->willReturn($sessionInterfaceMock);
         $sessionInterfaceMock->expects($this->once())
@@ -77,6 +77,10 @@ class EnvironmentSubscriberTest extends TestCase
         $requestMock->expects($this->once())
             ->method('setLocale')
             ->with('en_US');
+        $sessionInterfaceMock->expects($this->once())
+            ->method('set')
+            ->with('_locale')
+            ->willReturn('en_US');
         $this->coreParametersHelperMock->expects($this->never())
             ->method('get')
             ->with('locale');
