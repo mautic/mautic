@@ -173,7 +173,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                                        data-container="body" data-placement="top" title=""
                                        data-original-title="<?php echo $view['translator']->trans(
                                                'mautic.lead.list.form.config.segment_rebuild_time.message',
-                                               ['%hours%' => $lastBuiltDateDifference]
+                                               ['%count%' => $lastBuiltDateDifference]
                                        ); ?>">
                                     <i class="fa text-danger fa-exclamation-circle"></i></label>
                             <?php endif; ?>

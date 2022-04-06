@@ -14,14 +14,14 @@ trait WriteCountTrait
         $output->writeln(
             '<comment>'.$translator->trans(
                 'mautic.campaign.trigger.events_executed',
-                ['%events%' => $counter->getTotalExecuted()]
+                ['%count%' => $counter->getTotalExecuted()]
             )
             .'</comment>'
         );
         $output->writeln(
             '<comment>'.$translator->trans(
                 'mautic.campaign.trigger.events_scheduled',
-                ['%events%' => $counter->getTotalScheduled()]
+                ['%count%' => $counter->getTotalScheduled()]
             )
             .'</comment>'
         );

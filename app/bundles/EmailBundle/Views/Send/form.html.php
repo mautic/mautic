@@ -45,7 +45,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.email.send
                             <div class="text-center">
                                 <span class="label label-primary mt-lg"><?php echo $view['translator']->trans(
                                         'mautic.email.send.pending',
-                                        ['%pending%' => $pending]
+                                        ['%count%' => $pending]
                                     ); ?></span>
                                 <div class="mt-sm">
                                     <a class="text-danger mt-md" href="<?php echo $view['router']->path('mautic_email_action', ['objectAction' => 'view', 'objectId' => $email->getId()]); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.core.form.cancel'); ?></a>

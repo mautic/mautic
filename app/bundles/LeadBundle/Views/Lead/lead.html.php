@@ -460,7 +460,7 @@ $view['slots']->set(
                 <h1 <?php echo $style; ?>>
                     <?php echo $view['translator']->trans(
                         'mautic.lead.points.count',
-                        ['%points%' => $lead->getPoints()]
+                        ['%count%' => $lead->getPoints()]
                     ); ?>
                 </h1>
                 <hr/>

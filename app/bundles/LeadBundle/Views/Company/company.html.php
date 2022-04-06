@@ -238,7 +238,7 @@ $view['slots']->set(
                 <h1>
                     <?php echo $view['translator']->trans(
                         'mautic.company.score.count',
-                        ['%score%' => $company->getScore()]
+                        ['%count%' => $company->getScore()]
                     ); ?>
                 </h1>
                 <hr/>
