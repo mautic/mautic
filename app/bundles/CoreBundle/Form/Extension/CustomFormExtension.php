@@ -10,6 +10,8 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 
+trigger_deprecation('mautic/core', '4.3', 'The "%s" class is deprecated, will be removed in 5.0.', CustomFormExtension::class);
+
 /**
  * @deprecated since M4, will be removed in M5 because it's not used
  */
