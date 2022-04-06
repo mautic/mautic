@@ -46,7 +46,7 @@ class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
         $replyTo = new ReplyTo('email@example.com');
         $this->assertEquals($replyTo, $mail->getReplyTo());
 
-        $customArgs = ['mautic_metadata' => serialize(['email@example.com' => ['emailId' => 123]])];
+        $customArgs = ['mautic_metadata' => serialize(['to@example.com' => ['emailId' => 123]])];
         $this->assertEquals($customArgs, $mail->getCustomArgs());
 
         /**

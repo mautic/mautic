@@ -51,7 +51,7 @@ class SendGridApiCallbackTest extends \PHPUnit\Framework\TestCase
                 'sg_message_id'   => '14c5d75ce93.dfd.64b469.filter0001.16648.5515E0B88.0',
                 'reason'          => 'Bounced Address',
                 'status'          => '5.0.0',
-                'mautic_metadata' => 'a:1:{s:17:"example6@test.com";a:1:{s:7:"emailId";i:7;}}',
+                'mautic_metadata' => 'a:1:{s:17:"example7@test.com";a:1:{s:7:"emailId";i:7;}}',
             ],
             [
             ],
