@@ -266,12 +266,12 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $accountForm       = $accountSaveButton->form();
         $accountForm->setValues(
             [
-                'user[locale]' => 'de',
+                'user[locale]' => 'en_US',
             ]
         );
         $this->client->submit($accountForm);
         Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('de', self::$container->get('session')->get('_locale'));
+        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
 
         // 2. Change system locale in configuration - should not change _locale session
         $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -285,7 +285,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->client->submit($configForm);
         Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('de', self::$container->get('session')->get('_locale'));
+        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
 
         // 3. Change user locale to system default in account - should change _locale session to system default
         $accountCrawler    = $this->client->request(Request::METHOD_GET, '/s/account');
@@ -293,7 +293,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $accountForm       = $accountSaveButton->form();
         $accountForm->setValues(
             [
-                'user[locale]' => null,
+                'user[locale]' => '',
             ]
         );
         $this->client->submit($accountForm);
