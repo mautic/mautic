@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4ca154710a404a56f027083e607967ee",
+    "content-hash": "94238001c6cb3a361c2f5be188b74b63",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2820,19 +2820,18 @@
         },
         {
             "name": "friendsofsymfony/oauth-server-bundle",
-            "version": "dev-master",
+            "version": "dev-doctrine-fix",
             "source": {
                 "type": "git",
-                "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git",
-                "reference": "446f0c55aada5e2bbf731fe2a48cb7cabd85ef9c"
+                "url": "https://github.com/mollux/FOSOAuthServerBundle.git",
+                "reference": "0fed7a92dd08d175ba13cb12547a3bf95dafbcd6"
             },
             "require": {
                 "friendsofsymfony/oauth2-php": "~1.1",
                 "php": "^7.2 || ^8.0",
                 "symfony/dependency-injection": "^4.4 || ^5.1",
                 "symfony/framework-bundle": "^4.4 || ^5.1",
-                "symfony/security-bundle": "^4.4 || ^5.1",
-                "symfony/twig-bundle": "^4.4 || ^5.1"
+                "symfony/security-bundle": "^4.4 || ^5.1"
             },
             "conflict": {
                 "twig/twig": "<1.40 || >=2.0,<2.9"
@@ -2850,6 +2849,8 @@
                 "symfony/console": "^4.4 || ^5.1",
                 "symfony/form": "^4.4 || ^5.1",
                 "symfony/phpunit-bridge": "^4.4 || ^5.1",
+                "symfony/templating": "^4.4 || ^5.1",
+                "symfony/twig-bundle": "^4.4 || ^5.1",
                 "symfony/yaml": "^4.4 || ^5.1",
                 "willdurand/propel-typehintable-behavior": "~1.0"
             },
@@ -2861,7 +2862,6 @@
                 "symfony/form": "Needed to be able to use the AuthorizeFormType",
                 "willdurand/propel-typehintable-behavior": "The Typehintable behavior is useful to add type hints on generated methods, to be compliant with interfaces"
             },
-            "default-branch": true,
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
@@ -2896,7 +2896,7 @@
                 "oauth2",
                 "server"
             ],
-            "time": "2021-03-25T18:15:03+00:00"
+            "time": "2021-03-28T16:46:43+00:00"
         },
         {
             "name": "friendsofsymfony/oauth2-php",
@@ -5537,7 +5537,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "1d855e6ac5b5cc58ed8ea56b56d113bee42e1e52"
+                "reference": "a21ee17934d4fee9a0043d4b93bccac92bbf9b12"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5555,7 +5555,7 @@
                 "ext-imap": "*",
                 "ext-zip": "*",
                 "ext-zlib": "*",
-                "friendsofsymfony/oauth-server-bundle": "dev-master",
+                "friendsofsymfony/oauth-server-bundle": "dev-doctrine-fix",
                 "friendsofsymfony/rest-bundle": "^3.0.2",
                 "gaufrette/aws-s3-adapter": "^0.4.0",
                 "gaufrette/extras": "^0.1.0",
