@@ -2,7 +2,7 @@
 
 namespace Mautic\ApiBundle\Controller\oAuth2;
 
-use FOS\OAuthServerBundle\Event\OAuthEvent;
+use FOS\OAuthServerBundle\Event\PreAuthorizationEvent;
 use FOS\OAuthServerBundle\Form\Handler\AuthorizeFormHandler;
 use FOS\OAuthServerBundle\Model\ClientManagerInterface;
 use OAuth2\OAuth2;
@@ -68,7 +68,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
         ClientManagerInterface $clientManager,
         EventDispatcherInterface $eventDispatcher,
         SessionInterface $session = null,
-        $templateEngineType = 'php'
+        string $templateEngineType = 'php'
     ) {
         $this->session              = $session;
         $this->authorizeForm        = $authorizeForm;
@@ -112,12 +112,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
             $this->session->set('_fos_oauth_server.ensure_logout', true);
         }
 
-        $event = new OAuthEvent($user, $this->getClient());
-
-        $this->eventDispatcher->dispatch(
-            OAuthEvent::PRE_AUTHORIZATION_PROCESS,
-            $event
-        );
+        $event = $this->eventDispatcher->dispatch(new PreAuthorizationEvent($user, $this->getClient()));
 
         if ($event->isAuthorizedClient()) {
             $scope = $request->get('scope', null);
