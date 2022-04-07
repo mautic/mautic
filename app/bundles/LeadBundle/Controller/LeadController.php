@@ -388,7 +388,7 @@ class LeadController extends FormController
                     'doNotContact'      => end($dnc),
                     'doNotContactSms'   => end($dncSms),
                     'leadNotes'         => $this->forward(
-                        'MauticLeadBundle:Note:index',
+                        'Mautic\LeadBundle\Controller\NoteController::indexAction',
                         [
                             'leadId'     => $lead->getId(),
                             'ignoreAjax' => 1,

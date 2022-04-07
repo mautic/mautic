@@ -225,7 +225,7 @@ class NotificationController extends AbstractFormController
                 'security'    => $security,
                 'entityViews' => $entityViews,
                 'contacts'    => $this->forward(
-                    'MauticNotificationBundle:Notification:contacts',
+                    'Mautic\NotificationBundle\Controller\NotificationController::contactsAction',
                     [
                         'objectId'   => $notification->getId(),
                         'page'       => $this->get('session')->get('mautic.notification.contact.page', 1),

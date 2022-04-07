@@ -415,7 +415,7 @@ class EmailController extends FormController
                         UrlGeneratorInterface::ABSOLUTE_URL
                     ),
                     'contacts' => $this->forward(
-                        'MauticEmailBundle:Email:contacts',
+                        'Mautic\EmailBundle\Controller\EmailController::contactsAction',
                         [
                             'objectId'   => $email->getId(),
                             'page'       => $this->get('session')->get('mautic.email.contact.page', 1),

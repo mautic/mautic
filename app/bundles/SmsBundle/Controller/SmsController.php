@@ -212,7 +212,7 @@ class SmsController extends FormController
                 'security'    => $security,
                 'entityViews' => $entityViews,
                 'contacts'    => $this->forward(
-                    'MauticSmsBundle:Sms:contacts',
+                    'Mautic\SmsBundle\Controller\SmsController::contactsAction',
                     [
                         'objectId'   => $sms->getId(),
                         'page'       => $this->get('session')->get('mautic.sms.contact.page', 1),

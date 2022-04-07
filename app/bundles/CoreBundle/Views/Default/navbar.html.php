@@ -27,8 +27,8 @@
                 <i class="fa fa-navicon fs-16"></i>
             </a>
         </li>
-        <?php echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('MauticCoreBundle:Default:notifications')); ?>
-        <?php echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('MauticCoreBundle:Default:globalSearch')); ?>
+        <?php echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('Mautic\CoreBundle\Controller\DefaultController::notificationsAction')); ?>
+        <?php echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('Mautic\CoreBundle\Controller\DefaultController::globalSearchAction')); ?>
     </ul>
     <!--/ end: left nav -->
 

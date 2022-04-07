@@ -460,7 +460,7 @@ class MonitoringController extends FormController
                     'security'         => $security,
                     'leadStats'        => $chart->render(),
                     'monitorLeads'     => $this->forward(
-                        'MauticSocialBundle:Monitoring:contacts',
+                        'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::contactsAction',
                         [
                             'objectId'   => $monitoringEntity->getId(),
                             'page'       => $page,
