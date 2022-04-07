@@ -14,7 +14,7 @@ use Mautic\UserBundle\Security\Firewall\AuthenticationListener;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -75,7 +75,7 @@ class AuthenticationListenerTest extends TestCase
         $this->accessToken = new AccessToken();
         $this->accessToken->setClient($client);
 
-        $getResponseEvent = $this->createMock(GetResponseEvent::class);
+        $requestEvent = $this->createMock(RequestEvent::class);
 
         $this->tokenStorage->expects($this->any())
             ->method('getToken')
@@ -102,8 +102,7 @@ class AuthenticationListenerTest extends TestCase
             ->method('setToken')
             ->with($this->token);
 
-        $result = $this->authenticationListener->handle($getResponseEvent);
-
-        $this->assertNull($result);
+        $invokableListener = $this->authenticationListener;
+        $invokableListener($requestEvent);
     }
 }
