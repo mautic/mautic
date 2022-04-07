@@ -6,7 +6,6 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -15,19 +14,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface, FixtureGroupInterface
 {
     /**
-     * @var bool
-     */
-    private $addIndexes;
-
-    /**
      * @var ContainerInterface
      */
     private $container;
-
-    public function __construct(bool $addIndexes = true)
-    {
-        $this->addIndexes = $addIndexes;
-    }
 
     /**
      * {@inheritdoc}
@@ -54,16 +43,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         $fieldGroups['company'] = FieldModel::$coreCompanyFields;
 
         $translator   = $this->container->get('translator');
-        $indexesToAdd = [];
-        foreach ($fieldGroups as $object => $fields) {
-            if ('company' === $object) {
-                /** @var ColumnSchemaHelper $schema */
-                $schema = $this->container->get('mautic.schema.helper.column')->setName('companies', true);
-            } else {
-                /** @var ColumnSchemaHelper $schema */
-                $schema = $this->container->get('mautic.schema.helper.column')->setName('leads', true);
-            }
-
+        foreach ($fieldGroups as $fields) {
             $order = 1;
             foreach ($fields as $alias => $field) {
                 $type = isset($field['type']) ? $field['type'] : 'text';
