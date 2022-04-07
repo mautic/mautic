@@ -806,7 +806,7 @@ class ListController extends FormController
                     ],
                 ],
                 'contacts' => $this->forward(
-                    'MauticLeadBundle:List:contacts',
+                    'Mautic\LeadBundle\Controller\ListController::contactsAction',
                     [
                         'objectId'   => $list->getId(),
                         'page'       => $this->get('session')->get('mautic.segment.contact.page', 1),

@@ -783,7 +783,7 @@ return [
                 'class'     => 'Mautic\CoreBundle\EventListener\ExceptionListener',
                 'arguments' => [
                     'router',
-                    '"MauticCoreBundle:Exception:show"',
+                    'Mautic\CoreBundle\Controller\ExceptionController::showAction',
                     'monolog.logger.mautic',
                 ],
                 'tag'          => 'kernel.event_listener',

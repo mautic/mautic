@@ -124,7 +124,7 @@ class MessageController extends AbstractStandardFormController
 
                 $messagedLeads = [
                     'all' => $this->forward(
-                        'MauticChannelBundle:Message:contacts',
+                        'Mautic\ChannelBundle\Controller\MessageController::contactsAction',
                         [
                             'objectId'   => $message->getId(),
                             'page'       => $this->get('session')->get('mautic.'.$this->getSessionBase('all').'.contact.page', 1),
@@ -142,7 +142,7 @@ class MessageController extends AbstractStandardFormController
                         );
 
                         $messagedLeads[$channel->getChannel()] = $this->forward(
-                            'MauticChannelBundle:Message:contacts',
+                            'Mautic\ChannelBundle\Controller\MessageController::contactsAction',
                             [
                                 'objectId' => $message->getId(),
                                 'page'     => $this->get('session')->get(

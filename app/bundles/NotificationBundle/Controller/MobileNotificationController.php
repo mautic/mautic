@@ -221,7 +221,7 @@ class MobileNotificationController extends FormController
                 'security'    => $security,
                 'entityViews' => $entityViews,
                 'contacts'    => $this->forward(
-                    'MauticNotificationBundle:MobileNotification:contacts',
+                    'Mautic\NotificationBundle\Controller\MobileNotificationController::contactsAction',
                     [
                         'objectId'   => $notification->getId(),
                         'page'       => $this->get('session')->get('mautic.mobile_notification.contact.page', 1),

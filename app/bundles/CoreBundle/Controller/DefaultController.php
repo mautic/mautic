@@ -35,7 +35,7 @@ class DefaultController extends CommonController
 
             $request->attributes->set('ignore_mismatch', true);
 
-            return $this->forward('MauticPageBundle:Public:index', ['slug' => $slug]);
+            return $this->forward('Mautic\PageBundle\Controller\PublicController::indexAction', ['slug' => $slug]);
         }
     }
 
