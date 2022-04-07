@@ -3,9 +3,9 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
+use Mautic\LeadBundle\Model\FieldModel;
 
 trait CustomFieldEntityTrait
 {
@@ -123,7 +123,7 @@ trait CustomFieldEntityTrait
         $setter   = 'set'.ucfirst($property);
 
         if (null == $oldValue) {
-            $oldValue = $this->{$alias};
+            $oldValue = $this->getFieldValue($alias);
         } elseif ($field) {
             $oldValue = CustomFieldHelper::fixValueType($field['type'], $oldValue);
         }
@@ -292,25 +292,17 @@ trait CustomFieldEntityTrait
         foreach ($fields as $fieldProperty) {
             $field = (defined('self::FIELD_ALIAS')) ? self::FIELD_ALIAS.$fieldProperty : $fieldProperty;
 
-            $fieldProperty = lcfirst(str_replace('_', '', ucwords($fieldProperty, '_')));
-
             $type = 'text';
             if (isset($customFieldDefinitions[$field]) && !empty($customFieldDefinitions[$field]['type'])) {
                 $type = $customFieldDefinitions[$field]['type'];
             }
 
-            $schemaDefinition = SchemaDefinition::getSchemaDefinition($field, $type, !empty($customFieldDefinitions[$field]['unique']));
-
             $builder->addNamedField(
                 $fieldProperty,
-                $schemaDefinition['type'],
+                FieldModel::getSchemaDefinition($field, $type, !empty($customFieldDefinitions[$field]['unique']))['type'],
                 $field,
                 true
             );
-
-            if ('text' !== $schemaDefinition['type']) {
-                $builder->addIndex([$field], $field.'_search');
-            }
         }
     }
 }
