@@ -76,10 +76,20 @@ function setThemeHtml(theme) {
  * @param theme
  */
 function switchBuilderButton(theme) {
-  const builderButton = mQuery('.btn-builder');
+  const builderButton  = mQuery('.btn-builder');
+  const mEmailBuilderButton = mQuery('#emailform_buttons_builder_toolbar_mobile');
+  const mPageBuilderButton = mQuery('#page_buttons_builder_toolbar_mobile');
   const isCodeMode = theme === 'mautic_code_mode';
 
   builderButton.attr('disabled', isCodeMode);
+
+  if (isCodeMode) {
+    mPageBuilderButton.addClass('link-is-disabled');
+    mEmailBuilderButton.addClass('link-is-disabled');
+  } else {
+    mPageBuilderButton.removeClass('link-is-disabled');
+    mEmailBuilderButton.removeClass('link-is-disabled');
+  }
 }
 
 /**
