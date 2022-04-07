@@ -56,7 +56,6 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             try {
                 $this->connection->beginTransaction();
             } catch (\Exception $e) {
-                $a = 'b';
             }
         }
     }
@@ -68,7 +67,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                 try {
                     $this->connection->rollback();
                 } catch (\Exception $e) {
-                    $a = 'b';
+                    $this->prepareDatabase();
+                    $this->fail('unable to rollback, resetting db instead');
                 }
             }
         } else {
