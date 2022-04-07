@@ -1007,6 +1007,20 @@ return [
                 ],
                 'tag' => 'twig.extension',
             ],
+            'templating.twig.extension.menu' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\MenuExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.menu',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.gravatar' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\GravatarExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.gravatar',
+                ],
+                'tag' => 'twig.extension',
+            ],
             // Schema
             'mautic.schema.helper.column' => [
                 'class'     => 'Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper',

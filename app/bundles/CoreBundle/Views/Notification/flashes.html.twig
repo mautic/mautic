@@ -1,0 +1,11 @@
+<!--if (!isset($alertType)) {
+    $alertType = 'growl';
+}
+
+?>-->
+<div id="flashes"{{ alertType == 'growl' ? ' class="alert-growl-container"' : '' }}>
+    <?php echo $view->render('MauticCoreBundle:Notification:flash_messages.html.php', [
+        'dismissible' => (empty($notdismissible)) ? ' alert-dismissible' : '',
+        'alertType'   => $alertType,
+    ]); ?>
+</div>

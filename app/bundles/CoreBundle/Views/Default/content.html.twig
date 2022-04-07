@@ -2,19 +2,58 @@
 {% set content_only = true %}
 {% set modal_view = false %}
 
-{% if not request.isXmlHttpRequest() and not modal_view %}
-{% set template = 'slim' %}
-{% use 'MauticCoreBundle:Default:slim.html.twig' %}
-{% endif %}
+<!DOCTYPE html>
+<html>
+{% include('MauticCoreBundle:Default:head.html.twig') %}
 
-{% if not modal_view %}
-<div class="content-body">
-    {{ include('MauticCoreBundle:Default:pageheader.html.twig') }}
-	<!-- TODO <?php $view['slots']->output('_content'); ?> -->
-</div>
+{% if not request.isXmlHttpRequest() and not modal_view %}
+<!-- BASE VIEW -->
+<body class="header-fixed">
+    <section id="app-wrapper">
+        {{ outputScripts('bodyOpen') }}
+
+        <aside class="app-sidebar sidebar-left">
+            {{ include('MauticCoreBundle:LeftPanel:index.html.twig') }}
+        </aside>
+
+        <aside class="app-sidebar sidebar-right">
+            TODO sidebar right
+        </aside>
+
+        <header id="app-header" class="navbar">
+            {{ include('MauticCoreBundle:Default:navbar.html.twig') }}
+
+            {{ include('MauticCoreBundle:Notification:flashes.html.twig') }}
+        </header>
+
+        <footer id="app-footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-6 text-muted">TODO COPYRIGHT</div>
+                    <div class="col-xs-6 text-muted text-right small">TODO VERSION</div>
+                </div>
+            </div>
+        </footer>
+
+        <section id="app-content">
+            <!-- TODO add flashes -->
+            <div class="content-body">
+            {{ include('MauticCoreBundle:Default:pageheader.html.twig') }}
+            {% block content %}{% endblock %}
+            </div>
+        </section>
+
+        <script>
+            Mautic.onPageLoad('body');
+            // TODO add some == dev logic here for the symfony bar
+        </script>
+        {{ outputScripts('bodyClose') }}
+        <!-- TODO render modal.html.php here --> 
+    </section>
+</body>
+{% endif %}
 
 <!-- TODO add modal here -->
 <!-- TODO add getAuthenticationContext() here -->
-{% else %}
-{% block content %}{% endblock %}
-{% endif %}
+
+</html>
