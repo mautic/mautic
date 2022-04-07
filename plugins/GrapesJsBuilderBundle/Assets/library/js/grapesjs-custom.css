@@ -253,6 +253,10 @@ html {
   }
 }
 
+.is-not-allowed {
+  cursor: not-allowed;
+}
+
 .link-is-disabled {
   pointer-events: none;
   text-decoration: none;

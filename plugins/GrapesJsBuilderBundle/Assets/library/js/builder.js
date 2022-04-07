@@ -86,9 +86,15 @@ function switchBuilderButton(theme) {
   if (isCodeMode) {
     mPageBuilderButton.addClass('link-is-disabled');
     mEmailBuilderButton.addClass('link-is-disabled');
+
+    mPageBuilderButton.parent().addClass('is-not-allowed');
+    mEmailBuilderButton.parent().addClass('is-not-allowed');
   } else {
     mPageBuilderButton.removeClass('link-is-disabled');
     mEmailBuilderButton.removeClass('link-is-disabled');
+
+    mPageBuilderButton.parent().removeClass('is-not-allowed');
+    mEmailBuilderButton.parent().removeClass('is-not-allowed');
   }
 }
 
