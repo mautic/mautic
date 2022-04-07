@@ -222,7 +222,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         Assert::assertSame(2, $totalContacts);
     }
 
-    private function getCountAndDetails(bool $emulatePendingCount = false, bool $runCommand = false, int $expectedSuccessPercent, int $expectedCompleted, int $expectedPending): void
+    private function getCountAndDetails(bool $emulatePendingCount, bool $runCommand, int $expectedSuccessPercent, int $expectedCompleted, int $expectedPending): void
     {
         $campaign   = $this->saveSomeCampaignLeadEventLogs($emulatePendingCount);
         $campaignId = $campaign->getId();
