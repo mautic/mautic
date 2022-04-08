@@ -69,7 +69,7 @@ class AuthenticationListenerTest extends TestCase
         $adminRole = new Role();
         $adminRole->setIsAdmin(true);
 
-        $client = new class extends Client {
+        $client = new class() extends Client {
             public function getId()
             {
                 return 123;

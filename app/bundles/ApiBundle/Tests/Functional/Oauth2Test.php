@@ -13,7 +13,7 @@ final class Oauth2Test extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->useCleanupRollback = false;
-        $this->useMockServices = false;
+        $this->useMockServices    = false;
 
         parent::setUp();
     }
