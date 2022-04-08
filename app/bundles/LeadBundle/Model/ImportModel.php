@@ -292,10 +292,7 @@ class ImportModel extends FormModel
         $config           = $import->getParserConfig();
         $counter          = 0;
 
-        if ($lastImportedLine > 0) {
-            // Seek is zero-based line numbering and
-            $file->seek($lastImportedLine - 1);
-        }
+        $file->seek($lastImportedLine);
 
         $lineNumber = $lastImportedLine + 1;
         $this->logDebug('The import is starting on line '.$lineNumber, $import);
@@ -308,7 +305,9 @@ class ImportModel extends FormModel
         });
 
         while ($batchSize && !$file->eof()) {
-            $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+            $string = $file->current();
+            $file->next();
+            $data = str_getcsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
             $import->setLastLineImported($lineNumber);
 
             // Ignore the header row
