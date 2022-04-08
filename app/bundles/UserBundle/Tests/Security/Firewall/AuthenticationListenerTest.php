@@ -9,6 +9,7 @@ use Mautic\ApiBundle\Entity\oAuth2\AccessToken;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Authentication\AuthenticationHandler;
 use Mautic\UserBundle\Security\Firewall\AuthenticationListener;
 use PHPUnit\Framework\TestCase;
@@ -62,15 +63,20 @@ class AuthenticationListenerTest extends TestCase
         );
     }
 
-    public function testHandle(): void
+    public function testInvoke(): void
     {
-        $token = 'test-token';
-
+        $token     = 'test-token';
         $adminRole = new Role();
         $adminRole->setIsAdmin(true);
 
-        $client = new Client();
+        $client = new class extends Client {
+            public function getId()
+            {
+                return 123;
+            }
+        };
         $client->setRole($adminRole);
+        $client->setName('test-client');
 
         $this->accessToken = new AccessToken();
         $this->accessToken->setClient($client);
@@ -96,7 +102,15 @@ class AuthenticationListenerTest extends TestCase
             ->willReturn($this->accessToken);
 
         $this->token->expects($this->any())
-            ->method('setUser');
+            ->method('setUser')
+            ->with($this->callback(function (User $user) use ($adminRole) {
+                $this->assertSame('test-client', $user->getFirstName());
+                $this->assertSame('[123]', $user->getLastName());
+                $this->assertSame('test-client [123]', $user->getUsername());
+                $this->assertSame($adminRole, $user->getRole());
+
+                return true;
+            }));
 
         $this->tokenStorage->expects($this->any())
             ->method('setToken')
