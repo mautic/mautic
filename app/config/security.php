@@ -3,34 +3,34 @@
 $firewalls = [
     'install' => [
         'pattern'   => '^/installer',
-        'anonymous' => 'lazy',
+        'anonymous' => true,
         'context'   => 'mautic',
         'security'  => false,
     ],
     'dev' => [
         'pattern'   => '^/(_(profiler|wdt)|css|images|js)/',
         'security'  => true,
-        'anonymous' => 'lazy',
+        'anonymous' => true,
     ],
     'login' => [
         'pattern'   => '^/s/login$',
-        'anonymous' => 'lazy',
+        'anonymous' => true,
         'context'   => 'mautic',
     ],
     'sso_login' => [
         'pattern'            => '^/s/sso_login',
-        'anonymous'          => 'lazy',
+        'anonymous'          => true,
         'mautic_plugin_auth' => true,
         'context'            => 'mautic',
     ],
     'saml_login' => [
         'pattern'   => '^/s/saml/login$',
-        'anonymous' => 'lazy',
+        'anonymous' => true,
         'context'   => 'mautic',
     ],
     'saml_discovery' => [
         'pattern'   => '^/saml/discovery$',
-        'anonymous' => 'lazy',
+        'anonymous' => true,
         'context'   => 'mautic',
     ],
     'oauth2_token' => [
@@ -44,7 +44,7 @@ $firewalls = [
             'check_path' => '/oauth/v2/authorize_login_check',
             'login_path' => '/oauth/v2/authorize_login',
         ],
-        'anonymous' => 'lazy',
+        'anonymous' => true,
     ],
     'api' => [
         'pattern'            => '^/api',
@@ -92,7 +92,7 @@ $firewalls = [
     ],
     'public' => [
         'pattern'   => '^/',
-        'anonymous' => 'lazy',
+        'anonymous' => true,
         'context'   => 'mautic',
     ],
 ];
