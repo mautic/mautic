@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 class FormControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
-    
+
     /**
      * Index should return status code 200.
      */
