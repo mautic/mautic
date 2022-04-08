@@ -1470,7 +1470,7 @@ class LeadController extends FormController
                 [
                     'returnUrl'       => $this->generateUrl($route, $viewParameters),
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'MauticLeadBundle:Lead:'.$func,
+                    'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::'.$func.'Action',
                     'passthroughVars' => [
                         'mauticContent' => 'lead',
                         'closeModal'    => 1,

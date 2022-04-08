@@ -188,10 +188,7 @@ class MessageController extends AbstractStandardFormController
         return $this->deleteStandard($objectId);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getControllerBase()
+    protected function getTemplateBase(): string
     {
         return 'MauticChannelBundle:Message';
     }

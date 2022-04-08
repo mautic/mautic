@@ -688,10 +688,7 @@ class CampaignController extends AbstractStandardFormController
         return $sessionId;
     }
 
-    /**
-     * @return string
-     */
-    protected function getControllerBase()
+    protected function getTemplateBase(): string
     {
         return 'MauticCampaignBundle:Campaign';
     }
