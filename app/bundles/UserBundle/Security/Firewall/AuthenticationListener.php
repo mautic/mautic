@@ -21,14 +21,14 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
-class AuthenticationListener
+final class AuthenticationListener
 {
-    protected TokenStorageInterface $tokenStorage;
-    protected AuthenticationHandler $authenticationHandler;
-    protected AuthenticationManagerInterface $authenticationManager;
-    protected LoggerInterface $logger;
-    protected EventDispatcherInterface $dispatcher;
-    protected PermissionRepository $permissionRepository;
+    private TokenStorageInterface $tokenStorage;
+    private AuthenticationHandler $authenticationHandler;
+    private AuthenticationManagerInterface $authenticationManager;
+    private LoggerInterface $logger;
+    private EventDispatcherInterface $dispatcher;
+    private PermissionRepository $permissionRepository;
     private EntityManagerInterface $entityManager;
 
     /**
