@@ -27,11 +27,11 @@ final class Oauth2Test extends MauticMysqlTestCase
 
     public function testAuthWithInvalidCredentials(): void
     {
-        // $this->client->enableReboot();
+        $this->client->enableReboot();
 
         // Disable the default logging in via username and password.
         $this->clientServer = [];
-        $this->setUpSymfony();
+        $this->setUpSymfony($this->configParams);
 
         $this->client->request(
             Request::METHOD_POST,
@@ -53,11 +53,11 @@ final class Oauth2Test extends MauticMysqlTestCase
 
     public function testAuthWithInvalidAccessToken(): void
     {
-        // $this->client->enableReboot();
+        $this->client->enableReboot();
 
         // Disable the default logging in via username and password.
         $this->clientServer = [];
-        $this->setUpSymfony();
+        $this->setUpSymfony($this->configParams);
 
         $this->client->request(
             Request::METHOD_GET,
@@ -76,7 +76,7 @@ final class Oauth2Test extends MauticMysqlTestCase
 
     public function testAuthWorkflow(): void
     {
-        // $this->client->enableReboot();
+        $this->client->enableReboot();
 
         // Create OAuth2 credentials.
         $crawler    = $this->client->request(Request::METHOD_GET, 's/credentials/new');
@@ -93,7 +93,7 @@ final class Oauth2Test extends MauticMysqlTestCase
 
         // Disable the default logging in via username and password.
         $this->clientServer = [];
-        $this->setUpSymfony();
+        $this->setUpSymfony($this->configParams);
 
         // Get the access token.
         $this->client->request(
@@ -124,7 +124,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode(), $response->getContent());
+        Assert::assertSame(200, $response->getStatusCode());
         Assert::assertStringContainsString('"users":[', $response->getContent());
     }
 }
