@@ -13,7 +13,7 @@
             <ul class="list-group">
                 {% for r in result %}
                 <li class="list-group-item">
-                    {{ r }}
+                    {{ r|raw }}
                 </li>
                 {% endfor %}
             </ul>
