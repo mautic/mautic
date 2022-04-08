@@ -72,7 +72,7 @@ class FieldController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'MauticLeadBundle:Field:index',
+                'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contactfield_index',
                     'mauticContent' => 'leadfield',
@@ -187,7 +187,7 @@ class FieldController extends FormController
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
-                        'contentTemplate' => 'MauticLeadBundle:Field:index',
+                        'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
                         'passthroughVars' => [
                             'activeLink'    => '#mautic_contactfield_index',
                             'mauticContent' => 'leadfield',
@@ -243,7 +243,7 @@ class FieldController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticLeadBundle:Field:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'leadfield',
@@ -310,7 +310,7 @@ class FieldController extends FormController
                 return $this->postActionRedirect(
                     array_merge($postActionVars, [
                             'viewParameters'  => ['objectId' => $field->getId()],
-                            'contentTemplate' => 'MauticLeadBundle:Field:index',
+                            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
                         ]
                     )
                 );
@@ -389,7 +389,7 @@ class FieldController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticLeadBundle:Field:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'lead',
@@ -467,7 +467,7 @@ class FieldController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticLeadBundle:Field:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'lead',

@@ -425,7 +425,7 @@ class PluginController extends FormController
             [
                 'returnUrl'       => $this->generateUrl('mautic_plugin_index', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'MauticPluginBundle:Plugin:index',
+                'contentTemplate' => 'Mautic\PluginBundle\Controller\PluginController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'plugin',

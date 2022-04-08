@@ -50,7 +50,7 @@ class ResultController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $formPage],
-                    'contentTemplate' => 'MauticFormBundle:Form:index',
+                    'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'form',
@@ -130,7 +130,7 @@ class ResultController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticFormBundle:Result:index',
+                    'contentTemplate' => 'Mautic\FormBundle\Controller\ResultController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'formresult',
@@ -249,7 +249,7 @@ class ResultController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $formPage],
-                    'contentTemplate' => 'MauticFormBundle:Form:index',
+                    'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'form',
@@ -340,7 +340,7 @@ class ResultController extends CommonFormController
             [
                 'returnUrl'       => $this->generateUrl('mautic_form_results', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'MauticFormBundle:Result:index',
+                'contentTemplate' => 'Mautic\FormBundle\Controller\ResultController::indexAction',
                 'passthroughVars' => [
                     'mauticContent' => 'formresult',
                 ],
