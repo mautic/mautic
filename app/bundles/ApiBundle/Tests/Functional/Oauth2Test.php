@@ -27,7 +27,7 @@ final class Oauth2Test extends MauticMysqlTestCase
 
     public function testAuthWithInvalidCredentials(): void
     {
-        $this->client->enableReboot();
+        // $this->client->enableReboot();
 
         // Disable the default logging in via username and password.
         $this->clientServer = [];
@@ -53,7 +53,7 @@ final class Oauth2Test extends MauticMysqlTestCase
 
     public function testAuthWithInvalidAccessToken(): void
     {
-        $this->client->enableReboot();
+        // $this->client->enableReboot();
 
         // Disable the default logging in via username and password.
         $this->clientServer = [];
@@ -76,7 +76,7 @@ final class Oauth2Test extends MauticMysqlTestCase
 
     public function testAuthWorkflow(): void
     {
-        $this->client->enableReboot();
+        // $this->client->enableReboot();
 
         // Create OAuth2 credentials.
         $crawler    = $this->client->request(Request::METHOD_GET, 's/credentials/new');
