@@ -26,19 +26,26 @@ class AuthenticationListener
     protected TokenStorageInterface $tokenStorage;
     protected AuthenticationHandler $authenticationHandler;
     protected AuthenticationManagerInterface $authenticationManager;
-    protected string $providerKey;
     protected LoggerInterface $logger;
     protected EventDispatcherInterface $dispatcher;
     protected PermissionRepository $permissionRepository;
     private EntityManagerInterface $entityManager;
 
+    /**
+     * @var string|mixed
+     */
+    protected $providerKey;
+    
+    /**
+     * @param string|mixed $providerKey
+     */
     public function __construct(
         AuthenticationHandler $authenticationHandler,
         TokenStorageInterface $tokenStorage,
         AuthenticationManagerInterface $authenticationManager,
         LoggerInterface $logger,
         EventDispatcherInterface $dispatcher,
-        string $providerKey,
+        $providerKey,
         PermissionRepository $permissionRepository,
         EntityManagerInterface $entityManager
     ) {
