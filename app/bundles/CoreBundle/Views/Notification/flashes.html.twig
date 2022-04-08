@@ -1,11 +1,7 @@
-<!--if (!isset($alertType)) {
-    $alertType = 'growl';
-}
-
-?>-->
+{% set alertType = alertType|default('growl') %}
 <div id="flashes"{{ alertType == 'growl' ? ' class="alert-growl-container"' : '' }}>
-    <?php echo $view->render('MauticCoreBundle:Notification:flash_messages.html.php', [
-        'dismissible' => (empty($notdismissible)) ? ' alert-dismissible' : '',
-        'alertType'   => $alertType,
-    ]); ?>
+    {{ include('MauticCoreBundle:Notification:flash_messages.html.twig', {
+        dismissable: notDismissable|default(false) == false ? ' alert-dismissable' : '',
+        alertType: alertType
+    }) }}
 </div>

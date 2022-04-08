@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
 use Mautic\CoreBundle\Templating\Helper\GravatarHelper;
@@ -21,7 +23,7 @@ class GravatarExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            'gravatarGetImage' => new TwigFunction('gravatarGetImage', [$this, 'getImage'], ['is_safe' => ['all']]),
+            new TwigFunction('gravatarGetImage', [$this, 'getImage'], ['is_safe' => ['all']]),
         ];
     }
 

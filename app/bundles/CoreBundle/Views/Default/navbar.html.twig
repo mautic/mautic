@@ -13,11 +13,8 @@
                 <i class="fa fa-navicon fs-16"></i>
             </a>
         </li>
-        <!--
-        TODO
-        <?php echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('MauticCoreBundle:Default:notifications')); ?>
-        <?php echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('MauticCoreBundle:Default:globalSearch')); ?>
-        -->
+        {{ render(controller('MauticCoreBundle:Default:notifications')) }}
+        {{ render(controller('MauticCoreBundle:Default:globalSearch')) }}
     </ul>
     <!--/ end: left nav -->
 
@@ -31,14 +28,9 @@
         </li>
     </ul>
     <div class="navbar-toolbar pull-right mt-15 mr-10">
-    <!--
-    TODO
-    <?php
-    echo $view['buttons']->reset($app->getRequest(), \Mautic\CoreBundle\Templating\Helper\ButtonHelper::LOCATION_NAVBAR)
-        ->renderButtons();
-    ?>-->
+    <!-- TODO test through plugin hooks -->
+    {{ buttonResetAndRender(constant('Mautic\\CoreBundle\\Templating\\Helper\\ButtonHelper::LOCATION_NAVBAR')) }}
     </div>
-
 
     <!--/ end: right nav -->
 </div>

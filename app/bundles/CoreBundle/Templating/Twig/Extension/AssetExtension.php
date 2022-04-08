@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
@@ -27,12 +29,12 @@ class AssetExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            'outputScripts'           => new TwigFunction('outputScripts', [$this, 'outputScripts'], ['is_safe' => ['all']]),
-            'outputHeadDeclarations'  => new TwigFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
-            'getAssetUrl'             => new TwigFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
-            'outputStyles'            => new TwigFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
-            'outputSystemScripts'     => new TwigFunction('outputSystemScripts', [$this, 'outputSystemScripts'], ['is_safe' => ['html']]),
-            'outputSystemStylesheets' => new TwigFunction('outputSystemStylesheets', [$this, 'outputSystemStylesheets'], ['is_safe' => ['html']]),
+            new TwigFunction('outputScripts', [$this, 'outputScripts'], ['is_safe' => ['all']]),
+            new TwigFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
+            new TwigFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
+            new TwigFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
+            new TwigFunction('outputSystemScripts', [$this, 'outputSystemScripts'], ['is_safe' => ['html']]),
+            new TwigFunction('outputSystemStylesheets', [$this, 'outputSystemStylesheets'], ['is_safe' => ['html']]),
         ];
     }
 

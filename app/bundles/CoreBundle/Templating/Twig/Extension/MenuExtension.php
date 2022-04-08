@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
 use Mautic\CoreBundle\Templating\Helper\MenuHelper;
@@ -21,7 +23,7 @@ class MenuExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            'menuRender' => new TwigFunction('menuRender', [$this, 'menuRender'], ['is_safe' => ['all']]),
+            new TwigFunction('menuRender', [$this, 'menuRender'], ['is_safe' => ['all']]),
         ];
     }
 

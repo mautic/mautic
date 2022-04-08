@@ -4,7 +4,7 @@
 
 <!DOCTYPE html>
 <html>
-{% include('MauticCoreBundle:Default:head.html.twig') %}
+{{ include('MauticCoreBundle:Default:head.html.twig') }}
 
 {% if not request.isXmlHttpRequest() and not modal_view %}
 <!-- BASE VIEW -->
@@ -17,7 +17,7 @@
         </aside>
 
         <aside class="app-sidebar sidebar-right">
-            TODO sidebar right
+            {{ include('MauticCoreBundle:RightPanel:index.html.twig') }}
         </aside>
 
         <header id="app-header" class="navbar">
@@ -29,8 +29,8 @@
         <footer id="app-footer">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-xs-6 text-muted">TODO COPYRIGHT</div>
-                    <div class="col-xs-6 text-muted text-right small">TODO VERSION</div>
+                    <div class="col-xs-6 text-muted">{% trans with {'%date%': 'now' | date('Y') } %}mautic.core.copyright{% endtrans %}</div>
+                    <div class="col-xs-6 text-muted text-right small">v{{ mauticAppVersion() }}</div>
                 </div>
             </div>
         </footer>
@@ -48,7 +48,10 @@
             // TODO add some == dev logic here for the symfony bar
         </script>
         {{ outputScripts('bodyClose') }}
-        <!-- TODO render modal.html.php here --> 
+        {{ include('MauticCoreBundle:Helper:modal.html.twig', {
+            id: 'MauticSharedModal',
+            footerButtons: true
+        }) }}
     </section>
 </body>
 {% endif %}
