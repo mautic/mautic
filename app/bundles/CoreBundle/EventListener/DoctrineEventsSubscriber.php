@@ -102,7 +102,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
                             $classMetadata,
                             $em->getConnection()->getDatabasePlatform()
                         ),
-                        $newDefinition['allocationSize']
+                        (int) $newDefinition['allocationSize']
                     );
                     $classMetadata->setIdGenerator($sequenceGenerator);
                 }
