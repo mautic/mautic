@@ -8,6 +8,13 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * This test must run in a separate process because it sets the global constant
+ * MAUTIC_INSTALLER which breaks other tests.
+ *
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 final class Oauth2Test extends MauticMysqlTestCase
 {
     protected function setUp(): void
