@@ -15,10 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class FocusController extends AbstractStandardFormController
 {
-    /**
-     * @return string
-     */
-    protected function getControllerBase()
+    protected function getTemplateBase(): string
     {
         return 'MauticFocusBundle:Focus';
     }
