@@ -10,7 +10,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class Oauth2Test extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
+    protected function setUp(): void
+    {
+        $this->useCleanupRollback = false;
+        $this->useMockServices = false;
+
+        parent::setUp();
+    }
 
     public function testAuthWithInvalidCredentials(): void
     {
@@ -24,8 +30,8 @@ final class Oauth2Test extends MauticMysqlTestCase
             Request::METHOD_POST,
             '/oauth/v2/token',
             [
-                'grant_type' => 'client_credentials',
-                'client_id' => 'unicorn',
+                'grant_type'    => 'client_credentials',
+                'client_id'     => 'unicorn',
                 'client_secret' => 'secretUnicorn',
             ]
         );
@@ -52,7 +58,7 @@ final class Oauth2Test extends MauticMysqlTestCase
             [],
             [],
             [
-                'HTTP_Authorization' => "Bearer unicorn_token",
+                'HTTP_Authorization' => 'Bearer unicorn_token',
             ],
         );
 
@@ -87,15 +93,15 @@ final class Oauth2Test extends MauticMysqlTestCase
             Request::METHOD_POST,
             '/oauth/v2/token',
             [
-                'grant_type' => 'client_credentials',
-                'client_id' => $clientPublicKey,
+                'grant_type'    => 'client_credentials',
+                'client_id'     => $clientPublicKey,
                 'client_secret' => $clientSecretKey,
             ],
         );
 
         $response = $this->client->getResponse();
         Assert::assertSame(200, $response->getStatusCode());
-        $payload = json_decode($response->getContent(), true);
+        $payload     = json_decode($response->getContent(), true);
         $accessToken = $payload['access_token'];
         Assert::assertNotEmpty($accessToken);
 
