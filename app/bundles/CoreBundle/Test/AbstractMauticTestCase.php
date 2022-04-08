@@ -78,7 +78,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->setServerParameter('HTTPS', $secure);
 
         // if ($this->useMockServices) {
-            $this->mockServices();
+        $this->mockServices();
         // }
     }
 
