@@ -123,7 +123,7 @@ class CategoryController extends AbstractFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticCategoryBundle:Category:index',
+                    'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_'.$bundle.'category_index',
                         'mauticContent' => 'category',
@@ -237,7 +237,7 @@ class CategoryController extends AbstractFormController
             return $this->postActionRedirect([
                 'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'MauticCategoryBundle:Category:index',
+                'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_'.$bundle.'category_index',
                     'mauticContent' => 'category',
@@ -365,7 +365,7 @@ class CategoryController extends AbstractFormController
                 [
                     'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParameters),
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'MauticCategoryBundle:Category:index',
+                    'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_'.$bundle.'category_index',
                         'mauticContent' => 'category',
@@ -413,7 +413,7 @@ class CategoryController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => $viewParams,
-            'contentTemplate' => 'MauticCategoryBundle:Category:index',
+            'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_'.$bundle.'category_index',
                 'mauticContent' => 'category',
@@ -476,7 +476,7 @@ class CategoryController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => $viewParams,
-            'contentTemplate' => 'MauticCategoryBundle:Category:index',
+            'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_'.$bundle.'category_index',
                 'mauticContent' => 'category',

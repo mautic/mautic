@@ -201,7 +201,7 @@ class ProfileController extends FormController
                     return $this->postActionRedirect(
                         [
                             'returnUrl'       => $returnUrl,
-                            'contentTemplate' => 'MauticUserBundle:Profile:index',
+                            'contentTemplate' => 'Mautic\UserBundle\Controller\ProfileController::indexAction',
                             'passthroughVars' => [
                                 'mauticContent' => 'user',
                             ],
