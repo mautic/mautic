@@ -34,8 +34,8 @@ final class AuthenticationListener
     /**
      * @var string|mixed
      */
-    protected $providerKey;
-    
+    private $providerKey;
+
     /**
      * @param string|mixed $providerKey
      */
