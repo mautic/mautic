@@ -44,7 +44,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(400, $response->getStatusCode());
+        Assert::assertSame(400, $response->getStatusCode(), $response->getContent());
         Assert::assertSame(
             '{"errors":[{"message":"The client credentials are invalid","code":400,"type":"invalid_client"}]}',
             $response->getContent()
@@ -70,7 +70,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(401, $response->getStatusCode());
+        Assert::assertSame(401, $response->getStatusCode(), $response->getContent());
         Assert::assertSame('{"errors":[{"message":"The access token provided is invalid.","code":401,"type":"invalid_grant"}]}', $response->getContent());
     }
 
@@ -86,7 +86,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         $form['client[redirectUris]']->setValue('https://test.org');
 
         $crawler = $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         $clientPublicKey = $crawler->filter('input#client_publicId')->attr('value');
         $clientSecretKey = $crawler->filter('input#client_secret')->attr('value');
@@ -107,7 +107,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
+        Assert::assertSame(200, $response->getStatusCode(), $response->getContent());
         $payload     = json_decode($response->getContent(), true);
         $accessToken = $payload['access_token'];
         Assert::assertNotEmpty($accessToken);
@@ -124,7 +124,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
+        Assert::assertSame(200, $response->getStatusCode(), $response->getContent());
         Assert::assertStringContainsString('"users":[', $response->getContent());
     }
 }
