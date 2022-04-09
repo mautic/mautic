@@ -24,6 +24,11 @@ class ConfigExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * @param mixed $default
+     *
+     * @return mixed
+     */
     public function get(string $name, $default = null)
     {
         return $this->configHelper->get($name, $default);
