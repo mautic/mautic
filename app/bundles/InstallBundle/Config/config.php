@@ -130,6 +130,11 @@ return [
                     'security.password_encoder',
                 ],
             ],
+            'mautic.install.leadcolumns' => [
+                'class'     => \Mautic\InstallBundle\EventListener\DoctrineEventSubscriber::class,
+                'tag'       => 'doctrine.event_subscriber',
+                'arguments' => [],
+            ],
         ],
     ],
 ];
