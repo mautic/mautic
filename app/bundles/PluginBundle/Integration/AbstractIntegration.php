@@ -2375,7 +2375,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param null  $entity
      * @param array $params
      * @param bool  $ignoreEntityChanges
      *
@@ -2383,7 +2382,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     protected function getLastSyncDate($entity = null, $params = [], $ignoreEntityChanges = true)
     {
-        $isNew = method_exists($entity, 'isNew') && $entity->isNew();
+        $isNew = method_exists($entity ?? '', 'isNew') && $entity->isNew();
         if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
             // Check to see if this contact was modified prior to the fetch so that the push catches it
             /** @var FormEntity $entity */
