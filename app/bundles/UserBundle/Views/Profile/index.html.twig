@@ -1,12 +1,9 @@
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
 
 {% block headerTitle %}{% trans %}mautic.user.account.settings{% endtrans %}{% endblock %}
+{% block mauticContent %}user{% endblock %}
 
 {% block content %}
-
-<!-- TODO this doesn't actually work. Replace with proper Twig blocks/variables as appropriate -->
-{{ slotSet('mauticContent', 'user') }}
-{{ slotSet('headerTitle', 'mautic.user.account.settings'|trans) }}
 
 <!-- start: box layout -->
 <div class="box-layout">
