@@ -11,7 +11,7 @@
     
     Until recently, Symfony supported two templating engines: PHP and Twig. Mautic is pretty much exclusively built using the PHP templating engine. However, this engine was [officially deprecated in Symfony 4.3](https://symfony.com/doc/4.4/templating/PHP.html) and has been removed in Symfony 5.
     
-    Starting with Mautic 4, we'd like new internal bundles **as well as new plugins** to be built in Twig, so they'll be more future-proof. The main goal for Mautic 4.3 is to at least have a working `MauticCoreBundle:Default:content.html.twig` alongside the already existing `MauticCoreBundle:Default:content.html.php` that can be extended by bundle or plugin authors.
+    Starting with Mautic 4.3, we'd like new internal bundles **as well as new plugins** to be built in Twig. Mautic 4.3 introduces a working `MauticCoreBundle:Default:content.html.twig` alongside the already existing `MauticCoreBundle:Default:content.html.php` that can be extended by bundle or plugin authors.
 
     Later on in the Mautic 4 development lifecycle, the aim will be to slowly migrate exiting bundles from the PHP templating engine over to Twig. The good thing is that both engines can co-exist until we upgrade to Symfony 5 at some point in the future, so we can migrate bundles and plugins one by one.
 *   Packages removed
