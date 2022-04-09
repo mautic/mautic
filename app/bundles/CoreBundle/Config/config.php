@@ -486,6 +486,13 @@ return [
                 ],
                 'alias' => 'security',
             ],
+            'mautic.helper.template.translator' => [
+                'class'     => \Mautic\CoreBundle\Templating\Helper\TranslatorHelper::class,
+                'arguments' => [
+                    'translator',
+                ],
+                'alias' => 'translator',
+            ],
             'mautic.helper.paths' => [
                 'class'     => 'Mautic\CoreBundle\Helper\PathsHelper',
                 'arguments' => [
@@ -1074,6 +1081,27 @@ return [
             ],
             'templating.twig.extension.class' => [
                 'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ClassExtension::class,
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.security' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\SecurityExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.security',
+                ],
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.translator' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\TranslatorExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.translator',
+                ],
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.config' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ConfigExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.config',
+                ],
                 'tag'       => 'twig.extension',
             ],
             // Schema
