@@ -735,7 +735,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $nullExpr = $operators['null'][$exprType];
         $inExpr   = $operators['in'][$exprType];
         $xExpr    = $operators['x'][$exprType];
-
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous', [], null, 'en_US'):
@@ -798,6 +797,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                             $q->expr()->$eqExpr('list_lead.manually_removed', 0)
                         )
                     )
+                );
+                $filter->strict  = true;
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.company_id', [], null, 'en_US'):
+                $this->applySearchQueryRelationship(
+                    $q,
+                    [
+                        [
+                            'from_alias' => 'l',
+                            'table'      => 'companies_leads',
+                            'alias'      => 'comp_lead',
+                            'condition'  => 'l.id = comp_lead.lead_id',
+                        ],
+                    ],
+                    $innerJoinTables,
+                    $this->generateFilterExpression($q, 'comp_lead.company_id', $eqExpr, $unique, null)
                 );
                 $filter->strict  = true;
                 $returnParameter = true;
@@ -964,6 +981,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.list',
             'mautic.core.searchcommand.name',
             'mautic.lead.lead.searchcommand.company',
+            'mautic.lead.lead.searchcommand.company_id',
             'mautic.core.searchcommand.email',
             'mautic.lead.lead.searchcommand.owner',
             'mautic.core.searchcommand.ip',
