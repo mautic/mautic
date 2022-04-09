@@ -27,7 +27,7 @@ try {
         'marketplace.package.install.html.failed',
         ['%packagename%' => $packageDetail->packageBase->getHumanPackageName()]
         ); ?></p>
-    <textarea class="form-control" readonly id="marketplace-installation-failed-details"></textarea>
+    <textarea class="form-control" readonly id="marketplace-installation-failed-details" aria-label="Marketplace installation failed details"></textarea>
 </div>
 <div style="display: none" class="text-center" id="marketplace-installation-success">
     <p><?php echo $view['translator']->trans(
