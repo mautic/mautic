@@ -203,7 +203,7 @@ class ConfigType extends AbstractType
                     new Email(
                         [
                             'message' => 'mautic.core.email.required',
-                            'strict'  => true,
+                            'mode'    => Email::VALIDATION_MODE_HTML5,
                         ]
                     ),
                 ],
@@ -226,7 +226,7 @@ class ConfigType extends AbstractType
                     new Email(
                         [
                             'message' => 'mautic.core.email.required',
-                            'strict'  => true,
+                            'mode'    => Email::VALIDATION_MODE_HTML5,
                         ]
                     ),
                 ],

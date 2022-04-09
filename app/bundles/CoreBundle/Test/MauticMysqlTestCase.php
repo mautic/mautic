@@ -8,7 +8,7 @@ use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\Process\Process;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
@@ -105,7 +105,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         }
     }
 
-    protected function createAnotherClient(string $username = 'admin', string $password = 'mautic'): Client
+    protected function createAnotherClient(string $username = 'admin', string $password = 'mautic'): KernelBrowser
     {
         // turn off rollback cleanup as this client creates a separate DB connection
         $this->useCleanupRollback = false;

@@ -149,11 +149,11 @@ if ('index' == $tmpl) {
                         <?php echo $item->getScore(); ?>
                     </td>
                     <td class="visible-md visible-lg">
-                        <a class="label label-primary" href="<?php echo $view['router']->path(
+                        <a class="label label-primary" href="<?php
+                        echo $view['router']->path(
                             'mautic_contact_index',
                             [
-                                'search' => $view['translator']->trans('mautic.lead.lead.searchcommand.company').':"'
-                                    .$fields['core']['companyname']['value'].'"',
+                                'search' => $view['translator']->trans('mautic.lead.lead.searchcommand.company_id').':'.$item->getId(),
                             ]
                         ); ?>" data-toggle="ajax"<?php echo (0 == $leadCounts[$item->getId()]) ? 'disabled=disabled' : ''; ?>>
                             <?php echo $view['translator']->transChoice(
