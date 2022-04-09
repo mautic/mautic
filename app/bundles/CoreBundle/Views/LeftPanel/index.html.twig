@@ -1,5 +1,4 @@
-<!-- // $extraMenu = $view['menu']->render('extra'); -->
-{% set extraMenu = null %}
+{% set extraMenu = menuRender('extra') %}
 <div class="sidebar-header">
     <!-- brand -->
     <a class="mautic-brand{{ extraMenu is empty ? '' : ' pull-left pl-0 pr-0' }}" href="#">
@@ -41,15 +40,14 @@
         </svg>
         <!--/ logo text -->
     </a>
-    <!-- TODO extra menu -->
-    <!--<?php if (!empty($extraMenu)): ?>
+    {% if extraMenu is not empty %}
         <div class="dropdown extra-menu">
             <a href="#" data-toggle="dropdown" class="dropdown-toggle">
                 <i class="fa fa-chevron-down fa-lg"></i>
             </a>
-            <?php echo $extraMenu; ?>
+            {{ extraMenu }}
         </div>
-    <?php endif; ?>-->
+    {% endif %}
     <!--/ brand -->
 </div>
 <!--/ end: sidebar-header -->
@@ -60,7 +58,7 @@
     <div class="scroll-content slimscroll">
         <!-- start: navigation -->
         <nav class="nav-sidebar">
-            <!--<?php echo $view['content']->getCustomContent('menu.above', $mauticTemplateVars); ?>-->
+            {{ customContent('menu.above', mauticTemplateVars is defined ? mauticTemplateVars : []) }}
             {{ menuRender('main') }}
 
             <!-- start: left nav -->
