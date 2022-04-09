@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
+use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -2375,14 +2376,15 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param array $params
-     * @param bool  $ignoreEntityChanges
+     * @param CommonEntity|null $entity
+     * @param array             $params
+     * @param bool              $ignoreEntityChanges
      *
      * @return bool|\DateTime|null
      */
     protected function getLastSyncDate($entity = null, $params = [], $ignoreEntityChanges = true)
     {
-        $isNew = method_exists($entity ?? '', 'isNew') && $entity->isNew();
+        $isNew = ($entity instanceof FormEntity) && $entity->isNew();
         if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
             // Check to see if this contact was modified prior to the fetch so that the push catches it
             /** @var FormEntity $entity */
