@@ -66,11 +66,11 @@ $firewalls = [
             'login_path'      => '%env(MAUTIC_SAML_LOGIN_PATH)%', // '/s/saml/login',,
             'check_path'      => '%env(MAUTIC_SAML_LOGIN_CHECK_PATH)%', // '/s/saml/login_check',
         ],
-        'simple_form' => [
-            'authenticator'        => 'mautic.user.form_authenticator',
-            'csrf_token_generator' => 'security.csrf.token_manager',
-            'success_handler'      => 'mautic.security.authentication_handler',
-            'failure_handler'      => 'mautic.security.authentication_handler',
+        'form_login' => [
+            // 'authenticator'        => 'mautic.user.form_authenticator',
+            // 'csrf_token_generator' => 'security.csrf.token_manager',
+            // 'success_handler'      => 'mautic.security.authentication_handler',
+            // 'failure_handler'      => 'mautic.security.authentication_handler',
             'login_path'           => '/s/login',
             'check_path'           => '/s/login_check',
         ],
@@ -110,11 +110,11 @@ $container->loadFromExtension(
             ],
         ],
         'encoders' => [
-            'Symfony\Component\Security\Core\User\User' => [
+            \Symfony\Component\Security\Core\User\User::class => [
                 'algorithm'  => 'bcrypt',
                 'iterations' => 12,
             ],
-            'Mautic\UserBundle\Entity\User' => [
+            \Mautic\UserBundle\Entity\User::class => [
                 'algorithm'  => 'bcrypt',
                 'iterations' => 12,
             ],

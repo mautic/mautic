@@ -15,12 +15,23 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
+use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
 use Symfony\Component\Security\Http\Authentication\SimpleFormAuthenticatorInterface;
+use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
-class FormAuthenticator implements SimpleFormAuthenticatorInterface
+class FormAuthenticator extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
 {
+    use TargetPathTrait;
+
+    public const LOGIN_ROUTE = 'login';
+
     /**
      * @var UserPasswordEncoder
      */
@@ -51,6 +62,69 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
         $this->dispatcher        = $dispatcher;
         $this->integrationHelper = $integrationHelper;
         $this->requestStack      = $requestStack;
+    }
+
+    public function supports(Request $request): bool
+    {
+        return self::LOGIN_ROUTE === $request->attributes->get('_route')
+            && $request->isMethod(Request::METHOD_POST);
+    }
+
+    public function getCredentials(Request $request)
+    {
+        $credentials = [
+            'username' => $request->request->get('username'),
+            'password' => $request->request->get('password'),
+            'csrf_token' => $request->request->get('_csrf_token'),
+        ];
+
+        $request->getSession()->set(Security::LAST_USERNAME, $credentials['username']);
+
+        return $credentials;
+    }
+
+    public function getUser($credentials, UserProviderInterface $userProvider): ?User
+    {
+        $token = new CsrfToken('authenticate', $credentials['csrf_token']);
+        if (!$this->csrfTokenManager->isTokenValid($token)) {
+            throw new InvalidCsrfTokenException();
+        }
+
+        $user = $userProvider->loadUserByUsername($credentials['username']);
+
+        // $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $credentials['email']]);
+
+        if (!$user) {
+            // fail authentication with a custom error
+            throw new CustomUserMessageAuthenticationException('Email could not be found.');
+        }
+
+        return $user;
+    }
+
+    public function checkCredentials($credentials, UserInterface $user): bool
+    {
+        return $this->encoder->isPasswordValid($user, $credentials['password']);
+    }
+
+    public function getPassword($credentials): ?string
+    {
+        return $credentials['password'];
+    }
+
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
+    {
+        if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
+            return new RedirectResponse($targetPath);
+        }
+
+        // For example : return new RedirectResponse($this->urlGenerator->generate('some_route'));
+        throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
+    }
+
+    protected function getLoginUrl(): string
+    {
+        return $this->urlGenerator->generate(self::LOGIN_ROUTE);
     }
 
     /**
