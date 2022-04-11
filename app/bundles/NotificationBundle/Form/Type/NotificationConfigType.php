@@ -16,8 +16,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class NotificationConfigType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface<int,FormBuilderInterface> $builder
-     * @param array<string,mixed>                            $options
+     * @param array<string,mixed> $options
      *
      * @return void
      */

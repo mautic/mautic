@@ -2,6 +2,7 @@
 
 namespace Mautic\PluginBundle\Integration;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
@@ -842,18 +843,21 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param      $integrationEntity
-     * @param      $integrationEntityId
-     * @param      $internalEntity
-     * @param      $internalEntityId
-     * @param bool $persist
+     * @param                                                                  $integrationEntity
+     * @param                                                                  $integrationEntityId
+     * @param                                                                  $internalEntity
+     * @param                                                                  $internalEntityId
+     * @param bool                                                             $persist
+     * @param ArrayCollection<int|string, mixed>|array<int|string, mixed>|null $internal
+     *
+     * @return IntegrationEntity
      */
     public function createIntegrationEntity(
         $integrationEntity,
         $integrationEntityId,
         $internalEntity,
         $internalEntityId,
-        array $internal = null,
+        $internal = null,
         $persist = true
     ) {
         $date = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)

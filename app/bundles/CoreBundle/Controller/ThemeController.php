@@ -162,9 +162,9 @@ class ThemeController extends FormController
 
         $response = new Response();
         $response->headers->set('Content-Type', 'application/octet-stream');
-        $response->headers->set('Content-Length', filesize($zipPath));
+        $response->headers->set('Content-Length', strval(filesize($zipPath)));
 
-        $stream = $this->request->get('stream', 0);
+        $stream = $this->request->get('stream', '0');
 
         if (!$stream) {
             $response->headers->set('Content-Disposition', 'attachment;filename="'.$themeName.'.zip"');

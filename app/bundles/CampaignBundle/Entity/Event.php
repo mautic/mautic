@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -675,7 +676,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return ArrayCollection|Event[]
+     * @return Collection<int|string, mixed>|ArrayCollection|Event[]
      */
     public function getPositiveChildren()
     {
@@ -685,7 +686,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return ArrayCollection|Event[]
+     * @return Collection<int|string, mixed>|ArrayCollection|Event[]
      */
     public function getNegativeChildren()
     {
@@ -697,7 +698,7 @@ class Event implements ChannelInterface
     /**
      * @param $type
      *
-     * @return ArrayCollection
+     * @return Collection<int|string, mixed>|ArrayCollection
      */
     public function getChildrenByType($type)
     {
@@ -709,7 +710,7 @@ class Event implements ChannelInterface
     /**
      * @param $type
      *
-     * @return ArrayCollection
+     * @return Collection<int|string, mixed>|ArrayCollection
      */
     public function getChildrenByEventType($type)
     {

@@ -203,21 +203,21 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param array<int|string>|null $emailIds
+     * @param array<int|string>|null $listId
+     * @param bool                   $combined
      *
      * @return array|int
      */
-    public function getSentCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
+    public function getSentCount(array $emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
     {
         return $this->getStatusCount('is_sent', $emailIds, $listId, $chartQuery, $combined);
     }
 
     /**
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param array<int|string>|null $emailIds
+     * @param array<int|string>|null $listId
+     * @param bool                   $combined
      *
      * @return array|int
      */
@@ -227,9 +227,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param array<int|string>|null $emailIds
+     * @param array<int|string>|null $listId
+     * @param bool                   $combined
      *
      * @return array|int
      */

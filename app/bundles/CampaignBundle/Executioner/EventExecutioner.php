@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -122,12 +123,14 @@ class EventExecutioner
     }
 
     /**
+     * @param Collection<int|string, mixed>|ArrayCollection $events
+     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeEventsForContact(ArrayCollection $events, Lead $contact, Responses $responses = null, Counter $counter = null)
+    public function executeEventsForContact(Collection $events, Lead $contact, Responses $responses = null, Counter $counter = null)
     {
         if ($responses) {
             $this->responses = $responses;
@@ -210,14 +213,15 @@ class EventExecutioner
     }
 
     /**
-     * @param bool $isInactive
+     * @param Collection<int|string, mixed>|ArrayCollection<int, mixed> $events
+     * @param bool                                                      $isInactive
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter = null, $isInactive = false)
+    public function executeEventsForContacts(Collection $events, ArrayCollection $contacts, Counter $childrenCounter = null, $isInactive = false)
     {
         if (!$contacts->count()) {
             return;
@@ -327,13 +331,14 @@ class EventExecutioner
     }
 
     /**
-     * @param bool $isInactive
+     * @param Collection<int|string, mixed>|ArrayCollection $events
+     * @param bool                                          $isInactive
      *
-     * @return ArrayCollection
+     * @return Collection<int|string, mixed>|ArrayCollection
      *
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function scheduleEvents(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter = null, $isInactive = false)
+    private function scheduleEvents(Collection $events, ArrayCollection $contacts, Counter $childrenCounter = null, $isInactive = false)
     {
         $events = clone $events;
 
