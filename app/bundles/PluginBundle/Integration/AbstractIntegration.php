@@ -843,12 +843,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param                                                                  $integrationEntity
-     * @param                                                                  $integrationEntityId
-     * @param                                                                  $internalEntity
-     * @param                                                                  $internalEntityId
-     * @param bool                                                             $persist
      * @param ArrayCollection<int|string, mixed>|array<int|string, mixed>|null $internal
+     * @param bool                                                             $persist
      *
      * @return IntegrationEntity
      */
