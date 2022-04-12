@@ -67,7 +67,7 @@ trait TranslationModelTrait
                     $browserLanguages = explode(',', $browserLanguages);
                     if (!empty($browserLanguages)) {
                         foreach ($browserLanguages as $language) {
-                            if ($pos = false !== strpos($language, ';q=')) {
+                            if (($pos = strpos($language, ';q=')) !== false) {
                                 //remove weights
                                 $language = substr($language, 0, ($pos + 1));
                             }
