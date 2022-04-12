@@ -169,7 +169,6 @@ class FieldType extends AbstractType
                     'attr'        => ['class' => 'form-control not-chosen'],
                     'required'    => false,
                     'mapped'      => false,
-                    'multiple'    => 'multiselect' === $listType,
                 ]
             );
         }
