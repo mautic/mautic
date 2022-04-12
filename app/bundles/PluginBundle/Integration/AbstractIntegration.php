@@ -1739,7 +1739,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         if (is_object($data)) {
             // Convert to array in all levels
-            $data = json_encode(json_decode($data), true);
+            $data = json_encode(json_decode($data, true));
         } elseif (is_string($data)) {
             // Assume JSON
             $data = json_decode($data, true);
