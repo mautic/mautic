@@ -157,7 +157,6 @@ class FieldType extends AbstractType
             'timezone'      => FormFieldHelper::getTimezonesChoices(),
             'locale'        => FormFieldHelper::getLocaleChoices(),
             'select'        => [],
-            'multiselect'   => [],
         ];
         foreach ($listChoices as $listType => $choices) {
             $builder->add(
