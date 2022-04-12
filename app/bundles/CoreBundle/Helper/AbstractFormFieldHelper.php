@@ -235,7 +235,7 @@ abstract class AbstractFormFieldHelper
      *
      * @return mixed[]
      */
-    private static function appendChoice(array $choices, string $label, string $value, bool $labelsAsKeys = false): array
+    private static function appendChoice(array $choices, ?string $label, ?string $value, bool $labelsAsKeys = false): array
     {
         $label = trim(html_entity_decode($label, ENT_QUOTES));
         $value = trim(html_entity_decode($value, ENT_QUOTES));
