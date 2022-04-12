@@ -498,7 +498,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         return new Interval(new NullLogger(), $coreParametersHelper);
     }
 
-    public function testExecutionDateIsValidatedAsExpectedWithStartHourAndDaylightSavingsTimeChange()
+    public function testExecutionDateIsValidatedAsExpectedWithStartHourAndDaylightSavingsTimeChange(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
