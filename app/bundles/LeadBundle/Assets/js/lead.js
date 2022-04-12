@@ -487,6 +487,7 @@ Mautic.convertLeadFilterInput = function(el) {
     var fieldAlias = mQuery('#leadlist_filters_'+filterNum+'_field');
     var fieldObject = mQuery('#leadlist_filters_'+filterNum+'_object');
     var filterValue = mQuery('#leadlist_filters_'+filterNum+'_properties_filter').val();
+    var filterId  = '#leadlist_filters_' + filterNum + '_properties_filter';
 
     Mautic.loadFilterForm(filterNum, fieldObject.val(), fieldAlias.val(), operatorSelect.val(), function(propertiesFields) {
         var selector = '#leadlist_filters_'+filterNum;
@@ -495,7 +496,7 @@ Mautic.convertLeadFilterInput = function(el) {
         Mautic.triggerOnPropertiesFormLoadedEvent(selector, filterValue);
     });
 
-    Mautic.setProcessorForFilterValue(filterId, operator);
+    Mautic.setProcessorForFilterValue(filterId, operatorSelect.val());
 };
 
 Mautic.setFilterValuesProcessor = function () {
@@ -548,7 +549,7 @@ Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptio
     mQuery = mQueryBackup;
 };
 
-Mautic.loadFilterForm = function(filterNum, fieldObject, fieldAlias, operator, resultHtml) {
+Mautic.loadFilterForm = function(filterNum, fieldObject, fieldAlias, operator, resultHtml, search = null) {
     mQuery.ajax({
         showLoadingBar: true,
         url: mauticAjaxUrl,
@@ -559,11 +560,15 @@ Mautic.loadFilterForm = function(filterNum, fieldObject, fieldAlias, operator, r
             fieldObject: fieldObject,
             operator: operator,
             filterNum: filterNum,
+            search: search,
         },
         dataType: 'json',
         success: function (response) {
             Mautic.stopPageLoadingBar();
             resultHtml(response.viewParameters.form);
+            if (fieldAlias == 'lead_asset_download') {
+                Mautic.handleAssetDownloadSearch(filterNum, fieldObject, fieldAlias, operator, resultHtml, search);
+            }
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
@@ -1217,7 +1222,11 @@ Mautic.getLeadEmailContent = function (el) {
         var idPrefix = id.replace('templates', '');
         var bodyEl = (mQuery('#'+idPrefix+'message').length) ? '#'+idPrefix+'message' : '#'+idPrefix+'body';
 
-        mQuery(bodyEl).ckeditorGet().setData(response.body);
+        if (Mautic.getActiveBuilderName() === 'legacy') {
+            mQuery(bodyEl).froalaEditor('html.set', response.body);
+        } else {
+            mQuery(bodyEl).ckeditorGet().setData(response.body);
+        }
 
         mQuery(bodyEl).val(response.body);
         mQuery('#'+idPrefix+'subject').val(response.subject);
@@ -1450,3 +1459,29 @@ Mautic.setAsPrimaryCompany = function (companyId,leadId){
         }
     });
 };
+
+Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, operator, resultHtml, search) {
+    var assetDownloadFilter = mQuery('#leadlist_filters_' + filterNum + '_properties_filter');
+    var assetDownloadInput = mQuery('#leadlist_filters_' + filterNum + '_properties input');
+    var assetDownloadProperties = mQuery('#leadlist_filters_' + filterNum + '_properties');
+    assetDownloadFilter.on('chosen:no_results', function () {
+        var search = assetDownloadInput.val();
+        mQuery('#leadlist_filters_' + filterNum + '_properties .chosen-drop').remove();
+        clearTimeout(mQuery.data(this, 'timer'));
+        var existingOptions = mQuery('#leadlist_filters_' + filterNum + '_properties_filter option');
+        mQuery(assetDownloadProperties).data('existing-options', existingOptions);
+        mQuery(this).data('timer', setTimeout(function () {
+            assetDownloadInput.width('auto').prop('disabled', true).val(Mautic.translate('mautic.core.lookup.loading_data'));
+            Mautic.loadFilterForm(filterNum, fieldObject, fieldAlias, operator, resultHtml, search)
+        }, 1000, search))
+    });
+    var existingOptions = mQuery(assetDownloadProperties).data('existing-options');
+    assetDownloadFilter.append(existingOptions);
+    assetDownloadFilter.trigger('chosen:updated');
+    if (mQuery('#leadlist_filters_' + filterNum + '_properties_filter option').length === 0 ) {
+        assetDownloadInput.val(mauticLang['chosenNoResults']);
+    }
+    else if (search !== null) {
+        assetDownloadFilter.trigger('chosen:open.chosen')
+    }
+}

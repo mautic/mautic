@@ -27,7 +27,7 @@ class LeadImportType extends AbstractType
                 'constraints' => [
                     new File(
                         [
-                            'mimeTypes'        => ['text/*', 'application/octet-stream'],
+                            'mimeTypes'        => ['text/*', 'application/octet-stream', 'application/csv'],
                             'mimeTypesMessage' => 'mautic.core.invalid_file_type',
                         ]
                     ),
