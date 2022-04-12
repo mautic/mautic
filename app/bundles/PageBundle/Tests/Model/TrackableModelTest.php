@@ -346,7 +346,7 @@ class TrackableModelTest extends TestCase
         );
 
         $this->assertEmpty($trackables, $content);
-        $this->assertFalse(strpos($url, $content), 'https:// should have been stripped from the token URL');
+        $this->assertFalse(strpos($content, $url), 'https:// should have been stripped from the token URL');
     }
 
     /**
