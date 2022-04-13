@@ -87,6 +87,7 @@ class ListModel extends FormModel
         RequestStack $requestStack,
         SegmentCountCacheHelper $segmentCountCacheHelper
     ) {
+        $this->categoryModel            = $categoryModel;
         $this->coreParametersHelper     = $coreParametersHelper;
         $this->leadSegmentService       = $leadSegment;
         $this->segmentChartQueryFactory = $segmentChartQueryFactory;
