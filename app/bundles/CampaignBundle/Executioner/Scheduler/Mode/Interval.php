@@ -126,13 +126,6 @@ class Interval implements ScheduleModeInterface
         $endTime               = $event->getTriggerRestrictedStopHour();
         $daysOfWeek            = $event->getTriggerRestrictedDaysOfWeek();
 
-        $interval = $event->getTriggerInterval();
-        $unit     = $event->getTriggerIntervalUnit();
-
-        if ($interval && $unit) {
-            $executionDate->add((new DateTimeHelper())->buildInterval($interval, $unit));
-        }
-
         /** @var Lead $contact */
         foreach ($contacts as $contact) {
             $groupExecutionDate = $this->getGroupExecutionDateTime(
