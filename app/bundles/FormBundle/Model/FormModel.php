@@ -520,15 +520,6 @@ class FormModel extends CommonFormModel
         // Determine pages
         $fields = $entity->getOrderedFields()->toArray();
 
-        // Ensure the correct order in case this is generated right after a form save with new fields
-        uasort($fields, function ($a, $b) {
-            if ($a->getOrder() === $b->getOrder()) {
-                return 0;
-            }
-
-            return ($a->getOrder() < $b->getOrder()) ? -1 : 1;
-        });
-
         [$pages, $lastPage] = $this->getPages($fields);
         $html               = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
