@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -100,11 +101,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                                 $fieldValues = FormFieldHelper::getCountryChoices();
                                 break;
                             case 'region':
-                                $fieldValues          = [];
-                                $countriesWithRegions = FormFieldHelper::getRegionChoices();
-                                foreach ($countriesWithRegions as $regions) {
-                                    $fieldValues += $regions;
-                                }
+                                $fieldValues = ArrayHelper::flatten(FormFieldHelper::getRegionChoices());
                                 break;
                             case 'timezone':
                                 $fieldValues = FormFieldHelper::getTimezonesChoices();
