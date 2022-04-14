@@ -138,6 +138,8 @@
                     Form.prepareValidation(formId);
                     Form.prepareShowOn(formId);
                     Form.preparePagination(formId);
+
+                    Form.populateValuesWithGetParameters();
                 }
             }
         };
@@ -776,6 +778,23 @@
             }
 
             return containerId;
+        };
+
+        Form.populateValuesWithGetParameters = function() {
+            if (document.forms.length !== 0 && window.location.search) {
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+                const entries = urlParams.entries();
+
+                for (const entry of entries) {
+                    const inputs = document.getElementsByName(`mauticform[${entry[0]}]`);
+                    inputs.forEach(function (input) {
+                        if (input.type !== 'hidden') {
+                            input.value = entry[1];
+                        }
+                    });
+                }
+            }
         };
 
         Core.getValidator = function(formId) {
