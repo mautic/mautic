@@ -105,8 +105,8 @@ class ArrayHelper
     }
 
     /**
-     * @param array<mixed[]> $multidimensionalArray
-     * 
+     * @param array<mixed> $multidimensionalArray
+     *
      * @return array<mixed>
      */
     public static function flatten(array $multidimensionalArray): array

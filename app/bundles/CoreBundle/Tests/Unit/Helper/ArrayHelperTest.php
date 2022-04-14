@@ -98,14 +98,14 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
                 [
                     'third' => 'Custom third',
                 ],
-            ]
+            ],
         ];
 
         Assert::assertSame(
             [
-                'first' => 'Custom first',
+                'first'  => 'Custom first',
                 'second' => 'Custom second',
-                'third' => 'Custom third',
+                'third'  => 'Custom third',
             ],
             ArrayHelper::flatten($multidimensionalArray)
         );
