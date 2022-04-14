@@ -238,10 +238,9 @@ $view['slots']->set(
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
             <div class="mt-sm points-panel text-center">
                 <h1>
-                    <?php echo $view['translator']->transChoice(
+                    <?php echo $view['translator']->trans(
                         'mautic.company.score.count',
-                        $company->getScore(),
-                        ['%score%' => $company->getScore()]
+                        ['%count%' => $company->getScore()]
                     ); ?>
                 </h1>
                 <hr/>

@@ -460,10 +460,9 @@ $view['slots']->set(
                 $style = !empty($color) ? ' style="font-color: '.$color.' !important;"' : '';
                 ?>
                 <h1 <?php echo $style; ?>>
-                    <?php echo $view['translator']->transChoice(
+                    <?php echo $view['translator']->trans(
                         'mautic.lead.points.count',
-                        $lead->getPoints(),
-                        ['%points%' => $lead->getPoints()]
+                        ['%count%' => $lead->getPoints()]
                     ); ?>
                 </h1>
                 <hr/>
