@@ -50,18 +50,21 @@ export default (editor, opts = {}) => {
   // MJML columns
   if (typeof bm.get('mj-1-column') !== 'undefined') {
     bm.get('mj-1-column').set({
+      label: Mautic.translate('grapesjsbuilder.components.names.oneColumn'),
       category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 
   if (typeof bm.get('mj-2-columns') !== 'undefined') {
     bm.get('mj-2-columns').set({
+      label: Mautic.translate('grapesjsbuilder.components.names.twoColumn'),
       category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 
   if (typeof bm.get('mj-3-columns') !== 'undefined') {
     bm.get('mj-3-columns').set({
+      label: Mautic.translate('grapesjsbuilder.components.names.threeColumn'),
       category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
