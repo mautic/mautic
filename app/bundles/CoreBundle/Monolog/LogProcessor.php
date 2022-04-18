@@ -6,6 +6,11 @@ namespace Mautic\CoreBundle\Monolog;
 
 class LogProcessor
 {
+    /**
+     * @param array<mixed> $record
+     *
+     * @return array<mixed>
+     */
     public function __invoke(array $record): array
     {
         $record['extra']['gethostname'] = gethostname();
