@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Cache\InvalidArgumentException;
 
 class SegmentCountCacheHelperTest extends TestCase
 {
@@ -29,14 +28,11 @@ class SegmentCountCacheHelperTest extends TestCase
         $this->segmentCountCacheHelper = new SegmentCountCacheHelper($this->cacheStorageHelperMock);
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function testDecrementSegmentContactCountHasNoCache(): void
     {
         $segmentId = 1;
         $this->cacheStorageHelperMock
-            ->expects(self::at(0))
+            ->expects(self::once())
             ->method('has')
             ->with('segment.'.$segmentId.'.lead')
             ->willReturn(false);
@@ -44,50 +40,44 @@ class SegmentCountCacheHelperTest extends TestCase
         Assert::isNull();
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function testDecrementSegmentContactCount(): void
     {
         $segmentId = 1;
         $this->cacheStorageHelperMock
-            ->expects(self::at(0))
+            ->expects(self::once())
             ->method('has')
             ->with('segment.'.$segmentId.'.lead')
             ->willReturn(true);
         $this->cacheStorageHelperMock
-            ->expects(self::at(1))
+            ->expects(self::once())
             ->method('get')
             ->with('segment.'.$segmentId.'.lead')
             ->willReturn('10');
         // Decrement count.
         $this->cacheStorageHelperMock
-            ->expects(self::at(2))
+            ->expects(self::once())
             ->method('set')
             ->with('segment.'.$segmentId.'.lead', 9);
         $this->segmentCountCacheHelper->decrementSegmentContactCount($segmentId);
         Assert::isNull();
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function testDecrementSegmentCountIsNotNegative(): void
     {
         $segmentId = 1;
         $this->cacheStorageHelperMock
-            ->expects(self::at(0))
+            ->expects(self::once())
             ->method('has')
             ->with('segment.'.$segmentId.'.lead')
             ->willReturn(true);
         $this->cacheStorageHelperMock
-            ->expects(self::at(1))
+            ->expects(self::once())
             ->method('get')
             ->with('segment.'.$segmentId.'.lead')
             ->willReturn('0');
         // Edge case. Should not decrement below 0.
         $this->cacheStorageHelperMock
-            ->expects(self::at(2))
+            ->expects(self::once())
             ->method('set')
             ->with('segment.'.$segmentId.'.lead', 0);
         $this->segmentCountCacheHelper->decrementSegmentContactCount($segmentId);
