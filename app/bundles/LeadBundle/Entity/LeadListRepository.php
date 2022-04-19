@@ -3,9 +3,9 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Exception;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
-use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class LeadListRepository extends CommonRepository
@@ -57,7 +57,7 @@ class LeadListRepository extends CommonRepository
                 ->setParameter('listId', $id)
                 ->getQuery()
                 ->getSingleResult();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $entity = null;
         }
 
@@ -262,7 +262,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return array|int
      *
-     * @throws InvalidArgumentException
+     * @throws Exception
      */
     public function getLeadCount($listIds)
     {
@@ -434,7 +434,7 @@ class LeadListRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter)
     {
-        list($expr, $parameters) = parent::addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = parent::addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }

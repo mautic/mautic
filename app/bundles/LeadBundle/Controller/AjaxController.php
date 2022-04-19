@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Doctrine\DBAL\DBALException;
+use Exception;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -22,7 +22,6 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -949,8 +948,7 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @throws DBALException
-     * @throws InvalidArgumentException
+     * @throws Exception
      */
     protected function getLeadCountAction(Request $request): JsonResponse
     {
@@ -970,6 +968,9 @@ class AjaxController extends CommonAjaxController
         return new JsonResponse($this->prepareJsonResponse($leadCount));
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function prepareJsonResponse(int $leadCount): array
     {
         return [

@@ -2,16 +2,14 @@
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
+use Exception;
 use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
 class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
-    /**
-     * @var SegmentCountCacheHelper
-     */
-    private $segmentCountCacheHelper;
+    private ?SegmentCountCacheHelper $segmentCountCacheHelper = null;
 
     protected function setUp(): void
     {
@@ -32,7 +30,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testCampaignExecutionForAll()
     {
@@ -198,7 +196,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testCampaignExecutionForOne()
     {
@@ -546,8 +544,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \Exception
+     * @throws Exception
      */
     public function testSegmentCacheCount(): void
     {

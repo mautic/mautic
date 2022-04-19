@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Command;
 
+use Exception;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
@@ -14,7 +15,6 @@ use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
-use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -227,7 +227,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     /**
      * @return int|null
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -312,12 +312,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @throws InvalidArgumentException
-     * @throws \Doctrine\ORM\Query\QueryException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
-     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
-     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     * @throws Exception
      */
     private function triggerCampaign(Campaign $campaign)
     {
@@ -356,7 +351,7 @@ class TriggerCampaignCommand extends ModeratedCommand
             if (!$this->scheduleOnly && !$this->kickoffOnly) {
                 $this->executeInactive();
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             if ('prod' !== MAUTIC_ENV) {
                 // Throw the exception for dev/test mode
                 throw $exception;
@@ -423,11 +418,11 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws Exception
      */
     private function updateCampaignSegmentContactCount(Campaign $campaign): void
     {
-        $segmentIds = $this->campaignRepository->getCampaignListIds($campaign->getId());
+        $segmentIds = $this->campaignRepository->getCampaignListIds((int) $campaign->getId());
 
         foreach ($segmentIds as $segmentId) {
             $totalLeadCount = $this->listModel->getRepository()->getLeadCount($segmentId);
