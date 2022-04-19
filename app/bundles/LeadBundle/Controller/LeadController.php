@@ -74,6 +74,9 @@ class LeadController extends FormController
 
         //do some default filtering
         $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        // Add an id field to orderBy. Prevent Null-value ordering
+        $orderById  = 'l.id' !== $orderBy ? ', l.id' : '';
+        $orderBy    = $orderBy.$orderById;
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
 
         $filter      = ['string' => $search, 'force' => ''];
@@ -1571,7 +1574,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -1674,7 +1676,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -1771,7 +1772,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -1871,7 +1871,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -1949,6 +1948,9 @@ class LeadController extends FormController
         $session    = $this->get('session');
         $search     = $session->get('mautic.lead.filter', '');
         $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        // Add an id field to orderBy. Prevent Null-value ordering
+        $orderById  = 'l.id' !== $orderBy ? ', l.id' : '';
+        $orderBy    = $orderBy.$orderById;
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
         $ids        = $this->request->get('ids');
 

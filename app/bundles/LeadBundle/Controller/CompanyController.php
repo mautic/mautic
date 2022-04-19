@@ -791,7 +791,6 @@ class CompanyController extends FormController
                 $this->addFlash(
                     'mautic.company.notice.batch_deleted',
                     [
-                        'pluralCount' => $deleted,
                         '%count%'     => $deleted,
                     ]
                 );

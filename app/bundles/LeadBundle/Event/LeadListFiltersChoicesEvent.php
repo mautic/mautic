@@ -29,17 +29,20 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
      */
     protected $translator;
 
+    private string $search;
+
     /**
      * @param mixed[] $choices
      * @param mixed[] $operators
      */
-    public function __construct($choices, $operators, TranslatorInterface $translator, Request $request = null)
+    public function __construct($choices, $operators, TranslatorInterface $translator, Request $request = null, string $search = '')
     {
         parent::__construct($request);
 
         $this->choices    = $choices;
         $this->operators  = $operators;
         $this->translator = $translator;
+        $this->search     = $search;
     }
 
     /**
@@ -64,6 +67,11 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
     public function getTranslator()
     {
         return $this->translator;
+    }
+
+    public function getSearch(): string
+    {
+        return $this->search;
     }
 
     /**

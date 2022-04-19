@@ -199,4 +199,9 @@ class ContactSegmentFilterCrate
     {
         return $this->nullValue;
     }
+
+    public function getObject(): ?string
+    {
+        return $this->object;
+    }
 }
