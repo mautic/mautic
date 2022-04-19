@@ -249,7 +249,10 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         self::assertSame(Response::HTTP_NOT_FOUND, $response['statusCode']);
     }
 
-    private function saveContacts($count = 4): array
+    /**
+     * @return Lead[]
+     */
+    private function saveContacts(int $count = 4): array
     {
         $contacts = [];
 
@@ -271,6 +274,11 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         return trim($content);
     }
 
+    /**
+     * @param array<string, mixed> $parameter
+     *
+     * @return array<string, mixed>
+     */
     private function callGetLeadCountAjaxRequest(array $parameter): array
     {
         $this->client->request(Request::METHOD_POST, '/s/ajax?action=lead:getLeadCount', $parameter);

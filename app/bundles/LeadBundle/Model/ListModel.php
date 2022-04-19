@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\DBALException;
-use Doctrine\ORM\ORMException;
+use Exception;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -30,10 +30,8 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
-use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
-use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -358,7 +356,7 @@ class ListModel extends FormModel
     /**
      * @return array
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getVersionNew(LeadList $entity)
     {
@@ -393,11 +391,7 @@ class ListModel extends FormModel
      *
      * @return int
      *
-     * @throws DBALException
-     * @throws InvalidArgumentException
-     * @throws ORMException
-     * @throws SegmentQueryException
-     * @throws \Exception
+     * @throws Exception
      */
     public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, OutputInterface $output = null)
     {
@@ -610,8 +604,7 @@ class ListModel extends FormModel
      * @param int            $searchListLead  0 = reference, 1 = yes, -1 = known to not exist
      * @param \DateTime      $dateManipulated
      *
-     * @throws ORMException
-     * @throws InvalidArgumentException
+     * @throws Exception
      */
     public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1, $dateManipulated = null)
     {
@@ -750,8 +743,7 @@ class ListModel extends FormModel
      * @param bool $batchProcess
      * @param bool $skipFindOne
      *
-     * @throws ORMException
-     * @throws InvalidArgumentException
+     * @throws Exception
      */
     public function removeLead($lead, $lists, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false)
     {
@@ -1334,7 +1326,11 @@ class ListModel extends FormModel
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @param array<int> $listIds
+     *
+     * @return array<int>
+     *
+     * @throws Exception
      */
     public function getSegmentContactCountFromCache(array $listIds): array
     {
@@ -1347,16 +1343,17 @@ class ListModel extends FormModel
         return $leadCounts;
     }
 
-    /**
-     * @throws DBALException
-     */
     public function leadListExists(int $id): bool
     {
         return $this->getRepository()->leadListExists($id);
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @param array<int> $listIds
+     *
+     * @return array<int>
+     *
+     * @throws Exception
      */
     public function getSegmentContactCount(array $listIds): array
     {

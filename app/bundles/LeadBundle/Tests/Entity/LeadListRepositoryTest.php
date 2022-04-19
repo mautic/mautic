@@ -13,7 +13,6 @@ use Doctrine\ORM\Query\Expr;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Cache\InvalidArgumentException;
 
 class LeadListRepositoryTest extends TestCase
 {
@@ -23,7 +22,7 @@ class LeadListRepositoryTest extends TestCase
     private $connection;
 
     /**
-     * @var ResultStatement|MockObject
+     * @var MockObject
      */
     private $stmt;
 
@@ -60,9 +59,6 @@ class LeadListRepositoryTest extends TestCase
         $entityManager->method('getConnection')->willReturn($this->connection);
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function testGetMultipleLeadCounts(): void
     {
         $listIds = [765, 766];
@@ -99,9 +95,6 @@ class LeadListRepositoryTest extends TestCase
         self::assertSame(array_combine($listIds, $counts), $this->repository->getLeadCount($listIds));
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function testGetSingleLeadCount(): void
     {
         $listIds     = [765];
@@ -148,6 +141,9 @@ class LeadListRepositoryTest extends TestCase
         self::assertSame($counts[0], $this->repository->getLeadCount($listIds));
     }
 
+    /**
+     * @param array<mixed> $queryResult
+     */
     private function mockGetLeadCount(array $queryResult): void
     {
         $this->connection
