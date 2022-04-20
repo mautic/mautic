@@ -11,6 +11,8 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
