@@ -109,10 +109,10 @@
         Require all denied
     </FilesMatch>
 
-    # Except those whitelisted bellow.
-    <FilesMatch "^(index|index_dev|filemanager|upgrade)\.php$">
+    # Except those allowed below.
+    <If "%{REQUEST_URI} =~ m#^/(index|index_dev|upgrade/upgrade)\.php#">
         Require all granted
-    </FilesMatch>
+    </If>
 </IfModule>
 
 # Fallback for Apache < 2.4
@@ -129,10 +129,10 @@
         Deny from all
     </FilesMatch>
 
-    # Except those whitelisted bellow.
-    <FilesMatch "^(index|index_dev|filemanager|upgrade)\.php$">
+    # Except those allowed below.
+    <If "%{REQUEST_URI} =~ m#^/(index|index_dev|upgrade/upgrade)\.php#">
         Order allow,deny
         Allow from all
-    </FilesMatch>
+    </If>
 </IfModule>
 

@@ -53,7 +53,7 @@ class AssetRepository extends CommonRepository
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('a.title', ':search'))
-                ->setParameter('search', "{$search}%");
+                ->setParameter('search', "%{$search}%");
         }
 
         if (!$viewOther) {

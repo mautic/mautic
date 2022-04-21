@@ -91,8 +91,13 @@ class TokenHelper
         $value = '';
         if (isset($lead[$alias])) {
             $value = $lead[$alias];
-        } elseif (isset($lead['companies'][0][$alias])) {
-            $value = $lead['companies'][0][$alias];
+        } elseif (!empty($lead['companies'])) {
+            foreach ($lead['companies'] as $company) {
+                if (1 === (int) $company['is_primary'] && $company[$alias]) {
+                    $value = $company[$alias];
+                    break;
+                }
+            }
         }
 
         if ('' !== $value) {
