@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
@@ -129,6 +130,9 @@ class PointSubscriber implements EventSubscriberInterface
         $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead, true);
     }
 
+    /**
+     * @return void
+     */
     public function onEmailOpenPointChange(PointChangeActionExecutedEvent $changeActionExecutedEvent)
     {
         $action = $changeActionExecutedEvent->getPointAction();
@@ -154,6 +158,9 @@ class PointSubscriber implements EventSubscriberInterface
         $changeActionExecutedEvent->setStatusFromLogs();
     }
 
+    /**
+     * @return void
+     */
     public function onEmailSentPointChange(PointChangeActionExecutedEvent $changeActionExecutedEvent)
     {
         $action = $changeActionExecutedEvent->getPointAction();

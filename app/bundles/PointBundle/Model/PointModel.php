@@ -258,22 +258,21 @@ class PointModel extends CommonFormModel
 
             $settings = $availableActions['actions'][$action->getType()];
 
-            if (!$action->getRepeatable()) {
-                if (isset($settings['eventName'])) {
-                    $pointChangeActionExecutedEvent = new PointChangeActionExecutedEvent($action, $lead, $eventDetails, $completedActions);
-                    $event                          = $this->dispatcher->dispatch($settings['eventName'], $pointChangeActionExecutedEvent);
-                    if (!$event->canChangePoints()) {
-                        continue;
-                    }
-                } else {
-                    // 1. step - can change points from callback
-                    if (!$this->invokeCallback($action, $lead, $eventDetails, $settings)) {
-                        continue;
-                    }
-                    // 2. step - can change points from log
-                    if (isset($completedActions[$action->getId()])) {
-                        continue;
-                    }
+            if (isset($settings['eventName'])) {
+                // 1. step - can change points from event
+                $pointChangeActionExecutedEvent = new PointChangeActionExecutedEvent($action, $lead, $eventDetails, $completedActions);
+                $event                          = $this->dispatcher->dispatch($settings['eventName'], $pointChangeActionExecutedEvent);
+                if (!$event->canChangePoints()) {
+                    continue;
+                }
+            } elseif (!$action->getRepeatable()) {
+                // 2. step - can change points from callback
+                if (!$this->invokeCallback($action, $lead, $eventDetails, $settings)) {
+                    continue;
+                }
+                // 3. step - can change points from log
+                if (isset($completedActions[$action->getId()])) {
+                    continue;
                 }
             }
 

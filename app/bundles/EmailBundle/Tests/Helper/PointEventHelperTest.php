@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\PointEventHelper;
@@ -40,6 +41,69 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
 
         $result = $helper->sendEmail($event, new Lead(), $this->getMockMauticFactory(true, false));
         $this->assertEquals(false, $result);
+    }
+
+    public function testValidateEmail()
+    {
+        $categoryMock = $this->getMockBuilder(Category::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getId'])
+            ->getMock();
+        $categoryMock->expects($this->any())
+            ->method('getId')->willReturn(1);
+
+        $emailMock = $this->getMockBuilder(Email::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getId', 'getCategory'])
+            ->getMock();
+        $emailMock->expects($this->any())
+            ->method('getId')->willReturn(4);
+        $emailMock->expects($this->any())
+            ->method('getCategory')->willReturn($categoryMock);
+
+        // validate email id in point action
+        $this->assertEquals(true, PointEventHelper::validateEmail($emailMock, [
+            'properties' => [
+                'emails' => [
+                    0 => '4',
+                ],
+                'categories'  => [],
+                'triggerMode' => 'internalId',
+            ],
+        ]));
+
+        // validate email id not in point action
+        $this->assertEquals(false, PointEventHelper::validateEmail($emailMock, [
+            'properties' => [
+                'emails' => [
+                    0 => '21',
+                ],
+                'categories'  => [],
+                'triggerMode' => 'internalId',
+            ],
+        ]));
+
+        // validate category id in point action
+        $this->assertEquals(true, PointEventHelper::validateEmail($emailMock, [
+            'properties' => [
+                'emails'     => [],
+                'categories' => [
+                    0 => 1,
+                ],
+                'triggerMode' => 'internalId',
+            ],
+        ]));
+
+        // validate category id not in point action
+        $this->assertEquals(false, PointEventHelper::validateEmail($emailMock, [
+            'properties' => [
+                'emails'     => [],
+                'categories' => [
+                    0 => 5,
+                ],
+                'triggerMode' => 'internalId',
+            ],
+        ]));
     }
 
     /**
