@@ -32,16 +32,16 @@ class PointChangeActionExecutedEventTest extends \PHPUnit\Framework\TestCase
         $this->leadMock         = $this->createMock(Lead::class);
         $this->eventDetailsMock = $this->createMock(Stat::class);
         $this->completedActions = [
-            1=> [
-                'internal_id'=> 99,
+            1 => [
+                99 => ['internal_id' => 99],
             ],
-            2=> [
-                'internal_id'=> 32,
+            2 => [
+                32 => ['internal_id' => 32],
             ],
         ];
     }
 
-    public function testSetStatusFromLogsCannotCahngePoints()
+    public function testSetStatusFromLogsCannotChangePoints()
     {
         $this->pointMock->method('getId')
             ->willReturn(1);
