@@ -239,7 +239,7 @@ class CompanyController extends FormController
                             '%url%'       => $this->generateUrl(
                                 'mautic_company_action',
                                 [
-                                    'objectAction' => 'edit',
+                                    'objectAction' => 'view',
                                     'objectId'     => $entity->getId(),
                                 ]
                             ),
