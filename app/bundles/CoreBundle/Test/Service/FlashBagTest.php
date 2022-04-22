@@ -79,12 +79,12 @@ class FlashBagTest extends TestCase
 
     public function testAddWithChoices(): void
     {
-        $message                    = 'message';
-        $messageVars['pluralCount'] = 2;
-        $translatedMessage          = 'translatedMessage';
-        $level                      = FlashBag::LEVEL_NOTICE;
-        $domain                     = 'flashes';
-        $addNotification            = false;
+        $message                      = 'message';
+        $messageVars['%count%']       = 2;
+        $translatedMessage            = 'translatedMessage';
+        $level                        = FlashBag::LEVEL_NOTICE;
+        $domain                       = 'flashes';
+        $addNotification              = false;
 
         $this->symfonyFlashBag
             ->expects($this->once())
@@ -98,8 +98,8 @@ class FlashBagTest extends TestCase
 
         $this->translator
             ->expects($this->once())
-            ->method('transChoice')
-            ->with($message, $messageVars['pluralCount'], $messageVars, $domain)
+            ->method('trans')
+            ->with($message, $messageVars, $domain)
             ->willReturn($translatedMessage);
 
         $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);

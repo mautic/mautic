@@ -12,7 +12,7 @@ on:
 jobs:
   phpunit:
     # We don't want the scheduled jobs to run on forks of Mautic
-    if: (github.event_name == 'schedule' && github.repository_owner == 'mautic') || (github.event_name != 'schedule')
+    if: (github.event_name == 'schedule' && (github.repository == 'mautic/mautic' || github.repository == 'mautic/api-library') ) || (github.event_name != 'schedule')
     runs-on: ubuntu-latest
 
     strategy:
@@ -107,7 +107,7 @@ jobs:
 
   misc:
     # We don't want the scheduled jobs to run on forks of Mautic
-    if: (github.event_name == 'schedule' && github.repository_owner == 'mautic') || (github.event_name != 'schedule')
+    if: (github.event_name == 'schedule' && (github.repository == 'mautic/mautic' || github.repository == 'mautic/api-library') ) || (github.event_name != 'schedule')
     runs-on: ubuntu-latest
 
     strategy:
@@ -124,7 +124,7 @@ jobs:
 
     - name: Get changed files
       id: changed-files
-      uses: tj-actions/changed-files@v6.2
+      uses: tj-actions/changed-files@v18.7
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2

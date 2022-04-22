@@ -98,10 +98,9 @@ class Fetcher
                         $this->dispatcher->dispatch(EmailEvents::EMAIL_PARSE, $event);
                     }
 
-                    $this->log[] = $this->translator->transChoice(
+                    $this->log[] = $this->translator->trans(
                         'mautic.email.fetch.processed',
-                        $processed,
-                        ['%processed%' => $processed, '%imapPath%' => $path, '%criteria%' => $criteria]
+                        ['%count%' => $processed, '%imapPath%' => $path, '%criteria%' => $criteria]
                     );
 
                     if ($limit && $this->processedMessageCounter >= $limit) {
