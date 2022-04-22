@@ -26,6 +26,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -40,7 +41,7 @@ final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
     private $em;
 
     /**
-     * @var MockObject|Session
+     * @var SessionInterface|MockObject
      */
     protected $session;
 

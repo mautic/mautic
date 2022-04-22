@@ -9,13 +9,25 @@ use Mautic\PointBundle\Event\PointChangeActionExecutedEvent;
 
 class PointChangeActionExecutedEventTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var Stat|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $eventDetailsMock;
 
+    /**
+     * @var Lead|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $leadMock;
 
+    /**
+     * @var Point|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $pointMock;
 
-    private $completedActions;
+    /**
+     * @var array<int, array<int, array<string, int>>>
+     */
+    private array $completedActions;
 
     protected function setUp(): void
     {
@@ -32,7 +44,7 @@ class PointChangeActionExecutedEventTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSetStatusFromLogsCannotChangePoints()
+    public function testSetStatusFromLogsCannotChangePoints(): void
     {
         $this->pointMock->method('getId')
             ->willReturn(1);
@@ -42,7 +54,7 @@ class PointChangeActionExecutedEventTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($event->canChangePoints());
     }
 
-    public function testSetStatusFromLogsCanChangePoints()
+    public function testSetStatusFromLogsCanChangePoints(): void
     {
         $this->pointMock->method('getId')
             ->willReturn(9);
@@ -52,7 +64,7 @@ class PointChangeActionExecutedEventTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($event->canChangePoints());
     }
 
-    public function testSetStatusFromLogsByInternalIdCannotChangePoints()
+    public function testSetStatusFromLogsByInternalIdCannotChangePoints(): void
     {
         $this->pointMock->method('getId')
             ->willReturn(1);
@@ -62,7 +74,7 @@ class PointChangeActionExecutedEventTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($event->canChangePoints());
     }
 
-    public function testSetStatusFromLogsByInternalIdCanChangePoints()
+    public function testSetStatusFromLogsByInternalIdCanChangePoints(): void
     {
         $this->pointMock->method('getId')
             ->willReturn(1);

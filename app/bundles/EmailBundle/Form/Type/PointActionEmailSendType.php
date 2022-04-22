@@ -8,7 +8,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class PointActionEmailSendType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    /**
+     * @param FormBuilderInterface<string|FormBuilderInterface> $builder
+     * @param array<mixed>                                      $options
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'emails',

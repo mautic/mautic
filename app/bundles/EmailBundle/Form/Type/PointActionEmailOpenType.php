@@ -9,6 +9,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 class PointActionEmailOpenType extends EmailOpenType
 {
     /**
+     * @param FormBuilderInterface<string|FormBuilderInterface> $builder
+     * @param array<mixed>                                      $options
+     *
      * @return void
      */
     public function buildForm(FormBuilderInterface $builder, array $options)

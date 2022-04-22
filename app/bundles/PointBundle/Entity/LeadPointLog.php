@@ -134,7 +134,7 @@ class LeadPointLog
     /**
      * @param int|string $internalId
      */
-    public function setInternalId($internalId)
+    public function setInternalId($internalId): void
     {
         $this->internalId = $internalId;
     }

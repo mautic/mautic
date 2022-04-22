@@ -43,7 +43,7 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(false, $result);
     }
 
-    public function testValidateEmail()
+    public function testValidateEmail(): void
     {
         $categoryMock = $this->getMockBuilder(Category::class)
             ->disableOriginalConstructor()

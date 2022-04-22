@@ -295,7 +295,7 @@ class PointModel extends CommonFormModel
         }
     }
 
-    private function adjustLeadPoints(Point $action, Lead $lead)
+    private function adjustLeadPoints(Point $action, Lead $lead): void
     {
         $delta = $action->getDelta();
         $lead->adjustPoints($delta);
@@ -310,9 +310,14 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * @param $eventDetails
+     * @depreacated need replace by eventName
+     *
+     * @param mixed             $eventDetails
+     * @param array<string|int> $settings
      *
      * @return bool
+     *
+     * @throws \ReflectionException
      */
     private function invokeCallback(Point $action, Lead $lead, $eventDetails, array $settings)
     {
