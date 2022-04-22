@@ -11,9 +11,10 @@ class ResponseItemTest extends \PHPUnit\Framework\TestCase
     public function testFullResponseItem()
     {
         $item = [
-            'email'  => 'info@example.com',
-            'reason' => 'My reason',
-            'event'  => 'bounce',
+            'email'           => 'info@example.com',
+            'reason'          => 'My reason',
+            'event'           => 'bounce',
+            'mautic_metadata' => 'a:1:{s:16:"info@example.com";a:1:{s:7:"emailId";i:1;}}',
         ];
 
         $responseItem = new ResponseItem($item);
@@ -21,6 +22,7 @@ class ResponseItemTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('info@example.com', $responseItem->getEmail());
         $this->assertSame('My reason', $responseItem->getReason());
         $this->assertSame(DoNotContact::BOUNCED, $responseItem->getDncReason());
+        $this->assertSame(1, $responseItem->getChannel());
     }
 
     public function testResponseItemWithoutReason()
@@ -35,6 +37,7 @@ class ResponseItemTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('info@example.com', $responseItem->getEmail());
         $this->assertNull($responseItem->getReason());
         $this->assertSame(DoNotContact::BOUNCED, $responseItem->getDncReason());
+        $this->assertNull($responseItem->getChannel());
     }
 
     public function testResponseItemWithoutEmail()

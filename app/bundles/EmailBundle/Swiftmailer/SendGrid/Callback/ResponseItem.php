@@ -22,6 +22,11 @@ class ResponseItem
     private $dncReason;
 
     /**
+     * @var int|null
+     */
+    private $channel;
+
+    /**
      * @throws ResponseItemException
      */
     public function __construct(array $item)
@@ -29,9 +34,13 @@ class ResponseItem
         if (empty($item['email'])) {
             throw new ResponseItemException();
         }
+        if (isset($item['mautic_metadata'])) {
+            $item['mautic_metadata'] = unserialize($item['mautic_metadata']);
+        }
         $this->email     = $item['email'];
         $this->reason    = !empty($item['reason']) ? $item['reason'] : null;
         $this->dncReason = CallbackEnum::convertEventToDncReason($item['event']);
+        $this->channel   = !empty($item['mautic_metadata'][$this->email]['emailId']) ? $item['mautic_metadata'][$this->email]['emailId'] : null;
     }
 
     /**
@@ -56,5 +65,13 @@ class ResponseItem
     public function getDncReason()
     {
         return $this->dncReason;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getChannel()
+    {
+        return $this->channel;
     }
 }

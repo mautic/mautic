@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
 
+use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailMetadata;
 use SendGrid\BccSettings;
 use SendGrid\Mail;
@@ -14,7 +15,7 @@ class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
     {
         $sendGridMailMetadata = new SendGridMailMetadata();
 
-        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+        $message = $this->getMockBuilder(MauticMessage::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -28,12 +29,25 @@ class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn(['bcc@example.com' => 'bcc@example.com']);
 
+        $message->expects($this->exactly(1))
+            ->method('getTo')
+            ->with()
+            ->willReturn(['to@example.com' => 'to@example.com']);
+
+        $message->expects($this->exactly(1))
+            ->method('getMetadata')
+            ->with()
+            ->willReturn(['to@example.com' => ['emailId' => 123]]);
+
         $mail = new Mail('from', 'subject', 'to', 'content');
 
         $sendGridMailMetadata->addMetadataToMail($mail, $message);
 
         $replyTo = new ReplyTo('email@example.com');
         $this->assertEquals($replyTo, $mail->getReplyTo());
+
+        $customArgs = ['mautic_metadata' => serialize(['to@example.com' => ['emailId' => 123]])];
+        $this->assertEquals($customArgs, $mail->getCustomArgs());
 
         /**
          * @var MailSettings
