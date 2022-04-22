@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -99,6 +90,11 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|UserModel
      */
     private $userModel;
+
+    /**
+     * @var MockObject|UserHelper
+     */
+    private $userHelper;
 
     /**
      * @var MockObject|Translator
@@ -191,7 +187,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private $doNotContact;
 
     /**
-     * @var CorePermissions|MockObject
+     * @var MockObject|CorePermissions
      */
     private $corePermissions;
 
@@ -211,6 +207,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel                = $this->createMock(LeadModel::class);
         $this->trackableModel           = $this->createMock(TrackableModel::class);
         $this->userModel                = $this->createMock(UserModel::class);
+        $this->userHelper               = $this->createMock(UserHelper::class);
         $this->translator               = $this->createMock(Translator::class);
         $this->emailEntity              = $this->createMock(Email::class);
         $this->entityManager            = $this->createMock(EntityManager::class);
@@ -253,6 +250,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->emailModel->setTranslator($this->translator);
         $this->emailModel->setEntityManager($this->entityManager);
+        $this->emailModel->setSecurity($this->corePermissions);
     }
 
     /**
@@ -611,7 +609,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $messageModel = new MessageQueueModel($this->leadModel, $this->companyModel, $coreParametersHelper);
         $messageModel->setEntityManager($this->entityManager);
-        $messageModel->setUserHelper($this->createMock(UserHelper::class));
+        $messageModel->setUserHelper($this->userHelper);
         $messageModel->setDispatcher($this->createMock(EventDispatcher::class));
 
         $emailModel = new EmailModel(
@@ -701,6 +699,72 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailModel->setDispatcher($this->createMock(EventDispatcher::class));
 
         $this->emailModel->hitEmail($stat, $request);
+    }
+
+    public function testGetLookupResultsWithNameIsKey(): void
+    {
+        $this->emailModel->setUserHelper($this->userHelper);
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($this->emailRepository);
+
+        $this->emailRepository->expects($this->once())
+            ->method('getEmailList')
+            ->with(
+                '',
+                0,
+                0,
+                null,
+                false,
+                null,
+                [],
+                null
+            )
+            ->willReturn([
+                [
+                    'id'       => 123,
+                    'name'     => 'Email 123',
+                    'language' => 'EN',
+                ],
+            ]);
+
+        $this->assertSame(
+            ['EN' => ['Email 123' => 123]],
+            $this->emailModel->getLookupResults('email', '', 0, 0, ['name_is_key' => true])
+        );
+    }
+
+    public function testGetLookupResultsWithWithDefaultOptions(): void
+    {
+        $this->emailModel->setUserHelper($this->userHelper);
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($this->emailRepository);
+
+        $this->emailRepository->expects($this->once())
+            ->method('getEmailList')
+            ->with(
+                '',
+                0,
+                0,
+                null,
+                false,
+                null,
+                [],
+                null
+            )
+            ->willReturn([
+                [
+                    'id'       => 123,
+                    'name'     => 'Email 123',
+                    'language' => 'EN',
+                ],
+            ]);
+
+        $this->assertSame(
+            ['EN' => [123 => 'Email 123']],
+            $this->emailModel->getLookupResults('email', '', 0, 0)
+        );
     }
 
     public function testGetEmailListStatsOneSegment()
