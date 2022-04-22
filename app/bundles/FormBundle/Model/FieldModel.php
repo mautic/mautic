@@ -87,10 +87,12 @@ class FieldModel extends CommonFormModel
         $choices = [];
 
         foreach ($fields as $alias => $field) {
+            if (empty($field['isPublished'])) {
+                continue;
+            }
             if (!isset($choices[$field['group_label']])) {
                 $choices[$field['group_label']] = [];
             }
-
             $choices[$field['group_label']][$field['label']] = $alias;
         }
 

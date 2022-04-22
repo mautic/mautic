@@ -577,12 +577,31 @@ return [
                     'mautic.lead.model.dnc',
                 ],
             ],
-            'mautic.lead.subscriber.segment.filter' => [
-                'class'     => \Mautic\LeadBundle\EventListener\SegmentFiltersSubscriber::class,
+            'mautic.lead.subscriber.filterOperator' => [
+                'class'     => \Mautic\LeadBundle\EventListener\FilterOperatorSubscriber::class,
                 'arguments' => [
+                    'mautic.lead.segment.operator_options',
+                    'mautic.lead.repository.field',
+                    'mautic.lead.provider.typeOperator',
+                    'mautic.lead.provider.fieldChoices',
                     'translator',
-                    'mautic.lead.model.list',
                 ],
+            ],
+            'mautic.lead.subscriber.typeOperator' => [
+                'class'     => \Mautic\LeadBundle\EventListener\TypeOperatorSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.list',
+                    'mautic.campaign.model.campaign',
+                    'mautic.email.model.email',
+                    'mautic.stage.model.stage',
+                    'mautic.category.model.category',
+                    'mautic.asset.model.asset',
+                    'translator',
+                ],
+            ],
+            'mautic.lead.subscriber.segmentOperatorQuery' => [
+                'class'     => \Mautic\LeadBundle\EventListener\SegmentOperatorQuerySubscriber::class,
             ],
             'mautic.lead.generated_columns.subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\GeneratedColumnSubscriber::class,
@@ -606,14 +625,6 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.lead.model.list',
-                    'mautic.email.model.email',
-                    'mautic.security',
-                    'mautic.lead.model.lead',
-                    'mautic.stage.model.stage',
-                    'mautic.category.model.category',
-                    'mautic.helper.user',
-                    'mautic.campaign.model.campaign',
-                    'mautic.asset.model.asset',
                 ],
             ],
             'mautic.form.type.leadlist_choices' => [
@@ -622,11 +633,9 @@ return [
             ],
             'mautic.form.type.leadlist_filter' => [
                 'class'       => \Mautic\LeadBundle\Form\Type\FilterType::class,
-                'arguments'   => ['translator', 'request_stack'],
-                'methodCalls' => [
-                    'setConnection' => [
-                        'database_connection',
-                    ],
+                'arguments'   => [
+                    'mautic.lead.provider.formAdjustments',
+                    'mautic.lead.model.list',
                 ],
             ],
             'mautic.form.type.leadfield' => [
@@ -794,6 +803,9 @@ return [
                     'mautic.lead.model.lead',
                 ],
             ],
+            'mautic.segment.config' => [
+                'class' => \Mautic\LeadBundle\Form\Type\SegmentConfigType::class,
+            ],
         ],
         'other' => [
             'mautic.lead.doctrine.subscriber' => [
@@ -821,6 +833,8 @@ return [
                     'mautic.lead.model.list',
                     'mautic.helper.field.alias',
                     '@doctrine.orm.entity_manager',
+                    'translator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
                 ],
             ],
             \Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class => [
@@ -1030,31 +1044,31 @@ return [
             //  Segment Filter Query builders
             'mautic.lead.query.builder.basic' => [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
             ],
             'mautic.lead.query.builder.foreign.value' => [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
             ],
             'mautic.lead.query.builder.foreign.func' => [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
             ],
             'mautic.lead.query.builder.special.dnc' => [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
             ],
             'mautic.lead.query.builder.special.integration' => [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
             ],
             'mautic.lead.query.builder.special.sessions' => [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
             ],
             'mautic.lead.query.builder.complex_relation.value' => [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'event_dispatcher'],
             ],
             'mautic.lead.query.builder.special.leadlist' => [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder::class,
@@ -1062,7 +1076,9 @@ return [
                     'mautic.lead.model.random_parameter_name',
                     'mautic.lead.repository.lead_segment_query_builder',
                     'doctrine.orm.entity_manager',
-                    'mautic.lead.model.lead_segment_filter_factory', ],
+                    'mautic.lead.model.lead_segment_filter_factory',
+                    'event_dispatcher',
+                ],
             ],
         ],
         'helpers' => [
@@ -1151,7 +1167,9 @@ return [
             ],
             'mautic.lead.repository.lead_segment_filter_descriptor' => [
                 'class'     => \Mautic\LeadBundle\Services\ContactSegmentFilterDictionary::class,
-                'arguments' => [],
+                'arguments' => [
+                    'event_dispatcher',
+                ],
             ],
             'mautic.lead.repository.lead_segment_query_builder' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder::class,
@@ -1192,9 +1210,7 @@ return [
             'mautic.lead.model.lead_segment_filter_operator' => [
                 'class'     => \Mautic\LeadBundle\Segment\ContactSegmentFilterOperator::class,
                 'arguments' => [
-                    'translator',
-                    'event_dispatcher',
-                    'mautic.lead.segment.operator_options',
+                    'mautic.lead.provider.fillterOperator',
                 ],
             ],
             'mautic.lead.model.lead_segment_decorator_factory' => [
@@ -1247,6 +1263,32 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.lead.provider.fillterOperator' => [
+                'class'     => \Mautic\LeadBundle\Provider\FilterOperatorProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'translator',
+                ],
+            ],
+            'mautic.lead.provider.typeOperator' => [
+                'class'     => \Mautic\LeadBundle\Provider\TypeOperatorProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.lead.provider.fillterOperator',
+                ],
+            ],
+            'mautic.lead.provider.fieldChoices' => [
+                'class'     => \Mautic\LeadBundle\Provider\FieldChoicesProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.provider.formAdjustments' => [
+                'class'     => \Mautic\LeadBundle\Provider\FormAdjustmentsProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
                 ],
             ],
             'mautic.lead.model.random_parameter_name' => [
@@ -1541,5 +1583,6 @@ return [
         \Mautic\LeadBundle\Field\Settings\BackgroundSettings::CREATE_CUSTOM_FIELD_IN_BACKGROUND => false,
         'company_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
         'contact_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
+        'segment_rebuild_time_warning'                                                          => 30,
     ],
 ];
