@@ -1,6 +1,6 @@
 ## Reporting Security Vulnerabilities
 
-If you think that you have found a security vulnerability, please email security@mautic.org with as much detail as possible. The Core Team will review the vulnerability and if found applicable, will assign a CVE ID and issue a fix. The vulnerability will be disclosed once the patch has been included into a release. 
+If you think that you have found a security vulnerability, please report it at [https://huntr.dev](https://huntr.dev) with as much detail as possible. The Core Team will review the vulnerability and if found applicable, will assign a CVE ID and issue a fix. The vulnerability will be disclosed once the patch has been included into a release. 
 
 ## Contributing to Mautic
 
