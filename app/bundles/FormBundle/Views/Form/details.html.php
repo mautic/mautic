@@ -333,7 +333,9 @@ $showActions = count($activeFormActions);
                             true
                         ); ?>" width="300" height="300"&gt;&lt;p&gt;Your browser does not support iframes.&lt;/p&gt;&lt;/iframe&gt;</textarea>
                     <i><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy.iframe.note'); ?></i>
-                </div>
+                    <h3 class="pt-lg"><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy.wordpress'); ?></h3>
+                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lsqb;mautic type="form" id="&lcub;&lcub;<?php echo$activeForm->getId(); ?>&rcub;&rcub;"&rsqb;</textarea>
+               </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $view['translator']->trans(
                             'mautic.core.close'
