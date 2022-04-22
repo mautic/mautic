@@ -842,6 +842,9 @@ return [
                 'class'     => \Mautic\EmailBundle\Model\SendEmailToUser::class,
                 'arguments' => [
                     'mautic.email.model.email',
+                    'event_dispatcher',
+                    'mautic.lead.validator.custom_field',
+                    'mautic.validator.email',
                 ],
             ],
             'mautic.email.model.send_email_to_contacts' => [
@@ -893,6 +896,14 @@ return [
                 ],
                 'tag' => 'validator.constraint_validator',
             ],
+            'mautic.email.validator.email_or_token_list_validator' => [
+                'class'     => \Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator::class,
+                'arguments' => [
+                    'mautic.validator.email',
+                    'mautic.lead.validator.custom_field',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
         ],
         'repositories' => [
             'mautic.email.repository.email' => [
@@ -929,6 +940,7 @@ return [
         'mailer_api_key'                 => null, // Api key from mail delivery provider.
         'mailer_from_name'               => 'Mautic',
         'mailer_from_email'              => 'email@yoursite.com',
+        'mailer_reply_to_email'          => null,
         'mailer_return_path'             => null,
         'mailer_transport'               => 'smtp',
         'mailer_append_tracking_pixel'   => true,

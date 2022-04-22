@@ -14,7 +14,6 @@ namespace Mautic\FormBundle\EventListener;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
-use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -33,35 +32,17 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var MailHelper
-     */
-    private $mailer;
+    private MailHelper $mailer;
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private AuditLogModel $auditLogModel;
 
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
+    private IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private RouterInterface $router;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -253,8 +234,12 @@ class FormSubscriber implements EventSubscriberInterface
             // Use the cleaned value by default - but if set to not save result, get from post
             $value               = (isset($results[$field['alias']])) ? $results[$field['alias']] : $post[$field['alias']];
             $matchedFields[$key] = $field['alias'];
-            $payload[$key]       = $value;
+
+            // decode html chars and quotes before posting to next form
+            $payload[$key]       = htmlspecialchars_decode($value, ENT_QUOTES);
         }
+
+        $event->setPostSubmitPayload($payload);
 
         $headers = [
             'X-Forwarded-For' => $event->getSubmission()->getIpAddress()->getIpAddress(),

@@ -8,11 +8,15 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+
 //Check to see if the entire page should be displayed or just main content
 if ('index' == $tmpl):
     $view->extend('MauticLeadBundle:List:index.html.php');
 endif;
 $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list');
+$now         = (new DateTimeHelper())->getUtcDateTime();
 ?>
 
 <?php if (count($items)): ?>
@@ -37,7 +41,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
                         'orderBy'    => 'l.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-leadlist-name',
@@ -47,7 +51,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
                         'text'       => 'mautic.lead.list.thead.leadcount',
                         'class'      => 'visible-md visible-lg col-leadlist-leadcount',
                     ]
@@ -56,7 +60,38 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
+                        'orderBy'    => 'l.dateAdded',
+                        'text'       => 'mautic.lead.import.label.dateAdded',
+                        'class'      => 'visible-md visible-lg col-leadlist-dateAdded',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'lead.list',
+                        'orderBy'    => 'l.dateModified',
+                        'text'       => 'mautic.lead.import.label.dateModified',
+                        'class'      => 'visible-md visible-lg col-leadlist-dateModified',
+                        'default'    => true,
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'lead.list',
+                        'orderBy'    => 'l.createdByUser',
+                        'text'       => 'mautic.core.createdby',
+                        'class'      => 'visible-md visible-lg col-leadlist-createdByUser',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'lead.list',
                         'orderBy'    => 'l.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-leadlist-id',
@@ -66,7 +101,16 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
             </tr>
             </thead>
             <tbody>
+            <?php /** @var \Mautic\LeadBundle\Entity\LeadList $item */?>
             <?php foreach ($items as $item): ?>
+                <?php
+                    $lastBuiltDateDifference = null;
+                    if ($item->getLastBuiltDate() instanceof \DateTime) {
+                        $lastBuiltDateDifferenceInterval = $now->diff($item->getLastBuiltDate());
+                        // Calculate difference between now and last_built_date in hours
+                        $lastBuiltDateDifference = (int) abs((new \DateTime())->setTimestamp(0)->add($lastBuiltDateDifferenceInterval)->getTimestamp() / 3600);
+                    }
+                ?>
                 <?php $mauticTemplateVars['item'] = $item; ?>
                 <tr>
                     <td>
@@ -124,6 +168,12 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             <?php if ($item->isGlobal()): ?>
                                 <i class="fa fa-fw fa-globe"></i>
                             <?php endif; ?>
+                            <?php if ($lastBuiltDateDifference >= $segmentRebuildWarningThreshold): ?>
+                                <label class="control-label" data-toggle="tooltip"
+                                       data-container="body" data-placement="top" title=""
+                                       data-original-title="<?php echo $view['translator']->transChoice('mautic.lead.list.form.config.segment_rebuild_time.message', $lastBuiltDateDifference, ['%hours%' => $lastBuiltDateDifference]); ?>">
+                                    <i class="fa text-danger fa-exclamation-circle"></i></label>
+                            <?php endif; ?>
                             <?php echo $view['content']->getCustomContent('segment.name', $mauticTemplateVars); ?>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>
@@ -144,6 +194,13 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             ); ?>
                         </a>
                     </td>
+                    <td class="visible-md visible-lg" title="<?php echo $item->getDateAdded() ? $view['date']->toFullConcat($item->getDateAdded()) : ''; ?>">
+                        <?php echo $item->getDateAdded() ? $view['date']->toDate($item->getDateAdded()) : ''; ?>
+                    </td>
+                    <td class="visible-md visible-lg" title="<?php echo $item->getDateModified() ? $view['date']->toFullConcat($item->getDateModified()) : ''; ?>">
+                        <?php echo $item->getDateModified() ? $view['date']->toDate($item->getDateModified()) : ''; ?>
+                    </td>
+                    <td class="visible-md visible-lg"><?php echo $view->escape($item->getCreatedByUser()); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
@@ -157,7 +214,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                     'page'       => $page,
                     'limit'      => $limit,
                     'baseUrl'    => $view['router']->path('mautic_segment_index'),
-                    'sessionVar' => 'segment',
+                    'sessionVar' => 'lead.list',
                 ]
             ); ?>
         </div>

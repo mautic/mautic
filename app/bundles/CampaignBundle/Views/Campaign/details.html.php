@@ -105,7 +105,7 @@ switch (true) {
                             <?php foreach ($sources as $sourceType => $typeNames): ?>
                             <?php if (!empty($typeNames)): ?>
                             <tr>
-                                <td width="20%"><span class="fw-b">
+                                <td width="20%"><span class="fw-b textTitle">
                                     <?php echo $view['translator']->trans('mautic.campaign.leadsource.'.$sourceType); ?>
                                 </td>
                                 <td>
@@ -231,8 +231,13 @@ switch (true) {
                 </div>
             <?php endif; ?>
             <!--/ #events-container -->
-            <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container">
-                <?php echo $campaignLeads; ?>
+            <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container" data-target-url="<?php
+                    echo $view['router']->url(
+                        'mautic_campaign_contacts',
+                        ['objectId' => $campaign->getId(), 'page' => $app->getSession()->get('mautic.campaign.contact.page', 1)]
+                    );
+                ?>">
+                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                 <div class="clearfix"></div>
             </div>
             <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>

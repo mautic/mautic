@@ -83,9 +83,9 @@ class StatsDAO
             $week = CalculatorHelper::getWeekFromDayString($day);
             if (!isset($flattenedWeeks[$week])) {
                 $flattenedWeeks[$week] = new WeekStat();
-                $flattenedWeeks[$week]->setCount($stats->getCount());
+                $flattenedWeeks[$week]->setCount($stats->getSum());
             } else {
-                $flattenedWeeks[$week]->addToCount($stats->getCount());
+                $flattenedWeeks[$week]->addToCount($stats->getSum());
             }
         }
 
@@ -131,7 +131,7 @@ class StatsDAO
             $stats = $dayStats->getStats();
 
             foreach ($stats as $hour => $hourStat) {
-                $flattenedHours[$hour] = $hourStat->getCount();
+                $flattenedHours[$hour] = $hourStat;
             }
         }
 

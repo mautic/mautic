@@ -1,5 +1,9 @@
 /** SmsBundle **/
 Mautic.smsOnLoad = function (container, response) {
+    mQuery('#sms_message').on("input", () => {
+        mQuery('#sms_nb_char').text((mQuery('#sms_message').val().length))
+    });
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'sms');
     }

@@ -49,7 +49,7 @@ class ReportFilterDataTransformer implements DataTransformerInterface
                 return $filters;
             }
             $type = $this->columns[$f['column']]['type'];
-            if (in_array($type, ['datetime', 'date', 'time', DateTimeType::class, DateType::class, TimeType::class])) {
+            if (in_array($type, ['datetime', 'time', DateTimeType::class, DateType::class, TimeType::class])) {
                 $dt         = new DateTimeHelper($f['value'], '', 'utc');
                 $f['value'] = $dt->toLocalString();
             }
@@ -75,7 +75,7 @@ class ReportFilterDataTransformer implements DataTransformerInterface
                 return $filters;
             }
             $type = $this->columns[$f['column']]['type'];
-            if (in_array($type, ['datetime', 'date', 'time'])) {
+            if (in_array($type, ['datetime', 'time'])) {
                 $dt         = new DateTimeHelper($f['value'], '', 'local');
                 $f['value'] = $dt->toUtcString();
             }
