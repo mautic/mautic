@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-paprika",
+            "directory": "themes/paprika",
+            "target": "git@github.com:mautic/theme-paprika.git"
+        }
+    ]
+}

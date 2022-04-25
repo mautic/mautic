@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'menu' => [
         'main' => [
@@ -163,6 +154,7 @@ return [
                     'mautic.dynamicContent.model.dynamicContent',
                     'mautic.campaign.executioner.realtime',
                     'event_dispatcher',
+                    'mautic.lead.model.lead',
                 ],
             ],
         ],

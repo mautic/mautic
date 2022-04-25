@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -21,7 +12,6 @@ use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -449,7 +440,7 @@ class PageModel extends FormModel
 
     /**
      * @param Page|Redirect $page
-     * @param string        $code
+     * @param string|int    $code
      * @param array         $query
      *
      * @throws \Exception
@@ -471,7 +462,7 @@ class PageModel extends FormModel
             $lead = $this->leadModel->getContactFromRequest($query);
 
             // company
-            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
+            [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
             if ($leadAdded) {
                 $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             } elseif ($companyEntity instanceof Company) {
@@ -1030,8 +1021,10 @@ class PageModel extends FormModel
         parse_str($urlQuery, $urlQueryArray);
 
         foreach ($urlQueryArray as $key => $value) {
-            $key           = strtolower($key);
-            $query[$key]   = urldecode($value);
+            if (is_string($value)) {
+                $key         = strtolower($key);
+                $query[$key] = urldecode($value);
+            }
         }
 
         return $query;

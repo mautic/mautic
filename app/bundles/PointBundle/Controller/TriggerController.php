@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -184,7 +175,7 @@ class TriggerController extends FormController
 
         $session      = $this->get('session');
         $pointTrigger = $this->request->request->get('pointtrigger', []);
-        $sessionId    = $pointTrigger['sessionId'] ?? 'mautic_'.sha1(uniqid(mt_rand(), true));
+        $sessionId    = $pointTrigger['sessionId'] ?? 'mautic_'.sha1(uniqid(random_int(1, PHP_INT_MAX), true));
 
         if (!$this->get('mautic.security')->isGranted('point:triggers:create')) {
             return $this->accessDenied();

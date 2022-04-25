@@ -1,23 +1,11 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
-use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Assert;

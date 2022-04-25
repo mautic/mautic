@@ -2,19 +2,9 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailType;

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -238,6 +229,18 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 $contacts[$contact->getId()] = $contact;
             }
         }
+
+        if (!$sms->isPublished()) {
+            foreach ($contacts as $leadId => $lead) {
+                $results[$leadId] = [
+                    'sent'   => false,
+                    'status' => 'mautic.sms.campaign.failed.unpublished',
+                ];
+            }
+
+            return $results;
+        }
+
         $contactIds = array_keys($contacts);
 
         /** @var DoNotContactRepository $dncRepo */

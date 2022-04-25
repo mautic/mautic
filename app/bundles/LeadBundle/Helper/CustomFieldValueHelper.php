@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -97,8 +88,10 @@ class CustomFieldValueHelper
                 return $value;
             }
             foreach ($list as $property) {
-                if ($property['value'] == $value) {
-                    $value = $property['label'];
+                if (isset($property[$value])) {
+                    return $property[$value];
+                } elseif (isset($property['value']) && $property['value'] == $value) {
+                    return $property['label'];
                 }
             }
         }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
@@ -163,7 +154,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $countryJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/countries.json');
         $countries   = json_decode($countryJson);
 
-        return  array_combine($countries, $countries);
+        return array_combine($countries, $countries);
     }
 
     /**
