@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
@@ -272,12 +263,16 @@ class ListController extends FormController
      *
      * @return Response
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function editAction($objectId, $ignorePost = false, bool $isNew = false)
     {
         $postActionVars = $this->getPostActionVars($objectId);
 
         try {
             $segment = $this->getSegment($objectId);
+
+            if ($isNew) {
+                $segment->setNew();
+            }
 
             return $this->createSegmentModifyResponse(
                 $segment,

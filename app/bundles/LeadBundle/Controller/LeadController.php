@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -1583,7 +1574,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -1686,7 +1676,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -1783,7 +1772,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -1883,7 +1871,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );

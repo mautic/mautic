@@ -10,6 +10,7 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Assert;
@@ -19,6 +20,20 @@ use Tightenco\Collect\Support\Collection;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     */
+    protected function createLeadCompany(Lead $contactA, Company $company): CompanyLead
+    {
+        $leadCompany = new CompanyLead();
+        $leadCompany->setLead($contactA);
+        $leadCompany->setCompany($company);
+        $leadCompany->setDateAdded(new \DateTime());
+        $this->em->persist($leadCompany);
+
+        return $leadCompany;
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -387,6 +402,30 @@ class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertStringContainsString('firstname: This field is required.', $clientResponse->getContent());
+    }
+
+    public function testCompanyIdSearchCommand(): void
+    {
+        $contactA = $this->createContact('contact@a.email');
+        $contactB = $this->createContact('contact@b.email');
+        $contactC = $this->createContact('contact@c.email');
+
+        $companyName = 'Doe Corp';
+        $company     = new Company();
+        $company->setName($companyName);
+        $this->em->persist($company);
+
+        $this->em->flush();
+
+        $this->createLeadCompany($contactA, $company);
+        $this->createLeadCompany($contactB, $company);
+
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=company_id:'.$company->getId());
+
+        $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
+        $this->assertEquals(2, $leadsTableRows->count(), $crawler->html());
     }
 
     private function createContact(string $email): Lead
