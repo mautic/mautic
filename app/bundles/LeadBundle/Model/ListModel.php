@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Exception\RecordCanNotBeDeletedException;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -188,8 +191,23 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $this->getRepository()->setSegmentAsDeleted($id);
 
         $entity->deletedId = $id;
-        $this->dispatcher->dispatch(new LeadListEvent($entity), LeadEvents::ON_LIST_DELETE);
+        $this->dispatchEvent($entity, 'on_list_delete');
         $entity->setId(null);
+    }
+
+    /**
+     * Check if entity can be deleted and returns an Exception var.
+     */
+    public function preDeleteEntity(LeadList $entity): ?RecordCanNotBeDeletedException
+    {
+        try {
+            $this->dispatchEvent('pre_delete', $entity);
+            // @phpstan-ignore-next-line
+        } catch (RecordCanNotBeDeletedException $deleteException) {
+            return $deleteException;
+        }
+
+        return null;
     }
 
     public function hardDeleteEntity(LeadList $leadList): void
@@ -259,6 +277,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 break;
             case 'pre_unpublish':
                 $name = LeadEvents::LIST_PRE_UNPUBLISH;
+                break;
+            case 'on_list_delete':
+                $name = LeadEvents::ON_LIST_DELETE;
                 break;
             default:
                 return null;
@@ -1388,7 +1409,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             } else {
                 $count               = $this->getRepository()->getLeadCount($listId);
                 $leadCounts[$listId] = $count;
-                $this->segmentCountCacheHelper->setSegmentContactCount($listId, $count);
+                $this->segmentCountCacheHelper->setSegmentContactCount($listId, (int) $count);
             }
         }
 

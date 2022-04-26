@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\CoreBundle\Exception\RecordCanNotBeDeletedException;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -204,7 +207,7 @@ class ListController extends FormController
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
-            $segment = $this->getSegment($objectId, LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER);
+            $segment = $this->getSegment((int) $objectId, LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER);
 
             return $this->createSegmentNewResponse(
                 $request,
@@ -215,7 +218,7 @@ class ListController extends FormController
                 $auditLogModel,
                 $postActionVars,
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
-                $ignorePost
+                (bool) $ignorePost
             );
         } catch (AccessDeniedException) {
             return $this->accessDenied();
@@ -247,7 +250,7 @@ class ListController extends FormController
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
-            $segment = $this->getSegment($objectId, LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER);
+            $segment = $this->getSegment((int) $objectId, LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER);
 
             if ($isNew) {
                 $segment->setNew();
@@ -537,6 +540,12 @@ class ListController extends FormController
                 return $this->accessDenied();
             } elseif ($model->isLocked($list)) {
                 return $this->isLocked($postActionVars, $list, 'lead.list');
+            } elseif (($deletedException = $model->preDeleteEntity($list)) instanceof RecordCanNotBeDeletedException) {
+                $postActionVars['responseCode'] = Response::HTTP_UNPROCESSABLE_ENTITY;
+                $flashes[]                      = [
+                    'type'  => 'notice',
+                    'msg'   => $deletedException->getMessage(),
+                ];
             } else {
                 $model->deleteEntity($list);
 
@@ -595,8 +604,9 @@ class ListController extends FormController
             $deleteIds   = [];
 
             // Loop over the IDs to perform access checks pre-delete
+            $deletedExceptions = [];
             foreach ($toBeDeleted as $objectId) {
-                $entity = $model->getEntity($objectId);
+                $entity              = $model->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -611,12 +621,22 @@ class ListController extends FormController
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.list', true);
                 } else {
-                    $deleteIds[] = $objectId;
+                    $deleteIds[]         = $objectId;
+                    $deletedExceptions[] = $model->preDeleteEntity($entity);
                 }
             }
 
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            $deletedExceptions = array_filter($deletedExceptions, fn ($e) => $e instanceof RecordCanNotBeDeletedException);
+            if (!empty($deletedExceptions)) {
+                $postActionVars['responseCode'] = Response::HTTP_UNPROCESSABLE_ENTITY;
+                foreach ($deletedExceptions as $deletedException) {
+                    $flashes[] = [
+                        'type'  => 'notice',
+                        'msg'   => $deletedException->getMessage(),
+                    ];
+                }
+            } elseif (!empty($deleteIds)) {
+                // Delete everything we are able to
                 $entities = $model->deleteEntities($deleteIds);
 
                 $flashes[] = [

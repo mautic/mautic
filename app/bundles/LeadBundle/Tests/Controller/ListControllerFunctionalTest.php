@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
 use Mautic\LeadBundle\Entity\Lead;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ListControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -29,6 +31,10 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
     protected SegmentCountCacheHelper $segmentCountCacheHelper;
 
     private LeadRepository $leadRepo;
+
+    private TranslatorInterface $translator;
+
+    private string $prefix;
 
     protected function setUp(): void
     {
@@ -43,73 +49,10 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         \assert($leadModel instanceof LeadModel);
         $this->segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
         $this->leadRepo                = $leadModel->getRepository();
-    }
-
-    public function testUnpublishUsedSegment(): void
-    {
-        $filter = [[
-            'glue'     => 'and',
-            'field'    => 'email',
-            'object'   => 'lead',
-            'type'     => 'email',
-            'operator' => '!empty',
-            'display'  => '',
-        ]];
-        $list1  = $this->saveSegment('s1', 's1', $filter);
-        $filter = [[
-            'object'     => 'lead',
-            'glue'       => 'and',
-            'field'      => 'leadlist',
-            'type'       => 'leadlist',
-            'operator'   => 'in',
-            'properties' => [
-                'filter' => [$list1->getId()],
-            ],
-            'display' => '',
-        ]];
-        $list2 = $this->saveSegment('s2', 's2', $filter);
-        $this->em->clear();
-        $expectedErrorMessage = sprintf('This segment is used in %s, please go back and check segments before unpublishing', $list2->getName());
-
-        $crawler = $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list1->getId()]);
-        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $this->client->getResponse()->getStatusCode());
-        $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list1->getId());
-        $this->assertResponseIsSuccessful();
-        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
-        $form['leadlist[isPublished]']->setValue('0');
-        $crawler = $this->client->submit($form);
-        $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
-    }
-
-    public function testUnpublishUnUsedSegment(): void
-    {
-        $filter = [[
-            'glue'     => 'and',
-            'field'    => 'email',
-            'object'   => 'lead',
-            'type'     => 'email',
-            'operator' => '!empty',
-            'display'  => '',
-        ]];
-        $list1 = $this->saveSegment('s1', 's1', $filter);
-        $list2 = $this->saveSegment('s2', 's2', $filter);
-        $this->em->clear();
-
-        $crawler = $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list1->getId()]);
-        $this->assertResponseIsSuccessful();
-
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list2->getId());
-        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
-        $form['leadlist[isPublished]']->setValue('0');
-        $crawler = $this->client->submit($form);
-        $this->assertResponseIsSuccessful();
-
-        $rows = $this->listRepo->findAll();
-        $this->assertCount(2, $rows);
-        $this->assertFalse($rows[0]->isPublished());
-        $this->assertFalse($rows[1]->isPublished());
+        \assert($this->leadRepo instanceof LeadRepository);
+        $this->prefix                  = self::getContainer()->getParameter('mautic.db_table_prefix');
+        $this->translator              = self::getContainer()->get('translator');
+        \assert($this->translator instanceof TranslatorInterface);
     }
 
     public function testBCSegmentWithPageHitInLeadObject(): void
@@ -172,15 +115,6 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $savedSegment = $this->listRepo->find($segment->getId());
         Assert::assertSame($project->getId(), $savedSegment->getProjects()->first()->getId());
-    }
-
-    private function saveSegment(string $name, string $alias, array $filters = [], ?LeadList $segment = null): LeadList
-    {
-        $segment ??= new LeadList();
-        $segment->setName($name)->setAlias($alias)->setFilters($filters);
-        $this->listModel->saveEntity($segment);
-
-        return $segment;
     }
 
     /**
@@ -445,7 +379,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Number of segments before clone
         $segmentsCountBefore = $this->em->getRepository(LeadList::class)->count([]);
         // Go to clone segment action
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.(string) $segmentId);
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$segmentId);
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
         // First submit
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
@@ -476,7 +410,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getAliasWhenCloneSegment(int $segmentId): string
     {
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.(string) $segmentId);
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$segmentId);
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
         // Save cloned segment
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
@@ -497,10 +431,169 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         self::assertSame(Response::HTTP_NOT_FOUND, $response['statusCode']);
     }
 
+    public function testUnpublishUsedSegment(): void
+    {
+        $filter = [[
+            'glue'     => 'and',
+            'field'    => 'email',
+            'object'   => 'lead',
+            'type'     => 'email',
+            'operator' => '!empty',
+            'display'  => '',
+        ]];
+        $list1  = $this->saveSegment('s1', 's1', $filter);
+        $filter = [[
+            'object'     => 'lead',
+            'glue'       => 'and',
+            'field'      => 'leadlist',
+            'type'       => 'leadlist',
+            'operator'   => 'in',
+            'properties' => [
+                'filter' => [$list1->getId()],
+            ],
+            'display' => '',
+        ]];
+        $list2 = $this->saveSegment('s2', 's2', $filter);
+        $this->em->clear();
+        $expectedErrorMessage = sprintf('The segment %s is used in %s, please go back and check segments before unpublishing', $list1->getName(), $list2->getName());
+
+        $crawler = $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list1->getId()]);
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
+        $this->client->restart();
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list1->getId());
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form['leadlist[isPublished]']->setValue('0');
+        $crawler = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
+    }
+
+    public function testUnpublishUnUsedSegment(): void
+    {
+        $list1 = $this->saveSegment('s1', 's1');
+        $list2 = $this->saveSegment('s2', 's2');
+        $this->em->clear();
+
+        $crawler = $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list1->getId()]);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list2->getId());
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form['leadlist[isPublished]']->setValue('0');
+        $crawler = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $rows = $this->listRepo->findAll();
+        $this->assertCount(2, $rows);
+        $this->assertFalse($rows[0]->isPublished());
+        $this->assertFalse($rows[1]->isPublished());
+    }
+
+    public function testDeleteUsedInCampaignSegment(): void
+    {
+        $list1  = $this->saveSegment('s1', 's1');
+
+        $campaign     = new Campaign();
+        $campaignName = 'Campaign1';
+        $campaign->setName($campaignName);
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        // insert unpublished record
+        $this->connection->insert($this->prefix.'campaign_leadlist_xref', [
+            'campaign_id'   => $campaign->getId(),
+            'leadlist_id'   => $list1->getId(),
+        ]);
+
+        $expectedErrorMessage = $this->translator->trans(
+            'mautic.lead.lists.used_in_campaigns.delete',
+            [
+                '%campaignNames%' => '"'.$campaignName.'"',
+                '%segmentNames%'  => 's1',
+                '%count%'         => 1,
+            ],
+            'validators'
+        );
+
+        $this->client->request('POST', 's/segments/delete/'.$list1->getId(), [], [], $this->createAjaxHeaders());
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $clientResponseBody = json_decode($clientResponse->getContent(), true);
+
+        $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
+    }
+
+    public function testBatchDeleteUsedInCampaignSegment(): void
+    {
+        $list1  = $this->saveSegment('s1', 's1');
+        $list2  = $this->saveSegment('s2', 's2');
+
+        $campaign     = new Campaign();
+        $campaignName = 'Campaign1';
+        $campaign->setName($campaignName);
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        // insert unpublished record
+        $this->connection->insert($this->prefix.'campaign_leadlist_xref', [
+            'campaign_id'   => $campaign->getId(),
+            'leadlist_id'   => $list1->getId(),
+        ]);
+        $this->connection->insert($this->prefix.'campaign_leadlist_xref', [
+            'campaign_id'   => $campaign->getId(),
+            'leadlist_id'   => $list2->getId(),
+        ]);
+
+        $expectedErrorMessage1 = $this->translator->trans(
+            'mautic.lead.lists.used_in_campaigns.delete',
+            [
+                '%campaignNames%' => '"'.$campaignName.'"',
+                '%segmentNames%'  => $list1->getName(),
+                '%count%'         => 1,
+            ],
+            'validators'
+        );
+
+        $expectedErrorMessage2 = $this->translator->trans(
+            'mautic.lead.lists.used_in_campaigns.delete',
+            [
+                '%campaignNames%' => '"'.$campaignName.'"',
+                '%segmentNames%'  => $list2->getName(),
+                '%count%'         => 1,
+
+            ],
+            'validators'
+        );
+
+        $parameters = 'ids=["'.$list1->getId().'","'.$list2->getId().'"]';
+        $this->client->request('POST', 's/segments/batchDelete?'.$parameters, [], [], $this->createAjaxHeaders());
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $clientResponseBody = json_decode($clientResponse->getContent(), true);
+
+        $this->assertStringContainsString($expectedErrorMessage1, $clientResponseBody['flashes']);
+        $this->assertStringContainsString($expectedErrorMessage2, $clientResponseBody['flashes']);
+    }
+
+    private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
+    {
+        $segment = $segment ?? new LeadList();
+        $filters = empty($filters) ? $this->defaultFilter() : $filters;
+        $segment->setName($name)->setAlias($alias)->setFilters($filters);
+        $this->listModel->saveEntity($segment);
+
+        return $segment;
+    }
+
     /**
      * @return Lead[]
      */
-    private function saveContacts(int $count = 4): array
+    private function saveContacts($count = 4): array
     {
         $contacts = [];
 
@@ -836,5 +929,20 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('2', $html);
         $this->assertStringContainsString('Active contacts', $html);
         $this->assertStringContainsString('1', $html);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function defaultFilter(): array
+    {
+        return [[
+            'glue'     => 'and',
+            'field'    => 'email',
+            'object'   => 'lead',
+            'type'     => 'email',
+            'operator' => '!empty',
+            'display'  => '',
+        ]];
     }
 }

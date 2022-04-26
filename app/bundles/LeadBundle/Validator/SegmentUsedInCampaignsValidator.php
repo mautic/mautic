@@ -4,42 +4,51 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Validator;
 
-use Mautic\CoreBundle\Exception\RecordNotUnpublishedException;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentUsedInCampaignsValidator
 {
+    private string $errorMessage = '';
+
     public function __construct(private LeadListRepository $leadListRepository, private TranslatorInterface $translator)
     {
     }
 
-    /**
-     * @throws RecordNotUnpublishedException
-     */
-    public function validate(LeadList $segment): void
+    public function validate(LeadList $segment, string $action = 'unpublish'): bool
     {
         if (!$segment->getId()) {
-            return;
+            return false;
         }
 
-        $campaignNames = $this->leadListRepository->getSegmentCampaigns($segment->getId());
-
-        if (1 > count($campaignNames)) {
-            return;
+        $segments = $this->leadListRepository->getSegmentCampaigns($segment->getId());
+        if (1 > count($segments)) {
+            return false;
         }
 
-        $campaignNames = array_map(fn (string $segmentName): string => sprintf('"%s"', $segmentName), $campaignNames);
-        $errorMessage  = $this->translator->trans(
-            'mautic.lead.lists.used_in_campaigns',
+        $campaignNames      = array_map([$this, 'decorateCampaignName'], $segments);
+        $campaignNames      = implode(', ', $campaignNames);
+        $this->errorMessage = $this->translator->trans(
+            'mautic.lead.lists.used_in_campaigns.'.$action,
             [
-                '%count%'         => count($campaignNames),
-                '%campaignNames%' => implode(', ', $campaignNames),
+                '%campaignNames%' => $campaignNames,
+                '%segmentNames%'  => $segment->getName(),
+                '%count%' => count($segments),
             ],
             'validators'
         );
 
-        throw new RecordNotUnpublishedException($errorMessage);
+        return true;
+    }
+
+    private function decorateCampaignName($campaignName): string
+    {
+        return sprintf('"%s"', $campaignName);
+    }
+
+    public function getErrorMessage(): string
+    {
+        return $this->errorMessage;
     }
 }

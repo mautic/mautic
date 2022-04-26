@@ -19,15 +19,13 @@ class SegmentUsedInCampaignsValidator extends ConstraintValidator
 
     public function validate(mixed $segment, Constraint $constraint): void
     {
-        try {
-            /** @var LeadList $segment */
-            if ($segment->getIsPublished()) {
-                return;
-            }
+        /** @var LeadList $segment */
+        if ($segment->getIsPublished()) {
+            return;
+        }
 
-            $this->internalValidator->validate($segment);
-        } catch (RecordNotUnpublishedException $exception) {
-            $this->context->buildViolation($exception->getMessage())
+        if ($this->internalValidator->validate($segment)) {
+            $this->context->buildViolation($this->internalValidator->getErrorMessage())
                 ->atPath('isPublished')
                 ->setCode((string) Response::HTTP_UNPROCESSABLE_ENTITY)
                 ->addViolation();

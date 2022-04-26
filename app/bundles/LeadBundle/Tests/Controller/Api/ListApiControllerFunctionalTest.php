@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -402,6 +404,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             [
                 '%count%'         => '1',
                 '%campaignNames%' => '"'.$campaignName.'"',
+                '%segmentNames%'  => 'Segment1',
             ],
             'validators'
         );
@@ -455,13 +458,14 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ]];
         $list2 = $this->saveSegment('s2', 's2', $filter);
         $this->em->clear();
-        $expectedErrorMessage = sprintf('leadlist: This segment is used in %s, please go back and check segments before unpublishing', $list2->getName());
 
         $this->client->request('PATCH', "/api/segments/{$list1->getId()}/edit", ['name' => 'API segment renamed', 'isPublished' => false]);
+        $expectedErrorMessage = sprintf('leadlist: The segment %s is used in %s, please go back and check segments before unpublishing', 'API segment renamed', $list2->getName());
+
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode());
-        $this->assertSame($response['errors'][0]['message'], $expectedErrorMessage);
+        $this->assertSame($expectedErrorMessage, $response['errors'][0]['message']);
     }
 
     public function testUnpublishUsedBatchSegment(): void
@@ -488,7 +492,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ]];
         $list2 = $this->saveSegment('s2', 's2', $filter);
         $this->em->clear();
-        $expectedErrorMessage = sprintf('leadlist: This segment is used in %s, please go back and check segments before unpublishing', $list2->getName());
+        $expectedErrorMessage = sprintf('leadlist: The segment %s is used in %s, please go back and check segments before unpublishing', $list1->getName(), $list2->getName());
 
         $segments = [
             ['id' => $list1->getId(), 'isPublished' => false],
