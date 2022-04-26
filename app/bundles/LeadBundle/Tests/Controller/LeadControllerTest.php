@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tightenco\Collect\Support\Collection;
@@ -553,9 +552,9 @@ class LeadControllerTest extends MauticMysqlTestCase
     public function testContactCompanyEditShowsOldCompanyNameInAuditLog(): void
     {
         /** @var CompanyModel $companyModel */
-        $companyModel = $this->container->get('mautic.lead.model.company');
+        $companyModel = self::$container->get('mautic.lead.model.company');
         /** @var LeadModel $contactModel */
-        $contactModel = $this->container->get('mautic.lead.model.lead');
+        $contactModel = self::$container->get('mautic.lead.model.lead');
 
         // Create companies
         $company = (new Company())
