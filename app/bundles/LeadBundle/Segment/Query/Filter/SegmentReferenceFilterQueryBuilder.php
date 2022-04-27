@@ -111,7 +111,11 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
                 $expression = $queryBuilder->expr()->exists($segmentQueryBuilder->getSQL());
             }
 
-            $logic[] = $expression;
+            if (!$exclusion && count($segmentIds) > 1) {
+                $orLogic[] = $expression;
+            } else {
+                $queryBuilder->addLogic($expression, $filter->getGlue());
+            }
         }
 
         if (count($orLogic)) {
