@@ -218,13 +218,17 @@ class EmailType extends AbstractType
             ]
         );
 
+        $data = $options['data']->isPublished(false);
         if (!empty($options['data']) && $options['data'] instanceof Email) {
             $readonly = !$this->security->hasAccessByEntity(
                 'email:emails:publishown',
                 'email:emails:publishother',
                 $options['data']
             );
-            $data = !$readonly && $options['data']->isPublished(false);
+
+            if ($readonly && $options['data']->isNew()) {
+                $data = false;
+            }
         } else {
             $data     = $options['data']->isPublished(false);
             $readonly = false;
