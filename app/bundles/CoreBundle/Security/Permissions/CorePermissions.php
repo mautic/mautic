@@ -362,6 +362,8 @@ class CorePermissions
     }
 
     /**
+     * @depreacated favor to hasAccessByEntity
+     *
      * Checks if the user has access to the requested entity.
      *
      * @param string|bool   $ownPermission
