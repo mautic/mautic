@@ -183,6 +183,11 @@ class ContactSegmentFilter
         return $this->contactSegmentFilterCrate->isBooleanType();
     }
 
+    public function isColumnTypeDate(): bool
+    {
+        return $this->contactSegmentFilterCrate->isDateType();
+    }
+
     /**
      * @return mixed
      */

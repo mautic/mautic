@@ -32,16 +32,19 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
         $leadsTableAlias = $event->getLeadsTableAlias();
 
+        $parts = [$event->getQueryBuilder()->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField())];
+
+        if (!$event->getFilter()->isColumnTypeDate()) {
+            $parts[] = $event->getQueryBuilder()->expr()->eq(
+                $leadsTableAlias.'.'.$event->getFilter()->getField(),
+                $event->getQueryBuilder()->expr()->literal('')
+            );
+        }
+
         $event->addExpression(
             new CompositeExpression(
                 CompositeExpression::TYPE_OR,
-                [
-                    $event->getQueryBuilder()->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
-                    $event->getQueryBuilder()->expr()->eq(
-                        $leadsTableAlias.'.'.$event->getFilter()->getField(),
-                        $event->getQueryBuilder()->expr()->literal('')
-                    ),
-                ]
+                $parts
             )
         );
 
@@ -56,16 +59,19 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
         $leadsTableAlias = $event->getLeadsTableAlias();
 
+        $parts = [$event->getQueryBuilder()->expr()->isNotNull($leadsTableAlias.'.'.$event->getFilter()->getField())];
+
+        if (!$event->getFilter()->isColumnTypeDate()) {
+            $parts[] = $event->getQueryBuilder()->expr()->neq(
+                $leadsTableAlias.'.'.$event->getFilter()->getField(),
+                $event->getQueryBuilder()->expr()->literal('')
+            );
+        }
+
         $event->addExpression(
             new CompositeExpression(
                 CompositeExpression::TYPE_AND,
-                [
-                    $event->getQueryBuilder()->expr()->isNotNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
-                    $event->getQueryBuilder()->expr()->neq(
-                        $leadsTableAlias.'.'.$event->getFilter()->getField(),
-                        $event->getQueryBuilder()->expr()->literal('')
-                    ),
-                ]
+                $parts
             )
         );
 
