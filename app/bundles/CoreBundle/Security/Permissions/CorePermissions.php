@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Exception\PermissionBadFormatException;
@@ -346,6 +347,23 @@ class CorePermissions
     /**
      * Checks if the user has access to the requested entity.
      *
+     * @param string|bool $ownPermission
+     * @param string|bool $otherPermission
+     */
+    public function hasAccessByEntity($ownPermission, $otherPermission, FormEntity $entity): bool
+    {
+        $user = $this->userHelper->getUser();
+        if (!is_object($user)) {
+            //user is likely anon. so assume no access and let controller handle via published status
+            return false;
+        }
+
+        return $this->hasEntityAccess($ownPermission, $otherPermission, $entity->isNew() ? $user->getId() : $entity->getCreatedBy());
+    }
+
+    /**
+     * Checks if the user has access to the requested entity.
+     *
      * @param string|bool   $ownPermission
      * @param string|bool   $otherPermission
      * @param User|int|null $ownerId
@@ -358,11 +376,6 @@ class CorePermissions
         if (!is_object($user)) {
             //user is likely anon. so assume no access and let controller handle via published status
             return false;
-        }
-
-        // assume logged user is owner for new entity
-        if (null === $ownerId) {
-            $ownerId = $user;
         }
 
         if ($ownerId instanceof User) {
