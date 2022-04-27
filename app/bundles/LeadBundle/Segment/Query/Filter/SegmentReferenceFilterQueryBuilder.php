@@ -70,8 +70,8 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
             $segmentIds = [intval($segmentIds)];
         }
 
-        $orLogic   = [];
-        $exclusion = false;
+        $orLogic = [];
+
         foreach ($segmentIds as $segmentId) {
             $exclusion = in_array($filter->getOperator(), ['notExists', 'notIn']);
 
