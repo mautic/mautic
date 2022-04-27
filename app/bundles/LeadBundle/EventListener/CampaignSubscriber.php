@@ -33,6 +33,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\LeadBundle\Form\Type\CampaignConditionLeadPageHitType;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -206,6 +207,15 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
 
         $event->addCondition('lead.device', $trigger);
+
+        $trigger = [
+            'label'       => 'mautic.lead.lead.events.pageHit',
+            'description' => 'mautic.lead.lead.events.pageHit_descr',
+            'formType'    => CampaignConditionLeadPageHitType::class,
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+
+        $event->addCondition('lead.pageHit', $trigger);
 
         $trigger = [
             'label'       => 'mautic.lead.lead.events.tags',
@@ -499,6 +509,76 @@ class CampaignSubscriber implements EventSubscriberInterface
                     $fieldValue,
                     $operators[$event->getConfig()['operator']]['expr']
                 );
+            }
+        } elseif ($event->checkContext('lead.pageHit')) {
+            $startDate = $event->getConfig()['startDate'] ?? null;
+            $endDate = $event->getConfig()['endDate'] ?? null;
+            $page = $event->getConfig()['page'] ?? null;
+            $url = $event->getConfig()['page_url'] ?? null;
+
+            $filter = array(
+                'search' => '',
+                'includeEvents' =>
+                    array(
+                        0 => 'page.hit',
+                    ),
+                'excludeEvents' =>
+                    array(),
+            );
+
+            if ($startDate) {
+                if (!is_a($startDate, 'DateTime')) {
+                    $startDate = new \DateTime($startDate);
+                }
+                $filter['dateFrom'] = $startDate;
+            }
+
+            if ($endDate) {
+                if (!is_a($endDate, 'DateTime')) {
+                    $endDate = new \DateTime($endDate);
+                }
+                $filter['dateTo'] = $endDate->modify("+1 minutes");
+            }
+
+            $orderby = array(
+                0 => 'timestamp',
+                1 => 'DESC',
+            );
+
+            $leadTimeline = $this->leadModel->getEngagements($lead, $filter, $orderby, 1, 255, false);
+            $totalSpentTime = $event->getConfig()['accumulative_time'] ?? null;
+            $eventsLeadTimeline = $leadTimeline[0]['events'] ?? null;
+            foreach ($eventsLeadTimeline as $eventLeadTimeline) {
+                $hit = $eventLeadTimeline['details']['hit'] ?? null;
+                $pageHitUrl = $hit['url'] ?? null;
+                $pageId = $hit['page_id'] ?? null;
+
+                if (!empty($url)) {
+                    $pageUrl = html_entity_decode($pageHitUrl);
+                    if (fnmatch($url, $pageUrl)) {
+                        if ($hit['dateLeft'] && $totalSpentTime) {
+                            $realTotalSpentTime = (new \DateTime($hit['dateLeft']->format('Y-m-d H:i')))->getTimestamp() -
+                                (new \DateTime($hit['dateHit']->format('Y-m-d H:i')))->getTimestamp();
+                            if ($realTotalSpentTime >= $totalSpentTime) {
+                                return $event->setResult(true);
+                            }
+                        } elseif (!$totalSpentTime) {
+                            return $event->setResult(true);
+                        }
+                    }
+                }
+
+                if (!empty($page) && (int)$page === (int)$pageId) {
+                    if ($hit['dateLeft'] && $totalSpentTime) {
+                        $realTotalSpentTime = (new \DateTime($hit['dateLeft']->format('Y-m-d H:i')))->getTimestamp() -
+                            (new \DateTime($hit['dateHit']->format('Y-m-d H:i')))->getTimestamp();
+                        if ($realTotalSpentTime >= $totalSpentTime) {
+                            return $event->setResult(true);
+                        }
+                    } elseif (!$totalSpentTime) {
+                        return $event->setResult(true);
+                    }
+                }
             }
         }
 
