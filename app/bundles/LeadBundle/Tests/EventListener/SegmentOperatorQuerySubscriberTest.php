@@ -127,6 +127,9 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->assertTrue($event->wasOperatorHandled());
     }
 
+    /**
+     * @return iterable<array<bool|string>>
+     */
     public function dataOnEmptyOperatorIfEmpty(): iterable
     {
         yield [false, 'l.email IS NULL'];
@@ -210,6 +213,9 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->assertTrue($event->wasOperatorHandled());
     }
 
+    /**
+     * @return iterable<array<bool|string>>
+     */
     public function dataOnNotEmptyOperatorIfEmpty(): iterable
     {
         yield [false, 'l.email IS NOT NULL'];

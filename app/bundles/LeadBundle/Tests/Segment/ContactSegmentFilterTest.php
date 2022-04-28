@@ -34,7 +34,7 @@ class ContactSegmentFilterTest extends TestCase
     private $tableSchemaColumnCache;
 
     /**
-     * @var MockObject
+     * @var FilterQueryBuilderInterface&MockObject
      */
     private $filterQueryBuilder;
 
@@ -419,6 +419,9 @@ class ContactSegmentFilterTest extends TestCase
         self::assertEquals($doesColumnSupportEmptyValue, $filter->doesColumnSupportEmptyValue());
     }
 
+    /**
+     * @return iterable<array<bool|string>>
+     */
     public function dataDoesColumnSupportEmptyValue(): iterable
     {
         yield ['boolean', true];
