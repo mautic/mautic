@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
@@ -157,14 +148,12 @@ class ContactSegmentFilterTest extends TestCase
     {
         $filter = $this->createContactSegmentFilter();
 
-        $this->filterDecorator->expects(self::at(0))
-            ->method('getField')
-            ->with($this->contactSegmentFilterCrate)
-            ->willReturn('leadlist');
-        $this->filterDecorator->expects(self::at(1))
-            ->method('getField')
-            ->with($this->contactSegmentFilterCrate)
-            ->willReturn('something');
+        $this->filterDecorator->method('getField')
+            ->withConsecutive(
+                [$this->contactSegmentFilterCrate],
+                [$this->contactSegmentFilterCrate]
+            )
+            ->willReturnOnConsecutiveCalls('leadlist', 'something');;
 
         self::assertTrue($filter->isContactSegmentReference());
         self::assertFalse($filter->isContactSegmentReference());
