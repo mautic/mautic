@@ -153,7 +153,7 @@ class ContactSegmentFilterTest extends TestCase
                 [$this->contactSegmentFilterCrate],
                 [$this->contactSegmentFilterCrate]
             )
-            ->willReturnOnConsecutiveCalls('leadlist', 'something');;
+            ->willReturnOnConsecutiveCalls('leadlist', 'something');
 
         self::assertTrue($filter->isContactSegmentReference());
         self::assertFalse($filter->isContactSegmentReference());
