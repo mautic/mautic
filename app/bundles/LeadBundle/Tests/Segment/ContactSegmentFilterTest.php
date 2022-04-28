@@ -18,7 +18,6 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
-use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 use Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -253,22 +252,6 @@ class ContactSegmentFilterTest extends TestCase
         $filter = $this->createContactSegmentFilter();
 
         self::assertSame($value, $filter->getNullValue());
-    }
-
-    public function testGetColumnMissingTable(): void
-    {
-        $this->tableSchemaColumnCache->expects(self::once())
-            ->method('getCurrentDatabaseName')
-            ->willReturn(null);
-
-        $this->filterDecorator->expects(self::once())
-            ->method('getTable')
-            ->with($this->contactSegmentFilterCrate)
-            ->willReturn('');
-
-        $this->expectException(TableNotFoundException::class);
-        $filter = $this->createContactSegmentFilter();
-        $filter->getColumn();
     }
 
     public function testGetColumnMissingColumn(): void
