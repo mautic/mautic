@@ -46,8 +46,7 @@ class BatchSegmentController extends AbstractFormController
             }
 
             $this->addFlash('mautic.lead.batch_leads_affected', [
-                'pluralCount' => count($contactIds),
-                '%count%'     => count($contactIds),
+                '%count%' => count($contactIds),
             ]);
         } else {
             $this->addFlash('mautic.core.error.ids.missing');
