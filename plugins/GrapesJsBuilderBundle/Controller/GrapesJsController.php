@@ -25,8 +25,8 @@ class GrapesJsController extends CommonController
     /**
      * Activate the custom builder.
      *
-     * @param string $objectType
-     * @param int    $objectId
+     * @param string     $objectType
+     * @param int|string $objectId
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
