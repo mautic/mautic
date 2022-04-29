@@ -24,6 +24,7 @@ return (new PhpCsFixer\Config())
             'syntax' => 'short',
         ],
         'no_unused_imports' => true,
+        'mb_str_functions' => true,
         /**
          * Our templates rely heavily on things like endforeach, endif, etc.
          * This setting should be turned off at least until we've switched to Twig
