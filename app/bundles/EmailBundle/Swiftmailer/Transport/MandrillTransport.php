@@ -177,7 +177,8 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
 
                             // If CC and BCC, remove the ct from URLs to prevent false lead tracking
                             foreach ($ccMergeVars['vars'] as &$var) {
-                                if (false !== mb_strpos($var['content'], 'http') && $ctPos = false !== mb_strpos($var['content'], 'ct=')) {
+                                $ctPos = mb_strpos($var['content'], 'ct=');
+                                if (false !== mb_strpos($var['content'], 'http') && false !== $ctPos) {
                                     // URL so make sure a ct query is not part of it
                                     $var['content'] = mb_substr($var['content'], 0, $ctPos);
                                 }
