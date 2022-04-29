@@ -34,6 +34,9 @@ class EmailAddressValidatorTest extends AbstractMauticTestCase
         Assert::assertSame($expectedViolationCount, $context->getViolations()->count());
     }
 
+    /**
+     * @return iterable<mixed[]>
+     */
     public function provider(): iterable
     {
         yield [null, 0];

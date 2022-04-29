@@ -42,7 +42,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
              */
             public function addViolation($message, array $parameters = [])
             {
-                $this->violationCount++;
+                ++$this->violationCount;
                 ($this->violationResult)($message, $parameters);
             }
         };
