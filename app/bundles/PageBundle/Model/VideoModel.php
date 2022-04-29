@@ -132,7 +132,8 @@ class VideoModel extends FormModel
         if (!empty($browserLanguages)) {
             $languages = explode(',', $browserLanguages);
             foreach ($languages as $k => $l) {
-                if ($pos = false !== mb_strpos(';q=', $l)) {
+                $pos = mb_strpos(';q=', $l);
+                if (false !== $pos) {
                     //remove weights
                     $languages[$k] = mb_substr($l, 0, $pos);
                 }
