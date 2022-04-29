@@ -69,9 +69,9 @@ class PublicController extends CommonFormController
 
             // Add subject as title
             if (!empty($subject)) {
-                if (false !== strpos($content, '<title></title>')) {
+                if (false !== mb_strpos($content, '<title></title>')) {
                     $content = str_replace('<title></title>', "<title>$subject</title>", $content);
-                } elseif (false === strpos($content, '<title>')) {
+                } elseif (false === mb_strpos($content, '<title>')) {
                     $content = str_replace('<head>', "<head>\n<title>$subject</title>", $content);
                 }
             }
@@ -208,8 +208,8 @@ class PublicController extends CommonFormController
                 if ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())) {
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
-                    $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"') ||
-                        false !== strpos($html, BuilderSubscriber::saveprefsRegex);
+                    $savePrefsPresent = false !== mb_strpos($html, 'data-slot="saveprefsbutton"') ||
+                        false !== mb_strpos($html, BuilderSubscriber::saveprefsRegex);
                     if ($savePrefsPresent) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
@@ -221,10 +221,10 @@ class PublicController extends CommonFormController
                                 'form'                         => $formView,
                                 'startform'                    => $formHelper->start($formView),
                                 'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
-                                'showContactFrequency'         => false !== strpos($html, 'data-slot="channelfrequency"') || false !== strpos($html, BuilderSubscriber::channelfrequency),
-                                'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
-                                'showContactCategories'        => false !== strpos($html, 'data-slot="categorylist"') || false !== strpos($html, BuilderSubscriber::categoryListRegex),
-                                'showContactPreferredChannels' => false !== strpos($html, 'data-slot="preferredchannel"') || false !== strpos($html, BuilderSubscriber::preferredchannel),
+                                'showContactFrequency'         => false !== mb_strpos($html, 'data-slot="channelfrequency"') || false !== mb_strpos($html, BuilderSubscriber::channelfrequency),
+                                'showContactSegments'          => false !== mb_strpos($html, 'data-slot="segmentlist"') || false !== mb_strpos($html, BuilderSubscriber::segmentListRegex),
+                                'showContactCategories'        => false !== mb_strpos($html, 'data-slot="categorylist"') || false !== mb_strpos($html, BuilderSubscriber::categoryListRegex),
+                                'showContactPreferredChannels' => false !== mb_strpos($html, 'data-slot="preferredchannel"') || false !== mb_strpos($html, BuilderSubscriber::preferredchannel),
                             ]
                         );
                         // Replace tokens in preference center page
@@ -562,8 +562,8 @@ class PublicController extends CommonFormController
             return;
         }
 
-        if (0 === strpos($query_string, 'r=')) {
-            $query_string = substr($query_string, strpos($query_string, '?') + 1);
+        if (0 === mb_strpos($query_string, 'r=')) {
+            $query_string = mb_substr($query_string, mb_strpos($query_string, '?') + 1);
         } // remove route variable
 
         parse_str($query_string, $query);
@@ -588,7 +588,7 @@ class PublicController extends CommonFormController
 
         // generate signature
         $salt = $keys['secret'];
-        if (false === strpos($salt, '$1$')) {
+        if (false === mb_strpos($salt, '$1$')) {
             $salt = '$1$'.$salt;
         } // add MD5 prefix
         $cr    = crypt(urlencode($query['d']), $salt);
@@ -635,7 +635,7 @@ class PublicController extends CommonFormController
             } // lead was not created
 
             $idHash = hash('crc32', $email.$query['body']);
-            $idHash = substr($idHash.$idHash, 0, 13); // 13 bytes length
+            $idHash = mb_substr($idHash.$idHash, 0, 13); // 13 bytes length
 
             $stat = $model->getEmailStatus($idHash);
 

@@ -31,7 +31,7 @@ class RequestStorageHelperTest extends \PHPUnit\Framework\TestCase
         $key = $this->helper->storeRequest(MomentumTransport::class, new Request([], $payload));
 
         $this->assertStringStartsWith(MomentumTransport::class, $key);
-        $this->assertEquals(98, strlen($key));
+        $this->assertEquals(98, mb_strlen($key));
     }
 
     public function testStoreRequestWithLongTansportName()

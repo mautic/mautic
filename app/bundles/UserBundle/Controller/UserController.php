@@ -453,7 +453,7 @@ class UserController extends FormController
                         $entityId = $user->getId();
                     } else {
                         $bundle = $object = $reEntity;
-                        if (strpos($reEntity, ':')) {
+                        if (mb_strpos($reEntity, ':')) {
                             [$bundle, $object] = explode(':', $reEntity);
                         }
                         $entityId = $form->get('id')->getData();

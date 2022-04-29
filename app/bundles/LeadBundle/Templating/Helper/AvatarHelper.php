@@ -62,7 +62,7 @@ class AvatarHelper extends Helper
             mkdir($avatarDir);
         }
 
-        $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        $ext = mb_strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
         if (!in_array($ext, $this->imageTypes)) {
             throw new \Exception('File is not image');
         }

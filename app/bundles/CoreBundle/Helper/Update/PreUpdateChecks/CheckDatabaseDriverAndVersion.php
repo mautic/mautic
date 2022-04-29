@@ -25,15 +25,15 @@ class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
         $version  = $connection->executeQuery('SELECT VERSION()')->fetchOne();
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
-        $platform = strtolower(get_class($connection->getDatabasePlatform()));
+        $platform = mb_strtolower(get_class($connection->getDatabasePlatform()));
 
         /**
          * The second case is for MariaDB < 10.2, where Doctrine reports it as MySQLPlatform. Here we can use a little
          * help from the version string, which contains "MariaDB" in that case: 10.1.48-MariaDB-1~bionic.
          */
-        if (false !== strpos($platform, 'mariadb') || false !== strpos(strtolower($version), 'mariadb')) {
+        if (false !== mb_strpos($platform, 'mariadb') || false !== mb_strpos(mb_strtolower($version), 'mariadb')) {
             $minSupported = $metadata->getMinSupportedMariaDbVersion();
-        } elseif (false !== strpos($platform, 'mysql')) {
+        } elseif (false !== mb_strpos($platform, 'mysql')) {
             $minSupported = $metadata->getMinSupportedMySqlVersion();
         } else {
             $supportedDrivers = implode(', ', DoctrineStep::getDriverKeys());

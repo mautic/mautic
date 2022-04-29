@@ -204,7 +204,7 @@ JS;
             return false;
         }
 
-        if (false === strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
+        if (false === mb_strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
             $landingPage = false;
         }
 

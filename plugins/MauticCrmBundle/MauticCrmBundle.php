@@ -38,7 +38,7 @@ class MauticCrmBundle extends PluginBundleBase
 
         /** @var \Doctrine\ORM\Mapping\ClassMetadata $meta */
         foreach ($allMetadata as $meta) {
-            if (false === strpos($meta->namespace, 'MauticPlugin\\MauticCrmBundle')) {
+            if (false === mb_strpos($meta->namespace, 'MauticPlugin\\MauticCrmBundle')) {
                 continue;
             }
 

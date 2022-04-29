@@ -55,7 +55,7 @@ class CopyRepository extends CommonRepository
         }
 
         // Assume that $string is already a md5 hash if 32 characters
-        $hash = (32 !== strlen($string)) ? $hash = md5($string) : $string;
+        $hash = (32 !== mb_strlen($string)) ? $hash = md5($string) : $string;
 
         $q = $this->createQueryBuilder($this->getTableAlias());
         $q->where(

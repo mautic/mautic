@@ -22,7 +22,7 @@ class ModelFactory
     public function getModel($modelNameKey)
     {
         // Shortcut for models with the same name as the bundle
-        if (false === strpos($modelNameKey, '.')) {
+        if (false === mb_strpos($modelNameKey, '.')) {
             $modelNameKey = "$modelNameKey.$modelNameKey";
         }
 

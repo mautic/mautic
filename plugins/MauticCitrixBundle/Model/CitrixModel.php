@@ -184,16 +184,16 @@ class CitrixModel extends FormModel
         foreach ($items as $item) {
             $eventDesc = $item['eventDesc'];
             // strip joinUrl if exists
-            $pos = strpos($eventDesc, '_!');
+            $pos = mb_strpos($eventDesc, '_!');
             if (false !== $pos) {
-                $eventDesc = substr($eventDesc, 0, $pos);
+                $eventDesc = mb_substr($eventDesc, 0, $pos);
             }
             // filter events with same id
             $eventId = $item['eventName'];
-            $pos     = strpos($eventId, '_#');
-            $eventId = substr($eventId, $pos);
+            $pos     = mb_strpos($eventId, '_#');
+            $eventId = mb_substr($eventId, $pos);
             foreach ($result as $k => $v) {
-                if (false !== strpos($k, $eventId)) {
+                if (false !== mb_strpos($k, $eventId)) {
                     unset($result[$k]);
                 }
             }
@@ -324,14 +324,14 @@ class CitrixModel extends FormModel
             );
 
             foreach ($contactsToAdd as $email => $info) {
-                if (!isset($leads[strtolower($email)])) {
+                if (!isset($leads[mb_strtolower($email)])) {
                     $lead = (new Lead())
                         ->addUpdatedField('email', $info['email'])
                         ->addUpdatedField('firstname', $info['firstname'])
                         ->addUpdatedField('lastname', $info['lastname']);
                     $this->leadModel->saveEntity($lead);
 
-                    $leads[strtolower($email)] = $lead;
+                    $leads[mb_strtolower($email)] = $lead;
                 }
 
                 $citrixEvent = new CitrixEvent();
@@ -355,7 +355,7 @@ class CitrixModel extends FormModel
                 if (null !== $output) {
                     $output->writeln(
                         ' + '.$email.' '.$eventType.' to '.
-                        substr($citrixEvent->getEventName(), 0, 40).((strlen(
+                        mb_substr($citrixEvent->getEventName(), 0, 40).((mb_strlen(
                                 $citrixEvent->getEventName()
                             ) > 40) ? '...' : '.')
                     );
@@ -383,7 +383,7 @@ class CitrixModel extends FormModel
                 if (null !== $output) {
                     $output->writeln(
                         ' - '.$citrixEvent->getEmail().' '.$eventType.' from '.
-                        substr($citrixEvent->getEventName(), 0, 40).((strlen(
+                        mb_substr($citrixEvent->getEventName(), 0, 40).((mb_strlen(
                                 $citrixEvent->getEventName()
                             ) > 40) ? '...' : '.')
                     );
@@ -423,7 +423,7 @@ class CitrixModel extends FormModel
         $add    = array_filter(
             $found,
             function ($key) use ($known) {
-                return !in_array(strtolower($key), $known);
+                return !in_array(mb_strtolower($key), $known);
             },
             ARRAY_FILTER_USE_KEY
         );

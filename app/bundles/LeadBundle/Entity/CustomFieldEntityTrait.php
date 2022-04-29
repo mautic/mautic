@@ -38,7 +38,7 @@ trait CustomFieldEntityTrait
      */
     public function __get($name)
     {
-        return $this->getFieldValue(strtolower($name));
+        return $this->getFieldValue(mb_strtolower($name));
     }
 
     /**
@@ -49,7 +49,7 @@ trait CustomFieldEntityTrait
      */
     public function __set($name, $value)
     {
-        return $this->addUpdatedField(strtolower($name), $value);
+        return $this->addUpdatedField(mb_strtolower($name), $value);
     }
 
     /**
@@ -60,8 +60,8 @@ trait CustomFieldEntityTrait
      */
     public function __call($name, $arguments)
     {
-        $isSetter = 0 === strpos($name, 'set');
-        $isGetter = 0 === strpos($name, 'get');
+        $isSetter = 0 === mb_strpos($name, 'set');
+        $isGetter = 0 === mb_strpos($name, 'get');
 
         if (($isSetter && array_key_exists(0, $arguments)) || $isGetter) {
             $fieldRequested = mb_strtolower(mb_substr($name, 3));

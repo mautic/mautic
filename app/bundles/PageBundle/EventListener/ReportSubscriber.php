@@ -528,7 +528,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $chart = new PieChart();
 
                     foreach ($data as $device) {
-                        $label = substr(empty($device['device']) ? $this->translator->trans('mautic.core.no.info') : $device['device'], 0, 12);
+                        $label = mb_substr(empty($device['device']) ? $this->translator->trans('mautic.core.no.info') : $device['device'], 0, 12);
                         $chart->setDataset($label, $device['the_count']);
                     }
 

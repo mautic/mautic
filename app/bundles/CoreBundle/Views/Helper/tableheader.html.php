@@ -70,7 +70,7 @@ $tmpl         = (!empty($tmpl)) ? $tmpl : 'list';
         <a href="javascript: void(0);" onclick="Mautic.reorderTableData('<?php echo $sessionVar; ?>','<?php echo $orderBy; ?>','<?php echo $tmpl; ?>','<?php echo $target; ?>'<?php if (!empty($baseUrl)): ?>, '<?php echo $baseUrl; ?>'<?php endif; ?>);">
             <span><?php echo $view['translator']->trans($text); ?></span>
             <?php if ($order == $orderBy): ?>
-            <i class="fa fa-sort-amount-<?php echo strtolower($dir); ?>"></i>
+            <i class="fa fa-sort-amount-<?php echo mb_strtolower($dir); ?>"></i>
             <?php endif; ?>
         </a>
         <?php else: ?>

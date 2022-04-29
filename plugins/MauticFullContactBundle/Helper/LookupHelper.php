@@ -163,8 +163,8 @@ class LookupHelper
     {
         // prefix#entityId#hour#userId#nonce
         list($w, $id, $hour, $uid, $nonce) = explode('#', $oid, 5);
-        $notify                            = (false !== strpos($w, '_notify') && $uid) ? $uid : false;
-        $type                              = (0 === strpos($w, 'fullcontactcomp')) ? 'company' : 'person';
+        $notify                            = (false !== mb_strpos($w, '_notify') && $uid) ? $uid : false;
+        $type                              = (0 === mb_strpos($w, 'fullcontactcomp')) ? 'company' : 'person';
 
         switch ($type) {
             case 'person':
@@ -220,7 +220,7 @@ class LookupHelper
     {
         /** @var User $user */
         $user      = $this->userHelper->getUser();
-        $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);
+        $nonce     = mb_substr(EncryptionHelper::generateKey(), 0, 16);
         $cacheId   = sprintf('fullcontact%s%s#', $entity instanceof Company ? 'comp' : '', $notify ? '_notify' : '').$entity->getId().'#'.gmdate('YmdH');
         $webhookId = $cacheId.'#'.$user->getId().'#'.$nonce;
 

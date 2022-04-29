@@ -116,7 +116,7 @@ abstract class AbstractMigration implements MigrationInterface
             )
         );
 
-        return substr(strtoupper($type.'_'.$hash), 0, 63);
+        return mb_substr(mb_strtoupper($type.'_'.$hash), 0, 63);
     }
 
     protected function addSql(string $sql): void

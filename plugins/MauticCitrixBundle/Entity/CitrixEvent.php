@@ -157,7 +157,7 @@ class CitrixEvent
     {
         $eventName = $this->eventName;
 
-        return substr($eventName, 0, strpos($eventName, '_#'));
+        return mb_substr($eventName, 0, mb_strpos($eventName, '_#'));
     }
 
     /**
@@ -167,7 +167,7 @@ class CitrixEvent
     {
         $eventName = $this->eventName;
 
-        return substr($eventName, strpos($eventName, '_#') + 2);
+        return mb_substr($eventName, mb_strpos($eventName, '_#') + 2);
     }
 
     /**
@@ -175,12 +175,12 @@ class CitrixEvent
      */
     public function getEventDesc()
     {
-        $pos = strpos($this->eventDesc, '_!');
+        $pos = mb_strpos($this->eventDesc, '_!');
         if (false === $pos) {
             return $this->eventDesc;
         }
 
-        return substr($this->eventDesc, 0, $pos);
+        return mb_substr($this->eventDesc, 0, $pos);
     }
 
     /**
@@ -188,12 +188,12 @@ class CitrixEvent
      */
     public function getJoinUrl()
     {
-        $pos = strpos($this->eventDesc, '_!');
+        $pos = mb_strpos($this->eventDesc, '_!');
         if (false === $pos) {
             return '';
         }
 
-        return substr($this->eventDesc, $pos + 2);
+        return mb_substr($this->eventDesc, $pos + 2);
     }
 
     /**

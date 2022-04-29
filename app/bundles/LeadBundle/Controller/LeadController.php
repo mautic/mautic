@@ -89,10 +89,10 @@ class LeadController extends FormController
         $session->set('mautic.lead.indexmode', $indexMode);
 
         $anonymousShowing = false;
-        if ('list' != $indexMode || ('list' == $indexMode && false === strpos($search, $anonymous))) {
+        if ('list' != $indexMode || ('list' == $indexMode && false === mb_strpos($search, $anonymous))) {
             //remove anonymous leads unless requested to prevent clutter
             $filter['force'] .= " !$anonymous";
-        } elseif (false !== strpos($search, $anonymous) && false === strpos($search, '!'.$anonymous)) {
+        } elseif (false !== mb_strpos($search, $anonymous) && false === mb_strpos($search, '!'.$anonymous)) {
             $anonymousShowing = true;
         }
 
@@ -151,7 +151,7 @@ class LeadController extends FormController
         $lists = $this->getModel('lead.list')->getUserLists();
 
         //check to see if in a single list
-        $inSingleList = (1 === substr_count($search, "$listCommand:")) ? true : false;
+        $inSingleList = (1 === mb_substr_count($search, "$listCommand:")) ? true : false;
         $list         = [];
         if ($inSingleList) {
             preg_match("/$listCommand:(.*?)(?=\s|$)/", $search, $matches);
@@ -1970,7 +1970,7 @@ class LeadController extends FormController
                 ],
             ];
         } else {
-            if ('list' != $indexMode || ('list' == $indexMode && false === strpos($search, $anonymous))) {
+            if ('list' != $indexMode || ('list' == $indexMode && false === mb_strpos($search, $anonymous))) {
                 //remove anonymous leads unless requested to prevent clutter
                 $filter['force'] .= " !$anonymous";
             }

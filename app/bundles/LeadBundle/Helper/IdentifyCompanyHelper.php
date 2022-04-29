@@ -128,7 +128,7 @@ class IdentifyCompanyHelper
      */
     protected static function domainExists($email)
     {
-        if (!strstr($email, '@')) { //not a valid email adress
+        if (!mb_strstr($email, '@')) { //not a valid email adress
             return false;
         }
 

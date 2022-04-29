@@ -116,8 +116,8 @@ CONTENT
         MailHelper::searchReplaceTokens(array_keys($mailerTokens), $mailerTokens, $mailHelper->message);
         $parsedBody = $mailHelper->message->getBody();
 
-        $this->assertNotFalse(strpos($parsedBody, 'DEC value'));
-        $this->assertNotFalse(strpos($parsedBody, 'value test We'));
-        $this->assertNotFalse(strpos($parsedBody, 'Place your content here value'));
+        $this->assertNotFalse(mb_strpos($parsedBody, 'DEC value'));
+        $this->assertNotFalse(mb_strpos($parsedBody, 'value test We'));
+        $this->assertNotFalse(mb_strpos($parsedBody, 'Place your content here value'));
     }
 }

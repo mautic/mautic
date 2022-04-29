@@ -694,7 +694,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             foreach ($keys as $key) {
-                if (strpos($key, '__'.$obj)) {
+                if (mb_strpos($key, '__'.$obj)) {
                     $newKey = str_replace('__'.$obj, '', $key);
                     if ('Id' === $newKey) {
                         // Don't map Id for push
@@ -1473,10 +1473,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $mixedFields = array_filter($fields['leadFields']);
         $fields      = [];
         foreach ($mixedFields as $sfField => $mField) {
-            if (false !== strpos($sfField, '__'.$object)) {
+            if (false !== mb_strpos($sfField, '__'.$object)) {
                 $fields[] = str_replace('__'.$object, '', $sfField);
             }
-            if (false !== strpos($sfField, '-'.$object)) {
+            if (false !== mb_strpos($sfField, '-'.$object)) {
                 $fields[] = str_replace('-'.$object, '', $sfField);
             }
         }
@@ -2017,7 +2017,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         list($contactId, $object) = $reference;
                     }
                 }
-                if (strstr($object, 'CampaignMember')) {
+                if (mb_strstr($object, 'CampaignMember')) {
                     $object = 'CampaignMember';
                 }
                 if ('Account' == $object) {
@@ -2606,10 +2606,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $mixedFields = array_filter($fields['leadFields']);
                 $fields      = [];
                 foreach ($mixedFields as $sfField => $mField) {
-                    if (false !== strpos($sfField, '__'.$object)) {
+                    if (false !== mb_strpos($sfField, '__'.$object)) {
                         $fields[] = str_replace('__'.$object, '', $sfField);
                     }
-                    if (false !== strpos($sfField, '-'.$object)) {
+                    if (false !== mb_strpos($sfField, '-'.$object)) {
                         $fields[] = str_replace('-'.$object, '', $sfField);
                     }
                 }

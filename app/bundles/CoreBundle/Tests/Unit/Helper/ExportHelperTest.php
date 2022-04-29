@@ -97,8 +97,8 @@ class ExportHelperTest extends \PHPUnit\Framework\TestCase
      */
     private function removeBomUtf8(string $s): string
     {
-        if (substr($s, 0, 3) == chr(hexdec('EF')).chr(hexdec('BB')).chr(hexdec('BF'))) {
-            return substr($s, 3);
+        if (mb_substr($s, 0, 3) == chr(hexdec('EF')).chr(hexdec('BB')).chr(hexdec('BF'))) {
+            return mb_substr($s, 3);
         } else {
             return $s;
         }

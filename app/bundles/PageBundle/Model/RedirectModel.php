@@ -94,7 +94,7 @@ class RedirectModel extends FormModel
     {
         $utmTags = [];
         foreach ($rawUtmTags as $utmTag => $value) {
-            $utmTags[str_replace('utm', 'utm_', strtolower($utmTag))] = $value;
+            $utmTags[str_replace('utm', 'utm_', mb_strtolower($utmTag))] = $value;
         }
 
         return $utmTags;
@@ -112,7 +112,7 @@ class RedirectModel extends FormModel
     public function getRedirectByUrl($url)
     {
         // Ensure the URL saved to the database does not have encoded ampersands
-        while (false !== strpos($url, '&amp;')) {
+        while (false !== mb_strpos($url, '&amp;')) {
             $url = str_replace('&amp;', '&', $url);
         }
 

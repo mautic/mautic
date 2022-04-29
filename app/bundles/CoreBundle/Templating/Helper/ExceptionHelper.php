@@ -97,7 +97,7 @@ class ExceptionHelper extends Helper
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
             } elseif ('boolean' === $item[0]) {
-                $formattedValue = '<em>'.strtolower(var_export($item[1], true)).'</em>';
+                $formattedValue = '<em>'.mb_strtolower(var_export($item[1], true)).'</em>';
             } elseif ('resource' === $item[0]) {
                 $formattedValue = '<em>resource</em>';
             } else {
@@ -135,8 +135,8 @@ class ExceptionHelper extends Helper
     {
         if (null === $text) {
             $text = str_replace('\\', '/', $file);
-            if (0 === strpos($text, $this->rootDir)) {
-                $text = substr($text, strlen($this->rootDir));
+            if (0 === mb_strpos($text, $this->rootDir)) {
+                $text = mb_substr($text, mb_strlen($this->rootDir));
                 $text = explode('/', $text, 2);
                 $text = sprintf('<abbr title="%s%2$s">%s</abbr>%s', $this->rootDir, $text[0], isset($text[1]) ? '/'.$text[1] : '');
             }
@@ -194,15 +194,15 @@ class ExceptionHelper extends Helper
     private function fixCodeMarkup($line)
     {
         // </span> ending tag from previous line
-        $opening = strpos($line, '<span');
-        $closing = strpos($line, '</span>');
+        $opening = mb_strpos($line, '<span');
+        $closing = mb_strpos($line, '</span>');
         if (false !== $closing && (false === $opening || $closing < $opening)) {
             $line = substr_replace($line, '', $closing, 7);
         }
 
         // missing </span> tag at the end of line
-        $opening = strpos($line, '<span');
-        $closing = strpos($line, '</span>');
+        $opening = mb_strpos($line, '<span');
+        $closing = mb_strpos($line, '</span>');
         if (false !== $opening && (false === $closing || $closing > $opening)) {
             $line .= '</span>';
         }

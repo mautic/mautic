@@ -80,7 +80,7 @@ class ResultsPaginator
             $this->retryCount     = 0;
             $this->nextRecordsUrl = $this->results['nextRecordsUrl'];
 
-            if (false === strpos($this->nextRecordsUrl, $this->salesforceBaseUrl)) {
+            if (false === mb_strpos($this->nextRecordsUrl, $this->salesforceBaseUrl)) {
                 $this->nextRecordsUrl = $this->salesforceBaseUrl.$this->nextRecordsUrl;
             }
 

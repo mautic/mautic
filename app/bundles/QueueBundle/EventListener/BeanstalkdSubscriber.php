@@ -79,8 +79,8 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
                 try {
                     $pheanstalk->delete($job);
                 } catch (ServerException $e) {
-                    if (false === strpos($e->getMessage(), 'Cannot delete job')
-                        && false === strpos($e->getMessage(), 'NOT_FOUND')
+                    if (false === mb_strpos($e->getMessage(), 'Cannot delete job')
+                        && false === mb_strpos($e->getMessage(), 'NOT_FOUND')
                     ) {
                         throw $e;
                     }

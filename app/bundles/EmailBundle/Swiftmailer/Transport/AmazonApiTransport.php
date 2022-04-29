@@ -368,11 +368,11 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 $sesArray['FromEmailAddress'] =  (!empty($tokenizedMessage['from']['name'])) ? '"'.mb_encode_mimeheader($tokenizedMessage['from']['name']).'" <'.$tokenizedMessage['from']['email'].'>' : $tokenizedMessage['from']['email'];
                 $toSendMessage->setTo([$recipient]);
                 $sesArray['Destination']['ToAddresses'] = [$recipient];
-                if (isset($tokenizedMessage['text']) && strlen($tokenizedMessage['text']) > 0) {
+                if (isset($tokenizedMessage['text']) && mb_strlen($tokenizedMessage['text']) > 0) {
                     $toSendMessage->addPart($tokenizedMessage['text'], 'text/plain');
                 }
 
-                if (isset($tokenizedMessage['html']) && strlen($tokenizedMessage['html']) > 0) {
+                if (isset($tokenizedMessage['html']) && mb_strlen($tokenizedMessage['html']) > 0) {
                     $toSendMessage->addPart($tokenizedMessage['html'], 'text/html');
                 }
                 if (isset($tokenizedMessage['headers'])) {
@@ -380,7 +380,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                     foreach ($tokenizedMessage['headers'] as $key => $value) {
                         if ('List-Unsubscribe' === $key) {
                             $listUnsubscribe = array_map('trim', explode(',', $value));
-                            $listUnsubscribe = array_filter($listUnsubscribe, fn ($el) => strpos($el, $mailData['hashId']));
+                            $listUnsubscribe = array_filter($listUnsubscribe, fn ($el) => mb_strpos($el, $mailData['hashId']));
                             $value           = implode(',', $listUnsubscribe);
                         }
                         $headers->addTextHeader($key, $value);

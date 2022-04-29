@@ -78,10 +78,10 @@ class AssetsHelper
     {
         $prefix = $this->pathsHelper->getSystemPath('asset_prefix');
         if (!empty($prefix)) {
-            if ($includeEndingSlash && '/' != substr($prefix, -1)) {
+            if ($includeEndingSlash && '/' != mb_substr($prefix, -1)) {
                 $prefix .= '/';
-            } elseif (!$includeEndingSlash && '/' == substr($prefix, -1)) {
-                $prefix = substr($prefix, 0, -1);
+            } elseif (!$includeEndingSlash && '/' == mb_substr($prefix, -1)) {
+                $prefix = mb_substr($prefix, 0, -1);
             }
         }
 
@@ -107,13 +107,13 @@ class AssetsHelper
     public function getUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false)
     {
         // if we have http in the url it is absolute and we can just return it
-        if (0 === strpos($path, 'http')) {
+        if (0 === mb_strpos($path, 'http')) {
             return $path;
         }
 
         // otherwise build the complete path
         if (!$ignorePrefix) {
-            $assetPrefix = $this->getAssetPrefix(0 !== strpos($path, '/'));
+            $assetPrefix = $this->getAssetPrefix(0 !== mb_strpos($path, '/'));
             $path        = $assetPrefix.$path;
         }
 
@@ -125,7 +125,7 @@ class AssetsHelper
         }
 
         // Remove the dev index so the assets work in the dev mode
-        if (strpos($url, '/index_dev.php/')) {
+        if (mb_strpos($url, '/index_dev.php/')) {
             $url = str_replace('index_dev.php/', '', $url);
         }
 
@@ -657,7 +657,7 @@ class AssetsHelper
      */
     public function shortenText($text, $charCount = null)
     {
-        if ($charCount && strlen($text) > $charCount) {
+        if ($charCount && mb_strlen($text) > $charCount) {
             return mb_substr($text, 0, $charCount, 'utf-8').'...';
         }
 
@@ -723,8 +723,8 @@ class AssetsHelper
      */
     public function setSiteUrl($siteUrl)
     {
-        if ('/' === substr($siteUrl, -1)) {
-            $siteUrl = substr($siteUrl, 0, -1);
+        if ('/' === mb_substr($siteUrl, -1)) {
+            $siteUrl = mb_substr($siteUrl, 0, -1);
         }
 
         $this->siteUrl = $siteUrl;
@@ -741,7 +741,7 @@ class AssetsHelper
      */
     public function setVersion($secretKey, $version)
     {
-        $this->version = substr(hash('sha1', $secretKey.$version), 0, 8);
+        $this->version = mb_substr(hash('sha1', $secretKey.$version), 0, 8);
     }
 
     public function setBuilderIntegrationsHelper(BuilderIntegrationsHelper $builderIntegrationsHelper)

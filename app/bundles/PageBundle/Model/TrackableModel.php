@@ -116,7 +116,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Ensure the URL saved to the database does not have encoded ampersands
-        while (false !== strpos($url, '&amp;')) {
+        while (false !== mb_strpos($url, '&amp;')) {
             $url = str_replace('&amp;', '&', $url);
         }
 
@@ -440,7 +440,7 @@ class TrackableModel extends AbstractCommonModel
         $url = trim($url);
 
         // Ensure these are & for the sake of parsing
-        while (false !== strpos($url, '&amp;')) {
+        while (false !== mb_strpos($url, '&amp;')) {
             $url = str_replace('&amp;', '&', $url);
         }
 
@@ -740,7 +740,7 @@ class TrackableModel extends AbstractCommonModel
                         // If the URL doesn't start with a slash, we need to merge
                         if ('/' != $url['path'][0]) {
                             // If the path ends with a slash, store as is
-                            if ('/' == $parts['path'][strlen($parts['path']) - 1]) {
+                            if ('/' == $parts['path'][mb_strlen($parts['path']) - 1]) {
                                 $sBasePath = $parts['path'];
                             } // Else trim off the file
                             else {
@@ -760,7 +760,7 @@ class TrackableModel extends AbstractCommonModel
                             unset($sBasePath);
                         }
 
-                        if (false !== strpos($url['path'], './')) {
+                        if (false !== mb_strpos($url['path'], './')) {
                             // Remove any '../' and their directories
                             while (preg_match('/\w+\/\.\.\//', $url['path'])) {
                                 $url['path'] = preg_replace('/\w+\/\.\.\//', '', $url['path']);
@@ -844,7 +844,7 @@ class TrackableModel extends AbstractCommonModel
      */
     private function isContactFieldToken($token)
     {
-        return false !== strpos($token, '{contactfield') || false !== strpos($token, '{leadfield');
+        return false !== mb_strpos($token, '{contactfield') || false !== mb_strpos($token, '{leadfield');
     }
 
     /**

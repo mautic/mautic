@@ -35,14 +35,14 @@ class OpenSSLCipher implements SymmetricCipherInterface
      */
     public function decrypt($encryptedMessage, $key, $originalInitVector)
     {
-        if (strlen($originalInitVector) !== $this->getInitVectorSize()) {
+        if (mb_strlen($originalInitVector) !== $this->getInitVectorSize()) {
             throw new InvalidDecryptionException();
         }
         $key           = pack('H*', $key);
         $decrypted     = trim(openssl_decrypt($encryptedMessage, $this->cipher, $key, $options = 0, $originalInitVector));
         $sha256Length  = 64;
-        $secretMessage = substr($decrypted, 0, -$sha256Length);
-        $originalHash  = substr($decrypted, -$sha256Length);
+        $secretMessage = mb_substr($decrypted, 0, -$sha256Length);
+        $originalHash  = mb_substr($decrypted, -$sha256Length);
         $newHash       = $this->getHash($secretMessage, $this->getHashKey($key));
         if (!hash_equals($originalHash, $newHash)) {
             throw new InvalidDecryptionException();
@@ -100,6 +100,6 @@ class OpenSSLCipher implements SymmetricCipherInterface
     {
         $hexKey = bin2hex($binaryKey);
         // Get second half of hexKey version (stable but different than original key)
-        return substr($hexKey, -32);
+        return mb_substr($hexKey, -32);
     }
 }

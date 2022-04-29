@@ -239,7 +239,7 @@ class FieldsBuilder
      */
     private function sanitizePrefix($prefix)
     {
-        if (false === strpos($prefix, '.')) {
+        if (false === mb_strpos($prefix, '.')) {
             $prefix .= '.';
         }
 

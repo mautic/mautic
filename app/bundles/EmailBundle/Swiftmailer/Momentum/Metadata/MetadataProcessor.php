@@ -115,7 +115,7 @@ class MetadataProcessor
         $this->mauticTokens = array_keys($tokens);
 
         foreach ($this->mauticTokens as $token) {
-            $this->substitutionKeys[$token]      = strtoupper(preg_replace('/[^a-z0-9]+/i', '', $token));
+            $this->substitutionKeys[$token]      = mb_strtoupper(preg_replace('/[^a-z0-9]+/i', '', $token));
             $this->substitutionMergeVars[$token] = '{{{ '.$this->substitutionKeys[$token].' }}}';
         }
 

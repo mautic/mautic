@@ -285,7 +285,7 @@ class DateTimeHelper
     public function buildInterval($interval, $unit)
     {
         $possibleUnits = ['Y', 'M', 'D', 'I', 'H', 'S'];
-        $unit          = strtoupper($unit);
+        $unit          = mb_strtoupper($unit);
 
         if (!in_array($unit, $possibleUnits)) {
             throw new \InvalidArgumentException($unit.' is invalid unit for DateInterval');

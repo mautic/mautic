@@ -104,7 +104,7 @@ class CampaignHelper
                     \GuzzleHttp\RequestOptions::HEADERS     => $headers,
                     \GuzzleHttp\RequestOptions::TIMEOUT     => $timeout,
                 ];
-                if (array_key_exists('content-type', $headers) && 'application/json' == strtolower($headers['content-type'])) {
+                if (array_key_exists('content-type', $headers) && 'application/json' == mb_strtolower($headers['content-type'])) {
                     $options[\GuzzleHttp\RequestOptions::BODY] = json_encode($payload);
                 } else {
                     $options[\GuzzleHttp\RequestOptions::FORM_PARAMS] = $payload;

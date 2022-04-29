@@ -75,7 +75,7 @@ class DsnParser
         }
 
         if (preg_match('/Action: (.+)/i', $dsnReport, $match)) {
-            $action = strtolower(trim($match[1]));
+            $action = mb_strtolower(trim($match[1]));
         }
 
         // Could be multi-line , if the new line is beginning with SPACE or HTAB

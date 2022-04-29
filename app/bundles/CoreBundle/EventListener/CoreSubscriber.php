@@ -381,7 +381,7 @@ class CoreSubscriber implements EventSubscriberInterface
                             $id = explode('_', $item['id']);
                             if (isset($id[1])) {
                                 // some bundle names are in plural, create also singular item
-                                if ('s' == substr($id[1], -1)) {
+                                if ('s' == mb_substr($id[1], -1)) {
                                     $event->addIcon(rtrim($id[1], 's'), $item['iconClass']);
                                 }
                                 $event->addIcon($id[1], $item['iconClass']);
@@ -426,7 +426,7 @@ class CoreSubscriber implements EventSubscriberInterface
         $requirements = (!empty($details['requirements'])) ? $details['requirements'] : [];
 
         // Set some very commonly used defaults and requirements
-        if (false !== strpos($details['path'], '{page}')) {
+        if (false !== mb_strpos($details['path'], '{page}')) {
             if (!isset($defaults['page'])) {
                 $defaults['page'] = 0;
             }
@@ -434,7 +434,7 @@ class CoreSubscriber implements EventSubscriberInterface
                 $requirements['page'] = '\d+';
             }
         }
-        if (false !== strpos($details['path'], '{objectId}')) {
+        if (false !== mb_strpos($details['path'], '{objectId}')) {
             if (!isset($defaults['objectId'])) {
                 // Set default to 0 for the "new" actions
                 $defaults['objectId'] = 0;
@@ -445,7 +445,7 @@ class CoreSubscriber implements EventSubscriberInterface
             }
         }
         if ('api' == $type) {
-            if (false !== strpos($details['path'], '{id}')) {
+            if (false !== mb_strpos($details['path'], '{id}')) {
                 if (!isset($requirements['page'])) {
                     $requirements['id'] = '\d+';
                 }

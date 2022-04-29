@@ -20,7 +20,7 @@ trait MatchFilterForLeadTrait
         $groupNum = 0;
 
         foreach ($filter as $data) {
-            $isCompanyField = (0 === strpos($data['field'], 'company') && 'company' !== $data['field']);
+            $isCompanyField = (0 === mb_strpos($data['field'], 'company') && 'company' !== $data['field']);
             $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
 
             if (!array_key_exists($data['field'], $lead) && !$isCompanyField) {
@@ -69,8 +69,8 @@ trait MatchFilterForLeadTrait
                     break;
                 case 'datetime':
                 case 'time':
-                    $leadValCount   = substr_count($leadVal, ':');
-                    $filterValCount = substr_count($filterVal, ':');
+                    $leadValCount   = mb_substr_count($leadVal, ':');
+                    $filterValCount = mb_substr_count($filterVal, ':');
 
                     if (2 === $leadValCount && 1 === $filterValCount) {
                         $filterVal .= ':00';
@@ -172,14 +172,14 @@ trait MatchFilterForLeadTrait
                     $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/i', $leadVal);
                     break;
                 case 'startsWith':
-                    $groups[$groupNum] = 0 === strncmp($leadVal, $filterVal, strlen($filterVal));
+                    $groups[$groupNum] = 0 === strncmp($leadVal, $filterVal, mb_strlen($filterVal));
                     break;
                 case 'endsWith':
-                    $endOfString       = substr($leadVal, strlen($leadVal) - strlen($filterVal));
+                    $endOfString       = mb_substr($leadVal, mb_strlen($leadVal) - mb_strlen($filterVal));
                     $groups[$groupNum] = 0 === strcmp($endOfString, $filterVal);
                     break;
                 case 'contains':
-                    $groups[$groupNum] = false !== strpos((string) $leadVal, (string) $filterVal);
+                    $groups[$groupNum] = false !== mb_strpos((string) $leadVal, (string) $filterVal);
                     break;
             }
         }

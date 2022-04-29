@@ -20,7 +20,7 @@
 <?php foreach ($socialProfiles as $integrationName => $details): ?>
     <?php if ($count > 0 && 0 == $count % 2): echo '</div><div class="row">'; endif; ?>
     <div class="col-md-6">
-        <div class="panel panel-default panel-<?php echo strtolower($integrationName); ?>">
+        <div class="panel panel-default panel-<?php echo mb_strtolower($integrationName); ?>">
             <div class="panel-heading pr-0">
                 <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.integration.'.$integrationName); ?></h3>
                 <div class="panel-toolbar text-right">

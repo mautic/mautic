@@ -1,7 +1,7 @@
 <?php
 
 $appendAttribute = function (&$attributes, $attributeName, $append) {
-    if (false === stripos($attributes, "{$attributeName}=")) {
+    if (false === mb_stripos($attributes, "{$attributeName}=")) {
         $attributes .= ' '.$attributeName.'="'.$append.'"';
     } else {
         $attributes = str_ireplace($attributeName.'="', $attributeName.'="'.$append.' ', $attributes);

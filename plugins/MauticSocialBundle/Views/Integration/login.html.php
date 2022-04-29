@@ -16,7 +16,7 @@ include __DIR__.'/../../../../app/bundles/FormBundle/Views/Field/field_helper.ph
 $action   = $app->getRequest()->get('objectAction');
 $settings = $field['properties'];
 
-$integrations = (isset($settings['integrations']) and !empty($settings['integrations'])) ? explode(',', substr($settings['integrations'], 0, -1))
+$integrations = (isset($settings['integrations']) and !empty($settings['integrations'])) ? explode(',', mb_substr($settings['integrations'], 0, -1))
     : [];
 
 $formName    = str_replace('_', '', $formName);

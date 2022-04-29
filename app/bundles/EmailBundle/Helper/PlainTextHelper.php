@@ -336,7 +336,7 @@ class PlainTextHelper
             $url = $link;
         } else {
             $url = $this->options['base_url'];
-            if ('/' != substr($link, 0, 1)) {
+            if ('/' != mb_substr($link, 0, 1)) {
                 $url .= '/';
             }
             $url .= $link;
@@ -411,7 +411,7 @@ class PlainTextHelper
                         $end = $m[1];
                         $len = $end - $taglen - $start;
                         // Get blockquote content
-                        $body = substr($text, $start + $taglen - $diff, $len);
+                        $body = mb_substr($text, $start + $taglen - $diff, $len);
 
                         // Set text width
                         $pWidth = $this->options['width'];
@@ -427,16 +427,16 @@ class PlainTextHelper
                         // Re-set text width
                         $this->options['width'] = $pWidth;
                         // Replace content
-                        $text = substr($text, 0, $start - $diff)
-                            .$body.substr($text, $end + strlen($m[0]) - $diff);
+                        $text = mb_substr($text, 0, $start - $diff)
+                            .$body.mb_substr($text, $end + mb_strlen($m[0]) - $diff);
 
-                        $diff = $len + $taglen + strlen($m[0]) - strlen($body);
+                        $diff = $len + $taglen + mb_strlen($m[0]) - mb_strlen($body);
                         unset($body);
                     }
                 } else {
                     if (0 == $level) {
                         $start  = $m[1];
-                        $taglen = strlen($m[0]);
+                        $taglen = mb_strlen($m[0]);
                     }
                     ++$level;
                 }
@@ -453,7 +453,7 @@ class PlainTextHelper
      */
     protected function pregCallback($matches)
     {
-        switch (strtolower($matches[1])) {
+        switch (mb_strtolower($matches[1])) {
             case 'b':
             case 'strong':
                 return $matches[3];
@@ -524,7 +524,7 @@ class PlainTextHelper
         if (function_exists('mb_strtoupper')) {
             $str = mb_strtoupper($str, self::ENCODING);
         } else {
-            $str = strtoupper($str);
+            $str = mb_strtoupper($str);
         }
 
         return htmlspecialchars($str, ENT_COMPAT, self::ENCODING);

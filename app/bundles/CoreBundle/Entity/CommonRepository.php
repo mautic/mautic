@@ -99,13 +99,13 @@ class CommonRepository extends EntityRepository
             if (is_array($args['order'])) {
                 foreach ($args['order'] as &$o) {
                     $alias = '';
-                    if (false !== strpos($o, '.')) {
+                    if (false !== mb_strpos($o, '.')) {
                         list($alias, $o) = explode('.', $o);
                     }
 
                     if (in_array($o, $properties)) {
                         $o = preg_replace('/(?<=\\w)(?=[A-Z])/', '_$1', $o);
-                        $o = strtolower($o);
+                        $o = mb_strtolower($o);
                     }
 
                     $o = (!empty($alias)) ? $alias.'.'.$o : $o;
@@ -334,7 +334,7 @@ class CommonRepository extends EntityRepository
         $query = $q->getQuery();
 
         if (isset($args['hydration_mode'])) {
-            $hydrationMode = constant('\\Doctrine\\ORM\\Query::'.strtoupper($args['hydration_mode']));
+            $hydrationMode = constant('\\Doctrine\\ORM\\Query::'.mb_strtoupper($args['hydration_mode']));
             $query->setHydrationMode($hydrationMode);
         } else {
             $hydrationMode = Query::HYDRATE_OBJECT;
@@ -414,7 +414,7 @@ class CommonRepository extends EntityRepository
                 }
                 $expr->add($groupExpr);
             }
-        } elseif (false !== strpos($filter['column'], ',')) {
+        } elseif (false !== mb_strpos($filter['column'], ',')) {
             $columns      = explode(',', $filter['column']);
             $expr         = $q->expr()->orX();
             $setParameter = false;
@@ -569,7 +569,7 @@ class CommonRepository extends EntityRepository
 
         if ($select) {
             foreach ($select as &$column) {
-                if (false === strpos($column, '.')) {
+                if (false === mb_strpos($column, '.')) {
                     $column = $alias.'.'.$column;
                 }
             }
@@ -820,7 +820,7 @@ class CommonRepository extends EntityRepository
             $clause['dir'] = 'ASC';
         }
 
-        $clause['dir'] = $this->sanitize(strtoupper($clause['dir']));
+        $clause['dir'] = $this->sanitize(mb_strtoupper($clause['dir']));
         $clause['col'] = $this->sanitize($clause['col'], ['_.']);
 
         return $clause;
@@ -989,7 +989,7 @@ class CommonRepository extends EntityRepository
         $string = $filter->string;
 
         if (!$filter->strict) {
-            if (false === strpos($string, '%')) {
+            if (false === mb_strpos($string, '%')) {
                 $string = "%$string%";
             }
         }
@@ -1077,7 +1077,7 @@ class CommonRepository extends EntityRepository
                 foreach ($joins as $joinStatements) {
                     /** @var Query\Expr\Join $join */
                     foreach ($joinStatements as $join) {
-                        if (false !== strpos($join->getJoin(), '.category')) {
+                        if (false !== mb_strpos($join->getJoin(), '.category')) {
                             $catPrefix = $join->getAlias();
                             break;
                         }
@@ -1110,7 +1110,7 @@ class CommonRepository extends EntityRepository
         } else {
             $string = $filter->string;
             if (!$filter->strict) {
-                if (false === strpos($string, '%')) {
+                if (false === mb_strpos($string, '%')) {
                     $string = "$string%";
                 }
             }
@@ -1207,7 +1207,7 @@ class CommonRepository extends EntityRepository
                 $indexAlias = $this->getTableAlias();
                 $indexBy    = $args['index_by'];
             }
-            if (0 !== strpos($indexBy, $indexAlias)) {
+            if (0 !== mb_strpos($indexBy, $indexAlias)) {
                 $indexBy = $indexAlias.'.'.$indexBy;
             }
             $q->indexBy($indexAlias, $indexBy);
@@ -1272,7 +1272,7 @@ class CommonRepository extends EntityRepository
         if ($clauses && is_array($clauses)) {
             foreach ($clauses as $clause) {
                 $clause = $this->validateOrderByClause($clause);
-                $column = (false === strpos($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+                $column = (false === mb_strpos($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
                 $query->addOrderBy($column, $clause['dir']);
             }
         }
@@ -1293,7 +1293,7 @@ class CommonRepository extends EntityRepository
 
             $selects = [];
             foreach ($args['select'] as $select) {
-                if (false !== strpos($select, '.')) {
+                if (false !== mb_strpos($select, '.')) {
                     list($alias, $select) = explode('.', $select);
                 } else {
                     $alias = $this->getTableAlias();
@@ -1332,9 +1332,9 @@ class CommonRepository extends EntityRepository
                 } else {
                     if (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
                         $q->select($newSelect);
-                    } elseif (is_string($select) && false !== strpos($select, $this->getTableAlias().',')) {
+                    } elseif (is_string($select) && false !== mb_strpos($select, $this->getTableAlias().',')) {
                         $q->select(str_replace($this->getTableAlias().',', $newSelect.',', $select));
-                    } elseif (is_string($select) && false !== strpos($select, $this->getTableAlias().'.*,')) {
+                    } elseif (is_string($select) && false !== mb_strpos($select, $this->getTableAlias().'.*,')) {
                         $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.',', $select));
                     }
                 }
@@ -1498,7 +1498,7 @@ class CommonRepository extends EntityRepository
                     }
                 } else {
                     $clause = $this->validateWhereClause($clause);
-                    $column = (false === strpos($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+                    $column = (false === mb_strpos($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
 
                     $whereClause = null;
                     switch ($clause['expr']) {
@@ -1697,13 +1697,13 @@ class CommonRepository extends EntityRepository
             $key   = (isset($f['col'])) ? 'col' : 'column';
             $col   = $f[$key];
             $alias = '';
-            if (false !== strpos($col, '.')) {
+            if (false !== mb_strpos($col, '.')) {
                 list($alias, $col) = explode('.', $col);
             }
 
             if (in_array($col, $properties)) {
                 $col = preg_replace('/(?<=\\w)(?=[A-Z])/', '_$1', $col);
-                $col = strtolower($col);
+                $col = mb_strtolower($col);
             }
 
             $f[$key] = (!empty($alias)) ? $alias.'.'.$col : $col;

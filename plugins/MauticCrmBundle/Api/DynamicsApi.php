@@ -154,8 +154,8 @@ class DynamicsApi extends CrmApi
 
         $returnIds = [];
 
-        $batchId  = substr(str_shuffle(uniqid('b', false)), 0, 6);
-        $changeId = substr(str_shuffle(uniqid('c', false)), 0, 6);
+        $batchId  = mb_substr(str_shuffle(uniqid('b', false)), 0, 6);
+        $changeId = mb_substr(str_shuffle(uniqid('c', false)), 0, 6);
 
         $settings['headers']['Content-Type'] = 'multipart/mixed;boundary=batch_'.$batchId;
         $settings['headers']['Accept']       = 'application/json';
@@ -233,7 +233,7 @@ class DynamicsApi extends CrmApi
         $input                = array_pop($a_blocks);
         list($header, $input) = explode("\r\n\r\n", $input, 2);
         foreach (explode("\r\n", $header) as $r) {
-            if (0 === stripos($r, 'Content-Type:')) {
+            if (0 === mb_stripos($r, 'Content-Type:')) {
                 list($headername, $contentType) = explode(':', $r, 2);
             }
         }
@@ -248,7 +248,7 @@ class DynamicsApi extends CrmApi
             if (empty($block)) {
                 continue;
             }
-            if (false !== stripos($block, 'OData-EntityId:')) {
+            if (false !== mb_stripos($block, 'OData-EntityId:')) {
                 preg_match('/Content-ID: (\d+)/', $block, $matches);
                 $leadId = (count($matches) > 1) ? $matches[1] : 0;
                 // OData-EntityId: https://virlatinus.crm.dynamics.com/api/data/v8.2/contacts(2725f27c-2058-e711-8111-c4346bac1938)

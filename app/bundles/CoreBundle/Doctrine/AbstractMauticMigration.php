@@ -107,8 +107,8 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
             $tables[$table] = [];
         }
 
-        $type   = strtolower($type);
-        $suffix = strtolower(substr($suffix, -4));
+        $type   = mb_strtolower($type);
+        $suffix = mb_strtolower(mb_substr($suffix, -4));
 
         switch ($type) {
             case 'fk':
@@ -116,8 +116,8 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
                     $keys = $schemaManager->listTableForeignKeys($table);
                     /** @var \Doctrine\DBAL\Schema\ForeignKeyConstraint $k */
                     foreach ($keys as $k) {
-                        $name                       = strtolower($k->getName());
-                        $key                        = substr($name, -4);
+                        $name                       = mb_strtolower($k->getName());
+                        $key                        = mb_substr($name, -4);
                         $tables[$table]['fk'][$key] = $name;
                     }
                 }
@@ -137,12 +137,12 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
 
                     /** @var \Doctrine\DBAL\Schema\Index $i */
                     foreach ($indexes as $i) {
-                        $name   = strtolower($i->getName());
-                        $isIdx  = stripos($name, 'idx');
-                        $isUniq = stripos($name, 'uniq');
+                        $name   = mb_strtolower($i->getName());
+                        $isIdx  = mb_stripos($name, 'idx');
+                        $isUniq = mb_stripos($name, 'uniq');
 
                         if (false !== $isIdx || false !== $isUniq) {
-                            $key     = substr($name, -4);
+                            $key     = mb_substr($name, -4);
                             $keyType = (false !== $isIdx) ? 'idx' : 'uniq';
 
                             $tables[$table]['idx'][$keyType][$key] = $name;
@@ -155,7 +155,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
                 break;
         }
 
-        return strtoupper($localName);
+        return mb_strtoupper($localName);
     }
 
     /**
@@ -179,7 +179,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
             )
         );
 
-        return substr(strtoupper($type.'_'.$hash), 0, 63);
+        return mb_substr(mb_strtoupper($type.'_'.$hash), 0, 63);
     }
 
     /**

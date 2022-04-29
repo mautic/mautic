@@ -138,7 +138,7 @@ class TrackingHelper
     protected function isLandingPage()
     {
         $server = $this->requestStack->getCurrentRequest()->server;
-        if (false === strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
+        if (false === mb_strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
             return false;
         }
 

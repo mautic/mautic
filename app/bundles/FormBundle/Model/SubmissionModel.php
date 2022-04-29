@@ -997,7 +997,7 @@ class SubmissionModel extends CommonFormModel
             $conflicts = [];
             foreach ($potentialConflicts as $field) {
                 if (!empty($fieldSet1[$field]) && !empty($fieldSet2[$field])) {
-                    if (strtolower($fieldSet1[$field]) !== strtolower($fieldSet2[$field])) {
+                    if (mb_strtolower($fieldSet1[$field]) !== mb_strtolower($fieldSet2[$field])) {
                         $conflicts[] = $field;
                     }
                 }

@@ -124,7 +124,7 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     public function onListChoicesGenerate(LeadListFiltersChoicesEvent $event)
     {
-        if (false === strpos($event->getRoute(), 'mautic_segment_action')) {
+        if (false === mb_strpos($event->getRoute(), 'mautic_segment_action')) {
             return;
         }
 

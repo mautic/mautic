@@ -218,7 +218,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
                 break;
             case 'checkboxgrp':
-                if (is_string($value) && strrpos($value, '|') > 0) {
+                if (is_string($value) && mb_strrpos($value, '|') > 0) {
                     $value = explode('|', $value);
                 } elseif (!is_array($value)) {
                     $value = [$value];

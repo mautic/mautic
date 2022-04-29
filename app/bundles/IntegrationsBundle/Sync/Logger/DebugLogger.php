@@ -35,6 +35,6 @@ class DebugLogger
             $context['logged from'] = $loggedFrom;
         }
 
-        static::$logger->$urgency(strtoupper($integration).' SYNC: '.$message, $context);
+        static::$logger->$urgency(mb_strtoupper($integration).' SYNC: '.$message, $context);
     }
 }

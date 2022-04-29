@@ -115,7 +115,7 @@ class BuilderTokenHelper
             );
 
             $parameters = [
-                'label' => strtolower($filter).'%',
+                'label' => mb_strtolower($filter).'%',
             ];
         } else {
             $parameters = [];

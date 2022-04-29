@@ -281,8 +281,8 @@ class TwitterIntegration extends SocialIntegration
         if (preg_match('#https?://twitter.com/(.*?)(/.*?|$)#i', $identifier, $match)) {
             //extract the handle
             $identifier = $match[1];
-        } elseif ('@' == substr($identifier, 0, 1)) {
-            $identifier = substr($identifier, 1);
+        } elseif ('@' == mb_substr($identifier, 0, 1)) {
+            $identifier = mb_substr($identifier, 1);
         }
 
         return urlencode($identifier);

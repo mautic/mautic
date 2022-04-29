@@ -209,7 +209,7 @@ class LeadTimelineEvent extends Event
                 // Ensure a full URL
                 if ($this->siteDomain && isset($data['eventLabel']) && is_array($data['eventLabel']) && isset($data['eventLabel']['href'])) {
                     // If this does not have a http, then assume a Mautic URL
-                    if (false === strpos($data['eventLabel']['href'], '://')) {
+                    if (false === mb_strpos($data['eventLabel']['href'], '://')) {
                         $data['eventLabel']['href'] = $this->siteDomain.$data['eventLabel']['href'];
                     }
                 }
@@ -608,7 +608,7 @@ class LeadTimelineEvent extends Event
                 continue;
             }
 
-            if (strstr($key, '_')) {
+            if (mb_strstr($key, '_')) {
                 $newKey           = lcfirst(str_replace('_', '', ucwords($key, '_')));
                 $details[$newKey] = $details[$key];
                 unset($details[$key]);

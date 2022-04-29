@@ -219,7 +219,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.imap';
         }
 
-        if ('https' !== substr($this->site_url, 0, 5)) {
+        if ('https' !== mb_substr($this->site_url, 0, 5)) {
             $messages[] = 'mautic.install.ssl.certificate';
         }
 

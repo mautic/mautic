@@ -694,9 +694,9 @@ class PageModel extends FormModel
         if (!empty($browserLanguages)) {
             $languages = explode(',', $browserLanguages);
             foreach ($languages as $k => $l) {
-                if ($pos = false !== strpos(';q=', $l)) {
+                if ($pos = false !== mb_strpos(';q=', $l)) {
                     //remove weights
-                    $languages[$k] = substr($l, 0, $pos);
+                    $languages[$k] = mb_substr($l, 0, $pos);
                 }
             }
             $hit->setBrowserLanguages($languages);
@@ -1022,7 +1022,7 @@ class PageModel extends FormModel
 
         foreach ($urlQueryArray as $key => $value) {
             if (is_string($value)) {
-                $key         = strtolower($key);
+                $key         = mb_strtolower($key);
                 $query[$key] = urldecode($value);
             }
         }
@@ -1039,7 +1039,7 @@ class PageModel extends FormModel
         $queryHasUtmTags = false;
         $query           = $hit->getQuery();
         foreach ($query as $key => $value) {
-            if (false !== strpos($key, 'utm_')) {
+            if (false !== mb_strpos($key, 'utm_')) {
                 $queryHasUtmTags = true;
                 break;
             }
@@ -1122,13 +1122,13 @@ class PageModel extends FormModel
 
         // Use the current URL
         $isPageEvent = false;
-        if (false !== strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
+        if (false !== mb_strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
             // Tracking pixel is used
             if ($request->server->get('QUERY_STRING')) {
                 parse_str($request->server->get('QUERY_STRING'), $query);
                 $isPageEvent = true;
             }
-        } elseif (false !== strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
+        } elseif (false !== mb_strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
             $query       = $request->request->all();
             $isPageEvent = true;
         }

@@ -91,8 +91,8 @@ class UrlHelper
         $path = $host = $scheme = '';
 
         $ssl    = !empty($_SERVER['HTTPS']) && 'on' == $_SERVER['HTTPS'];
-        $scheme = strtolower($_SERVER['SERVER_PROTOCOL']);
-        $scheme = substr($scheme, 0, strpos($scheme, '/')).($ssl ? 's' : '');
+        $scheme = mb_strtolower($_SERVER['SERVER_PROTOCOL']);
+        $scheme = mb_substr($scheme, 0, mb_strpos($scheme, '/')).($ssl ? 's' : '');
         $port   = $_SERVER['SERVER_PORT'];
         $port   = ((!$ssl && '80' == $port) || ($ssl && '443' == $port)) ? '' : ":$port";
         $host   = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
@@ -159,7 +159,7 @@ class UrlHelper
         $urls = [];
         // Check if there are any tokens that URL based fields
         foreach ($contactUrlFields as $field) {
-            if (false !== strpos($text, "{contactfield=$field}")) {
+            if (false !== mb_strpos($text, "{contactfield=$field}")) {
                 $urls[] = "{contactfield=$field}";
             }
         }
@@ -218,13 +218,13 @@ class UrlHelper
      */
     private static function sanitizeUrlScheme($url)
     {
-        $isRelative = 0 === strpos($url, '//');
+        $isRelative = 0 === mb_strpos($url, '//');
 
         if ($isRelative) {
             return $url;
         }
 
-        $containSlashes = false !== strpos($url, '://');
+        $containSlashes = false !== mb_strpos($url, '://');
 
         if (!$containSlashes) {
             $url = sprintf('://%s', $url);
@@ -286,15 +286,15 @@ class UrlHelper
     private static function removeTrailingNonAlphaNumeric($string)
     {
         // Special handling of closing bracket
-        if ('}' === substr($string, -1) && preg_match('/^[^{\r\n]*\}.*?$/', $string)) {
-            $string = substr($string, 0, -1);
+        if ('}' === mb_substr($string, -1) && preg_match('/^[^{\r\n]*\}.*?$/', $string)) {
+            $string = mb_substr($string, 0, -1);
 
             return self::removeTrailingNonAlphaNumeric($string);
         }
 
         // Ensure only alphanumeric allowed
         if (!preg_match("/^.*?[a-zA-Z0-9}\/]$/i", $string)) {
-            $string = substr($string, 0, -1);
+            $string = mb_substr($string, 0, -1);
 
             return self::removeTrailingNonAlphaNumeric($string);
         }

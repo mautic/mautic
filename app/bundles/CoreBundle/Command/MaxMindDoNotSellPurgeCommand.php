@@ -81,7 +81,7 @@ EOT
             $this->doNotSellList->loadList();
             $doNotSellListIPs = array_map(function ($item) {
                 // strip subnet mask characters
-                return substr_replace($item['value'], '', strpos($item['value'], '/'), 3);
+                return substr_replace($item['value'], '', mb_strpos($item['value'], '/'), 3);
             }, $this->doNotSellList->getList());
             $doNotSellContacts = $this->findContactsFromIPs($doNotSellListIPs);
 

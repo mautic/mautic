@@ -602,7 +602,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         }
 
         // segment API
-        if (0 === strpos($route, 'mautic_api_lists')) {
+        if (0 === mb_strpos($route, 'mautic_api_lists')) {
             return true;
         }
 

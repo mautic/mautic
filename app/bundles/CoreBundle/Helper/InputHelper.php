@@ -37,7 +37,7 @@ class InputHelper
     public static function boolean($value)
     {
         // Common strings used that filter_var does not parse yet.
-        switch (strtoupper((string) $value)) {
+        switch (mb_strtoupper((string) $value)) {
             case 'T':
             case 'Y':
                 return true;
@@ -258,8 +258,8 @@ class InputHelper
     {
         $value = str_replace(' ', '_', $value);
 
-        $sanitized = preg_replace("/[^a-z0-9\.\_-]/", '', strtolower($value));
-        $sanitized = preg_replace("/^\.\./", '', strtolower($sanitized));
+        $sanitized = preg_replace("/[^a-z0-9\.\_-]/", '', mb_strtolower($value));
+        $sanitized = preg_replace("/^\.\./", '', mb_strtolower($sanitized));
 
         if (null === $extension) {
             return $sanitized;
@@ -369,7 +369,7 @@ class InputHelper
             $value = urldecode($value);
         }
 
-        $value = substr($value, 0, 254);
+        $value = mb_substr($value, 0, 254);
         $value = filter_var($value, FILTER_SANITIZE_EMAIL);
         $value = str_replace('..', '.', $value);
 
@@ -428,7 +428,7 @@ class InputHelper
                     $from[]   = $match;
                     $startTag = '<mcondition>';
                     $endTag   = '</mcondition>';
-                    if (false !== strpos($match, '<!--<![endif]-->')) {
+                    if (false !== mb_strpos($match, '<!--<![endif]-->')) {
                         $startTag = '<mconditionnonoutlook>';
                         $endTag   = '</mconditionnonoutlook>';
                     }
@@ -457,7 +457,7 @@ class InputHelper
             $value = str_replace(['<!-->', '<!--', '-->'], ['<mcomment></mcomment>', '<mcomment>', '</mcomment>'], $value, $commentCount);
 
             // detect if there is any unicode character in the passed string
-            $hasUnicode = strlen($value) != strlen(utf8_decode($value));
+            $hasUnicode = mb_strlen($value) != mb_strlen(utf8_decode($value));
 
             // Encode the incoming value before cleaning, it convert unicode to encoded strings
             $value = $hasUnicode ? rawurlencode($value) : $value;

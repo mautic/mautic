@@ -540,7 +540,7 @@ class MailHelper
             $this->queuedRecipients = [];
 
             // Reset message
-            switch (strtoupper($returnMode)) {
+            switch (mb_strtoupper($returnMode)) {
                 case self::QUEUE_RESET_TO:
                     $this->message->setTo([]);
                     $this->clearErrors();
@@ -975,7 +975,7 @@ class MailHelper
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
-            if (false !== strpos($content, '</body>')) {
+            if (false !== mb_strpos($content, '</body>')) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
                 $content .= $trackingImg;
@@ -1003,7 +1003,7 @@ class MailHelper
         $content = strtr($content, $this->embedImagesReplaces);
         if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
             foreach ($matches[1] as $match) {
-                if (false === strpos($match, 'cid:') && false === strpos($match, '{tracking_pixel}') && !array_key_exists($match, $this->embedImagesReplaces)) {
+                if (false === mb_strpos($match, 'cid:') && false === mb_strpos($match, '{tracking_pixel}') && !array_key_exists($match, $this->embedImagesReplaces)) {
                     $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
                 }
             }
@@ -1502,7 +1502,7 @@ class MailHelper
         $listUnsubscribeHeader = $this->getUnsubscribeHeader();
         if ($listUnsubscribeHeader) {
             if (!empty($headers['List-Unsubscribe'])) {
-                if (false === strpos($headers['List-Unsubscribe'], $listUnsubscribeHeader)) {
+                if (false === mb_strpos($headers['List-Unsubscribe'], $listUnsubscribeHeader)) {
                     // Ensure Mautic's is always part of this header
                     $headers['List-Unsubscribe'] .= ','.$listUnsubscribeHeader;
                 }
@@ -1657,7 +1657,7 @@ class MailHelper
         }
 
         $logDump = $this->logger->dump();
-        if (!empty($logDump) && false === strpos($error, $logDump)) {
+        if (!empty($logDump) && false === mb_strpos($error, $logDump)) {
             $error .= " Log data: $logDump";
         }
 
@@ -1805,7 +1805,7 @@ class MailHelper
     public function getTrackableLink($url)
     {
         // Ensure a valid URL and that it has not already been found
-        if ('http' !== substr($url, 0, 4) && 'ftp' !== substr($url, 0, 3)) {
+        if ('http' !== mb_substr($url, 0, 4) && 'ftp' !== mb_substr($url, 0, 3)) {
             return null;
         }
 
@@ -1885,7 +1885,7 @@ class MailHelper
         // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
         $id = (null !== $this->email) ? $this->email->getId() : md5($this->subject.$this->body['content']);
         if (!isset($this->copies[$id])) {
-            $hash = (32 !== strlen($id)) ? md5($this->subject.$this->body['content']) : $id;
+            $hash = (32 !== mb_strlen($id)) ? md5($this->subject.$this->body['content']) : $id;
 
             $copy        = $emailModel->getCopyRepository()->findByHash($hash);
             $copyCreated = false;
@@ -2179,7 +2179,7 @@ class MailHelper
         $invalidChar = strpbrk($address, '\'^&*%');
 
         if (false !== $invalidChar) {
-            throw new \Swift_RfcComplianceException('Email address ['.$address.'] contains this invalid character: '.substr($invalidChar, 0, 1));
+            throw new \Swift_RfcComplianceException('Email address ['.$address.'] contains this invalid character: '.mb_substr($invalidChar, 0, 1));
         }
 
         if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {

@@ -80,7 +80,7 @@ abstract class SocialIntegration extends AbstractIntegration
     public function appendToForm(&$builder, $data, $formArea)
     {
         if ('features' == $formArea) {
-            $name     = strtolower($this->getName());
+            $name     = mb_strtolower($this->getName());
             $formType = $this->getFormType();
             if ($formType) {
                 $builder->add('shareButton', $formType, [

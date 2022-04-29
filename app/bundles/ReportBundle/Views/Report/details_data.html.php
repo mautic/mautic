@@ -66,7 +66,7 @@ $graphContent = $view->render(
                                 if (isset($columns[$key])):
                                     // order by alias if exists, if not then by column name
                                     $orderBy = $columns[$key]['alias'] ??
-                                        (0 === strpos($key, 'channel.') ? str_replace('.', '_', $key) : $key);
+                                        (0 === mb_strpos($key, 'channel.') ? str_replace('.', '_', $key) : $key);
                                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                                         'sessionVar' => 'report.'.$report->getId(),
                                         'orderBy'    => $orderBy,
@@ -122,7 +122,7 @@ $graphContent = $view->render(
                                                 $cellVal  = $row[$columns[$key]['alias']];
 
                                                 // For grouping by datetime fields, so we don't get the timestamp on them
-                                                if ('datetime' === $cellType && 10 === strlen($cellVal)) {
+                                                if ('datetime' === $cellType && 10 === mb_strlen($cellVal)) {
                                                     $cellType = 'date';
                                                 }
                                                 ?>

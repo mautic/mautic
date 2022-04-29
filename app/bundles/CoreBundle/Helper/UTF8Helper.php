@@ -251,8 +251,8 @@ class UTF8Helper
 
     public static function removeBOM($str = '')
     {
-        if (substr($str, 0, 3) == pack('CCC', 0xef, 0xbb, 0xbf)) {
-            $str = substr($str, 3);
+        if (mb_substr($str, 0, 3) == pack('CCC', 0xef, 0xbb, 0xbf)) {
+            $str = mb_substr($str, 3);
         }
 
         return $str;
@@ -261,12 +261,12 @@ class UTF8Helper
     protected static function strlen($text)
     {
         return (function_exists('mb_strlen') && ((int) ini_get('mbstring.func_overload')) & 2) ?
-            mb_strlen($text, '8bit') : strlen($text);
+            mb_strlen($text, '8bit') : mb_strlen($text);
     }
 
     public static function normalizeEncoding($encodingLabel)
     {
-        $encoding     = strtoupper($encodingLabel);
+        $encoding     = mb_strtoupper($encodingLabel);
         $encoding     = preg_replace('/[^a-zA-Z0-9\s]/', '', $encoding);
         $equivalences = [
             'ISO88591'    => 'ISO-8859-1',

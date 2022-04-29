@@ -288,7 +288,7 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'text/csv; charset=UTF-8');
-        $this->assertEquals(true, (strlen($content) > 5000));
+        $this->assertEquals(true, (mb_strlen($content) > 5000));
     }
 
     /**
@@ -308,7 +308,7 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $this->assertEquals(true, (strlen($content) > 10000));
+        $this->assertEquals(true, (mb_strlen($content) > 10000));
     }
 
     public function testContactsAreAddedAndRemovedFromCompanies(): void

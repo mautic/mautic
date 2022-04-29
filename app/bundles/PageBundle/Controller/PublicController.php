@@ -499,7 +499,7 @@ class PublicController extends CommonFormController
                 $url = TokenHelper::findLeadTokens($url, $leadArray, true);
             }
 
-            if (false !== strpos($url, $this->generateUrl('mautic_asset_download'))) {
+            if (false !== mb_strpos($url, $this->generateUrl('mautic_asset_download'))) {
                 $url .= '?ct='.$ct;
             }
         }

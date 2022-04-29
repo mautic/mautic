@@ -984,7 +984,7 @@ class Asset extends FormEntity
      */
     public function isImage()
     {
-        $fileType = strtolower($this->getFileType());
+        $fileType = mb_strtolower($this->getFileType());
 
         if (!$fileType) {
             return false;
@@ -1324,7 +1324,7 @@ class Asset extends FormEntity
         $number = number_format($number, 2);
 
         // Remove trailing .00
-        $number = false !== strpos($number, '.') ? rtrim(rtrim($number, '0'), '.') : $number;
+        $number = false !== mb_strpos($number, '.') ? rtrim(rtrim($number, '0'), '.') : $number;
 
         return $number.' '.$unit;
     }
@@ -1337,7 +1337,7 @@ class Asset extends FormEntity
      */
     public static function convertBytesToUnit($size, $unit = '')
     {
-        $unit = strtoupper($unit);
+        $unit = mb_strtoupper($unit);
 
         if ((!$unit && $size >= 1 << 30) || 'GB' == $unit || 'G' == $unit) {
             return [$size / (1 << 30), 'GB'];

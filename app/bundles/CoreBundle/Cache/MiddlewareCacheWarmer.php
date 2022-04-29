@@ -94,7 +94,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         }
 
         foreach ($middlewares as $middleware) {
-            $this->push($prefix.basename(substr($middleware, 0, -4)));
+            $this->push($prefix.basename(mb_substr($middleware, 0, -4)));
         }
     }
 

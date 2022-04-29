@@ -15,15 +15,15 @@ class DoNotContactParts
      */
     public function __construct($field)
     {
-        if (false !== strpos($field, '_manual')) {
+        if (false !== mb_strpos($field, '_manual')) {
             $this->type = DoNotContact::MANUAL;
         }
 
-        if (false !== strpos($field, '_bounced')) {
+        if (false !== mb_strpos($field, '_bounced')) {
             $this->type = DoNotContact::BOUNCED;
         }
 
-        if (false !== strpos($field, '_sms')) {
+        if (false !== mb_strpos($field, '_sms')) {
             $this->channel = 'sms';
         }
     }

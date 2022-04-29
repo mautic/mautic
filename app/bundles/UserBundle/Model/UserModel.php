@@ -93,7 +93,7 @@ class UserModel extends FormModel
     public function checkNewPassword(User $entity, UserPasswordEncoder $encoder, $submittedPassword, $validate = false)
     {
         if ($validate) {
-            if (strlen($submittedPassword) < 6) {
+            if (mb_strlen($submittedPassword) < 6) {
                 throw new \InvalidArgumentException($this->translator->trans('mautic.user.user.password.minlength', 'validators'));
             }
         }

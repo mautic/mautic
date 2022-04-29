@@ -36,7 +36,7 @@ class ButtonSubscriber implements EventSubscriberInterface
 
     public function injectViewButtons(CustomButtonEvent $event)
     {
-        if (0 === strpos($event->getRoute(), 'mautic_contact_index')) {
+        if (0 === mb_strpos($event->getRoute(), 'mautic_contact_index')) {
             $exportRoute = $this->router->generate(
                 'mautic_contact_action',
                 ['objectAction' => 'batchExport']

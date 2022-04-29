@@ -843,13 +843,13 @@ class Mailbox
         $mail->subject  = isset($headObject->subject) ? $this->decodeMimeStr($headObject->subject, $this->serverEncoding) : null;
         $mail->fromName = isset($headObject->from[0]->personal) ? $this->decodeMimeStr($headObject->from[0]->personal, $this->serverEncoding)
             : null;
-        $mail->fromAddress = strtolower($headObject->from[0]->mailbox.'@'.$headObject->from[0]->host);
+        $mail->fromAddress = mb_strtolower($headObject->from[0]->mailbox.'@'.$headObject->from[0]->host);
 
         if (isset($headObject->to)) {
             $toStrings = [];
             foreach ($headObject->to as $to) {
                 if (!empty($to->mailbox) && !empty($to->host)) {
-                    $toEmail            = strtolower($to->mailbox.'@'.$to->host);
+                    $toEmail            = mb_strtolower($to->mailbox.'@'.$to->host);
                     $toName             = isset($to->personal) ? $this->decodeMimeStr($to->personal, $this->serverEncoding) : null;
                     $toStrings[]        = $toName ? "$toName <$toEmail>" : $toEmail;
                     $mail->to[$toEmail] = $toName;
@@ -860,14 +860,14 @@ class Mailbox
 
         if (isset($headObject->cc)) {
             foreach ($headObject->cc as $cc) {
-                $mail->cc[strtolower($cc->mailbox.'@'.$cc->host)] = isset($cc->personal) ? $this->decodeMimeStr($cc->personal, $this->serverEncoding)
+                $mail->cc[mb_strtolower($cc->mailbox.'@'.$cc->host)] = isset($cc->personal) ? $this->decodeMimeStr($cc->personal, $this->serverEncoding)
                     : null;
             }
         }
 
         if (isset($headObject->reply_to)) {
             foreach ($headObject->reply_to as $replyTo) {
-                $mail->replyTo[strtolower($replyTo->mailbox.'@'.$replyTo->host)] = isset($replyTo->personal) ? $this->decodeMimeStr(
+                $mail->replyTo[mb_strtolower($replyTo->mailbox.'@'.$replyTo->host)] = isset($replyTo->personal) ? $this->decodeMimeStr(
                     $replyTo->personal,
                     $this->serverEncoding
                 ) : null;
@@ -902,7 +902,7 @@ class Mailbox
             $headers = [];
             foreach ($tempArray as $line) {
                 if (preg_match('/^X-(.*?): (.*?)$/is', trim($line), $matches)) {
-                    $headers['x-'.strtolower($matches[1])] = $matches[2];
+                    $headers['x-'.mb_strtolower($matches[1])] = $matches[2];
                 }
             }
             $mail->xHeaders = $headers;
@@ -952,7 +952,7 @@ class Mailbox
         if ($attachmentId) {
             if (isset($this->settings['use_attachments']) && $this->settings['use_attachments']) {
                 if (empty($params['filename']) && empty($params['name'])) {
-                    $fileName = $attachmentId.'.'.strtolower($partStructure->subtype);
+                    $fileName = $attachmentId.'.'.mb_strtolower($partStructure->subtype);
                 } else {
                     $fileName = !empty($params['filename']) ? $params['filename'] : $params['name'];
                     $fileName = $this->decodeMimeStr($fileName, $this->serverEncoding);
@@ -985,7 +985,7 @@ class Mailbox
 
             if (!empty($data)) {
                 $subtype = !empty($partStructure->ifsubtype)
-                    ? strtolower($partStructure->subtype)
+                    ? mb_strtolower($partStructure->subtype)
                     : '';
                 switch ($partStructure->type) {
                     case TYPETEXT:
@@ -1006,7 +1006,7 @@ class Mailbox
                         ) {
                             break;
                         }
-                        $reportType = strtolower($params['report-type']);
+                        $reportType = mb_strtolower($params['report-type']);
                         switch ($reportType) {
                             case 'delivery-status':
                                 $mail->dsnMessage = trim($data);
@@ -1055,12 +1055,12 @@ class Mailbox
         $params = [];
         if (!empty($partStructure->parameters)) {
             foreach ($partStructure->parameters as $param) {
-                $params[strtolower($param->attribute)] = $param->value;
+                $params[mb_strtolower($param->attribute)] = $param->value;
             }
         }
         if (!empty($partStructure->dparameters)) {
             foreach ($partStructure->dparameters as $param) {
-                $paramName = strtolower(preg_match('~^(.*?)\*~', $param->attribute, $matches) ? $matches[1] : $param->attribute);
+                $paramName = mb_strtolower(preg_match('~^(.*?)\*~', $param->attribute, $matches) ? $matches[1] : $param->attribute);
                 if (isset($params[$paramName])) {
                     $params[$paramName] .= $param->value;
                 } else {

@@ -156,7 +156,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         /** @var ContactSegmentService $contactSegmentService */
         $contactSegmentService = self::$container->get('mautic.lead.model.lead_segment_service');
 
-        $alias = strtolower(InputHelper::alphanum($name, false, '-'));
+        $alias = mb_strtolower(InputHelper::alphanum($name, false, '-'));
 
         $segmentName = 'segment-with-relative-date-'.$alias;
         /** @var LeadList $segmentRef */

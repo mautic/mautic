@@ -271,7 +271,7 @@ class CitrixHelper
      */
     public static function getCleanString($str, $limit = 20)
     {
-        $str = htmlentities(strtolower($str), ENT_NOQUOTES, 'utf-8');
+        $str = htmlentities(mb_strtolower($str), ENT_NOQUOTES, 'utf-8');
         $str = preg_replace('#&([A-za-z])(?:acute|cedil|caron|circ|grave|orn|ring|slash|th|tilde|uml);#', '\1', $str);
         $str = preg_replace('#&([A-za-z]{2})(?:lig);#', '\1', $str);
         $str = preg_replace('#&[^;]+;#', '', $str);
@@ -280,7 +280,7 @@ class CitrixHelper
         $safeStr        = '';
         $safeChar       = '';
         /** @var array $chars */
-        $chars = str_split($str);
+        $chars = mb_str_split($str);
         foreach ($chars as $char) {
             if (!in_array($char, $availableChars, true)) {
                 if ('-' !== $safeChar) {
@@ -294,7 +294,7 @@ class CitrixHelper
             $safeStr .= $safeChar;
         }
 
-        return trim(substr($safeStr, 0, $limit), '-');
+        return trim(mb_substr($safeStr, 0, $limit), '-');
     }
 
     /**
@@ -534,7 +534,7 @@ class CitrixHelper
                     // ignore
                     continue;
                 }
-                $emailKey = strtolower($result['attendeeEmail']);
+                $emailKey = mb_strtolower($result['attendeeEmail']);
                 $names    = explode(' ', $result['attendeeName']);
                 switch (count($names)) {
                     case 1:
@@ -556,7 +556,7 @@ class CitrixHelper
                     'email'     => $result['attendeeEmail'],
                 ];
             } elseif (!empty($result['email'])) {
-                $emailKey            = strtolower($result['email']);
+                $emailKey            = mb_strtolower($result['email']);
                 $contacts[$emailKey] = [
                     'firstname' => (isset($result['firstName'])) ? $result['firstName'] : '',
                     'lastname'  => (isset($result['lastName'])) ? $result['lastName'] : '',

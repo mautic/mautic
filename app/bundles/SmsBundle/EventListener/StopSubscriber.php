@@ -37,7 +37,7 @@ class StopSubscriber implements EventSubscriberInterface
     {
         $message = $event->getMessage();
 
-        if ('stop' === strtolower($message)) {
+        if ('stop' === mb_strtolower($message)) {
             // Unsubscribe the contact
             $this->doNotContactModel->addDncForContact($event->getContact()->getId(), 'sms', DoNotContact::UNSUBSCRIBED);
         }

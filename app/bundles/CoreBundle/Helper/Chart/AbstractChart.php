@@ -90,7 +90,7 @@ abstract class AbstractChart
             $unit = 'M';
         }
 
-        return new \DateInterval('P'.$isTime.'1'.strtoupper($unit));
+        return new \DateInterval('P'.$isTime.'1'.mb_strtoupper($unit));
     }
 
     /**
@@ -106,7 +106,7 @@ abstract class AbstractChart
     {
         $string = trim($string);
 
-        if (strlen($string) > $length) {
+        if (mb_strlen($string) > $length) {
             $string = wordwrap($string, $length);
             $string = explode("\n", $string, 2);
             $string = $string[0].$append;

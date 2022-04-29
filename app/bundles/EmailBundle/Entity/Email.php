@@ -1124,7 +1124,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             foreach ($matches[0] as $url) {
                 $newUrl = $url;
 
-                while (false !== strpos($newUrl, '&amp;')) {
+                while (false !== mb_strpos($newUrl, '&amp;')) {
                     $newUrl = str_replace('&amp;', '&', $newUrl);
                 }
 

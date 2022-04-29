@@ -85,8 +85,8 @@ class RouterSubscriber implements EventSubscriberInterface
 
         // Remove index_dev.php, index.php, and ending forward slash from the URL to match what is configured in SiteUrlEnvVars
         $originalBaseUrl = str_replace(['index_dev.php', 'index.php'], '', $originalContext->getBaseUrl());
-        if ('/' == substr($originalBaseUrl, -1)) {
-            $originalBaseUrl = substr($originalBaseUrl, 0, -1);
+        if ('/' == mb_substr($originalBaseUrl, -1)) {
+            $originalBaseUrl = mb_substr($originalBaseUrl, 0, -1);
         }
 
         if ($originalBaseUrl && !$this->baseUrl) {
@@ -95,7 +95,7 @@ class RouterSubscriber implements EventSubscriberInterface
         }
 
         // Append index_dev.php for installations at the root level
-        if ('dev' === MAUTIC_ENV && false === strpos($this->baseUrl, 'index_dev.php')) {
+        if ('dev' === MAUTIC_ENV && false === mb_strpos($this->baseUrl, 'index_dev.php')) {
             $this->baseUrl = $this->baseUrl.'/index_dev.php';
         }
 

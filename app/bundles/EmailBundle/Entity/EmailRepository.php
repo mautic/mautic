@@ -41,7 +41,7 @@ class EmailRepository extends CommonRepository
 
         $dnc = [];
         foreach ($results as $r) {
-            $dnc[$r['id']] = strtolower($r['email']);
+            $dnc[$r['id']] = mb_strtolower($r['email']);
         }
 
         return $dnc;

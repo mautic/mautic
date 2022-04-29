@@ -16,7 +16,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         $result = $method->invokeArgs($helper, ['hello@mautic.org']);
 
         $this->assertTrue(is_string($result));
-        $this->assertGreaterThan(0, strlen($result));
+        $this->assertGreaterThan(0, mb_strlen($result));
     }
 
     public function testDomainExistsWithFakeDomain()

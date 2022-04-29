@@ -16,7 +16,7 @@ $channelNumber = 0;
     <?php foreach ($form['lead_channels']['subscribed_channels']->vars['choices'] as $key=>$channel):
         $contactMe   = isset($leadChannels[$channel->value]);
         $checked     = $contactMe ? 'checked' : '';
-        $channelName = strtolower($view['channel']->getChannelLabel($channel->value));
+        $channelName = mb_strtolower($view['channel']->getChannelLabel($channel->value));
         ?>
         <tr>
             <td>

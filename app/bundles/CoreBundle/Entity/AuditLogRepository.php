@@ -89,7 +89,7 @@ class AuditLogRepository extends CommonRepository
             if (isset($orderBy[1])) {
                 $orderdir = $orderBy[1];
             }
-            if (0 !== strpos($order, 'al.')) {
+            if (0 !== mb_strpos($order, 'al.')) {
                 $order = 'al.'.$order;
             }
 
@@ -141,7 +141,7 @@ class AuditLogRepository extends CommonRepository
             if (isset($orderBy[1])) {
                 $orderdir = $orderBy[1];
             }
-            if (0 !== strpos($order, 'al.')) {
+            if (0 !== mb_strpos($order, 'al.')) {
                 $order = 'al.'.$order;
             }
 

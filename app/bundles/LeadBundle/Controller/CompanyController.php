@@ -157,7 +157,7 @@ class CompanyController extends FormController
         foreach ($contacts as $contact) {
             $leadsIds .= $contact['lead_id'].',';
         }
-        $leadsIds = substr($leadsIds, 0, -1);
+        $leadsIds = mb_substr($leadsIds, 0, -1);
 
         $data = $this->getCompanyContacts($objectId, $page, $leadsIds);
 
@@ -581,7 +581,7 @@ class CompanyController extends FormController
         foreach ($contacts as $contact) {
             $leadsIds .= $contact['lead_id'].',';
         }
-        $leadsIds = substr($leadsIds, 0, -1);
+        $leadsIds = mb_substr($leadsIds, 0, -1);
 
         $engagementData = is_array($contacts) ? $this->getCompanyEngagementsForGraph($contacts) : [];
 

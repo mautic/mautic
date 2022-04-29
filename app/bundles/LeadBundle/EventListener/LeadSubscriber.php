@@ -498,10 +498,10 @@ class LeadSubscriber implements EventSubscriberInterface
             foreach ($utmTags['results'] as $utmTag) {
                 $icon = 'fa-tag';
                 if (isset($utmTag['utm_medium'])) {
-                    switch (strtolower($utmTag['utm_medium'])) {
+                    switch (mb_strtolower($utmTag['utm_medium'])) {
                             case 'social':
                             case 'socialmedia':
-                                $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'share-alt');
+                                $icon = 'fa-'.((isset($utmTag['utm_source'])) ? mb_strtolower($utmTag['utm_source']) : 'share-alt');
                                 break;
                             case 'email':
                             case 'newsletter':
@@ -518,7 +518,7 @@ class LeadSubscriber implements EventSubscriberInterface
                                 $icon = 'fa-map-marker';
                                 break;
                             case 'device':
-                                $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'tablet');
+                                $icon = 'fa-'.((isset($utmTag['utm_source'])) ? mb_strtolower($utmTag['utm_source']) : 'tablet');
                                 break;
                         }
                 }

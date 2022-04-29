@@ -45,11 +45,11 @@ class FileHelper
             return (int) $sSize;
         }
 
-        $sSuffix = substr($sSize, -1);
-        $iValue  = substr($sSize, 0, -1);
+        $sSuffix = mb_substr($sSize, -1);
+        $iValue  = mb_substr($sSize, 0, -1);
 
         //missing breaks are important
-        switch (strtoupper($sSuffix)) {
+        switch (mb_strtoupper($sSuffix)) {
             case 'P':
                 $iValue *= 1024;
                 // no break

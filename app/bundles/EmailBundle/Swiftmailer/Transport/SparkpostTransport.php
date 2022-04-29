@@ -174,7 +174,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
             $mergeVars = $mergeVarPlaceholders = [];
             foreach ($mauticTokens as $token) {
-                $mergeVars[$token]            = strtoupper(preg_replace('/[^a-z0-9]+/i', '', $token));
+                $mergeVars[$token]            = mb_strtoupper(preg_replace('/[^a-z0-9]+/i', '', $token));
                 $mergeVarPlaceholders[$token] = '{{{ '.$mergeVars[$token].' }}}';
             }
 
@@ -505,7 +505,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             $id = $metadataSet['emailId'];
         }
 
-        return substr($id, 0, 64);
+        return mb_substr($id, 0, 64);
     }
 
     /**

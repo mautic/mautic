@@ -109,9 +109,9 @@ class FocusSubscriber implements EventSubscriberInterface
 
             $formGenerateUrl = $this->router->generate('mautic_form_generateform');
 
-            if (false !== strpos($requestUri, $formGenerateUrl)) {
+            if (false !== mb_strpos($requestUri, $formGenerateUrl)) {
                 $id = InputHelper::_($this->requestStack->getCurrentRequest()->get('id'));
-                if (0 === strpos($id, 'mf-')) {
+                if (0 === mb_strpos($id, 'mf-')) {
                     $mfId             = str_replace('mf-', '', $id);
                     $focusGenerateUrl = $this->router->generate('mautic_focus_generate', ['id' => $mfId]);
 

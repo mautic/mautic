@@ -147,7 +147,7 @@ class SearchStringHelper
         $filters->{$baseName}[$keyCount]->string  = '';
         $filters->{$baseName}[$keyCount]->not     = 0;
         $filters->{$baseName}[$keyCount]->strict  = 0;
-        $chars                                    = str_split($input);
+        $chars                                    = mb_str_split($input);
         $pos                                      = 0;
         $string                                   = '';
 
@@ -162,11 +162,11 @@ class SearchStringHelper
 
             if (':' == $char) {
                 //the string is a command
-                $command = trim(substr($string, 0, -1));
+                $command = trim(mb_substr($string, 0, -1));
                 //does this have a negative?
-                if (0 === strpos($command, '!')) {
+                if (0 === mb_strpos($command, '!')) {
                     $filters->{$baseName}[$keyCount]->not = 1;
-                    $command                              = substr($command, 1);
+                    $command                              = mb_substr($command, 1);
                 }
 
                 if (empty($chars)) {
@@ -180,7 +180,7 @@ class SearchStringHelper
                 //arrived at the end of a single word that is not within a quote or parenthesis so add it as standalone
                 if (' ' != $string) {
                     $string = trim($string);
-                    $type   = ('or' == strtolower($string) || 'and' == strtolower($string)) ? $string : '';
+                    $type   = ('or' == mb_strtolower($string) || 'and' == mb_strtolower($string)) ? $string : '';
                     $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, (!empty($chars)));
                 }
                 continue;
@@ -203,8 +203,8 @@ class SearchStringHelper
                         //found the matching character (accounts for nesting)
 
                         //remove wrapping grouping chars
-                        if (0 === strpos($string, $char) && substr($string, -1) === $c) {
-                            $string = substr($string, 1, -1);
+                        if (0 === mb_strpos($string, $char) && mb_substr($string, -1) === $c) {
+                            $string = mb_substr($string, 1, -1);
                         }
 
                         //handle characters that support nesting
@@ -212,7 +212,7 @@ class SearchStringHelper
                         if ('"' !== $c) {
                             //check to see if the nested string needs to be parsed as well
                             foreach ($this->needsParsing as $parseMe) {
-                                if (false !== strpos($string, $parseMe)) {
+                                if (false !== mb_strpos($string, $parseMe)) {
                                     $parsed                                    = $this->splitUpSearchString($string, 'parsed', $command);
                                     $filters->{$baseName}[$keyCount]->children = $parsed->parsed;
                                     $neededParsing                             = true;
@@ -247,9 +247,9 @@ class SearchStringHelper
                                       $setUpNext = true)
     {
         if (!empty($type)) {
-            $filters->{$baseName}[$keyCount]->type = strtolower($type);
+            $filters->{$baseName}[$keyCount]->type = mb_strtolower($type);
         } elseif ($setFilter) {
-            $string = trim(strtolower($string));
+            $string = trim(mb_strtolower($string));
 
             //remove operators and empty values
             if (in_array($string, ['', 'or', 'and'])) {
@@ -265,24 +265,24 @@ class SearchStringHelper
                 $filters->{$baseName}[$keyCount]->not = 0;
             }
 
-            $strictPos = strpos($string, '+');
-            $notPos    = strpos($string, '!');
+            $strictPos = mb_strpos($string, '+');
+            $notPos    = mb_strpos($string, '!');
             if ((0 === $strictPos || 1 === $strictPos || 0 === $notPos || 1 === $notPos)) {
                 if (false !== $strictPos && false !== $notPos) {
                     //+! or !+
                     $filters->{$baseName}[$keyCount]->strict = 1;
                     $filters->{$baseName}[$keyCount]->not    = 1;
-                    $string                                  = substr($string, 2);
+                    $string                                  = mb_substr($string, 2);
                 } elseif (0 === $strictPos && false === $notPos) {
                     //+
                     $filters->{$baseName}[$keyCount]->strict = 1;
                     $filters->{$baseName}[$keyCount]->not    = 0;
-                    $string                                  = substr($string, 1);
+                    $string                                  = mb_substr($string, 1);
                 } elseif (false === $strictPos && 0 === $notPos) {
                     //!
                     $filters->{$baseName}[$keyCount]->strict = 0;
                     $filters->{$baseName}[$keyCount]->not    = 1;
-                    $string                                  = substr($string, 1);
+                    $string                                  = mb_substr($string, 1);
                 }
             }
 

@@ -46,7 +46,7 @@ class AjaxController extends CommonAjaxController
         ];
 
         // if we get a 2xx response convert to success message
-        if (2 == substr($response->getStatusCode(), 0, 1)) {
+        if (2 == mb_substr($response->getStatusCode(), 0, 1)) {
             $dataArray['html'] =
                 '<div class="has-success"><span class="help-block">'
                 .$this->translator->trans('mautic.webhook.label.success')
@@ -85,7 +85,7 @@ class AjaxController extends CommonAjaxController
 
             // if plugin is in first part of the string this is an addon
             // input is plugin.bundlename or mautic.bundlename
-            if (strpos('plugin.', $prefix)) {
+            if (mb_strpos('plugin.', $prefix)) {
                 $payloadPath = $this->factory->getSystemPath('plugins', true);
             }
 

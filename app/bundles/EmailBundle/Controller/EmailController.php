@@ -933,7 +933,7 @@ class EmailController extends FormController
         $model = $this->getModel('email');
 
         //permission check
-        if (false !== strpos($objectId, 'new')) {
+        if (false !== mb_strpos($objectId, 'new')) {
             $isNew = true;
             if (!$this->get('mautic.security')->isGranted('email:emails:create')) {
                 return $this->accessDenied();

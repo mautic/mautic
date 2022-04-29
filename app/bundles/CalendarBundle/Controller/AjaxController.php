@@ -115,8 +115,8 @@ class AjaxController extends CommonAjaxController
         foreach ($events as $key => $event) {
             //make sure the user has view access to the entities
             foreach ($event as $eventKey => $eventValue) {
-                if ('_id' === substr($eventKey, -3)) {
-                    $modelName = substr($eventKey, 0, -3);
+                if ('_id' === mb_substr($eventKey, -3)) {
+                    $modelName = mb_substr($eventKey, 0, -3);
                     if ($modelFactory->hasModel($modelName)) {
                         $model = $modelFactory->getModel($modelName);
                         $base  = $model->getPermissionBase();

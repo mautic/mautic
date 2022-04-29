@@ -72,7 +72,7 @@ class Release
     private function parseUpdatePackage(array $assets): string
     {
         foreach ($assets as $asset) {
-            if (false !== strpos($asset['name'], 'update.zip')) {
+            if (false !== mb_strpos($asset['name'], 'update.zip')) {
                 return $asset['browser_download_url'];
             }
         }

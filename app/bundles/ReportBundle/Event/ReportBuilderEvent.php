@@ -91,9 +91,9 @@ class ReportBuilderEvent extends AbstractReportEvent
         foreach ($data['columns'] as $column => &$d) {
             $d['label'] = $this->translator->trans($d['label']);
             if (!isset($d['alias'])) {
-                $d['alias'] = substr(
+                $d['alias'] = mb_substr(
                     $column,
-                    false !== ($pos = strpos($column, '.')) ? $pos + 1 : 0
+                    false !== ($pos = mb_strpos($column, '.')) ? $pos + 1 : 0
                 );
             }
         }
@@ -109,9 +109,9 @@ class ReportBuilderEvent extends AbstractReportEvent
             foreach ($data['filters'] as $column => &$d) {
                 $d['label'] = $this->translator->trans($d['label']);
                 if (!isset($d['alias'])) {
-                    $d['alias'] = substr(
+                    $d['alias'] = mb_substr(
                         $column,
-                        false !== ($pos = strpos($column, '.')) ? $pos + 1 : 0
+                        false !== ($pos = mb_strpos($column, '.')) ? $pos + 1 : 0
                     );
                 }
             }

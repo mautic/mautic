@@ -126,6 +126,6 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
      */
     private function getAliasFromName($name)
     {
-        return strtolower(str_replace(' ', '', $name));
+        return mb_strtolower(str_replace(' ', '', $name));
     }
 }

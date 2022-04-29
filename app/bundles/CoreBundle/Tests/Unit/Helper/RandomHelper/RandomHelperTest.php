@@ -12,9 +12,9 @@ class RandomHelperTest extends \PHPUnit\Framework\TestCase
     public function testGenerate()
     {
         $randomHelper = $this->getRandomHelper();
-        $this->assertSame(10, strlen($randomHelper->generate(10)));
-        $this->assertSame(5, strlen($randomHelper->generate(5)));
-        $this->assertSame(200, strlen($randomHelper->generate(200)));
+        $this->assertSame(10, mb_strlen($randomHelper->generate(10)));
+        $this->assertSame(5, mb_strlen($randomHelper->generate(5)));
+        $this->assertSame(200, mb_strlen($randomHelper->generate(200)));
         $this->assertTrue((bool) preg_match('#^[0-9a-z]+$#', $randomHelper->generate()));
         $this->assertTrue((bool) preg_match('#^[0-9]+$#', $randomHelper->generate(1000, '0-9')));
         $this->assertTrue((bool) preg_match('#^[0a-z12]+$#', $randomHelper->generate(1000, '0a-z12')));

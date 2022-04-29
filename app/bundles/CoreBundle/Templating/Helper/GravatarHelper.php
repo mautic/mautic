@@ -62,13 +62,13 @@ class GravatarHelper extends Helper
             :
             $this->defaultAvatarHelper->getDefaultAvatar(true);
 
-        $url = 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($email))).'?s='.$size;
+        $url = 'https://www.gravatar.com/avatar/'.md5(mb_strtolower(trim($email))).'?s='.$size;
 
         if (null === $default) {
             $default = $localDefault;
         }
 
-        $default = (false !== strpos($default, '.') && 0 !== strpos($default, 'http')) ? UrlHelper::rel2abs($default) : $default;
+        $default = (false !== mb_strpos($default, '.') && 0 !== mb_strpos($default, 'http')) ? UrlHelper::rel2abs($default) : $default;
 
         return $url.('&d='.urlencode($default));
     }

@@ -441,8 +441,8 @@ class ThemeHelper
         $config = [];
         for ($i = 0; $i < $zipper->numFiles; ++$i) {
             $entry = $zipper->getNameIndex($i);
-            if (0 === strpos($entry, '/')) {
-                $entry = substr($entry, 1);
+            if (0 === mb_strpos($entry, '/')) {
+                $entry = mb_substr($entry, 1);
             }
 
             $extension = pathinfo($entry, PATHINFO_EXTENSION);
@@ -453,7 +453,7 @@ class ThemeHelper
             }
 
             // Filter out dangerous files like .php
-            if (empty($extension) || in_array(strtolower($extension), $allowedExtensions)) {
+            if (empty($extension) || in_array(mb_strtolower($extension), $allowedExtensions)) {
                 $allowedFiles[] = $entry;
             }
 
@@ -464,7 +464,7 @@ class ThemeHelper
 
         if (!empty($config['features'])) {
             foreach ($config['features'] as $feature) {
-                $featureFile     = sprintf('html/%s.html.twig', strtolower($feature));
+                $featureFile     = sprintf('html/%s.html.twig', mb_strtolower($feature));
                 $requiredFiles[] = $featureFile;
 
                 if (in_array($featureFile, $allowedFiles)) {

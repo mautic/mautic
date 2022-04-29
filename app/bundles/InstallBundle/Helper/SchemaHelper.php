@@ -193,16 +193,16 @@ class SchemaHelper
         $version  = $this->db->executeQuery('SELECT VERSION()')->fetchOne();
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
-        $platform = strtolower(get_class($this->db->getDatabasePlatform()));
+        $platform = mb_strtolower(get_class($this->db->getDatabasePlatform()));
         $metadata = ThisRelease::getMetadata();
 
         /**
          * The second case is for MariaDB < 10.2, where Doctrine reports it as MySQLPlatform. Here we can use a little
          * help from the version string, which contains "MariaDB" in that case: 10.1.48-MariaDB-1~bionic.
          */
-        if (false !== strpos($platform, 'mariadb') || false !== strpos(strtolower($version), 'mariadb')) {
+        if (false !== mb_strpos($platform, 'mariadb') || false !== mb_strpos(mb_strtolower($version), 'mariadb')) {
             $minSupported = $metadata->getMinSupportedMariaDbVersion();
-        } elseif (false !== strpos($platform, 'mysql')) {
+        } elseif (false !== mb_strpos($platform, 'mysql')) {
             $minSupported = $metadata->getMinSupportedMySqlVersion();
         } else {
             throw new \Exception('Invalid database platform '.$platform.'. Mautic only supports MySQL and MariaDB!');
@@ -346,7 +346,7 @@ class SchemaHelper
      */
     protected function generateBackupName($prefix, $backupPrefix, $name)
     {
-        if (empty($prefix) || false === strpos($name, $prefix)) {
+        if (empty($prefix) || false === mb_strpos($name, $prefix)) {
             return $backupPrefix.$name;
         } else {
             return str_replace($prefix, $backupPrefix, $name);

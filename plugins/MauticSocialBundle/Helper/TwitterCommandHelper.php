@@ -183,7 +183,7 @@ class TwitterCommandHelper
             $usersByHandles[] = $expr->literal($status['user']['screen_name']);
 
             // Split the twitter user's name into its parts if we're matching to contacts by name
-            if ($monitorProperties['checknames'] && $status['user']['name'] && false !== strpos($status['user']['name'], ' ')) {
+            if ($monitorProperties['checknames'] && $status['user']['name'] && false !== mb_strpos($status['user']['name'], ' ')) {
                 list($firstName, $lastName) = $this->splitName($status['user']['name']);
 
                 if (!empty($firstName) && !empty($lastName)) {
@@ -215,7 +215,7 @@ class TwitterCommandHelper
             $twitterLeads = [];
             foreach ($leads as $lead) {
                 $fields                       = $lead->getFields();
-                $twitterHandle                = strtolower($fields[$handleFieldGroup][$this->twitterHandleField]['value']);
+                $twitterHandle                = mb_strtolower($fields[$handleFieldGroup][$this->twitterHandleField]['value']);
                 $twitterLeads[$twitterHandle] = $lead;
             }
 
@@ -262,7 +262,7 @@ class TwitterCommandHelper
 
         $processedLeads = [];
         foreach ($statusList as $status) {
-            $handle = strtolower($status['user']['screen_name']);
+            $handle = mb_strtolower($status['user']['screen_name']);
 
             /* @var \Mautic\LeadBundle\Entity\Lead $leadEntity */
             if (!isset($processedLeads[$handle])) {

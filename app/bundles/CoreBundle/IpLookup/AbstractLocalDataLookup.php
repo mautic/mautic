@@ -72,9 +72,9 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
         }
 
         $tempTarget        = $this->cacheDir.'/'.basename($package);
-        $tempExt           = strtolower(pathinfo($package, PATHINFO_EXTENSION));
+        $tempExt           = mb_strtolower(pathinfo($package, PATHINFO_EXTENSION));
         $localTarget       = $this->getLocalDataStoreFilepath();
-        $localTargetExt    = strtolower(pathinfo($localTarget, PATHINFO_EXTENSION));
+        $localTargetExt    = mb_strtolower(pathinfo($localTarget, PATHINFO_EXTENSION));
 
         try {
             $success = false;
@@ -113,7 +113,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                     $freeMem  = $memLimit - memory_get_peak_usage();
                     //check whether there is enough memory to handle large iplookp DB
                     // or will throw iplookup exception
-                    if (function_exists('gzdecode') && strlen($data->getBody()) < ($freeMem / 3)) {
+                    if (function_exists('gzdecode') && mb_strlen($data->getBody()) < ($freeMem / 3)) {
                         $success = (bool) file_put_contents($localTarget, gzdecode($data->getBody()));
                     } elseif (function_exists('gzopen')) {
                         if (file_put_contents($tempTarget, $data->getBody())) {
@@ -178,8 +178,8 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
     protected function sizeInByte($size)
     {
-        $data = (int) substr($size, 0, -1);
-        switch (strtoupper(substr($size, -1))) {
+        $data = (int) mb_substr($size, 0, -1);
+        switch (mb_strtoupper(mb_substr($size, -1))) {
             case 'K':
                 return $data * 1024;
             case 'M':
@@ -199,6 +199,6 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
      */
     private function endsWith($haystack, $needle)
     {
-        return 0 === substr_compare($haystack, $needle, -strlen($needle));
+        return 0 === substr_compare($haystack, $needle, -mb_strlen($needle));
     }
 }

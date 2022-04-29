@@ -344,7 +344,7 @@ class FormModel extends CommonFormModel
                 if ('properties' == $f) {
                     if (isset($v['mappedFields'])) {
                         foreach ($v['mappedFields'] as $pk => $pv) {
-                            if (false !== strpos($pv, 'new')) {
+                            if (false !== mb_strpos($pv, 'new')) {
                                 $v['mappedFields'][$pk] = $fieldIds[$pv];
                             }
                         }

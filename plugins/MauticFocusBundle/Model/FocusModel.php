@@ -302,9 +302,9 @@ class FocusModel extends FormModel
     public static function isLightColor($hex, $level = 200)
     {
         $hex = str_replace('#', '', $hex);
-        $r   = hexdec(substr($hex, 0, 2));
-        $g   = hexdec(substr($hex, 2, 2));
-        $b   = hexdec(substr($hex, 4, 2));
+        $r   = hexdec(mb_substr($hex, 0, 2));
+        $g   = hexdec(mb_substr($hex, 2, 2));
+        $b   = hexdec(mb_substr($hex, 4, 2));
 
         $compareWith = ((($r * 299) + ($g * 587) + ($b * 114)) / 1000);
 

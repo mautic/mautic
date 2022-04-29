@@ -49,7 +49,7 @@ class FileApiController extends CommonApiController
                     $fileName = md5(uniqid()).'.'.$extension;
                     $moved    = $file->move($path, $fileName);
 
-                    if ('images' === substr($dir, 0, 6)) {
+                    if ('images' === mb_substr($dir, 0, 6)) {
                         $response[$this->entityNameOne]['link'] = $this->getMediaUrl().'/'.$fileName;
                     }
 
@@ -85,7 +85,7 @@ class FileApiController extends CommonApiController
         if (is_array($fnames)) {
             foreach ($fnames as $key => $name) {
                 // remove hidden files
-                if ('.' === substr($name, 0, 1)) {
+                if ('.' === mb_substr($name, 0, 1)) {
                     unset($fnames[$key]);
                 }
             }
@@ -143,7 +143,7 @@ class FileApiController extends CommonApiController
             $subdir       = trim(InputHelper::alphanum($this->request->get('subdir', ''), true, false, ['/']));
 
             // Dots in the dir name are slashes
-            if (false !== strpos($dir, '.') && !$subdir) {
+            if (false !== mb_strpos($dir, '.') && !$subdir) {
                 $dirs = explode('.', $dir);
                 $dir  = $dirs[0];
                 unset($dirs[0]);

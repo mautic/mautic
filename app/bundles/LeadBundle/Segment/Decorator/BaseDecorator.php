@@ -110,7 +110,7 @@ class BaseDecorator implements FilterDecoratorInterface
                 return !is_array($filter) ? explode('|', $filter) : $filter;
             case 'like':
             case '!like':
-                return false === strpos($filter, '%') ? '%'.$filter.'%' : $filter;
+                return false === mb_strpos($filter, '%') ? '%'.$filter.'%' : $filter;
             case 'contains':
                 return '%'.$filter.'%';
             case 'startsWith':

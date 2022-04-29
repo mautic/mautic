@@ -294,22 +294,22 @@ class InstallCommand extends ContainerAwareCommand
 
         // Initialize DB and admin params from local.php
         foreach ((array) $allParams as $opt => $value) {
-            if (0 === strpos($opt, 'db_')) {
-                $dbParams[substr($opt, 3)] = $value;
-            } elseif (0 === strpos($opt, 'admin_')) {
-                $adminParam[substr($opt, 6)] = $value;
+            if (0 === mb_strpos($opt, 'db_')) {
+                $dbParams[mb_substr($opt, 3)] = $value;
+            } elseif (0 === mb_strpos($opt, 'admin_')) {
+                $adminParam[mb_substr($opt, 6)] = $value;
             }
         }
 
         // Initialize DB and admin params from cli options
         foreach ($options as $opt => $value) {
             if (isset($value)) {
-                if (0 === strpos($opt, 'db_')) {
-                    $dbParams[substr($opt, 3)] = $value;
-                    $allParams[$opt]           = $value;
-                } elseif (0 === strpos($opt, 'admin_')) {
-                    $adminParam[substr($opt, 6)] = $value;
-                } elseif (0 === strpos($opt, 'mailer_')) {
+                if (0 === mb_strpos($opt, 'db_')) {
+                    $dbParams[mb_substr($opt, 3)] = $value;
+                    $allParams[$opt]              = $value;
+                } elseif (0 === mb_strpos($opt, 'admin_')) {
+                    $adminParam[mb_substr($opt, 6)] = $value;
+                } elseif (0 === mb_strpos($opt, 'mailer_')) {
                     $allParams[$opt] = $value;
                 }
             }

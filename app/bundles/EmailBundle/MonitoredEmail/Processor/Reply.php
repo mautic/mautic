@@ -162,7 +162,7 @@ class Reply implements ProcessorInterface
      */
     protected function cleanEmail($email)
     {
-        return strtolower(preg_replace("/[^a-z0-9\.@]/i", '', $email));
+        return mb_strtolower(preg_replace("/[^a-z0-9\.@]/i", '', $email));
     }
 
     private function dispatchEvent(Stat $stat)

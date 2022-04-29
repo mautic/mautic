@@ -639,7 +639,7 @@ class MailHelperTest extends TestCase
         /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
         $headers = $mailer->message->getHeaders()->getAll();
         foreach ($headers as $header) {
-            if (false !== strpos($header->getFieldName(), 'X-Mautic-Test')) {
+            if (false !== mb_strpos($header->getFieldName(), 'X-Mautic-Test')) {
                 $customHeadersFounds[] = $header->getFieldName();
 
                 $this->assertEquals('test', $header->getValue());
@@ -671,7 +671,7 @@ class MailHelperTest extends TestCase
         /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
         $headers = $mailer->message->getHeaders()->getAll();
         foreach ($headers as $header) {
-            $this->assertFalse(strpos($header->getFieldName(), 'X-Mautic-Test'), 'System headers were not supposed to be set');
+            $this->assertFalse(mb_strpos($header->getFieldName(), 'X-Mautic-Test'), 'System headers were not supposed to be set');
         }
     }
 
@@ -700,7 +700,7 @@ class MailHelperTest extends TestCase
         /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
         $headers = $mailer->message->getHeaders()->getAll();
         foreach ($headers as $header) {
-            if (false !== strpos($header->getFieldName(), 'X-Mautic-Test')) {
+            if (false !== mb_strpos($header->getFieldName(), 'X-Mautic-Test')) {
                 $customHeadersFounds[] = $header->getFieldName();
 
                 $this->assertEquals('test2', $header->getValue());

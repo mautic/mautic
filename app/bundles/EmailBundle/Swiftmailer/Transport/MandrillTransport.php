@@ -48,7 +48,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
 
             $mandrillMergeVars = $mandrillMergePlaceholders = [];
             foreach ($mauticTokens as $token) {
-                $mandrillMergeVars[$token]         = strtoupper(preg_replace('/[^a-z0-9]+/i', '', $token));
+                $mandrillMergeVars[$token]         = mb_strtoupper(preg_replace('/[^a-z0-9]+/i', '', $token));
                 $mandrillMergePlaceholders[$token] = '*|'.$mandrillMergeVars[$token].'|*';
             }
         }
@@ -177,9 +177,9 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
 
                             // If CC and BCC, remove the ct from URLs to prevent false lead tracking
                             foreach ($ccMergeVars['vars'] as &$var) {
-                                if (false !== strpos($var['content'], 'http') && $ctPos = false !== strpos($var['content'], 'ct=')) {
+                                if (false !== mb_strpos($var['content'], 'http') && $ctPos = false !== mb_strpos($var['content'], 'ct=')) {
                                     // URL so make sure a ct query is not part of it
-                                    $var['content'] = substr($var['content'], 0, $ctPos);
+                                    $var['content'] = mb_substr($var['content'], 0, $ctPos);
                                 }
                             }
 

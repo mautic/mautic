@@ -173,11 +173,11 @@ class SysinfoModel
             fseek($f, -$seek, SEEK_CUR);
             $output = ($chunk = fread($f, $seek)).$output;
             fseek($f, -mb_strlen($chunk, '8bit'), SEEK_CUR);
-            $lines -= substr_count($chunk, "\n");
+            $lines -= mb_substr_count($chunk, "\n");
         }
 
         while ($lines++ < 0) {
-            $output = substr($output, strpos($output, "\n") + 1);
+            $output = mb_substr($output, mb_strpos($output, "\n") + 1);
         }
 
         fclose($f);

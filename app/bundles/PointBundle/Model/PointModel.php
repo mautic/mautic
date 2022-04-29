@@ -263,7 +263,7 @@ class PointModel extends CommonFormModel
             if (is_callable($callback)) {
                 if (is_array($callback)) {
                     $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                } elseif (false !== strpos($callback, '::')) {
+                } elseif (false !== mb_strpos($callback, '::')) {
                     $parts      = explode('::', $callback);
                     $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                 } else {

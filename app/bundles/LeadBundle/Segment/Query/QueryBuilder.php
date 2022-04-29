@@ -279,9 +279,9 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      */
     public function setParameter($key, $value, $type = null)
     {
-        if (':' === substr($key, 0, 1)) {
+        if (':' === mb_substr($key, 0, 1)) {
             // For consistency sake, remove the :
-            $key = substr($key, 1);
+            $key = mb_substr($key, 1);
         }
 
         if (is_bool($value)) {
@@ -1291,7 +1291,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
             ++$this->boundCounter;
             $placeHolder = ':dcValue'.$this->boundCounter;
         }
-        $this->setParameter(substr($placeHolder, 1), $value, $type);
+        $this->setParameter(mb_substr($placeHolder, 1), $value, $type);
 
         return $placeHolder;
     }
@@ -1342,7 +1342,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
                 if (array_key_exists($join['joinAlias'], $knownAliases)) {
                     throw QueryException::nonUniqueAlias($join['joinAlias'], array_keys($knownAliases));
                 }
-                $sql .= ' '.strtoupper($join['joinType'])
+                $sql .= ' '.mb_strtoupper($join['joinType'])
                     .' JOIN '.$join['joinTable'].' '.$join['joinAlias']
                     .' ON '.($join['joinCondition']);
                 $knownAliases[$join['joinAlias']] = true;
@@ -1656,7 +1656,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     public function addLogic($expression, $glue)
     {
         // little setup
-        $glue = strtolower($glue);
+        $glue = mb_strtolower($glue);
 
         //  Different handling
         if ('or' == $glue) {

@@ -123,8 +123,8 @@ class PageModelTest extends PageTestAbstract
         $this->assertArrayHasKey('utm_content', $query, 'utm_content not found');
         // evaluate all utm tags that they contain the key name in the value
         foreach ($query as $key => $value) {
-            if (false !== strpos($key, 'utm_')) {
-                $this->assertNotFalse(strpos($value, $key), sprintf('%s not found in %s', $key, $value));
+            if (false !== mb_strpos($key, 'utm_')) {
+                $this->assertNotFalse(mb_strpos($value, $key), sprintf('%s not found in %s', $key, $value));
             }
         }
     }

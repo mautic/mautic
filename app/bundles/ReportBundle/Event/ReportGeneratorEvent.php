@@ -492,7 +492,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     {
         $alpha_numeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
-        return substr(str_shuffle($alpha_numeric), 0, 8);
+        return mb_substr(str_shuffle($alpha_numeric), 0, 8);
     }
 
     private function buildSortedFilters(): void

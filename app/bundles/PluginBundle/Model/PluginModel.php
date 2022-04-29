@@ -117,7 +117,7 @@ class PluginModel extends FormModel
         foreach ($allMetadata as $meta) {
             $namespace = $meta->namespace;
 
-            if (false !== strpos($namespace, 'MauticPlugin')) {
+            if (false !== mb_strpos($namespace, 'MauticPlugin')) {
                 $bundleName = preg_replace('/\\\Entity$/', '', $namespace);
                 if (!isset($pluginsMetadata[$bundleName])) {
                     $pluginsMetadata[$bundleName] = [];

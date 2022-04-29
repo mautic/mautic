@@ -136,7 +136,7 @@ class BatchIdToEntityHelper
         }
 
         // ['ids' => '1,2,3'] OR ['ids' => '1']
-        if (false !== strpos($ids, ',') || is_numeric($ids)) {
+        if (false !== mb_strpos($ids, ',') || is_numeric($ids)) {
             $this->ids           = str_getcsv($ids);
             $this->originalKeys  = array_keys($this->ids);
             $this->isAssociative = false;

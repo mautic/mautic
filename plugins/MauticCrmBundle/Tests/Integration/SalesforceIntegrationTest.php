@@ -439,11 +439,11 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                     $args = func_get_args();
 
                     // Checking for campaign members should return empty array for testing purposes
-                    if (false !== strpos($args[0], '/query') && false !== strpos($args[1]['q'], 'CampaignMember')) {
+                    if (false !== mb_strpos($args[0], '/query') && false !== mb_strpos($args[1]['q'], 'CampaignMember')) {
                         return [];
                     }
 
-                    if (false !== strpos($args[0], '/composite')) {
+                    if (false !== mb_strpos($args[0], '/composite')) {
                         $this->assertSame(
                             '1-CampaignMemberNew-null-1',
                             $args[1]['compositeRequest'][0]['referenceId'],
@@ -475,11 +475,11 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                     $args = func_get_args();
 
                     // Checking for campaign members should return empty array for testing purposes
-                    if (false !== strpos($args[0], '/query') && false !== strpos($args[1]['q'], 'Account')) {
+                    if (false !== mb_strpos($args[0], '/query') && false !== mb_strpos($args[1]['q'], 'Account')) {
                         return [];
                     }
 
-                    if (false !== strpos($args[0], '/composite')) {
+                    if (false !== mb_strpos($args[0], '/composite')) {
                         $this->assertSame(
                             '1-Account-null-1',
                             $args[1]['compositeRequest'][0]['referenceId'],
@@ -1026,15 +1026,15 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                         $args = func_get_args();
                         // Determine what to return by analyzing the URL and query parameters
                         switch (true) {
-                            case false !== strpos($args[0], '/query'):
-                                if (isset($args[1]['q']) && false !== strpos($args[0], 'from CampaignMember')) {
+                            case false !== mb_strpos($args[0], '/query'):
+                                if (isset($args[1]['q']) && false !== mb_strpos($args[0], 'from CampaignMember')) {
                                     return [];
-                                } elseif (isset($args[1]['q']) && false !== strpos($args[1]['q'], 'from Campaign')) {
+                                } elseif (isset($args[1]['q']) && false !== mb_strpos($args[1]['q'], 'from Campaign')) {
                                     return [
                                         'totalSize' => 0,
                                         'records'   => [],
                                     ];
-                                } elseif (isset($args[1]['q']) && false !== strpos($args[1]['q'], 'from Account')) {
+                                } elseif (isset($args[1]['q']) && false !== mb_strpos($args[1]['q'], 'from Account')) {
                                     return [
                                         'totalSize' => 0,
                                         'records'   => [],
@@ -1045,7 +1045,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                                             ['CreatedDate' => '2012-10-30T17:56:50.000+0000'],
                                         ],
                                     ];
-                                } elseif (isset($args[1]['q']) && false !== strpos($args[1]['q'], 'from '.$updateObject.'History')) {
+                                } elseif (isset($args[1]['q']) && false !== mb_strpos($args[1]['q'], 'from '.$updateObject.'History')) {
                                     return $this->getSalesforceDNCHistory($updateObject, 'Mautic');
                                 } else {
                                     // Extract emails
@@ -1059,7 +1059,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                                     }
                                 }
                                 // no break
-                            case false !== strpos($args[0], '/composite'):
+                            case false !== mb_strpos($args[0], '/composite'):
                                 return $this->getSalesforceCompositeResponse($args[1]);
                         }
                     }

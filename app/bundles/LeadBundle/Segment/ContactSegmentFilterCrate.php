@@ -176,7 +176,7 @@ class ContactSegmentFilterCrate
         $operator = isset($filter['operator']) ? $filter['operator'] : null;
 
         if ('multiselect' === $this->getType() && in_array($operator, ['in', '!in'])) {
-            $neg            = false === strpos($operator, '!') ? '' : '!';
+            $neg            = false === mb_strpos($operator, '!') ? '' : '!';
             $this->operator = $neg.$this->getType();
 
             return;

@@ -140,10 +140,10 @@ class OneSignalApi extends AbstractNotificationApi
                     $data['big_picture'] = $value;
                     break;
                 case 'android_led_color':
-                    $data['android_led_color'] = 'FF'.strtoupper($value);
+                    $data['android_led_color'] = 'FF'.mb_strtoupper($value);
                     break;
                 case 'android_accent_color':
-                    $data['android_accent_color'] = 'FF'.strtoupper($value);
+                    $data['android_accent_color'] = 'FF'.mb_strtoupper($value);
                     break;
                 case 'android_group_key':
                     $data['android_group'] = $value;

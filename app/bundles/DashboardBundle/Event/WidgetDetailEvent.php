@@ -212,7 +212,7 @@ class WidgetDetailEvent extends CommonEvent
             'locale' => $this->translator->getLocale(),
         ];
 
-        return $this->uniqueId = $this->getType().'_'.substr(md5(json_encode($uniqueSettings)), 0, 16);
+        return $this->uniqueId = $this->getType().'_'.mb_substr(md5(json_encode($uniqueSettings)), 0, 16);
     }
 
     /**

@@ -3,7 +3,7 @@
 $attr     = $form->vars['attr'];
 $onchange = "Mautic.toggleYesNoButtonClass(mQuery(this).attr('id'));";
 if (isset($attr['onchange'])) {
-    if (';' !== substr($attr['onchange'], 0, -1)) {
+    if (';' !== mb_substr($attr['onchange'], 0, -1)) {
         $attr['onchange'] .= ';';
     }
     $attr['onchange'] .= " $onchange";

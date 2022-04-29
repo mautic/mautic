@@ -31,15 +31,15 @@ class ExceptionController extends CommonController
 
         // Special handling for oauth and api urls
         if (
-            (false !== strpos($request->getUri(), '/oauth') && false === strpos($request->getUri(), 'authorize'))
+            (false !== mb_strpos($request->getUri(), '/oauth') && false === mb_strpos($request->getUri(), 'authorize'))
             || RequestHelper::isApiRequest($request)
-            || (!defined('MAUTIC_AJAX_VIEW') && false !== strpos($request->server->get('HTTP_ACCEPT', ''), 'application/json'))
+            || (!defined('MAUTIC_AJAX_VIEW') && false !== mb_strpos($request->server->get('HTTP_ACCEPT', ''), 'application/json'))
         ) {
             $allowRealMessage =
                 'dev' === MAUTIC_ENV ||
-                false !== strpos($class, 'UnexpectedValueException') ||
-                false !== strpos($class, 'NotFoundHttpException') ||
-                false !== strpos($class, 'AccessDeniedHttpException');
+                false !== mb_strpos($class, 'UnexpectedValueException') ||
+                false !== mb_strpos($class, 'NotFoundHttpException') ||
+                false !== mb_strpos($class, 'AccessDeniedHttpException');
 
             $message   = $allowRealMessage
                 ? $exception->getMessage()

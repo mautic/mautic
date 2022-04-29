@@ -133,14 +133,14 @@ class IntegrationHelper
                     $pluginNamespace     = str_replace('MauticPlugin', '', $plugin['bundle']);
 
                     foreach ($finder as $file) {
-                        $integrationName = substr($file->getBaseName(), 0, -15);
+                        $integrationName = mb_substr($file->getBaseName(), 0, -15);
 
                         if (!isset($integrationSettings[$integrationName])) {
                             $newIntegration = new Integration();
                             $newIntegration->setName($integrationName)
                                 ->setPlugin($pluginReference);
                             $integrationSettings[$integrationName] = $newIntegration;
-                            $integrationContainerKey               = strtolower("mautic.integration.{$integrationName}");
+                            $integrationContainerKey               = mb_strtolower("mautic.integration.{$integrationName}");
 
                             // Initiate the class in order to get the features supported
                             if ($this->container->has($integrationContainerKey)) {
@@ -186,7 +186,7 @@ class IntegrationHelper
             foreach ($this->bundleHelper->getMauticBundles() as $coreBundle) {
                 if (
                     // Skip plugin bundles
-                    false !== strpos($coreBundle['relative'], 'app/bundles')
+                    false !== mb_strpos($coreBundle['relative'], 'app/bundles')
                     // Skip core bundles without an Integration directory
                     && is_dir($coreBundle['directory'].'/Integration')
                 ) {
@@ -196,14 +196,14 @@ class IntegrationHelper
                     $coreBundleNamespace = str_replace('Mautic', '', $coreBundle['bundle']);
 
                     foreach ($finder as $file) {
-                        $integrationName = substr($file->getBaseName(), 0, -15);
+                        $integrationName = mb_substr($file->getBaseName(), 0, -15);
 
                         if (!isset($coreIntegrationSettings[$integrationName])) {
                             $newIntegration = new Integration();
                             $newIntegration->setName($integrationName);
                             $integrationSettings[$integrationName] = $newIntegration;
 
-                            $integrationContainerKey = strtolower("mautic.integration.{$integrationName}");
+                            $integrationContainerKey = mb_strtolower("mautic.integration.{$integrationName}");
 
                             // Initiate the class in order to get the features supported
                             if ($this->container->has($integrationContainerKey)) {
@@ -282,7 +282,7 @@ class IntegrationHelper
 
             if (!isset($this->integrations[$integrationName])) {
                 $integration             = $this->available[$integrationName];
-                $integrationContainerKey = strtolower("mautic.integration.{$integrationName}");
+                $integrationContainerKey = mb_strtolower("mautic.integration.{$integrationName}");
 
                 if ($this->container->has($integrationContainerKey)) {
                     $this->integrations[$integrationName] = $this->container->get($integrationContainerKey);
@@ -589,7 +589,7 @@ class IntegrationHelper
                 foreach ($identifierField as $idf) {
                     $value = (is_array($fields[$f]) && isset($fields[$f]['value'])) ? $fields[$f]['value'] : $fields[$f];
 
-                    if (!in_array($value, $identifier) && false !== strpos($f, $idf)) {
+                    if (!in_array($value, $identifier) && false !== mb_strpos($f, $idf)) {
                         $identifier[$f] = $value;
                         if (count($identifier) === count($identifierField)) {
                             //found enough matches so break
@@ -598,7 +598,7 @@ class IntegrationHelper
                         }
                     }
                 }
-            } elseif ($identifierField === $f || false !== strpos($f, $identifierField)) {
+            } elseif ($identifierField === $f || false !== mb_strpos($f, $identifierField)) {
                 $matchFound = true;
                 $identifier = (is_array($fields[$f])) ? $fields[$f]['value'] : $fields[$f];
             }

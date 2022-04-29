@@ -237,7 +237,7 @@ class FormSubscriber implements EventSubscriberInterface
         ];
 
         if (!empty($config['authorization_header'])) {
-            if (false !== strpos($config['authorization_header'], ':')) {
+            if (false !== mb_strpos($config['authorization_header'], ':')) {
                 list($key, $value) = explode(':', $config['authorization_header']);
             } else {
                 $key   = 'Authorization';

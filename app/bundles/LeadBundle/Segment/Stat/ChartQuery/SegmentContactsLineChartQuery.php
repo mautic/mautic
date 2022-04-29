@@ -244,7 +244,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         $compositeExpressionReflectionParts->setAccessible(true);
         $parts    = $compositeExpressionReflectionParts->getValue($compositeExpression);
         $newParts = array_filter($parts, function ($val) use ($joinAlias) {
-            return 0 !== strpos($val, "$joinAlias.");
+            return 0 !== mb_strpos($val, "$joinAlias.");
         });
         $compositeExpressionReflectionParts->setValue($compositeExpression, $newParts);
         $compositeExpressionReflectionParts->setAccessible(false);

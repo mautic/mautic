@@ -101,7 +101,7 @@ class RequestStorageHelper
      */
     private function removeCachePrefix($key)
     {
-        if (0 === strpos($key, 'mautic:')) {
+        if (0 === mb_strpos($key, 'mautic:')) {
             $key = ltrim($key, 'mautic:');
         }
 
@@ -120,7 +120,7 @@ class RequestStorageHelper
     private function getUniqueCacheHash($transportName)
     {
         $key       = uniqid($transportName.self::KEY_SEPARATOR, true);
-        $keyLength = strlen($key);
+        $keyLength = mb_strlen($key);
 
         if ($keyLength > 191) {
             throw new \LengthException(sprintf('Key %s must be shorter than 256 characters. It has %d characters', $key, $keyLength));

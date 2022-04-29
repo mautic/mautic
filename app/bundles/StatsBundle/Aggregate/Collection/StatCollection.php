@@ -84,7 +84,7 @@ class StatCollection
         if (preg_match('/([0-9]{4})\\s([0-9]{2})/', $dateTimeInUTC, $matches)) {    //  Is this a week?
             $dateTimeString = CalculatorHelper::getWeekDateString($matches[1].'-'.$matches[2]);
             $dateTime       = new DateTime($dateTimeString, new DateTimeZone('UTC'));
-        } elseif (4 === strlen($dateTimeInUTC) and is_numeric($dateTimeInUTC)) {
+        } elseif (4 === mb_strlen($dateTimeInUTC) and is_numeric($dateTimeInUTC)) {
             $dateTime = (new DateTime('now', new DateTimeZone('UTC')))
                 ->setDate($dateTimeInUTC, 1, 1)
                 ->setTime(0, 0);

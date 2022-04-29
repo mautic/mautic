@@ -290,7 +290,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                         $newValue = implode('|', $newValue);
                     }
 
-                    if ($curValue !== $newValue && (strlen($newValue) > 0 || (0 === strlen($newValue) && $overwriteWithBlank))) {
+                    if ($curValue !== $newValue && (mb_strlen($newValue) > 0 || (0 === mb_strlen($newValue) && $overwriteWithBlank))) {
                         $field['value'] = $newValue;
                         $company->addUpdatedField($alias, $newValue, $curValue);
                     }

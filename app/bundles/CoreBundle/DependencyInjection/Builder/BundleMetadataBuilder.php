@@ -80,14 +80,14 @@ class BundleMetadataBuilder
     {
         foreach ($this->symfonyBundles as $symfonyBundle => $namespace) {
             // Plugin
-            if (false !== strpos($namespace, 'MauticPlugin\\')) {
+            if (false !== mb_strpos($namespace, 'MauticPlugin\\')) {
                 $this->pluginMetadata[$symfonyBundle] = $this->buildPluginMetadata($namespace, $symfonyBundle);
 
                 continue;
             }
 
             // Core bundle
-            if (false !== strpos($namespace, 'Mautic\\')) {
+            if (false !== mb_strpos($namespace, 'Mautic\\')) {
                 $this->coreMetadata[$symfonyBundle] = $this->buildCoreMetadata($namespace, $symfonyBundle);
 
                 continue;

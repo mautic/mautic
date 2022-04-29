@@ -293,7 +293,7 @@ abstract class AbstractCommonModel
         }
 
         $entity = false;
-        if (false !== strpos($idSlug, ':')) {
+        if (false !== mb_strpos($idSlug, ':')) {
             $parts = explode(':', $idSlug);
             if (2 == count($parts)) {
                 $entity = $this->getEntity($parts[0]);

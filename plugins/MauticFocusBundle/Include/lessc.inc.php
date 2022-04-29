@@ -59,7 +59,7 @@ class lessc
     protected function findImport($url)
     {
         foreach ((array) $this->importDir as $dir) {
-            $full = $dir.('/' != substr($dir, -1) ? '/' : '').$url;
+            $full = $dir.('/' != mb_substr($dir, -1) ? '/' : '').$url;
             if ($this->fileExists($file = $full.'.less') || $this->fileExists($file = $full)) {
                 return $file;
             }
@@ -308,7 +308,7 @@ class lessc
         $comments = [];
 
         foreach ($lines as $line) {
-            if (0 === strpos($line, '/*')) {
+            if (0 === mb_strpos($line, '/*')) {
                 $comments[] = $line;
                 continue;
             }
@@ -1795,9 +1795,9 @@ class lessc
                 return $value;
             case 'raw_color':
                 $c        = ['color', 0, 0, 0];
-                $colorStr = substr($value[1], 1);
+                $colorStr = mb_substr($value[1], 1);
                 $num      = hexdec($colorStr);
-                $width    = 3 == strlen($colorStr) ? 16 : 256;
+                $width    = 3 == mb_strlen($colorStr) ? 16 : 256;
 
                 for ($i = 3; $i > 0; --$i) { // 3 2 1
                     $t = $num % $width;
@@ -2678,7 +2678,7 @@ class lessc_parser
         while (false !== $this->parseChunk()) {
         }
 
-        if ($this->count != strlen($this->buffer)) {
+        if ($this->count != mb_strlen($this->buffer)) {
             $this->throwError();
         }
 
@@ -3277,13 +3277,13 @@ class lessc_parser
             if (!empty($m[1])) {
                 $content[] = $m[1];
                 if ($nestingOpen) {
-                    $nestingLevel += substr_count($m[1], $nestingOpen);
+                    $nestingLevel += mb_substr_count($m[1], $nestingOpen);
                 }
             }
 
             $tok = $m[2];
 
-            $this->count -= strlen($tok);
+            $this->count -= mb_strlen($tok);
             if ($tok == $end) {
                 if (0 == $nestingLevel) {
                     break;
@@ -3307,7 +3307,7 @@ class lessc_parser
             }
 
             $content[] = $tok;
-            $this->count += strlen($tok);
+            $this->count += mb_strlen($tok);
         }
 
         $this->eatWhiteDefault = $oldWhite;
@@ -3349,11 +3349,11 @@ class lessc_parser
         while ($this->match($patt, $m, false)) {
             $content[] = $m[1];
             if ('@{' == $m[2]) {
-                $this->count -= strlen($m[2]);
+                $this->count -= mb_strlen($m[2]);
                 if ($this->interpolation($inter, false)) {
                     $content[] = $inter;
                 } else {
-                    $this->count += strlen($m[2]);
+                    $this->count += mb_strlen($m[2]);
                     $content[] = '@{'; // ignore it
                 }
             } elseif ('\\' == $m[2]) {
@@ -3362,7 +3362,7 @@ class lessc_parser
                     $content[] = $delim;
                 }
             } else {
-                $this->count -= strlen($delim);
+                $this->count -= mb_strlen($delim);
                 break; // delim
             }
         }
@@ -3428,7 +3428,7 @@ class lessc_parser
     protected function color(&$out)
     {
         if ($this->match('(#(?:[0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{3}))', $m)) {
-            if (strlen($m[1]) > 7) {
+            if (mb_strlen($m[1]) > 7) {
                 $out = ['string', '', [$m[1]]];
             } else {
                 $out = ['raw_color', $m[1]];
@@ -3828,7 +3828,7 @@ class lessc_parser
     {
         if ($this->literal(';', false)) {
             return true;
-        } elseif ($this->count == strlen($this->buffer) || '}' == $this->buffer[$this->count]) {
+        } elseif ($this->count == mb_strlen($this->buffer) || '}' == $this->buffer[$this->count]) {
             // if there is end of file or a closing block next then we don't need a ;
             return true;
         }
@@ -3978,7 +3978,7 @@ class lessc_parser
             return false;
         }
         if ($until) {
-            $this->count -= strlen($what);
+            $this->count -= mb_strlen($what);
         } // give back $what
         $out = $m[1];
 
@@ -3994,7 +3994,7 @@ class lessc_parser
 
         $r = '/'.$regex.($eatWhitespace && !$this->writeComments ? '\s*' : '').'/Ais';
         if (preg_match($r, $this->buffer, $out, null, $this->count)) {
-            $this->count += strlen($out[0]);
+            $this->count += mb_strlen($out[0]);
             if ($eatWhitespace && $this->writeComments) {
                 $this->whitespace();
             }
@@ -4015,7 +4015,7 @@ class lessc_parser
                     $this->append(['comment', $m[1]]);
                     $this->seenComments[$this->count] = true;
                 }
-                $this->count += strlen($m[0]);
+                $this->count += mb_strlen($m[0]);
                 $gotWhite = true;
             }
 
@@ -4023,7 +4023,7 @@ class lessc_parser
         } else {
             $this->match('', $m);
 
-            return strlen($m[0]) > 0;
+            return mb_strlen($m[0]) > 0;
         }
     }
 
@@ -4058,7 +4058,7 @@ class lessc_parser
         $count = is_null($count) ? $this->count : $count;
 
         $line = $this->line +
-            substr_count(substr($this->buffer, 0, $count), "\n");
+            mb_substr_count(mb_substr($this->buffer, 0, $count), "\n");
 
         if (!empty($this->sourceName)) {
             $loc = "$this->sourceName on line $line";
@@ -4134,7 +4134,7 @@ class lessc_parser
         while (true) {
             // find the next item
             foreach ($look as $token) {
-                $pos = strpos($text, $token);
+                $pos = mb_strpos($text, $token);
                 if (false !== $pos) {
                     if (!isset($min) || $pos < $min[1]) {
                         $min = [$token, $pos];
@@ -4152,37 +4152,37 @@ class lessc_parser
             switch ($min[0]) {
                 case 'url(':
                     if (preg_match('/url\(.*?\)/', $text, $m, 0, $count)) {
-                        $count += strlen($m[0]) - strlen($min[0]);
+                        $count += mb_strlen($m[0]) - mb_strlen($min[0]);
                     }
                     break;
                 case '"':
                 case "'":
                     if (preg_match('/'.$min[0].'.*?(?<!\\\\)'.$min[0].'/', $text, $m, 0, $count)) {
-                        $count += strlen($m[0]) - 1;
+                        $count += mb_strlen($m[0]) - 1;
                     }
                     break;
                 case '//':
-                    $skip = strpos($text, "\n", $count);
+                    $skip = mb_strpos($text, "\n", $count);
                     if (false === $skip) {
-                        $skip = strlen($text) - $count;
+                        $skip = mb_strlen($text) - $count;
                     } else {
                         $skip -= $count;
                     }
                     break;
                 case '/*':
                     if (preg_match('/\/\*.*?\*\//s', $text, $m, 0, $count)) {
-                        $skip     = strlen($m[0]);
-                        $newlines = substr_count($m[0], "\n");
+                        $skip     = mb_strlen($m[0]);
+                        $newlines = mb_substr_count($m[0], "\n");
                     }
                     break;
             }
 
             if (0 == $skip) {
-                $count += strlen($min[0]);
+                $count += mb_strlen($min[0]);
             }
 
-            $out .= substr($text, 0, $count).str_repeat("\n", $newlines);
-            $text = substr($text, $count + $skip);
+            $out .= mb_substr($text, 0, $count).str_repeat("\n", $newlines);
+            $text = mb_substr($text, $count + $skip);
 
             $min = null;
         }

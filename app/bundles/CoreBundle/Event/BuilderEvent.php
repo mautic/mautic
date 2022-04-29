@@ -27,7 +27,7 @@ class BuilderEvent extends Event
         $this->translator        = $translator;
         $this->entity            = $entity;
         $this->requested         = $requested;
-        $this->tokenFilterTarget = (0 === strpos($tokenFilter, '{@')) ? 'label' : 'token';
+        $this->tokenFilterTarget = (0 === mb_strpos($tokenFilter, '{@')) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(['{@', '{', '}'], '', $tokenFilter);
         $this->tokenFilter       = ('label' == $this->tokenFilterTarget) ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);
     }
@@ -216,7 +216,7 @@ class BuilderEvent extends Event
         if (false === $withBC) {
             $tokens = [];
             foreach ($this->tokens as $key => $value) {
-                if ('{leadfield' !== substr($key, 0, 10)) {
+                if ('{leadfield' !== mb_substr($key, 0, 10)) {
                     $tokens[$key] = $value;
                 }
             }
@@ -245,7 +245,7 @@ class BuilderEvent extends Event
 
                 $found = false;
                 foreach ($tokenKeys as $token) {
-                    if (0 === stripos($token, $this->tokenFilter)) {
+                    if (0 === mb_stripos($token, $this->tokenFilter)) {
                         $found = true;
                         break;
                     }
@@ -293,7 +293,7 @@ class BuilderEvent extends Event
             $tokens = array_filter(
                 $tokens,
                 function ($v) use ($filter) {
-                    return 0 === stripos($v, $filter);
+                    return 0 === mb_stripos($v, $filter);
                 }
             );
         } else {
@@ -301,7 +301,7 @@ class BuilderEvent extends Event
             $found = array_filter(
                 array_keys($tokens),
                 function ($k) use ($filter) {
-                    return 0 === stripos($k, $filter);
+                    return 0 === mb_stripos($k, $filter);
                 }
             );
 

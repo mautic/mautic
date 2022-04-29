@@ -547,7 +547,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     $entity   = $objectId;
                     $isClone  = true;
                     $objectId = (!empty($this->sessionId)) ? $this->sessionId : 'mautic_'.sha1(uniqid(mt_rand(), true));
-                } elseif (false !== strpos($objectId, 'mautic_')) {
+                } elseif (false !== mb_strpos($objectId, 'mautic_')) {
                     $isClone = true;
                     $entity  = $model->getEntity();
                 } else {

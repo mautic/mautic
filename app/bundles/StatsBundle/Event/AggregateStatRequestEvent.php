@@ -120,7 +120,7 @@ class AggregateStatRequestEvent extends Event
      */
     public function checkContextPrefix($prefix)
     {
-        return 0 === strpos($this->statName, $prefix);
+        return 0 === mb_strpos($this->statName, $prefix);
     }
 
     /**
@@ -129,7 +129,7 @@ class AggregateStatRequestEvent extends Event
     public function checkContextPrefixes(array $prefixes)
     {
         foreach ($prefixes as $string) {
-            if (0 === strpos($this->statName, $string)) {
+            if (0 === mb_strpos($this->statName, $string)) {
                 return true;
             }
         }

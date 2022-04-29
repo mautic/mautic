@@ -62,6 +62,6 @@ class LocalFileAdapterServiceTest extends MauticMysqlTestCase
         $pathsHelper = self::$container->get('mautic.helper.paths');
         $folderPath  = "{$pathsHelper->getImagePath()}/$this->folderName";
         self::assertDirectoryExists($folderPath);
-        self::assertSame('777', substr(sprintf('%o', fileperms($folderPath)), -3));
+        self::assertSame('777', mb_substr(sprintf('%o', fileperms($folderPath)), -3));
     }
 }

@@ -62,7 +62,7 @@ if (!isset($inBuilder)) {
                     <strong><?php echo $formFields[$field['parent']]['label']; ?></strong>
                     <span style="text-transform: none">
                           <?php echo $view['translator']->trans(
-                              'mautic.core.operator.'.strtolower($field['conditions']['expr'])
+                              'mautic.core.operator.'.mb_strtolower($field['conditions']['expr'])
                           ); ?>
                         <?php echo $view['translator']->trans(
                             'mautic.form.field.form.condition.select.value'

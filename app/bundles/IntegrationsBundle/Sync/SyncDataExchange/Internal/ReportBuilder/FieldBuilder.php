@@ -81,7 +81,7 @@ class FieldBuilder
         }
 
         // Special handling of DNC fields
-        if (0 === strpos($field, 'mautic_internal_dnc_')) {
+        if (0 === mb_strpos($field, 'mautic_internal_dnc_')) {
             return $this->addDoNotContactField($field);
         }
 

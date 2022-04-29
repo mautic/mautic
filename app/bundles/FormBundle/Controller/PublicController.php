@@ -44,7 +44,7 @@ class PublicController extends CommonFormController
         if (!empty($return)) {
             //remove mauticError and mauticMessage from the referer so it doesn't get sent back
             $return = InputHelper::url($return, null, null, null, ['mauticError', 'mauticMessage'], true);
-            $query  = (false === strpos($return, '?')) ? '?' : '&';
+            $query  = (false === mb_strpos($return, '?')) ? '?' : '&';
         }
 
         $translator = $this->get('translator');
@@ -203,7 +203,7 @@ class PublicController extends CommonFormController
         } else {
             if (!empty($error)) {
                 if ($return) {
-                    $hash = (null !== $form) ? '#'.strtolower($form->getAlias()) : '';
+                    $hash = (null !== $form) ? '#'.mb_strtolower($form->getAlias()) : '';
 
                     return $this->redirect($return.$query.'mauticError='.rawurlencode($error).$hash);
                 } else {

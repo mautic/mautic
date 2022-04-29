@@ -29,7 +29,7 @@ class Parser
     {
         $unsubscriptionEmail = null;
         foreach ($this->message->to as $to => $name) {
-            if (false !== strpos($to, '+unsubscribe')) {
+            if (false !== mb_strpos($to, '+unsubscribe')) {
                 $unsubscriptionEmail = $to;
 
                 break;

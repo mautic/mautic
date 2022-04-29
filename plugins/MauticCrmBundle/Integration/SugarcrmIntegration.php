@@ -351,7 +351,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                             )
                                         ) {
                                             $type      = 'string';
-                                            $fieldName = (false === strpos($fieldInfo['name'],
+                                            $fieldName = (false === mb_strpos($fieldInfo['name'],
                                                     'webtolead_email')) ? $fieldInfo['name'] : str_replace('webtolead_',
                                                 '', $fieldInfo['name']);
                                             // make these congruent as some come in with colons and some do not
@@ -395,7 +395,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                             // make these congruent as some come in with colons and some do not
                                             $label = str_replace(':', '', $label);
 
-                                            $fieldName = (false === strpos($fieldInfo['name'], 'webtolead_email'))
+                                            $fieldName = (false === mb_strpos($fieldInfo['name'], 'webtolead_email'))
                                                 ? $fieldInfo['name']
                                                 : str_replace(
                                                     'webtolead_',
@@ -1246,7 +1246,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $leadFields = [];
 
         foreach ($keys as $key) {
-            if (strstr($key, '__'.$object)) {
+            if (mb_strstr($key, '__'.$object)) {
                 $newKey = str_replace('__'.$object, '', $key);
                 //$leadFields[$object][$newKey] = $fields['leadFields'][$key];
                 $leadFields[$newKey] = $fields['leadFields'][$key];
@@ -1602,7 +1602,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             foreach ($fieldsToUpdateInSugarUpdate as $sugarField => $mauticField) {
                 $required = !empty($availableFields[$object][$sugarField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
-                    if (false !== strpos($lead[$mauticField], '|')) {
+                    if (false !== mb_strpos($lead[$mauticField], '|')) {
                         // Transform Mautic Multi Select into SugarCRM/SuiteCRM Multi Select format
                         $value = $this->convertMauticToSuiteCrmMultiSelect($lead[$mauticField]);
                     } else {
@@ -1782,7 +1782,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             }
 
             foreach ($keys as $key) {
-                if (strpos($key, '__'.$obj)) {
+                if (mb_strpos($key, '__'.$obj)) {
                     $newKey = str_replace('__'.$obj, '', $key);
                     if ('Id' === $newKey) {
                         // Don't map Id for push
@@ -1866,7 +1866,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $convertedSugarCrmMultiSelectString = $convertedSugarCrmMultiSelectString.'^'.$item.'^'.',';
         }
 
-        return substr($convertedSugarCrmMultiSelectString, 0, -1);
+        return mb_substr($convertedSugarCrmMultiSelectString, 0, -1);
     }
 
     /**
@@ -1905,6 +1905,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $convertedString     = $convertedString.$innerArray[2].'|';
         }
 
-        return substr($convertedString, 0, -1);
+        return mb_substr($convertedString, 0, -1);
     }
 }

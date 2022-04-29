@@ -237,7 +237,7 @@ class LeadFieldRepository extends CommonRepository
                 );
 
                 $value = trim($value, "'");
-                if ('not' === substr($operatorExpr, 0, 3)) {
+                if ('not' === mb_substr($operatorExpr, 0, 3)) {
                     $operator = 'NOT REGEXP';
                 } else {
                     $operator = 'REGEXP';
@@ -291,7 +291,7 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             }
-            if (0 === strpos($property, 'u.')) {
+            if (0 === mb_strpos($property, 'u.')) {
                 // Match only against the latest UTM properties.
                 $q->orderBy('u.date_added', 'DESC');
                 $q->setMaxResults(1);

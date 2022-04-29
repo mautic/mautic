@@ -10,7 +10,7 @@
  */
 use Mautic\CoreBundle\Helper\InputHelper;
 
-$formName = '_'.strtolower(
+$formName = '_'.mb_strtolower(
         InputHelper::alphanum(
             InputHelper::transliterate(
                 $form->getName()

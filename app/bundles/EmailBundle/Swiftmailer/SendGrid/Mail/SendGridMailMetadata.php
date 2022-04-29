@@ -28,7 +28,7 @@ class SendGridMailMetadata
             $key   = $header->getFieldName();
             $value = $header->getFieldBody();
 
-            if (in_array(strtolower($key), $skip_headers) || '' === $value) {
+            if (in_array(mb_strtolower($key), $skip_headers) || '' === $value) {
                 continue;
             }
             $mail->addHeader($key, $value);

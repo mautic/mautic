@@ -32,7 +32,7 @@ class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInte
         $cat->setBundle('page');
         $cat->setDateAdded($today);
         $cat->setTitle($events);
-        $cat->setAlias(strtolower($events));
+        $cat->setAlias(mb_strtolower($events));
 
         $this->categoryModel->getRepository()->saveEntity($cat);
         $this->setReference('page-cat-1', $cat);

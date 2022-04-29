@@ -573,10 +573,10 @@ class SugarcrmApi extends CrmApi
                 $fields      = [];
                 $object      = ('Contacts' == $object) ? 'Contacts' : 'Leads';
                 foreach ($mixedFields as $sugarField => $mField) {
-                    if (false !== strpos($sugarField, '__'.$object)) {
+                    if (false !== mb_strpos($sugarField, '__'.$object)) {
                         $fields[] = str_replace('__'.$object, '', $sugarField);
                     }
-                    if (false !== strpos($sugarField, '-'.$object)) {
+                    if (false !== mb_strpos($sugarField, '-'.$object)) {
                         $fields[] = str_replace('-'.$object, '', $sugarField);
                     }
                 }
@@ -589,10 +589,10 @@ class SugarcrmApi extends CrmApi
                 $q   = '';
                 $qry = [];
                 if (isset($query['start'])) {
-                    $qry[] = ' '.strtolower($object).".date_modified >= '".$query['start']."' ";
+                    $qry[] = ' '.mb_strtolower($object).".date_modified >= '".$query['start']."' ";
                 }
                 if (isset($query['end'])) {
-                    $qry[] = ' '.strtolower($object).".date_modified <= '".$query['end']."' ";
+                    $qry[] = ' '.mb_strtolower($object).".date_modified <= '".$query['end']."' ";
                 }
                 if (isset($query['email'])) {
                     $qry[]    = " leads.id IN (SELECT bean_id FROM email_addr_bean_rel eabr JOIN email_addresses ea ON (eabr.email_address_id = ea.id) WHERE bean_module = 'Leads' AND ea.email_address = '".$query['email']."' AND eabr.deleted=0) ";

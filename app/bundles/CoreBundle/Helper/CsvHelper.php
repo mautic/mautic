@@ -53,7 +53,7 @@ class CsvHelper
         $importedFields = [];
 
         foreach ($headers as $header) {
-            $fieldName = strtolower(InputHelper::alphanum($header, false, '_'));
+            $fieldName = mb_strtolower(InputHelper::alphanum($header, false, '_'));
 
             // Skip columns with empty names as they cannot be mapped.
             if (!empty($fieldName)) {

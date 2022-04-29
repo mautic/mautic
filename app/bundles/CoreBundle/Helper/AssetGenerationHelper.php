@@ -31,7 +31,7 @@ class AssetGenerationHelper
     {
         $this->bundleHelper = $bundleHelper;
         $this->pathsHelper  = $pathsHelper;
-        $this->version      = substr(hash('sha1', $coreParametersHelper->get('secret_key').$version->getVersion()), 0, 8);
+        $this->version      = mb_substr(hash('sha1', $coreParametersHelper->get('secret_key').$version->getVersion()), 0, 8);
     }
 
     /**
@@ -233,8 +233,8 @@ class AssetGenerationHelper
                 foreach ($files as $file) {
                     $fullPath = $file->getPathname();
                     $relPath  = str_replace($rootPath, '', $file->getPathname());
-                    if (0 === strpos($relPath, '/')) {
-                        $relPath = substr($relPath, 1);
+                    if (0 === mb_strpos($relPath, '/')) {
+                        $relPath = mb_substr($relPath, 1);
                     }
 
                     $details = [

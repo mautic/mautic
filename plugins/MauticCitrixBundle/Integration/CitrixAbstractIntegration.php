@@ -24,8 +24,8 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     {
         //make sure URL does not have ending /
         $keys = $this->getDecryptedApiKeys($settings);
-        if (array_key_exists('url', $keys) && '/' === substr($keys['url'], -1)) {
-            $keys['url'] = substr($keys['url'], 0, -1);
+        if (array_key_exists('url', $keys) && '/' === mb_substr($keys['url'], -1)) {
+            $keys['url'] = mb_substr($keys['url'], 0, -1);
             $this->encryptAndSetApiKeys($keys, $settings);
         }
 

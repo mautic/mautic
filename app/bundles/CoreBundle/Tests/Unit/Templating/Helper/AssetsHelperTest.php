@@ -144,7 +144,7 @@ class AssetsHelperTest extends TestCase
         $version     = 1;
         $assetHelper = new AssetsHelper($this->createPackagesMock());
         $assetHelper->setVersion($secretKey, $version);
-        $version = substr(hash('sha1', $secretKey.$version), 0, 8);
+        $version = mb_substr(hash('sha1', $secretKey.$version), 0, 8);
 
         $reflectionObject = new \ReflectionObject($assetHelper);
         $method           = $reflectionObject->getMethod('getCKEditorScripts');
@@ -178,6 +178,6 @@ class AssetsHelperTest extends TestCase
         $version   = '123';
         $assetsHelper->setVersion($secretKey, $version);
 
-        return substr(hash('sha1', $secretKey.$version), 0, 8);
+        return mb_substr(hash('sha1', $secretKey.$version), 0, 8);
     }
 }

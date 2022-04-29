@@ -13,7 +13,7 @@ $optionLabelAttr = (isset($properties['labelAttributes'])) ? $properties['labelA
 $wrapDiv         = true;
 
 $defaultOptionLabelClass = 'mauticform-'.$containerType.'-label';
-if (false === stripos($optionLabelAttr, 'class')) {
+if (false === mb_stripos($optionLabelAttr, 'class')) {
     $optionLabelAttr .= ' class="'.$defaultOptionLabelClass.'"';
 } else {
     $optionLabelAttr = str_ireplace('class="', 'class="'.$defaultOptionLabelClass.' ', $optionLabelAttr);

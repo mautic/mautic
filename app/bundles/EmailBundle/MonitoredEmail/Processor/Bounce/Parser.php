@@ -39,7 +39,7 @@ class Parser
         foreach ($this->message->to as $to => $name) {
             // Some ISPs strip the + email so will still process the content for a bounce
             // even if a +bounce address was not found
-            if (false !== strpos($to, '+bounce')) {
+            if (false !== mb_strpos($to, '+bounce')) {
                 $bouncerAddress = $to;
 
                 break;

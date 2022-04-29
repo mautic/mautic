@@ -301,7 +301,7 @@ class ImportModel extends FormModel
 
         // Convert to field names
         array_walk($headers, function (&$val) {
-            $val = strtolower(InputHelper::alphanum($val, false, '_'));
+            $val = mb_strtolower(InputHelper::alphanum($val, false, '_'));
         });
 
         while ($batchSize && !$file->eof()) {

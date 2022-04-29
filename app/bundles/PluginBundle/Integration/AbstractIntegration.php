@@ -221,7 +221,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         $name   = $this->getName();
         $bundle = $this->settings->getPlugin()->getBundle();
-        $icon   = $pluginPath.'/'.$bundle.'/Assets/img/'.strtolower($name).'.png';
+        $icon   = $pluginPath.'/'.$bundle.'/Assets/img/'.mb_strtolower($name).'.png';
 
         if (file_exists($systemPath.'/'.$icon)) {
             return $icon;
@@ -681,7 +681,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $this->isAuthorized();
         }
 
-        $method   = strtoupper($method);
+        $method   = mb_strtoupper($method);
         $authType = (empty($settings['auth_type'])) ? $this->getAuthenticationType() : $settings['auth_type'];
 
         [$parameters, $headers] = $this->prepareRequest($url, $parameters, $method, $settings, $authType);
@@ -727,10 +727,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         if ('GET' == $method && !empty($parameters)) {
             $parameters = array_merge($settings['query'], $parameters);
             $query      = http_build_query($parameters);
-            $url .= (false === strpos($url, '?')) ? '?'.$query : '&'.$query;
+            $url .= (false === mb_strpos($url, '?')) ? '?'.$query : '&'.$query;
         } elseif (!empty($settings['query'])) {
             $query = http_build_query($settings['query']);
-            $url .= (false === strpos($url, '?')) ? '?'.$query : '&'.$query;
+            $url .= (false === mb_strpos($url, '?')) ? '?'.$query : '&'.$query;
         }
 
         if (isset($postAppend)) {
@@ -790,7 +790,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         if (is_array($parseHeaders)) {
             foreach ($parseHeaders as $key => $value) {
                 // Ignore string keys which assume it is already parsed and avoids splitting up a value that includes colons (such as a date/time)
-                if (!is_string($key) && false !== strpos($value, ':')) {
+                if (!is_string($key) && false !== mb_strpos($value, ':')) {
                     [$key, $value]     = explode(':', $value);
                     $key               = trim($key);
                     $value             = trim($value);
@@ -1531,7 +1531,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             if ('leadFields' === $fieldType) {
                 if ((is_array($details) && !empty($details['required'])) || 'email' === $field
                     || (isset($details['optionLabel'])
-                        && 'email' == strtolower(
+                        && 'email' == mb_strtolower(
                             $details['optionLabel']
                         ))
                 ) {

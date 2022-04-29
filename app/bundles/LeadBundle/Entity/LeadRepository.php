@@ -644,7 +644,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 if (is_array($value)) {
                     $this->buildWhereClauseFromArray($qb, [$value]);
                 } else {
-                    if (false === strpos($column, '.')) {
+                    if (false === mb_strpos($column, '.')) {
                         $column = "entity.$column";
                     }
 
@@ -1305,7 +1305,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         } catch (DriverException $exception) {
             $message = $exception->getMessage();
 
-            if (false !== strpos($message, 'Deadlock') && $tries <= 3) {
+            if (false !== mb_strpos($message, 'Deadlock') && $tries <= 3) {
                 ++$tries;
 
                 $this->updateContactPoints($changes, $id, $tries);

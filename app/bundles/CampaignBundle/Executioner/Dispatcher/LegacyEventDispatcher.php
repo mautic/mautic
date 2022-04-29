@@ -243,7 +243,7 @@ class LegacyEventDispatcher
         try {
             if (is_array($settings['callback'])) {
                 $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-            } elseif (false !== strpos($settings['callback'], '::')) {
+            } elseif (false !== mb_strpos($settings['callback'], '::')) {
                 $parts      = explode('::', $settings['callback']);
                 $reflection = new \ReflectionMethod($parts[0], $parts[1]);
             } else {

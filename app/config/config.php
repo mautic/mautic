@@ -49,7 +49,7 @@ if (defined('MAUTIC_INSTALLER')) {
     $secureCookie = $request->isSecure();
 } else {
     $siteUrl      = $configParameterBag->get('site_url');
-    $secureCookie = ($siteUrl && 0 === strpos($siteUrl, 'https'));
+    $secureCookie = ($siteUrl && 0 === mb_strpos($siteUrl, 'https'));
 }
 
 $container->loadFromExtension('framework', [

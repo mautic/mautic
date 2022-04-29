@@ -346,7 +346,7 @@ class TrackableModelTest extends TestCase
         );
 
         $this->assertEmpty($trackables, $content);
-        $this->assertFalse(strpos($url, $content), 'https:// should have been stripped from the token URL');
+        $this->assertFalse(mb_strpos($url, $content), 'https:// should have been stripped from the token URL');
     }
 
     /**
@@ -425,7 +425,7 @@ class TrackableModelTest extends TestCase
             1
         );
 
-        $this->assertTrue((false !== strpos($content, $url)), $content);
+        $this->assertTrue((false !== mb_strpos($content, $url)), $content);
     }
 
     /**
@@ -485,7 +485,7 @@ class TrackableModelTest extends TestCase
 
         foreach ($trackables as $redirectId => $trackable) {
             // If the shared base was correctly parsed, all generated tokens will be in the content
-            $this->assertNotFalse(strpos($content, $redirectId), $content);
+            $this->assertNotFalse(mb_strpos($content, $redirectId), $content);
         }
     }
 

@@ -32,8 +32,8 @@ class SiteUrlEnvVars implements EnvVarsInterface
             $path = str_replace(['index_dev.php', 'index.php'], '', $parts['path']);
 
             // Check and remove trailing slash to prevent double // in Symfony cli generated URLs
-            if ('/' == substr($path, -1)) {
-                $path = substr($path, 0, -1);
+            if ('/' == mb_substr($path, -1)) {
+                $path = mb_substr($path, 0, -1);
             }
 
             $envVars->set('MAUTIC_REQUEST_CONTEXT_BASE_URL', $path);

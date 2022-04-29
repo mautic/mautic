@@ -52,7 +52,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
             return;
         }
 
-        if (false !== strpos($classMetadata->namespace, 'Mautic')) {
+        if (false !== mb_strpos($classMetadata->namespace, 'Mautic')) {
             //if in the installer, use the prefix set by it rather than what is cached
 
             // Prefix indexes

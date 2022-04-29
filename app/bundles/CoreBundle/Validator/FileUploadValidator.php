@@ -57,7 +57,7 @@ class FileUploadValidator
      */
     public function checkExtension($extension, array $allowedExtensions, $extensionErrorMsg)
     {
-        if (!in_array(strtolower($extension), array_map('strtolower', $allowedExtensions), true)) {
+        if (!in_array(mb_strtolower($extension), array_map('strtolower', $allowedExtensions), true)) {
             $error = $this->translator->trans($extensionErrorMsg, [
                 '%fileExtension%' => $extension,
                 '%extensions%'    => implode(', ', $allowedExtensions),

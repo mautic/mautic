@@ -20,7 +20,7 @@ final class RandomHelper implements RandomHelperInterface
         $charlist = count_chars(preg_replace_callback('#.-.#', function (array $m) {
             return implode('', range($m[0][0], $m[0][2]));
         }, $charlist), 3);
-        $chLen = strlen($charlist);
+        $chLen = mb_strlen($charlist);
         if ($length < 1) {
             throw new \InvalidArgumentException('Length must be greater than zero.');
         } elseif ($chLen < 2) {

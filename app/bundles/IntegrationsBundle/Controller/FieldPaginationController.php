@@ -76,8 +76,8 @@ class FieldPaginationController extends CommonController
 
         $prefix   = "integration_config[featureSettings][sync][fieldMappings][$object]";
         $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
-        if ('_' == substr($idPrefix, -1)) {
-            $idPrefix = substr($idPrefix, 0, -1);
+        if ('_' == mb_substr($idPrefix, -1)) {
+            $idPrefix = mb_substr($idPrefix, 0, -1);
         }
 
         $formType = 'integration_sync_settings_object_field_mapping';

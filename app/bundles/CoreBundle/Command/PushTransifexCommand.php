@@ -167,7 +167,7 @@ EOT
         $str = str_replace('?', '', $str);
 
         // Trim white spaces at beginning and end of alias and make lowercase
-        $str = trim(strtolower($str));
+        $str = trim(mb_strtolower($str));
 
         // Remove any duplicate whitespace and replace whitespaces by hyphens
         $str = preg_replace('#\x20+#', '-', $str);

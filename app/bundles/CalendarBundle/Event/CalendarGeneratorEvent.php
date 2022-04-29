@@ -70,9 +70,9 @@ class CalendarGeneratorEvent extends Event
      */
     public function getContrastColor($hex)
     {
-        $r = hexdec(substr($hex, 0, 2));
-        $g = hexdec(substr($hex, 2, 2));
-        $b = hexdec(substr($hex, 4, 2));
+        $r = hexdec(mb_substr($hex, 0, 2));
+        $g = hexdec(mb_substr($hex, 2, 2));
+        $b = hexdec(mb_substr($hex, 4, 2));
 
         if ($r + $g + $b > 382) {
             //bright color, use dark font

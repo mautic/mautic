@@ -76,7 +76,7 @@ $indexCount = 1;
                     </div>
                 </div>
             <?php endif; ?>
-            <?php if (strstr($child->vars['name'], 'update_mautic')): ?>
+            <?php if (mb_strstr($child->vars['name'], 'update_mautic')): ?>
             <div class="pr-xs <?php echo $class; ?>" style="padding-left: 8px;" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.plugin.direction.data.update'); ?>">
                 <div class="row">
                     <div class="form-group col-xs-12 ">

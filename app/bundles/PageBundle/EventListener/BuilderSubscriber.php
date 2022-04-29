@@ -363,21 +363,21 @@ class BuilderSubscriber implements EventSubscriberInterface
         $page    = $event->getPage();
         $params  = $event->getParams();
 
-        if (false !== strpos($content, $this->langBarRegex)) {
+        if (false !== mb_strpos($content, $this->langBarRegex)) {
             $langbar = $this->renderLanguageBar($page);
             $content = str_ireplace($this->langBarRegex, $langbar, $content);
         }
 
-        if (false !== strpos($content, $this->shareButtonsRegex)) {
+        if (false !== mb_strpos($content, $this->shareButtonsRegex)) {
             $buttons = $this->renderSocialShareButtons();
             $content = str_ireplace($this->shareButtonsRegex, $buttons, $content);
         }
 
-        if (false !== strpos($content, $this->titleRegex)) {
+        if (false !== mb_strpos($content, $this->titleRegex)) {
             $content = str_ireplace($this->titleRegex, $page->getTitle(), $content);
         }
 
-        if (false !== strpos($content, $this->descriptionRegex)) {
+        if (false !== mb_strpos($content, $this->descriptionRegex)) {
             $content = str_ireplace($this->descriptionRegex, $page->getMetaDescription(), $content);
         }
 
@@ -437,32 +437,32 @@ class BuilderSubscriber implements EventSubscriberInterface
                 unset($slot, $xpath, $dom);
             }
             // replace tokens
-            if (false !== strpos($content, self::segmentListRegex)) {
+            if (false !== mb_strpos($content, self::segmentListRegex)) {
                 $segmentList = $this->renderSegmentList($params);
                 $content     = str_ireplace(self::segmentListRegex, $segmentList, $content);
             }
 
-            if (false !== strpos($content, self::categoryListRegex)) {
+            if (false !== mb_strpos($content, self::categoryListRegex)) {
                 $categoryList = $this->renderCategoryList($params);
                 $content      = str_ireplace(self::categoryListRegex, $categoryList, $content);
             }
 
-            if (false !== strpos($content, self::preferredchannel)) {
+            if (false !== mb_strpos($content, self::preferredchannel)) {
                 $preferredChannel = $this->renderPreferredChannel($params);
                 $content          = str_ireplace(self::preferredchannel, $preferredChannel, $content);
             }
 
-            if (false !== strpos($content, self::channelfrequency)) {
+            if (false !== mb_strpos($content, self::channelfrequency)) {
                 $channelfrequency = $this->renderChannelFrequency($params);
                 $content          = str_ireplace(self::channelfrequency, $channelfrequency, $content);
             }
 
-            if (false !== strpos($content, self::saveprefsRegex)) {
+            if (false !== mb_strpos($content, self::saveprefsRegex)) {
                 $savePrefs = $this->renderSavePrefs($params);
                 $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
             }
             // add form before first block of prefs center
-            if (isset($params['startform']) && false !== strpos($content, 'data-prefs-center')) {
+            if (isset($params['startform']) && false !== mb_strpos($content, 'data-prefs-center')) {
                 $dom = new DOMDocument('1.0', 'utf-8');
                 $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
                 $xpath      = new DOMXPath($dom);
@@ -482,7 +482,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 }
             }
 
-            if (false !== strpos($content, self::successmessage)) {
+            if (false !== mb_strpos($content, self::successmessage)) {
                 $successMessage = $this->renderSuccessMessage($params);
                 $content        = str_ireplace(self::successmessage, $successMessage, $content);
             }

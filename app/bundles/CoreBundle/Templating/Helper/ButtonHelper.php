@@ -510,7 +510,7 @@ class ButtonHelper extends Helper
             $addTo['attr']['class'] = $addTo['btnClass'];
         } elseif (!isset($button['attr']['class'])) {
             $addTo['attr']['class'] = 'btn btn-default';
-        } elseif (!strstr($addTo['attr']['class'], 'btn-')) {
+        } elseif (!mb_strstr($addTo['attr']['class'], 'btn-')) {
             $addTo['attr']['class'] .= ' btn btn-default';
         }
 

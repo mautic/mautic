@@ -175,7 +175,7 @@ class CommonController extends Controller implements MauticController
             $args = [
                 'contentTemplate' => $args,
                 'passthroughVars' => [
-                    'mauticContent' => strtolower(InputHelper::alphanum($this->request->query->get('bundle'))),
+                    'mauticContent' => mb_strtolower(InputHelper::alphanum($this->request->query->get('bundle'))),
                 ],
             ];
         }
@@ -192,7 +192,7 @@ class CommonController extends Controller implements MauticController
             if (isset($args['passthroughVars']['mauticContent'])) {
                 $mauticContent = $args['passthroughVars']['mauticContent'];
             } else {
-                $mauticContent = strtolower(InputHelper::alphanum($this->request->query->get('bundle')));
+                $mauticContent = mb_strtolower(InputHelper::alphanum($this->request->query->get('bundle')));
             }
             $args['viewParameters']['mauticContent'] = $mauticContent;
         }
@@ -685,7 +685,7 @@ class CommonController extends Controller implements MauticController
             $icon = 'media/images/favicon.ico';
         }
 
-        if (0 !== strpos($icon, 'http')) {
+        if (0 !== mb_strpos($icon, 'http')) {
             $assetHelper = $this->factory->getHelper('template.assets');
             $icon        = $assetHelper->getUrl($icon, null, null, true);
         }
@@ -741,7 +741,7 @@ class CommonController extends Controller implements MauticController
 
         $dateFormat = $this->coreParametersHelper->get('date_format_dateonly');
         $dateFormat = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
-        $filename   = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
+        $filename   = mb_strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
 
         return $exportHelper->exportDataAs($toExport, $type, $filename);
     }

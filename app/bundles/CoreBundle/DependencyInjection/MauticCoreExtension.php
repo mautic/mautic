@@ -221,14 +221,14 @@ class MauticCoreExtension extends Extension
                              *
                              * Services must always be prefaced with an @ symbol (similar to "normal" config files)
                              */
-                            if (is_string($factory) && false !== strpos($factory, '::')) {
+                            if (is_string($factory) && false !== mb_strpos($factory, '::')) {
                                 $factory = explode('::', $factory, 2);
                             }
 
                             // Check if the first item in the factory array is a service and if so fetch its reference
-                            if (is_array($factory) && 0 === strpos($factory[0], '@')) {
+                            if (is_array($factory) && 0 === mb_strpos($factory[0], '@')) {
                                 // Exclude the leading @ character in the service ID
-                                $factory[0] = new Reference(substr($factory[0], 1));
+                                $factory[0] = new Reference(mb_substr($factory[0], 1));
                             }
 
                             $definition->setFactory($factory);
@@ -296,29 +296,29 @@ class MauticCoreExtension extends Extension
             $definitionArguments[] = '';
         } elseif (is_array($argument) || is_object($argument)) {
             foreach ($argument as &$v) {
-                if (0 === strpos($v, '%')) {
+                if (0 === mb_strpos($v, '%')) {
                     $v = str_replace('%%', '%', $v);
-                    $v = $container->getParameter(substr($v, 1, -1));
+                    $v = $container->getParameter(mb_substr($v, 1, -1));
                 }
             }
             $definitionArguments[] = $argument;
-        } elseif (0 === strpos($argument, '%')) {
+        } elseif (0 === mb_strpos($argument, '%')) {
             // Parameter
             $argument              = str_replace('%%', '%', $argument);
-            $definitionArguments[] = $container->getParameter(substr($argument, 1, -1));
-        } elseif (is_bool($argument) || false !== strpos($argument, '\\')) {
+            $definitionArguments[] = $container->getParameter(mb_substr($argument, 1, -1));
+        } elseif (is_bool($argument) || false !== mb_strpos($argument, '\\')) {
             // Parameter or Class
             $definitionArguments[] = $argument;
-        } elseif (0 === strpos($argument, '"')) {
+        } elseif (0 === mb_strpos($argument, '"')) {
             // String
-            $definitionArguments[] = substr($argument, 1, -1);
-        } elseif (0 === strpos($argument, '@=')) {
+            $definitionArguments[] = mb_substr($argument, 1, -1);
+        } elseif (0 === mb_strpos($argument, '@=')) {
             // Expression
-            $argument              = substr($argument, 2);
+            $argument              = mb_substr($argument, 2);
             $definitionArguments[] = new Expression($argument);
-        } elseif (0 === strpos($argument, '@')) {
+        } elseif (0 === mb_strpos($argument, '@')) {
             // Service
-            $argument              = substr($argument, 1);
+            $argument              = mb_substr($argument, 1);
             $definitionArguments[] = new Reference($argument);
         } else {
             // Reference

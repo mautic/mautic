@@ -8,7 +8,7 @@ $replaceRootPlaceholder = function (&$value) use ($root, &$replaceRootPlaceholde
         foreach ($value as &$v) {
             $replaceRootPlaceholder($v);
         }
-    } elseif (false !== strpos($value, '%kernel.root_dir%')) {
+    } elseif (false !== mb_strpos($value, '%kernel.root_dir%')) {
         $value = str_replace('%kernel.root_dir%', $root, $value);
     }
 };

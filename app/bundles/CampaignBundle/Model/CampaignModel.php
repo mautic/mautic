@@ -232,7 +232,7 @@ class CampaignModel extends CommonFormModel
             $event = !$isNew ? $existingEvents[$properties['id']] : new Event();
 
             foreach ($properties as $f => $v) {
-                if ('id' == $f && 0 === strpos($v, 'new')) {
+                if ('id' == $f && 0 === mb_strpos($v, 'new')) {
                     //set the temp ID used to be able to match up connections
                     $event->setTempId($v);
                 }
@@ -386,7 +386,7 @@ class CampaignModel extends CommonFormModel
         }
 
         foreach ($settings['nodes'] as &$node) {
-            if (false !== strpos($node['id'], 'new')) {
+            if (false !== mb_strpos($node['id'], 'new')) {
                 // Find the real one and update the node
                 $node['id'] = str_replace($node['id'], $tempIds[$node['id']], $node['id']);
             }
@@ -398,13 +398,13 @@ class CampaignModel extends CommonFormModel
 
         foreach ($settings['connections'] as &$connection) {
             // Check source
-            if (false !== strpos($connection['sourceId'], 'new')) {
+            if (false !== mb_strpos($connection['sourceId'], 'new')) {
                 // Find the real one and update the node
                 $connection['sourceId'] = str_replace($connection['sourceId'], $tempIds[$connection['sourceId']], $connection['sourceId']);
             }
 
             // Check target
-            if (false !== strpos($connection['targetId'], 'new')) {
+            if (false !== mb_strpos($connection['targetId'], 'new')) {
                 // Find the real one and update the node
                 $connection['targetId'] = str_replace($connection['targetId'], $tempIds[$connection['targetId']], $connection['targetId']);
             }

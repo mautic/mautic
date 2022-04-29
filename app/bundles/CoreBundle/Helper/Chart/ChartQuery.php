@@ -565,11 +565,11 @@ class ChartQuery extends AbstractChart
      */
     protected function prepareTable($table)
     {
-        if (MAUTIC_TABLE_PREFIX && 0 === strpos($table, MAUTIC_TABLE_PREFIX)) {
+        if (MAUTIC_TABLE_PREFIX && 0 === mb_strpos($table, MAUTIC_TABLE_PREFIX)) {
             return $table;
         }
 
-        if (0 === strpos($table, '(')) {
+        if (0 === mb_strpos($table, '(')) {
             return $table;
         }
 
