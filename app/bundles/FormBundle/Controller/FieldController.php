@@ -201,7 +201,7 @@ class FieldController extends CommonFormController
     /**
      * Generates edit form and processes post data.
      *
-     * @param int $objectId
+     * @param int|string $objectId
      *
      * @return JsonResponse
      */
