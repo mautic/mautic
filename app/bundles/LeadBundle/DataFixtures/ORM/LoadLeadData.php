@@ -85,6 +85,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
                     $companyLead->setLead($lead);
                     $companyLead->setCompany($this->getReference('company-'.$lastCharacter));
                     $companyLead->setDateAdded($today);
+                    $companyLead->setPrimary(true);
                     $companyLeadRepo->saveEntity($companyLead);
                 }
             }
