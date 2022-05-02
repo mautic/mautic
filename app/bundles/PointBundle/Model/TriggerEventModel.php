@@ -42,11 +42,6 @@ class TriggerEventModel extends CommonFormModel
         return parent::getEntity($id);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws MethodNotAllowedHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof TriggerEvent) {

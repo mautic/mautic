@@ -141,9 +141,6 @@ class FormModel extends CommonFormModel
         return 'getName';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Form) {

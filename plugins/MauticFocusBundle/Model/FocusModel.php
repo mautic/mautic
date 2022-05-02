@@ -55,9 +55,6 @@ class FocusModel extends FormModel
      */
     protected $contactTracker;
 
-    /**
-     * FocusModel constructor.
-     */
     public function __construct(
         \Mautic\FormBundle\Model\FormModel $formModel,
         TrackableModel $trackableModel,
@@ -90,16 +87,6 @@ class FocusModel extends FormModel
         return 'focus:items';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param object                              $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param null                                $action
-     * @param array                               $options
-     *
-     * @throws NotFoundHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Focus) {

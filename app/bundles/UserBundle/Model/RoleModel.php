@@ -11,9 +11,6 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 
-/**
- * Class RoleModel.
- */
 class RoleModel extends FormModel
 {
     /**
@@ -95,11 +92,6 @@ class RoleModel extends FormModel
         parent::deleteEntity($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Role) {

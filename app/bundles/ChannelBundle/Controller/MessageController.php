@@ -7,11 +7,8 @@ use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 
-/**
- * Class MessageController.
- */
 class MessageController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
@@ -197,11 +194,12 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param $view
+     * @param FormInterface<FormInterface> $form
+     * @param string                       $view
      *
      * @return \Symfony\Component\Form\FormView
      */
-    protected function getFormView(Form $form, $view)
+    protected function getFormView(FormInterface $form, $view)
     {
         $themes = ['MauticChannelBundle:FormTheme'];
         /** @var MessageModel $model */

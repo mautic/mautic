@@ -112,18 +112,6 @@ class CampaignModel extends CommonFormModel
         return 'campaign:campaigns';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param object      $entity
-     * @param object      $formFactory
-     * @param string|null $action
-     * @param array       $options
-     *
-     * @return mixed
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Campaign) {

@@ -248,11 +248,6 @@ class PageModel extends FormModel
         parent::deleteEntity($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Page) {

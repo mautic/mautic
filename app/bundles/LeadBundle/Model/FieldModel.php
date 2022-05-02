@@ -769,18 +769,6 @@ class FieldModel extends FormModel
         return $contactRepository->getValueList($type, $filter, $limit);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
-     *
-     * @return mixed
-     *
-     * @throws MethodNotAllowedHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof LeadField) {

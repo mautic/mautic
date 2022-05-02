@@ -11,9 +11,6 @@ use Mautic\PageBundle\Event\VideoHitEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class PageModel.
- */
 class VideoModel extends FormModel
 {
     /**
@@ -26,9 +23,6 @@ class VideoModel extends FormModel
      */
     protected $contactTracker;
 
-    /**
-     * VideoModel constructor.
-     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         ContactTracker $contactTracker

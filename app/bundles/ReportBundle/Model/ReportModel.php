@@ -31,9 +31,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class ReportModel.
- */
 class ReportModel extends FormModel
 {
     const CHANNEL_FEATURE = 'reporting';
@@ -124,11 +121,6 @@ class ReportModel extends FormModel
         return 'report:reports';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Report) {

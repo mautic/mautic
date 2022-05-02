@@ -16,9 +16,6 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class StageModel.
- */
 class StageModel extends CommonFormModel
 {
     /**
@@ -61,11 +58,6 @@ class StageModel extends CommonFormModel
         return 'stage:stages';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws MethodNotAllowedHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Stage) {

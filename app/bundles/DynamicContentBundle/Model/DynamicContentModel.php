@@ -86,18 +86,6 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
         return parent::getEntity($id);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
-     *
-     * @return mixed
-     *
-     * @throws \InvalidArgumentException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof DynamicContent) {

@@ -376,18 +376,6 @@ class LeadModel extends FormModel
         return 'getPrimaryIdentifier';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param Lead                                $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param string|null                         $action
-     * @param array                               $options
-     *
-     * @return \Symfony\Component\Form\Form
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Lead) {

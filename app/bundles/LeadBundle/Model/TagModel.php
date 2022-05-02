@@ -10,10 +10,6 @@ use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class TagModel
- * {@inheritdoc}
- */
 class TagModel extends FormModel
 {
     /**
@@ -52,18 +48,6 @@ class TagModel extends FormModel
         return parent::getEntity($id);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param Tag   $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
-     *
-     * @return mixed
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Tag) {

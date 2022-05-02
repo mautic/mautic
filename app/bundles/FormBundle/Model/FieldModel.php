@@ -34,14 +34,6 @@ class FieldModel extends CommonFormModel
         $this->session = $session;
     }
 
-    /**
-     * @param object                              $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param null                                $action
-     * @param array                               $options
-     *
-     * @return \Symfony\Component\Form\FormInterface
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         list($fields, $choices)               = $this->getObjectFields('lead');

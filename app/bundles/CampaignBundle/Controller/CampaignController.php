@@ -16,12 +16,11 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class CampaignController extends AbstractStandardFormController
 {
@@ -499,11 +498,12 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param object    $entity
-     * @param string    $action
-     * @param bool|null $persistConnections
+     * @param object                       $entity
+     * @param FormInterface<FormInterface> $form
+     * @param string                       $action
+     * @param bool|null                    $persistConnections
      */
-    protected function afterEntitySave($entity, Form $form, $action, $persistConnections = null)
+    protected function afterEntitySave($entity, FormInterface $form, $action, $persistConnections = null)
     {
         if ($persistConnections) {
             // Update canvas settings with new event IDs then save
@@ -515,12 +515,13 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param      $isValid
-     * @param      $entity
-     * @param      $action
-     * @param bool $isClone
+     * @param bool                         $isValid
+     * @param object                       $entity
+     * @param FormInterface<FormInterface> $form
+     * @param string                       $action
+     * @param bool                         $isClone
      */
-    protected function afterFormProcessed($isValid, $entity, Form $form, $action, $isClone = false)
+    protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, $isClone = false)
     {
         if (!$isValid) {
             // Add the canvas settings to the entity to be able to rebuild it
@@ -532,13 +533,14 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param      $entity
-     * @param      $action
-     * @param      $isPost
-     * @param null $objectId
-     * @param bool $isClone
+     * @param object                       $entity
+     * @param FormInterface<FormInterface> $form
+     * @param string                       $action
+     * @param bool                         $isPost
+     * @param null|int                     $objectId
+     * @param bool                         $isClone
      */
-    protected function beforeFormProcessed($entity, Form $form, $action, $isPost, $objectId = null, $isClone = false)
+    protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, $isClone = false)
     {
         $sessionId = $this->getCampaignSessionId($entity, $action, $objectId);
         //set added/updated events
@@ -574,14 +576,15 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param Campaign $entity
-     * @param          $action
-     * @param null     $objectId
-     * @param bool     $isClone
+     * @param Campaign                     $entity
+     * @param FormInterface<FormInterface> $form
+     * @param string                       $action
+     * @param int|null                     $objectId
+     * @param bool                         $isClone
      *
      * @return bool
      */
-    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, $isClone = false)
+    protected function beforeEntitySave($entity, FormInterface $form, $action, $objectId = null, $isClone = false)
     {
         if (empty($this->campaignEvents)) {
             //set the error

@@ -83,11 +83,6 @@ class PointModel extends CommonFormModel
         return 'point:points';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws MethodNotAllowedHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Point) {

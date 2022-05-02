@@ -18,10 +18,6 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class NotificationModel
- * {@inheritdoc}
- */
 class NotificationModel extends FormModel implements AjaxLookupModelInterface
 {
     /**
@@ -29,9 +25,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      */
     protected $pageTrackableModel;
 
-    /**
-     * NotificationModel constructor.
-     */
     public function __construct(TrackableModel $pageTrackableModel)
     {
         $this->pageTrackableModel = $pageTrackableModel;
@@ -99,9 +92,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
         $this->em->flush();
     }
 
-    /**
-     * @throws MethodNotAllowedHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Notification) {
@@ -111,7 +101,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        $type = false !== mb_strpos($action, 'mobile_') ? MobileNotificationType::class : NotificationType::class;
+        $type = null !== $action && false !== mb_strpos($action, 'mobile_') ? MobileNotificationType::class : NotificationType::class;
 
         return $formFactory->create($type, $entity, $options);
     }

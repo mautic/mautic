@@ -68,11 +68,6 @@ class ClientModel extends FormModel
         return 'api:clients';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws MethodNotAllowedHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Client) {

@@ -41,12 +41,6 @@ class ActionModel extends CommonFormModel
         return parent::getEntity($id);
     }
 
-    /**
-     * @param object                              $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param null                                $action
-     * @param array                               $options
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Action) {

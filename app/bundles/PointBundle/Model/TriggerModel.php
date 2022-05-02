@@ -91,11 +91,6 @@ class TriggerModel extends CommonFormModel
         return 'point:triggers';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws MethodNotAllowedHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Trigger) {

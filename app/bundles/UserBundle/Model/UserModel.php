@@ -106,11 +106,6 @@ class UserModel extends FormModel
         return $entity->getPassword();
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof User) {
