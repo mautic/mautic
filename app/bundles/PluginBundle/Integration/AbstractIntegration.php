@@ -2228,8 +2228,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         /** @var PluginIntegrationKeyEvent $event */
         $event = $this->dispatcher->dispatch(
-            $eventName,
-            new PluginIntegrationKeyEvent($this, $keys)
+            new PluginIntegrationKeyEvent($this, $keys),
+            $eventName
         );
 
         return $event->getKeys();
