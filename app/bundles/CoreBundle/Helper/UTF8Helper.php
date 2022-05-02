@@ -137,7 +137,7 @@ class UTF8Helper
             return $text;
         }
 
-        $max = self::strlen($text);
+        $max = mb_strlen($text);
 
         $buf = '';
         for ($i = 0; $i < $max; ++$i) {
@@ -251,17 +251,15 @@ class UTF8Helper
 
     public static function removeBOM($str = '')
     {
-        if (mb_substr($str, 0, 3) == pack('CCC', 0xef, 0xbb, 0xbf)) {
-            $str = mb_substr($str, 3);
-        }
-
-        return $str;
+        return str_replace("\xEF\xBB\xBF", '', $str);
     }
 
+    /**
+     * @deprecated use mb_strlen instead. To be removed in Mautic 6.
+     */
     protected static function strlen($text)
     {
-        return (function_exists('mb_strlen') && ((int) ini_get('mbstring.func_overload')) & 2) ?
-            mb_strlen($text, '8bit') : mb_strlen($text);
+        return mb_strlen($text, '8bit');
     }
 
     public static function normalizeEncoding($encodingLabel)
