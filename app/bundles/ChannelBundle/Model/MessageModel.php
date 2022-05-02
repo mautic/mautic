@@ -11,12 +11,8 @@ use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class MessageModel.
- */
 class MessageModel extends FormModel implements AjaxLookupModelInterface
 {
     const CHANNEL_FEATURE = 'marketing_messages';
@@ -33,9 +29,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
 
     protected static $channels;
 
-    /**
-     * MessageModel constructor.
-     */
     public function __construct(ChannelListHelper $channelListHelper, CampaignModel $campaignModel)
     {
         $this->channelListHelper = $channelListHelper;

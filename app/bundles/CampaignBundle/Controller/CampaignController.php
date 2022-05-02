@@ -537,7 +537,7 @@ class CampaignController extends AbstractStandardFormController
      * @param FormInterface<FormInterface> $form
      * @param string                       $action
      * @param bool                         $isPost
-     * @param null|int                     $objectId
+     * @param int|null                     $objectId
      * @param bool                         $isClone
      */
     protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, $isClone = false)
