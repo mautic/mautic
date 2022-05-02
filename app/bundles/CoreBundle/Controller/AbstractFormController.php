@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 
 abstract class AbstractFormController extends CommonController
 {
@@ -126,7 +127,7 @@ abstract class AbstractFormController extends CommonController
      *
      * @return bool
      */
-    protected function isFormCancelled(Form $form)
+    protected function isFormCancelled(FormInterface $form)
     {
         $formData = $this->request->request->get($form->getName());
 
@@ -138,7 +139,7 @@ abstract class AbstractFormController extends CommonController
      *
      * @return bool
      */
-    protected function isFormApplied(Form $form)
+    protected function isFormApplied(FormInterface $form)
     {
         $formData = $this->request->request->get($form->getName());
 
@@ -152,7 +153,7 @@ abstract class AbstractFormController extends CommonController
      *
      * @return bool
      */
-    protected function isFormValid(Form $form, array $data = null)
+    protected function isFormValid(FormInterface $form, array $data = null)
     {
         //bind request to the form
         $form->handleRequest($this->request);
@@ -195,7 +196,7 @@ abstract class AbstractFormController extends CommonController
         return $this->get('mautic.helper.user')->getUser()->isAdmin();
     }
 
-    protected function copyErrorsRecursively(Form $copyFrom, Form $copyTo)
+    protected function copyErrorsRecursively(FormInterface $copyFrom, FormInterface $copyTo)
     {
         /** @var $error FormError */
         foreach ($copyFrom->getErrors() as $error) {

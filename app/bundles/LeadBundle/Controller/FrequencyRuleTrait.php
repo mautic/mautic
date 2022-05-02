@@ -6,7 +6,8 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\ContactFrequencyType;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 
 trait FrequencyRuleTrait
 {
@@ -27,7 +28,7 @@ trait FrequencyRuleTrait
      * @param null  $action
      * @param bool  $isPreferenceCenter
      *
-     * @return bool|Form
+     * @return true|FormInterface<FormInterface>
      */
     protected function getFrequencyRuleForm($lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null, $isPreferenceCenter = false)
     {
@@ -61,8 +62,11 @@ trait FrequencyRuleTrait
         if (null == $data) {
             $data = $this->getFrequencyRuleFormData($lead, $allChannels, $leadChannels, $isPublic, null, $isPreferenceCenter);
         }
-        /** @var Form $form */
-        $form = $this->get('form.factory')->create(
+
+        /** @var FormFactoryInterface $formFactory */
+        $formFactory = $this->get('form.factory');
+
+        $form = $formFactory->create(
             ContactFrequencyType::class,
             $data,
             [

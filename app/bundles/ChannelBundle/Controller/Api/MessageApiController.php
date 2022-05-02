@@ -8,7 +8,7 @@ use Mautic\ChannelBundle\Entity\Message;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class MessageApiController extends CommonApiController
@@ -29,7 +29,10 @@ class MessageApiController extends CommonApiController
         parent::initialize($event);
     }
 
-    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [], $fields = [])
+    /**
+     * @param FormInterface<FormInterface> $form
+     */
+    protected function prepareParametersFromRequest(FormInterface $form, array &$params, $entity = null, $masks = [], $fields = [])
     {
         parent::prepareParametersFromRequest($form, $params, $entity, $masks);
 

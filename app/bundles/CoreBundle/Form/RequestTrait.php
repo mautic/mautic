@@ -16,12 +16,15 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 trait RequestTrait
 {
-    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [], $fields = [])
+    /**
+     * @param FormInterface<FormInterface> $form
+     */
+    protected function prepareParametersFromRequest(FormInterface $form, array &$params, $entity = null, $masks = [], $fields = [])
     {
         // ungroup fields if need it
         foreach ($fields as $key=>$field) {

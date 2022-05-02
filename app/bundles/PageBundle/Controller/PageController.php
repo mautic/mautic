@@ -795,7 +795,7 @@ class PageController extends FormController
     /**
      * Activate the builder.
      *
-     * @param int $objectId
+     * @param int|string $objectId
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */

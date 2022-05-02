@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 abstract class AbstractStandardFormController extends AbstractFormController
@@ -562,11 +563,12 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Set custom form themes, etc.
      *
-     * @param $action
+     * @param FormInterface<FormInterface> $form
+     * @param string                       $action
      *
      * @return \Symfony\Component\Form\FormView
      */
-    protected function getFormView(Form $form, $action)
+    protected function getFormView(FormInterface $form, $action)
     {
         return $form->createView();
     }

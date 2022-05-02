@@ -13,13 +13,11 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
- * Class LeadApiController.
- *
  * @property LeadModel $model
  */
 class LeadApiController extends CommonApiController
@@ -648,8 +646,9 @@ class LeadApiController extends CommonApiController
         if (!empty($parameters['frequencyRules'])) {
             $viewParameters = [];
             $data           = $this->getFrequencyRuleFormData($entity, null, null, false, $parameters['frequencyRules']);
+            $frequencyForm  = $this->getFrequencyRuleForm($entity, $viewParameters, $data);
 
-            if (!$frequencyForm = $this->getFrequencyRuleForm($entity, $viewParameters, $data)) {
+            if ($frequencyForm instanceof FormInterface) {
                 $formErrors = $this->getFormErrorMessages($frequencyForm);
                 $msg        = $this->getFormErrorMessage($formErrors);
 
@@ -670,11 +669,11 @@ class LeadApiController extends CommonApiController
     /**
      * Helper method to be used in FrequencyRuleTrait.
      *
-     * @param Form $form
+     * @param FormInterface<FormInterface> $form
      *
      * @return bool
      */
-    protected function isFormCancelled($form = null)
+    protected function isFormCancelled(FormInterface $form)
     {
         return false;
     }
@@ -682,11 +681,12 @@ class LeadApiController extends CommonApiController
     /**
      * Helper method to be used in FrequencyRuleTrait.
      *
-     * @param array $data
+     * @param FormInterface<FormInterface> $form
+     * @param mixed[]                      $data
      *
      * @return bool
      */
-    protected function isFormValid(Form $form, array $data = null)
+    protected function isFormValid(FormInterface $form, array $data = null)
     {
         $form->submit($data, 'PATCH' !== $this->request->getMethod());
 
