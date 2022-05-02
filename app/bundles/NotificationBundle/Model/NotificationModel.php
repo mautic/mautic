@@ -15,6 +15,7 @@ use Mautic\NotificationBundle\Form\Type\MobileNotificationType;
 use Mautic\NotificationBundle\Form\Type\NotificationType;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Model\TrackableModel;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -102,10 +103,10 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param             $entity
-     * @param             $formFactory
-     * @param string|null $action
-     * @param array       $options
+     * @param Notification|null $entity
+     * @param FormFactory       $formFactory
+     * @param string|null       $action
+     * @param array             $options
      *
      * @return mixed
      *

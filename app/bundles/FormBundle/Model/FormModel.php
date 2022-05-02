@@ -182,7 +182,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @return bool|FormEvent|void
+     * @return bool|FormEvent|Event|void|null
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -584,13 +584,11 @@ class FormModel extends CommonFormModel
             $previousId = $fieldId;
         }
 
-        if (!empty($pages)) {
-            if ($openFieldId) {
-                $pages['open'][$openFieldId] = $pageCount;
-            }
-            if ($previousId !== $lastPage) {
-                $pages['close'][$previousId] = $pageCount;
-            }
+        if ($openFieldId) {
+            $pages['open'][$openFieldId] = $pageCount;
+        }
+        if ($previousId !== $lastPage) {
+            $pages['close'][$previousId] = $pageCount;
         }
 
         return [$pages, $lastPage];
