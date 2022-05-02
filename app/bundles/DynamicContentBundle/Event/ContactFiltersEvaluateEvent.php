@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\DynamicContentBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 final class ContactFiltersEvaluateEvent extends Event
 {

@@ -10,10 +10,10 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class UpdateSchemaStepTest extends AbstractStepTest
 {

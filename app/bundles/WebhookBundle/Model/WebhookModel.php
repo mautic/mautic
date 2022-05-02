@@ -22,9 +22,9 @@ use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\Form\Type\WebhookType;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\WebhookEvents;
-use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 
 class WebhookModel extends FormModel
 {

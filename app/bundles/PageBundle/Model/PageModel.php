@@ -35,9 +35,9 @@ use Mautic\PageBundle\Form\Type\PageType;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class PageModel extends FormModel
 {

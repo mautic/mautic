@@ -7,9 +7,9 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Form\Type\RoleType;
 use Mautic\UserBundle\UserEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class RoleModel.

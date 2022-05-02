@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Menu\MenuHelper;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class MenuEvent extends Event
 {

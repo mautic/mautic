@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class SidebarCanvasEvent extends Event
 {

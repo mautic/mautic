@@ -174,7 +174,7 @@ class CampaignModel extends CommonFormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Component\EventDispatcher\Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
     {
         if ($entity instanceof \Mautic\CampaignBundle\Entity\Lead) {
             return;

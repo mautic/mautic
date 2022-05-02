@@ -20,9 +20,9 @@ use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Form\Type\CompanyType;
 use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class CompanyModel.

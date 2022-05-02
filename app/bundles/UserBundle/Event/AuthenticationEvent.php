@@ -6,13 +6,13 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\Security\Provider\UserProvider;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class AuthenticationEvent.

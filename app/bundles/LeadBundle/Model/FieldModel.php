@@ -21,8 +21,8 @@ use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class FieldModel extends FormModel
 {

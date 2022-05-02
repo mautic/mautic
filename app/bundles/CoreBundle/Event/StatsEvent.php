@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Event;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class StatsEvent.

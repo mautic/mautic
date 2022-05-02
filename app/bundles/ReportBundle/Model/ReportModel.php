@@ -24,12 +24,12 @@ use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class ReportModel.

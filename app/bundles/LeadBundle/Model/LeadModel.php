@@ -54,11 +54,11 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Provider\UserProvider;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Intl\Intl;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class LeadModel

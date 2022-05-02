@@ -15,8 +15,8 @@ use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Form\Type\TriggerType;
 use Mautic\PointBundle\PointEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class TriggerModel extends CommonFormModel
 {

@@ -10,8 +10,8 @@ use MauticPlugin\MauticSocialBundle\Entity\TweetStat;
 use MauticPlugin\MauticSocialBundle\Event as Events;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class TweetModel

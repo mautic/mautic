@@ -8,10 +8,10 @@ use Mautic\ApiBundle\Event\ClientEvent;
 use Mautic\ApiBundle\Form\Type\ClientType;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ClientModel extends FormModel
 {

@@ -15,8 +15,8 @@ use Mautic\NotificationBundle\Form\Type\MobileNotificationType;
 use Mautic\NotificationBundle\Form\Type\NotificationType;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class NotificationModel

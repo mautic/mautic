@@ -4,7 +4,7 @@ namespace Mautic\EmailBundle\Event;
 
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class EmailReplyEvent.

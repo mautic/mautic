@@ -9,8 +9,8 @@ use MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class MonitoringModel

@@ -12,10 +12,10 @@ use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\Form\Type\UserType;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Mautic\UserBundle\UserEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class UserModel extends FormModel
 {

@@ -2,8 +2,8 @@
 
 namespace Mautic\EmailBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class MonitoredEmailEvent extends Event
 {

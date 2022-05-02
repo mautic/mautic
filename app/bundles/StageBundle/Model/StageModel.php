@@ -12,9 +12,9 @@ use Mautic\StageBundle\Event\StageBuilderEvent;
 use Mautic\StageBundle\Event\StageEvent;
 use Mautic\StageBundle\Form\Type\StageType;
 use Mautic\StageBundle\StageEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class StageModel.

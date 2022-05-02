@@ -3,8 +3,8 @@
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class BuilderEvent.

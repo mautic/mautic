@@ -22,8 +22,8 @@ use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Form\Type\SmsType;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class SmsModel extends FormModel implements AjaxLookupModelInterface
 {

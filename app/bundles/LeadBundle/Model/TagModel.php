@@ -7,8 +7,8 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Event\TagEvent;
 use Mautic\LeadBundle\Form\Type\TagEntityType;
 use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class TagModel
