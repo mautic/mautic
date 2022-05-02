@@ -11,15 +11,26 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class BatchSendType extends AbstractType
 {
+    private CoreParametersHelper $coreParametersHelper;
+
+    public function __construct(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $default = (empty($options['data']['batchlimit'])) ? 100 : (int) $options['data']['batchlimit'];
+        $default = (empty($options['data']['batchlimit']))
+            ? $this->coreParametersHelper->get('mailer_memory_msg_limit')
+            : (int) $options['data']['batchlimit'];
+
         $builder->add(
             'batchlimit',
             TextType::class,

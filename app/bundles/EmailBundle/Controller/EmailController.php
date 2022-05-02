@@ -1196,11 +1196,7 @@ class EmailController extends FormController
 
         $action   = $this->generateUrl('mautic_email_action', ['objectAction' => 'send', 'objectId' => $objectId]);
         $pending  = $model->getPendingLeads($entity, null, true);
-        $data     = [
-            'action' => $action,
-            'data'   => ['batchlimit' => $this->coreParametersHelper->get('mailer_memory_msg_limit')],
-        ];
-        $form     = $this->get('form.factory')->create(BatchSendType::class, [], $data);
+        $form     = $this->get('form.factory')->create(BatchSendType::class, [], ['action' => $action]);
         $complete = $this->request->request->get('complete', false);
 
         if ('POST' == $this->request->getMethod() && ($complete || $this->isFormValid($form))) {

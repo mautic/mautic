@@ -348,7 +348,10 @@ return [
                 'class' => \Mautic\EmailBundle\Form\Type\AbTestPropertiesType::class,
             ],
             'mautic.email.type.batch_send' => [
-                'class' => \Mautic\EmailBundle\Form\Type\BatchSendType::class,
+                'class'     => \Mautic\EmailBundle\Form\Type\BatchSendType::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
             ],
             'mautic.form.type.emailconfig' => [
                 'class'     => \Mautic\EmailBundle\Form\Type\ConfigType::class,
