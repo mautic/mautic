@@ -11,7 +11,33 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Point extends FormEntity
+//The minimum and maximum possible integer values
+const MIN_INTEGER_VALUE = -2147483648;
+const MAX_INTEGER_VALUE = 2147483647;
+
+/**
+ * Class Point.
+ *
+ * @ApiResource(
+ *   attributes={
+ *     "security"="false",
+ *     "normalization_context"={
+ *       "groups"={
+ *         "point:read"
+ *        },
+ *       "swagger_definition_name"="Read",
+ *       "api_included"={"category"}
+ *     },
+ *     "denormalization_context"={
+ *       "groups"={
+ *         "point:write"
+ *       },
+ *       "swagger_definition_name"="Write"
+ *     }
+ *   }
+ * )
+ */
+class Point extends FormEntity implements UuidInterface
 {
     /**
      * @var int
@@ -125,6 +151,11 @@ class Point extends FormEntity
 
         $metadata->addPropertyConstraint('delta', new Assert\NotBlank([
             'message' => 'mautic.point.delta.notblank',
+        ]));
+
+        $metadata->addPropertyConstraint('delta', new Assert\Range([
+            'min' => MIN_INTEGER_VALUE,
+            'max' => MAX_INTEGER_VALUE,
         ]));
     }
 
