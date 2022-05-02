@@ -73,7 +73,7 @@ class ContactMerger
 
         // Dispatch pre merge event
         $event = new LeadMergeEvent($winner, $loser);
-        $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_MERGE, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::LEAD_PRE_MERGE);
 
         // Merge everything
         $this->updateMergeRecords($winner, $loser)
@@ -88,7 +88,7 @@ class ContactMerger
         $this->leadModel->saveEntity($winner, false);
 
         // Dispatch post merge event
-        $this->dispatcher->dispatch(LeadEvents::LEAD_POST_MERGE, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_MERGE);
 
         // Delete the loser
         $this->leadModel->deleteEntity($loser);

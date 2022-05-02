@@ -90,7 +90,7 @@ class FieldSaveDispatcher
             $event->setEntityManager($this->entityManager);
         }
 
-        $this->dispatcher->dispatch($action, $event);
+        $this->dispatcher->dispatch($event, $action);
 
         return $event;
     }

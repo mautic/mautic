@@ -141,7 +141,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
             $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
-            $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
+            $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
 
             $content = $tokenEvent->getContent();
             $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);

@@ -292,7 +292,7 @@ class AssetModel extends FormModel
         // Dispatch event
         if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_LOAD)) {
             $event = new AssetLoadEvent($download, $isUnique);
-            $this->dispatcher->dispatch(AssetEvents::ASSET_ON_LOAD, $event);
+            $this->dispatcher->dispatch($event, AssetEvents::ASSET_ON_LOAD);
         }
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
@@ -431,7 +431,7 @@ class AssetModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

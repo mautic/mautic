@@ -216,8 +216,8 @@ class TrackableModel extends AbstractCommonModel
     public function getDoNotTrackList($content = null)
     {
         $event = $this->dispatcher->dispatch(
-            PageEvents::REDIRECT_DO_NOT_TRACK,
-            new UntrackableUrlsEvent($content)
+            new UntrackableUrlsEvent($content),
+            PageEvents::REDIRECT_DO_NOT_TRACK
         );
 
         return $event->getDoNotTrackList();

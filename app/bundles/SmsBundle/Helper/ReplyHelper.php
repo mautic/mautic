@@ -106,7 +106,7 @@ class ReplyHelper
     {
         $replyEvent = new ReplyEvent($contact, trim($message));
 
-        $this->eventDispatcher->dispatch(SmsEvents::ON_REPLY, $replyEvent);
+        $this->eventDispatcher->dispatch($replyEvent, SmsEvents::ON_REPLY);
 
         return $replyEvent->getResponse();
     }

@@ -215,7 +215,7 @@ class FormModel extends CommonFormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -714,7 +714,7 @@ class FormModel extends CommonFormModel
         if (empty($customComponents)) {
             //build them
             $event = new FormBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(FormEvents::FORM_ON_BUILD, $event);
+            $this->dispatcher->dispatch($event, FormEvents::FORM_ON_BUILD);
             $customComponents['fields']     = $event->getFormFields();
             $customComponents['actions']    = $event->getSubmitActions();
             $customComponents['choices']    = $event->getSubmitActionGroups();

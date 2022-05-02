@@ -184,7 +184,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         if ($this->dispatcher) {
             $event = new CompanyBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $q);
-            $this->dispatcher->dispatch(LeadEvents::COMPANY_BUILD_SEARCH_COMMANDS, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::COMPANY_BUILD_SEARCH_COMMANDS);
             if ($event->isSearchDone()) {
                 $returnParameter = $event->getReturnParameters();
                 $filter->strict  = $event->getStrict();

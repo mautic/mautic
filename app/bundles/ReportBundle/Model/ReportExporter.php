@@ -115,7 +115,7 @@ class ReportExporter
 
             $file  = $this->reportFileWriter->getFilePath($scheduler);
             $event = new ReportScheduleSendEvent($scheduler, $file);
-            $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
+            $this->eventDispatcher->dispatch($event, ReportEvents::REPORT_SCHEDULE_SEND);
         }
 
         $this->schedulerModel->reportWasScheduled($report);

@@ -199,7 +199,7 @@ class CoreSubscriber implements EventSubscriberInterface
             //dispatch on login events
             if ($this->dispatcher->hasListeners(UserEvents::USER_LOGIN)) {
                 $loginEvent = new LoginEvent($this->userHelper->getUser());
-                $this->dispatcher->dispatch(UserEvents::USER_LOGIN, $loginEvent);
+                $this->dispatcher->dispatch($loginEvent, UserEvents::USER_LOGIN);
             }
         } else {
             $session->remove('mautic.user');

@@ -409,7 +409,7 @@ class PublicController extends CommonFormController
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->get('event_dispatcher');
         $event           = new TrackingEvent($lead, $request, $sessionValue);
-        $eventDispatcher->dispatch(PageEvents::ON_CONTACT_TRACKED, $event);
+        $eventDispatcher->dispatch($event, PageEvents::ON_CONTACT_TRACKED);
 
         return new JsonResponse(
             [

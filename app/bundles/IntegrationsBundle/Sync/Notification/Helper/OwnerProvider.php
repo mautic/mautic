@@ -55,7 +55,7 @@ class OwnerProvider
 
         $event = new InternalObjectOwnerEvent($object, $objectIds);
 
-        $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_FIND_OWNER_IDS, $event);
+        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_FIND_OWNER_IDS);
 
         return $event->getOwners();
     }

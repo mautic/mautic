@@ -198,7 +198,7 @@ class PartialObjectReportBuilder
 
         $event = new InternalObjectFindEvent($this->objectProvider->getObjectByName($objectName));
         $event->setIds(array_keys($this->objectsWithMissingFields));
-        $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS, $event);
+        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS);
 
         return $event->getFoundObjects();
     }

@@ -206,7 +206,7 @@ class CampaignModel extends CommonFormModel
                 $event = new Events\CampaignEvent($entity, $isNew);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

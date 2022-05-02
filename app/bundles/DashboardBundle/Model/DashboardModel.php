@@ -245,7 +245,7 @@ class DashboardModel extends FormModel
         $event->setWidget($widget);
         $event->setCacheDir($cacheDir, $this->userHelper->getUser()->getId());
         $event->setSecurity($this->security);
-        $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
+        $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE);
     }
 
     /**

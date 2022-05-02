@@ -153,7 +153,7 @@ class PointModel extends CommonFormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }
@@ -174,7 +174,7 @@ class PointModel extends CommonFormModel
             //build them
             $actions = [];
             $event   = new PointBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(PointEvents::POINT_ON_BUILD, $event);
+            $this->dispatcher->dispatch($event, PointEvents::POINT_ON_BUILD);
             $actions['actions'] = $event->getActions();
             $actions['list']    = $event->getActionList();
             $actions['choices'] = $event->getActionChoices();
@@ -293,7 +293,7 @@ class PointModel extends CommonFormModel
                     );
 
                     $event = new PointActionEvent($action, $lead);
-                    $this->dispatcher->dispatch(PointEvents::POINT_ON_ACTION, $event);
+                    $this->dispatcher->dispatch($event, PointEvents::POINT_ON_ACTION);
 
                     if (!$action->getRepeatable()) {
                         $log = new LeadPointLog();

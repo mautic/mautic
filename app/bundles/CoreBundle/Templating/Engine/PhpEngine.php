@@ -102,8 +102,8 @@ class PhpEngine extends BasePhpEngine
         defined('MAUTIC_RENDERING_TEMPLATE') || define('MAUTIC_RENDERING_TEMPLATE', 1);
         if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE)) {
             $event = $this->dispatcher->dispatch(
-                CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE,
-                new CustomTemplateEvent($this->request, $name, $parameters)
+                new CustomTemplateEvent($this->request, $name, $parameters),
+                CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE
             );
 
             $name       = $event->getTemplate();

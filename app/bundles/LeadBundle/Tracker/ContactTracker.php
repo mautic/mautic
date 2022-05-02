@@ -323,12 +323,12 @@ class ContactTracker
         if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST')) {
             // Dispatch events for new lead to write create log, ip address change, etc
             $event = new LeadEvent($lead, true);
-            $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_SAVE, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::LEAD_PRE_SAVE);
             $this->setEntityDefaultValues($lead);
             $this->leadRepository->saveEntity($lead);
             $this->hydrateCustomFieldData($lead);
 
-            $this->dispatcher->dispatch(LeadEvents::LEAD_POST_SAVE, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
 
             $this->logger->addDebug("CONTACT: New lead created with ID# {$lead->getId()}.");
         }
@@ -379,7 +379,7 @@ class ContactTracker
         if (null !== $previouslyTrackedId) {
             if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
                 $event = new LeadChangeEvent($previouslyTrackedContact, $previouslyTrackedId, $this->trackedContact, $newTrackingId);
-                $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
+                $this->dispatcher->dispatch($event, LeadEvents::CURRENT_LEAD_CHANGED);
             }
         }
     }

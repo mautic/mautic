@@ -201,7 +201,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
                 $event = new Events\SocialEvent($entity, $isNew);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

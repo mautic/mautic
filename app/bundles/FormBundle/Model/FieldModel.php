@@ -201,7 +201,7 @@ class FieldModel extends CommonFormModel
                 $event = new FormFieldEvent($entity, $isNew);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

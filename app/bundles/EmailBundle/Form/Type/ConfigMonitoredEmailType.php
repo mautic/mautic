@@ -29,7 +29,7 @@ class ConfigMonitoredEmailType extends AbstractType
             // Default email bundles
             $event->addFolder('general', '', 'mautic.email.config.monitored_email.general');
 
-            $this->dispatcher->dispatch(EmailEvents::MONITORED_EMAIL_CONFIG, $event);
+            $this->dispatcher->dispatch($event, EmailEvents::MONITORED_EMAIL_CONFIG);
 
             $folderSettings = $event->getFolders();
             foreach ($folderSettings as $key => $settings) {

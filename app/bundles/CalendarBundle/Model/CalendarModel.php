@@ -22,7 +22,7 @@ class CalendarModel extends FormModel
     public function getCalendarEvents(array $dates)
     {
         $event = new CalendarGeneratorEvent($dates);
-        $this->dispatcher->dispatch(CalendarEvents::CALENDAR_ON_GENERATE, $event);
+        $this->dispatcher->dispatch($event, CalendarEvents::CALENDAR_ON_GENERATE);
 
         return $event->getEvents();
     }
@@ -38,7 +38,7 @@ class CalendarModel extends FormModel
     public function editCalendarEvent($bundle, $id)
     {
         $event = new EventGeneratorEvent($bundle, $id);
-        $this->dispatcher->dispatch(CalendarEvents::CALENDAR_EVENT_ON_GENERATE, $event);
+        $this->dispatcher->dispatch($event, CalendarEvents::CALENDAR_EVENT_ON_GENERATE);
 
         return $event;
     }

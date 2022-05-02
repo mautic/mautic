@@ -343,7 +343,7 @@ class ImportModel extends FormModel
                 try {
                     $event = new ImportProcessEvent($import, $eventLog, $data);
 
-                    $this->dispatcher->dispatch(LeadEvents::IMPORT_ON_PROCESS, $event);
+                    $this->dispatcher->dispatch($event, LeadEvents::IMPORT_ON_PROCESS);
 
                     if ($event->wasMerged()) {
                         $this->logDebug('Entity on line '.$lineNumber.' has been updated', $import);
@@ -663,7 +663,7 @@ class ImportModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

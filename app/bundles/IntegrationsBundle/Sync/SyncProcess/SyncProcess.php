@@ -142,8 +142,8 @@ class SyncProcess
 
         // Tell listeners sync is done
         $this->eventDispatcher->dispatch(
-            IntegrationEvents::INTEGRATION_POST_EXECUTE,
-            new SyncEvent($this->mappingManualDAO->getIntegration(), $this->inputOptionsDAO->getStartDateTime(), $this->inputOptionsDAO->getEndDateTime())
+            new SyncEvent($this->mappingManualDAO->getIntegration(), $this->inputOptionsDAO->getStartDateTime(), $this->inputOptionsDAO->getEndDateTime()),
+            IntegrationEvents::INTEGRATION_POST_EXECUTE
         );
     }
 

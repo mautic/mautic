@@ -171,7 +171,7 @@ class Reply implements ProcessorInterface
             $this->contactTracker->setTrackedContact($stat->getLead());
 
             $event = new EmailReplyEvent($stat);
-            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_REPLY, $event);
+            $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_REPLY);
             unset($event);
         }
     }

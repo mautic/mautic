@@ -42,8 +42,8 @@ class AssetsSubscriber implements EventSubscriberInterface
     {
         if ($event->isMasterRequest() && $this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_ASSETS)) {
             $this->dispatcher->dispatch(
-                CoreEvents::VIEW_INJECT_CUSTOM_ASSETS,
-                new CustomAssetsEvent($this->assetsHelper)
+                new CustomAssetsEvent($this->assetsHelper),
+                CoreEvents::VIEW_INJECT_CUSTOM_ASSETS
             );
         }
     }

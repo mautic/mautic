@@ -87,8 +87,8 @@ class FullObjectReportBuilder
                 }
 
                 $this->dispatcher->dispatch(
-                    IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
-                    $event
+                    $event,
+                    IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
                 );
 
                 $foundObjects = $event->getFoundObjects();

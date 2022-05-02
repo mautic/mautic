@@ -113,7 +113,7 @@ class SendEmailToUser
     private function replaceToken(string $token, Lead $lead): string
     {
         $tokenEvent = new TokenReplacementEvent($token, $lead);
-        $this->dispatcher->dispatch(EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT, $tokenEvent);
+        $this->dispatcher->dispatch($tokenEvent, EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT);
 
         return $tokenEvent->getContent();
     }
