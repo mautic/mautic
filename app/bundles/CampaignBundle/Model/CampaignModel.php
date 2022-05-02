@@ -177,7 +177,7 @@ class CampaignModel extends CommonFormModel
     protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
     {
         if ($entity instanceof \Mautic\CampaignBundle\Entity\Lead) {
-            return;
+            return null;
         }
 
         if (!$entity instanceof Campaign) {

@@ -102,10 +102,10 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param             $entity
+     * @param             $formFactory
+     * @param string|null $action
+     * @param array       $options
      *
      * @return mixed
      *
@@ -190,7 +190,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                 $name = NotificationEvents::NOTIFICATION_POST_DELETE;
                 break;
             default:
-                return;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -202,9 +202,9 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return;
         }
+
+        return null;
     }
 
     /**

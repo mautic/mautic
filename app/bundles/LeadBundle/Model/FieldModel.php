@@ -835,7 +835,7 @@ class FieldModel extends FormModel
             throw new MethodNotAllowedHttpException(['LeadField']);
         }
 
-        return $this->fieldSaveDispatcher->dispatchEventBc($action, $entity, $isNew, $event);
+        return $this->fieldSaveDispatcher->dispatchEvent($action, $entity, $isNew, $event);
     }
 
     /**
