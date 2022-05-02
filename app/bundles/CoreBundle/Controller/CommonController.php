@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,7 +28,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * Class CommonController.
  */
-class CommonController extends Controller implements MauticController
+class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
 
