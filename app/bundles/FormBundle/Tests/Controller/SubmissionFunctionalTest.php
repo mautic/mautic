@@ -355,8 +355,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertCount(1, $submissions);
 
-        // The previous request changes user to anonymous. We have to configure API again.
-        $this->setUpSymfony($this->configParams);
+        // Enable reboots so all the services and in-memory data are refreshed.
+        $this->client->enableReboot();
 
         // fetch form submissions as Admin User
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
@@ -369,18 +369,19 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         Assert::assertGreaterThanOrEqual(1, $response['total']);
 
         // Create non admin user
-        $this->createUser();
+        $user = $this->createUser();
 
         // Fetch form submissions as non-admin-user who don't have the permission to view submissions
-        $apiClient = $this->createAnotherClient('non-admin-user', 'test-pass');
-        $apiClient->followRedirects();
-        $apiClient->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
-        $clientResponse = $apiClient->getResponse();
+        $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions", [], [], [
+            'PHP_AUTH_USER' => $user->getUsername(),
+            'PHP_AUTH_PW'   => $this->getUserPlainPassword(),
+        ]);
+        $clientResponse = $this->client->getResponse();
 
         $this->assertSame(Response::HTTP_FORBIDDEN, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
-    private function createUser(): void
+    private function createUser(): User
     {
         $role = new Role();
         $role->setName('api_restricted');
@@ -401,10 +402,17 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         /** @var PasswordEncoderInterface $encoder */
         $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
-        $user->setPassword($encoder->encodePassword('test-pass', $user->getSalt()));
+        $user->setPassword($encoder->encodePassword($this->getUserPlainPassword(), $user->getSalt()));
 
         /** @var UserRepository $userRepo */
         $userRepo = $this->em->getRepository(User::class);
         $userRepo->saveEntities([$user]);
+
+        return $user;
+    }
+
+    private function getUserPlainPassword(): string
+    {
+        return 'test-pass';
     }
 }
