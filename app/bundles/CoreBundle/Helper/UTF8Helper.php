@@ -137,7 +137,7 @@ class UTF8Helper
             return $text;
         }
 
-        $max = mb_strlen($text);
+        $max = mb_strlen($text, '8bit');
 
         $buf = '';
         for ($i = 0; $i < $max; ++$i) {
