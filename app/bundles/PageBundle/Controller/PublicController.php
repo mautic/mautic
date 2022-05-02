@@ -54,7 +54,7 @@ class PublicController extends CommonFormController
                 if (null != $entity->getRedirectType()) {
                     $model->hitPage($entity, $this->request, $entity->getRedirectType());
 
-                    return $this->redirect($entity->getRedirectUrl(), $entity->getRedirectType());
+                    return $this->redirect($entity->getRedirectUrl(), (int) $entity->getRedirectType());
                 } else {
                     $model->hitPage($entity, $this->request, 401);
 
