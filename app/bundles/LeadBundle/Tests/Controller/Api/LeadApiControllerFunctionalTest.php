@@ -25,7 +25,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         self::$container->set(
             'session',
             new Session(
-                new class extends FixedMockFileSessionStorage {
+                new class() extends FixedMockFileSessionStorage {
                     public function start()
                     {
                         Assert::fail('Session cannot be started during API call. It must be stateless.');
@@ -328,9 +328,9 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
-        
+
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        
+
         $response  = json_decode($clientResponse->getContent(), true);
         $contactId = $response['contact']['id'];
 

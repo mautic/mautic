@@ -76,6 +76,16 @@ return [
                     'priority' => 1,
                 ],
             ],
+<<<<<<< HEAD
+=======
+            'mautic.install.configurator.step.email' => [
+                'class'        => \Mautic\InstallBundle\Configurator\Step\EmailStep::class,
+                'tag'          => 'mautic.configurator.step',
+                'tagArguments' => [
+                    'priority' => 3,
+                ],
+            ],
+>>>>>>> b00ec6fd1e (CS fix)
             'mautic.install.configurator.step.user' => [
                 'class'        => \Mautic\InstallBundle\Configurator\Step\UserStep::class,
                 'tag'          => 'mautic.configurator.step',
