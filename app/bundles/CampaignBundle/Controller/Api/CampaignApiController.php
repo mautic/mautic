@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -108,10 +109,10 @@ class CampaignApiController extends CommonApiController
     /**
      * {@inheritdoc}
      *
-     * @param Lead   $entity
-     * @param        $parameters
-     * @param        $form
-     * @param string $action
+     * @param Campaign                             $entity
+     * @param ?array<int|string|array<int|string>> $parameters
+     * @param Form                                 $form
+     * @param string                               $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
@@ -232,7 +233,7 @@ class CampaignApiController extends CommonApiController
     /**
      * Obtains a list of campaign contacts.
      *
-     * @param $id
+     * @param int $id
      *
      * @return Response
      */
@@ -278,6 +279,11 @@ class CampaignApiController extends CommonApiController
         );
     }
 
+    /**
+     * @param int $campaignId
+     *
+     * @return Response
+     */
     public function cloneCampaignAction($campaignId)
     {
         if (empty($campaignId) || false == intval($campaignId)) {

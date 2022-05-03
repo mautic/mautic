@@ -18,7 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ApiSubscriberTest extends CommonMocks
@@ -39,7 +39,7 @@ class ApiSubscriberTest extends CommonMocks
     private $request;
 
     /**
-     * @var GetResponseEvent|MockObject
+     * @var RequestEvent|MockObject
      */
     private $event;
 
@@ -56,14 +56,14 @@ class ApiSubscriberTest extends CommonMocks
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->request              = $this->createMock(Request::class);
         $this->request->headers     = new ParameterBag();
-        $this->event                = $this->createMock(GetResponseEvent::class);
+        $this->event                = $this->createMock(RequestEvent::class);
         $this->subscriber           = new ApiSubscriber(
             $this->coreParametersHelper,
             $this->translator
         );
     }
 
-    public function testOnKernelRequestWhenNotMasterRequest()
+    public function testOnKernelRequestWhenNotMasterRequest(): void
     {
         $this->event->expects($this->once())
             ->method('isMasterRequest')
@@ -75,7 +75,7 @@ class ApiSubscriberTest extends CommonMocks
         $this->assertNull($this->subscriber->onKernelRequest($this->event));
     }
 
-    public function testOnKernelRequestOnApiRequestWhenApiDisabled()
+    public function testOnKernelRequestOnApiRequestWhenApiDisabled(): void
     {
         $this->event->expects($this->once())
             ->method('isMasterRequest')
@@ -106,7 +106,7 @@ class ApiSubscriberTest extends CommonMocks
         $this->subscriber->onKernelRequest($this->event);
     }
 
-    public function testOnKernelRequestOnApiRequestWhenApiEnabled()
+    public function testOnKernelRequestOnApiRequestWhenApiEnabled(): void
     {
         $this->event->expects($this->once())
             ->method('isMasterRequest')
