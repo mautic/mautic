@@ -347,4 +347,14 @@ class AppKernel extends Kernel
 
         return $this->parameterLoader = new ParameterLoader();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getKernelParameters(): array
+    {
+        return array_merge(parent::getKernelParameters(), [
+            'kernel.root_dir' => $this->getRootDir(),
+        ]);
+    }
 }
