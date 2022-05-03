@@ -266,7 +266,7 @@ class TimelineController extends CommonController
                 }
             }
 
-            $items = $this->getEngagements($lead, $filters, $order, $loop + 1, 200);
+            $items = $this->getEngagements($lead, $filters, $order, $loop + 1, 200)['events'] ?? [];
 
             $this->getDoctrine()->getManager()->clear();
 

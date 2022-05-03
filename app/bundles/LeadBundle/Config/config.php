@@ -332,6 +332,7 @@ return [
                     'doctrine.orm.entity_manager',
                     'translator',
                     'router',
+                    'mautic.helper.core_parameters',
                 ],
                 'methodCalls' => [
                     'setModelFactory' => ['mautic.model.factory'],

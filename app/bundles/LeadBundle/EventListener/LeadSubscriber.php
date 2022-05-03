@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -79,6 +80,11 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $isTest;
 
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParameterHelper;
+
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
@@ -87,6 +93,7 @@ class LeadSubscriber implements EventSubscriberInterface
         EntityManager $entityManager,
         TranslatorInterface $translator,
         RouterInterface $router,
+        CoreParametersHelper $coreParameterHelper,
         $isTest = false
     ) {
         $this->ipLookupHelper      = $ipLookupHelper;
@@ -96,6 +103,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->entityManager       = $entityManager;
         $this->translator          = $translator;
         $this->router              = $router;
+        $this->coreParameterHelper = $coreParameterHelper;
         $this->isTest              = $isTest;
     }
 
@@ -391,14 +399,15 @@ class LeadSubscriber implements EventSubscriberInterface
         $rows = $this->auditLogModel->getRepository()->getLeadIpLogs($lead, $event->getQueryOptions());
 
         if (!$event->isEngagementCount()) {
-            // Add to counter
-            $event->addToCounter($eventTypeKey, $rows);
-
             // Add the entries to the event array
             $ipAddresses = ($lead instanceof Lead) ? $lead->getIpAddresses()->toArray() : null;
 
+            $annonimizedIps = $this->coreParameterHelper->get('anonymize_ip');
+
             foreach ($rows['results'] as $row) {
-                if (null !== $ipAddresses && !isset($ipAddresses[$row['ip_address']])) {
+                $rowIP = $annonimizedIps ? preg_replace(['/\.\d*$/', '/[\da-f]*:[\da-f]*$/'], ['.***', '****:****'], $row['ip_address']) : $row['ip_address'];
+
+                if (null !== $ipAddresses && !isset($ipAddresses[$rowIP])) {
                     continue;
                 }
 
@@ -411,12 +420,13 @@ class LeadSubscriber implements EventSubscriberInterface
                         'eventPriority' => -1, // Usually an IP is added after another event
                         'timestamp'     => $row['date_added'],
                         'extra'         => [
-                            'ipDetails' => $ipAddresses[$row['ip_address']],
+                            'ipDetails' => $ipAddresses[$rowIP],
                         ],
                         'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:ipadded.html.php',
                         'contactId'       => $row['lead_id'],
                     ]
                 );
+                $event->addToCounter($eventTypeKey, 1);
             }
         } else {
             // Purposively not including this in engagements graph as it's info only
@@ -436,8 +446,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
         $dateAdded = $event->getLead()->getDateAdded();
         if (!$event->isEngagementCount()) {
-            $event->addToCounter($eventTypeKey, 1);
-
             $start = $event->getEventLimit()['start'];
             if (empty($start)) {
                 $event->addEvent(
@@ -450,6 +458,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'timestamp'     => $dateAdded,
                     ]
                 );
+                $event->addToCounter($eventTypeKey, 1);
             }
         } else {
             // Purposively not including this in engagements graph as it's info only
@@ -469,8 +478,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
         if ($dateIdentified = $event->getLead()->getDateIdentified()) {
             if (!$event->isEngagementCount()) {
-                $event->addToCounter($eventTypeKey, 1);
-
                 $start = $event->getEventLimit()['start'];
                 if (empty($start)) {
                     $event->addEvent(
@@ -484,6 +491,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'featured'      => true,
                         ]
                     );
+                    $event->addToCounter($eventTypeKey, 1);
                 }
             } else {
                 // Purposively not including this in engagements graph as it's info only
@@ -499,8 +507,6 @@ class LeadSubscriber implements EventSubscriberInterface
     {
         $utmRepo = $this->entityManager->getRepository(UtmTag::class);
         $utmTags = $utmRepo->getUtmTagsByLead($event->getLead(), $event->getQueryOptions());
-        // Add to counter
-        $event->addToCounter($eventTypeKey, $utmTags);
 
         if (!$event->isEngagementCount()) {
             // Add the logs to the event array
@@ -546,6 +552,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'contactId'       => $utmTag['lead_id'],
                         ]
                     );
+                $event->addToCounter($eventTypeKey, 1);
             }
         } else {
             // Purposively not including this in engagements graph as the engagement is counted by the page hit
@@ -563,9 +570,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
         $rows = $dncRepo->getTimelineStats($event->getLeadId(), $event->getQueryOptions());
-
-        // Add to counter
-        $event->addToCounter($eventTypeKey, $rows);
 
         if (!$event->isEngagementCount()) {
             foreach ($rows['results'] as $row) {
@@ -619,6 +623,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'contactId'       => $contactId,
                     ]
                 );
+                $event->addToCounter($eventTypeKey, 1);
             }
         }
     }
@@ -638,9 +643,6 @@ class LeadSubscriber implements EventSubscriberInterface
             ['failed', 'inserted', 'updated'],
             $event->getQueryOptions()
         );
-
-        // Add to counter
-        $event->addToCounter($eventTypeKey, $imports);
 
         if (!$event->isEngagementCount()) {
             // Add the logs to the event array
@@ -678,6 +680,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'contactId'       => $import['lead_id'],
                         ]
                     );
+                $event->addToCounter($eventTypeKey, 1);
             }
         } else {
             // Purposively not including this
