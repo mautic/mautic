@@ -12,9 +12,10 @@
 namespace Mautic\LeadBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
@@ -103,10 +104,10 @@ class FieldApiController extends CommonApiController
     /**
      * {@inheritdoc}
      *
-     * @param Lead   $entity
-     * @param        $parameters
-     * @param        $form
-     * @param string $action
+     * @param LeadField                            $entity
+     * @param ?array<int|string|array<int|string>> $parameters
+     * @param Form                                 $form
+     * @param string                               $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {

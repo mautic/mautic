@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -50,7 +51,7 @@ class CompanyApiController extends CommonApiController
         $parameters = $this->request->request->all();
 
         if (empty($parameters['force'])) {
-            list($company, $companyEntities) = IdentifyCompanyHelper::findCompany($parameters, $this->getModel('lead.company'));
+            [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($parameters, $this->getModel('lead.company'));
 
             if (count($companyEntities)) {
                 return $this->editEntityAction($company['id']);
@@ -63,10 +64,10 @@ class CompanyApiController extends CommonApiController
     /**
      * {@inheritdoc}
      *
-     * @param Lead   $entity
-     * @param        $parameters
-     * @param        $form
-     * @param string $action
+     * @param Company                              $entity
+     * @param ?array<int|string|array<int|string>> $parameters
+     * @param Form                                 $form
+     * @param string                               $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {

@@ -12,7 +12,8 @@
 namespace Mautic\UserBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\UserBundle\Entity\Role;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
@@ -37,10 +38,10 @@ class RoleApiController extends CommonApiController
     /**
      * {@inheritdoc}
      *
-     * @param Lead   $entity
-     * @param        $parameters
-     * @param        $form
-     * @param string $action
+     * @param Role                                 $entity
+     * @param ?array<int|string|array<int|string>> $parameters
+     * @param Form                                 $form
+     * @param string                               $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
