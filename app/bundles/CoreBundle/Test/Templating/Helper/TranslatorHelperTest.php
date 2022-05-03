@@ -8,7 +8,7 @@ use Symfony\Component\Translation\Translator;
 
 class TranslatorHelperTest extends TestCase
 {
-    public function testGetJsLang()
+    public function testGetJsLang(): void
     {
         $translator = $this->createMock(Translator::class);
         $translator->expects($this->exactly(2))->method('getCatalogue')->willReturnCallback(
@@ -21,7 +21,7 @@ class TranslatorHelperTest extends TestCase
         $translatorHelper->getJsLang();
     }
 
-    public function testGetJsLangBasedOnLocale()
+    public function testGetJsLangBasedOnLocale(): void
     {
         $translator = $this->createMock(Translator::class);
         $translator->method('setLocale')->willReturnCallback(
@@ -60,6 +60,9 @@ class TranslatorCatalogue
         $this->translator = $translator;
     }
 
+    /**
+     * @return string[]
+     */
     public function all()
     {
         switch ($this->translator->getLocale()) {
