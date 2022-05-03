@@ -7,13 +7,13 @@ use Mautic\CoreBundle\Exception\UpdateFailedException;
 use Mautic\CoreBundle\Update\Step\UpdateSchemaStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 class UpdateSchemaStepTest extends AbstractStepTest
 {
@@ -113,7 +113,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (Event $event, string $eventName) {
+                function (ConsoleCommandEvent $event, string $eventName) {
                     switch ($eventName) {
                         case ConsoleEvents::COMMAND:
                             $event->enableCommand();
@@ -136,7 +136,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (Event $event, string $eventName) {
+                function (ConsoleCommandEvent $event, string $eventName) {
                     switch ($eventName) {
                         case ConsoleEvents::COMMAND:
                             $event->enableCommand();

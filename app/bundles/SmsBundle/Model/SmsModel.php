@@ -433,7 +433,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 $name = SmsEvents::SMS_POST_DELETE;
                 break;
             default:
-                return;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -446,7 +446,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
             return $event;
         } else {
-            return;
+            return null;
         }
     }
 

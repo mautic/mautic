@@ -313,7 +313,7 @@ class FocusModel extends FormModel
     /**
      * Add a stat entry.
      *
-     * @param                                               $type
+     * @param mixed                                         $type
      * @param null                                          $data
      * @param array<int|string|array<int|string>>|Lead|null $lead
      *
