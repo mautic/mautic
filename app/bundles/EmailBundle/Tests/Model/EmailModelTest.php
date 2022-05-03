@@ -27,11 +27,13 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -288,13 +290,14 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue(true));
 
         $this->mailHelper->method('createEmailStat')
-            ->will($this->returnCallback(function () {
-                $stat = new Stat();
-                $stat->setEmail($this->emailEntity);
+            ->will($this->returnCallback(
+                function () {
+                    $stat = new Stat();
+                    $stat->setEmail($this->emailEntity);
 
-                return $stat;
-            }
-        ));
+                    return $stat;
+                }
+            ));
 
         $variantA = $this->createMock(Email::class);
         $variantA->expects($this->any())
@@ -425,12 +428,13 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailEntity->method('isVariant')->will($this->returnValue(true));
 
         $this->mailHelper->method('createEmailStat')
-            ->will($this->returnCallback(function () {
-                $stat = new Stat();
-                $stat->setEmail($this->emailEntity);
+            ->will($this->returnCallback(
+                function () {
+                    $stat = new Stat();
+                    $stat->setEmail($this->emailEntity);
 
-                return $stat;
-            }
+                    return $stat;
+                }
             ));
 
         $variantA = $this->createMock(Email::class);
@@ -795,5 +799,26 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame([0, 1, 2, 3], $chartData['labels']);
         $this->assertSame([0.0, 20.0, 50.0, 30.0], $chartData['datasets'][0]['data']);
+    }
+
+    public function testIsUpdatingTranslationChildren(): void
+    {
+        $email = new Email();
+        $email->setEmailType('list');
+        $email->addTranslationChild($child = new Email());
+        $userHelper  = $this->createMock(UserHelper::class);
+        $this->emailModel->setUserHelper($userHelper);
+        $dispatcher = new EventDispatcher();
+        $listener   = function (EmailEvent $event) use ($child) {
+            $isChild = $event->getEmail() === $child;
+            $this->assertSame($isChild, $this->emailModel->isUpdatingTranslationChildren());
+        };
+        $dispatcher->addListener(EmailEvents::EMAIL_PRE_SAVE, $listener);
+        $dispatcher->addListener(EmailEvents::EMAIL_POST_SAVE, $listener);
+        $this->emailModel->setDispatcher($dispatcher);
+        $emailRepository = $this->createMock(EmailRepository::class);
+        $this->entityManager->method('getRepository')->willReturn($emailRepository);
+        $this->emailModel->saveEntity($email);
+        $this->assertFalse($this->emailModel->isUpdatingTranslationChildren());
     }
 }
