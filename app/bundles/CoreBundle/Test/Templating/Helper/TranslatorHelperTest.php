@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Test\Templating\Helper;
 use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TranslatorHelperTest extends TestCase
 {
