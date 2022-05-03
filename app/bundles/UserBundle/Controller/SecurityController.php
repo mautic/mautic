@@ -12,9 +12,14 @@
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Helper\CookieHelper;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\Security\Core\Exception as Exception;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Security;
 
 /**
@@ -25,9 +30,9 @@ class SecurityController extends CommonController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
-        /** @var \Symfony\Component\Security\Core\Authorization\AuthorizationChecker $authChecker */
+        /** @var AuthorizationChecker $authChecker */
         $authChecker = $this->get('security.authorization_checker');
 
         //redirect user if they are already authenticated
@@ -44,7 +49,7 @@ class SecurityController extends CommonController
     /**
      * Generates login form and processes login.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function loginAction()
     {
@@ -70,7 +75,7 @@ class SecurityController extends CommonController
                 );
             }
 
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+            /** @var CookieHelper $cookieHelper */
             $cookieHelper = $this->factory->getHelper('cookie');
             $cookieHelper->deleteCookie('mautic_update');
         }
@@ -86,9 +91,9 @@ class SecurityController extends CommonController
         }
 
         if (!empty($error)) {
-            if (($error instanceof Exception\BadCredentialsException)) {
+            if (($error instanceof BadCredentialsException)) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
-            } elseif ($error instanceof Exception\DisabledException) {
+            } elseif ($error instanceof DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';
             } elseif ($error instanceof \Exception) {
                 $msg = $error->getMessage();

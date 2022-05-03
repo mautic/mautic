@@ -30,6 +30,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Security\Exception\PermissionException;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -37,7 +38,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -125,7 +126,7 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     /**
      * Model object for processing the entity.
      *
-     * @var \Mautic\CoreBundle\Model\AbstractCommonModel
+     * @var AbstractCommonModel
      */
     protected $model;
 
@@ -154,7 +155,7 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     protected $routeParams = [];
 
     /**
-     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     * @var CorePermissions
      */
     protected $security;
 
@@ -538,7 +539,7 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     /**
      * Initialize some variables.
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->security = $this->get('mautic.security');
 

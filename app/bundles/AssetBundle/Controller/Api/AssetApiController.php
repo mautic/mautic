@@ -13,14 +13,14 @@ namespace Mautic\AssetBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
  * Class AssetApiController.
  */
 class AssetApiController extends CommonApiController
 {
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model            = $this->getModel('asset');
         $this->entityClass      = 'Mautic\AssetBundle\Entity\Asset';

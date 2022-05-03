@@ -13,9 +13,10 @@ namespace Mautic\CoreBundle\EventListener;
 
 use LightSaml\Error\LightSamlException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\EventListener\ExceptionListener as KernelExceptionListener;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -28,7 +29,7 @@ use Symfony\Component\Security\Core\Security;
 /**
  * Class ExceptionListener.
  */
-class ExceptionListener extends KernelExceptionListener
+class ExceptionListener extends ErrorListener
 {
     /**
      * @var Router
@@ -47,7 +48,8 @@ class ExceptionListener extends KernelExceptionListener
         $this->router = $router;
     }
 
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event, ?string $eventName
+    = null, ?EventDispatcherInterface $eventDispatcher = null)
     {
         $exception = $event->getException();
 

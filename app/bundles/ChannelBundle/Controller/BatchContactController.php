@@ -17,7 +17,8 @@ use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\LeadBundle\Form\Type\ContactChannelsType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 class BatchContactController extends AbstractFormController
 {
@@ -40,7 +41,7 @@ class BatchContactController extends AbstractFormController
      * Initialize object props here to simulate constructor
      * and make the future controller refactoring easier.
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->channelActionModel   = $this->container->get('mautic.channel.model.channel.action');
         $this->frequencyActionModel = $this->container->get('mautic.channel.model.frequency.action');
@@ -81,7 +82,7 @@ class BatchContactController extends AbstractFormController
     /**
      * View for batch action.
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction()
     {

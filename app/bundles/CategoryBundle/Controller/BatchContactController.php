@@ -16,7 +16,8 @@ use Mautic\CategoryBundle\Model\ContactActionModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 class BatchContactController extends AbstractFormController
 {
@@ -34,7 +35,7 @@ class BatchContactController extends AbstractFormController
      * Initialize object props here to simulate constructor
      * and make the future controller refactoring easier.
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->actionModel   = $this->container->get('mautic.category.model.contact.action');
         $this->categoryModel = $this->container->get('mautic.category.model.category');
@@ -75,7 +76,7 @@ class BatchContactController extends AbstractFormController
     /**
      * View the modal form for adding contacts into categories in batches.
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction()
     {

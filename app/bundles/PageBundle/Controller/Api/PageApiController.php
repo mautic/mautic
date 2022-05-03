@@ -13,7 +13,8 @@ namespace Mautic\PageBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\PageBundle\Entity\Page;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
  * Class PageApiController.
@@ -23,7 +24,7 @@ class PageApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model            = $this->getModel('page');
         $this->entityClass      = Page::class;
@@ -38,7 +39,7 @@ class PageApiController extends CommonApiController
     /**
      * Obtains a list of pages.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getEntitiesAction()
     {

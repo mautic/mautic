@@ -18,14 +18,14 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
  * Class WidgetApiController.
  */
 class WidgetApiController extends CommonApiController
 {
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model            = $this->getModel('dashboard');
         $this->entityClass      = 'Mautic\DashboardBundle\Entity\Widget';
@@ -39,7 +39,7 @@ class WidgetApiController extends CommonApiController
     /**
      * Obtains a list of available widget types.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getTypesAction()
     {
@@ -57,7 +57,7 @@ class WidgetApiController extends CommonApiController
      *
      * @param string $type of the widget
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getDataAction($type)
     {

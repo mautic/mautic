@@ -16,7 +16,7 @@ use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
  * Class FormApiController.
@@ -26,7 +26,7 @@ class FormApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model            = $this->getModel('form');
         $this->entityClass      = 'Mautic\FormBundle\Entity\Form';
@@ -48,7 +48,7 @@ class FormApiController extends CommonApiController
     /**
      * Delete fields from a form.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function deleteFieldsAction($formId)
     {
@@ -78,7 +78,7 @@ class FormApiController extends CommonApiController
     /**
      * Delete fields from a form.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function deleteActionsAction($formId)
     {

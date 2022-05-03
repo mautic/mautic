@@ -13,11 +13,13 @@ namespace Mautic\CoreBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
  * Class ThemeApiController.
@@ -25,11 +27,11 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 class ThemeApiController extends CommonApiController
 {
     /**
-     * @var Mautic\CoreBundle\Helper\ThemeHelper
+     * @var ThemeHelper
      */
     protected $themeHelper;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->themeHelper = $this->container->get('mautic.helper.theme');
 
@@ -39,7 +41,7 @@ class ThemeApiController extends CommonApiController
     /**
      * Accepts the zip file and installs the theme from it.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function newAction(Request $request)
     {
@@ -124,7 +126,7 @@ class ThemeApiController extends CommonApiController
     /**
      * List the folders (themes) in the /themes directory.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function listAction()
     {
@@ -148,7 +150,7 @@ class ThemeApiController extends CommonApiController
      *
      * @param string $theme
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function deleteAction($theme)
     {

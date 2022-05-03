@@ -30,7 +30,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -175,7 +175,7 @@ class CoreSubscriberTest extends TestCase
             ->getMock();
         $controllers = [$controller];
 
-        $event = $this->createMock(FilterControllerEvent::class);
+        $event = $this->createMock(ControllerArgumentsEvent::class);
         $event->expects(self::once())
             ->method('getController')
             ->willReturn($controllers);

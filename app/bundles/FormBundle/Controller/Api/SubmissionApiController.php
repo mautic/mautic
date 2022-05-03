@@ -15,7 +15,7 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
  * Class SubmissionApiController.
@@ -25,7 +25,7 @@ class SubmissionApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model            = $this->getModel('form.submission');
         $this->entityClass      = Submission::class;

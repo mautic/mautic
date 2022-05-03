@@ -13,9 +13,10 @@ namespace Mautic\LeadBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
  * Class NoteApiController.
@@ -24,7 +25,7 @@ class NoteApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model            = $this->getModel('lead.note');
         $this->entityClass      = LeadNote::class;
@@ -38,10 +39,10 @@ class NoteApiController extends CommonApiController
     /**
      * {@inheritdoc}
      *
-     * @param \Mautic\LeadBundle\Entity\Lead &$entity
-     * @param                                $parameters
-     * @param                                $form
-     * @param string                         $action
+     * @param Lead   $entity
+     * @param        $parameters
+     * @param        $form
+     * @param string $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {

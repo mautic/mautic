@@ -13,14 +13,14 @@ namespace Mautic\CategoryBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CategoryBundle\Entity\Category;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
  * Class CategoryApiController.
  */
 class CategoryApiController extends CommonApiController
 {
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model            = $this->getModel('category');
         $this->entityClass      = 'Mautic\CategoryBundle\Entity\Category';

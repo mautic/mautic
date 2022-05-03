@@ -31,7 +31,7 @@ use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -157,7 +157,7 @@ class CoreSubscriber implements EventSubscriberInterface
     /**
      * Add mauticForms in js script tag for Froala.
      */
-    public function onKernelRequestAddGlobalJS(FilterControllerEvent $event)
+    public function onKernelRequestAddGlobalJS(ControllerEvent $event)
     {
         if (defined('MAUTIC_INSTALLER') || $this->userHelper->getUser()->isGuest() || !$event->isMasterRequest()) {
             return;
@@ -218,7 +218,7 @@ class CoreSubscriber implements EventSubscriberInterface
     /**
      * Populates namespace, bundle, controller, and action into request to be used throughout application.
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(ControllerEvent $event)
     {
         $controller = $event->getController();
 
@@ -253,7 +253,7 @@ class CoreSubscriber implements EventSubscriberInterface
             $controller[0]->setFlashBag($this->flashBag);
 
             //run any initialize functions
-            $controller[0]->initialize($event);
+          //  $controller[0]->initialize($event);
         }
     }
 

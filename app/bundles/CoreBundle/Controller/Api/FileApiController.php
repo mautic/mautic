@@ -13,8 +13,9 @@ namespace Mautic\CoreBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
  * Class FileApiController.
@@ -28,7 +29,7 @@ class FileApiController extends CommonApiController
      */
     protected $allowedExtensions = [];
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->entityNameOne     = 'file';
         $this->entityNameMulti   = 'files';
@@ -40,7 +41,7 @@ class FileApiController extends CommonApiController
     /**
      * Uploads a file.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function createAction($dir)
     {
@@ -79,7 +80,7 @@ class FileApiController extends CommonApiController
     /**
      * List the files in /media directory.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function listAction($dir)
     {
@@ -110,7 +111,7 @@ class FileApiController extends CommonApiController
     /**
      * Delete a file from /media directory.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function deleteAction($dir, $file)
     {

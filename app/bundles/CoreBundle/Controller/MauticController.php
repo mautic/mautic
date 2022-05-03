@@ -11,7 +11,7 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
  * Interface MauticController.
@@ -25,5 +25,5 @@ interface MauticController
      *
      * @return mixed
      */
-    public function initialize(FilterControllerEvent $event);
+    public function initialize(ControllerArgumentsEvent $event);
 }

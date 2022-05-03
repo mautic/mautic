@@ -13,7 +13,7 @@ namespace Mautic\WebhookBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\WebhookBundle\Entity\Webhook;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
  * Class WebhookApiController.
@@ -23,7 +23,7 @@ class WebhookApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model            = $this->getModel('webhook');
         $this->entityClass      = Webhook::class;

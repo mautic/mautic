@@ -13,7 +13,8 @@ namespace Mautic\UserBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -24,7 +25,7 @@ class UserApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model            = $this->getModel('user.user');
         $this->entityClass      = 'Mautic\UserBundle\Entity\User';
@@ -38,9 +39,9 @@ class UserApiController extends CommonApiController
     /**
      * Obtains the logged in user's data.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function getSelfAction()
     {
@@ -77,7 +78,7 @@ class UserApiController extends CommonApiController
      *
      * @param int $id User ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws NotFoundHttpException
      */
@@ -151,10 +152,10 @@ class UserApiController extends CommonApiController
      *
      * @param int $id User ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException   ;
      */
     public function isGrantedAction($id)
     {
@@ -180,7 +181,7 @@ class UserApiController extends CommonApiController
     /**
      * Obtains a list of roles for user edits.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getRolesAction()
     {

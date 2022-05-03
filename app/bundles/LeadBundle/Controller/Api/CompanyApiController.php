@@ -17,7 +17,8 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class CompanyApiController.
@@ -27,7 +28,7 @@ class CompanyApiController extends CommonApiController
     use CustomFieldsApiControllerTrait;
     use LeadAccessTrait;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model              = $this->getModel('lead.company');
         $this->entityClass        = Company::class;
@@ -41,7 +42,7 @@ class CompanyApiController extends CommonApiController
     /**
      * If an existing company is matched, it'll be merged. Otherwise it'll be created.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function newEntityAction()
     {
@@ -62,10 +63,10 @@ class CompanyApiController extends CommonApiController
     /**
      * {@inheritdoc}
      *
-     * @param \Mautic\LeadBundle\Entity\Lead &$entity
-     * @param                                $parameters
-     * @param                                $form
-     * @param string                         $action
+     * @param Lead   $entity
+     * @param        $parameters
+     * @param        $form
+     * @param string $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
@@ -78,9 +79,9 @@ class CompanyApiController extends CommonApiController
      * @param int $companyId Company ID
      * @param int $contactId Contact ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function addContactAction($companyId, $contactId)
     {
@@ -107,9 +108,9 @@ class CompanyApiController extends CommonApiController
      * @param int $companyId List ID
      * @param int $contactId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function removeContactAction($companyId, $contactId)
     {

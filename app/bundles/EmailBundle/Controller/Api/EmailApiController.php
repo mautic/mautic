@@ -19,13 +19,14 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class EmailApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model            = $this->getModel('email');
         $this->entityClass      = 'Mautic\EmailBundle\Entity\Email';
@@ -68,7 +69,7 @@ class EmailApiController extends CommonApiController
      *
      * @return Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function sendAction($id)
     {
@@ -107,7 +108,7 @@ class EmailApiController extends CommonApiController
      *
      * @return Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function sendLeadAction($id, $leadId)
     {

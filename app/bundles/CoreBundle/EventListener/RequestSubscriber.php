@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -58,7 +58,7 @@ class RequestSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function validateCsrfTokenForAjaxPost(GetResponseEvent $event)
+    public function validateCsrfTokenForAjaxPost(RequestEvent $event)
     {
         $request = $event->getRequest();
 

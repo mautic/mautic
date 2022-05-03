@@ -15,13 +15,14 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ListApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model            = $this->getModel('lead.list');
         $this->entityClass      = LeadList::class;
@@ -35,7 +36,7 @@ class ListApiController extends CommonApiController
     /**
      * Obtains a list of smart lists for the user.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getListsAction()
     {
@@ -53,9 +54,9 @@ class ListApiController extends CommonApiController
      * @param int $id     List ID
      * @param int $leadId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function addLeadAction($id, $leadId)
     {
@@ -88,9 +89,9 @@ class ListApiController extends CommonApiController
      *
      * @param int $id segement ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function addLeadsAction($id)
     {
@@ -134,9 +135,9 @@ class ListApiController extends CommonApiController
      * @param int $id     List ID
      * @param int $leadId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function removeLeadAction($id, $leadId)
     {

@@ -14,11 +14,14 @@ namespace Mautic\CoreBundle\Controller;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DataExporterHelper;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -27,7 +30,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -37,7 +40,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * Class CommonController.
  */
-class CommonController extends Controller implements MauticController
+class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
 
@@ -47,7 +50,7 @@ class CommonController extends Controller implements MauticController
     protected $factory;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Request
+     * @var Request
      */
     protected $request;
 
@@ -111,7 +114,7 @@ class CommonController extends Controller implements MauticController
         $this->flashBag = $flashBag;
     }
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
     }
 
@@ -225,7 +228,7 @@ class CommonController extends Controller implements MauticController
      *
      * @param $url
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function delegateRedirect($url)
     {
@@ -239,7 +242,7 @@ class CommonController extends Controller implements MauticController
     /**
      * Redirects URLs with trailing slashes in order to prevent 404s.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse
      */
     public function removeTrailingSlashAction(Request $request)
     {
@@ -262,7 +265,7 @@ class CommonController extends Controller implements MauticController
      *
      * @param array $args [returnUrl, viewParameters, contentTemplate, passthroughVars, flashes, forwardController]
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function postActionRedirect($args = [])
     {
@@ -448,7 +451,7 @@ class CommonController extends Controller implements MauticController
      * @param int    $objectSubId
      * @param string $objectModel
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|JsonResponse|RedirectResponse
      */
     public function executeAction($objectAction, $objectId = 0, $objectSubId = 0, $objectModel = '')
     {
@@ -465,7 +468,7 @@ class CommonController extends Controller implements MauticController
      * @param bool   $batch Flag if a batch action is being performed
      * @param string $msg   Message that is logged
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|array
+     * @return JsonResponse|RedirectResponse|array
      *
      * @throws AccessDeniedHttpException
      */
@@ -604,10 +607,10 @@ class CommonController extends Controller implements MauticController
 
         $afterId = $request->get('mauticLastNotificationId', null);
 
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
+        /** @var NotificationModel $model */
         $model = $this->getModel('core.notification');
 
-        list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent($afterId, false, 200);
+        [$notifications, $showNewIndicator, $updateMessage] = $model->getNotificationContent($afterId, false, 200);
 
         $lastNotification = reset($notifications);
 
@@ -633,7 +636,7 @@ class CommonController extends Controller implements MauticController
      */
     public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
     {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
+        /** @var NotificationModel $notificationModel */
         $notificationModel = $this->getModel('core.notification');
         $notificationModel->addNotification($message, $type, $isRead, $header, $iconClass, $datetime);
     }
@@ -739,7 +742,7 @@ class CommonController extends Controller implements MauticController
      */
     public function exportResultsAs($toExport, $type, $filename)
     {
-        /** @var \Mautic\CoreBundle\Helper\ExportHelper */
+        /** @var ExportHelper */
         $exportHelper = $this->get('mautic.helper.export');
 
         if (!in_array($type, $exportHelper->getSupportedExportTypes())) {

@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Controller\Api;
 
+use FOS\RestBundle\View\View;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Serializer\Exclusion\FieldInclusionStrategy;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -20,7 +21,7 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
  * Class EventLogApiController.
@@ -42,7 +43,7 @@ class EventLogApiController extends CommonApiController
     /** @var EventLogModel */
     protected $model;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model                    = $this->getModel('campaign.event_log');
         $this->entityClass              = 'Mautic\CampaignBundle\Entity\LeadEventLog';
@@ -79,7 +80,7 @@ class EventLogApiController extends CommonApiController
      * @param      $contactId
      * @param null $campaignId
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getContactEventsAction($contactId, $campaignId = null)
     {
@@ -126,7 +127,7 @@ class EventLogApiController extends CommonApiController
      * @param $eventId
      * @param $contactId
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function editContactEventAction($eventId, $contactId)
     {
@@ -247,7 +248,7 @@ class EventLogApiController extends CommonApiController
      * @param null $data
      * @param null $statusCode
      *
-     * @return \FOS\RestBundle\View\View
+     * @return View
      */
     protected function view($data = null, $statusCode = null, array $headers = [])
     {

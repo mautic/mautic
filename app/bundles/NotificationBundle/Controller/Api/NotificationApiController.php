@@ -12,9 +12,10 @@
 namespace Mautic\NotificationBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
  * Class NotificationApiController.
@@ -29,7 +30,7 @@ class NotificationApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->contactTracker  = $this->container->get('mautic.tracker.contact');
         $this->model           = $this->getModel('notification');
@@ -49,7 +50,7 @@ class NotificationApiController extends CommonApiController
     {
         $osid = $this->request->get('osid');
         if ($osid) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+            /** @var LeadModel $leadModel */
             $leadModel = $this->getModel('lead');
 
             if ($currentLead = $this->contactTracker->getContact()) {

@@ -14,7 +14,8 @@ namespace Mautic\StageBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class PointApiController.
@@ -26,7 +27,7 @@ class StageApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model            = $this->getModel('stage');
         $this->entityClass      = 'Mautic\StageBundle\Entity\Stage';
@@ -43,9 +44,9 @@ class StageApiController extends CommonApiController
      * @param int $id        Stage ID
      * @param int $contactId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function addContactAction($id, $contactId)
     {
@@ -76,9 +77,9 @@ class StageApiController extends CommonApiController
      * @param int $id        Stage ID
      * @param int $contactId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function removeContactAction($id, $contactId)
     {

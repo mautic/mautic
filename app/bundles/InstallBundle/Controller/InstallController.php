@@ -12,14 +12,16 @@
 namespace Mautic\InstallBundle\Controller;
 
 use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Configurator\Configurator;
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 class InstallController extends CommonController
 {
@@ -32,7 +34,7 @@ class InstallController extends CommonController
     /**
      * Initialize controller.
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->configurator = $this->container->get('mautic.configurator');
         $this->installer    = $this->container->get('mautic.install.service');
@@ -73,7 +75,7 @@ class InstallController extends CommonController
             return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1]));
         }
 
-        /** @var \Mautic\CoreBundle\Configurator\Step\StepInterface $step */
+        /** @var StepInterface $step */
         $step   = $this->configurator->getStep($index)[0];
         $action = $this->generateUrl('mautic_installer_step', ['index' => $index]);
 
@@ -106,7 +108,7 @@ class InstallController extends CommonController
                             break;
                         }
 
-                        /** @var \Doctrine\ORM\EntityManager */
+                        /** @var EntityManager */
                         $entityManager = $this->get('doctrine.orm.default_entity_manager');
 
                         /**

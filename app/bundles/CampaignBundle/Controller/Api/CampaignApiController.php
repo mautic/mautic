@@ -16,8 +16,10 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CampaignApiController extends CommonApiController
 {
@@ -28,7 +30,7 @@ class CampaignApiController extends CommonApiController
      */
     private $membershipManager;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerArgumentsEvent $event)
     {
         $this->model             = $this->getModel('campaign');
         $this->membershipManager = $this->get('mautic.campaign.membership.manager');
@@ -47,9 +49,9 @@ class CampaignApiController extends CommonApiController
      * @param int $id     Campaign ID
      * @param int $leadId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function addLeadAction($id, $leadId)
     {
@@ -80,9 +82,9 @@ class CampaignApiController extends CommonApiController
      * @param int $id     Campaign ID
      * @param int $leadId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function removeLeadAction($id, $leadId)
     {
@@ -106,10 +108,10 @@ class CampaignApiController extends CommonApiController
     /**
      * {@inheritdoc}
      *
-     * @param \Mautic\LeadBundle\Entity\Lead &$entity
-     * @param                                $parameters
-     * @param                                $form
-     * @param string                         $action
+     * @param Lead   $entity
+     * @param        $parameters
+     * @param        $form
+     * @param string $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
@@ -232,7 +234,7 @@ class CampaignApiController extends CommonApiController
      *
      * @param $id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getContactsAction($id)
     {

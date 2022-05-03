@@ -15,8 +15,8 @@ use Mautic\ApiBundle\Helper\RequestHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -57,7 +57,7 @@ class ApiSubscriber implements EventSubscriberInterface
      *
      * @throws AccessDeniedHttpException
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -113,7 +113,7 @@ class ApiSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event)
     {
         $request      = $event->getRequest();
         $isApiRequest = RequestHelper::isApiRequest($request);
