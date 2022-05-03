@@ -12,14 +12,17 @@ use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Release\ThisRelease;
+use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
+use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\UserBundle\Entity\User;
+use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -249,18 +252,22 @@ class InstallService
             );
         }
 
+        if (!empty($dbParams['driver']) && !in_array($dbParams['driver'], DoctrineStep::getDriverKeys())) {
+            $messages['driver'] = $this->translator->trans(
+                'mautic.install.database.driver.invalid',
+                ['%drivers%' => implode(', ', DoctrineStep::getDriverKeys())],
+                'validators'
+            );
+        }
+
         return $messages;
     }
 
     /**
      * Create the database.
      */
-    public function createDatabaseStep(StepInterface $step, array $dbParams, bool $nukeCache = false): array
+    public function createDatabaseStep(StepInterface $step, array $dbParams): array
     {
-        if ($nukeCache) {
-            $this->cacheHelper->nukeCache();
-        }
-
         $messages = $this->validateDatabaseParams($dbParams);
 
         if (!empty($messages)) {
@@ -272,6 +279,7 @@ class InstallService
 
         try {
             $schemaHelper->testConnection();
+            $schemaHelper->validateDatabaseVersion();
 
             if ($schemaHelper->createDatabase()) {
                 $messages = $this->saveConfiguration($dbParams, $step, true);
@@ -283,6 +291,18 @@ class InstallService
             $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.creating.database',
                 ['%name%' => $dbParams['name']],
+                'flashes'
+            );
+        } catch (DatabaseVersionTooOldException $e) {
+            $metadata = ThisRelease::getMetadata();
+
+            $messages['error'] = $this->translator->trans(
+                'mautic.installer.error.database.version',
+                [
+                    '%currentversion%'    => $e->getCurrentVersion(),
+                    '%mysqlminversion%'   => $metadata->getMinSupportedMySqlVersion(),
+                    '%mariadbminversion%' => $metadata->getMinSupportedMariaDbVersion(),
+                ],
                 'flashes'
             );
         } catch (\Exception $exception) {
@@ -350,6 +370,7 @@ class InstallService
     public function installDatabaseFixtures(ContainerInterface $container): void
     {
         $paths  = [dirname(__DIR__).'/InstallFixtures/ORM'];
+        /** @phpstan-ignore-next-line */
         $loader = new ContainerAwareLoader($container);
 
         foreach ($paths as $path) {
@@ -419,22 +440,25 @@ class InstallService
             return $messages;
         }
 
+        $validations  = [];
+
         $emailConstraint          = new Assert\Email();
-        $emailConstraint->message = $this->translator->trans('mautic.core.email.required',
-            [],
-            'validators'
-        );
+        $emailConstraint->message = $this->translator->trans('mautic.core.email.required', [], 'validators');
 
-        $errors = $this->validator->validate(
-            $data['email'],
-            $emailConstraint
-        );
+        $passwordConstraint             = new Assert\Length(['min' => 6]);
+        $passwordConstraint->minMessage = $this->translator->trans('mautic.install.password.minlength', [], 'validators');
 
-        if (0 !== count($errors)) {
+        $validations[] = $this->validator->validate($data['email'], $emailConstraint);
+        $validations[] = $this->validator->validate($data['password'], $passwordConstraint);
+
+        $messages = [];
+        foreach ($validations as $errors) {
             foreach ($errors as $error) {
                 $messages[] = $error->getMessage();
             }
+        }
 
+        if (!empty($messages)) {
             return $messages;
         }
 

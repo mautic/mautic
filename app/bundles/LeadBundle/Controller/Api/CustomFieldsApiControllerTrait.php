@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller\Api;
 
 use Mautic\LeadBundle\Entity\Company;
@@ -60,7 +51,6 @@ trait CustomFieldsApiControllerTrait
     /**
      * Flatten fields into an 'all' key for dev convenience.
      *
-     * @param        $entity
      * @param string $action
      */
     protected function preSerializeEntity(&$entity, $action = 'view')

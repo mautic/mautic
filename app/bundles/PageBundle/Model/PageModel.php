@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -449,7 +440,7 @@ class PageModel extends FormModel
 
     /**
      * @param Page|Redirect $page
-     * @param string        $code
+     * @param string|int    $code
      * @param array         $query
      *
      * @throws \Exception

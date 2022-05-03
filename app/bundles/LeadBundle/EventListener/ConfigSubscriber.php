@@ -1,20 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\LeadBundle\Form\Type\ConfigCompanyType;
 use Mautic\LeadBundle\Form\Type\ConfigType;
+use Mautic\LeadBundle\Form\Type\SegmentConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
@@ -42,6 +34,14 @@ class ConfigSubscriber implements EventSubscriberInterface
             'formType'   => ConfigType::class,
             'formTheme'  => 'MauticLeadBundle:FormTheme\Config',
             'parameters' => $parameters,
+        ]);
+
+        $event->addForm([
+            'bundle'     => 'LeadBundle',
+            'formAlias'  => 'segment_config',
+            'formType'   => SegmentConfigType::class,
+            'formTheme'  => 'MauticLeadBundle:FormTheme\Config',
+            'parameters' => $event->getParametersFromConfig('MauticLeadBundle'),
         ]);
     }
 

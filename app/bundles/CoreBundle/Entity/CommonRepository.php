@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -399,7 +390,6 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param      $q
      * @param      $filter
      * @param null $parameterName
      *
@@ -1168,7 +1158,7 @@ class CommonRepository extends EntityRepository
      *
      * @return bool
      */
-    protected function buildDbalJoinsFromAssociations(\Doctrine\DBAL\Query\QueryBuilder $q, $associations, $alias, array $allowed)
+    protected function buildDbalJoinsFromAssociations(DbalQueryBuilder $q, $associations, $alias, array $allowed)
     {
         $joinAdded = false;
         foreach ($associations as $property => $association) {
@@ -1342,9 +1332,9 @@ class CommonRepository extends EntityRepository
                 } else {
                     if (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
                         $q->select($newSelect);
-                    } elseif (false !== strpos($select, $this->getTableAlias().',')) {
+                    } elseif (is_string($select) && false !== strpos($select, $this->getTableAlias().',')) {
                         $q->select(str_replace($this->getTableAlias().',', $newSelect.',', $select));
-                    } elseif (false !== strpos($select, $this->getTableAlias().'.*,')) {
+                    } elseif (is_string($select) && false !== strpos($select, $this->getTableAlias().'.*,')) {
                         $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.',', $select));
                     }
                 }
@@ -1540,7 +1530,6 @@ class CommonRepository extends EntityRepository
                             break;
                         case 'in':
                         case 'notIn':
-
                             $parsed = str_getcsv(html_entity_decode($clause['val']), ',', '"');
 
                             $param = $this->generateRandomParameterName();

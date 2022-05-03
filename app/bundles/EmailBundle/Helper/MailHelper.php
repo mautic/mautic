@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Helper;
 
 use Doctrine\ORM\ORMException;
@@ -367,7 +358,7 @@ class MailHelper
             }
         } // from is set in flushQueue
 
-        if (!empty($this->replyTo)) {
+        if (empty($this->message->getReplyTo()) && !empty($this->replyTo)) {
             $this->setReplyTo($this->replyTo);
         }
         // Set system return path if applicable
@@ -1391,7 +1382,11 @@ class MailHelper
 
         $this->replyTo = $email->getReplyToAddress();
         if (empty($this->replyTo)) {
-            $this->replyTo = $this->systemReplyTo;
+            if (!empty($fromEmail) && empty($this->factory->getParameter('mailer_reply_to_email'))) {
+                $this->replyTo = $fromEmail;
+            } else {
+                $this->replyTo = $this->systemReplyTo;
+            }
         }
         if (!empty($this->replyTo)) {
             $addresses = explode(',', $this->replyTo);
