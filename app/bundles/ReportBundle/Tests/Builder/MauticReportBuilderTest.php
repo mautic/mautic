@@ -6,10 +6,8 @@ namespace Mautic\ReportBundle\Tests\Builder;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
-use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use PHPUnit\Framework\Assert;
@@ -35,9 +33,9 @@ final class MauticReportBuilderTest extends TestCase
     private $channelListHelper;
 
     /**
-     * @var ExpressionBuilder|mixed|MockObject
+     * @var QueryBuilder
      */
-    private $expressionBuilderMock;
+    private $queryBuilder;
 
     protected function setUp(): void
     {
@@ -45,6 +43,7 @@ final class MauticReportBuilderTest extends TestCase
 
         $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
         $this->connection        = $this->createMock(Connection::class);
+        $this->queryBuilder      = new QueryBuilder($this->connection);
         $this->channelListHelper = $this->createMock(ChannelListHelper::class);
 
         $this->connection->method('createQueryBuilder')->willReturn(new QueryBuilder($this->connection));
@@ -158,52 +157,32 @@ final class MauticReportBuilderTest extends TestCase
         ")), $query->getSql());
     }
 
-    public function testReportsFilterNotEqual(): void
+    public function testFiltersWithEmptyAndNotEmptyDateTypes2(): void
     {
-        $this->expressionBuilderMock = $this->createMock(ExpressionBuilder::class);
-        $this->expressionBuilderMock->expects($this->any())
-            ->method('andX')
-            ->willReturn(new CompositeExpression(CompositeExpression::TYPE_AND));
-
-        $this->expressionBuilderMock->expects($this->once())->method('isNull');
-        $this->expressionBuilderMock->expects($this->once())->method('neq');
-
-        $this->connection->method('getExpressionBuilder')->willReturn($this->expressionBuilderMock);
-
-        $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
-
-        $report  = new Report();
-        $columns = ['a.b', 'b.c', 'foo.firstname'];
-        $report->setColumns($columns);
-        $filters = [
-            'foo.firstname' => [
-                'column'    => 'foo.firstname',
-                'condition' => 'neq',
-                'value'     => 'xxx',
+        $report = new Report();
+        $report->setColumns(['a.someField']);
+        $report->setFilters([
+            [
+                'column'    => 'a.notEqualString',
                 'glue'      => 'and',
-                'dynamic'   => null,
+                'value'     => '',
+                'condition' => 'neq',
             ],
-        ];
-
-        $options = [
-            'columns' => [
-                'foo.firstname' => [
-                    'label'     => 'Firstname',
-                    'type'      => 'string',
-                    'alias'     => 'firstname',
-                ],
-            ],
-            'filters' => [
-                'foo.firstname' => [
-                    'label'     => 'Firstname',
-                    'type'      => 'string',
-                    'alias'     => 'firstname',
-                ],
-            ],
-        ];
-        $report->setFilters($filters);
+        ]);
         $builder = $this->buildBuilder($report);
-        $builder->getQuery($options);
+        $query   = $builder->getQuery([
+            'columns' => ['a.someField' => []],
+            'filters' => [
+                'a.notEqualString' => [
+                    'label' => 'Not equal string',
+                    'type'  => 'string',
+                    'alias' => 'notEqualString',
+                ],
+            ],
+        ]);
+        Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+            SELECT `a`.`someField` WHERE (a.notEqualString IS NULL) OR (a.notEqualString <> :i0canotEqualString)
+        ')), $query->getSql());
     }
 
     private function buildBuilder(Report $report): MauticReportBuilder
