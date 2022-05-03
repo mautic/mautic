@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadDevice;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
@@ -37,10 +38,10 @@ class DeviceApiController extends CommonApiController
     /**
      * {@inheritdoc}
      *
-     * @param LeadDevice $entity
-     * @param            $parameters
-     * @param            $form
-     * @param string     $action
+     * @param LeadDevice                           $entity
+     * @param ?array<int|string|array<int|string>> $parameters
+     * @param Form                                 $form
+     * @param string                               $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
