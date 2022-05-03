@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Model;
 
 use Doctrine\ORM\PersistentCollection;
@@ -34,6 +25,7 @@ use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactor
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -48,11 +40,6 @@ class AssetModel extends FormModel
      * @var LeadModel
      */
     protected $leadModel;
-
-    /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
-     */
-    protected $request;
 
     /**
      * @var IpLookupHelper
@@ -89,9 +76,6 @@ class AssetModel extends FormModel
      */
     private $requestStack;
 
-    /**
-     * AssetModel constructor.
-     */
     public function __construct(
         LeadModel $leadModel,
         CategoryModel $categoryModel,
@@ -470,8 +454,15 @@ class AssetModel extends FormModel
         switch ($type) {
             case 'asset':
                 $viewOther = $this->security->isGranted('asset:assets:viewother');
+                $request   = $this->requestStack->getCurrentRequest();
                 $repo      = $this->getRepository();
                 $repo->setCurrentUser($this->userHelper->getUser());
+                // During the form submit & edit, make sure that the data is checked against available assets
+                if ('mautic_segment_action' === $request->get('_route') &&
+                    (Request::METHOD_POST === $request->getMethod() || 'edit' === $request->get('objectAction'))
+                ) {
+                    $limit = 0;
+                }
                 $results = $repo->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':

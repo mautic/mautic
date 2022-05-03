@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -1341,9 +1332,9 @@ class CommonRepository extends EntityRepository
                 } else {
                     if (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
                         $q->select($newSelect);
-                    } elseif (false !== strpos($select, $this->getTableAlias().',')) {
+                    } elseif (is_string($select) && false !== strpos($select, $this->getTableAlias().',')) {
                         $q->select(str_replace($this->getTableAlias().',', $newSelect.',', $select));
-                    } elseif (false !== strpos($select, $this->getTableAlias().'.*,')) {
+                    } elseif (is_string($select) && false !== strpos($select, $this->getTableAlias().'.*,')) {
                         $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.',', $select));
                     }
                 }

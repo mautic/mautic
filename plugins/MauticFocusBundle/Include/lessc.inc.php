@@ -1,16 +1,6 @@
 <?php
 
 /**
- * lessphp v0.5.0
- * http://leafo.net/lessphp.
- *
- * LESS CSS compiler, adapted from http://lesscss.org
- *
- * Copyright 2013, Leaf Corcoran <leafot@gmail.com>
- * Licensed under MIT or GPLv3, see LICENSE
- */
-
-/**
  * The LESS compiler and parser.
  *
  * Converting LESS to CSS is a three stage process. The incoming file is parsed
@@ -716,7 +706,7 @@ class lessc
 
         // check for a rest
         $last = end($args);
-        if ('rest' == $last[0]) {
+        if (is_array($last) && isset($last[0]) && 'rest' == $last[0]) {
             $rest = array_slice($orderedValues, count($args) - 1);
             $this->set($last[1], $this->reduce(['list', ' ', $rest]));
         }

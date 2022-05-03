@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -2164,7 +2155,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param        $type
+     * @param string $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
@@ -2184,14 +2175,18 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     $limit,
                     $start,
                     $this->security->isGranted('email:emails:viewother'),
-                    isset($options['top_level']) ? $options['top_level'] : false,
-                    isset($options['email_type']) ? $options['email_type'] : null,
-                    isset($options['ignore_ids']) ? $options['ignore_ids'] : [],
-                    isset($options['variant_parent']) ? $options['variant_parent'] : null
+                    $options['top_level'] ?? false,
+                    $options['email_type'] ?? null,
+                    $options['ignore_ids'] ?? [],
+                    $options['variant_parent'] ?? null
                 );
 
                 foreach ($emails as $email) {
-                    $results[$email['language']][$email['id']] = $email['name'];
+                    if (empty($options['name_is_key'])) {
+                        $results[$email['language']][$email['id']] = $email['name'];
+                    } else {
+                        $results[$email['language']][$email['name']] = $email['id'];
+                    }
                 }
 
                 //sort by language

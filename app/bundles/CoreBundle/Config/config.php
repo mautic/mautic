@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
@@ -157,6 +148,12 @@ return [
                     'translator',
                     'request_stack',
                     'mautic.core.model.notification',
+                ],
+            ],
+            'mautic.core.service.local_file_adapter' => [
+                'class'     => \Mautic\CoreBundle\Service\LocalFileAdapterService::class,
+                'arguments' => [
+                    '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
                 ],
             ],
         ],
@@ -583,6 +580,9 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.helper.update_checks' => [
+                'class' => \Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class,
+            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -837,6 +837,7 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.http.client',
                     'mautic.helper.update.release_parser',
+                    'mautic.helper.update_checks',
                 ],
             ],
             'mautic.helper.update.release_parser' => [
@@ -851,6 +852,7 @@ return [
                     '%kernel.cache_dir%',
                     'session',
                     'mautic.helper.paths',
+                    'kernel',
                 ],
             ],
             'mautic.helper.templating' => [
@@ -906,6 +908,13 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.helper.composer' => [
+                'class'     => \Mautic\CoreBundle\Helper\ComposerHelper::class,
+                'arguments' => [
+                    'kernel',
+                    'monolog.logger.mautic',
+                ],
+            ],
             // Menu
             'mautic.helper.menu' => [
                 'class'     => 'Mautic\CoreBundle\Menu\MenuHelper',
@@ -921,6 +930,10 @@ return [
             ],
             'mautic.helper.random' => [
                 'class' => \Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class,
+            ],
+            'mautic.helper.command' => [
+                'class'     => \Mautic\CoreBundle\Helper\CommandHelper::class,
+                'arguments' => 'kernel',
             ],
             'mautic.menu_renderer' => [
                 'class'     => \Mautic\CoreBundle\Menu\MenuRenderer::class,
@@ -1096,6 +1109,25 @@ return [
                     'monolog.logger.mautic',
                 ],
                 'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.step.checks' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\PreUpdateChecksStep::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.update',
+                ],
+                'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.checks.php' => [
+                'class' => \Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckPhpVersion::class,
+                'tag'   => 'mautic.update_check',
+            ],
+            'mautic.update.checks.database' => [
+                'class'     => \Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class,
+                'arguments' => [
+                    'doctrine.orm.default_entity_manager',
+                ],
+                'tag' => 'mautic.update_check',
             ],
         ],
         'models' => [
@@ -1721,5 +1753,6 @@ return [
                 'font' => 'メイリオ, Meiryo, ＭＳ Ｐゴシック, MS PGothic, ヒラギノ角ゴ Pro W3, Hiragino Kaku Gothic Pro,Osaka, sans-serif',
             ],
         ],
+        'composer_updates' => false,
     ],
 ];
