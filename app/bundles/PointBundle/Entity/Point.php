@@ -8,12 +8,12 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
+use Mautic\CoreBundle\Helper\IntHelper;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-
-//The minimum and maximum possible integer values
-const MIN_INTEGER_VALUE = -2147483648;
-const MAX_INTEGER_VALUE = 2147483647;
 
 /**
  * Class Point.
@@ -154,8 +154,8 @@ class Point extends FormEntity implements UuidInterface
         ]));
 
         $metadata->addPropertyConstraint('delta', new Assert\Range([
-            'min' => MIN_INTEGER_VALUE,
-            'max' => MAX_INTEGER_VALUE,
+            'min' => IntHelper::MIN_INTEGER_VALUE,
+            'max' => IntHelper::MAX_INTEGER_VALUE,
         ]));
     }
 

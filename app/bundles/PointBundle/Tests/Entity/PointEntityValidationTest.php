@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace Mautic\PointBundle\Tests\Entity;
 
 use Doctrine\Persistence\Mapping\MappingException;
+use Exception;
+use Mautic\CoreBundle\Helper\IntHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\Point;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
 
-const MIN_INTEGER_VALUE = -2147483648;
-const MAX_INTEGER_VALUE = 2147483647;
+const MIN_INTEGER_VALUE = IntHelper::MIN_INTEGER_VALUE;
+const MAX_INTEGER_VALUE = IntHelper::MAX_INTEGER_VALUE;
 
 class PointEntityValidationTest extends MauticMysqlTestCase
 {
@@ -55,6 +57,9 @@ class PointEntityValidationTest extends MauticMysqlTestCase
         $this->testPointData($form, $delta, $errorMessage);
     }
 
+    /**
+     * @throws Exception
+     */
     public function deltaScenariosProvider(): iterable
     {
         $acceptableDelta = random_int(MIN_INTEGER_VALUE, MAX_INTEGER_VALUE);
