@@ -35,9 +35,8 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)): ?>
             <?php echo $view['translator']->trans('mautic.email.timeline.event.viewed.in.browser'); ?>
         <?php endif; ?>
         <?php if (!empty($item['retryCount'])) : ?>
-            <?php echo $view['translator']->transChoice(
+            <?php echo $view['translator']->trans(
                 'mautic.email.timeline.event.retried',
-                $item['retryCount'],
                 ['%count%' => $item['retryCount']]
             ); ?>
         <?php endif; ?>

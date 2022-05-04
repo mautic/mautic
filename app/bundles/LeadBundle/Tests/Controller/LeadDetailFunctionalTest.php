@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\FetchMode;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
@@ -22,6 +23,9 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
     public function testCustomFieldOrderIsRespected(): void
     {
         $lead = new Lead();
+        $lead->setFirstname('John');
+        $lead->setLastname('Doe');
+        $lead->setEmail('john@his-site.com');
         $this->em->persist($lead);
 
         $fieldRepository = $this->em->getRepository(LeadField::class);
@@ -42,13 +46,42 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
+        // initialize lead fields to adjust the expected core labels
+        $lead->setFields([
+            'core' => [
+                'First Name' => [
+                    'value' => 'John',
+                ],
+                'Last Name' => [
+                    'value' => 'Doe',
+                ],
+                'Email' => [
+                    'value' => 'john@his-site.com',
+                ],
+                'Primary company' => [
+                    'value' => null,
+                ],
+                'Points' => [
+                    'value' => 0,
+                ],
+            ],
+        ]);
+        $leadFields = array_filter($lead->getFields(true), fn ($value) => isset($value['value']));
+        $leadFields = array_keys($leadFields);
+
         // get expected core labels
         $expectedLabels = $this->connection->createQueryBuilder()
             ->select('label')
             ->from(MAUTIC_TABLE_PREFIX.'lead_fields')
             ->where('object = "lead"')
             ->andWhere('field_group = "core"')
+            ->andWhere('label IN (:leadFields)')
             ->orderBy('field_order')
+            ->setParameter(
+                'leadFields',
+                $leadFields,
+                Connection::PARAM_STR_ARRAY
+            )
             ->execute()
             ->fetchAll(FetchMode::COLUMN);
 

@@ -440,22 +440,25 @@ class InstallService
             return $messages;
         }
 
+        $validations  = [];
+
         $emailConstraint          = new Assert\Email();
-        $emailConstraint->message = $this->translator->trans('mautic.core.email.required',
-            [],
-            'validators'
-        );
+        $emailConstraint->message = $this->translator->trans('mautic.core.email.required', [], 'validators');
 
-        $errors = $this->validator->validate(
-            $data['email'],
-            $emailConstraint
-        );
+        $passwordConstraint             = new Assert\Length(['min' => 6]);
+        $passwordConstraint->minMessage = $this->translator->trans('mautic.install.password.minlength', [], 'validators');
 
-        if (0 !== count($errors)) {
+        $validations[] = $this->validator->validate($data['email'], $emailConstraint);
+        $validations[] = $this->validator->validate($data['password'], $passwordConstraint);
+
+        $messages = [];
+        foreach ($validations as $errors) {
             foreach ($errors as $error) {
                 $messages[] = $error->getMessage();
             }
+        }
 
+        if (!empty($messages)) {
             return $messages;
         }
 
