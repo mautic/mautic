@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
@@ -210,11 +210,11 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Get locale choices.
      *
-     * @return array
+     * @return array<string,string>
      */
     public static function getLocaleChoices()
     {
-        return array_flip(Intl::getLocaleBundle()->getLocaleNames());
+        return array_flip(Locales::getNames());
     }
 
     /**
