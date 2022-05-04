@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
@@ -12,17 +14,16 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
      * @covers  \Mautic\CoreBundle\Helper\ListParser\BarListParser::parse
      */
-    public function testBarFormatConvertedToArray()
+    public function testBarFormatConvertedToArray(): void
     {
-        $string   = 'value1|value2|value3';
-        $expected = [
-            'value1' => 'value1',
-            'value2' => 'value2',
-            'value3' => 'value3',
-        ];
-        $actual   = AbstractFormFieldHelper::parseList($string);
-
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals(
+            [
+                'value1' => 'value1',
+                'value2' => 'value2',
+                'value3' => 'value3',
+            ],
+            AbstractFormFieldHelper::parseList('value1|value2|value3')
+        );
     }
 
     /**
@@ -31,17 +32,16 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
      * @covers  \Mautic\CoreBundle\Helper\ListParser\BarListParser::parse
      */
-    public function testBarLabelValueFormatConvertedToArray()
+    public function testBarLabelValueFormatConvertedToArray(): void
     {
-        $string   = 'label1|label2|label3||value1|value2|value3';
-        $expected = [
-            'value1' => 'label1',
-            'value2' => 'label2',
-            'value3' => 'label3',
-        ];
-        $actual   = AbstractFormFieldHelper::parseList($string);
-
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals(
+            [
+                'value1' => 'label1',
+                'value2' => 'label2',
+                'value3' => 'label3',
+            ],
+            AbstractFormFieldHelper::parseList('label1|label2|label3||value1|value2|value3')
+        );
     }
 
     /**
@@ -50,17 +50,16 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
      * @covers  \Mautic\CoreBundle\Helper\ListParser\JsonListParser::parse
      */
-    public function testJsonEncodedFormatConvertedToArray()
+    public function testJsonEncodedFormatConvertedToArray(): void
     {
-        $string   = '{"value1":"label1","value2":"label2","value3":"label3"}';
-        $expected = [
-            'value1' => 'label1',
-            'value2' => 'label2',
-            'value3' => 'label3',
-        ];
-        $actual   = AbstractFormFieldHelper::parseList($string);
-
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals(
+            [
+                'value1' => 'label1',
+                'value2' => 'label2',
+                'value3' => 'label3',
+            ],
+            AbstractFormFieldHelper::parseList('{"value1":"label1","value2":"label2","value3":"label3"}')
+        );
     }
 
     /**
@@ -69,15 +68,9 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
      * @covers  \Mautic\CoreBundle\Helper\ListParser\ValueListParser::parse
      */
-    public function testSingleSelectedValueDoesNotGoIntoJson()
+    public function testSingleSelectedValueDoesNotGoIntoJson(): void
     {
-        $string   = '1';
-        $expected = [
-            '1' => '1',
-        ];
-        $actual   = AbstractFormFieldHelper::parseList($string);
-
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals(['1' => '1'], AbstractFormFieldHelper::parseList('1'));
     }
 
     /**
@@ -86,30 +79,96 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
      * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
      */
-    public function testLabelValuePairsAreFlattened()
+    public function testLabelValuePairsAreFlattened(): void
     {
-        $array    = [
+        $this->assertEquals(
             [
-                'label' => 'label1',
-                'value' => 'value1',
+                'value1' => 'label1',
+                'value2' => 'label2',
+                'value3' => 'label3',
             ],
-            [
-                'label' => 'label2',
-                'value' => 'value2',
-            ],
-            [
-                'label' => 'label3',
-                'value' => 'value3',
-            ],
-        ];
-        $expected = [
-            'value1' => 'label1',
-            'value2' => 'label2',
-            'value3' => 'label3',
-        ];
-        $actual   = AbstractFormFieldHelper::parseList($array);
+            AbstractFormFieldHelper::parseList(
+                [
+                    [
+                        'label' => 'label1',
+                        'value' => 'value1',
+                    ],
+                    [
+                        'label' => 'label2',
+                        'value' => 'value2',
+                    ],
+                    [
+                        'label' => 'label3',
+                        'value' => 'value3',
+                    ],
+                ]
+            )
+        );
+    }
 
-        $this->assertEquals($expected, $actual);
+    /**
+     * @dataProvider provideChoices
+     *
+     * @param mixed[] $inputOptions
+     * @param mixed[] $expectedOptions
+     */
+    public function testParseList(array $inputOptions, array $expectedOptions): void
+    {
+        $this->assertEquals($expectedOptions, AbstractFormFieldHelper::parseList($inputOptions));
+    }
+
+    /**
+     * @return iterable<array<mixed[]>>
+     */
+    public function provideChoices(): iterable
+    {
+        yield [
+            [
+                ['value' => null, 'label' => null],
+            ],
+            [],
+        ];
+
+        yield [
+            [
+                ['value' => 0, 'label' => 0],
+            ],
+            [0 => '0'],
+        ];
+
+        yield [
+            [
+                ['value' => '', 'label' => ''],
+            ],
+            [],
+        ];
+
+        yield [
+            [
+                ['value' => 'one', 'label' => 'One'],
+            ],
+            ['one' => 'One'],
+        ];
+
+        yield [
+            ['one' => 'One'],
+            ['one' => 'One'],
+        ];
+
+        yield [
+            ['' => ''],
+            [],
+        ];
+
+        yield [
+            [null => null],
+            [],
+        ];
+
+        yield [
+            [0 => 0],
+            [0 => '0'],
+        ];
     }
 
     /**
@@ -118,7 +177,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
      * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
      */
-    public function testLabelValuePairsAreFlattenedWithOptGroup()
+    public function testLabelValuePairsAreFlattenedWithOptGroup(): void
     {
         $array['optGroup1'] = [
             [
@@ -148,7 +207,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
                 'value' => 'value3',
             ],
         ];
-        $expected           = [
+        $expected = [
             'optGroup1' => [
                 'value1' => 'label1',
                 'value2' => 'label2',
@@ -160,7 +219,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
                 'value3' => 'label3',
             ],
         ];
-        $actual             = AbstractFormFieldHelper::parseList($array);
+        $actual = AbstractFormFieldHelper::parseList($array);
 
         $this->assertEquals($expected, $actual);
     }
@@ -168,7 +227,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
      */
-    public function testNumericalArrayConvertedToKeyLabelPairs()
+    public function testNumericalArrayConvertedToKeyLabelPairs(): void
     {
         $array = [
             'value1',
@@ -181,7 +240,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
             'value2' => 'value2',
             'value3' => 'value3',
         ];
-        $actual   = AbstractFormFieldHelper::parseList($array);
+        $actual = AbstractFormFieldHelper::parseList($array);
 
         $this->assertEquals($expected, $actual);
     }
@@ -189,7 +248,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
      */
-    public function testBooleanArrayList()
+    public function testBooleanArrayList(): void
     {
         $array = [
             0 => 'no',
@@ -210,7 +269,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Helper\ListParser\BarListParser::parse
      * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
      */
-    public function testBooleanBarStringList()
+    public function testBooleanBarStringList(): void
     {
         $string   = 'no|yes||0|1';
         $expected = [
@@ -227,7 +286,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Helper\ListParser\JsonListParser::parse
      * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
      */
-    public function testBooleanJsonStringList()
+    public function testBooleanJsonStringList(): void
     {
         $string   = '["no", "yes"]';
         $expected = [
@@ -244,7 +303,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Helper\ListParser\JsonListParser::parse
      * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
      */
-    public function testNumericalJsonStringList()
+    public function testNumericalJsonStringList(): void
     {
         $string   = '["no", "yes"]';
         $expected = [

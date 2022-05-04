@@ -23,6 +23,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     const POINTS_SUBTRACT = 'minus';
     const POINTS_MULTIPLY = 'times';
     const POINTS_DIVIDE   = 'divide';
+    const DEFAULT_ALIAS   = 'l';
 
     /**
      * Used to determine social identity.
