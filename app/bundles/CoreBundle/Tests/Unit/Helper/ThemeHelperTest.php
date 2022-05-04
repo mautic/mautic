@@ -325,7 +325,8 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new class() extends Finder {
-                private $dirs = [];
+                /** @var \SplFileInfo[] */
+                private array $dirs = [];
 
                 public function __construct()
                 {
@@ -340,6 +341,9 @@ class ThemeHelperTest extends TestCase
                     return $this;
                 }
 
+                /**
+                 * @return \ArrayIterator<int,\SplFileInfo>
+                 */
                 public function getIterator()
                 {
                     return new \ArrayIterator($this->dirs);
@@ -386,6 +390,9 @@ class ThemeHelperTest extends TestCase
                 {
                 }
 
+                /**
+                 * @param string $files
+                 */
                 public function exists($files)
                 {
                     if ('/path/to/themes/requested-theme-dir' === $files) {
@@ -395,6 +402,12 @@ class ThemeHelperTest extends TestCase
                     return true;
                 }
 
+                /**
+                 * @param ?\Traversable<mixed> $iterator
+                 * @param array<mixed>         $options
+                 *
+                 * @return void
+                 */
                 public function mirror($originDir, $targetDir, ?\Traversable $iterator = null, $options = [])
                 {
                     Assert::assertSame('/path/to/themes/origin-template-dir', $originDir);
@@ -408,6 +421,9 @@ class ThemeHelperTest extends TestCase
                     return '{"name":"Origin Theme"}';
                 }
 
+                /**
+                 * @return void
+                 */
                 public function dumpFile($filename, $content)
                 {
                     Assert::assertSame('/path/to/themes/requested-theme-dir/config.json', $filename);

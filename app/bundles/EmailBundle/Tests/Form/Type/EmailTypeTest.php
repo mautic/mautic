@@ -83,7 +83,6 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
             ->with('blank', 'email')
             ->willReturn('blank');
 
-
         $this->formBuilder->method('add')
             ->with(
                 $this->callback(
