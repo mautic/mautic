@@ -4,55 +4,87 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Tests\Entity;
 
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Doctrine\Persistence\Mapping\MappingException;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\PointBundle\Entity\Point;
+use Symfony\Component\DomCrawler\Form;
+use Symfony\Component\HttpFoundation\Request;
 
 const MIN_INTEGER_VALUE = -2147483648;
 const MAX_INTEGER_VALUE = 2147483647;
 
-class PointEntityValidationTest extends AbstractMauticTestCase
+class PointEntityValidationTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
+    /**
+     * @dataProvider deltaScenariosProvider
+     *
+     * @throws MappingException
+     */
+    public function testDeltaValidationOnCreate(int $delta, string $errorMessage = '')
     {
-        parent::setUp();
+        $crawler       = $this->client->request(Request::METHOD_GET, '/s/points/new');
+        $buttonCrawler = $crawler->selectButton('Save & Close');
+        $form          = $buttonCrawler->form();
+        $form['point[name]']->setValue('Add point');
+        $this->testPointData($form, $delta, $errorMessage);
     }
 
     /**
      * @dataProvider deltaScenariosProvider
+     *
+     * @throws MappingException
      */
-    public function testDeltaValidation(int $delta, int $status, string $errorMessage = '')
+    public function testDeltaValidationOnUpdate(int $delta, string $errorMessage = '')
     {
-        $this->client->request(
-            'POST',
-            '/s/points/new',
-            [
-                'name'        => 'Point1',
-                'delta'       => $delta,
-                'isPublished' => true,
-                'type'        => 'form.submit',
-            ]
-        );
+        $point = new Point();
 
-        //tried $response = $this->client->getInternalResponse(); this function too, same results
-        $response = $this->client->getResponse();
+        $point->setName('Edit point');
+        $point->setDelta(5);
+        $point->setType('form.submit');
+        $point->setIsPublished(true);
 
-        //can't differentiate using status code, I get 200 in all cases, this assertion doesn't add any value. This will be removed
-        self::assertSame($status, $response->getStatusCode());
+        $this->em->persist($point);
+        $this->em->flush();
 
-        //trying to assert the error string in the response.
-        //The error string can be seen in inspect->network tab inside response and preview sections
-        //but I can't find it in the responses here, causing the last two data sets to fail
-        self::assertStringContainsString($errorMessage, (string) $response);
+        $pointId = $point->getId();
 
-        self::markTestIncomplete();
+        $crawler       = $this->client->request(Request::METHOD_GET, '/s/points/edit/'.$pointId);
+        $buttonCrawler = $crawler->selectButton('Save & Close');
+        $form          = $buttonCrawler->form();
+        $form['point[name]']->setValue('Point1');
+        $this->testPointData($form, $delta, $errorMessage);
     }
 
     public function deltaScenariosProvider(): iterable
     {
         $acceptableDelta = random_int(MIN_INTEGER_VALUE, MAX_INTEGER_VALUE);
-        yield 'within range' => [$acceptableDelta, 200, ''];
-        yield 'upper limit' => [MAX_INTEGER_VALUE, 200, ''];
-        yield 'lower limit' => [MIN_INTEGER_VALUE, 200, ''];
-        yield 'above upper limit' => [MAX_INTEGER_VALUE - 10, 200, 'This value should be between -2147483648 and 2147483647.'];
-        yield 'below lower limit' => [MIN_INTEGER_VALUE - 10, 200, 'This value should be between -2147483648 and 2147483647.'];
+        yield 'within range' => [$acceptableDelta, ''];
+        yield 'upper limit' => [MAX_INTEGER_VALUE, ''];
+        yield 'lower limit' => [MIN_INTEGER_VALUE, ''];
+        yield 'above upper limit' => [MAX_INTEGER_VALUE + 10, 'This value should be between -2147483648 and 2147483647.'];
+        yield 'below lower limit' => [MIN_INTEGER_VALUE - 10, 'This value should be between -2147483648 and 2147483647.'];
+    }
+
+    /**
+     * @throws MappingException
+     */
+    private function testPointData(Form $form, int $delta, string $errorMessage): void
+    {
+        $form['point[delta]']->setValue($delta);
+        $form['point[isPublished]']->setValue(1);
+        $form['point[type]']->setValue('form.submit');
+
+        $this->client->submit($form);
+        self::assertTrue($this->client->getResponse()->isOk());
+
+        $this->em->clear();
+
+        $response = $this->client->getResponse()->getContent();
+        self::assertStringContainsString($errorMessage, (string) $response);
+
+        if ('' != $errorMessage) {
+            $pointDetail = $this->em->getRepository(Point::class)->findOneBy(['delta' => $delta]);
+            self::assertNull($pointDetail);
+        }
     }
 }
