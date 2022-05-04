@@ -58,7 +58,7 @@ class PointEntityValidationTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return iterable<string, array>
+     * @return iterable<string, array<mixed>>
      *
      * @throws Exception
      */
