@@ -30,7 +30,7 @@ class ConfigController extends FormController
 
         $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
-        $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
+        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
         $fileFields  = $event->getFileFields();
         $formThemes  = $event->getFormThemes();
         $formConfigs = $this->get('mautic.config.mapper')->bindFormConfigsWithRealValues($event->getForms());
@@ -69,7 +69,7 @@ class ConfigController extends FormController
                     $configEvent
                         ->setOriginalNormData($originalNormData)
                         ->setNormData($form->getNormData());
-                    $dispatcher->dispatch(ConfigEvents::CONFIG_PRE_SAVE, $configEvent);
+                    $dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_PRE_SAVE);
                     $formValues = $configEvent->getConfig();
 
                     $errors      = $configEvent->getErrors();
@@ -115,7 +115,7 @@ class ConfigController extends FormController
                             }
 
                             $configurator->write();
-                            $dispatcher->dispatch(ConfigEvents::CONFIG_POST_SAVE, $configEvent);
+                            $dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
 
                             $this->addFlash('mautic.config.config.notice.updated');
 
@@ -189,7 +189,7 @@ class ConfigController extends FormController
 
         $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
-        $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
+        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();
@@ -231,7 +231,7 @@ class ConfigController extends FormController
         $success    = 0;
         $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
-        $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
+        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();
