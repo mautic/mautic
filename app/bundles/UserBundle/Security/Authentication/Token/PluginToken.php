@@ -86,17 +86,17 @@ class PluginToken extends AbstractToken
     /**
      * {@inheritdoc}
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([$this->authenticatingService, $this->credentials, $this->providerKey, parent::serialize()]);
+        return [$this->authenticatingService, $this->credentials, $this->providerKey, parent::__serialize()];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $data): void
     {
-        list($this->authenticatingService, $this->credentials, $this->providerKey, $parentStr) = unserialize($serialized);
-        parent::unserialize($parentStr);
+        [$this->authenticatingService, $this->credentials, $this->providerKey, $parentStr] = $data;
+        parent::__unserialize($parentStr);
     }
 }
