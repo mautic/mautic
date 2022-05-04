@@ -85,6 +85,8 @@ class PluginToken extends AbstractToken
 
     /**
      * {@inheritdoc}
+     *
+     * @return array<mixed>
      */
     public function __serialize(): array
     {
@@ -93,6 +95,8 @@ class PluginToken extends AbstractToken
 
     /**
      * {@inheritdoc}
+     *
+     * @param array<mixed> $data
      */
     public function __unserialize(array $data): void
     {
