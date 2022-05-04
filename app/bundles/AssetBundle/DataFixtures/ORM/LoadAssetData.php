@@ -6,24 +6,10 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\AssetBundle\Entity\Asset;
-use Mautic\AssetBundle\Model\AssetModel;
 
 class LoadAssetData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(AssetModel $assetModel)
-    {
-        $this->assetModel = $assetModel;
-    }
-
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $asset = new Asset();
         $asset
@@ -36,17 +22,11 @@ class LoadAssetData extends AbstractFixture implements OrderedFixtureInterface
             ->setRevision(1)
             ->setLanguage('en');
 
-        try {
-            $this->assetModel->getRepository()->saveEntity($asset);
-        } catch (\Exception $e) {
-            echo $e->getMessage();
-        }
+        $manager->persist($asset);
+        $manager->flush();
     }
 
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 10;
     }

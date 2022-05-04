@@ -204,9 +204,8 @@ class DateHelper extends Helper
 
             foreach ($timeUnits as $key => $unit) {
                 if ($range->{$key}) {
-                    $formated[] = $this->translator->transChoice(
+                    $formated[] = $this->translator->trans(
                         'mautic.core.date.'.$unit,
-                        $range->{$key},
                         ['%count%' => $range->{$key}]
                     );
                 }
