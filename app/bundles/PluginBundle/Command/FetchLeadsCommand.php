@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Command;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
@@ -276,7 +267,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 .'</comment>'."\n"
             );
 
-            if (method_exists($integrationObject, 'pushCompanies')) {
+            if (in_array('push_companies', $supportedFeatures) && method_exists($integrationObject, 'pushCompanies')) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.companies', ['%integration%' => $integration]).'</info>');
                 $result  = $integrationObject->pushCompanies($params);
                 $ignored = 0;

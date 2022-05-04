@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -448,7 +439,8 @@ class CommonRepository extends EntityRepository
             if (in_array($func, ['isNull', 'isNotNull'])) {
                 $expr = $q->expr()->{$func}($filter['column']);
             } elseif (in_array($func, ['in', 'notIn'])) {
-                $expr = $q->expr()->{$func}($filter['column'], $filter['value']);
+                $expr = $q->expr()->{$func}($filter['column'], ':'.$unique);
+                $q->setParameter($unique, $filter['value'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
             } elseif (in_array($func, ['like', 'notLike'])) {
                 if (isset($filter['strict']) && !$filter['strict']) {
                     if (is_numeric($filter['value'])) {
@@ -1341,9 +1333,9 @@ class CommonRepository extends EntityRepository
                 } else {
                     if (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
                         $q->select($newSelect);
-                    } elseif (false !== strpos($select, $this->getTableAlias().',')) {
+                    } elseif (is_string($select) && false !== strpos($select, $this->getTableAlias().',')) {
                         $q->select(str_replace($this->getTableAlias().',', $newSelect.',', $select));
-                    } elseif (false !== strpos($select, $this->getTableAlias().'.*,')) {
+                    } elseif (is_string($select) && false !== strpos($select, $this->getTableAlias().'.*,')) {
                         $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.',', $select));
                     }
                 }

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Field;
 
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
@@ -34,6 +25,11 @@ class FieldList
         $this->translator          = $translator;
     }
 
+    /**
+     * @param mixed[] $filters
+     *
+     * @return mixed[]
+     */
     public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array
     {
         $forceFilters = [];
