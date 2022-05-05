@@ -64,8 +64,9 @@ class PointEntityValidationTest extends MauticMysqlTestCase
      */
     public function deltaScenariosProvider(): iterable
     {
-        $acceptableDelta = random_int(MIN_INTEGER_VALUE, MAX_INTEGER_VALUE);
-        yield 'within range' => [$acceptableDelta, ''];
+        yield 'within range positive number' => [3000, ''];
+        yield 'within range negative number' => [-7857, ''];
+        yield 'within range zero' => [0, ''];
         yield 'upper limit' => [MAX_INTEGER_VALUE, ''];
         yield 'lower limit' => [MIN_INTEGER_VALUE, ''];
         yield 'above upper limit' => [MAX_INTEGER_VALUE + 10, 'This value should be between -2147483648 and 2147483647.'];
