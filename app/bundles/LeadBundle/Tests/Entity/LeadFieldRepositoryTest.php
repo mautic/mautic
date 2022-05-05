@@ -241,7 +241,7 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->repository->compareDateValue($contactId, $fieldAlias, $value));
     }
 
-    public function testGetFieldThatIsMissingColumnWhenMutlipleColumsMissing()
+    public function testGetFieldThatIsMissingColumnWhenMutlipleColumsMissing(): void
     {
         $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
 
@@ -261,7 +261,7 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
             ->method('expr')
             ->willReturn($expr);
 
-        $comparison= $this->createMock(Query\Expr\Comparison::class);
+        $comparison = $this->createMock(Query\Expr\Comparison::class);
         $expr->expects(self::once())
             ->method('eq')
             ->willReturn($comparison);
