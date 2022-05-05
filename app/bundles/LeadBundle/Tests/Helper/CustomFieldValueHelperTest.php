@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
+use PHPUnit\Framework\Assert;
 
 class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -76,5 +68,47 @@ class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('Option 1 yes', $normalizedFields['core']['test']['normalizedValue']);
         $this->assertEquals('option 4', $normalizedFields['core']['test2']['normalizedValue']);
+    }
+
+    public function testSetValueFromPropertiesListWithoutList(): void
+    {
+        Assert::assertSame(
+            'value_1',
+            CustomFieldValueHelper::setValueFromPropertiesList([], 'value_1')
+        );
+    }
+
+    public function testSetValueFromPropertiesListWithStringList(): void
+    {
+        Assert::assertSame(
+            'value_1',
+            CustomFieldValueHelper::setValueFromPropertiesList(['list' => 'some|string'], 'value_1')
+        );
+    }
+
+    public function testSetValueFromPropertiesListWithAssociativeArrayList(): void
+    {
+        Assert::assertSame(
+            'value_1',
+            CustomFieldValueHelper::setValueFromPropertiesList(
+                ['list' => ['value_1' => 'Label 1']],
+                'value_1'
+            )
+        );
+    }
+
+    public function testSetValueFromPropertiesListWithArrayList(): void
+    {
+        Assert::assertSame(
+            'Label 1',
+            CustomFieldValueHelper::setValueFromPropertiesList(
+                [
+                    'list' => [
+                        ['value' => 'value_1', 'label' => 'Label 1'],
+                    ],
+                ],
+                'value_1'
+            )
+        );
     }
 }

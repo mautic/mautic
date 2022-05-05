@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Chart;
 
 use Doctrine\DBAL\Connection;
@@ -322,5 +313,41 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
             $expectedResult,
             $this->chartQuery->completeTimeData($data, false, false)
         );
+    }
+
+    public function testPrepareTimeDataQueryWithLeadEventLog(): void
+    {
+        $table   = 'lead_event_log';
+        $column  = 'date_added';
+        $filters = [
+            'object'    => 'segment',
+            'bundle'    => 'lead',
+            'action'    => 'added',
+            'object_id' => '1',
+        ];
+
+        $this->queryBuilder->expects($this->once())
+            ->method('select')
+            ->with("DATE_FORMAT(t.date_added, '%Y-%m-%d') AS date, COUNT(*) AS count");
+
+        $this->queryBuilder->expects($this->once())
+            ->method('from')
+            ->with('lead_event_log', 't');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('groupBy')
+            ->with("DATE_FORMAT(t.date_added, '%Y-%m-%d')");
+
+        $this->queryBuilder->expects($this->once())
+            ->method('orderBy')
+            ->with("DATE_FORMAT(t.date_added, '%Y-%m-%d')");
+
+        $this->queryBuilder->expects($this->once())
+            ->method('setMaxResults')
+            ->with(32);
+
+        $this->createChartQuery();
+        $query = $this->chartQuery->prepareTimeDataQuery($table, $column, $filters);
+        $this->assertInstanceOf(QueryBuilder::class, $query);
     }
 }

@@ -1,38 +1,31 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\DoNotContact;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
 
 class DoNotContactParts
 {
-    /**
-     * @var string
-     */
-    private $channel;
+    private string $channel = 'email';
 
-    /**
-     * @var string
-     */
-    private $type;
+    private int $type = DoNotContact::UNSUBSCRIBED;
 
     /**
      * @param string $field
      */
     public function __construct($field)
     {
-        $parts         = explode('_', $field);
-        $this->type    = $parts[1];
-        $this->channel = 3 === count($parts) ? $parts[2] : 'email';
+        if (false !== strpos($field, '_manual')) {
+            $this->type = DoNotContact::MANUAL;
+        }
+
+        if (false !== strpos($field, '_bounced')) {
+            $this->type = DoNotContact::BOUNCED;
+        }
+
+        if (false !== strpos($field, '_sms')) {
+            $this->channel = 'sms';
+        }
     }
 
     /**
@@ -48,15 +41,6 @@ class DoNotContactParts
      */
     public function getParameterType()
     {
-        switch ($this->type) {
-            case 'bounced':
-            case DoNotContact::BOUNCED:
-                return DoNotContact::BOUNCED;
-            case 'manual':
-            case DoNotContact::MANUAL:
-                return DoNotContact::MANUAL;
-            default:
-                return DoNotContact::UNSUBSCRIBED;
-        }
+        return $this->type;
     }
 }

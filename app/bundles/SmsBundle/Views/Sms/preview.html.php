@@ -11,5 +11,5 @@
 /** @var \Mautic\SmsBundle\Entity\Sms $sms */
 ?>
 <blockquote>
-    <p><?=$sms->getMessage(); ?></p>
+    <p><?php echo $sms->getMessage(); ?></p>
 </blockquote>

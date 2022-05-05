@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use function Clue\StreamFilter\fun;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use Mautic\LeadBundle\Entity\Lead;

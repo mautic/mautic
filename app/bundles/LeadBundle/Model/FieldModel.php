@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\DBALException;
@@ -16,8 +7,10 @@ use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
@@ -31,9 +24,6 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class FieldModel.
- */
 class FieldModel extends FormModel
 {
     public static $coreFields = [
@@ -765,15 +755,18 @@ class FieldModel extends FormModel
     /**
      * Get list of custom field values for autopopulate fields.
      *
-     * @param $type
-     * @param $filter
-     * @param $limit
+     * @param string $type
+     * @param string $filter
+     * @param int    $limit
      *
      * @return array
      */
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
-        return $this->em->getRepository('MauticLeadBundle:Lead')->getValueList($type, $filter, $limit);
+        /** @var LeadRepository $contactRepository */
+        $contactRepository = $this->em->getRepository(Lead::class);
+
+        return $contactRepository->getValueList($type, $filter, $limit);
     }
 
     /**
@@ -919,6 +912,7 @@ class FieldModel extends FormModel
                 'group_label'  => $this->translator->trans('mautic.lead.field.group.'.$contactField['group']),
                 'defaultValue' => $contactField['defaultValue'],
                 'properties'   => $contactField['properties'],
+                'isPublished'  => $contactField['isPublished'],
             ];
         }
 

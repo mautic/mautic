@@ -1,5 +1,10 @@
 /** SmsBundle **/
 Mautic.smsOnLoad = function (container, response) {
+    Mautic.setSmsCharactersCount();
+    mQuery('#sms_message').on("input", () => {
+        Mautic.setSmsCharactersCount();
+    });
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'sms');
     }
@@ -35,6 +40,10 @@ Mautic.smsOnLoad = function (container, response) {
             );
         }
     }
+};
+
+Mautic.setSmsCharactersCount = function () {
+    mQuery('#sms_nb_char').text((mQuery('#sms_message').val().length))
 };
 
 Mautic.selectSmsType = function(smsType) {
