@@ -7,13 +7,13 @@ use PHPUnit\Framework\TestCase;
 
 class UpdatedObjectMappingDAOTest extends TestCase
 {
-    public function testUpdatedObjectMappingDAO()
+    public function testUpdatedObjectMappingDAO(): void
     {
-        $integration             = 'integration';
-        $integrationObjectName   = 'contact';
-        $integrationObjectId     = 1;
-        $objectModifiedDate      = new \DateTime('2020-02-02');
-        $internalObjectId        = 99;
+        $integration           = 'integration';
+        $integrationObjectName = 'contact';
+        $integrationObjectId   = 1;
+        $objectModifiedDate    = new \DateTime('2020-02-02');
+        $internalObjectId      = 99;
 
         $updatedObjectMappingDAO = new UpdatedObjectMappingDAO(
             $integration,

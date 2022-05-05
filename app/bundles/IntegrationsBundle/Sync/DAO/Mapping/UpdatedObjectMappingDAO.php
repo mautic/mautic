@@ -25,6 +25,7 @@ class UpdatedObjectMappingDAO
      * @var \DateTime
      */
     private $objectModifiedDate;
+
     /**
      * @var mixed
      */
@@ -34,6 +35,7 @@ class UpdatedObjectMappingDAO
      * @param string $integration
      * @param string $integrationObjectName
      * @param mixed  $integrationObjectId
+     * @param mixed  $internalObjectId
      */
     public function __construct(
         $integration,
