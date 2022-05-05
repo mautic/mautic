@@ -300,6 +300,60 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
+    public function testProgressiveFormsWithMaximumFieldsDisplayedAtTime(): void
+    {
+        // Create the test form via API.
+        $payload = [
+            'name'                      => 'Submission test form',
+            'description'               => 'Form created via submission test',
+            'formType'                  => 'standalone',
+            'isPublished'               => true,
+            'progressiveProfilingLimit' => 2,
+            'fields'                    => [
+                [
+                    'label'                  => 'Email',
+                    'type'                   => 'email',
+                    'alias'                  => 'email',
+                    'leadField'              => 'email',
+                    'is_auto_fill'           => 1,
+                    'show_when_value_exists' => 0,
+                ],
+                [
+                    'label'                  => 'Firstname',
+                    'type'                   => 'text',
+                    'alias'                  => 'firstname',
+                    'leadField'              => 'firstname',
+                    'is_auto_fill'           => 1,
+                    'show_when_value_exists' => 0,
+                ],
+                [
+                    'label'                  => 'Lastname',
+                    'type'                   => 'text',
+                    'alias'                  => 'lastname',
+                    'leadField'              => 'lastname',
+                    'is_auto_fill'           => 1,
+                    'show_when_value_exists' => 0,
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        // Submit the form:
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
+        $this->assertSame(1, $formCrawler->count());
+        // show just one text field
+        $this->assertSame(1, $formCrawler->filter('.mauticform-text')->count());
+    }
+
     protected function tearDown(): void
     {
         $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');

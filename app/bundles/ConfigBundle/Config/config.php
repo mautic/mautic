@@ -64,6 +64,8 @@ return [
                     'mautic.helper.core_parameters',
                     'translator',
                     'doctrine.dbal.default_connection',
+                    'mautic.install.service',
+                    'mautic.install.configurator.step.check',
                 ],
             ],
         ],

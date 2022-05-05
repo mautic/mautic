@@ -59,11 +59,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Intl\Intl;
 use Tightenco\Collect\Support\Collection;
+use Symfony\Component\Intl\Countries;
 
-/**
- * Class LeadModel
- * {@inheritdoc}
- */
 class LeadModel extends FormModel
 {
     use DefaultValueTrait;
@@ -1969,10 +1966,10 @@ class LeadModel extends FormModel
      * Get leads count per country name.
      * Can't use entity, because country is a custom field.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
-     * @param bool   $canViewOthers
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param mixed[]   $filters
+     * @param bool      $canViewOthers
      *
      * @return array
      */
@@ -1992,9 +1989,8 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
-
-        $countries = array_flip(Intl::getRegionBundle()->getCountryNames('en'));
+        $results   = $q->execute()->fetchAllAssociative();
+        $countries = array_flip(Countries::getNames('en'));
         $mapData   = [];
 
         // Convert country names to 2-char code
