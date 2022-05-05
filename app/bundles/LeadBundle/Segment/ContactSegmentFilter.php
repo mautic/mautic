@@ -235,4 +235,9 @@ class ContactSegmentFilter
         return method_exists($this->filterDecorator, 'getRelationJoinTableField') ?
             $this->filterDecorator->getRelationJoinTableField() : null;
     }
+
+    public function doesColumnSupportEmptyValue(): bool
+    {
+        return !in_array($this->contactSegmentFilterCrate->getType(), ['date', 'datetime'], true);
+    }
 }
