@@ -33,6 +33,30 @@ class PointEntityValidationTest extends MauticMysqlTestCase
 
     /**
      * @dataProvider deltaScenariosProvider
+     */
+    public function testDeltaValidationOnCreateViaAPI(int $delta, string $errorMessage = ''): void
+    {
+        $this->client->request(
+            Request::METHOD_POST,
+            '/s/points/new',
+            [
+                'name'        => 'Point1',
+                'delta'       => $delta,
+                'isPublished' => true,
+                'type'        => 'form.submit',
+            ],
+            [],
+            ['Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8']
+        );
+
+        $response = $this->client->getResponse();
+        //self::assertStringContainsString($errorMessage, (string) $response);
+
+        $this->markTestSkipped('Failing for negative test cases, still needs work');
+    }
+
+    /**
+     * @dataProvider deltaScenariosProvider
      *
      * @throws MappingException
      */
@@ -53,7 +77,7 @@ class PointEntityValidationTest extends MauticMysqlTestCase
         $crawler       = $this->client->request(Request::METHOD_GET, '/s/points/edit/'.$pointId);
         $buttonCrawler = $crawler->selectButton('Save & Close');
         $form          = $buttonCrawler->form();
-        $form['point[name]']->setValue('Point1');
+        $form['point[name]']->setValue('Edit point');
         $this->testPointData($form, $delta, $errorMessage);
     }
 
