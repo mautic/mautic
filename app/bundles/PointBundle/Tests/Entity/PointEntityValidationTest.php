@@ -11,9 +11,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\Point;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
-
-const MIN_INTEGER_VALUE = IntHelper::MIN_INTEGER_VALUE;
-const MAX_INTEGER_VALUE = IntHelper::MAX_INTEGER_VALUE;
+use Symfony\Component\HttpFoundation\Response;
 
 class PointEntityValidationTest extends MauticMysqlTestCase
 {
@@ -38,21 +36,25 @@ class PointEntityValidationTest extends MauticMysqlTestCase
     {
         $this->client->request(
             Request::METHOD_POST,
-            '/s/points/new',
+            '/api/points/new',
             [
                 'name'        => 'Point1',
                 'delta'       => $delta,
                 'isPublished' => true,
                 'type'        => 'form.submit',
-            ],
-            [],
-            ['Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8']
+            ]
         );
 
         $response = $this->client->getResponse();
-        //self::assertStringContainsString($errorMessage, (string) $response);
 
-        $this->markTestSkipped('Failing for negative test cases, still needs work');
+        if ($errorMessage) {
+            self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode(), $response->getContent());
+            self::assertStringContainsString('error', $response->getContent());
+            self::assertStringContainsString($errorMessage, $response->getContent());
+        } else {
+            self::assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+            self::assertStringNotContainsString('error', $response->getContent());
+        }
     }
 
     /**
@@ -91,10 +93,10 @@ class PointEntityValidationTest extends MauticMysqlTestCase
         yield 'within range positive number' => [3000, ''];
         yield 'within range negative number' => [-7857, ''];
         yield 'within range zero' => [0, ''];
-        yield 'upper limit' => [MAX_INTEGER_VALUE, ''];
-        yield 'lower limit' => [MIN_INTEGER_VALUE, ''];
-        yield 'above upper limit' => [MAX_INTEGER_VALUE + 10, 'This value should be between -2147483648 and 2147483647.'];
-        yield 'below lower limit' => [MIN_INTEGER_VALUE - 10, 'This value should be between -2147483648 and 2147483647.'];
+        yield 'upper limit' => [IntHelper::MAX_INTEGER_VALUE, ''];
+        yield 'lower limit' => [IntHelper::MIN_INTEGER_VALUE, ''];
+        yield 'above upper limit' => [IntHelper::MAX_INTEGER_VALUE + 10, 'This value should be between -2147483648 and 2147483647.'];
+        yield 'below lower limit' => [IntHelper::MIN_INTEGER_VALUE - 10, 'This value should be between -2147483648 and 2147483647.'];
     }
 
     /**
