@@ -25,9 +25,7 @@ class TranslatorHelperTest extends TestCase
     {
         $translator = $this->createMock(Translator::class);
         $translator->method('setLocale')->willReturnCallback(
-            function ($locale) use ($translator) {
-                $translator->method('getLocale')->willReturn($locale);
-            }
+            fn ($locale) => $translator->method('getLocale')->willReturn($locale)
         );
         $translator->method('getCatalogue')->willReturnCallback(
             function () use ($translator) {
