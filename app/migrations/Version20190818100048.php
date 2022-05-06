@@ -55,7 +55,7 @@ class Version20190818100048 extends AbstractMauticMigration
             $this->addSql('ALTER TABLE '.$this->prefix.'sms_messages ADD failed_count INT NOT NULL');
         }
         if (!$smsTable->hasColumn('properties')) {
-            $this->addSql("ALTER TABLE {$this->prefix}sms_messages ADD properties LONGTEXT NOT NULL COMMENT '(DC2Type:json_array)'");
+            $this->addSql("ALTER TABLE {$this->prefix}sms_messages ADD properties LONGTEXT NOT NULL COMMENT '(DC2Type:json)'");
         }
     }
 }
