@@ -10,11 +10,12 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\MarketplaceBundle\Service\Allowlist;
 use PHPUnit\Framework\Assert;
 
 final class ListControllerTest extends MauticMysqlTestCase
 {
-    public function testMakretplaceListTable(): void
+    public function testMarketplaceListTable(): void
     {
         $requests     = [];
         $history      = Middleware::history($requests);
@@ -22,6 +23,9 @@ final class ListControllerTest extends MauticMysqlTestCase
         $handlerStack = HandlerStack::create(new MockHandler([$response]));
         $handlerStack->push($history);
         self::$container->set('mautic.http.client', new Client(['handler' => $handlerStack]));
+        $allowlist = $this->createMock(Allowlist::class);
+        $allowlist->method('getAllowList')->willReturn(null);
+        self::$container->set('marketplace.service.allowlist', $allowlist);
 
         $crawler = $this->client->request('GET', 's/marketplace');
 

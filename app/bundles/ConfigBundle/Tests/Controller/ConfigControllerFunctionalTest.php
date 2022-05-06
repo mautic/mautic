@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Tests\Controller;
 
 use DateTime;
@@ -127,7 +118,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getConfigPath(): string
     {
-        return self::$container->getParameter('kernel.project_dir').'/app/config/local.php';
+        return self::$container->get('kernel')->getLocalConfigFile();
     }
 
     private function getConfigParameters(): array
@@ -223,7 +214,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form          = $buttonCrawler->form();
         Assert::assertEquals($page3, $form['config[coreconfig][404_page]']->getValue());
         // re-create the Symfony client to make config changes applied
-        $this->setUpSymfony();
+        $this->setUpSymfony($this->configParams);
 
         // Request not found url page3 page content should be rendered
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/editnotfoundurlblablabla');
@@ -237,7 +228,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $buttonCrawler  =  $crawler->selectButton('config[buttons][save]');
         $form           = $buttonCrawler->form();
 
-        $send_notification_to_author           = '';
+        $send_notification_to_author           = '0';
         $campaign_notification_email_addresses = 'a@test.com, b@test.com';
         $webhook_notification_email_addresses  = 'a@webhook.com, b@webhook.com';
 

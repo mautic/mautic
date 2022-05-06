@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CampaignBundle\Membership\MembershipManager;
@@ -19,11 +10,18 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -92,14 +90,22 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     protected function fieldListAction(Request $request)
     {
         $dataArray  = ['success' => 1];
         $filter     = InputHelper::clean($request->query->get('filter'));
         $fieldAlias = InputHelper::alphanum($request->query->get('field'), false, false, ['_']);
+
+        /** @var FieldModel $fieldModel */
         $fieldModel = $this->getModel('lead.field');
+
+        /** @var LeadModel $contactModel */
+        $contactModel = $this->getModel('lead.lead');
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = $this->getModel('lead.company');
 
         if (empty($fieldAlias)) {
             $dataArray['error']   = 'Alias cannot be empty';
@@ -109,7 +115,7 @@ class AjaxController extends CommonAjaxController
         }
 
         if ('owner_id' === $fieldAlias) {
-            $results = $this->getModel('lead.lead')->getLookupResults('user', $filter);
+            $results = $contactModel->getLookupResults('user', $filter);
             foreach ($results as $r) {
                 $name        = $r['firstName'].' '.$r['lastName'];
                 $dataArray[] = [
@@ -136,8 +142,14 @@ class AjaxController extends CommonAjaxController
             return $this->sendJsonResponse($dataArray);
         }
 
+        if ($isLookup && !empty($field->getProperties()['list'])) {
+            foreach ($field->getProperties()['list'] as $predefinedValue) {
+                $dataArray[] = ['value' => $predefinedValue];
+            }
+        }
+
         if ('company' === $field->getObject()) {
-            $results = $this->getModel('lead.company')->getLookupResults('companyfield', [$fieldAlias, $filter]);
+            $results = $companyModel->getLookupResults('companyfield', [$fieldAlias, $filter]);
             foreach ($results as $r) {
                 $dataArray[] = ['value' => $r['label']];
             }
@@ -149,6 +161,54 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    protected function loadSegmentFilterFormAction(Request $request): JsonResponse
+    {
+        $fieldAlias  = InputHelper::clean($request->request->get('fieldAlias'));
+        $fieldObject = InputHelper::clean($request->request->get('fieldObject'));
+        $operator    = InputHelper::clean($request->request->get('operator'));
+        $search      = InputHelper::clean($request->request->get('search'));
+        $filterNum   = (int) $request->request->get('filterNum');
+
+        /** @var FormFactoryInterface $formFactory */
+        $formFactory = $this->get('form.factory');
+
+        /** @var FormAdjustmentsProviderInterface $formAdjustmentsProvider */
+        $formAdjustmentsProvider = $this->get('mautic.lead.provider.formAdjustments');
+
+        /** @var ListModel $listModel */
+        $listModel = $this->get('mautic.lead.model.list');
+
+        $form = $formFactory->createNamed('RENAME', FilterPropertiesType::class);
+
+        if ($fieldAlias && $operator) {
+            $formAdjustmentsProvider->adjustForm(
+                $form,
+                $fieldAlias,
+                $fieldObject,
+                $operator,
+                $listModel->getChoiceFields($search)[$fieldObject][$fieldAlias]
+            );
+        }
+
+        $formHtml = $this->renderView(
+            'MauticLeadBundle:List:filterpropform.html.php',
+            [
+                'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:filterpropform.html.php', []),
+            ]
+        );
+
+        $formHtml = str_replace('id="RENAME', "id=\"leadlist_filters_{$filterNum}_properties", $formHtml);
+        $formHtml = str_replace('name="RENAME', "name=\"leadlist[filters][{$filterNum}][properties]", $formHtml);
+
+        return $this->sendJsonResponse(
+            [
+                'viewParameters' => [
+                    'form' => $formHtml,
+                ],
+            ]
+        );
     }
 
     /**

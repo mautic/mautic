@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -46,7 +37,7 @@ class CampaignExecutionEvent extends Event
     protected $systemTriggered;
 
     /**
-     * @var bool|array
+     * @var bool|mixed[]|string|null
      */
     protected $result;
 
@@ -76,7 +67,7 @@ class CampaignExecutionEvent extends Event
     protected $channelId;
 
     /**
-     * @param bool $result
+     * @param bool|mixed[]|string|null $result
      */
     public function __construct(array $args, $result, LeadEventLog $log = null)
     {
@@ -151,7 +142,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return bool
+     * @return bool|mixed[]|string|null
      */
     public function getResult()
     {
@@ -159,7 +150,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @param $result
+     * @param bool|mixed[]|string|null $result
      *
      * @return $this
      */
@@ -173,7 +164,7 @@ class CampaignExecutionEvent extends Event
     /**
      * Set the result to failed.
      *
-     * @param null $reason
+     * @param string|null $reason
      *
      * @return $this
      */
