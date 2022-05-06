@@ -144,7 +144,7 @@ function initSelectThemeGrapesjs(parentInitSelectTheme) {
     parentInitSelectTheme(themeField);
 
     mQuery('[data-theme]').click((event) => {
-      const theme = mQuery(event.target).attr('data-theme');
+      const theme = mQuery('.theme-selected').find('[data-theme]').attr('data-theme');
 
       switchBuilderButton(theme);
       switchCustomHtml(theme);
