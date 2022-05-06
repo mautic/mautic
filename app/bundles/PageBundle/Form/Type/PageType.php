@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
@@ -98,9 +89,11 @@ class PageType extends AbstractType
                 'label'    => 'mautic.page.form.customhtml',
                 'required' => false,
                 'attr'     => [
+                    'tooltip'              => 'mautic.page.form.customhtml.help',
                     'class'                => 'form-control editor-builder-tokens builder-html',
                     'data-token-callback'  => 'page:getBuilderTokens',
                     'data-token-activator' => '{',
+                    'rows'                 => '25',
                 ],
             ]
         );

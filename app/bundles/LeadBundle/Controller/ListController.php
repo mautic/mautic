@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
@@ -68,7 +59,7 @@ class ListController extends FormController
         $this->setListFilters();
 
         //set limits
-        $limit = $session->get('mautic.segment.limit', $this->coreParametersHelper->get('default_pagelimit'));
+        $limit = $session->get('mautic.lead.list.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -78,8 +69,8 @@ class ListController extends FormController
         $session->set('mautic.segment.filter', $search);
 
         //do some default filtering
-        $orderBy    = $session->get('mautic.segment.orderby', 'l.dateModified');
-        $orderByDir = $session->get('mautic.segment.orderbydir', 'DESC');
+        $orderBy    = $session->get('mautic.lead.list.orderby', 'l.dateModified');
+        $orderByDir = $session->get('mautic.lead.list.orderbydir', $this->getDefaultOrderDirection());
 
         $filter = [
             'string' => $search,
@@ -272,12 +263,16 @@ class ListController extends FormController
      *
      * @return Response
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function editAction($objectId, $ignorePost = false, bool $isNew = false)
     {
         $postActionVars = $this->getPostActionVars($objectId);
 
         try {
             $segment = $this->getSegment($objectId);
+
+            if ($isNew) {
+                $segment->setNew();
+            }
 
             return $this->createSegmentModifyResponse(
                 $segment,
@@ -992,5 +987,10 @@ class ListController extends FormController
             'leadlist_id',
             $listFilters
         );
+    }
+
+    protected function getDefaultOrderDirection()
+    {
+        return 'DESC';
     }
 }

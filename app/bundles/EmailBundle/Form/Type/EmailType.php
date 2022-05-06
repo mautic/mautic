@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
@@ -284,9 +275,11 @@ class EmailType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
                     'attr'       => [
+                        'tooltip'              => 'mautic.email.form.body.help',
                         'class'                => 'form-control editor-builder-tokens builder-html editor-email',
                         'data-token-callback'  => 'email:getBuilderTokens',
                         'data-token-activator' => '{',
+                        'rows'                 => '15',
                     ],
                 ]
             )->addModelTransformer($emojiTransformer)

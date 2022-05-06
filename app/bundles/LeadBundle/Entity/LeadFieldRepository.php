@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -376,7 +367,7 @@ class LeadFieldRepository extends CommonRepository
         $qb = $this->createQueryBuilder($this->getTableAlias());
         $qb->where($qb->expr()->eq("{$this->getTableAlias()}.columnIsNotCreated", 1));
         $qb->orderBy("{$this->getTableAlias()}.dateAdded", 'ASC');
-        $qb->getMaxResults(1);
+        $qb->setMaxResults(1);
 
         return $qb->getQuery()->getOneOrNullResult();
     }
