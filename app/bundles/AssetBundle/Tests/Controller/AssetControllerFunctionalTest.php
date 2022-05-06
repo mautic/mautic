@@ -34,4 +34,8 @@ class AssetControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->getControllerColumnTests($urlAlias, $routeAlias, $column, $tableAlias, $column2);
     }
+
+    public function testPreviewAction(): void
+    {
+    }
 }
