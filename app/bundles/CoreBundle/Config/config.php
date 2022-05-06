@@ -917,6 +917,7 @@ return [
                 'class'     => \Mautic\CoreBundle\Helper\ExportHelper::class,
                 'arguments' => [
                     'translator',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.helper.composer' => [

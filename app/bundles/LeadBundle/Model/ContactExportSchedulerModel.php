@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
+use Mautic\LeadBundle\Entity\ContactExportSchedulerRepository;
 
 class ContactExportSchedulerModel extends AbstractCommonModel
 {
@@ -26,5 +27,16 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         $this->em->flush();
 
         return $contactExportScheduler;
+    }
+
+    public function getRepository(): ContactExportSchedulerRepository
+    {
+        return $this->em->getRepository(ContactExportScheduler::class);
+    }
+
+    public function deleteEntity(ContactExportScheduler $contactExportScheduler): void
+    {
+        $this->em->remove($contactExportScheduler);
+        $this->em->flush();
     }
 }

@@ -6,8 +6,10 @@ namespace Mautic\CoreBundle\Helper;
 
 use ArrayIterator;
 use Iterator;
+use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -23,9 +25,12 @@ class ExportHelper
     /** @var TranslatorInterface */
     private $translator;
 
-    public function __construct(TranslatorInterface $translator)
+    private CoreParametersHelper $coreParametersHelper;
+
+    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
-        $this->translator = $translator;
+        $this->translator          = $translator;
+        $this->coreParametersHelper= $coreParametersHelper;
     }
 
     /**
@@ -114,7 +119,7 @@ class ExportHelper
     {
         $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
 
-        $objWriter = new \PhpOffice\PhpSpreadsheet\Writer\Csv($spreadsheet);
+        $objWriter = new Csv($spreadsheet);
         $objWriter->setPreCalculateFormulas(false);
         // For UTF-8 support
         $objWriter->setUseBOM(true);
@@ -132,5 +137,56 @@ class ExportHelper
         $response->headers->set('Pragma', 'public');
 
         return $response;
+    }
+
+    public function exportDataIntoFile(IteratorExportDataModel $data, string $type, string $filename): string
+    {
+        if (!$data->valid()) {
+            throw new \Exception('No or invalid data given');
+        }
+
+        switch ($type) {
+            case self::EXPORT_TYPE_CSV:
+                return $this->exportAsCsvIntoFile($data, $filename);
+
+            case self::EXPORT_TYPE_EXCEL:
+                return $this->exportAsExcelIntoFile($data, $filename);
+
+            default:
+                throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
+        }
+    }
+
+    /**
+     * @param Iterator<mixed> $data
+     */
+    private function exportAsCsvIntoFile(Iterator $data, string $filename): string
+    {
+        $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
+
+        $objWriter = new Csv($spreadsheet);
+        $objWriter->setPreCalculateFormulas(false);
+        // For UTF-8 support
+        $objWriter->setUseBOM(true);
+        $filePath = $this->coreParametersHelper->get('contact_export_dir').'/'.$filename;
+
+        $objWriter->save($filePath);
+
+        return $filePath;
+    }
+
+    /**
+     * @param Iterator<mixed> $data
+     */
+    private function exportAsExcelIntoFile(Iterator $data, string $filename): string
+    {
+        $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
+        $objWriter   = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $objWriter->setPreCalculateFormulas(false);
+        $filePath = $this->coreParametersHelper->get('contact_export_dir').'/'.$filename;
+
+        $objWriter->save($filePath);
+
+        return $filePath;
     }
 }

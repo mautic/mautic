@@ -1532,6 +1532,16 @@ return [
                 ],
                 'tag' => 'console.command',
             ],
+            'mautic.lead.command.contact_scheduled_export' => [
+                'class'     => \Mautic\LeadBundle\Command\ContactScheduledExportCommand::class,
+                'arguments' => [
+                    'mautic.lead.model.export_scheduler',
+                    'mautic.helper.export',
+                    'mautic.lead.model.lead',
+                    'translator',
+                ],
+                'tag' => 'console.command',
+            ],
         ],
         'fixtures' => [
             'mautic.lead.fixture.company' => [
@@ -1605,5 +1615,6 @@ return [
         'company_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
         'contact_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
         'segment_rebuild_time_warning'                                                          => 30,
+        'contact_export_dir'                                                                    => '%kernel.root_dir%/../media/files/temp',
     ],
 ];
