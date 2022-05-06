@@ -45,3 +45,4 @@ parameters:
 		# Following 2 ignores are there due to https://symfony.com/blog/new-in-symfony-4-3-simpler-event-dispatching
 		- '#Method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) invoked with 2 parameters, 1 required\.#'
 		- '#Parameter \#1 \$event of method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) expects object, string given\.#'
+		- '#Property [a-zA-Z0-9\\_]+::\$id is never written, only read.#'
