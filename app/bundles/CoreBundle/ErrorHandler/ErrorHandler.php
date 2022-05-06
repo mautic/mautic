@@ -5,11 +5,11 @@ namespace Mautic\CoreBundle\ErrorHandler {
     use Mautic\CoreBundle\Exception\ErrorHandlerException;
     use Psr\Log\LoggerInterface;
     use Psr\Log\LogLevel;
-    use Symfony\Component\Debug\Debug;
     use Symfony\Component\Debug\Exception\FatalErrorException;
     use Symfony\Component\Debug\Exception\FatalThrowableError;
     use Symfony\Component\Debug\Exception\FlattenException;
     use Symfony\Component\Debug\Exception\OutOfMemoryException;
+    use Symfony\Component\ErrorHandler\Debug;
 
     class ErrorHandler
     {
