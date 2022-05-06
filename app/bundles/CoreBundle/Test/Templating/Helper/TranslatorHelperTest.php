@@ -28,9 +28,7 @@ class TranslatorHelperTest extends TestCase
             fn ($locale) => $translator->method('getLocale')->willReturn($locale)
         );
         $translator->method('getCatalogue')->willReturnCallback(
-            function () use ($translator) {
-                return new TranslatorCatalogue($translator);
-            }
+            fn () => new TranslatorCatalogue($translator)
         );
 
         $translatorHelper = new TranslatorHelper($translator);
