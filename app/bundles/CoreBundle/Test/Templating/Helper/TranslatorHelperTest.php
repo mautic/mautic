@@ -12,9 +12,7 @@ class TranslatorHelperTest extends TestCase
     {
         $translator = $this->createMock(Translator::class);
         $translator->expects($this->exactly(2))->method('getCatalogue')->willReturnCallback(
-            function () use ($translator) {
-                return new TranslatorCatalogue($translator);
-            }
+            fn () => new TranslatorCatalogue($translator)
         );
 
         $translatorHelper = new TranslatorHelper($translator);
