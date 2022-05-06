@@ -203,7 +203,7 @@ ul.tag-cloud li {
 }
 
 .frequency{
-    width: 45px!important;
+    width: 65px!important;
 }
 
 .contact{
@@ -222,7 +222,7 @@ ul.tag-cloud li {
 }
 
 .frequency-select {
-    width:145px !important;
+    width:125px !important;
     float: right;
     padding-right: 5px;
 }

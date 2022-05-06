@@ -147,6 +147,27 @@ Mautic.leadOnLoad = function (container, response) {
     if (mQuery(container + ' .panel-companies').length) {
         mQuery(container + ' .panel-companies .fa-check').tooltip({html: true});
     }
+
+    // Adding behavior to be able to create new tags by pressing the `Escape` key
+    // when the search field is active (ie: the tag name we are typing is a substring of an existing tag)
+    mQuery('#lead_tags_chosen input').keyup(function(el) {
+        const newTag = mQuery('#lead_tags_chosen input').val();
+        if (el.key === "Escape" && newTag !== '') {
+            const selectElement = mQuery('#lead_tags').get();
+            const selectedValues = mQuery('#lead_tags').val();
+            const payload = [...selectedValues, newTag];
+
+            Mautic.activateLabelLoadingIndicator(mQuery(selectElement).attr('id'));
+            Mautic.ajaxActionRequest('lead:addLeadTags', {tags: JSON.stringify(payload)}, function(response) {
+                if (response.tags) {
+                    mQuery('#' + mQuery(selectElement).attr('id')).html(response.tags);
+                    mQuery('#' + mQuery(selectElement).attr('id')).trigger('chosen:updated');
+                }
+
+                Mautic.removeLabelLoadingIndicator();
+            });
+        }
+    });
 };
 
 Mautic.leadTimelineOnLoad = function (container, response) {

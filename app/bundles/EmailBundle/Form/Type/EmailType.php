@@ -275,9 +275,11 @@ class EmailType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
                     'attr'       => [
+                        'tooltip'              => 'mautic.email.form.body.help',
                         'class'                => 'form-control editor-builder-tokens builder-html editor-email',
                         'data-token-callback'  => 'email:getBuilderTokens',
                         'data-token-activator' => '{',
+                        'rows'                 => '15',
                     ],
                 ]
             )->addModelTransformer($emojiTransformer)
