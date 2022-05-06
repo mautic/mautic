@@ -1510,6 +1510,9 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.lead.model.export_scheduler' => [
+                'class' => \Mautic\LeadBundle\Model\ContactExportSchedulerModel::class,
+            ],
         ],
         'command' => [
             'mautic.lead.command.deduplicate' => [

@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -18,12 +20,16 @@ use Mautic\LeadBundle\Form\Type\EmailType;
 use Mautic\LeadBundle\Form\Type\MergeType;
 use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Form\Type\StageType;
+use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadController extends FormController
 {
@@ -2037,5 +2043,79 @@ class LeadController extends FormController
         }
 
         return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']));
+    }
+
+    public function contactExportSchedulerAction(): JsonResponse
+    {
+        $permissions = $this->get('mautic.security')
+            ->isGranted(['lead:leads:viewown', 'lead:leads:viewother'], 'RETURN_ARRAY');
+
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+            return $this->accessDenied();
+        }
+
+        /** @var SessionInterface $session */
+        $session    = $this->get('session');
+        $search     = $session->get('mautic.lead.filter', '');
+        $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
+        $indexMode  = $session->get('mautic.lead.indexmode', 'list');
+
+        /** @var TranslatorInterface $translator */
+        $translator = $this->get('translator');
+        $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $mine       = $translator->trans('mautic.core.searchcommand.ismine');
+
+        $ids      = $this->request->get('ids');
+        $fileType = $this->request->get('filetype');
+
+        $filter = ['string' => $search, 'force' => []];
+
+        if (!empty($ids)) {
+            $filter['force'] = [
+                [
+                    'column' => 'l.id',
+                    'expr'   => 'in',
+                    'value'  => json_decode($ids, true, 512, JSON_THROW_ON_ERROR),
+                ],
+            ];
+        } else {
+            if ('list' !== $indexMode || (false === strpos($search, $anonymous))) {
+                //remove anonymous leads unless requested to prevent clutter
+                $filter['force'][] = "!$anonymous";
+            }
+
+            if (!$permissions['lead:leads:viewother']) {
+                $filter['force'][] = $mine;
+            }
+        }
+
+        $data = [
+            'filter'         => $filter,
+            'orderBy'        => $orderBy,
+            'orderByDir'     => $orderByDir,
+            'withTotalCount' => true,
+            'fileType'       => $fileType,
+        ];
+
+        $model = $this->getModel('lead.export_scheduler');
+        \assert($model instanceof ContactExportSchedulerModel);
+        $contactExportScheduler = $model->saveEntity($data);
+        $scheduledDateTime      = $contactExportScheduler->getScheduledDateTime();
+        \assert($scheduledDateTime instanceof DateTimeImmutable);
+        $utcScheduledDateTimeStr = $scheduledDateTime->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
+
+        /** @var LoggerInterface $logger */
+        $logger = $this->get('monolog.logger.mautic');
+        $logger->debug(
+            'Contact export #ID '.$contactExportScheduler->getId()
+            .' scheduled at '.$utcScheduledDateTimeStr.' UTC'
+        );
+
+        $this->addFlash('mautic.lead.export.being.prepared', ['%file_type%' => $fileType]);
+        $response['message'] = 'Contact export scheduled.';
+        $response['flashes'] = $this->getFlashContent();
+
+        return new JsonResponse($response);
     }
 }

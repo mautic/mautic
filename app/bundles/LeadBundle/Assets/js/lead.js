@@ -450,7 +450,7 @@ Mautic.attachJsUiOnFilterForms = function() {
                 var fieldOptions = displayFieldEl.attr('data-field-list');
                 Mautic[fieldCallback](selector.replace('#', '') + '_properties_display', fieldAlias, fieldOptions);
             }
-        } 
+        }
     });
 
     // Trigger event so plugins could attach other JS magic to the form.
@@ -518,7 +518,7 @@ Mautic.reorderSegmentFilters = function() {
 
 Mautic.convertLeadFilterInput = function(el) {
     var operatorSelect = mQuery(el);
-    
+
     // Extract the filter number
     var regExp = /_filters_(\d+)_operator/;
     var matches = regExp.exec(operatorSelect.attr('id'));
@@ -1544,3 +1544,37 @@ Mautic.lazyLoadContactListOnSegmentDetail = function() {
         Mautic.processPageContent(response);
     });
 };
+
+Mautic.onContactExport = function (el) {
+    mQuery(".dropdown-toggle").dropdown('toggle');
+    const action = mQuery(el).attr('data-action');
+
+    if (!action) {
+        return;
+    }
+
+    if (typeof Mautic.activeActions == 'undefined') {
+        Mautic.activeActions = {};
+    } else if (typeof Mautic.activeActions[action] != 'undefined') {
+        // Action is currently being executed
+        return;
+    }
+
+    Mautic.activeActions[action] = true;
+
+    mQuery.ajax({
+        showLoadingBar: true,
+        url: action,
+        type: "POST",
+        dataType: "json",
+        success: function (response) {
+            Mautic.processPageContent(response);
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+        },
+        complete: function () {
+            delete Mautic.activeActions[action]
+        }
+    });
+}
