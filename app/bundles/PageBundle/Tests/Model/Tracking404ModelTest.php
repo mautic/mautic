@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -53,7 +44,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testIsTrackableIfTracking404OptionEnabled(): void
     {
-        $this->mockCoreParametersHelper->expects($this->at(0))
+        $this->mockCoreParametersHelper->expects($this->once())
             ->method('get')
             ->with('do_not_track_404_anonymous')
             ->willReturn(true);
@@ -64,7 +55,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testIsTrackableIfTracking404OptionDisable(): void
     {
-        $this->mockCoreParametersHelper->expects($this->at(0))
+        $this->mockCoreParametersHelper->expects($this->once())
             ->method('get')
             ->with('do_not_track_404_anonymous')
             ->willReturn(false);
@@ -75,7 +66,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testIsTrackableForIdentifiedContacts(): void
     {
-        $this->mockCoreParametersHelper->expects($this->at(0))
+        $this->mockCoreParametersHelper->expects($this->once())
             ->method('get')
             ->with('do_not_track_404_anonymous')
             ->willReturn(true);
@@ -91,7 +82,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testIsTrackableForAnonymouse(): void
     {
-        $this->mockCoreParametersHelper->expects($this->at(0))
+        $this->mockCoreParametersHelper->expects($this->once())
             ->method('get')
             ->with('do_not_track_404_anonymous')
             ->willReturn(true);

@@ -18,7 +18,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class GeneratedColumnSubscriberTest extends TestCase
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private $translator;
 

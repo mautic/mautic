@@ -77,7 +77,6 @@ class ContactChannelsType extends AbstractType
                     'frequency_number_'.$channel,
                     IntegerType::class,
                     [
-                        'scale'      => 0,
                         'label'      => 'mautic.lead.list.frequency.number',
                         'label_attr' => ['class' => 'text-muted fw-n label1'],
                         'attr'       => array_merge(

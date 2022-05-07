@@ -2,20 +2,12 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
@@ -26,11 +18,53 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use ControllerTrait;
+
     public function setUp(): void
     {
         $this->clientOptions = ['debug' => true];
 
         parent::setUp();
+    }
+
+    /**
+     * Check if email contains correct values.
+     */
+    public function testViewEmail(): void
+    {
+        $email = $this->createEmail('ABC', 'template');
+        $email->setDateAdded(new \DateTime('2020-02-07 20:29:02'));
+        $email->setDateModified(new \DateTime('2020-03-21 20:29:02'));
+        $email->setCreatedByUser('Test User');
+
+        $this->em->persist($email);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->client->request('GET', '/s/emails');
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200');
+        $this->assertStringContainsString('February 7, 2020', $clientResponse->getContent());
+        $this->assertStringContainsString('March 21, 2020', $clientResponse->getContent());
+        $this->assertStringContainsString('Test User', $clientResponse->getContent());
+
+        $urlAlias   = 'emails';
+        $routeAlias = 'email';
+        $column     = 'dateModified';
+        $column2    = 'name';
+        $tableAlias = 'e.';
+
+        $this->getControllerColumnTests($urlAlias, $routeAlias, $column, $tableAlias, $column2);
+    }
+
+    /**
+     * Filtering should return status code 200.
+     */
+    public function testIndexActionWhenFiltering(): void
+    {
+        $this->client->request('GET', '/s/emails?search=has%3Aresults&tmpl=list');
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
     }
 
     /**

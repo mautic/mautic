@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Form\DataTransformer;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -49,7 +40,7 @@ class ReportFilterDataTransformer implements DataTransformerInterface
                 return $filters;
             }
             $type = $this->columns[$f['column']]['type'];
-            if (in_array($type, ['datetime', 'date', 'time', DateTimeType::class, DateType::class, TimeType::class])) {
+            if (in_array($type, ['datetime', 'time', DateTimeType::class, DateType::class, TimeType::class])) {
                 $dt         = new DateTimeHelper($f['value'], '', 'utc');
                 $f['value'] = $dt->toLocalString();
             }
@@ -75,7 +66,7 @@ class ReportFilterDataTransformer implements DataTransformerInterface
                 return $filters;
             }
             $type = $this->columns[$f['column']]['type'];
-            if (in_array($type, ['datetime', 'date', 'time'])) {
+            if (in_array($type, ['datetime', 'time'])) {
                 $dt         = new DateTimeHelper($f['value'], '', 'local');
                 $f['value'] = $dt->toUtcString();
             }
