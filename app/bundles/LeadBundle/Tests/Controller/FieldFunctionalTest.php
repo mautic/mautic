@@ -31,9 +31,9 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         $field->setName("Field $suffix");
         $this->alias = "field_$suffix";
         $field->setAlias($this->alias);
-        $field->setDateAdded(new \DateTime('2020-02-07 20:29:02'));
-        $field->setDateAdded(new \DateTime('2020-02-07 20:29:02'));
-        $field->setDateModified(new \DateTime('2020-03-21 20:29:02'));
+        $field->setDateAdded(new \DateTime());
+        $field->setDateAdded(new \DateTime());
+        $field->setDateModified(new \DateTime());
         $field->setType('text');
         $field->setObject('lead');
 
