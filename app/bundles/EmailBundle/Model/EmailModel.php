@@ -1129,6 +1129,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     // Only retrieve the difference between what has already been sent and the limit
                     $limit -= $leadCount;
                 }
+                if (null !== $limit && $limit <= 0) {
+                    break;
+                }
 
                 $listErrors = $this->sendEmail($email, $leads, $options);
 
