@@ -75,8 +75,9 @@ class EmailApiController extends CommonApiController
 
         $lists = $this->request->request->get('lists', null);
         $limit = $this->request->request->get('limit', null);
+        $batch = $this->request->request->get('batch', null);
 
-        list($count, $failed) = $this->model->sendEmailToLists($entity, $lists, $limit);
+        list($count, $failed) = $this->model->sendEmailToLists($entity, $lists, $limit, $batch);
 
         $view = $this->view(
             [
