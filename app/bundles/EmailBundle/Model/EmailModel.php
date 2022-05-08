@@ -1053,8 +1053,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * Send an email to lead lists.
      *
      * @param array           $lists
-     * @param int             $limit
-     * @param bool            $batch        True to process and batch all pending leads
+     * @param int|null        $limit
+     * @param int|null        $batch        True to process and batch all pending leads
      * @param OutputInterface $output
      * @param int             $minContactId
      * @param int             $maxContactId
@@ -1065,7 +1065,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         Email $email,
         $lists = null,
         $limit = null,
-        $batch = false,
+        $batch = null,
         OutputInterface $output = null,
         $minContactId = null,
         $maxContactId = null
