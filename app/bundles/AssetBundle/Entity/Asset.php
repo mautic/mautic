@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IntIdInterface;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
@@ -16,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Asset extends FormEntity
+class Asset extends FormEntity implements IntIdInterface
 {
     /**
      * @var int

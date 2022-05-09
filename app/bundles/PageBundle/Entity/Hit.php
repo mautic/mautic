@@ -5,14 +5,12 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IntIdInterface;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
-/**
- * Class Hit.
- */
-class Hit
+class Hit implements IntIdInterface
 {
     /**
      * @var int

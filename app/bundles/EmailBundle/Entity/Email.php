@@ -12,6 +12,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IntIdInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
@@ -26,10 +27,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Email.
- */
-class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface
+class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, IntIdInterface
 {
     use VariantEntityTrait;
     use TranslationEntityTrait;
