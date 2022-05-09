@@ -13,6 +13,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -805,15 +806,6 @@ class ListController extends FormController
                         'filter_added'     => $translator->trans('mautic.segment.contact.filter.added'),
                     ],
                 ],
-                'contacts' => $this->forward(
-                    'MauticLeadBundle:List:contacts',
-                    [
-                        'objectId'   => $list->getId(),
-                        'page'       => $this->get('session')->get('mautic.segment.contact.page', 1),
-                        'ignoreAjax' => true,
-                        'filters'    => $filters,
-                    ]
-                )->getContent(),
             ],
             'contentTemplate' => 'MauticLeadBundle:List:details.html.php',
             'passthroughVars' => [
@@ -947,13 +939,17 @@ class ListController extends FormController
     }
 
     /**
-     * @param     $objectId
+     * @param int $objectId
      * @param int $page
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function contactsAction($objectId, $page = 1)
     {
+        $session = $this->get('session');
+        \assert($session instanceof SessionInterface);
+        $session->set('mautic.segment.contact.page', $page);
+
         $manuallyRemoved = 0;
         $listFilters     = ['manually_removed' => $manuallyRemoved];
         if ('POST' === $this->request->getMethod() && $this->request->request->has('includeEvents')) {

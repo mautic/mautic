@@ -74,7 +74,7 @@ class DynamicContentType extends AbstractType
 
         $tags = $leadModel->getTagList();
         foreach ($tags as $tag) {
-            $this->tagChoices[$tag['label']] = $tag['value'];
+            $this->tagChoices[$tag['value']] = $tag['label'];
         }
 
         $this->deviceTypesChoices  = array_combine(DeviceParser::getAvailableDeviceTypeNames(), DeviceParser::getAvailableDeviceTypeNames());
