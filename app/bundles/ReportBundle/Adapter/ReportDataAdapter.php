@@ -16,6 +16,7 @@ class ReportDataAdapter
 
     public function getReportData(Report $report, ReportExportOptions $reportExportOptions): ReportDataResult
     {
+        $exportData                 = $reportExportOptions->getData();
         $options                    = [];
         $options['paginate']        = true;
         $options['limit']           = $reportExportOptions->getBatchSize();
@@ -23,6 +24,9 @@ class ReportDataAdapter
         $options['page']            = $reportExportOptions->getPage();
         $options['dateTo']          = $reportExportOptions->getDateTo();
         $options['dateFrom']        = $reportExportOptions->getDateFrom();
+        if (!empty($exportData['dynamicFilters'])) {
+            $options['dynamicFilters']  = $exportData['dynamicFilters'];
+        }
 
         $data = $this->reportModel->getReportData($report, null, $options);
 

@@ -45,6 +45,10 @@ return [
                 'path'       => '/reports/schedule/{reportId}/now',
                 'controller' => 'Mautic\ReportBundle\Controller\ScheduleController::nowAction',
             ],
+            'mautic_report_export_schedule' => [
+                'path'       => '/reports/schedule/{reportId}/export',
+                'controller' => 'MauticReportBundle:Schedule:export',
+            ],
             'mautic_report_action' => [
                 'path'       => '/reports/{objectAction}/{objectId}',
                 'controller' => 'Mautic\ReportBundle\Controller\ReportController::executeAction',
@@ -153,7 +157,7 @@ return [
     'parameters' => [
         'report_temp_dir'                     => '%mautic.application_dir%/media/files/temp',
         'report_export_batch_size'            => 1000,
-        'report_export_max_filesize_in_bytes' => 5_000_000,
+        'report_export_max_filesize_in_bytes' => 0,
         'csv_always_enclose'                  => false,
     ],
 ];

@@ -39,10 +39,17 @@ class ReportExporter
      */
     private function processReport(Scheduler $scheduler): void
     {
-        $report = $scheduler->getReport();
-
-        $dateTo = clone $scheduler->getScheduleDate();
-        $dateTo->setTime(0, 0, 0);
+        $report                  = $scheduler->getReport();
+        $scheduledData           = $scheduler->getData();
+        $scheduleNextDownloadJob = true;
+        if (!empty($scheduledData)) {
+            $scheduleNextDownloadJob = false;
+            $this->reportExportOptions->setData($scheduledData);
+            $this->reportExportOptions->setDateFrom(new \DateTime($scheduledData['dateFrom']));
+            $this->reportExportOptions->setDateTo(new \DateTime($scheduledData['dateTo']));
+        } elseif (!is_null($scheduler->getScheduleDate())) {
+            $dateTo = clone $scheduler->getScheduleDate();
+            $dateTo->setTime(0, 0, 0);
 
         $dateFrom = clone $dateTo;
         switch ($report->getScheduleUnit()) {
@@ -87,6 +94,6 @@ class ReportExporter
             $this->eventDispatcher->dispatch($event, ReportEvents::REPORT_SCHEDULE_SEND);
         }
 
-        $this->schedulerModel->reportWasScheduled($report);
+        $this->schedulerModel->reportWasScheduled($report, $scheduleNextDownloadJob);
     }
 }

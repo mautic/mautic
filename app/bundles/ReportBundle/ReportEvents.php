@@ -109,6 +109,15 @@ final class ReportEvents
     public const REPORT_ON_COLUMN_COLLECT = 'mautic.report_on_column_collect';
 
     /**
+     * The mautic.report_schedule_export event is dispatched to send an exported report to a user.
+     *
+     * The event listener receives a Mautic\ReportBundle\Event\ReportEvent instance.
+     *
+     * @var string
+     */
+    public const REPORT_SCHEDULE_EXPORT = 'mautic.report_schedule_export';
+
+    /**
      * The mautic.report_cleanup event is dispatched to cleanup report files after they had been sent via email.
      *
      * The event listener receives a Mautic\ReportBundle\Event\PermanentReportFileCreated instance.

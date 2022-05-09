@@ -29,7 +29,8 @@ class SendSchedule
 
         $transformer = new ArrayStringTransformer();
         $report      = $scheduler->getReport();
-        $emails      = $transformer->reverseTransform($report->getToAddress());
+        $data        = $scheduler->getData();
+        $emails      =  $data['email_to_send_report'] ?? $transformer->reverseTransform($report->getToAddress());
         $subject     = $this->messageSchedule->getSubject($report);
         $message     = $this->messageSchedule->getMessageForAttachedFile($report);
 
