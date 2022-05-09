@@ -2,11 +2,13 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class LeadPointLog
 {
+    public const TABLE_NAME = 'point_lead_action_log';
     /**
      * @var Point
      **/
@@ -22,7 +24,9 @@ class LeadPointLog
      */
     private $ipAddress;
 
-    /** @var int|string */
+    /**
+     * @var int|null
+     */
     private $internalId;
 
     /**
@@ -34,8 +38,8 @@ class LeadPointLog
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('point_lead_action_log')
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\LeadPointLogRepository')
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(LeadPointLogRepository::class)
             ->addIndex(['internal_id'], 'internal_id');
 
         $builder->createManyToOne('point', 'Point')
@@ -52,10 +56,10 @@ class LeadPointLog
             ->columnName('date_fired')
             ->build();
 
-        $builder->createField('internalId', 'string')
+        $builder->createField('internalId', Types::BIGINT)
             ->columnName('internal_id')
-            ->length(191)
-            ->makePrimaryKey()
+            ->option('unsigned', true)
+            ->nullable()
             ->build();
     }
 
@@ -123,18 +127,12 @@ class LeadPointLog
         $this->point = $point;
     }
 
-    /**
-     * @return int|string
-     */
-    public function getInternalId()
+    public function getInternalId(): ?int
     {
         return $this->internalId;
     }
 
-    /**
-     * @param int|string $internalId
-     */
-    public function setInternalId($internalId): void
+    public function setInternalId(?int $internalId): void
     {
         $this->internalId = $internalId;
     }
