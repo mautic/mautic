@@ -2,6 +2,7 @@
 
 namespace Mautic\PointBundle\Model;
 
+use Mautic\CoreBundle\Entity\IntIdInterface;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -22,7 +23,6 @@ use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class PointModel extends CommonFormModel
 {
@@ -53,11 +53,6 @@ class PointModel extends CommonFormModel
      */
     private $contactTracker;
 
-    /**
-     * @var PropertyAccessor
-     */
-    private $propertyAccessor;
-
     public function __construct(
         Session $session,
         IpLookupHelper $ipLookupHelper,
@@ -70,7 +65,6 @@ class PointModel extends CommonFormModel
         $this->leadModel          = $leadModel;
         $this->mauticFactory      = $mauticFactory;
         $this->contactTracker     = $contactTracker;
-        $this->propertyAccessor   = new PropertyAccessor();
     }
 
     /**
@@ -194,11 +188,11 @@ class PointModel extends CommonFormModel
     /**
      * Triggers a specific point change.
      *
-     * @param       $type
-     * @param mixed $eventDetails     passthrough from function triggering action to the callback function
-     * @param mixed $typeId           Something unique to the triggering event to prevent  unnecessary duplicate calls
-     * @param Lead  $lead
-     * @param bool  $allowUserRequest
+     * @param string         $type
+     * @param IntIdInterface $eventDetails     passthrough from function triggering action to the callback function
+     * @param mixed|null     $typeId           Something unique to the triggering event to prevent  unnecessary duplicate calls
+     * @param Lead|null      $lead
+     * @param bool           $allowUserRequest
      *
      * @throws \ReflectionException
      */
@@ -278,7 +272,7 @@ class PointModel extends CommonFormModel
                 $log->setIpAddress($ipAddress);
                 $log->setPoint($action);
                 $log->setLead($lead);
-                $log->setInternalId($this->propertyAccessor->getValue($eventDetails, 'id'));
+                $log->setInternalId((int) $eventDetails->getId());
                 $log->setDateFired(new \DateTime());
                 $persist[] = $log;
             }
@@ -312,14 +306,13 @@ class PointModel extends CommonFormModel
     /**
      * @depreacated need replace by eventName
      *
-     * @param mixed             $eventDetails
      * @param array<string|int> $settings
      *
      * @return bool
      *
      * @throws \ReflectionException
      */
-    private function invokeCallback(Point $action, Lead $lead, $eventDetails, array $settings)
+    private function invokeCallback(Point $action, Lead $lead, IntIdInterface $eventDetails, array $settings)
     {
         $callback = (isset($settings['callback'])) ? $settings['callback'] :
             ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];

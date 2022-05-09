@@ -2,25 +2,24 @@
 
 namespace Mautic\PointBundle\Tests\Event;
 
-use Mautic\EmailBundle\Entity\Stat;
+use Mautic\AssetBundle\Entity\Asset;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Event\PointChangeActionExecutedEvent;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class PointChangeActionExecutedEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var Stat|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $eventDetailsMock;
-
-    /**
-     * @var Lead|\PHPUnit\Framework\MockObject\MockObject
+     * @var Lead|MockObject
      */
     private $leadMock;
 
     /**
-     * @var Point|\PHPUnit\Framework\MockObject\MockObject
+     * @var Point|MockObject
      */
     private $pointMock;
 
@@ -33,7 +32,6 @@ class PointChangeActionExecutedEventTest extends \PHPUnit\Framework\TestCase
     {
         $this->pointMock        = $this->createMock(Point::class);
         $this->leadMock         = $this->createMock(Lead::class);
-        $this->eventDetailsMock = $this->createMock(Stat::class);
         $this->completedActions = [
             1 => [
                 99 => ['internal_id' => 99],
@@ -49,7 +47,7 @@ class PointChangeActionExecutedEventTest extends \PHPUnit\Framework\TestCase
         $this->pointMock->method('getId')
             ->willReturn(1);
 
-        $event = new PointChangeActionExecutedEvent($this->pointMock, $this->leadMock, $this->eventDetailsMock, $this->completedActions);
+        $event = new PointChangeActionExecutedEvent($this->pointMock, $this->leadMock, new Email(), $this->completedActions);
         $event->setStatusFromLogs();
         $this->assertFalse($event->canChangePoints());
     }
@@ -59,7 +57,7 @@ class PointChangeActionExecutedEventTest extends \PHPUnit\Framework\TestCase
         $this->pointMock->method('getId')
             ->willReturn(9);
 
-        $event = new PointChangeActionExecutedEvent($this->pointMock, $this->leadMock, $this->eventDetailsMock, $this->completedActions);
+        $event = new PointChangeActionExecutedEvent($this->pointMock, $this->leadMock, new Submission(), $this->completedActions);
         $event->setStatusFromLogs();
         $this->assertTrue($event->canChangePoints());
     }
@@ -69,7 +67,7 @@ class PointChangeActionExecutedEventTest extends \PHPUnit\Framework\TestCase
         $this->pointMock->method('getId')
             ->willReturn(1);
 
-        $event = new PointChangeActionExecutedEvent($this->pointMock, $this->leadMock, $this->eventDetailsMock, $this->completedActions);
+        $event = new PointChangeActionExecutedEvent($this->pointMock, $this->leadMock, new Hit(), $this->completedActions);
         $event->setStatusFromLogsForInternalId(99);
         $this->assertFalse($event->canChangePoints());
     }
@@ -79,7 +77,7 @@ class PointChangeActionExecutedEventTest extends \PHPUnit\Framework\TestCase
         $this->pointMock->method('getId')
             ->willReturn(1);
 
-        $event = new PointChangeActionExecutedEvent($this->pointMock, $this->leadMock, $this->eventDetailsMock, $this->completedActions);
+        $event = new PointChangeActionExecutedEvent($this->pointMock, $this->leadMock, new Asset(), $this->completedActions);
         $event->setStatusFromLogsForInternalId(98);
         $this->assertTrue($event->canChangePoints());
     }

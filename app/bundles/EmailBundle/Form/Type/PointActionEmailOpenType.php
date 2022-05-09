@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
@@ -29,7 +31,7 @@ class PointActionEmailOpenType extends EmailOpenType
                 'with_create_new' => false,
                 'return_entity'   => false,
                 'attr'            => [
-                    'tooltip'=> 'mautic.email.open.limittocategories_descr',
+                    'tooltip' => 'mautic.email.open.limittocategories_descr',
                 ],
             ]
         );

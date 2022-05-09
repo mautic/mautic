@@ -121,14 +121,11 @@ class PointSubscriber implements EventSubscriberInterface
         $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead, true);
     }
 
-    /**
-     * @return void
-     */
-    public function onEmailOpenPointChange(PointChangeActionExecutedEvent $changeActionExecutedEvent)
+    public function onEmailOpenPointChange(PointChangeActionExecutedEvent $changeActionExecutedEvent): void
     {
         $action = $changeActionExecutedEvent->getPointAction();
 
-        if ('email.open' != $action->getType()) {
+        if ('email.open' !== $action->getType()) {
             return;
         }
         /** @var Email $eventDetails */
@@ -140,7 +137,7 @@ class PointSubscriber implements EventSubscriberInterface
             return;
         }
         $triggerMode = isset($action->getProperties()['triggerMode']) ? $action->getProperties()['triggerMode'] : null;
-        if ('internalId' == $triggerMode) {
+        if ('internalId' === $triggerMode) {
             $changeActionExecutedEvent->setStatusFromLogsForInternalId($eventDetails->getId());
 
             return;
@@ -149,14 +146,11 @@ class PointSubscriber implements EventSubscriberInterface
         $changeActionExecutedEvent->setStatusFromLogs();
     }
 
-    /**
-     * @return void
-     */
-    public function onEmailSentPointChange(PointChangeActionExecutedEvent $changeActionExecutedEvent)
+    public function onEmailSentPointChange(PointChangeActionExecutedEvent $changeActionExecutedEvent): void
     {
         $action = $changeActionExecutedEvent->getPointAction();
 
-        if ('email.send' != $action->getType()) {
+        if ('email.send' !== $action->getType()) {
             return;
         }
 

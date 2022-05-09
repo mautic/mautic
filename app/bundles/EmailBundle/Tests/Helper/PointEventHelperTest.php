@@ -110,7 +110,7 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
      * @param bool $published
      * @param bool $success
      *
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject&MauticFactory
      */
     private function getMockMauticFactory($published = true, $success = true)
     {
@@ -125,9 +125,9 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function ($model) use ($published, $success) {
                 switch ($model) {
                     case 'email':
-                        return $this->getMockEmail($published, $success);
+                        return $this->getMockEmailModel($published, $success);
                     case 'lead':
-                        return $this->getMockLead();
+                        return $this->createMock(LeadModel::class);
                 }
             });
 
@@ -135,33 +135,16 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject&EmailModel
      */
-    private function getMockLead()
-    {
-        $mock = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-
-        return $mock;
-    }
-
-    /**
-     * @param bool $published
-     * @param bool $success
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getMockEmail($published = true, $success = true)
+    private function getMockEmailModel(bool $published = true, bool $success = true)
     {
         $sendEmail = $success ? true : ['error' => 1];
 
         $mock = $this->getMockBuilder(EmailModel::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getEntity', 'sendEmail'])
-            ->getMock()
-        ;
+            ->getMock();
 
         $mock->expects($this->any())
             ->method('getEntity')

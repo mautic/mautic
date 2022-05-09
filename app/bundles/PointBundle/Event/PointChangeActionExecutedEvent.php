@@ -1,45 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Event;
 
+use Mautic\CoreBundle\Entity\IntIdInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\Point;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class PointChangeActionExecutedEvent extends Event
 {
-    /**
-     * @var Point
-     */
-    private $pointAction;
+    private Point $pointAction;
+
+    private Lead $lead;
 
     /**
-     * @var Lead
+     * The entity that was affected.
      */
-    private $lead;
+    private IntIdInterface $eventDetails;
+
+    private ?bool $changePoints;
 
     /**
-     * @var mixed
+     * @var mixed[]
      */
-    private $eventDetails;
+    private array $completedActions;
 
     /**
-     * @var bool
+     * @param mixed[] $completedActions
      */
-    private $changePoints;
-
-    /**
-     * @var array<mixed>
-     */
-    private $completedActions;
-
-    /**
-     * PointChangeActionExecutedEvent constructor.
-     *
-     * @param mixed        $eventDetails
-     * @param array<mixed> $completedActions
-     */
-    public function __construct(Point $pointAction, Lead $lead, $eventDetails, $completedActions = [])
+    public function __construct(Point $pointAction, Lead $lead, IntIdInterface $eventDetails, array $completedActions = [])
     {
         $this->pointAction      = $pointAction;
         $this->lead             = $lead;
@@ -47,10 +38,7 @@ class PointChangeActionExecutedEvent extends Event
         $this->completedActions = $completedActions;
     }
 
-    /**
-     * @return bool
-     */
-    public function canChangePoints()
+    public function canChangePoints(): ?bool
     {
         return $this->changePoints;
     }
@@ -70,42 +58,30 @@ class PointChangeActionExecutedEvent extends Event
         $this->changePoints = !(isset($this->completedActions[$this->pointAction->getId()]));
     }
 
-    /**
-     * @param int|string $internalId
-     */
-    public function setStatusFromLogsForInternalId($internalId): void
+    public function setStatusFromLogsForInternalId(int $internalId): void
     {
         $this->changePoints = !isset($this->completedActions[$this->pointAction->getId()][$internalId]);
     }
 
-    /**
-     * @return Point
-     */
-    public function getPointAction()
+    public function getPointAction(): Point
     {
         return $this->pointAction;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): Lead
     {
         return $this->lead;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getEventDetails()
+    public function getEventDetails(): IntIdInterface
     {
         return $this->eventDetails;
     }
 
     /**
-     * @return array<int|string>
+     * @return int[]
      */
-    public function getCompletedActions()
+    public function getCompletedActions(): array
     {
         return $this->completedActions;
     }
