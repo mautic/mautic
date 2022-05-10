@@ -6,12 +6,103 @@ namespace Mautic\LeadBundle\Model;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\ContactExportSchedulerRepository;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ContactExportSchedulerModel extends AbstractCommonModel
 {
+    private const EXPORT_FILE_NAME_DATE_FORMAT = 'Y_m_d_H_i_s';
+    private SessionInterface $session;
+    private RequestStack $requestStack;
+    private LeadModel $leadModel;
+    private ExportHelper $exportHelper;
+    private MailHelper $mailHelper;
+
+    public function __construct(
+        SessionInterface $session,
+        RequestStack $requestStack,
+        LeadModel $leadModel,
+        ExportHelper $exportHelper,
+        MailHelper $mailHelper
+    ) {
+        $this->session      = $session;
+        $this->requestStack = $requestStack;
+        $this->leadModel    = $leadModel;
+        $this->exportHelper = $exportHelper;
+        $this->mailHelper   = $mailHelper;
+    }
+
+    public function getRepository(): ContactExportSchedulerRepository
+    {
+        /** @var ContactExportSchedulerRepository $repo */
+        $repo = $this->em->getRepository(ContactExportScheduler::class);
+
+        return $repo;
+    }
+
+    /**
+     * @param array<mixed> $permissions
+     *
+     * @return array<string, mixed>
+     */
+    public function prepareData(array $permissions): array
+    {
+        $search     = $this->session->get('mautic.lead.filter', '');
+        $orderBy    = $this->session->get('mautic.lead.orderby', 'l.last_active');
+        $orderByDir = $this->session->get('mautic.lead.orderbydir', 'DESC');
+        $indexMode  = $this->session->get('mautic.lead.indexmode', 'list');
+
+        $anonymous = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $mine      = $this->translator->trans('mautic.core.searchcommand.ismine');
+
+        $request = $this->getRequest();
+        \assert($request instanceof Request);
+
+        $ids      = $request->get('ids');
+        $fileType = $request->get('filetype', 'csv');
+
+        $filter = ['string' => $search, 'force' => []];
+
+        if (!empty($ids)) {
+            $filter['force'] = [
+                [
+                    'column' => 'l.id',
+                    'expr'   => 'in',
+                    'value'  => json_decode($ids, true, 512, JSON_THROW_ON_ERROR),
+                ],
+            ];
+        } else {
+            if ('list' !== $indexMode || (false === strpos($search, $anonymous))) {
+                //remove anonymous leads unless requested to prevent clutter
+                $filter['force'][] = "!$anonymous";
+            }
+
+            if (!$permissions['lead:leads:viewother']) {
+                $filter['force'][] = $mine;
+            }
+        }
+
+        return [
+            'filter'         => $filter,
+            'orderBy'        => $orderBy,
+            'orderByDir'     => $orderByDir,
+            'withTotalCount' => true,
+            'fileType'       => $fileType,
+        ];
+    }
+
     /**
      * @param array<mixed> $data
      */
@@ -29,14 +120,103 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         return $contactExportScheduler;
     }
 
-    public function getRepository(): ContactExportSchedulerRepository
+    public function processAndGetExportFilePath(ContactExportScheduler $contactExportScheduler): string
     {
-        return $this->em->getRepository(ContactExportScheduler::class);
+        $data              = $contactExportScheduler->getData();
+        $fileType          = $data['fileType'];
+        $resultsCallback   = function ($contact) {
+            return $contact->getProfileFields();
+        };
+        $iterator          = new IteratorExportDataModel(
+            $this->leadModel,
+            $contactExportScheduler->getData(),
+            $resultsCallback
+        );
+        $scheduledDateTime = $contactExportScheduler->getScheduledDateTime();
+        \assert($scheduledDateTime instanceof \DateTimeImmutable);
+        $fileName = 'contacts_export_'.$scheduledDateTime->format(self::EXPORT_FILE_NAME_DATE_FORMAT);
+
+        return $this->exportResultsAs($iterator, $fileType, $fileName);
+    }
+
+    public function getEmailMessageWithLink(string $filePath): string
+    {
+        $link = $this->router->generate(
+            'mautic_contact_export_download',
+            ['fileName' => basename($filePath)],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        return $this->translator->trans(
+            'mautic.lead.export.email',
+            ['%link%' => $link, '%label%' => basename($filePath)]
+        );
+    }
+
+    public function sendEmail(ContactExportScheduler $contactExportScheduler, string $filePath): void
+    {
+        $user = $contactExportScheduler->getUser();
+        \assert($user instanceof User);
+        $message = $this->getEmailMessageWithLink($filePath);
+
+        $this->mailHelper->setTo([$user->getEmail() => $user->getName()]);
+        $this->mailHelper->setSubject(
+            $this->translator->trans('mautic.lead.export.email_subject', ['%file_name%' => basename($filePath)])
+        );
+        $this->mailHelper->setBody($message);
+        $this->mailHelper->parsePlainText($message);
+        $this->mailHelper->send(true);
     }
 
     public function deleteEntity(ContactExportScheduler $contactExportScheduler): void
     {
         $this->em->remove($contactExportScheduler);
         $this->em->flush();
+    }
+
+    public function getExportFileToDownload(string $fileName): BinaryFileResponse
+    {
+        $filePath    = $this->coreParametersHelper->get('contact_export_dir').'/'.$fileName;
+        $contentType = $this->getContactExportFileContentType($fileName);
+
+        return new BinaryFileResponse(
+            $filePath,
+            Response::HTTP_OK,
+            [
+                'Content-Type'        => $contentType,
+                'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
+                'Expires'             => 0,
+                'Cache-Control'       => 'must-revalidate',
+                'Pragma'              => 'public',
+            ]
+        );
+    }
+
+    private function getRequest(): ?Request
+    {
+        return $this->requestStack->getCurrentRequest();
+    }
+
+    private function exportResultsAs(IteratorExportDataModel $iterator, string $fileType, string $fileName): string
+    {
+        if (!in_array($fileType, $this->exportHelper->getSupportedExportTypes(), true)) {
+            throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $fileType]));
+        }
+
+        return $this->exportHelper->exportDataIntoFile($iterator, $fileType, strtolower($fileName.'.'.$fileType));
+    }
+
+    private function getContactExportFileContentType(string $fileName): string
+    {
+        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+
+        switch ($ext) {
+            case ExportHelper::EXPORT_TYPE_CSV:
+                return 'text/csv';
+            case ExportHelper::EXPORT_TYPE_EXCEL:
+                return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+            default:
+                throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $ext]));
+        }
     }
 }
