@@ -41,7 +41,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
                         'orderBy'    => 'l.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-leadlist-name',
@@ -51,7 +51,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
                         'text'       => 'mautic.lead.list.thead.leadcount',
                         'class'      => 'visible-md visible-lg col-leadlist-leadcount',
                     ]
@@ -60,7 +60,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
                         'orderBy'    => 'l.dateAdded',
                         'text'       => 'mautic.lead.import.label.dateAdded',
                         'class'      => 'visible-md visible-lg col-leadlist-dateAdded',
@@ -70,7 +70,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
                         'orderBy'    => 'l.dateModified',
                         'text'       => 'mautic.lead.import.label.dateModified',
                         'class'      => 'visible-md visible-lg col-leadlist-dateModified',
@@ -81,7 +81,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
                         'orderBy'    => 'l.createdByUser',
                         'text'       => 'mautic.core.createdby',
                         'class'      => 'visible-md visible-lg col-leadlist-createdByUser',
@@ -91,7 +91,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'segment',
+                        'sessionVar' => 'lead.list',
                         'orderBy'    => 'l.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-leadlist-id',
@@ -171,7 +171,10 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                             <?php if ($lastBuiltDateDifference >= $segmentRebuildWarningThreshold): ?>
                                 <label class="control-label" data-toggle="tooltip"
                                        data-container="body" data-placement="top" title=""
-                                       data-original-title="<?php echo $view['translator']->transChoice('mautic.lead.list.form.config.segment_rebuild_time.message', $lastBuiltDateDifference, ['%hours%' => $lastBuiltDateDifference]); ?>">
+                                       data-original-title="<?php echo $view['translator']->trans(
+                                               'mautic.lead.list.form.config.segment_rebuild_time.message',
+                                               ['%count%' => $lastBuiltDateDifference]
+                                       ); ?>">
                                     <i class="fa text-danger fa-exclamation-circle"></i></label>
                             <?php endif; ?>
                             <?php echo $view['content']->getCustomContent('segment.name', $mauticTemplateVars); ?>
@@ -187,9 +190,8 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                             'mautic_contact_index',
                             ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.list').':'.$item->getAlias()]
                         ); ?>" data-toggle="ajax"<?php echo (0 == $leadCounts[$item->getId()]) ? 'disabled=disabled' : ''; ?>>
-                            <?php echo $view['translator']->transChoice(
+                            <?php echo $view['translator']->trans(
                                 'mautic.lead.list.viewleads_count',
-                                $leadCounts[$item->getId()],
                                 ['%count%' => $leadCounts[$item->getId()]]
                             ); ?>
                         </a>
@@ -214,7 +216,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                     'page'       => $page,
                     'limit'      => $limit,
                     'baseUrl'    => $view['router']->path('mautic_segment_index'),
-                    'sessionVar' => 'segment',
+                    'sessionVar' => 'lead.list',
                 ]
             ); ?>
         </div>

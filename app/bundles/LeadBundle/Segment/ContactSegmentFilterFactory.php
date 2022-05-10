@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment;
 
+use Exception;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
@@ -34,9 +26,6 @@ class ContactSegmentFilterFactory
      */
     private $decoratorFactory;
 
-    /**
-     * ContactSegmentFilterFactory constructor.
-     */
     public function __construct(
         TableSchemaColumnsCache $schemaCache,
         Container $container,
@@ -50,7 +39,7 @@ class ContactSegmentFilterFactory
     /**
      * @return ContactSegmentFilters
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getSegmentFilters(LeadList $leadList)
     {
@@ -85,7 +74,7 @@ class ContactSegmentFilterFactory
     /**
      * @return FilterQueryBuilderInterface
      *
-     * @throws \Exception
+     * @throws Exception
      */
     private function getQueryBuilderForFilter(FilterDecoratorInterface $decorator, ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
