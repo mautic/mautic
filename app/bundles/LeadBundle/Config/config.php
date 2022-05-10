@@ -136,6 +136,10 @@ return [
                 'path'       => '/segment/view/{objectId}/contact/{page}',
                 'controller' => 'MauticLeadBundle:List:contacts',
             ],
+            'mautic_contact_export_download' => [
+                'path'       => '/contacts/export/download/{fileName}',
+                'controller' => 'MauticLeadBundle:Lead:downloadExport',
+            ],
         ],
         'api' => [
             'mautic_api_contactsstandard' => [
@@ -601,6 +605,32 @@ return [
                 'arguments' => [
                     'mautic.lead.model.list',
                     'translator',
+                ],
+            ],
+            'mautic.lead.export_scheduled_audit_log_subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\ContactExportSchedulerAuditLogSubscriber::class,
+                'arguments' => [
+                    'mautic.core.model.auditlog',
+                    'mautic.helper.ip_lookup',
+                ],
+            ],
+            'mautic.lead.export_scheduled_logger_subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\ContactExportSchedulerLoggerSubscriber::class,
+                'arguments' => [
+                    'logger',
+                ],
+            ],
+            'mautic.lead.export_scheduled_notification_subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\ContactExportSchedulerNotificationSubscriber::class,
+                'arguments' => [
+                    'mautic.core.model.notification',
+                    'translator',
+                ],
+            ],
+            'mautic.lead.contact_scheduled_export.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\ContactScheduledExportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.export_scheduler',
                 ],
             ],
         ],
@@ -1511,7 +1541,14 @@ return [
                 ],
             ],
             'mautic.lead.model.export_scheduler' => [
-                'class' => \Mautic\LeadBundle\Model\ContactExportSchedulerModel::class,
+                'class'     => \Mautic\LeadBundle\Model\ContactExportSchedulerModel::class,
+                'arguments' => [
+                    'session',
+                    'request_stack',
+                    'mautic.lead.model.lead',
+                    'mautic.helper.export',
+                    'mautic.helper.mailer',
+                ],
             ],
         ],
         'command' => [
@@ -1536,9 +1573,7 @@ return [
                 'class'     => \Mautic\LeadBundle\Command\ContactScheduledExportCommand::class,
                 'arguments' => [
                     'mautic.lead.model.export_scheduler',
-                    'mautic.helper.export',
-                    'mautic.lead.model.lead',
-                    'translator',
+                    'event_dispatcher',
                 ],
                 'tag' => 'console.command',
             ],
