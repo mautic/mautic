@@ -65,7 +65,6 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         $indexMode  = $this->session->get('mautic.lead.indexmode', 'list');
 
         $anonymous = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
-        $mine      = $this->translator->trans('mautic.core.searchcommand.ismine');
 
         $request = $this->getRequest();
         \assert($request instanceof Request);
@@ -85,16 +84,29 @@ class ContactExportSchedulerModel extends AbstractCommonModel
             ];
         } else {
             if ('list' !== $indexMode || (false === strpos($search, $anonymous))) {
-                //remove anonymous leads unless requested to prevent clutter
-                $filter['force'][] = "!$anonymous";
+                // Remove anonymous leads unless requested to prevent clutter.
+                $filter['force'] = [
+                    [
+                        'column' => 'l.dateIdentified',
+                        'expr'   => 'isNotNull',
+                    ],
+                ];
             }
 
             if (!$permissions['lead:leads:viewother']) {
-                $filter['force'][] = $mine;
+                // Show only owner's contacts.
+                $filter['force'] = [
+                    [
+                        'column' => 'l.owner',
+                        'expr'   => 'eq',
+                    ],
+                ];
             }
         }
 
         return [
+            'start'          => 0,
+            'limit'          => 200,
             'filter'         => $filter,
             'orderBy'        => $orderBy,
             'orderByDir'     => $orderByDir,
