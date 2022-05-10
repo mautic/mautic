@@ -19,6 +19,8 @@ class ContactExportScheduler
     private DateTimeImmutable $scheduledDateTime;
     /** @var array<mixed> */
     private array $data;
+    /** @var array<mixed> */
+    private array $changes = [];
 
     public static function loadMetadata(ClassMetadata $metadata): void
     {
@@ -58,6 +60,7 @@ class ContactExportScheduler
     public function setUser(User $user): self
     {
         $this->user = $user;
+        $this->addChange('user', $user->getId());
 
         return $this;
     }
@@ -70,6 +73,7 @@ class ContactExportScheduler
     public function setScheduledDateTime(DateTimeImmutable $scheduledDateTime): self
     {
         $this->scheduledDateTime = $scheduledDateTime;
+        $this->addChange('scheduledDateTime', $scheduledDateTime);
 
         return $this;
     }
@@ -88,7 +92,24 @@ class ContactExportScheduler
     public function setData(array $data): self
     {
         $this->data = $data;
+        $this->addChange('data', $data);
 
         return $this;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getChanges(): array
+    {
+        return $this->changes;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function addChange(string $property, $value): void
+    {
+        $this->changes[$property] = $value;
     }
 }
