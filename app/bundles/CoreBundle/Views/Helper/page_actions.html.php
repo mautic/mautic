@@ -91,7 +91,7 @@ foreach ($templateButtons as $action => $enabled) {
 
 echo '<div class="std-toolbar btn-group">';
 
-$dropdownOpenHtml = '<button type="button" class="btn btn-default btn-nospin dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>'
+$dropdownOpenHtml = '<button id="dropdown" type="button" class="btn btn-default btn-nospin dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>'
     ."\n";
 $dropdownOpenHtml .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">'."\n";
 echo $view['buttons']->renderButtons($dropdownOpenHtml, '</ul>');

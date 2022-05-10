@@ -1546,7 +1546,7 @@ Mautic.lazyLoadContactListOnSegmentDetail = function() {
 };
 
 Mautic.onContactExport = function (el) {
-    mQuery(".dropdown-toggle").dropdown('toggle');
+    mQuery('#dropdown').dropdown('toggle');
     const action = mQuery(el).attr('data-action');
 
     if (!action) {
