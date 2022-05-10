@@ -5,35 +5,27 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Helper\ExitCode;
-use Mautic\CoreBundle\Helper\ExportHelper;
-use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactScheduledExportCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:contacts:scheduled_export';
 
     private ContactExportSchedulerModel $contactExportSchedulerModel;
-    private ExportHelper $exportHelper;
-    private LeadModel $leadModel;
-    private TranslatorInterface $translator;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
         ContactExportSchedulerModel $contactExportSchedulerModel,
-        ExportHelper $exportHelper,
-        LeadModel $leadModel,
-        TranslatorInterface $translator
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->contactExportSchedulerModel = $contactExportSchedulerModel;
-        $this->exportHelper                = $exportHelper;
-        $this->leadModel                   = $leadModel;
-        $this->translator                  = $translator;
+        $this->eventDispatcher             = $eventDispatcher;
 
         parent::__construct();
     }
@@ -49,37 +41,18 @@ class ContactScheduledExportCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $count = 0;
         while ($contactExportScheduler = $this->contactExportSchedulerModel->getRepository()
             ->findOneBy([], ['id' => 'ASC'])) {
-            $data              = $contactExportScheduler->getData();
-            $fileType          = $data['fileType'];
-            $resultsCallback   = function ($contact) {
-                return $contact->getProfileFields();
-            };
-            $iterator          = new IteratorExportDataModel(
-                $this->leadModel,
-                $contactExportScheduler->getData(),
-                $resultsCallback
-            );
-            $scheduledDateTime = $contactExportScheduler->getScheduledDateTime();
-            \assert($scheduledDateTime instanceof \DateTimeImmutable);
-            $fileName = 'contacts_exported_'.$scheduledDateTime->format('Y_m_d_H_i_s');
-            $filePath = $this->exportResultsAs($iterator, $fileType, $fileName);
-
-            // @todo email $filePath
-
-            $this->contactExportSchedulerModel->deleteEntity($contactExportScheduler);
+            $contactExportSchedulerEvent = new ContactExportSchedulerEvent($contactExportScheduler);
+            $this->eventDispatcher->dispatch(LeadEvents::CONTACT_EXPORT_PREPARE_FILE, $contactExportSchedulerEvent);
+            $this->eventDispatcher->dispatch(LeadEvents::CONTACT_EXPORT_SEND_EMAIL, $contactExportSchedulerEvent);
+            $this->eventDispatcher->dispatch(LeadEvents::POST_CONTACT_EXPORT_SEND_EMAIL, $contactExportSchedulerEvent);
+            ++$count;
         }
+
+        $output->writeln('Contact export email(s) sent: '.$count);
 
         return ExitCode::SUCCESS;
-    }
-
-    public function exportResultsAs(IteratorExportDataModel $iterator, string $fileType, string $fileName): string
-    {
-        if (!in_array($fileType, $this->exportHelper->getSupportedExportTypes(), true)) {
-            throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $fileType]));
-        }
-
-        return $this->exportHelper->exportDataIntoFile($iterator, $fileType, strtolower($fileName.'.'.$fileType));
     }
 }
