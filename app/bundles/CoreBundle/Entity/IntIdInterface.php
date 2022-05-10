@@ -8,7 +8,7 @@ interface IntIdInterface
 {
     /**
      * Can return null if not saved yet.
-     * 
+     *
      * @return ?int
      */
     public function getId();

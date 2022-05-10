@@ -191,7 +191,6 @@ class PointModel extends CommonFormModel
      * @param string         $type
      * @param IntIdInterface $eventDetails     passthrough from function triggering action to the callback function
      * @param mixed|null     $typeId           Something unique to the triggering event to prevent  unnecessary duplicate calls
-     * @param Lead|null      $lead
      * @param bool           $allowUserRequest
      *
      * @throws \ReflectionException
