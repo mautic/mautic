@@ -11,7 +11,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides several functions for export-related tasks,
@@ -22,15 +22,13 @@ class ExportHelper
     public const EXPORT_TYPE_EXCEL = 'xlsx';
     public const EXPORT_TYPE_CSV   = 'csv';
 
-    /** @var TranslatorInterface */
-    private $translator;
-
+    private TranslatorInterface $translator;
     private CoreParametersHelper $coreParametersHelper;
 
     public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
-        $this->translator          = $translator;
-        $this->coreParametersHelper= $coreParametersHelper;
+        $this->translator           = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -139,7 +137,7 @@ class ExportHelper
         return $response;
     }
 
-    public function exportDataIntoFile(IteratorExportDataModel $data, string $type, string $filename): string
+    public function exportDataIntoFile(IteratorExportDataModel $data, string $type, string $fileName): string
     {
         if (!$data->valid()) {
             throw new \Exception('No or invalid data given');
@@ -147,10 +145,10 @@ class ExportHelper
 
         switch ($type) {
             case self::EXPORT_TYPE_CSV:
-                return $this->exportAsCsvIntoFile($data, $filename);
+                return $this->exportAsCsvIntoFile($data, $fileName);
 
             case self::EXPORT_TYPE_EXCEL:
-                return $this->exportAsExcelIntoFile($data, $filename);
+                return $this->exportAsExcelIntoFile($data, $fileName);
 
             default:
                 throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
@@ -160,16 +158,13 @@ class ExportHelper
     /**
      * @param Iterator<mixed> $data
      */
-    private function exportAsCsvIntoFile(Iterator $data, string $filename): string
+    private function exportAsCsvIntoFile(Iterator $data, string $fileName): string
     {
-        $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
-
-        $objWriter = new Csv($spreadsheet);
+        $spreadsheet = $this->getSpreadsheetGeneric($data, $fileName);
+        $objWriter   = new Csv($spreadsheet);
         $objWriter->setPreCalculateFormulas(false);
-        // For UTF-8 support
-        $objWriter->setUseBOM(true);
-        $filePath = $this->coreParametersHelper->get('contact_export_dir').'/'.$filename;
-
+        $objWriter->setUseBOM(true); // For UTF-8 support
+        $filePath = $this->getValidContactExportFileName($fileName);
         $objWriter->save($filePath);
 
         return $filePath;
@@ -178,14 +173,30 @@ class ExportHelper
     /**
      * @param Iterator<mixed> $data
      */
-    private function exportAsExcelIntoFile(Iterator $data, string $filename): string
+    private function exportAsExcelIntoFile(Iterator $data, string $fileName): string
     {
-        $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
+        $spreadsheet = $this->getSpreadsheetGeneric($data, $fileName);
         $objWriter   = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $objWriter->setPreCalculateFormulas(false);
-        $filePath = $this->coreParametersHelper->get('contact_export_dir').'/'.$filename;
-
+        $filePath = $this->getValidContactExportFileName($fileName);
         $objWriter->save($filePath);
+
+        return $filePath;
+    }
+
+    private function getValidContactExportFileName(string $fileName): string
+    {
+        $filePath     = $this->coreParametersHelper->get('contact_export_dir').'/'.$fileName;
+        $fileName     = (string) pathinfo($filePath, PATHINFO_FILENAME);
+        $extension    = (string) pathinfo($filePath, PATHINFO_EXTENSION);
+        $originalName = $fileName;
+        $i            = 1;
+
+        while (file_exists($filePath)) {
+            $fileName = $originalName.'_'.$i;
+            $filePath = $fileName.'.'.$extension;
+            ++$i;
+        }
 
         return $filePath;
     }
