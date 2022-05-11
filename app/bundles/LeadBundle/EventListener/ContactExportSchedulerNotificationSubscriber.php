@@ -54,7 +54,7 @@ class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInt
     public function onContactExportEmailSent(ContactExportSchedulerEvent $event): void
     {
         $data    = $event->getContactExportScheduler()->getData();
-        $message = $this->translator->trans('mautic.lead.export.prepared', ['file_type' => $data['fileType']]);
+        $message = $this->translator->trans('mautic.lead.export.prepared', ['%file_type%' => $data['fileType']]);
         $user    = $event->getContactExportScheduler()->getUser();
         \assert($user instanceof User);
 
