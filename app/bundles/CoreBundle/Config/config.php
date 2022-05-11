@@ -156,6 +156,10 @@ return [
                     '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
                 ],
             ],
+            'mautic.core.service.log_processor' => [
+                'class'     => \Mautic\CoreBundle\Monolog\LogProcessor::class,
+                'tags'      => ['monolog.processor'],
+            ],
         ],
         'events' => [
             'mautic.core.subscriber' => [

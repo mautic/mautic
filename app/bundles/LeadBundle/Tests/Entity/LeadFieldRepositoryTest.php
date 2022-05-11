@@ -6,8 +6,11 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Portability\Statement;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -236,5 +239,60 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['id' => 456]);
 
         $this->assertTrue($this->repository->compareDateValue($contactId, $fieldAlias, $value));
+    }
+
+    public function testGetFieldThatIsMissingColumnWhenMutlipleColumsMissing(): void
+    {
+        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
+
+        $this->entityManager->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects(self::once())
+            ->method('select')
+            ->willReturnSelf();
+
+        $queryBuilder->expects(self::once())
+            ->method('from')
+            ->willReturnSelf();
+
+        $expr = $this->createMock(Query\Expr::class);
+        $queryBuilder->expects(self::once())
+            ->method('expr')
+            ->willReturn($expr);
+
+        $comparison = $this->createMock(Query\Expr\Comparison::class);
+        $expr->expects(self::once())
+            ->method('eq')
+            ->willReturn($comparison);
+
+        $queryBuilder->expects(self::once())
+            ->method('where')
+            ->with($comparison)
+            ->willReturnSelf();
+
+        $queryBuilder->expects(self::once())
+            ->method('orderBy')
+            ->willReturnSelf();
+
+        $queryBuilder->expects(self::once())
+            ->method('setMaxResults')
+            ->with(1)
+            ->willReturnSelf();
+
+        $query = $this->createMock(AbstractQuery::class);
+        $queryBuilder->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $leadField = $this->createMock(LeadField::class);
+        $query->expects(self::once())
+            ->method('getOneOrNullResult')
+            ->willReturn($leadField);
+
+        self::assertSame(
+            $leadField,
+            $this->repository->getFieldThatIsMissingColumn()
+        );
     }
 }
