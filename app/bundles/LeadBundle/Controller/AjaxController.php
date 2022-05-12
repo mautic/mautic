@@ -168,6 +168,7 @@ class AjaxController extends CommonAjaxController
         $fieldAlias  = InputHelper::clean($request->request->get('fieldAlias'));
         $fieldObject = InputHelper::clean($request->request->get('fieldObject'));
         $operator    = InputHelper::clean($request->request->get('operator'));
+        $search      = InputHelper::clean($request->request->get('search'));
         $filterNum   = (int) $request->request->get('filterNum');
 
         /** @var FormFactoryInterface $formFactory */
@@ -187,7 +188,7 @@ class AjaxController extends CommonAjaxController
                 $fieldAlias,
                 $fieldObject,
                 $operator,
-                $listModel->getChoiceFields()[$fieldObject][$fieldAlias]
+                $listModel->getChoiceFields($search)[$fieldObject][$fieldAlias]
             );
         }
 

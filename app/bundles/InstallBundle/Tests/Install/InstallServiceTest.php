@@ -14,6 +14,7 @@ use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class InstallServiceTest extends \PHPUnit\Framework\TestCase
@@ -320,5 +321,37 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->assertEquals(['password' => null], $this->installer->createAdminUserStep($data));
+    }
+
+    public function testCreateAdminUserStepWhenPasswordIsNotLongEnough(): void
+    {
+        $mockRepo = $this->createMock(EntityRepository::class);
+        $mockRepo->expects($this->once())
+            ->method('find')
+            ->willReturn(0);
+
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($mockRepo);
+
+        $data = [
+            'firstname' => 'Demo',
+            'lastname'  => 'User',
+            'username'  => 'admin',
+            'password'  => '1',
+            'email'     => 'demo@demo.com',
+        ];
+
+        $mockValidation = $this->createMock(ConstraintViolation::class);
+        $mockValidation->expects($this->once())
+            ->method('getMessage')
+            ->willReturn('password');
+
+        $this->validator->expects($this->any())
+            ->method('validate')
+            ->withConsecutive([$data['email']], [$data['password']])
+            ->willReturnOnConsecutiveCalls([], ['password' => $mockValidation]);
+
+        $this->assertEquals([0 => 'password'], $this->installer->createAdminUserStep($data));
     }
 }
