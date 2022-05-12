@@ -194,7 +194,7 @@ class ExportHelper
 
         while (file_exists($filePath)) {
             $fileName = $originalName.'_'.$i;
-            $filePath = $fileName.'.'.$extension;
+            $filePath = $this->coreParametersHelper->get('contact_export_dir').'/'.$fileName.'.'.$extension;
             ++$i;
         }
 
