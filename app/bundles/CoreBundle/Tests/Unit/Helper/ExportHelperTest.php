@@ -38,12 +38,27 @@ class ExportHelperTest extends TestCase
             'email'     => 'demo@mautic.org',
         ],
     ];
+    /** @var array<string> */
+    private array $filePaths = [];
 
     protected function setUp(): void
     {
         $this->translatorInterfaceMock  = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
-        $this->exportHelper             = new ExportHelper($this->translatorInterfaceMock, $this->coreParametersHelperMock);
+        $this->exportHelper             = new ExportHelper(
+            $this->translatorInterfaceMock,
+            $this->coreParametersHelperMock
+        );
+    }
+
+    protected function tearDown(): void
+    {
+        foreach ($this->filePaths as $filePath) {
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+        }
+        parent::tearDown();
     }
 
     /**
@@ -102,11 +117,14 @@ class ExportHelperTest extends TestCase
         $this->coreParametersHelperMock
             ->method('get')
             ->with('contact_export_dir')
-            ->willReturn('/var/www/html/media/files/temp');
+            ->willReturn('/tmp');
         $iteratorExportDataModelMock = $this->getIteratorExportDataModelMock();
-        $filePath                    = $this->exportHelper->exportDataIntoFile($iteratorExportDataModelMock, $type, $fileName);
+        $this->filePaths[]           = $filePath = $this->exportHelper->exportDataIntoFile(
+            $iteratorExportDataModelMock,
+            $type,
+            $fileName
+        );
         Assert::assertSame($filePath, $expectedFilePath);
-        unlink($filePath);
     }
 
     /**
@@ -116,8 +134,11 @@ class ExportHelperTest extends TestCase
     {
         $this->expectException(Exception::class);
         $iteratorExportDataModelMock = $this->createMock(IteratorExportDataModel::class);
-        $filePath                    = $this->exportHelper->exportDataIntoFile($iteratorExportDataModelMock, $type, $fileName);
-        unlink($filePath);
+        $this->filePaths[]           = $this->exportHelper->exportDataIntoFile(
+            $iteratorExportDataModelMock,
+            $type,
+            $fileName
+        );
     }
 
     /**
@@ -125,8 +146,8 @@ class ExportHelperTest extends TestCase
      */
     public function getExportDataIntoFileProvider(): iterable
     {
-        yield [ExportHelper::EXPORT_TYPE_CSV, 'contact_1.csv', '/var/www/html/media/files/temp/contact_1.csv'];
-        yield [ExportHelper::EXPORT_TYPE_EXCEL, 'contact_1.xlsx', '/var/www/html/media/files/temp/contact_1.xlsx'];
+        yield [ExportHelper::EXPORT_TYPE_CSV, 'contact_1.csv', '/tmp/contact_1.csv'];
+        yield [ExportHelper::EXPORT_TYPE_EXCEL, 'contact_1.xlsx', '/tmp/contact_1.xlsx'];
     }
 
     public function testExportDataIntoExistingFile(): void
@@ -134,14 +155,14 @@ class ExportHelperTest extends TestCase
         $this->coreParametersHelperMock
             ->method('get')
             ->with('contact_export_dir')
-            ->willReturn('/var/www/html/media/files/temp');
+            ->willReturn('/tmp');
         $iteratorExportDataModelMock1 = $this->getIteratorExportDataModelMock();
         $filePath1                    = $this->exportHelper->exportDataIntoFile(
             $iteratorExportDataModelMock1,
             ExportHelper::EXPORT_TYPE_CSV,
             'contact_1.csv'
         );
-        Assert::assertSame($filePath1, '/var/www/html/media/files/temp/contact_1.csv');
+        Assert::assertSame($filePath1, '/tmp/contact_1.csv');
 
         $iteratorExportDataModelMock2 = $this->getIteratorExportDataModelMock();
         $filePath2                    = $this->exportHelper->exportDataIntoFile(
@@ -149,9 +170,9 @@ class ExportHelperTest extends TestCase
             ExportHelper::EXPORT_TYPE_CSV,
             'contact_1.csv'
         );
-        Assert::assertSame($filePath2, '/var/www/html/media/files/temp/contact_1_1.csv');
-        unlink($filePath1);
-        unlink($filePath2);
+        Assert::assertSame($filePath2, '/tmp/contact_1_1.csv');
+        $this->filePaths[] = $filePath1;
+        $this->filePaths[] = $filePath2;
     }
 
     public function testExportDataIntoFileInvalidType(): void
@@ -163,8 +184,11 @@ class ExportHelperTest extends TestCase
             ->method('trans')
             ->with('mautic.error.invalid.export.type', ['%type%' => $type])
             ->willReturn('Invalid export type "'.$type.'" Must be one of "csv" or "xlsx".');
-        $filePath = $this->exportHelper->exportDataIntoFile($iteratorExportDataModelMock, $type, 'contact_1.csv');
-        unlink($filePath);
+        $this->filePaths[] = $this->exportHelper->exportDataIntoFile(
+            $iteratorExportDataModelMock,
+            $type,
+            'contact_1.csv'
+        );
     }
 
     /**
@@ -174,9 +198,9 @@ class ExportHelperTest extends TestCase
     {
         if (substr($s, 0, 3) == chr(hexdec('EF')).chr(hexdec('BB')).chr(hexdec('BF'))) {
             return substr($s, 3);
-        } else {
-            return $s;
         }
+
+        return $s;
     }
 
     private function getIteratorExportDataModelMock(): IteratorExportDataModel

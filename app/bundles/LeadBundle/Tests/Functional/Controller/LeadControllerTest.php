@@ -14,13 +14,34 @@ use Symfony\Component\HttpFoundation\Request;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
-    public function testContactExportIsScheduled(): void
+    /** @var array<string> */
+    private array $filePaths = [];
+
+    protected function setUp(): void
+    {
+        $this->configParams['contact_export_dir'] = '/tmp';
+        parent::setUp();
+    }
+
+    protected function beforeTearDown(): void
+    {
+        foreach ($this->filePaths as $filePath) {
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+        }
+    }
+
+    /**
+     * @dataProvider getContactExportIsScheduledProvider
+     */
+    public function testContactExportIsScheduled(string $fileType): void
     {
         $this->createContacts();
         $this->client->request(
             Request::METHOD_POST,
             's/contacts/contactExportScheduler',
-            ['filetype' => 'csv']
+            ['filetype' => $fileType]
         );
         Assert::assertTrue($this->client->getResponse()->isOk());
         $contactExportSchedulerRows = $this->checkContactExportScheduler(1);
@@ -34,9 +55,17 @@ class LeadControllerTest extends MauticMysqlTestCase
         $fileType = $contactExportSchedulerData['fileType'];
         $fileName = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()
                 ->format('Y_m_d_H_i_s').'.'.$fileType;
-        $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$fileName;
+        $this->filePaths[] = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$fileName;
         Assert::assertFileExists($filePath);
-        unlink($filePath);
+    }
+
+    /**
+     * @return iterable<mixed>
+     */
+    public function getContactExportIsScheduledProvider(): iterable
+    {
+        yield ['csv'];
+        yield ['xlsx'];
     }
 
     private function createContacts(): void
