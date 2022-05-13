@@ -26,6 +26,7 @@ class PermissionListType extends AbstractType
                     'onchange'        => 'Mautic.onPermissionChange(this, \''.$options['bundle'].'\')',
                 ];
             },
+            'choices_as_values' => false,
         ]);
     }
 

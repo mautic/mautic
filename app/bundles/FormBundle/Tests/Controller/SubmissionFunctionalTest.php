@@ -300,6 +300,60 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
+    public function testProgressiveFormsWithMaximumFieldsDisplayedAtTime(): void
+    {
+        // Create the test form via API.
+        $payload = [
+            'name'                      => 'Submission test form',
+            'description'               => 'Form created via submission test',
+            'formType'                  => 'standalone',
+            'isPublished'               => true,
+            'progressiveProfilingLimit' => 2,
+            'fields'                    => [
+                [
+                    'label'                  => 'Email',
+                    'type'                   => 'email',
+                    'alias'                  => 'email',
+                    'leadField'              => 'email',
+                    'is_auto_fill'           => 1,
+                    'show_when_value_exists' => 0,
+                ],
+                [
+                    'label'                  => 'Firstname',
+                    'type'                   => 'text',
+                    'alias'                  => 'firstname',
+                    'leadField'              => 'firstname',
+                    'is_auto_fill'           => 1,
+                    'show_when_value_exists' => 0,
+                ],
+                [
+                    'label'                  => 'Lastname',
+                    'type'                   => 'text',
+                    'alias'                  => 'lastname',
+                    'leadField'              => 'lastname',
+                    'is_auto_fill'           => 1,
+                    'show_when_value_exists' => 0,
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        // Submit the form:
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
+        $this->assertSame(1, $formCrawler->count());
+        // show just one text field
+        $this->assertSame(1, $formCrawler->filter('.mauticform-text')->count());
+    }
+
     protected function tearDown(): void
     {
         $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
@@ -355,8 +409,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertCount(1, $submissions);
 
-        // The previous request changes user to anonymous. We have to configure API again.
-        $this->setUpSymfony($this->configParams);
+        // Enable reboots so all the services and in-memory data are refreshed.
+        $this->client->enableReboot();
 
         // fetch form submissions as Admin User
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
@@ -369,18 +423,19 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         Assert::assertGreaterThanOrEqual(1, $response['total']);
 
         // Create non admin user
-        $this->createUser();
+        $user = $this->createUser();
 
         // Fetch form submissions as non-admin-user who don't have the permission to view submissions
-        $apiClient = $this->createAnotherClient('non-admin-user', 'test-pass');
-        $apiClient->followRedirects();
-        $apiClient->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
-        $clientResponse = $apiClient->getResponse();
+        $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions", [], [], [
+            'PHP_AUTH_USER' => $user->getUsername(),
+            'PHP_AUTH_PW'   => $this->getUserPlainPassword(),
+        ]);
+        $clientResponse = $this->client->getResponse();
 
         $this->assertSame(Response::HTTP_FORBIDDEN, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
-    private function createUser(): void
+    private function createUser(): User
     {
         $role = new Role();
         $role->setName('api_restricted');
@@ -401,10 +456,17 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         /** @var PasswordEncoderInterface $encoder */
         $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
-        $user->setPassword($encoder->encodePassword('test-pass', $user->getSalt()));
+        $user->setPassword($encoder->encodePassword($this->getUserPlainPassword(), $user->getSalt()));
 
         /** @var UserRepository $userRepo */
         $userRepo = $this->em->getRepository(User::class);
         $userRepo->saveEntities([$user]);
+
+        return $user;
+    }
+
+    private function getUserPlainPassword(): string
+    {
+        return 'test-pass';
     }
 }

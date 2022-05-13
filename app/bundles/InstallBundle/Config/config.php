@@ -46,11 +46,6 @@ return [
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => [],
             ],
-             'mautic.install.fixture.remove_duplicate_index' => [
-                 'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\RemoveDuplicateIndexData::class,
-                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                 'arguments' => [],
-             ],
             'mautic.install.fixture.grape_js' => [
                 'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\GrapesJsData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
@@ -129,6 +124,11 @@ return [
                     'validator',
                     'security.password_encoder',
                 ],
+            ],
+            'mautic.install.leadcolumns' => [
+                'class'     => \Mautic\InstallBundle\EventListener\DoctrineEventSubscriber::class,
+                'tag'       => 'doctrine.event_subscriber',
+                'arguments' => [],
             ],
         ],
     ],

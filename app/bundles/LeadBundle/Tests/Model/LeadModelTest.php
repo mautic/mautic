@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -385,7 +386,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         // The availableLeadFields property should start empty.
         $this->assertEquals([], $mockLeadModel->getAvailableLeadFields());
 
-        list($contact, $fields) = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John'], null, true, true);
+        [$contact, $fields] = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John'], null, true, true);
         $this->assertEquals(['email' => 'Email'], $mockLeadModel->getAvailableLeadFields());
         $this->assertEquals('john@doe.com', $contact->getEmail());
         $this->assertNull($contact->getFirstname());
@@ -664,5 +665,55 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
                     ]
                 )
             );
+    }
+
+    public function testModifiedCompanies(): void
+    {
+        $lead          = $this->getLead(1);
+        $companies     = [];
+        $leadCompanies = [];
+
+        for ($i = 1; $i <= 4; ++$i) {
+            $companies[] = $i;
+        }
+
+        // Imitate that companies with id 3 and 4 are already added to the lead
+        for ($i = 3; $i <= 4; ++$i) {
+            // Taking only company_id into consideration as only this is required in this case
+            $leadCompanies[] = ['company_id' => $i];
+        }
+
+        $this->companyModelMock->expects($this->once())
+            ->method('getCompanyLeadRepository')
+            ->willReturn($this->companyLeadRepositoryMock);
+
+        $this->companyLeadRepositoryMock->expects($this->once())
+            ->method('getCompaniesByLeadId')
+            ->with($lead->getId())
+            ->willReturn($leadCompanies);
+
+        $this->companyModelMock->expects($this->once())
+            ->method('addLeadToCompany')
+            ->with([$companies[0], $companies[1]], $lead);
+
+        $this->leadModel->modifyCompanies($lead, $companies);
+    }
+
+    private function getLead(int $id): Lead
+    {
+        return new class($id) extends Lead {
+            private int $id;
+
+            public function __construct(int $id)
+            {
+                $this->id = $id;
+                parent::__construct();
+            }
+
+            public function getId(): int
+            {
+                return $this->id;
+            }
+        };
     }
 }
