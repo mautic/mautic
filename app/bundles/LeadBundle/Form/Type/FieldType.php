@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
@@ -157,7 +148,6 @@ class FieldType extends AbstractType
             'timezone'      => FormFieldHelper::getTimezonesChoices(),
             'locale'        => FormFieldHelper::getLocaleChoices(),
             'select'        => [],
-            'multiselect'   => [],
         ];
         foreach ($listChoices as $listType => $choices) {
             $builder->add(
@@ -170,7 +160,6 @@ class FieldType extends AbstractType
                     'attr'        => ['class' => 'form-control not-chosen'],
                     'required'    => false,
                     'mapped'      => false,
-                    'multiple'    => 'multiselect' === $listType,
                 ]
             );
         }

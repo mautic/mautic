@@ -82,7 +82,6 @@ $listCommand = $view['translator']->trans('mautic.tagmanager.tag.searchcommand.l
                                 'item'            => $item,
                                 'templateButtons' => [
                                     'edit'   => $permissions['tagManager:tagManager:edit'],
-                                    'clone'  => $permissions['tagManager:tagManager:create'],
                                     'delete' => $permissions['tagManager:tagManager:delete'],
                                 ],
                                 'routeBase'  => 'tagmanager',
@@ -120,6 +119,11 @@ $listCommand = $view['translator']->trans('mautic.tagmanager.tag.searchcommand.l
                                 <?php echo $item->getTag(); ?>
                             <?php endif; ?>
                         </div>
+                        <?php if ($description = $item->getDescription()): ?>
+                            <div class="text-muted mt-4">
+                                <small><?php echo $description; ?></small>
+                            </div>
+                        <?php endif; ?>
                     </td>
 
                     <td class="visible-md visible-lg">
@@ -127,9 +131,8 @@ $listCommand = $view['translator']->trans('mautic.tagmanager.tag.searchcommand.l
                             'mautic_contact_index',
                             ['search' => $view['translator']->trans('mautic.tagmanager.lead.searchcommand.list').':"'.$item->getTag().'"']
                         ); ?>" data-toggle="ajax"<?php echo (0 == $tagsCount[$item->getId()]) ? 'disabled=disabled' : ''; ?>>
-                            <?php echo $view['translator']->transChoice(
+                            <?php echo $view['translator']->trans(
                                 'mautic.lead.list.viewleads_count',
-                                $tagsCount[$item->getId()],
                                 ['%count%' => $tagsCount[$item->getId()]]
                             ); ?>
                         </a>

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Integration;
 
 use Doctrine\ORM\EntityManager;
@@ -59,6 +50,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  * @method pushLeadToCampaign(Lead $lead, mixed $integrationCampaign, mixed $integrationMemberStatus)
  * @method getLeads(array $params, string $query, &$executed, array $result = [], $object = 'Lead')
  * @method getCompanies(array $params)
+ *
+ * @deprecated To be removed in Mautic 6.0. Please use the IntegrationsBundle instead, which is meant to be a drop-in replacement for AbstractIntegration.
  */
 abstract class AbstractIntegration implements UnifiedIntegrationInterface
 {
@@ -481,7 +474,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         foreach ($keys as $name => $key) {
             $key = $this->encryptionHelper->decrypt($key, $mainDecryptOnly);
             if (false === $key) {
-                return [];
+                continue;
             }
             $decrypted[$name] = $key;
         }
