@@ -40,7 +40,7 @@ class IpstackLookup extends AbstractRemoteDataLookup
                     case 'country_name':
                         $key = 'country';
                         break;
-                    case 'zip_code':
+                    case 'zip':
                         $key = 'zipcode';
                         break;
                     case 'time_zone':

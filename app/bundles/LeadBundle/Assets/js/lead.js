@@ -1505,4 +1505,24 @@ Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, 
     else if (search !== null) {
         assetDownloadFilter.trigger('chosen:open.chosen')
     }
-}
+};
+
+Mautic.listOnLoad = function(container, response) {
+    Mautic.lazyLoadContactListOnSegmentDetail();
+};
+
+Mautic.lazyLoadContactListOnSegmentDetail = function() {
+    const containerId = '#contacts-container';
+    const container = mQuery(containerId);
+
+    // Load the contacts only if the container exists.
+    if (!container.length) {
+        return;
+    }
+
+    const segmentContactUrl = container.data('target-url');
+    mQuery.get(segmentContactUrl, function(response) {
+        response.target = containerId;
+        Mautic.processPageContent(response);
+    });
+};
