@@ -107,28 +107,6 @@ jobs:
         name: ${{ env.MAUTIC_VERSION }}-update.zip
         path: ./build/packages/${{ env.MAUTIC_VERSION }}-update.zip
 
-  changelog:
-    exclude:
-      labels:
-        - chore
-      authors:
-        - github-actions
-    categories:
-      - title: 🛠 Breaking Changes
-        labels:
-          - bc-break
-      - title: 🔒 Security
-        labels:
-          - security
-      - title: ✨ Features and enhancements
-        labels:
-          - feature
-          - enhancement
-      - title: 🐛 Bugs
-        labels:
-          - bug
-          - regression
-
   test-fresh-install:
     name: Test a fresh installation
     needs: release
