@@ -4,6 +4,7 @@ namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
@@ -20,6 +21,7 @@ class ProfileController extends FormController
     {
         //get current user
         $me    = $this->get('security.token_storage')->getToken()->getUser();
+        /** @var UserModel */
         $model = $this->getModel('user');
 
         //set some permissions
@@ -230,7 +232,7 @@ class ProfileController extends FormController
         return $this->delegateView(
             [
                 'viewParameters'  => $parameters,
-                'contentTemplate' => 'MauticUserBundle:Profile:index.html.php',
+                'contentTemplate' => 'MauticUserBundle:Profile:index.html.twig',
                 'passthroughVars' => [
                     'route'         => $this->generateUrl('mautic_user_account'),
                     'mauticContent' => 'user',

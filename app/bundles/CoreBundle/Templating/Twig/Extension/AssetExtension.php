@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
@@ -27,12 +29,14 @@ class AssetExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            'outputScripts'           => new TwigFunction('outputScripts', [$this, 'outputScripts'], ['is_safe' => ['all']]),
-            'outputHeadDeclarations'  => new TwigFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
-            'getAssetUrl'             => new TwigFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
-            'outputStyles'            => new TwigFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
-            'outputSystemScripts'     => new TwigFunction('outputSystemScripts', [$this, 'outputSystemScripts'], ['is_safe' => ['html']]),
-            'outputSystemStylesheets' => new TwigFunction('outputSystemStylesheets', [$this, 'outputSystemStylesheets'], ['is_safe' => ['html']]),
+            new TwigFunction('outputScripts', [$this, 'outputScripts'], ['is_safe' => ['all']]),
+            new TwigFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
+            new TwigFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
+            new TwigFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
+            new TwigFunction('outputSystemScripts', [$this, 'outputSystemScripts'], ['is_safe' => ['html']]),
+            new TwigFunction('outputSystemStylesheets', [$this, 'outputSystemStylesheets'], ['is_safe' => ['html']]),
+            new TwigFunction('assetsGetImagesPath', [$this, 'getImagesPath']),
+            new TwigFunction('assetsGetPrefix', [$this, 'getAssetPrefix']),
         ];
     }
 
@@ -41,7 +45,7 @@ class AssetExtension extends AbstractExtension
         return 'coreasset';
     }
 
-    public function outputSystemStylesheets()
+    public function outputSystemStylesheets(): string
     {
         ob_start();
 
@@ -52,10 +56,8 @@ class AssetExtension extends AbstractExtension
 
     /**
      * @param bool $includeEditor
-     *
-     * @return string
      */
-    public function outputSystemScripts($includeEditor = false)
+    public function outputSystemScripts($includeEditor = false): string
     {
         ob_start();
 
@@ -64,7 +66,7 @@ class AssetExtension extends AbstractExtension
         return ob_get_clean();
     }
 
-    public function outputScripts($name)
+    public function outputScripts($name): string
     {
         ob_start();
 
@@ -73,7 +75,7 @@ class AssetExtension extends AbstractExtension
         return ob_get_clean();
     }
 
-    public function outputStyles()
+    public function outputStyles(): string
     {
         ob_start();
 
@@ -82,7 +84,7 @@ class AssetExtension extends AbstractExtension
         return ob_get_clean();
     }
 
-    public function outputHeadDeclarations()
+    public function outputHeadDeclarations(): string
     {
         ob_start();
 
@@ -91,8 +93,18 @@ class AssetExtension extends AbstractExtension
         return ob_get_clean();
     }
 
-    public function getAssetUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false)
+    public function getAssetUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false): string
     {
         return $this->assetsHelper->getUrl($path, $packageName, $version, $absolute, $ignorePrefix);
+    }
+
+    public function getImagesPath(): string
+    {
+        return $this->assetsHelper->getImagesPath();
+    }
+
+    public function getAssetPrefix(bool $includeEndingslash = false): string
+    {
+        return $this->assetsHelper->getAssetPrefix($includeEndingslash);
     }
 }
