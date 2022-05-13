@@ -156,9 +156,8 @@ if ('index' == $tmpl) {
                                 'search' => $view['translator']->trans('mautic.lead.lead.searchcommand.company_id').':'.$item->getId(),
                             ]
                         ); ?>" data-toggle="ajax"<?php echo (0 == $leadCounts[$item->getId()]) ? 'disabled=disabled' : ''; ?>>
-                            <?php echo $view['translator']->transChoice(
+                            <?php echo $view['translator']->trans(
                                 'mautic.lead.company.viewleads_count',
-                                $leadCounts[$item->getId()],
                                 ['%count%' => $leadCounts[$item->getId()]]
                             ); ?>
                         </a>

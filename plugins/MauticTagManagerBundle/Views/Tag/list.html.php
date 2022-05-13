@@ -131,9 +131,8 @@ $listCommand = $view['translator']->trans('mautic.tagmanager.tag.searchcommand.l
                             'mautic_contact_index',
                             ['search' => $view['translator']->trans('mautic.tagmanager.lead.searchcommand.list').':"'.$item->getTag().'"']
                         ); ?>" data-toggle="ajax"<?php echo (0 == $tagsCount[$item->getId()]) ? 'disabled=disabled' : ''; ?>>
-                            <?php echo $view['translator']->transChoice(
+                            <?php echo $view['translator']->trans(
                                 'mautic.lead.list.viewleads_count',
-                                $tagsCount[$item->getId()],
                                 ['%count%' => $tagsCount[$item->getId()]]
                             ); ?>
                         </a>

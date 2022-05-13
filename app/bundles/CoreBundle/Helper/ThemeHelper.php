@@ -13,7 +13,7 @@ use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\TemplateReference;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ThemeHelper
+class ThemeHelper implements ThemeHelperInterface
 {
     /**
      * @var PathsHelper
@@ -83,7 +83,7 @@ class ThemeHelper
     /**
      * Default themes which cannot be deleted.
      *
-     * @var array
+     * @var string[]
      */
     protected $defaultThemes = [
         'Mauve',
@@ -128,32 +128,16 @@ class ThemeHelper
         $this->finder                    = clone $finder;
     }
 
-    /**
-     * Get theme names which are stock Mautic.
-     *
-     * @return array
-     */
     public function getDefaultThemes()
     {
         return $this->defaultThemes;
     }
 
-    /**
-     * @param string $defaultTheme
-     */
     public function setDefaultTheme($defaultTheme)
     {
         $this->defaultTheme = $defaultTheme;
     }
 
-    /**
-     * @param string $themeName
-     *
-     * @return TemplatingThemeHelper
-     *
-     * @throws BadConfigurationException
-     * @throws FileNotFoundException
-     */
     public function createThemeHelper($themeName)
     {
         if ('current' === $themeName) {
@@ -173,11 +157,6 @@ class ThemeHelper
         return InputHelper::filename(str_replace(' ', '-', $newName));
     }
 
-    /**
-     * @param string $theme
-     *
-     * @return bool
-     */
     public function exists($theme)
     {
         $root    = $this->pathsHelper->getSystemPath('themes', true).'/';
@@ -186,14 +165,6 @@ class ThemeHelper
         return $this->filesystem->exists($root.$dirName);
     }
 
-    /**
-     * @param string      $theme      original theme dir name
-     * @param string      $newName
-     * @param string|null $newDirName if not set then it will be generated from the $newName param
-     *
-     * @throws FileExistsException
-     * @throws FileNotFoundException
-     */
     public function copy($theme, $newName, $newDirName = null)
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
@@ -215,13 +186,6 @@ class ThemeHelper
         $this->updateConfig($root.$dirName, $newName);
     }
 
-    /**
-     * @param string $theme
-     * @param string $newName
-     *
-     * @throws FileNotFoundException
-     * @throws FileExistsException
-     */
     public function rename($theme, $newName)
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
@@ -243,11 +207,6 @@ class ThemeHelper
         $this->updateConfig($root.$theme, $dirName);
     }
 
-    /**
-     * @param string $theme
-     *
-     * @throws FileNotFoundException
-     */
     public function delete($theme)
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
@@ -280,11 +239,6 @@ class ThemeHelper
         $this->filesystem->dumpFile($configJsonPath, json_encode($config));
     }
 
-    /**
-     * Fetches the optional settings from the defined steps.
-     *
-     * @return array
-     */
     public function getOptionalSettings()
     {
         $minors = [];
@@ -298,11 +252,6 @@ class ThemeHelper
         return $minors;
     }
 
-    /**
-     * @param string $template
-     *
-     * @return string The logical name for the template
-     */
     public function checkForTwigTemplate($template)
     {
         $parser     = $this->templatingHelper->getTemplateNameParser();
@@ -329,14 +278,6 @@ class ThemeHelper
         return $twigTemplate->getLogicalName();
     }
 
-    /**
-     * @param string $specificFeature
-     * @param bool   $extended        returns extended information about the themes
-     * @param bool   $ignoreCache     true to get the fresh info
-     * @param bool   $includeDirs     true to get the theme dir details
-     *
-     * @return mixed
-     */
     public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false, $includeDirs = true)
     {
         // Use a concatenated key since $includeDirs changes what's returned ($includeDirs used by API controller to prevent from exposing file paths)
@@ -352,15 +293,6 @@ class ThemeHelper
         return $this->themes[$key];
     }
 
-    /**
-     * @param string $theme
-     * @param bool   $throwException
-     *
-     * @return TemplatingThemeHelper
-     *
-     * @throws FileNotFoundException
-     * @throws BadConfigurationException
-     */
     public function getTheme($theme = 'current', $throwException = false)
     {
         if (empty($this->themeHelpers[$theme])) {
@@ -399,16 +331,6 @@ class ThemeHelper
         return $this->themeHelpers[$theme];
     }
 
-    /**
-     * Install a theme from a zip package.
-     *
-     * @param string $zipFile path
-     *
-     * @return bool
-     *
-     * @throws FileNotFoundException
-     * @throws \Exception
-     */
     public function install($zipFile)
     {
         if (false === $this->filesystem->exists($zipFile)) {
@@ -488,13 +410,6 @@ class ThemeHelper
         }
     }
 
-    /**
-     * Get the error message from the zip archive.
-     *
-     * @param \ZipArchive $archive
-     *
-     * @return string
-     */
     public function getExtractError($archive)
     {
         switch ($archive) {
@@ -523,15 +438,6 @@ class ThemeHelper
         return $error;
     }
 
-    /**
-     * Creates a zip file from a theme and returns the path where it's stored.
-     *
-     * @param string $themeName
-     *
-     * @return string
-     *
-     * @throws \Exception
-     */
     public function zip($themeName)
     {
         $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
@@ -672,5 +578,14 @@ class ThemeHelper
         }
 
         return in_array($builderName, $builderRequested);
+    }
+
+    public function getCurrentTheme(string $template, string $specificFeature): string
+    {
+        if (!in_array($template, array_keys($this->getInstalledThemes($specificFeature)))) {
+            return $this->coreParametersHelper->get('theme_email_default');
+        }
+
+        return $template;
     }
 }
