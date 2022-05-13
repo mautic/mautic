@@ -61,6 +61,9 @@ $container->loadFromExtension('twig', [
     'paths'       => [
         '%kernel.root_dir%/bundles' => 'bundles',
     ],
+    'form_themes' => [
+        '@MauticCore/FormTheme/mautic_form_layout.html.twig',
+    ],
 ]);
 
 // Allow overriding config without a requiring a full bundle or hacks

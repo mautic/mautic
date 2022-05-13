@@ -1,0 +1,23 @@
+<div class="panel-group" id="globalSearchPanel">
+{% for header, result in results %}
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                {{ header }}
+                {% if result.count is defined and result.count is not empty %}
+                <span class="badge pull-right gs-count-badge">{{ result.count }}</span>
+                {% endif %}
+            </h4>
+        </div>
+        <div class="panel-body np">
+            <ul class="list-group">
+                {% for r in result %}
+                <li class="list-group-item">
+                    {{ r|raw }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endfor %}
+</div>
