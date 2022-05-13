@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
@@ -57,6 +58,14 @@ class LeadControllerTest extends MauticMysqlTestCase
                 ->format('Y_m_d_H_i_s').'.'.$fileType;
         $this->filePaths[] = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$fileName;
         Assert::assertFileExists($filePath);
+
+        $link = $this->router->generate(
+            'mautic_contact_export_download',
+            ['fileName' => basename($filePath)],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $this->client->request(Request::METHOD_GET, $link);
+        Assert::assertTrue($this->client->getResponse()->isOk());
     }
 
     /**
