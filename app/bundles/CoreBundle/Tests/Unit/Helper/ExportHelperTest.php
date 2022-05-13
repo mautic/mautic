@@ -8,6 +8,7 @@ use Exception;
 use InvalidArgumentException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
+use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -45,9 +46,11 @@ class ExportHelperTest extends TestCase
     {
         $this->translatorInterfaceMock  = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+        $this->filePathResolver         = $this->createMock(FilePathResolver::class);
         $this->exportHelper             = new ExportHelper(
             $this->translatorInterfaceMock,
-            $this->coreParametersHelperMock
+            $this->coreParametersHelperMock,
+            $this->filePathResolver
         );
     }
 

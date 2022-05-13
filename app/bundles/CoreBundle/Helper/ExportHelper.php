@@ -24,11 +24,16 @@ class ExportHelper
 
     private TranslatorInterface $translator;
     private CoreParametersHelper $coreParametersHelper;
+    private FilePathResolver $filePathResolver;
 
-    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        TranslatorInterface $translator,
+        CoreParametersHelper $coreParametersHelper,
+        FilePathResolver $filePathResolver
+    ) {
         $this->translator           = $translator;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->filePathResolver     = $filePathResolver;
     }
 
     /**
@@ -186,7 +191,9 @@ class ExportHelper
 
     private function getValidContactExportFileName(string $fileName): string
     {
-        $filePath     = $this->coreParametersHelper->get('contact_export_dir').'/'.$fileName;
+        $contactExportDir = $this->coreParametersHelper->get('contact_export_dir');
+        $this->filePathResolver->createDirectory($contactExportDir);
+        $filePath     = $contactExportDir.'/'.$fileName;
         $fileName     = (string) pathinfo($filePath, PATHINFO_FILENAME);
         $extension    = (string) pathinfo($filePath, PATHINFO_EXTENSION);
         $originalName = $fileName;
@@ -194,7 +201,7 @@ class ExportHelper
 
         while (file_exists($filePath)) {
             $fileName = $originalName.'_'.$i;
-            $filePath = $this->coreParametersHelper->get('contact_export_dir').'/'.$fileName.'.'.$extension;
+            $filePath = $contactExportDir.'/'.$fileName.'.'.$extension;
             ++$i;
         }
 
