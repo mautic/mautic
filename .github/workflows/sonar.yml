@@ -2,7 +2,8 @@ name: Sonar
 on:
   workflow_run:
     workflows: [Mautic tests and validations]
-    types: [completed]
+    types:
+      - completed
 jobs:
   sonar:
     name: Sonar
