@@ -414,6 +414,17 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             $expression
                         );
                         break;
+                    case 'neq':
+                        $columnValue = ":$paramName";
+                        $expression  = $queryBuilder->expr()->orX(
+                            $queryBuilder->expr()->isNull($filter['column']),
+                            $queryBuilder->expr()->$exprFunction($filter['column'], $columnValue)
+                        );
+                        $queryBuilder->setParameter($paramName, $filter['value']);
+                        $groupExpr->add(
+                            $expression
+                        );
+                        break;
                     default:
                         if ('' == trim($filter['value'])) {
                             // Ignore empty
@@ -470,7 +481,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             default:
                                 $queryBuilder->setParameter($paramName, $filter['value']);
                         }
-
                         $groupExpr->add(
                             $expr->{$exprFunction}($filter['column'], $columnValue)
                         );
