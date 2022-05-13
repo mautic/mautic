@@ -27,9 +27,7 @@ class BatchSendType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $default = (empty($options['data']['batchlimit']))
-            ? $this->coreParametersHelper->get('mailer_memory_msg_limit')
-            : (int) $options['data']['batchlimit'];
+        $default = (int) $options['data']['batchlimit'] ?? $this->coreParametersHelper->get('mailer_memory_msg_limit');
 
         $builder->add(
             'batchlimit',
