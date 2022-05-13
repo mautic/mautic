@@ -24,7 +24,7 @@ class Version20220429091934 extends PreUpAssertionMigration
             CREATE TABLE {$this->prefix}contact_export_scheduler (
                 id INT AUTO_INCREMENT NOT NULL,
                 user_id INT UNSIGNED NOT NULL,
-                scheduled_datetime DATE NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+                scheduled_datetime DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
                 data LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)',
                 PRIMARY KEY(id),
                 FOREIGN KEY (user_id) REFERENCES {$this->prefix}users (id)
