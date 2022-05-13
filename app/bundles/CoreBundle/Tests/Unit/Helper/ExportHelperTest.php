@@ -41,6 +41,8 @@ class ExportHelperTest extends TestCase
     ];
     /** @var array<string> */
     private array $filePaths = [];
+    /** @var FilePathResolver|MockObject */
+    private $filePathResolver;
 
     protected function setUp(): void
     {
