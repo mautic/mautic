@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\EventListener\SearchSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\SmsBundle\Entity\SmsRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -43,6 +44,7 @@ class SearchSubscriberTest extends TestCase
         $translator        = $this->createMock(TranslatorInterface::class);
         $security          = $this->createMock(CorePermissions::class);
         $templating        = $this->createMock(TemplatingHelper::class);
+        $smsRepository     = $this->createMock(SmsRepository::class);
 
         $contactRepository->method('applySearchQueryRelationship')
             ->willReturnCallback(
@@ -99,7 +101,8 @@ class SearchSubscriberTest extends TestCase
             $emailRepository,
             $translator,
             $security,
-            $templating
+            $templating,
+            $smsRepository
         );
 
         $dispatcher = new EventDispatcher();
@@ -136,6 +139,12 @@ class SearchSubscriberTest extends TestCase
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE ss.sms_id = ? GROUP BY l.id', $sql);
+
+        // test sms pending
+        $event = new LeadBuildSearchEvent('1', 'sms_pending', $alias, false, new QueryBuilder($connection));
+        $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+        $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
+        $this->assertEquals('SELECT  WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status = ?) GROUP BY l.id', $sql);
 
         // test web sent
         $event = new LeadBuildSearchEvent('1', 'web_sent', $alias, false, new QueryBuilder($connection));

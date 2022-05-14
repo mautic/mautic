@@ -23,6 +23,8 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\Entity\SmsRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -44,6 +46,11 @@ class SearchSubscriber implements EventSubscriberInterface
     private $emailRepository;
 
     /**
+     * @var SmsRepository
+     */
+    private $smsRepository;
+
+    /**
      * @var TranslatorInterface
      */
     private $translator;
@@ -63,7 +70,8 @@ class SearchSubscriber implements EventSubscriberInterface
         EmailRepository $emailRepository,
         TranslatorInterface $translator,
         CorePermissions $security,
-        TemplatingHelper $templating
+        TemplatingHelper $templating,
+        SmsRepository $smsRepository
     ) {
         $this->leadModel       = $leadModel;
         $this->leadRepo        = $leadModel->getRepository();
@@ -71,6 +79,7 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->translator      = $translator;
         $this->security        = $security;
         $this->templating      = $templating;
+        $this->smsRepository   = $smsRepository;
     }
 
     /**
@@ -196,6 +205,10 @@ class SearchSubscriber implements EventSubscriberInterface
             case $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent', [], null, 'en_US'):
                     $this->buildSmsSentQuery($event);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.sms_pending'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.sms_pending', [], null, 'en_US'):
+                $this->buildSmsPendingQuery($event);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.web_sent'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.web_sent', [], null, 'en_US'):
@@ -447,5 +460,48 @@ class SearchSubscriber implements EventSubscriberInterface
         $event->setReturnParameters(true); // replace search string
         $event->setStrict(true);           // don't use like
         $event->setSearchStatus(true);     // finish searching
+    }
+
+    public function buildSmsPendingQuery(LeadBuildSearchEvent $event)
+    {
+        $q     = $event->getQueryBuilder();
+        $smsId = (int) $event->getString();
+        /** @var Sms $sms */
+        $sms = $this->smsRepository->getEntity($smsId);
+        if (null !== $sms) {
+            $nq         = $this->smsRepository->getSmsPendingQuery($smsId);
+            if (!$nq instanceof QueryBuilder) {
+                return;
+            }
+
+            $nq->select('l.id'); // select only id
+            $nsql = $nq->getSQL();
+            foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
+                $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
+            }
+            $query = $q->expr()->in('l.id', sprintf('(%s)', $nsql));
+            $event->setSubQuery($query);
+
+            return;
+        }
+
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'message_queue',
+                'alias'      => 'mq',
+                'condition'  => 'l.id = mq.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'mq.channel_id',
+            'params' => [
+                'mq.channel' => 'sms',
+                'mq.status'  => MessageQueue::STATUS_PENDING,
+            ],
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
     }
 }
