@@ -189,6 +189,10 @@ class KickoffExecutioner implements ExecutionerInterface
             $batchMinContactId = max($contacts->getKeys()) + 1;
             $rootEvents        = clone $this->rootEvents;
 
+            // Unschedule currently scheduled events, which will soon
+            // belong to an older rotation
+            $this->kickoffContactFinder->unscheduleContacts($contacts, $this->campaign);
+
             /** @var Event $event */
             foreach ($rootEvents as $key => $event) {
                 $this->progressBar->advance($contacts->count());
