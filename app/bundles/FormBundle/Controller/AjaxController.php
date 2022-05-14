@@ -52,7 +52,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function reorderActionsAction(Request $request)
     {
-        return $this->reorderFieldsAction($request, 'actions');
+        return $this->reorderFieldsAction($request, null, 'actions');
     }
 
     /**
