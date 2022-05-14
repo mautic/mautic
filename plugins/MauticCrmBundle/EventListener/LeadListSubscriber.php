@@ -81,7 +81,14 @@ class LeadListSubscriber implements EventSubscriberInterface
                         );
                     }
 
-                    $choices[$integration->getDisplayName()] = $integrationChoices;
+                    array_walk(
+                        $integrationChoices,
+                        function (&$choice) use ($integrationName) {
+                            $choice['label'] = $integrationName.': '.$choice['label'];
+                        }
+                    );
+
+                    $choices = array_merge($choices, $integrationChoices);
                 }
             }
         }
