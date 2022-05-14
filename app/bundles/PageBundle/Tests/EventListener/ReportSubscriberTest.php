@@ -139,7 +139,7 @@ class ReportSubscriberTest extends TestCase
         $reportMock = $this->createMock(Report::class);
         $reportMock->expects($this->once())
             ->method('getGroupBy')
-            ->willReturn('');
+            ->willReturn([]);
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
