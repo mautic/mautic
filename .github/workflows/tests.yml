@@ -144,7 +144,7 @@ jobs:
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           composer rector -- --dry-run --no-progress-bar
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
-          for file in ${{ steps.changed-files.outputs.all_modified_files }}; do
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             if [[ $file == *.php ]]; then
               cs_fix_files="${cs_fix_files} $file"
             fi
