@@ -5,6 +5,7 @@ namespace Mautic\AssetBundle\Tests\Controller;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTest;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
+use Symfony\Component\HttpFoundation\Response;
 
 class AssetControllerFunctionalTest extends AbstractAssetTest
 {
@@ -13,8 +14,6 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
     }
 
     /**
@@ -41,62 +40,58 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
     }
 
     /**
-     * Preview action should return the file content or the html code.
+     * Preview action should return the file content.
      */
-    public function testPreviewAction(): void
+    public function testPreviewActionStreamByDefault(): void
     {
-        $expectedMimeType           = 'image/png';
-        $expectedContentDisposition = 'attachment;filename="';
-        $expectedPngContent         = file_get_contents($this->getPngFilenameFromFixtures());
-
-        $assetData = [
-            'title'     => 'Asset controller test. Preview action',
-            'alias'     => 'Test',
-            'createdAt' => new \DateTime('2021-05-05 22:30:00'),
-            'updatedAt' => new \DateTime('2022-05-05 22:30:00'),
-            'createdBy' => 'User',
-            'storage'   => 'local',
-            'path'      => basename($this->getPngFilenameFromFixtures()),
-            'extension' => 'png',
-        ];
-        $asset = $this->createAsset($assetData);
-
-        $this->client->request('GET', '/s/assets/preview/'.$asset->getId());
+        $this->client->request('GET', 's/assets/preview/'.$this->asset->getId());
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame($expectedMimeType, $response->headers->get('Content-Type'));
-        $this->assertNotSame($expectedContentDisposition.$asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
-        $this->assertEquals($expectedPngContent, $content);
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame($this->expectedMimeType, $response->headers->get('Content-Type'));
+        $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
+        $this->assertEquals($this->expectedPngContent, $content);
+    }
 
-        $this->client->request('GET', '/s/assets/preview/'.$asset->getId().'?stream=0&download=1');
+    /**
+     * Preview action should return the file content.
+     */
+    public function testPreviewActionStreamIsZero(): void
+    {
+        $this->client->request('GET', 's/assets/preview/'.$this->asset->getId().'?stream=0&download=1');
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame($expectedContentDisposition.$asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
-        $this->assertEquals($expectedPngContent, $content);
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
+        $this->assertEquals($this->expectedPngContent, $content);
+    }
 
-        $this->client->request('GET', '/s/assets/preview/'.$asset->getId().'?stream=0&download=0');
+    /**
+     * Preview action should return the html code.
+     */
+    public function testPreviewActionStreamDownloadAreZero(): void
+    {
+        $this->client->request('GET', 's/assets/preview/'.$this->asset->getId().'?stream=0&download=0');
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertNotEquals($expectedPngContent, $content);
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertNotEquals($this->expectedPngContent, $content);
         PageControllerTest::assertTrue($response->isOk());
 
         $url       = self::$container->get('mautic.helper.core_parameters')->get('site_url');
-        $assetSlug = $asset->getId().':'.$asset->getAlias();
+        $assetSlug = $this->asset->getId().':'.$this->asset->getAlias();
         PageControllerTest::assertStringContainsString(
             'img src="'.$url.'/asset/'.$assetSlug,
             $content,

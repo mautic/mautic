@@ -3,40 +3,43 @@
 namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTest;
+use Symfony\Component\HttpFoundation\Response;
 
 class PublicControllerFunctionalTest extends AbstractAssetTest
 {
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
     }
 
     /**
      * Download action should return the file content.
      */
-    public function testDownloadAction(): void
+    public function testDownloadActionStreamBydefault(): void
     {
-        $expectedMimeType           = 'image/png';
-        $expectedContentDisposition = 'attachment;filename="';
-        $expectedPngContent         = file_get_contents($this->getPngFilenameFromFixtures());
+        $assetSlug = $this->asset->getId().':'.$this->asset->getAlias();
 
-        $assetData = [
-            'title'     => 'Public controller test. Download action',
-            'alias'     => 'Test',
-            'createdAt' => new \DateTime('2021-05-05 22:30:00'),
-            'updatedAt' => new \DateTime('2022-05-05 22:30:00'),
-            'createdBy' => 'User',
-            'storage'   => 'local',
-            'path'      => basename($this->getPngFilenameFromFixtures()),
-            'extension' => 'png',
-        ];
-        $asset = $this->createAsset($assetData);
+        $this->client->request('GET', 'asset/'.$assetSlug);
+        ob_start();
+        $response = $this->client->getResponse();
+        $response->sendContent();
+        $content = ob_get_contents();
+        ob_end_clean();
 
-        $assetSlug = $asset->getId().':'.$asset->getAlias();
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame($this->expectedMimeType, $response->headers->get('Content-Type'));
+        $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
+        $this->assertEquals($this->expectedPngContent, $content);
+    }
 
-        $this->client->request('GET', '/asset/'.$assetSlug);
+    /**
+     * Download action should return the file content.
+     */
+    public function testDownloadActionStreamIsZero(): void
+    {
+        $assetSlug = $this->asset->getId().':'.$this->asset->getAlias();
+
+        $this->client->request('GET', 'asset/'.$assetSlug.'?stream=0');
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -44,19 +47,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTest
         ob_end_clean();
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame($expectedMimeType, $response->headers->get('Content-Type'));
-        $this->assertNotSame($expectedContentDisposition.$asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
-        $this->assertEquals($expectedPngContent, $content);
-
-        $this->client->request('GET', '/asset/'.$assetSlug.'?stream=0');
-        ob_start();
-        $response = $this->client->getResponse();
-        $response->sendContent();
-        $content = ob_get_contents();
-        ob_end_clean();
-
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame($expectedContentDisposition.$asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
-        $this->assertEquals($expectedPngContent, $content);
+        $this->assertSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
+        $this->assertEquals($this->expectedPngContent, $content);
     }
 }

@@ -11,6 +11,34 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 abstract class AbstractAssetTest extends MauticMysqlTestCase
 {
+    protected Asset $asset;
+    protected string $expectedMimeType;
+    protected string $expectedContentDisposition;
+    protected string $expectedPngContent;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+
+        $assetData = [
+            'title'     => 'Asset controller test. Preview action',
+            'alias'     => 'Test',
+            'createdAt' => new \DateTime('2021-05-05 22:30:00'),
+            'updatedAt' => new \DateTime('2022-05-05 22:30:00'),
+            'createdBy' => 'User',
+            'storage'   => 'local',
+            'path'      => basename($this->getPngFilenameFromFixtures()),
+            'extension' => 'png',
+        ];
+        $this->asset = $this->createAsset($assetData);
+
+        $this->expectedMimeType           = 'image/png';
+        $this->expectedContentDisposition = 'attachment;filename="';
+        $this->expectedPngContent         = file_get_contents($this->getPngFilenameFromFixtures());
+    }
+
     /**
      * Create an asset entity in the DB.
      *

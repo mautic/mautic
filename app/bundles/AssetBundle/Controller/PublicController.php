@@ -77,7 +77,7 @@ class PublicController extends CommonFormController
                 $response->headers->set('Content-Type', $entity->getFileMimeType());
 
                 // Display the file directly in the browser by default
-                $stream = $this->request->get('stream', 1);
+                $stream = $this->request->get('stream', '1');
                 if (!$stream) {
                     $response->headers->set('Content-Disposition', 'attachment;filename="'.$entity->getOriginalFileName());
                 }
