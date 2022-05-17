@@ -49,7 +49,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $contactExportScheduler     = $contactExportSchedulerRows[0];
         \assert($contactExportScheduler instanceof ContactExportScheduler);
         $contactExportSchedulerData = $contactExportScheduler->getData();
-        $this->runCommand(ContactScheduledExportCommand::COMMAND_NAME);
+        $this->runCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);
         $coreParametersHelper = self::$container->get('mautic.helper.core_parameters');
         \assert($coreParametersHelper instanceof CoreParametersHelper);
