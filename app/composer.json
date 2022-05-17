@@ -148,7 +148,7 @@
         "[web-root]/media/js/mautic-form-src.js": "assets/js/mautic-form-src.js",
         "[web-root]/media/css/mediaelementplayer.css": "assets/css/mediaelementplayer.css",
         "[web-root]/media/css/mediaelementplayer.min.css": "assets/css/mediaelementplayer.min.css",
-        "[web-root]/media/css/modal.css": "assets/css/modal.min.css",
+        "[web-root]/media/css/modal.css": "assets/css/modal.css",
         "[web-root]/media/css/modal.min.css": "assets/css/modal.min.css",
         "[web-root]/media/files/.htaccess": "assets/scaffold/media/files/.htaccess",
         "[web-root]/media/images/.htaccess": "assets/scaffold/media/images/.htaccess",
