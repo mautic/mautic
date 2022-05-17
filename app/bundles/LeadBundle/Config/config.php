@@ -1574,6 +1574,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.export_scheduler',
                     'event_dispatcher',
+                    'mautic.helper.template.formatter',
                 ],
                 'tag' => 'console.command',
             ],
