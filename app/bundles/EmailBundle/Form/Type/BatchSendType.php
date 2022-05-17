@@ -16,7 +16,7 @@ class BatchSendType extends AbstractType
             TextType::class,
             [
                 'label'       => false,
-                'attr'        => ['class' => 'form-control'],
+                'attr'        => ['class' => 'form-control hidden'],
                 'data'        => $default,
                 'constraints' => [
                     new \Symfony\Component\Validator\Constraints\NotBlank(
