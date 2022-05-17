@@ -78,21 +78,21 @@
             "versions": {
                 "mautic/core-lib": "4.x-dev"
             },
-            "symlink": true
+            "symlink": false
         }
     },
     {
         "type": "path",
         "url": "../themes/**",
         "options": {
-            "symlink": true
+            "symlink": false
         }
     },
     {
         "type": "path",
         "url": "../plugins/**",
         "options": {
-            "symlink": true
+            "symlink": false
         }
     }
   ],
