@@ -44,7 +44,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
      */
     public function testPreviewActionStreamByDefault(): void
     {
-        $this->client->request('GET', 's/assets/preview/'.$this->asset->getId());
+        $this->client->request('GET', '/s/assets/preview/'.$this->asset->getId());
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -62,7 +62,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
      */
     public function testPreviewActionStreamIsZero(): void
     {
-        $this->client->request('GET', 's/assets/preview/'.$this->asset->getId().'?stream=0&download=1');
+        $this->client->request('GET', '/s/assets/preview/'.$this->asset->getId().'?stream=0&download=1');
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -79,7 +79,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
      */
     public function testPreviewActionStreamDownloadAreZero(): void
     {
-        $this->client->request('GET', 's/assets/preview/'.$this->asset->getId().'?stream=0&download=0');
+        $this->client->request('GET', '/s/assets/preview/'.$this->asset->getId().'?stream=0&download=0');
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -90,10 +90,9 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
         $this->assertNotEquals($this->expectedPngContent, $content);
         PageControllerTest::assertTrue($response->isOk());
 
-        $url       = self::$container->get('mautic.helper.core_parameters')->get('site_url');
         $assetSlug = $this->asset->getId().':'.$this->asset->getAlias();
         PageControllerTest::assertStringContainsString(
-            'img src="'.$url.'/asset/'.$assetSlug,
+            '/asset/'.$assetSlug,
             $content,
             'The return must contain the assert slug'
         );

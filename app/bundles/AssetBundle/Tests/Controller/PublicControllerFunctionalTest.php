@@ -15,11 +15,11 @@ class PublicControllerFunctionalTest extends AbstractAssetTest
     /**
      * Download action should return the file content.
      */
-    public function testDownloadActionStreamBydefault(): void
+    public function testDownloadActionStreamByDefault(): void
     {
         $assetSlug = $this->asset->getId().':'.$this->asset->getAlias();
 
-        $this->client->request('GET', 'asset/'.$assetSlug);
+        $this->client->request('GET', '/asset/'.$assetSlug);
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -39,14 +39,14 @@ class PublicControllerFunctionalTest extends AbstractAssetTest
     {
         $assetSlug = $this->asset->getId().':'.$this->asset->getAlias();
 
-        $this->client->request('GET', 'asset/'.$assetSlug.'?stream=0');
+        $this->client->request('GET', '/asset/'.$assetSlug.'?stream=0');
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
         $this->assertSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
         $this->assertEquals($this->expectedPngContent, $content);
     }
