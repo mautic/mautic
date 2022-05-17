@@ -129,7 +129,7 @@ class IpAddress
      *
      * @return IpAddress
      */
-    public function setIpDetails(ipDetails)
+    public function setIpDetails($ipDetails)
     {
         $this->ipDetails = $ipDetails;
 
