@@ -1,11 +1,11 @@
 <?php
 
+$baseDir = __DIR__;
+
 /*
  * Build a "production" package from the current development HEAD, this should be run after a 'composer install --no-dev --no-scripts --optimize-autoloader'
  * to emulate a proper release package
  */
-
-$baseDir = __DIR__;
 
 // Preparation - Remove previous packages
 echo "Preparing environment\n";
