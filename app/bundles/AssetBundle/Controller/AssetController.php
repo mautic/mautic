@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -45,9 +36,7 @@ class AssetController extends FormController
             return $this->accessDenied();
         }
 
-        if ('POST' == $this->request->getMethod()) {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         //set limits
         $limit = $this->get('session')->get('mautic.asset.limit', $this->get('mautic.helper.core_parameters')->get('default_assetlimit'));
@@ -67,7 +56,7 @@ class AssetController extends FormController
         }
 
         $orderBy    = $this->get('session')->get('mautic.asset.orderby', 'a.dateModified');
-        $orderByDir = $this->get('session')->get('mautic.asset.orderbydir', 'DESC');
+        $orderByDir = $this->get('session')->get('mautic.asset.orderbydir', $this->getDefaultOrderDirection());
 
         $assets = $model->getEntities(
             [
@@ -771,5 +760,15 @@ class AssetController extends FormController
                 'route'         => $this->generateUrl('mautic_asset_index', ['page' => $this->get('session')->get('mautic.asset.page', 1)]),
             ],
         ]);
+    }
+
+    public function getModelName(): string
+    {
+        return 'asset';
+    }
+
+    protected function getDefaultOrderDirection(): string
+    {
+        return 'DESC';
     }
 }

@@ -138,8 +138,8 @@ $indexCount = 1;
 
                     </optgroup>
                     <?php else : ?>
-                    <option value="<?php echo $view->escape($keyLabel); ?>" <?php if ($keyLabel === $child->vars['data']): echo 'selected'; $selected = true; elseif (empty($selected) && '-1' == $keyLabel): echo 'selected'; endif; ?>>
-                        <?php echo $options; ?>
+                    <option value="<?php echo $view->escape($options); ?>" <?php if ($options === $child->vars['data']): echo 'selected'; $selected = true; elseif (empty($selected) && '-1' == $options): echo 'selected'; endif; ?>>
+                        <?php echo $view['translator']->trans($keyLabel); ?>
                     </option>
                     <?php endif; ?>
                     <?php endforeach; ?>

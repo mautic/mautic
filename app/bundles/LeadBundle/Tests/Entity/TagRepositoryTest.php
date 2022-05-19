@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\ORM\EntityManager;
@@ -64,7 +55,7 @@ class TagRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $mockRepository->expects($this->once())
             ->method('findOneBy')
-            ->with(['tag' => 'hello&#34; world'])
+            ->with(['tag' => 'hello" world'])
             ->willReturn($fetchedEntity);
 
         $this->assertSame($fetchedEntity, $mockRepository->getTagByNameOrCreateNewOne('hello" world'));

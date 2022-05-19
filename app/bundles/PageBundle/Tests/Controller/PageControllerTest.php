@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageData;
@@ -12,6 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PageControllerTest extends MauticMysqlTestCase
 {
+    use ControllerTrait;
+
     /**
      * @var string
      */
@@ -50,18 +53,13 @@ class PageControllerTest extends MauticMysqlTestCase
      */
     public function testIndexAction(): void
     {
-        $this->client->request('GET', '/s/pages');
-        $clientResponse  = $this->client->getResponse();
-        $responseContent = $clientResponse->getContent();
+        $urlAlias   = 'pages';
+        $routeAlias = 'page';
+        $column     = 'dateModified';
+        $column2    = 'title';
+        $tableAlias = 'p.';
 
-        $dom = new \DOMDocument('1.0', 'utf-8');
-        $dom->loadHTML(mb_convert_encoding($responseContent, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
-        $xpath = new \DOMXPath($dom);
-
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
-        $this->assertStringContainsString('col-page-dateAdded', $responseContent, 'The return must contain the created at date column');
-        $this->assertStringContainsString('col-page-dateModified', $responseContent, 'The return must contain the modified date column');
-        $this->assertEquals(1, $xpath->query("//th[contains(@class,'col-page-dateModified')]//i[contains(@class, 'fa-sort-amount-desc')]")->count(), 'The order of date modified must be desc');
+        $this->getControllerColumnTests($urlAlias, $routeAlias, $column, $tableAlias, $column2);
     }
 
     public function testLandingPageTracking()

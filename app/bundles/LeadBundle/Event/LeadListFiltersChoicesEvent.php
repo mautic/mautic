@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright  2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\AbstractCustomRequestEvent;
@@ -38,17 +29,20 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
      */
     protected $translator;
 
+    private string $search;
+
     /**
      * @param mixed[] $choices
      * @param mixed[] $operators
      */
-    public function __construct($choices, $operators, TranslatorInterface $translator, Request $request = null)
+    public function __construct($choices, $operators, TranslatorInterface $translator, Request $request = null, string $search = '')
     {
         parent::__construct($request);
 
         $this->choices    = $choices;
         $this->operators  = $operators;
         $this->translator = $translator;
+        $this->search     = $search;
     }
 
     /**
@@ -73,6 +67,11 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
     public function getTranslator()
     {
         return $this->translator;
+    }
+
+    public function getSearch(): string
+    {
+        return $this->search;
     }
 
     /**

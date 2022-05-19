@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
@@ -132,7 +123,7 @@ class RequestStorageHelper
         $keyLength = strlen($key);
 
         if ($keyLength > 191) {
-            throw new \LengthException(sprintf('Key %s must be shorter than 256 characters. It has %d characters', $key, $keyLength));
+            throw new \LengthException(sprintf('Key %s must be shorter than 191 characters. It has %d characters', $key, $keyLength));
         }
 
         return $key;

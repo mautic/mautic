@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Model;
 
 use Doctrine\ORM\ORMException;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Exception\FileUploadException;
@@ -449,8 +441,11 @@ class SubmissionModel extends CommonFormModel
             // Find and add the lead to the associated campaigns
             $campaigns = $this->campaignModel->getCampaignsByForm($form);
             if (!empty($campaigns)) {
+                /** @var Campaign $campaign */
                 foreach ($campaigns as $campaign) {
-                    $this->membershipManager->addContact($lead, $campaign);
+                    if ($campaign->isPublished()) {
+                        $this->membershipManager->addContact($lead, $campaign);
+                    }
                 }
             }
         }

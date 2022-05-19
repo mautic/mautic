@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
@@ -164,6 +155,10 @@ return [
                 'arguments' => [
                     '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
                 ],
+            ],
+            'mautic.core.service.log_processor' => [
+                'class'     => \Mautic\CoreBundle\Monolog\LogProcessor::class,
+                'tags'      => ['monolog.processor'],
             ],
         ],
         'events' => [
@@ -494,6 +489,13 @@ return [
                     'security.csrf.token_manager',
                 ],
                 'alias' => 'security',
+            ],
+            'mautic.helper.template.translator' => [
+                'class'     => \Mautic\CoreBundle\Templating\Helper\TranslatorHelper::class,
+                'arguments' => [
+                    'translator',
+                ],
+                'alias' => 'translator',
             ],
             'mautic.helper.paths' => [
                 'class'     => 'Mautic\CoreBundle\Helper\PathsHelper',
@@ -1015,6 +1017,96 @@ return [
                     'templating.helper.assets',
                 ],
                 'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.menu' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\MenuExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.menu',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.gravatar' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\GravatarExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.gravatar',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.version' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\VersionExtension::class,
+                'arguments' => [
+                    'mautic.helper.app_version',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.mautibot' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\MautibotExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.mautibot',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.formatter' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\FormatterExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.formatter',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.date' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\DateExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.date',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.button' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ButtonExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.button',
+                    'request_stack',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.content' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ContentExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.content',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.numeric' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\NumericExtension::class,
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.form' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\FormExtension::class,
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.class' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ClassExtension::class,
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.security' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\SecurityExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.security',
+                ],
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.translator' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\TranslatorExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.translator',
+                ],
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.config' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ConfigExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.config',
+                ],
+                'tag'       => 'twig.extension',
             ],
             // Schema
             'mautic.schema.helper.column' => [
