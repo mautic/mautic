@@ -174,11 +174,19 @@ jobs:
             fi
           fi
         elif [[ "${{ matrix.commands }}" == "composer install" ]]; then
+          # create a temp dir and mimic a composer install via mautic/recommended-project
           mkdir test_composer
           cd test_composer
           cp ../.github/ci-files/composer.json ./
           composer install
+          
+          # test if console works by generating assets for next step
           php ./bin/console mautic:assets:generate
+          
+          # test if media/css and media/js folder contain the same files as the tarball releases
+          test -z "$(comm -23 <(ls ../media/js  | sort) <(ls docroot/media/js  | sort))"
+          test -z "$(comm -23 <(ls ../media/css | sort) <(ls docroot/media/css | sort))"
+
           php ./bin/console cache:clear
         else
           echo "Invalid command"
