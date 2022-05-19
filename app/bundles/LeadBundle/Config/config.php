@@ -1109,6 +1109,10 @@ return [
                 'arguments' => ['translator'],
                 'alias'     => 'lead_dnc_reason',
             ],
+            'mautic.helper.segment.count.cache' => [
+                'class'     => \Mautic\LeadBundle\Helper\SegmentCountCacheHelper::class,
+                'arguments' => ['mautic.helper.cache_storage'],
+            ],
         ],
         'models' => [
             'mautic.lead.model.lead' => [
@@ -1163,6 +1167,7 @@ return [
                     'mautic.lead.model.lead_segment_service',
                     'mautic.lead.segment.stat.chart.query.factory',
                     'request_stack',
+                    'mautic.helper.segment.count.cache',
                 ],
             ],
             'mautic.lead.repository.lead_segment_filter_descriptor' => [
