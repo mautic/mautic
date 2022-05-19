@@ -154,6 +154,11 @@ class ReportSubscriber implements EventSubscriberInterface
                     $event->addCompanyLeftJoin($qb);
                 }
 
+                // Adding default group by to prevent contact duplicates in reports
+                if (!$event->hasGroupBy()) {
+                    $qb->addGroupBy('fs.id');
+                }
+
                 break;
         }
 
