@@ -244,6 +244,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->cacheStorageHelperMock,
             $this->contactTracker,
             $this->doNotContact,
+            $this->emailRepository,
             $this->statsCollectionHelper,
             $this->corePermissions
         );
@@ -628,6 +629,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->cacheStorageHelperMock,
             $this->contactTracker,
             $this->doNotContact,
+            $this->emailRepository,
             $this->statsCollectionHelper,
             $this->corePermissions
         );

@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
@@ -149,6 +150,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $doNotContact;
 
     /**
+     * @var EmailRepository
+     */
+    private $emailRepository;
+
+    /**
      * @var StatsCollectionHelper
      */
     private $statsCollectionHelper;
@@ -169,6 +175,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         CacheStorageHelper $cacheStorageHelper,
         ContactTracker $contactTracker,
         DNC $doNotContact,
+        EmailRepository $emailRepository,
         StatsCollectionHelper $statsCollectionHelper,
         CorePermissions $corePermissions
     ) {
@@ -187,6 +194,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->cacheStorageHelper       = $cacheStorageHelper;
         $this->contactTracker           = $contactTracker;
         $this->doNotContact             = $doNotContact;
+        $this->emailRepository          = $emailRepository;
         $this->statsCollectionHelper    = $statsCollectionHelper;
         $this->corePermissions          = $corePermissions;
     }
@@ -425,8 +433,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param $action
      * @param $event
-     * @param $entity
-     * @param $isNew
+     * @param bool $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -1005,7 +1012,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $storeToCache = true
     ) {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
-        $total      = $this->getRepository()->getEmailPendingLeads(
+        $total      = $this->emailRepository->getEmailPendingLeads(
             $email->getId(),
             $variantIds,
             $listId,

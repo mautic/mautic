@@ -687,6 +687,7 @@ return [
                     'translator',
                     'monolog.logger.mautic',
                     'mautic.lead.model.dnc',
+                    'mautic.email.repository.email',
                 ],
             ],
             'mautic.message.processor.replier' => [
@@ -826,6 +827,7 @@ return [
                     'mautic.helper.cache_storage',
                     'mautic.tracker.contact',
                     'mautic.lead.model.dnc',
+                    'mautic.email.repository.email',
                     'mautic.email.helper.stats_collection',
                     'mautic.security',
                 ],
@@ -903,6 +905,9 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\EmailBundle\Entity\Email::class,
+                ],
+                'methodCalls' => [
+                    'setSegmentEmailOnceToEmailAddress' => ['%mautic.segment_email_once_to_email_address%'],
                 ],
             ],
             'mautic.email.repository.emailReply' => [
@@ -1010,6 +1015,7 @@ return [
         'mailer_mailjet_sandbox'              => false,
         'mailer_mailjet_sandbox_default_mail' => null,
         'disable_trackable_urls'              => false,
+        'segment_email_once_to_email_address' => false,
         'theme_email_default'                 => 'blank',
     ],
 ];
