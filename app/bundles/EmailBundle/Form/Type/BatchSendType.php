@@ -27,7 +27,7 @@ class BatchSendType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $default = (int) $options['data']['batchlimit'] ?? $this->coreParametersHelper->get('mailer_memory_msg_limit');
+        $default = $options['data']['batchlimit'] ?? $this->coreParametersHelper->get('mailer_memory_msg_limit');
 
         $builder->add(
             'batchlimit',
@@ -35,7 +35,7 @@ class BatchSendType extends AbstractType
             [
                 'label'       => false,
                 'attr'        => ['class' => 'form-control'],
-                'data'        => $default,
+                'data'        => (int) $default,
                 'constraints' => [
                     new \Symfony\Component\Validator\Constraints\NotBlank(
                         ['message' => 'mautic.core.value.required']
