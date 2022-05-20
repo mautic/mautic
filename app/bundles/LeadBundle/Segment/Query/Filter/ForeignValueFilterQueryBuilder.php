@@ -37,19 +37,39 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
         if (!is_null($filter->getWhere())) {
             $subQueryBuilder->andWhere(str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $filter->getWhere()));
         }
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
 
         switch ($filterOperator) {
             case 'empty':
+            if ('tag_id' === $filter->getField()) {
                 $subQueryBuilder->select($tableAlias.'.lead_id')
-                    ->from($filter->getTable(), $tableAlias)
-                    ->andWhere($subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()));
-                $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
+                    ->from($filter->getTable(), $tableAlias);
+                $queryBuilder->addLogic($queryBuilder->expr()->notIn($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
+            } else {
+                $subQueryBuilder->andWhere($subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()));
+                $queryBuilder->addLogic(
+                    $queryBuilder->expr()->exists($subQueryBuilder->getSQL()),
+                    $filter->getGlue()
+                );
+            }
                 break;
             case 'notEmpty':
+            if ('tag_id' === $filter->getField()) {
                 $subQueryBuilder->select($tableAlias.'.lead_id')
-                    ->from($filter->getTable(), $tableAlias)
-                    ->andWhere($subQueryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()));
-                $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
+                    ->from($filter->getTable(), $tableAlias);
+                $queryBuilder->addLogic(
+                    $queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()),
+                    $filter->getGlue()
+                );
+            } else {
+                $subQueryBuilder->andWhere(
+                    $subQueryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField())
+                );
+                $queryBuilder->addLogic(
+                    $queryBuilder->expr()->exists($subQueryBuilder->getSQL()),
+                    $filter->getGlue()
+                );
+            }
                 break;
             case 'notIn':
                 $subQueryBuilder
