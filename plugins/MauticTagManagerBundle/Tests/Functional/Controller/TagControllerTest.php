@@ -8,6 +8,8 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\TagModel;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 
 class TagControllerTest extends MauticMysqlTestCase
 {
@@ -167,5 +169,18 @@ class TagControllerTest extends MauticMysqlTestCase
         $this->client->request('POST', '/s/tags/batchDelete?ids='.json_encode($tagsId));
         $this->assertTrue($this->client->getResponse()->isOk(), 'Return code must be 200.');
         $this->assertEmpty($this->tagRepository->count([]), 'All tags must be deleted.');
+    }
+
+    public function testEmptyTagShouldThrowValidationError(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/tags/new');
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $buttonCrawler  = $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $form->setValues(['tag_entity[tag]' => '']);
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertStringContainsString('A value is required.', $this->client->getResponse()->getContent());
     }
 }

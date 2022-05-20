@@ -51,6 +51,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  * @method pushLeadToCampaign(Lead $lead, mixed $integrationCampaign, mixed $integrationMemberStatus)
  * @method getLeads(array $params, string $query, &$executed, array $result = [], $object = 'Lead')
  * @method getCompanies(array $params)
+ *
+ * @deprecated To be removed in Mautic 6.0. Please use the IntegrationsBundle instead, which is meant to be a drop-in replacement for AbstractIntegration.
  */
 abstract class AbstractIntegration implements UnifiedIntegrationInterface
 {
@@ -80,8 +82,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Used for notifications.
+     *
+     * @var \Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\UserBundle\Entity\User>
      */
-    protected ?array $adminUsers;
+    protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
     protected array $notifications = [];
     protected ?string $lastIntegrationError;

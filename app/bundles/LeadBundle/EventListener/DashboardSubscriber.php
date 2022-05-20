@@ -136,7 +136,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $params = $event->getWidget()->getParams();
                 $event->setTemplateData([
                     'height' => $event->getWidget()->getHeight() - 80,
-                    'data'   => $this->leadModel->getLeadMapData($params['dateFrom'], $params['dateTo'], $canViewOthers),
+                    'data'   => $this->leadModel->getLeadMapData($params['dateFrom'], $params['dateTo'], [], $canViewOthers),
                 ]);
             }
 

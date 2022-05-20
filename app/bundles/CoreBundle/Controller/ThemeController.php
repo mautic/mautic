@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Form\Type\ThemeUploadType;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -32,7 +32,7 @@ class ThemeController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var ThemeHelper $themeHelper */
+        /** @var ThemeHelperInterface $themeHelper */
         $themeHelper = $this->container->get('mautic.helper.theme');
         /** @var BuilderIntegrationsHelper $builderIntegrationsHelper */
         $builderIntegrationsHelper    = $this->container->get('mautic.integrations.helper.builder_integrations');
@@ -117,6 +117,7 @@ class ThemeController extends FormController
      */
     public function downloadAction($themeName)
     {
+        /** @var ThemeHelperInterface $themeHelper */
         $themeHelper = $this->container->get('mautic.helper.theme');
         $flashes     = [];
         $error       = false;
