@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ac01c6e56ac3f9e884c57232824c8ca5",
+    "content-hash": "8ef905e8fc7ce47f47a6c5f646cc0538",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -5619,7 +5619,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "11188a9f9bdab1f49c5ee3d63ef83ab43163089a"
+                "reference": "26de85c160019b2e7a8578337c0b03b259d72adc"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5729,6 +5729,7 @@
                         "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
                         "[project-root]/app/.htaccess": "assets/scaffold/files/deny.htaccess",
+                        "[project-root]/autoload.php": "assets/scaffold/files/autoload.php",
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
                         "[web-root]/index.php": "assets/scaffold/files/index.php",
                         "[web-root]/index_dev.php": "assets/scaffold/files/index_dev.php",
@@ -5741,6 +5742,11 @@
                         "[web-root]/media/dashboards/default.json": "assets/scaffold/media/dashboards/default.json",
                         "[web-root]/media/dashboards/email-overview.json": "assets/scaffold/media/dashboards/email-overview.json",
                         "[web-root]/media/dashboards/stats-overview.json": "assets/scaffold/media/dashboards/stats-overview.json",
+                        "[web-root]/media/js/mautic-form-src.js": "assets/js/mautic-form-src.js",
+                        "[web-root]/media/css/mediaelementplayer.css": "assets/css/mediaelementplayer.css",
+                        "[web-root]/media/css/mediaelementplayer.min.css": "assets/css/mediaelementplayer.min.css",
+                        "[web-root]/media/css/modal.css": "assets/css/modal.css",
+                        "[web-root]/media/css/modal.min.css": "assets/css/modal.min.css",
                         "[web-root]/media/files/.htaccess": "assets/scaffold/media/files/.htaccess",
                         "[web-root]/media/images/.htaccess": "assets/scaffold/media/images/.htaccess",
                         "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
