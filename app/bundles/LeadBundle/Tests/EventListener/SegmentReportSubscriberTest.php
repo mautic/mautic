@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -55,7 +46,6 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $translatorMock        = $this->createMock(TranslatorInterface::class);
         $channelListHelperMock = $this->createMock(ChannelListHelper::class);
-        $reportHelperMock      = $this->createMock(ReportHelper::class);
         $fieldsBuilderMock     = $this->createMock(FieldsBuilder::class);
 
         $leadColumns = [
@@ -82,7 +72,7 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with('l.', 'lll.')
             ->willReturn($filterColumns);
 
-        $reportBuilderEvent = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'segment.membership', [], $reportHelperMock);
+        $reportBuilderEvent = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'segment.membership', [], new ReportHelper());
 
         $segmentReportSubscriber = new SegmentReportSubscriber($fieldsBuilderMock);
         $segmentReportSubscriber->onReportBuilder($reportBuilderEvent);

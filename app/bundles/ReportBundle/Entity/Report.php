@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
@@ -221,8 +212,6 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -236,8 +225,6 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      *
      * @return Report
@@ -261,8 +248,6 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Set system.
-     *
      * @param string $system
      *
      * @return Report
@@ -276,8 +261,6 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Get system.
-     *
      * @return int
      */
     public function getSystem()
@@ -301,8 +284,6 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Get source.
-     *
      * @return string
      */
     public function getSource()
@@ -311,9 +292,7 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Set columns.
-     *
-     * @param string $columns
+     * @param mixed[] $columns
      *
      * @return Report
      */
@@ -326,8 +305,6 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Get columns.
-     *
      * @return array
      */
     public function getColumns()
@@ -336,9 +313,7 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Set filters.
-     *
-     * @param string $filters
+     * @param mixed[] $filters
      *
      * @return Report
      */
@@ -351,8 +326,6 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Get filters.
-     *
      * @return array
      */
     public function getFilters()

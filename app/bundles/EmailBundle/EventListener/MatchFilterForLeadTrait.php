@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\EmailBundle\EventListener;
 
@@ -24,7 +16,6 @@ trait MatchFilterForLeadTrait
             // Lead in generated for preview with faked data
             return false;
         }
-
         $groups   = [];
         $groupNum = 0;
 
@@ -74,15 +65,6 @@ trait MatchFilterForLeadTrait
 
                     if (null !== $filterVal) {
                         $filterVal = (bool) $filterVal;
-                    }
-                    break;
-                case 'date':
-                    if (!$leadVal instanceof \DateTime) {
-                        $leadVal = new \DateTime($leadVal);
-                    }
-
-                    if (!$filterVal instanceof \DateTime) {
-                        $filterVal = new \DateTime($filterVal);
                     }
                     break;
                 case 'datetime':

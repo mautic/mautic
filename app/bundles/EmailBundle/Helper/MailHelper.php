@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Helper;
 
 use Doctrine\ORM\ORMException;
@@ -72,6 +63,16 @@ class MailHelper
     protected $from;
 
     protected $systemFrom;
+
+    /**
+     * @var string
+     */
+    protected $replyTo;
+
+    /**
+     * @var string
+     */
+    protected $systemReplyTo;
 
     /**
      * @var string
@@ -252,11 +253,13 @@ class MailHelper
             $this->logError($e);
         }
 
-        $systemFromEmail  = $factory->getParameter('mailer_from_email');
-        $systemFromName   = $this->cleanName(
+        $systemFromEmail    = $factory->getParameter('mailer_from_email');
+        $systemReplyToEmail = $factory->getParameter('mailer_reply_to_email');
+        $systemFromName     = $this->cleanName(
             $factory->getParameter('mailer_from_name')
         );
         $this->setDefaultFrom($from, [$systemFromEmail => $systemFromName]);
+        $this->setDefaultReplyTo($systemReplyToEmail, $this->from);
 
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
@@ -304,7 +307,7 @@ class MailHelper
             return $this->getMailer($cleanSlate);
         }
 
-        $transport  = $this->factory->get('swiftmailer.transport.real');
+        $transport  = $this->factory->get('swiftmailer.mailer.default.transport.real');
         $mailer     = new \Swift_Mailer($transport);
         $mailHelper = new self($this->factory, $mailer, $this->from);
 
@@ -348,13 +351,16 @@ class MailHelper
                 } elseif (!empty($emailToSend->getFromAddress())) {
                     $this->setFrom($emailToSend->getFromAddress(), $emailToSend->getFromName());
                 } else {
-                    $this->setFrom($this->systemFrom, null);
+                    $this->setFrom($this->from, null);
                 }
             } else {
                 $this->setFrom($this->from, null);
             }
         } // from is set in flushQueue
 
+        if (empty($this->message->getReplyTo()) && !empty($this->replyTo)) {
+            $this->setReplyTo($this->replyTo);
+        }
         // Set system return path if applicable
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
             $this->message->setReturnPath($bounceEmail);
@@ -672,6 +678,7 @@ class MailHelper
             $this->appendTrackingPixel = false;
             $this->queueEnabled        = false;
             $this->from                = $this->systemFrom;
+            $this->replyTo             = $this->systemReplyTo;
             $this->headers             = [];
             [];
             $this->source              = [];
@@ -1373,9 +1380,16 @@ class MailHelper
             $this->from = $this->systemFrom;
         }
 
-        $replyTo = $email->getReplyToAddress();
-        if (!empty($replyTo)) {
-            $addresses = explode(',', $replyTo);
+        $this->replyTo = $email->getReplyToAddress();
+        if (empty($this->replyTo)) {
+            if (!empty($fromEmail) && empty($this->factory->getParameter('mailer_reply_to_email'))) {
+                $this->replyTo = $fromEmail;
+            } else {
+                $this->replyTo = $this->systemReplyTo;
+            }
+        }
+        if (!empty($this->replyTo)) {
+            $addresses = explode(',', $this->replyTo);
 
             // Only a single email is supported
             $this->setReplyTo($addresses[0]);
@@ -2188,5 +2202,22 @@ class MailHelper
 
         $this->systemFrom = $overrideFrom ?: $systemFrom;
         $this->from       = $this->systemFrom;
+    }
+
+    /**
+     * @param $systemReplyToEmail
+     * @param $systemFromEmail
+     */
+    private function setDefaultReplyTo($systemReplyToEmail =null, $systemFromEmail = null)
+    {
+        $fromEmail = null;
+        if (is_array($systemFromEmail)) {
+            $fromEmail    = key($systemFromEmail);
+        } elseif (!empty($systemFromEmail)) {
+            $fromEmail = $systemFromEmail;
+        }
+
+        $this->systemReplyTo = $systemReplyToEmail ?: $fromEmail;
+        $this->replyTo       = $this->systemReplyTo;
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFullContactBundle\Controller;
 
 use Mautic\FormBundle\Controller\FormController;
@@ -211,7 +202,7 @@ class PublicController extends FormController
             }
         } catch (\Exception $ex) {
             try {
-                if ($notify && isset($lead) && (!isset($lead->imported) || !$lead->imported)) {
+                if ($notify && $lead && (!isset($lead->imported) || !$lead->imported)) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
                     if ($user = $userModel->getEntity($notify)) {
@@ -371,7 +362,7 @@ class PublicController extends FormController
             }
         } catch (\Exception $ex) {
             try {
-                if ($notify && isset($company)) {
+                if ($notify && $company) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
                     if ($user = $userModel->getEntity($notify)) {

@@ -117,6 +117,7 @@ $dbalSettings = [
         'bit'   => 'string',
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
+    'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
 ];
 
 $container->loadFromExtension('doctrine', [
@@ -125,6 +126,11 @@ $container->loadFromExtension('doctrine', [
         'auto_generate_proxy_classes' => '%kernel.debug%',
         'auto_mapping'                => true,
         'mappings'                    => $bundleMetadataBuilder->getOrmConfig(),
+        'dql'                         => [
+            'string_functions' => [
+                'match' => \DoctrineExtensions\Query\Mysql\MatchAgainst::class,
+            ],
+        ],
     ],
 ]);
 
@@ -295,7 +301,7 @@ $container->loadFromExtension('fm_elfinder', [
     'assets_path' => 'media/assets',
     'instances'   => [
         'default' => [
-            'locale'          => 'LANG',
+            'locale'          => '%mautic.locale%',
             'editor'          => 'custom',
             'editor_template' => '@bundles/CoreBundle/Assets/js/libraries/filemanager/index.html.twig',
             'fullscreen'      => true,
@@ -320,15 +326,12 @@ $container->loadFromExtension('fm_elfinder', [
                 ],
                 'roots' => [
                     'local' => [
-                        'driver'    => 'Flysystem',
-                        'path'      => '',
-                        'flysystem' => [
-                            'type'    => 'local',
-                            'options' => [
-                                'local' => [
-                                    'path' => '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
-                                ],
-                            ],
+                        'driver'        => 'Flysystem',
+                        'path'          => '',
+                        'flysystem'     => [
+                            'type'            => 'custom',
+                            'adapter_service' => 'mautic.core.service.local_file_adapter',
+                            'options'         => [],
                         ],
                         'upload_allow'  => ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
                         'upload_deny'   => ['all'],

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Company;
@@ -36,7 +27,12 @@ class IdentifyCompanyHelper
             return [null, false, null];
         }
 
-        $companies = $companyModel->checkForDuplicateCompanies($parameters);
+        try {
+            $companies = $companyModel->checkForDuplicateCompanies($parameters);
+        } catch (UniqueFieldNotFoundException $uniqueFieldNotFoundException) {
+            return [null, false, null];
+        }
+
         if (!empty($companies)) {
             $companyEntity = end($companies);
             $companyData   = $companyEntity->getProfileFields();

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests;
 
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -20,6 +11,7 @@ use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class StandardImportTestHelper extends CommonMocks
@@ -94,8 +86,12 @@ abstract class StandardImportTestHelper extends CommonMocks
         $this->eventEntities = [];
     }
 
+    /**
+     * @return Import&MockObject
+     */
     protected function initImportEntity(array $methods = null)
     {
+        /** @var Import&MockObject $entity */
         $entity = $this->getMockBuilder(Import::class)
             ->setMethods($methods)
             ->getMock();
@@ -127,13 +123,15 @@ abstract class StandardImportTestHelper extends CommonMocks
         $entityManager        = $this->getEntityManagerMock();
         $coreParametersHelper = $this->getCoreParametersHelperMock();
 
-        $logRepository = $this->getMockBuilder(LeadEventLogRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var MockObject&UserHelper */
+        $userHelper = $this->createMock(UserHelper::class);
 
-        $importRepository = $this->getMockBuilder(ImportRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var MockObject&LeadEventLogRepository */
+        $logRepository = $this->createMock(LeadEventLogRepository::class);
+
+        /** @var MockObject&ImportRepository */
+        $importRepository = $this->createMock(ImportRepository::class);
+
         $importRepository->method('getValue')
             ->willReturn(true);
 
@@ -148,9 +146,12 @@ abstract class StandardImportTestHelper extends CommonMocks
                 )
             );
 
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManager->expects($this->any())
+            ->method('isOpen')
+            ->willReturn(true);
+
+        /** @var MockObject&LeadModel */
+        $leadModel = $this->createMock(LeadModel::class);
 
         $leadModel->setEntityManager($entityManager);
 
@@ -158,27 +159,20 @@ abstract class StandardImportTestHelper extends CommonMocks
             ->method('getEventLogRepository')
             ->will($this->returnValue($logRepository));
 
-        $companyModel = $this->getMockBuilder(CompanyModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var MockObject&CompanyModel */
+        $companyModel = $this->createMock(CompanyModel::class);
 
         $companyModel->setEntityManager($entityManager);
 
-        $notificationModel = $this->getMockBuilder(NotificationModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var MockObject&NotificationModel */
+        $notificationModel = $this->createMock(NotificationModel::class);
 
         $notificationModel->setEntityManager($entityManager);
 
         $importModel = new ImportModel($pathsHelper, $leadModel, $notificationModel, $coreParametersHelper, $companyModel);
         $importModel->setEntityManager($entityManager);
         $importModel->setTranslator($translator);
-
-        $userHelper = $this->getMockBuilder(UserHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
         $importModel->setUserHelper($userHelper);
-
         $importModel->setDispatcher(new EventDispatcher());
 
         return $importModel;

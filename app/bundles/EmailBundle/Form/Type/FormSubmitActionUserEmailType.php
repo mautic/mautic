@@ -1,20 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class FormSubmitActionUserEmailType extends AbstractType
 {
@@ -42,7 +34,12 @@ class FormSubmitActionUserEmailType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.help.autocomplete',
                 ],
-                'required' => false,
+                'required'    => true,
+                'constraints' => new NotBlank(
+                    [
+                        'message' => 'mautic.core.value.required',
+                    ]
+                ),
             ]
         );
     }

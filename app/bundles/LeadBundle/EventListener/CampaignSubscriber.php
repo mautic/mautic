@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -501,10 +492,11 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $value     = $event->getConfig()['value'];
                 $fields    = $this->getFields($lead);
 
-                $result = $this->leadFieldModel->getRepository()->compareValue(
+                $fieldValue = isset($fields[$field]) ? CustomFieldHelper::fieldValueTransfomer($fields[$field], $value) : $value;
+                $result     = $this->leadFieldModel->getRepository()->compareValue(
                     $lead->getId(),
                     $field,
-                    CustomFieldHelper::fieldValueTransfomer($fields[$field], $value),
+                    $fieldValue,
                     $operators[$event->getConfig()['operator']]['expr']
                 );
             }

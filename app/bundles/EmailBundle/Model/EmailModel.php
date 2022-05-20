@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -22,7 +13,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
@@ -73,7 +64,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     protected $ipLookupHelper;
 
     /**
-     * @var ThemeHelper
+     * @var ThemeHelperInterface
      */
     protected $themeHelper;
 
@@ -164,7 +155,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
-        ThemeHelper $themeHelper,
+        ThemeHelperInterface $themeHelper,
         Mailbox $mailboxHelper,
         MailHelper $mailHelper,
         LeadModel $leadModel,
@@ -1855,6 +1846,53 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param string $column
+     * @param bool   $canViewOthers
+     *
+     * @return array
+     */
+    public function getBestHours($column, \DateTime $dateFrom, \DateTime $dateTo, array $filter = [], $canViewOthers = true, $timeFormat = 24
+    ) {
+        $companyId  = ArrayHelper::pickValue('companyId', $filter);
+        $campaignId = ArrayHelper::pickValue('campaignId', $filter);
+        $segmentId  = ArrayHelper::pickValue('segmentId', $filter);
+
+        $format = '%H:00';
+        if (12 == $timeFormat) {
+            $format = '%h %p';
+        }
+
+        $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $q          = $query->prepareTimeDataQuery('email_stats', $column, $filter);
+        $q->select('CONCAT(TIME_FORMAT(t.'.$column.', \''.$format.'\'),\'-\',TIME_FORMAT(t.'.$column.' + INTERVAL 1 HOUR, \''.$format.'\'),\'\') as hour, COUNT(t.id) AS count')
+        ->groupBy('hour')
+        ->orderBy('count', 'DESC')
+        ->setMaxResults(24);
+
+        if (!$canViewOthers) {
+            $this->limitQueryToCreator($q);
+        }
+
+        $this->addCompanyFilter($q, $companyId);
+        $this->addCampaignFilter($q, $campaignId);
+        $this->addSegmentFilter($q, $segmentId);
+
+        $result = $q->execute()->fetchAll();
+
+        $chart  = new BarChart(array_column($result, 'hour'));
+        $counts = array_column($result, 'count');
+        $total  = array_sum($counts);
+
+        array_walk($counts, function (&$percentage) use ($total) {
+            $percentage = round(($percentage / $total) * 100, 1);
+        });
+
+        $chart->setDataset($this->translator->trans('mautic.widget.emails.best.hours.reads_total', ['%reads%'=>$total]), $counts);
+
+        return $chart->render();
+    }
+
+    /**
      * Get line chart data of emails sent and read.
      *
      * @param string|null $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
@@ -2117,7 +2155,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param        $type
+     * @param string $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
@@ -2137,14 +2175,18 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     $limit,
                     $start,
                     $this->security->isGranted('email:emails:viewother'),
-                    isset($options['top_level']) ? $options['top_level'] : false,
-                    isset($options['email_type']) ? $options['email_type'] : null,
-                    isset($options['ignore_ids']) ? $options['ignore_ids'] : [],
-                    isset($options['variant_parent']) ? $options['variant_parent'] : null
+                    $options['top_level'] ?? false,
+                    $options['email_type'] ?? null,
+                    $options['ignore_ids'] ?? [],
+                    $options['variant_parent'] ?? null
                 );
 
                 foreach ($emails as $email) {
-                    $results[$email['language']][$email['id']] = $email['name'];
+                    if (empty($options['name_is_key'])) {
+                        $results[$email['language']][$email['id']] = $email['name'];
+                    } else {
+                        $results[$email['language']][$email['name']] = $email['id'];
+                    }
                 }
 
                 //sort by language
@@ -2296,5 +2338,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         return $ids;
+    }
+
+    public function isUpdatingTranslationChildren(): bool
+    {
+        return $this->updatingTranslationChildren;
     }
 }

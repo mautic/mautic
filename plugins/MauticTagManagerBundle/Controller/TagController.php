@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticTagManagerBundle\Controller;
 
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
@@ -20,7 +11,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TagController extends FormController
 {
@@ -29,7 +19,7 @@ class TagController extends FormController
      *
      * @param int $page
      *
-     * @return JsonResponse | Response
+     * @return JsonResponse|Response
      */
     public function indexAction($page = 1)
     {
@@ -150,7 +140,7 @@ class TagController extends FormController
     /**
      * Generate's new form and processes post data.
      *
-     * @return JsonResponse | RedirectResponse | Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function newAction()
     {
@@ -179,7 +169,7 @@ class TagController extends FormController
                     $found = $model->getRepository()->countOccurrences($tag->getTag());
                     if (0 !== $found) {
                         $valid = false;
-                        $this->addFlash('mautic.tagmanager.tag.error.already_exists', [
+                        $this->addFlash('mautic.core.notice.updated', [
                             '%name%'      => $tag->getTag(),
                             '%menu_link%' => 'mautic_tagmanager_index',
                             '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
@@ -232,50 +222,6 @@ class TagController extends FormController
     }
 
     /**
-     * Generate's clone form and processes post data.
-     *
-     * @param int  $objectId
-     * @param bool $ignorePost
-     *
-     * @return Response
-     */
-    public function cloneAction($objectId, $ignorePost = false)
-    {
-        if (!$this->get('mautic.security')->isGranted('tagManager:tagManager:create')) {
-            return $this->accessDenied();
-        }
-
-        $postActionVars = $this->getPostActionVars();
-
-        try {
-            $tag   = $this->getTag($objectId);
-            $clone = new Tag();
-            $clone->setTag($tag->getTag());
-
-            return $this->createTagModifyResponse(
-                $clone,
-                $postActionVars,
-                $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
-                $ignorePost
-            );
-        } catch (AccessDeniedException $exception) {
-            return $this->accessDenied();
-        } catch (EntityNotFoundException $exception) {
-            return $this->postActionRedirect(
-                array_merge($postActionVars, [
-                    'flashes' => [
-                        [
-                            'type'    => 'error',
-                            'msg'     => 'mautic.tagmanager.tag.error.notfound',
-                            'msgVars' => ['%id%' => $objectId],
-                        ],
-                    ],
-                ])
-            );
-        }
-    }
-
-    /**
      * Generate's edit form and processes post data.
      *
      * @param int  $objectId
@@ -314,7 +260,7 @@ class TagController extends FormController
     }
 
     /**
-     * Create modifying response for tags - edit/clone.
+     * Create modifying response for tags - edit.
      *
      * @param string $action
      * @param bool   $ignorePost
@@ -333,10 +279,18 @@ class TagController extends FormController
         if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
-                    $found = $tagModel->getRepository()->countOccurrences($tag->getTag());
-                    if (0 !== $found) {
-                        $valid = false;
-                        $this->addFlash('mautic.tagmanager.tag.error.already_exists', [
+                    // We are editing existing tag.in the database.
+                    $valid        = true;
+                    $existingTags = $tagModel->getRepository()->getTagsByName([$tag->getTag()]);
+                    foreach ($existingTags as $e) {
+                        if ($e->getId() != $tag->getId()) {
+                            $valid = false;
+                            break;
+                        }
+                    }
+
+                    if (!$valid) {
+                        $this->addFlash('mautic.core.notice.updated', [
                             '%name%'      => $tag->getTag(),
                             '%menu_link%' => 'mautic_tagmanager_index',
                             '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
@@ -522,7 +476,7 @@ class TagController extends FormController
      *
      * @param $objectId
      *
-     * @return JsonResponse | RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function deleteAction($objectId)
     {
@@ -593,7 +547,7 @@ class TagController extends FormController
     /**
      * Deletes a group of entities.
      *
-     * @return JsonResponse | RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function batchDeleteAction()
     {

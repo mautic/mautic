@@ -1,21 +1,5 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
-
- Modified for
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
- * @author      Mautic
- * @link        http://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Mautic\CoreBundle\Templating\Engine\PhpEngine;
@@ -47,6 +31,8 @@ class TemplatingPass implements CompilerPassInterface
                 ->setClass(AssetsHelper::class)
                 ->addMethodCall('setPathsHelper', [new Reference('mautic.helper.paths')])
                 ->addMethodCall('setAssetHelper', [new Reference('mautic.helper.assetgeneration')])
+                ->addMethodCall('setBuilderIntegrationsHelper', [new Reference('mautic.integrations.helper.builder_integrations')])
+                ->addMethodCall('setInstallService', [new Reference('mautic.install.service')])
                 ->addMethodCall('setSiteUrl', ['%mautic.site_url%'])
                 ->addMethodCall('setVersion', ['%mautic.secret_key%', MAUTIC_VERSION])
                 ->setPublic(true);

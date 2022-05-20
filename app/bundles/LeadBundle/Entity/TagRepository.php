@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -119,16 +110,15 @@ class TagRepository extends CommonRepository
      */
     public function getTagByNameOrCreateNewOne($name)
     {
-        $tag = $this->findOneBy(
+        $tag = new Tag($name, true);
+
+        /** @var Tag|null $existingTag */
+        $existingTag = $this->findOneBy(
             [
-                'tag' => $name,
+                'tag' => $tag->getTag(),
             ]
         );
 
-        if (!$tag) {
-            $tag = new Tag($name);
-        }
-
-        return $tag;
+        return $existingTag ?? $tag;
     }
 }
