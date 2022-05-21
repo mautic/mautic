@@ -16,7 +16,7 @@ if ('index' == $tmpl):
     $view->extend('MauticLeadBundle:List:index.html.php');
 endif;
 $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list');
-$now         = (new DateTimeHelper())->getUtcDateTime();
+$now = (new DateTimeHelper())->getUtcDateTime();
 ?>
 
 <?php if (count($items)): ?>
@@ -26,8 +26,8 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
             <tr>
                 <?php
                 echo $view->render(
-                    'MauticCoreBundle:Helper:tableheader.html.php',
-                    [
+    'MauticCoreBundle:Helper:tableheader.html.php',
+    [
                         'checkall'        => 'true',
                         'target'          => '#leadListTable',
                         'langVar'         => 'lead.list',
@@ -36,7 +36,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                             'delete' => $permissions['lead:lists:deleteother'],
                         ],
                     ]
-                );
+);
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
@@ -116,8 +116,8 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                     <td>
                         <?php
                         echo $view->render(
-                            'MauticCoreBundle:Helper:list_actions.html.php',
-                            [
+                    'MauticCoreBundle:Helper:list_actions.html.php',
+                    [
                                 'item'            => $item,
                                 'templateButtons' => [
                                     'edit'   => $view['security']->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy()),
@@ -142,26 +142,26 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                                     ],
                                 ],
                             ]
-                        );
+                );
                         ?>
                     </td>
                     <td>
                         <div>
                             <?php echo $view->render(
-                                'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                ['item' => $item, 'model' => 'lead.list']
-                            ); ?>
+                            'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                            ['item' => $item, 'model' => 'lead.list']
+                        ); ?>
                             <?php if ($view['security']->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy())) : ?>
                                 <a href="<?php echo $view['router']->path(
-                                    'mautic_segment_action',
-                                    ['objectAction' => 'view', 'objectId' => $item->getId()]
-                                ); ?>" data-toggle="ajax">
+                                'mautic_segment_action',
+                                ['objectAction' => 'view', 'objectId' => $item->getId()]
+                            ); ?>" data-toggle="ajax">
                                     <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
                                 </a>
                             <?php else : ?>
                                 <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
                             <?php endif; ?>
-                            <?php if (!$item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()): ?>
+                            <?php if (! $item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()): ?>
                                 <br/>
                                 <span class="small">(<?php echo $item->getCreatedByUser(); ?>)</span>
                             <?php endif; ?>
@@ -172,9 +172,9 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                                 <label class="control-label" data-toggle="tooltip"
                                        data-container="body" data-placement="top" title=""
                                        data-original-title="<?php echo $view['translator']->trans(
-                                               'mautic.lead.list.form.config.segment_rebuild_time.message',
-                                               ['%count%' => $lastBuiltDateDifference]
-                                       ); ?>">
+                                    'mautic.lead.list.form.config.segment_rebuild_time.message',
+                                    ['%count%' => $lastBuiltDateDifference]
+                                ); ?>">
                                     <i class="fa text-danger fa-exclamation-circle"></i></label>
                             <?php endif; ?>
                             <?php echo $view['content']->getCustomContent('segment.name', $mauticTemplateVars); ?>
@@ -186,14 +186,14 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                         <?php endif; ?>
                     </td>
                     <td class="visible-md visible-lg">
-                        <a class="label label-primary" href="<?php echo $view['router']->path(
-                            'mautic_contact_index',
-                            ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.list').':'.$item->getAlias()]
-                        ); ?>" data-toggle="ajax"<?php echo (0 == $leadCounts[$item->getId()]) ? 'disabled=disabled' : ''; ?>>
+                        <a class="label label-primary col-count" data-id="<?php echo $item->getId(); ?>" href="<?php echo $view['router']->path(
+                                           'mautic_contact_index',
+                                           ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.list').':'.$item->getAlias()]
+                                       ); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans(
-                                'mautic.lead.list.viewleads_count',
-                                ['%count%' => $leadCounts[$item->getId()]]
-                            ); ?>
+                            'mautic.lead.list.viewleads_count',
+                            ['%count%' => $leadCounts[$item->getId()]]
+                        ); ?>
                         </a>
                     </td>
                     <td class="visible-md visible-lg" title="<?php echo $item->getDateAdded() ? $view['date']->toFullConcat($item->getDateAdded()) : ''; ?>">
@@ -210,15 +210,15 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
         </table>
         <div class="panel-footer">
             <?php echo $view->render(
-                'MauticCoreBundle:Helper:pagination.html.php',
-                [
+                                'MauticCoreBundle:Helper:pagination.html.php',
+                                [
                     'totalItems' => count($items),
                     'page'       => $page,
                     'limit'      => $limit,
                     'baseUrl'    => $view['router']->path('mautic_segment_index'),
                     'sessionVar' => 'lead.list',
                 ]
-            ); ?>
+                            ); ?>
         </div>
     </div>
 <?php else: ?>

@@ -26,7 +26,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
     public function onEmptyOperator(SegmentOperatorQueryBuilderEvent $event): void
     {
-        if (!$event->operatorIsOneOf('empty')) {
+        if (! $event->operatorIsOneOf('empty')) {
             return;
         }
 
@@ -50,7 +50,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
     public function onNotEmptyOperator(SegmentOperatorQueryBuilderEvent $event): void
     {
-        if (!$event->operatorIsOneOf('notEmpty')) {
+        if (! $event->operatorIsOneOf('notEmpty')) {
             return;
         }
 
@@ -74,7 +74,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
     public function onNegativeOperators(SegmentOperatorQueryBuilderEvent $event): void
     {
-        if (!$event->operatorIsOneOf(
+        if (! $event->operatorIsOneOf(
             'neq',
             'notLike',
             'notBetween', //Used only for date with week combination (NOT EQUAL [this week, next week, last week])
@@ -100,13 +100,13 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
     public function onMultiselectOperators(SegmentOperatorQueryBuilderEvent $event): void
     {
-        if (!$event->operatorIsOneOf('multiselect', '!multiselect')) {
+        if (! $event->operatorIsOneOf('multiselect', '!multiselect')) {
             return;
         }
 
         $leadsTableAlias = $event->getLeadsTableAlias();
 
-        $operator    = 'multiselect' === $event->getFilter()->getOperator() ? 'regexp' : 'notRegexp';
+        $operator = 'multiselect' === $event->getFilter()->getOperator() ? 'regexp' : 'notRegexp';
         $expressions = [];
 
         foreach ($event->getParameterHolder() as $parameter) {
@@ -119,7 +119,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
     public function onDefaultOperators(SegmentOperatorQueryBuilderEvent $event): void
     {
-        if (!$event->operatorIsOneOf(
+        if (! $event->operatorIsOneOf(
             'startsWith',
             'endsWith',
             'gt',

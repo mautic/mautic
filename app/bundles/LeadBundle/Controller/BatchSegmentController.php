@@ -19,7 +19,7 @@ class BatchSegmentController extends AbstractFormController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        $this->actionModel  = $this->container->get('mautic.lead.model.segment.action');
+        $this->actionModel = $this->container->get('mautic.lead.model.segment.action');
         $this->segmentModel = $this->container->get('mautic.lead.model.list');
     }
 
@@ -30,11 +30,11 @@ class BatchSegmentController extends AbstractFormController
      */
     public function setAction()
     {
-        $params     = $this->request->get('lead_batch', []);
+        $params = $this->request->get('lead_batch', []);
         $contactIds = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($contactIds && is_array($contactIds)) {
-            $segmentsToAdd    = $params['add'] ?? [];
+            $segmentsToAdd = $params['add'] ?? [];
             $segmentsToRemove = $params['remove'] ?? [];
 
             if ($segmentsToAdd) {
