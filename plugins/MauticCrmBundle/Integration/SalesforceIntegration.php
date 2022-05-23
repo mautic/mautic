@@ -784,13 +784,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     if (isset($personData['Id'])) {
                         /** @var IntegrationEntityRepository $integrationEntityRepo */
-                        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+                        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
                         $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'lead', $lead->getId());
 
+                        /** @var IntegrationEntity $integrationEntity */
                         $integrationEntity = (empty($integrationId))
                             ? $this->createIntegrationEntity($object, $personData['Id'], 'lead', $lead->getId(), [], false)
                             :
-                            $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationId[0]['id']);
+                            $this->em->getReference(IntegrationEntity::class, $integrationId[0]['id']);
 
                         $integrationEntity->setLastSyncDate($this->getLastSyncDate());
                         $integrationEntityRepo->saveEntity($integrationEntity);
@@ -864,13 +865,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                 if (isset($companyData['Id'])) {
                     /** @var IntegrationEntityRepository $integrationEntityRepo */
-                    $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+                    $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
                     $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'company', $company->getId());
 
                     $integrationEntity = (empty($integrationId))
                         ? $this->createIntegrationEntity($object, $companyData['Id'], 'lead', $company->getId(), [], false)
                         :
-                        $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationId[0]['id']);
+                        $this->em->getReference(IntegrationEntity::class, $integrationId[0]['id']);
 
                     $integrationEntity->setLastSyncDate($this->getLastSyncDate());
                     $integrationEntityRepo->saveEntity($integrationEntity);
