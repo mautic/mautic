@@ -63,7 +63,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $responseContent = json_decode($clientResponse->getContent(), true);
-        $contentDom = new \DOMDocument();
+        $contentDom      = new \DOMDocument();
         $contentDom->loadHTML($responseContent['newContent']);
 
         $xpath = new \DOMXPath($contentDom);
@@ -75,7 +75,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     public function testAddCategorizedLeadList(): void
     {
         $this->loadFixtures([LoadCategoryData::class]);
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/new');
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/segments/new');
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
 
@@ -114,26 +114,26 @@ class LeadControllerTest extends MauticMysqlTestCase
             ]
         );
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $this->assertEquals(7, $leadListsTableRows->count());
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:1"]');
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:1"]');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertEquals(4, $leadListsTableRows->count());
         $firstLeadListLinkTest = trim($leadListsTableRows->first()->filterXPath('//td[2]//div//a')->text());
         $this->assertEquals('Lead List 1 - Segment Category 1 (lead-list-1)', $firstLeadListLinkTest);
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:2"]');
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:2"]');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertEquals(2, $leadListsTableRows->count());
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:2","category:1"]');
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:2","category:1"]');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertEquals(6, $leadListsTableRows->count());
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:4"]');
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:4"]');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertEquals(0, $leadListsTableRows->count());
     }
@@ -144,7 +144,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $contactB = $this->createContact('contact@b.email');
         $contactC = $this->createContact('contact@c.email');
         $campaign = $this->createCampaign();
-        $payload = [
+        $payload  = [
             'lead_batch' => [
                 'add' => [$campaign->getId()],
                 'ids' => json_encode([$contactA->getId(), $contactB->getId(), $contactC->getId()]),
@@ -236,7 +236,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $crawler = $this->client->request('GET', 's/contacts/new/');
-        $form = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
                 'lead[firstname]' => 'John',
@@ -341,12 +341,12 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertCompanyAssociation([1, 2, 3], 1);
 
         // Test that removing all companies will empty the lead's primary company
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
+        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
         $saveButton = $crawler->selectButton('lead[buttons][save]');
-        $form = $saveButton->form();
+        $form       = $saveButton->form();
         $form['lead[companies]']->setValue([]);
         $this->client->submit($form);
-        $companies = $this->getCompanyLeads(1);
+        $companies  = $this->getCompanyLeads(1);
         $collection = new Collection($companies);
         // Should have no companies associated
         $this->assertCount(0, $collection);
@@ -379,8 +379,8 @@ class LeadControllerTest extends MauticMysqlTestCase
      */
     public function testEnsureCorrectPreferredTimeZonePlaceHolderOnContactPage(): void
     {
-        $crawler = $this->client->request('GET', '/s/contacts/new');
-        $elementPlaceholder = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
+        $crawler             = $this->client->request('GET', '/s/contacts/new');
+        $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
         $expectedPlaceholder = self::$container->get('translator')->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
 
@@ -394,13 +394,13 @@ class LeadControllerTest extends MauticMysqlTestCase
     public function testAddContactsErrorMessage(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel     = self::getContainer()->get('mautic.lead.model.field');
         $firstnameField = $fieldModel->getEntity(2);
         $firstnameField->setIsRequired(true);
         $fieldModel->getRepository()->saveEntity($firstnameField);
 
         $crawler = $this->client->request('GET', 's/contacts/new/');
-        $form = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
             ]
@@ -419,7 +419,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $contactC = $this->createContact('contact@c.email');
 
         $companyName = 'Doe Corp';
-        $company = new Company();
+        $company     = new Company();
         $company->setName($companyName);
         $this->em->persist($company);
 
@@ -450,7 +450,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     public function testLookupTypeFieldOnError(): void
     {
         $crawler = $this->client->request('GET', 's/contacts/new/');
-        $form = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
                 'lead[title]' => 'Custom title longer like 191 characters Custom title longer like 191 characters Custom title longer like 191 characters Custom title longer like 191 characters Custom title longer like 191 characters Custom title longer like 191 characters ',
@@ -530,12 +530,12 @@ class LeadControllerTest extends MauticMysqlTestCase
      */
     private function assertCompanyAssociation(array $expectedCompanies, int $leadId): void
     {
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
+        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
         $saveButton = $crawler->selectButton('lead[buttons][save]');
-        $form = $saveButton->form();
+        $form       = $saveButton->form();
         $form['lead[companies]']->setValue($expectedCompanies);
-        $crawler = $this->client->submit($form);
-        $companies = $this->getCompanyLeads($leadId);
+        $crawler    = $this->client->submit($form);
+        $companies  = $this->getCompanyLeads($leadId);
         $collection = (new Collection($companies))->keyBy('company_id');
         // Should have only one company associated
         $this->assertCount(count($expectedCompanies), $collection);
@@ -568,7 +568,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $newCompany = (new Company())
             ->setName('New Co.');
         $companyModel->saveEntities([$company, $newCompany]);
-        $companyId = $company->getId();
+        $companyId    = $company->getId();
         $newCompanyId = $newCompany->getId();
 
         // Create contact with first 'Co.' company
@@ -578,7 +578,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $contactModel->saveEntity($contact);
 
         // Check contact detail view audit log
-        $createAuditLog = $this->getContactAuditLogForSpecificAction($contact, 'create');
+        $createAuditLog        = $this->getContactAuditLogForSpecificAction($contact, 'create');
         $createAuditLogDetails = $createAuditLog->getDetails();
         // `dateIdentified` is added to the audit log when contact is identified, we want to remove this for easier comparison
         unset($createAuditLogDetails['dateIdentified']);

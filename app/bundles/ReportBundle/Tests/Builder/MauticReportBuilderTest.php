@@ -41,8 +41,8 @@ final class MauticReportBuilderTest extends TestCase
     {
         parent::setUp();
 
-        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->connection = $this->createMock(Connection::class);
+        $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
+        $this->connection        = $this->createMock(Connection::class);
         $this->channelListHelper = $this->createMock(ChannelListHelper::class);
 
         $this->connection->method('createQueryBuilder')->willReturn(new QueryBuilder($this->connection));
@@ -59,7 +59,7 @@ final class MauticReportBuilderTest extends TestCase
         $report = new Report();
         $report->setColumns(['a.b', 'b.c']);
         $builder = $this->buildBuilder($report);
-        $query = $builder->getQuery([
+        $query   = $builder->getQuery([
             'columns' => ['a.b' => [], 'b.c' => []],
         ]);
         Assert::assertSame('SELECT `a`.`b`, `b`.`c`', $query->getSql());
@@ -108,7 +108,7 @@ final class MauticReportBuilderTest extends TestCase
             ],
         ]);
         $builder = $this->buildBuilder($report);
-        $query = $builder->getQuery([
+        $query   = $builder->getQuery([
             'columns' => ['a.someField' => []],
             'filters' => [
                 'a.emptyDate' => [
@@ -169,7 +169,7 @@ final class MauticReportBuilderTest extends TestCase
             ],
         ]);
         $builder = $this->buildBuilder($report);
-        $query = $builder->getQuery([
+        $query   = $builder->getQuery([
             'columns' => ['a.someField' => []],
             'filters' => [
                 'a.notEqualString' => [

@@ -18,7 +18,7 @@ class TagEntityType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
 
         // We only allow to set tag field value if we are creating new tag.
-        $tagReadOnly = ! empty($options['data']) && $options['data']->getId() ? true : false;
+        $tagReadOnly = !empty($options['data']) && $options['data']->getId() ? true : false;
 
         $builder->add(
             'tag',
@@ -48,7 +48,7 @@ class TagEntityType extends AbstractType
             ]
         );
 
-        if (! empty($options['action'])) {
+        if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
     }

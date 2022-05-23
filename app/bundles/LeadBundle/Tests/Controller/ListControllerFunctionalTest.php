@@ -56,7 +56,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
             'operator' => '!empty',
             'display'  => '',
         ]];
-        $list1 = $this->saveSegment('s1', 's1', $filter);
+        $list1  = $this->saveSegment('s1', 's1', $filter);
         $filter = [[
             'object'     => 'lead',
             'glue'       => 'and',
@@ -77,7 +77,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
         $this->client->restart();
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list1->getId());
-        $form = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $form['leadlist[isPublished]']->setValue('0');
         $crawler = $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
@@ -102,7 +102,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($this->client->getResponse()->isOk());
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list2->getId());
-        $form = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $form['leadlist[isPublished]']->setValue('0');
         $crawler = $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
@@ -164,16 +164,16 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
                 'operator' => '!empty',
             ],
         ];
-        $segment = $this->saveSegment('Lead List 1', 'lead-list-1', $filters);
+        $segment   = $this->saveSegment('Lead List 1', 'lead-list-1', $filters);
         $segmentId = $segment->getId();
 
         // Check segment count UI for no contacts.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
-        $html = $this->getSegmentCountHtml($crawler, $segmentId);
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
         self::assertSame('No Contacts', $html);
 
         // Add 4 contacts.
-        $contacts = $this->saveContacts();
+        $contacts   = $this->saveContacts();
         $contact1Id = $contacts[0]->getId();
 
         // Rebuild segment - set current count to the cache.
@@ -181,7 +181,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check segment count UI for 4 contacts.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
-        $html = $this->getSegmentCountHtml($crawler, $segmentId);
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
         self::assertSame('View 4 Contacts', $html);
 
         // Remove 1 contact from segment.
@@ -191,7 +191,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check segment count UI for 3 contacts.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
-        $html = $this->getSegmentCountHtml($crawler, $segmentId);
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
         self::assertSame('View 3 Contacts', $html);
 
         // Add 1 contact back to segment.
@@ -202,12 +202,12 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check segment count UI for 4 contacts.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
-        $html = $this->getSegmentCountHtml($crawler, $segmentId);
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
         self::assertSame('View 4 Contacts', $html);
 
         // Check segment count AJAX for 4 contacts.
         $parameter = ['id' => $segmentId];
-        $response = $this->callGetLeadCountAjaxRequest($parameter);
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
         self::assertSame('View 4 Contacts', $response['content']['html']);
         self::assertSame(4, $response['content']['leadCount']);
         self::assertSame(Response::HTTP_OK, $response['statusCode']);
@@ -219,7 +219,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check segment count AJAX for 3 contacts.
         $parameter = ['id' => $segmentId];
-        $response = $this->callGetLeadCountAjaxRequest($parameter);
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
         self::assertSame('View 3 Contacts', $response['content']['html']);
         self::assertSame(3, $response['content']['leadCount']);
         self::assertSame(Response::HTTP_OK, $response['statusCode']);
@@ -232,7 +232,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check segment count AJAX for 4 contacts.
         $parameter = ['id' => $segmentId];
-        $response = $this->callGetLeadCountAjaxRequest($parameter);
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
         self::assertSame('View 4 Contacts', $response['content']['html']);
         self::assertSame(4, $response['content']['leadCount']);
         self::assertSame(Response::HTTP_OK, $response['statusCode']);
@@ -242,7 +242,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     {
         // Emulate invalid request parameter.
         $parameter = ['id' => 'ABC'];
-        $response = $this->callGetLeadCountAjaxRequest($parameter);
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
 
         self::assertSame('No Contacts', $response['content']['html']);
         self::assertSame(0, $response['content']['leadCount']);
@@ -256,7 +256,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     {
         $contacts = [];
 
-        for ($i = 1; $i <= $count; $i++) {
+        for ($i = 1; $i <= $count; ++$i) {
             $contact = new Lead();
             $contact->setFirstname('Contact '.$i)->setEmail('contact'.$i.'@example.com');
             $contacts[] = $contact;

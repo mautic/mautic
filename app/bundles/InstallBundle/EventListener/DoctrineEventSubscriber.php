@@ -20,16 +20,16 @@ class DoctrineEventSubscriber implements EventSubscriber
     {
         $schema = $args->getSchema();
 
-        $fieldGroups['leads'] = FieldModel::$coreFields;
+        $fieldGroups['leads']     = FieldModel::$coreFields;
         $fieldGroups['companies'] = FieldModel::$coreCompanyFields;
 
         foreach ($fieldGroups as $tableName => $fields) {
             $table = $schema->getTable(MAUTIC_TABLE_PREFIX.$tableName);
 
             foreach ($fields as $alias => $field) {
-                if (! $table->hasColumn($alias)) {
-                    $type = $field['type'] ?? 'text';
-                    $definition = SchemaDefinition::getSchemaDefinition($alias, $type, ! empty($field['unique']));
+                if (!$table->hasColumn($alias)) {
+                    $type       = $field['type'] ?? 'text';
+                    $definition = SchemaDefinition::getSchemaDefinition($alias, $type, !empty($field['unique']));
                     $table->addColumn($definition['name'], $definition['type'], $definition['options']);
 
                     if ('textarea' !== $type) {

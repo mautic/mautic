@@ -16,7 +16,7 @@ if ('index' == $tmpl):
     $view->extend('MauticLeadBundle:List:index.html.php');
 endif;
 $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list');
-$now = (new DateTimeHelper())->getUtcDateTime();
+$now         = (new DateTimeHelper())->getUtcDateTime();
 ?>
 
 <?php if (count($items)): ?>
@@ -161,7 +161,7 @@ $now = (new DateTimeHelper())->getUtcDateTime();
                             <?php else : ?>
                                 <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
                             <?php endif; ?>
-                            <?php if (! $item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()): ?>
+                            <?php if (!$item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()): ?>
                                 <br/>
                                 <span class="small">(<?php echo $item->getCreatedByUser(); ?>)</span>
                             <?php endif; ?>

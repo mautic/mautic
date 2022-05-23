@@ -26,10 +26,10 @@ class ListControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $urlAlias = 'segments';
+        $urlAlias   = 'segments';
         $routeAlias = 'leadlist';
-        $column = 'dateModified';
-        $column2 = 'name';
+        $column     = 'dateModified';
+        $column2    = 'name';
         $tableAlias = 'l.';
 
         $this->getControllerColumnTests($urlAlias, $routeAlias, $column, $tableAlias, $column2);
@@ -70,7 +70,7 @@ class ListControllerTest extends MauticMysqlTestCase
     public function testSegmentView(): void
     {
         $contacts = $this->createContacts();
-        $segment = $this->addContactsToSegment($contacts, 'MySeg');
+        $segment  = $this->addContactsToSegment($contacts, 'MySeg');
         $this->client->request('GET', sprintf('/s/segments/view/%d', $segment->getId()));
         $response = $this->client->getResponse();
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
@@ -82,9 +82,9 @@ class ListControllerTest extends MauticMysqlTestCase
 
     public function testSegmentContactGrid(): void
     {
-        $pageId = 1;
+        $pageId   = 1;
         $contacts = $this->createContacts();
-        $segment = $this->addContactsToSegment($contacts, 'MySeg');
+        $segment  = $this->addContactsToSegment($contacts, 'MySeg');
         $this->client->request('GET', sprintf('/s/segment/view/%d/contact/%d', $segment->getId(), $pageId));
         $response = $this->client->getResponse();
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
