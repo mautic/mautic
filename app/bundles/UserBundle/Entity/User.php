@@ -65,7 +65,7 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     private $position;
 
     /**
-     * @var Role
+     * @var Role|null
      */
     private $role;
 
@@ -303,22 +303,27 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
      */
     protected function isChanged($prop, $val)
     {
-        $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
-        if ('role' == $prop) {
-            if ($current && !$val) {
-                $this->changes['role'] = [$current->getName().' ('.$current->getId().')', $val];
-            } elseif (!$this->role && $val) {
-                $this->changes['role'] = [$current, $val->getName().' ('.$val->getId().')'];
-            } elseif ($current && $val && $current->getId() != $val->getId()) {
-                $this->changes['role'] = [
-                    $current->getName().'('.$current->getId().')',
-                    $val->getName().'('.$val->getId().')',
-                ];
+        if ('role' === $prop) {
+            /** @var Role|null $newRole */
+            $newRole     = $val;
+            $currentRole = $this->getRole();
+
+            if ($currentRole && $newRole) {
+                if ((int) $currentRole->getId() === (int) $newRole->getId()) {
+                    unset($this->changes['role']);
+                } else {
+                    $this->changes['role'] = [$currentRole->getNameAndId(), $newRole->getNameAndId()];
+                }
+            } elseif ($currentRole) {
+                $this->changes['role'] = [$currentRole->getNameAndId(), null];
+            } elseif ($newRole) {
+                $this->changes['role'] = [null, $newRole->getNameAndId()];
             }
-        } else {
-            parent::isChanged($prop, $val);
+
+            return;
         }
+
+        parent::isChanged($prop, $val);
     }
 
     /**
@@ -347,8 +352,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Get plain password.
-     *
      * @return string
      */
     public function getPlainPassword()
@@ -421,8 +424,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -431,8 +432,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Set username.
-     *
      * @param string $username
      *
      * @return User
@@ -446,8 +445,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Set password.
-     *
      * @param string $password
      *
      * @return User
@@ -460,8 +457,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Set plain password.
-     *
      * @param $plainPassword
      *
      * @return User
@@ -474,8 +469,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Set current password.
-     *
      * @param $currentPassword
      *
      * @return User
@@ -488,8 +481,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Set firstName.
-     *
      * @param string $firstName
      *
      * @return User
@@ -503,8 +494,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Get firstName.
-     *
      * @return string
      */
     public function getFirstName()
@@ -513,8 +502,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Set lastName.
-     *
      * @param string $lastName
      *
      * @return User
@@ -528,8 +515,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Get lastName.
-     *
      * @return string
      */
     public function getLastName()
@@ -538,8 +523,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Get full name.
-     *
      * @param bool $lastFirst
      *
      * @return string
@@ -550,8 +533,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Set email.
-     *
      * @param string $email
      *
      * @return User
@@ -565,8 +546,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Get email.
-     *
      * @return string
      */
     public function getEmail()
@@ -575,10 +554,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Set role.
-     *
-     * @param Role $role
-     *
      * @return User
      */
     public function setRole(Role $role = null)
@@ -590,9 +565,7 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Get role.
-     *
-     * @return Role
+     * @return Role|null
      */
     public function getRole()
     {
@@ -600,8 +573,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Set active permissions.
-     *
      * @return User
      */
     public function setActivePermissions(array $permissions)
@@ -612,8 +583,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Get active permissions.
-     *
      * @return mixed
      */
     public function getActivePermissions()
@@ -622,8 +591,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Set position.
-     *
      * @param string $position
      *
      * @return User
@@ -637,8 +604,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Get position.
-     *
      * @return string
      */
     public function getPosition()
@@ -647,8 +612,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Set timezone.
-     *
      * @param string $timezone
      *
      * @return User
@@ -662,8 +625,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Get timezone.
-     *
      * @return string
      */
     public function getTimezone()
@@ -672,8 +633,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Set locale.
-     *
      * @param string $locale
      *
      * @return User
@@ -687,8 +646,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Get locale.
-     *
      * @return string
      */
     public function getLocale()
@@ -765,8 +722,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Set signature.
-     *
      * @param string $signature
      *
      * @return User
@@ -780,8 +735,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * Get signature.
-     *
      * @return string
      */
     public function getSignature()

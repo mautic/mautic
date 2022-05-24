@@ -10,9 +10,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Role.
- */
 class Role extends FormEntity
 {
     /**
@@ -50,9 +47,6 @@ class Role extends FormEntity
      */
     private $users;
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->permissions = new ArrayCollection();
@@ -118,8 +112,6 @@ class Role extends FormEntity
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -128,8 +120,6 @@ class Role extends FormEntity
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      *
      * @return Role
@@ -143,8 +133,6 @@ class Role extends FormEntity
     }
 
     /**
-     * Get name.
-     *
      * @return string
      */
     public function getName()
@@ -153,8 +141,6 @@ class Role extends FormEntity
     }
 
     /**
-     * Add permissions.
-     *
      * @return Role
      */
     public function addPermission(Permission $permissions)
@@ -166,17 +152,12 @@ class Role extends FormEntity
         return $this;
     }
 
-    /**
-     * Remove permissions.
-     */
     public function removePermission(Permission $permissions)
     {
         $this->permissions->removeElement($permissions);
     }
 
     /**
-     * Get permissions.
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getPermissions()
@@ -185,8 +166,6 @@ class Role extends FormEntity
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      *
      * @return Role
@@ -200,8 +179,6 @@ class Role extends FormEntity
     }
 
     /**
-     * Get description.
-     *
      * @return string
      */
     public function getDescription()
@@ -210,8 +187,6 @@ class Role extends FormEntity
     }
 
     /**
-     * Set isAdmin.
-     *
      * @param bool $isAdmin
      *
      * @return Role
@@ -225,8 +200,6 @@ class Role extends FormEntity
     }
 
     /**
-     * Get isAdmin.
-     *
      * @return bool
      */
     public function getIsAdmin()
@@ -235,8 +208,6 @@ class Role extends FormEntity
     }
 
     /**
-     * Get isAdmin.
-     *
      * @return bool
      */
     public function isAdmin()
@@ -254,8 +225,6 @@ class Role extends FormEntity
     }
 
     /**
-     * Get rawPermissions.
-     *
      * @return array
      */
     public function getRawPermissions()
@@ -264,8 +233,6 @@ class Role extends FormEntity
     }
 
     /**
-     * Add users.
-     *
      * @return Role
      */
     public function addUser(User $users)
@@ -275,21 +242,21 @@ class Role extends FormEntity
         return $this;
     }
 
-    /**
-     * Remove users.
-     */
     public function removeUser(User $users)
     {
         $this->users->removeElement($users);
     }
 
     /**
-     * Get users.
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getUsers()
     {
         return $this->users;
+    }
+
+    public function getNameAndId(): string
+    {
+        return $this->getName().' ('.$this->getId().')';
     }
 }
