@@ -8,10 +8,8 @@ use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * Class FormApiController.
- */
 class FormApiController extends CommonApiController
 {
     /**
@@ -38,7 +36,7 @@ class FormApiController extends CommonApiController
      */
     protected function preSerializeEntity(&$entity, $action = 'view')
     {
-        $entity->automaticJs = '<script type="text/javascript" src="'.$this->generateUrl('mautic_form_generateform', ['id' => $entity->getId()], true).'"></script>';
+        $entity->automaticJs = '<script type="text/javascript" src="'.$this->generateUrl('mautic_form_generateform', ['id' => $entity->getId()], UrlGeneratorInterface::ABSOLUTE_URL).'"></script>';
     }
 
     /**

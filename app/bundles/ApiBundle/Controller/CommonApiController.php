@@ -30,11 +30,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CommonApiController.
- */
 class CommonApiController extends AbstractFOSRestController implements MauticController
 {
     use RequestTrait;
@@ -1125,7 +1123,7 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
                 $headers['Location'] = $this->generateUrl(
                     $route,
                     array_merge(['id' => $entity->getId()], $this->routeParams),
-                    true
+                    UrlGeneratorInterface::ABSOLUTE_URL
                 );
             }
 
