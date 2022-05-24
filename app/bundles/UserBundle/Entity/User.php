@@ -457,7 +457,7 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * @param $plainPassword
+     * @param string $plainPassword
      *
      * @return User
      */
@@ -469,7 +469,7 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * @param $currentPassword
+     * @param string $currentPassword
      *
      * @return User
      */
