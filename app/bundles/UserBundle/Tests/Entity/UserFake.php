@@ -4,20 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Entity;
 
-use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 
-class RoleFake extends Role
+class UserFake extends User
 {
-    private ?int $id;
-
     public function __construct(?int $id = null)
     {
         $this->id = $id;
         parent::__construct();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 }

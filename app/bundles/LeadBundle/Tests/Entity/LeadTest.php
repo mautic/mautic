@@ -7,6 +7,11 @@ use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Tests\Unit\Entity\StageFake;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Tests\Entity\UserFake;
+use PHPUnit\Framework\Assert;
 
 class LeadTest extends \PHPUnit\Framework\TestCase
 {
@@ -282,13 +287,75 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $contact->getChanges());
 
         $contact->addIpAddress($ip1);
-        $changes = $contact->getChanges();
 
         $this->assertSame(['1.2.3.4' => $ip1], $contact->getChanges()['ipAddressList']);
 
         $contact->addIpAddress($ip2);
 
         $this->assertSame(['1.2.3.4' => $ip1, '1.2.3.5' => $ip2], $contact->getChanges()['ipAddressList']);
+    }
+
+    public function testFirstNameChange(): void
+    {
+        $contact = new Lead();
+        $contact->setFirstName('John');
+        Assert::assertEquals(['firstname' => [null, 'John']], $contact->getChanges());
+
+        $contact->setFirstName('Jane');
+        Assert::assertEquals(['firstname' => ['John', 'Jane']], $contact->getChanges());
+
+        $contact->setFirstName(null);
+        Assert::assertEquals(['firstname' => ['Jane', null]], $contact->getChanges());
+    }
+
+    /**
+     * @dataProvider ownerProvider
+     * 
+     * @param mixed[] $expectedChanges
+     */
+    public function testOwnerChange(?User $currentOwner, ?User $newOnwer, array $expectedChanges): void
+    {
+        $contact = new Lead();
+        $contact->setOwner($currentOwner);
+        $contact->setOwner($newOnwer);
+        Assert::assertEquals($expectedChanges, $contact->getChanges());
+    }
+
+    /**
+     * @return iterable<mixed[]>
+     */
+    public function ownerProvider(): iterable
+    {
+        yield [null, null, []];
+        yield [new UserFake(11), null, ['owner' => [11, null]]];
+        yield [new UserFake(11), new UserFake(345), ['owner' => [11, 345]]];
+        yield [new UserFake(11), new UserFake(11), []];
+        yield [null,new UserFake(11), ['owner' => [null, 11]]];
+    }
+
+    /**
+     * @dataProvider stageProvider
+     * 
+     * @param mixed[] $expectedChanges
+     */
+    public function testStageChange(?Stage $currentStage, ?Stage $newStage, array $expectedChanges): void
+    {
+        $contact = new Lead();
+        $contact->setStage($currentStage);
+        $contact->setStage($newStage);
+        Assert::assertEquals($expectedChanges, $contact->getChanges());
+    }
+
+    /**
+     * @return iterable<mixed[]>
+     */
+    public function stageProvider(): iterable
+    {
+        yield [null, null, []];
+        yield [new StageFake(11), null, ['stage' => [11, null]]];
+        yield [new StageFake(11), new StageFake(345), ['stage' => [11, 345]]];
+        yield [new StageFake(11), new StageFake(11), []];
+        yield [null,new StageFake(11), ['stage' => [null, 11]]];
     }
 
     /**

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mautic\UserBundle\Tests\Entity;
+namespace Mautic\StageBundle\Tests\Unit\Entity;
 
-use Mautic\UserBundle\Entity\Role;
+use Mautic\StageBundle\Entity\Stage;
 
-class RoleFake extends Role
+class StageFake extends Stage
 {
     private ?int $id;
 

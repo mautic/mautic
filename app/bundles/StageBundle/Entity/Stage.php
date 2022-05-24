@@ -5,14 +5,12 @@ namespace Mautic\StageBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Stage.
- */
 class Stage extends FormEntity
 {
     /**
@@ -51,7 +49,7 @@ class Stage extends FormEntity
     private $log;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var Category
      **/
     private $category;
 
@@ -62,9 +60,6 @@ class Stage extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * Construct.
-     */
     public function __construct()
     {
         $this->log = new ArrayCollection();
@@ -127,8 +122,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -137,8 +130,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Set weight.
-     *
      * @return int
      */
     public function setWeight($type)
@@ -149,8 +140,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get weight.
-     *
      * @return int
      */
     public function getWeight()
@@ -167,8 +156,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      *
      * @return string
@@ -182,8 +169,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get description.
-     *
      * @return string
      */
     public function getDescription()
@@ -192,8 +177,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      *
      * @return string
@@ -207,8 +190,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get name.
-     *
      * @return string
      */
     public function getName()
@@ -217,8 +198,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Add log.
-     *
      * @return Log
      */
     public function addLog(LeadStageLog $log)
@@ -228,17 +207,12 @@ class Stage extends FormEntity
         return $this;
     }
 
-    /**
-     * Remove log.
-     */
     public function removeLog(LeadStageLog $log)
     {
         $this->log->removeElement($log);
     }
 
     /**
-     * Get log.
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getLog()
@@ -247,8 +221,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Set publishUp.
-     *
      * @param \DateTime $publishUp
      *
      * @return Stage
@@ -262,8 +234,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get publishUp.
-     *
      * @return \DateTime
      */
     public function getPublishUp()
@@ -272,8 +242,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Set publishDown.
-     *
      * @param \DateTime $publishDown
      *
      * @return Stage
@@ -287,8 +255,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get publishDown.
-     *
      * @return \DateTime
      */
     public function getPublishDown()
@@ -297,7 +263,7 @@ class Stage extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return Category|null
      */
     public function getCategory()
     {
@@ -305,7 +271,7 @@ class Stage extends FormEntity
     }
 
     /**
-     * @param mixed $category
+     * @param Category|null $category
      */
     public function setCategory($category)
     {

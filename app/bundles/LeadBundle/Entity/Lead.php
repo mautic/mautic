@@ -461,17 +461,49 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     protected function isChanged($prop, $val, $oldValue = null)
     {
+       
+        if ('owner' === $prop) {
+            /** @var User|null $newOwner */
+            $newOwner     = $val;
+            $currentOwner = $this->getOwner();
+            if ($currentOwner && $newOwner) {
+                if ((int) $currentOwner->getId() === (int) $newOwner->getId()) {
+                    unset($this->changes['owner']);
+                } else {
+                    $this->changes['owner'] = [$currentOwner->getId(), $newOwner->getId()];
+                }
+            } elseif ($currentOwner) {
+                $this->changes['owner'] = [$currentOwner->getId(), $newOwner];
+            } elseif ($newOwner) {
+                $this->changes['owner'] = [$currentOwner, $newOwner->getId()];
+            }
+
+            return;
+        }
+
+        if ('stage' === $prop) {
+            /** @var Stage|null $newStage */
+            $newStage     = $val;
+            $currentStage = $this->getStage();
+            if ($currentStage && $newStage) {
+                if ((int) $currentStage->getId() === (int) $newStage->getId()) {
+                    unset($this->changes['stage']);
+                } else {
+                    $this->changes['stage'] = [$currentStage->getId(), $newStage->getId()];
+                }
+            } elseif ($currentStage) {
+                $this->changes['stage'] = [$currentStage->getId(), $newStage];
+            } elseif ($newStage) {
+                $this->changes['stage'] = [$currentStage, $newStage->getId()];
+            }
+
+            return;
+        }
+
         $getter  = 'get'.ucfirst($prop);
         $current = null !== $oldValue ? $oldValue : $this->$getter();
-        if ('owner' == $prop) {
-            if ($current && !$val) {
-                $this->changes['owner'] = [$current->getId(), $val];
-            } elseif (!$current && $val) {
-                $this->changes['owner'] = [$current, $val->getId()];
-            } elseif ($current && $val && $current->getId() != $val->getId()) {
-                $this->changes['owner'] = [$current->getId(), $val->getId()];
-            }
-        } elseif ('ipAddresses' == $prop) {
+        
+        if ('ipAddresses' == $prop) {
             $this->changes['ipAddresses'] = ['', $val->getIpAddress()]; // Kept for BC. Not a good way to track changes on a collection
 
             if (empty($this->changes['ipAddressList'])) {
@@ -514,14 +546,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 $this->changes['frequencyRules'][$channel] = $val->getChanges();
             } else {
                 $this->changes['frequencyRules']['removed'][] = $val;
-            }
-        } elseif ('stage' == $prop) {
-            if ($current && !$val) {
-                $this->changes['stage'] = [$current->getId(), $val];
-            } elseif (!$current && $val) {
-                $this->changes['stage'] = [$current, $val->getId()];
-            } elseif ($current && $val && $current->getId() != $val->getId()) {
-                $this->changes['stage'] = [$current->getId(), $val->getId()];
             }
         } elseif ('points' == $prop && $current != $val) {
             $this->changes['points'] = [$current, $val];
@@ -1384,11 +1408,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Set stage.
+     * @param Stage|null $stage
      *
-     * @param \Mautic\StageBundle\Entity\Stage $stage
-     *
-     * @return Stage
+     * @return Lead
      */
     public function setStage(Stage $stage = null)
     {
@@ -1399,9 +1421,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get stage.
-     *
-     * @return \Mautic\StageBundle\Entity\Stage
+     * @return Stage|null
      */
     public function getStage()
     {
