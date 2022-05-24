@@ -461,7 +461,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     protected function isChanged($prop, $val, $oldValue = null)
     {
-       
         if ('owner' === $prop) {
             /** @var User|null $newOwner */
             $newOwner     = $val;
@@ -502,7 +501,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
         $getter  = 'get'.ucfirst($prop);
         $current = null !== $oldValue ? $oldValue : $this->$getter();
-        
+
         if ('ipAddresses' == $prop) {
             $this->changes['ipAddresses'] = ['', $val->getIpAddress()]; // Kept for BC. Not a good way to track changes on a collection
 
@@ -1408,8 +1407,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param Stage|null $stage
-     *
      * @return Lead
      */
     public function setStage(Stage $stage = null)

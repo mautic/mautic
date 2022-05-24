@@ -38,7 +38,7 @@ class CompanyTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider ownerProvider
-     * 
+     *
      * @param mixed[] $expectedChanges
      */
     public function testOwnerChange(?User $currentOwner, ?User $newOnwer, array $expectedChanges): void
@@ -58,6 +58,6 @@ class CompanyTest extends \PHPUnit\Framework\TestCase
         yield [new UserFake(11), null, ['owner' => [11, null]]];
         yield [new UserFake(11), new UserFake(345), ['owner' => [11, 345]]];
         yield [new UserFake(11), new UserFake(11), []];
-        yield [null,new UserFake(11), ['owner' => [null, 11]]];
+        yield [null, new UserFake(11), ['owner' => [null, 11]]];
     }
 }

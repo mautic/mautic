@@ -217,8 +217,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param User|null $owner
-     *
      * @return Company
      */
     public function setOwner(User $owner = null)

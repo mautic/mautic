@@ -310,7 +310,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider ownerProvider
-     * 
+     *
      * @param mixed[] $expectedChanges
      */
     public function testOwnerChange(?User $currentOwner, ?User $newOnwer, array $expectedChanges): void
@@ -330,12 +330,12 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         yield [new UserFake(11), null, ['owner' => [11, null]]];
         yield [new UserFake(11), new UserFake(345), ['owner' => [11, 345]]];
         yield [new UserFake(11), new UserFake(11), []];
-        yield [null,new UserFake(11), ['owner' => [null, 11]]];
+        yield [null, new UserFake(11), ['owner' => [null, 11]]];
     }
 
     /**
      * @dataProvider stageProvider
-     * 
+     *
      * @param mixed[] $expectedChanges
      */
     public function testStageChange(?Stage $currentStage, ?Stage $newStage, array $expectedChanges): void
@@ -355,7 +355,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         yield [new StageFake(11), null, ['stage' => [11, null]]];
         yield [new StageFake(11), new StageFake(345), ['stage' => [11, 345]]];
         yield [new StageFake(11), new StageFake(11), []];
-        yield [null,new StageFake(11), ['stage' => [null, 11]]];
+        yield [null, new StageFake(11), ['stage' => [null, 11]]];
     }
 
     /**

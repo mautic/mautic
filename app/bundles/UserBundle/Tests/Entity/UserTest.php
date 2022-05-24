@@ -32,7 +32,7 @@ class UserTest extends TestCase
 
     /**
      * @dataProvider roleProvider
-     * 
+     *
      * @param mixed[] $expectedChanges
      */
     public function testRoleChange(?Role $currentRole, ?Role $newRole, array $expectedChanges): void
