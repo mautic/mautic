@@ -96,16 +96,8 @@
       "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
     },
     {
-      "type": "package",
-      "package": {
-        "name": "fresh-consulting/fresh-consulting-wcag-linter",
-        "version": "1.0",
-        "source": {
-          "url": "https://github.com/FreshConsulting/FreshConsulting-WCAG-Linter.git",
-          "type": "git",
-          "reference": "master"
-        }
-      }
+      "type": "git",
+      "url": "https://github.com/FreshConsulting/FreshConsulting-WCAG-Linter.git"
     }
   ],
   "conflict": {

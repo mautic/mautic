@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8ef905e8fc7ce47f47a6c5f646cc0538",
+    "content-hash": "4316e6261314a94a0ea5b6043b79b3bd",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2782,14 +2782,20 @@
             "time": "2021-12-25T01:21:49+00:00"
         },
         {
-            "name": "fresh-consulting/fresh-consulting-wcag-linter",
-            "version": "1.0",
+            "name": "freshconsulting/wcag_linter",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FreshConsulting/FreshConsulting-WCAG-Linter.git",
-                "reference": "master"
+                "reference": "a3e03be9cf90e09583cb080e79d4c48ea57cb8f7"
             },
-            "type": "library"
+            "default-branch": true,
+            "type": "library",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "A PHP_CodeSniffer custom rule (sniff) to detect obvious WCAG 2.0 accessibility violations.",
+            "time": "2019-07-17T17:10:17+00:00"
         },
         {
             "name": "friendsofphp/proxy-manager-lts",
@@ -5619,7 +5625,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "26de85c160019b2e7a8578337c0b03b259d72adc"
+                "reference": "e298afdcc51aa2665cbf75a05cb8acd79186abf8"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5637,7 +5643,7 @@
                 "ext-imap": "*",
                 "ext-zip": "*",
                 "ext-zlib": "*",
-                "fresh-consulting/fresh-consulting-wcag-linter": "^1.0",
+                "freshconsulting/wcag_linter": "dev-master",
                 "friendsofsymfony/oauth-server-bundle": "dev-doctrine-fix",
                 "friendsofsymfony/rest-bundle": "^3.0.2",
                 "gaufrette/aws-s3-adapter": "^0.4.0",
