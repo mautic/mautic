@@ -35,7 +35,6 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.email.send
                                     ?>
                                 </span>
                             </div>
-                            <?php echo $view['form']->errors($form['batchlimit']); ?>
                             <div class="text-center">
                                 <span class="label label-primary mt-lg"><?php echo $view['translator']->trans(
                                         'mautic.email.send.pending',
