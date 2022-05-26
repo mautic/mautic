@@ -278,7 +278,7 @@ class LeadListRepository extends CommonRepository
         $countListIds = count($listIds);
 
         if (1 === $countListIds) {
-            $q          = $this->forceUseIndex($q, MAUTIC_TABLE_PREFIX.'manually_removed');
+            $q          = $this->forceUseIndex($q, 'manually_removed');
             $expression = $q->expr()->eq('l.leadlist_id', $listIds[0]);
         } else {
             $expression = $q->expr()->in('l.leadlist_id', $listIds);
