@@ -26,6 +26,9 @@ class ObjectMappingRepository extends CommonRepository
         return $this->doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName);
     }
 
+    /**
+     * @return array<string,mixed>|null
+     */
     public function getInternalObjectWithLock(string $integration, string $integrationObjectName, string $integrationObjectId, string $internalObjectName, string $lock = 'LOCK IN SHARE MODE'): ?array
     {
         return $this->doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName, $lock);
