@@ -460,7 +460,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                     'alias'   => 'stage_date_added',
                     'label'   => null,
                     'type'    => 'string',
-                    'formula' => '(SELECT MAX(stage_log.date_added) FROM lead_stages_change_log stage_log WHERE stage_log.stage_id = l.stage_id AND stage_log.lead_id = l.id)',
+                    'formula' => '(SELECT MAX(stage_log.date_added) FROM '.MAUTIC_TABLE_PREFIX.'lead_stages_change_log stage_log WHERE stage_log.stage_id = l.stage_id AND stage_log.lead_id = l.id)',
                 ];
                 break;
             case 'contact.frequencyrules':

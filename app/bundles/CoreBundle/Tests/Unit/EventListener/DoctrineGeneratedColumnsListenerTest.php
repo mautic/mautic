@@ -52,7 +52,7 @@ class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->schema->expects($this->once())
             ->method('hasTable')
-            ->with('page_hits')
+            ->with(MAUTIC_TABLE_PREFIX.'page_hits')
             ->willReturn(false);
 
         $this->schema->expects($this->never())
@@ -65,12 +65,12 @@ class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->schema->expects($this->once())
             ->method('hasTable')
-            ->with('page_hits')
+            ->with(MAUTIC_TABLE_PREFIX.'page_hits')
             ->willReturn(true);
 
         $this->schema->expects($this->once())
             ->method('getTable')
-            ->with('page_hits')
+            ->with(MAUTIC_TABLE_PREFIX.'page_hits')
             ->willReturn($this->table);
 
         $this->table->expects($this->once())
@@ -88,12 +88,12 @@ class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->schema->expects($this->once())
             ->method('hasTable')
-            ->with('page_hits')
+            ->with(MAUTIC_TABLE_PREFIX.'page_hits')
             ->willReturn(true);
 
         $this->schema->expects($this->once())
             ->method('getTable')
-            ->with('page_hits')
+            ->with(MAUTIC_TABLE_PREFIX.'page_hits')
             ->willReturn($this->table);
 
         $this->table->expects($this->once())

@@ -332,7 +332,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('from')
-            ->with('lead_event_log', 't');
+            ->with(MAUTIC_TABLE_PREFIX.'lead_event_log', 't');
 
         $this->queryBuilder->expects($this->once())
             ->method('groupBy')

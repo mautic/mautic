@@ -86,7 +86,7 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
 
         /** @var GeneratedColumn $generatedColumn */
         $generatedColumn = $generatedColumns->current();
-        $this->assertSame('page_hits', $generatedColumn->getTableName());
+        $this->assertSame(MAUTIC_TABLE_PREFIX.'page_hits', $generatedColumn->getTableName());
 
         // Ensure that the cache works and dispatcher is called only once
         $generatedColumns = $this->provider->getGeneratedColumns();

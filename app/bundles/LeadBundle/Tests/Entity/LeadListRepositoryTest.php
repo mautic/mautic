@@ -128,7 +128,7 @@ class LeadListRepositoryTest extends TestCase
                 ],
                 [
                     MAUTIC_TABLE_PREFIX.'lead_lists_leads',
-                    'l USE INDEX '.MAUTIC_TABLE_PREFIX.'(manually_removed)',
+                    'l USE INDEX ('.MAUTIC_TABLE_PREFIX.'manually_removed)',
                 ]
             )
             ->willReturnOnConsecutiveCalls($this->queryBuilderMock, $this->queryBuilderMock);
