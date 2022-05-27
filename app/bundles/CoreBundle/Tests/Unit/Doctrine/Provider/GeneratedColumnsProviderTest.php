@@ -34,8 +34,6 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->versionProvider = $this->createMock(VersionProviderInterface::class);
         $this->dispatcher      = $this->createMock(EventDispatcherInterface::class);
         $this->provider        = new GeneratedColumnsProvider($this->versionProvider, $this->dispatcher);

@@ -14,15 +14,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', '');
-        }
-    }
-
     public function testCommandDryRun()
     {
         $mockEntityManager = $this->buildMockEntityManager(['test1', 'test2']);

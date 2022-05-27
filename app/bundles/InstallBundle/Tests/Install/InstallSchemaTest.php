@@ -36,8 +36,6 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
         $envFile = file_exists($root.'.env') ? $root.'.env' : $root.'.env.dist';
 
         $env->load($envFile);
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->dbParams = [
             'driver'        => getenv('DB_DRIVER') ?: 'pdo_mysql',
             'host'          => getenv('DB_HOST'),

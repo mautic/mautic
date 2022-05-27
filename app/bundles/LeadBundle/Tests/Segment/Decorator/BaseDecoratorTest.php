@@ -8,12 +8,6 @@ use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 
 class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-    }
-
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getField
      */

@@ -27,8 +27,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->prefix = MAUTIC_TABLE_PREFIX;
 
         $configPath = $this->getConfigPath();

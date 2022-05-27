@@ -67,8 +67,6 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->versionProvider          = $this->createMock(VersionProviderInterface::class);
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->connection               = $this->createMock(Connection::class);

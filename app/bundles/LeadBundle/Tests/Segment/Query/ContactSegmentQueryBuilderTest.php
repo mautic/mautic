@@ -15,10 +15,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ContactSegmentQueryBuilderTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-    }
 
     public function testAddNewContactsRestrictions(): void
     {

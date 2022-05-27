@@ -12,7 +12,6 @@ class FieldChangeRepositoryTest extends TestCase
 {
     public function testWhereQueryPartForFindingChangesForSingleObject()
     {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
         $dbalMock = new DBALMocker($this);
         $metadata = $this->createMock(ClassMetadata::class);
 

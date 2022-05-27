@@ -24,7 +24,6 @@ class SegmentLogReportSubscriberTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->fieldsBuilder = $this->createMock(FieldsBuilder::class);
 

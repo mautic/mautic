@@ -66,8 +66,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $this->connectionMock           = $this->createMock(Connection::class);
         $this->companyReportDataMock    = $this->createMock(CompanyReportData::class);
         $this->statRepository           = $this->createMock(StatRepository::class);

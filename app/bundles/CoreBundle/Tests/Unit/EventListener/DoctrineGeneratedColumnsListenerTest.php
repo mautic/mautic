@@ -49,8 +49,6 @@ class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->logger                   = $this->createMock(LoggerInterface::class);
         $this->event                    = $this->createMock(GenerateSchemaEventArgs::class);

@@ -16,11 +16,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class DoNotContactFilterQueryBuilderTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-    }
-
     public function testGetServiceId(): void
     {
         Assert::assertSame('mautic.lead.query.builder.special.dnc', DoNotContactFilterQueryBuilder::getServiceId());

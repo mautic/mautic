@@ -36,10 +36,6 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnDataCleanup()
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', 'mautic');
-        }
-
         $dateTime         = new \DateTimeImmutable();
         $format           = 'Y-m-d H:i:s';
         $rowCount         = 2;

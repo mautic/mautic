@@ -26,8 +26,6 @@ class GeneratedColumnSubscriberTest extends TestCase
 
     protected function setUp(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         parent::setUp();
 
         $segmentModel = new class() extends ListModel {

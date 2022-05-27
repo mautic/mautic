@@ -42,7 +42,6 @@ class ReportSubscriberTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->companyReportData = $this->createMock(CompanyReportData::class);
         $this->hitRepository     = $this->createMock(HitRepository::class);

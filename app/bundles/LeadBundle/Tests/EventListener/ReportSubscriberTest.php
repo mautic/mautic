@@ -169,10 +169,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', '');
-        }
-
         $this->leadModelMock                    = $this->createMock(LeadModel::class);
         $this->stageModelMock                   = $this->createMock(StageModel::class);
         $this->campaignModelMock                = $this->createMock(CampaignModel::class);

@@ -23,8 +23,6 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $this->entityManager  = $this->createMock(EntityManager::class);
         $this->logger         = $this->createMock(LoggerInterface::class);
         $this->ipAddressModel = new IpAddressModel($this->entityManager, $this->logger);

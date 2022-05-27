@@ -10,8 +10,6 @@ class GeneratedColumnTest extends \PHPUnit\Framework\TestCase
 {
     public function testAllGettersAndSeters(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $generatedColumn = new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'CONCAT(YEAR(date_hit), "-", LPAD(MONTH(date_hit), 2, "0"), "-", LPAD(DAY(date_hit), 2, "0"))');
         $generatedColumn->addIndexColumn('page_id');
         $generatedColumn->setOriginalDateColumn('date_hit', 'd');

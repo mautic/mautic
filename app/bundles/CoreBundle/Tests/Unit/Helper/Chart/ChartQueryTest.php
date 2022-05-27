@@ -53,8 +53,6 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $this->dateFrom     = new \DateTime('2018-01-01 12:00:00');
         $this->dateTo       = new \DateTime('2018-02-01 12:00:00');
         $this->unit         = 'd';
