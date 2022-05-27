@@ -34,6 +34,7 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
         $env     = new Dotenv();
         $root    = __DIR__.'/../../../../../';
         $envFile = file_exists($root.'.env') ? $root.'.env' : $root.'.env.dist';
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 
         $env->load($envFile);
         $this->dbParams = [
