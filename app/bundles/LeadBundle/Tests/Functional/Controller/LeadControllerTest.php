@@ -33,16 +33,13 @@ class LeadControllerTest extends MauticMysqlTestCase
         }
     }
 
-    /**
-     * @dataProvider getContactExportIsScheduledProvider
-     */
-    public function testContactExportIsScheduled(string $fileType): void
+    public function testContactExportIsScheduledForCsvFileType(): void
     {
         $this->createContacts();
         $this->client->request(
             Request::METHOD_POST,
-            's/contacts/contactExportScheduler',
-            ['filetype' => $fileType]
+            's/contacts/batchExport',
+            ['filetype' => 'csv']
         );
         Assert::assertTrue($this->client->getResponse()->isOk());
         $contactExportSchedulerRows = $this->checkContactExportScheduler(1);
@@ -66,15 +63,6 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
         $this->client->request(Request::METHOD_GET, $link);
         Assert::assertTrue($this->client->getResponse()->isOk());
-    }
-
-    /**
-     * @return iterable<mixed>
-     */
-    public function getContactExportIsScheduledProvider(): iterable
-    {
-        yield ['csv'];
-        yield ['xlsx'];
     }
 
     private function createContacts(): void

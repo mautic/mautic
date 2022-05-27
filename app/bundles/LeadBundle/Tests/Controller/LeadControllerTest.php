@@ -11,6 +11,7 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -274,23 +275,40 @@ class LeadControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * Only tests if an actual CSV file is returned and if the content size isn't suspiciously small.
-     * We do more in-depth tests in \Mautic\CoreBundle\Tests\Unit\Helper\ExportHelperTest.
+     * Only tests if a contact export is scheduled for CSV file.
      */
-    public function testCsvIsExportedCorrectly(): void
+    public function testCsvIsScheduledForExport(): void
     {
         $this->loadFixtures([LoadLeadData::class]);
-
-        ob_start();
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=csv');
-        $content = ob_get_contents();
-        ob_end_clean();
-
         $clientResponse = $this->client->getResponse();
-
-        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'text/csv; charset=UTF-8');
-        $this->assertEquals(true, (strlen($content) > 5000));
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertStringContainsString(
+            'Contact export scheduled for CSV file type.',
+            $clientResponse->getContent()
+        );
+        $contactExportScheduler = $this->em->getRepository(ContactExportScheduler::class)->findOneBy([]);
+        $data                   = $contactExportScheduler->getData();
+        Assert::assertSame(
+            [
+                'start'          => 0,
+                'limit'          => 200,
+                'filter'         => [
+                    'string' => '',
+                    'force'  => [
+                        [
+                            'column' => 'l.dateIdentified',
+                            'expr'   => 'isNotNull',
+                        ],
+                    ],
+                ],
+                'orderBy'        => 'l.last_active',
+                'orderByDir'     => 'DESC',
+                'withTotalCount' => true,
+                'fileType'       => 'csv',
+            ],
+            $data
+        );
     }
 
     /**
