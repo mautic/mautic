@@ -5625,7 +5625,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "ece66e7afc9ea6aa3427b056b83fc5a2a06d1475"
+                "reference": "e298afdcc51aa2665cbf75a05cb8acd79186abf8"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5643,7 +5643,7 @@
                 "ext-imap": "*",
                 "ext-zip": "*",
                 "ext-zlib": "*",
-                "freshconsulting/wcag_linter": "@dev",
+                "freshconsulting/wcag_linter": "dev-master",
                 "friendsofsymfony/oauth-server-bundle": "dev-doctrine-fix",
                 "friendsofsymfony/rest-bundle": "^3.0.2",
                 "gaufrette/aws-s3-adapter": "^0.4.0",

@@ -72,6 +72,10 @@
       "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
     },
     {
+      "type": "git",
+      "url": "https://github.com/FreshConsulting/FreshConsulting-WCAG-Linter.git"
+    },
+    {
         "type": "path",
         "url": "../app",
         "options": {
