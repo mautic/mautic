@@ -47,6 +47,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $report;
 
+    /**
+     * @var ChannelListHelper|MockObject
+     */
     private $channelListHelper;
 
     /**

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 
 class GeneratedColumnTest extends \PHPUnit\Framework\TestCase
 {
-    public function testAllGettersAndSeters()
+    public function testAllGettersAndSeters(): void
     {
         defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 

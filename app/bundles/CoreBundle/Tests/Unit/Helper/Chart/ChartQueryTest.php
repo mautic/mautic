@@ -65,7 +65,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
     }
 
-    public function testClassicDateColumn()
+    public function testClassicDateColumn(): void
     {
         $this->createChartQuery();
 
@@ -88,7 +88,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $this->chartQuery->prepareTimeDataQuery('email_stats', $this->dateColumn);
     }
 
-    public function testGeneratedDateColumn()
+    public function testGeneratedDateColumn(): void
     {
         $this->createChartQuery();
 
@@ -306,6 +306,10 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $this->chartQuery = new ChartQuery($this->connection, $this->dateFrom, $this->dateTo, $this->unit);
     }
 
+    /**
+     * @param array<mixed> $expectedResult
+     * @param array<mixed> $data
+     */
     private function assertTimeDataWithoutSqlOrder($expectedResult, $data): void
     {
         $this->createChartQuery();

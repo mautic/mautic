@@ -10,7 +10,7 @@ use PHPUnit\Framework\Assert;
 
 class LeadEventLogRepositoryTest extends MauticMysqlTestCase
 {
-    public function testThatRemoveEventLogsMethodRemovesLogs()
+    public function testThatRemoveEventLogsMethodRemovesLogs(): void
     {
         $eventId    = random_int(200, 2000);
         $connection = $this->em->getConnection();

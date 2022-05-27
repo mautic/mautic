@@ -11,8 +11,19 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 
 class EmailRepositoryTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $mockConnection;
+
+    /**
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $em;
+
+    /**
+     * @var ClassMetadata<EmailRepository>|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $cm;
 
     /**
@@ -56,7 +67,7 @@ class EmailRepositoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->mockConnection);
     }
 
-    public function testGetEmailPendingQueryForSimpleCount()
+    public function testGetEmailPendingQueryForSimpleCount(): void
     {
         $emailId         = 5;
         $variantIds      = null;
@@ -83,7 +94,7 @@ class EmailRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['false' => false], $query->getParameters());
     }
 
-    public function testGetEmailPendingQueryForMaxMinIdCount()
+    public function testGetEmailPendingQueryForMaxMinIdCount(): void
     {
         $emailId         = 5;
         $variantIds      = null;
@@ -110,7 +121,7 @@ class EmailRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['false' => false], $query->getParameters());
     }
 
-    public function testGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined()
+    public function testGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined(): void
     {
         $emailId         = 5;
         $variantIds      = null;
