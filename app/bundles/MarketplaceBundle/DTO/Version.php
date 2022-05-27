@@ -10,6 +10,7 @@ final class Version
     public array $license;
     public string $homepage;
     public string $issues;
+    public string $wiki;
     public \DateTimeInterface $time;
     public array $require;
     public array $keywords;
@@ -17,13 +18,14 @@ final class Version
     public ?string $directoryName;
     public ?string $displayName;
 
-    public function __construct(string $version, array $license, \DateTimeInterface $time, string $homepage, string $issues, array $require, array $keywords, ?string $type, ?string $directoryName, ?string $displayName)
+    public function __construct(string $version, array $license, \DateTimeInterface $time, string $homepage, string $issues, string $wiki, array $require, array $keywords, ?string $type, ?string $directoryName, ?string $displayName)
     {
         $this->version       = $version;
         $this->license       = $license;
         $this->time          = $time;
         $this->homepage      = $homepage;
         $this->issues        = $issues;
+        $this->wiki          = $wiki;
         $this->require       = $require;
         $this->keywords      = $keywords;
         $this->type          = $type;
@@ -39,6 +41,7 @@ final class Version
             new \DateTimeImmutable($array['time']),
             $array['homepage'],
             $array['support']['issues'] ?? '',
+            $array['support']['wiki'] ?? '',
             $array['require'] ?? [],
             $array['keywords'] ?? [],
             $array['type'] ?? null,

@@ -13,7 +13,7 @@ $isInstalled = $isInstalled;
 /** @var bool $isComposerEnabled */
 $isComposerEnabled = $isComposerEnabled;
 
-$view['slots']->set('headerTitle', $view->escape($packageDetail->getHumanPackageName()));
+$view['slots']->set('headerTitle', $view->escape($packageDetail->packageBase->getHumanPackageName()));
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $buttons = [
@@ -23,6 +23,7 @@ $buttons = [
         ],
         'btnText'   => $view['translator']->trans('mautic.core.form.close'),
         'iconClass' => 'fa fa-remove',
+        'primary'   => true,
     ],
 ];
 
@@ -34,16 +35,31 @@ if (!$latestVersion) {
     $latestVersion = $packageDetail->versions->findLatestVersionPackage();
 }
 
-if (isset($latestVersion) && $latestVersion->issues) {
+if ($latestVersion && $latestVersion->issues) {
     $buttons[] = [
         'attr' => [
             'href'   => $latestVersion->issues,
             'target' => '_blank',
             'rel'    => 'noopener noreferrer',
+            'data-toggle' => '',
         ],
         'btnText'   => $view['translator']->trans('marketplace.package.issue.tracker'),
         'iconClass' => 'fa fa-question',
-        'primary'   => true,
+        'primary'   => false,
+    ];
+}
+
+if ($latestVersion && $latestVersion->wiki) {
+    $buttons[] = [
+        'attr' => [
+            'href'   => $latestVersion->wiki,
+            'target' => '_blank',
+            'rel'    => 'noopener noreferrer',
+            'data-toggle' => '',
+        ],
+        'btnText'   => $view['translator']->trans('marketplace.package.wiki'),
+        'iconClass' => 'fa fa-book',
+        'primary'   => false,
     ];
 }
 
@@ -268,14 +284,14 @@ $view['slots']->set(
 
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', [
     'id'            => 'InstallationInProgressModal',
-    'header'        => 'Installing '.$packageDetail->getHumanPackageName(),
+    'header'        => 'Installing '.$view->escape($packageDetail->packageBase->getHumanPackageName()),
     'size'          => 'md',
     'footerButtons' => false,
 ]); ?>
 
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', [
     'id'            => 'RemovalInProgressModal',
-    'header'        => 'Removing '.$packageDetail->getHumanPackageName(),
+    'header'        => 'Removing '.$view->escape($packageDetail->packageBase->getHumanPackageName()),
     'size'          => 'md',
     'footerButtons' => false,
 ]); ?>
