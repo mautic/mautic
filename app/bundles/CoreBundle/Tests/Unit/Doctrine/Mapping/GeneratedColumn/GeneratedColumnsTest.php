@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 
 class GeneratedColumnsTest extends \PHPUnit\Framework\TestCase
 {
-    public function testAllGettersAndSeters()
+    public function testAllGettersAndSeters(): void
     {
         $generatedColumn1 = new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important');
         $generatedColumn2 = new GeneratedColumn('page_hits2', 'generated_hit_date2', 'DATE', 'not important');

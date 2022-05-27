@@ -32,7 +32,7 @@ class SegmentLogReportSubscriberTest extends TestCase
         );
     }
 
-    public function testOnReportBuilder()
+    public function testOnReportBuilder(): void
     {
         $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
             ->disableOriginalConstructor()
@@ -69,7 +69,7 @@ class SegmentLogReportSubscriberTest extends TestCase
         $this->assertCount(1, $setTables);
     }
 
-    public function testOnReportGenerate()
+    public function testOnReportGenerate(): void
     {
         // Mock query builder
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)

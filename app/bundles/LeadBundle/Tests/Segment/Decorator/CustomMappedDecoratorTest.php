@@ -13,7 +13,7 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::getField
      */
-    public function testGetField()
+    public function testGetField(): void
     {
         $customMappedDecorator = $this->getDecorator();
 
@@ -27,7 +27,7 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::getTable
      */
-    public function testGetTable()
+    public function testGetTable(): void
     {
         $customMappedDecorator = $this->getDecorator();
 
@@ -41,7 +41,7 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::getQueryType
      */
-    public function testGetQueryType()
+    public function testGetQueryType(): void
     {
         $customMappedDecorator = $this->getDecorator();
 

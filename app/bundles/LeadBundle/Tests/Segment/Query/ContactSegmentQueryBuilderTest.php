@@ -15,7 +15,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ContactSegmentQueryBuilderTest extends TestCase
 {
-
     public function testAddNewContactsRestrictions(): void
     {
         $queryBuilder = new QueryBuilder($this->createConnection());

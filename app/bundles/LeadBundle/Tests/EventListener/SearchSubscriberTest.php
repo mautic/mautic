@@ -23,7 +23,7 @@ class SearchSubscriberTest extends TestCase
     /**
      * Tests emailread search command.
      */
-    public function testOnBuildSearchCommands()
+    public function testOnBuildSearchCommands(): void
     {
         $contactRepository = $this->createMock(LeadRepository::class);
         $emailRepository   = $this->createMock(EmailRepository::class);

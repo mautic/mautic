@@ -53,7 +53,7 @@ class ReportSubscriberTest extends TestCase
         );
     }
 
-    public function testOnReportBuilderAddsPageAndPageHitReports()
+    public function testOnReportBuilderAddsPageAndPageHitReports(): void
     {
         $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
             ->disableOriginalConstructor()
@@ -113,7 +113,7 @@ class ReportSubscriberTest extends TestCase
         $this->assertCount(9, $setGraphs);
     }
 
-    public function testOnReportGeneratePagesContext()
+    public function testOnReportGeneratePagesContext(): void
     {
         $mockEvent = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
@@ -159,7 +159,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGenerate($mockEvent);
     }
 
-    public function testOnReportGeneratePageHitsContext()
+    public function testOnReportGeneratePageHitsContext(): void
     {
         $mockEvent = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
@@ -209,7 +209,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGenerate($mockEvent);
     }
 
-    public function testOnReportGraphGenerateBadContextWillReturn()
+    public function testOnReportGraphGenerateBadContextWillReturn(): void
     {
         $mockEvent = $this->getMockBuilder(ReportGraphEvent::class)
             ->disableOriginalConstructor()
@@ -226,7 +226,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGraphGenerate($mockEvent);
     }
 
-    public function testOnReportGraphGenerate()
+    public function testOnReportGraphGenerate(): void
     {
         $mockEvent = $this->getMockBuilder(ReportGraphEvent::class)
             ->disableOriginalConstructor()

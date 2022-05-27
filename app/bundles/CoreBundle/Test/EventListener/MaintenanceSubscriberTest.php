@@ -26,7 +26,7 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber    = new MaintenanceSubscriber($connection, $userTokenRepository, $translator);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [CoreEvents::MAINTENANCE_CLEANUP_DATA => ['onDataCleanup', -50]],
@@ -34,7 +34,7 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnDataCleanup()
+    public function testOnDataCleanup(): void
     {
         $dateTime         = new \DateTimeImmutable();
         $format           = 'Y-m-d H:i:s';

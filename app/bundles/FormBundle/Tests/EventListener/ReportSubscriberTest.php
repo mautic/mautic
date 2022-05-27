@@ -15,7 +15,14 @@ use PHPUnit\Framework\TestCase;
 
 class ReportSubscriberTest extends TestCase
 {
+    /**
+     * @var SubmissionRepository|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $submissionRepository;
+
+    /**
+     * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $companyReportData;
 
     /**
@@ -32,7 +39,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber           = new ReportSubscriber($this->companyReportData, $this->submissionRepository);
     }
 
-    public function testOnReportBuilderAddsFormAndFormSubmissionReports()
+    public function testOnReportBuilderAddsFormAndFormSubmissionReports(): void
     {
         $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
             ->disableOriginalConstructor()
@@ -102,7 +109,7 @@ class ReportSubscriberTest extends TestCase
         $this->assertCount(3, $setGraphs);
     }
 
-    public function testOnReportGenerateFormsContext()
+    public function testOnReportGenerateFormsContext(): void
     {
         $mockQueryBuilder = $this->createMock(QueryBuilder::class);
         $mockEvent        = $this->getMockBuilder(ReportGeneratorEvent::class)
@@ -130,7 +137,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGenerate($mockEvent);
     }
 
-    public function testOnReportGenerateFormSubmissionContext()
+    public function testOnReportGenerateFormSubmissionContext(): void
     {
         $mockQueryBuilder = $this->createMock(QueryBuilder::class);
         $mockEvent        = $this->getMockBuilder(ReportGeneratorEvent::class)
@@ -166,7 +173,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGenerate($mockEvent);
     }
 
-    public function testOnReportGraphGenerateBadContextWillReturn()
+    public function testOnReportGraphGenerateBadContextWillReturn(): void
     {
         $mockEvent = $this->createMock(ReportGraphEvent::class);
 
@@ -180,7 +187,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGraphGenerate($mockEvent);
     }
 
-    public function testOnReportGraphGenerate()
+    public function testOnReportGraphGenerate(): void
     {
         $mockEvent        = $this->createMock(ReportGraphEvent::class);
         $mockTrans        = $this->createMock(Translator::class);

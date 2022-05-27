@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class FieldChangeRepositoryTest extends TestCase
 {
-    public function testWhereQueryPartForFindingChangesForSingleObject()
+    public function testWhereQueryPartForFindingChangesForSingleObject(): void
     {
         $dbalMock = new DBALMocker($this);
         $metadata = $this->createMock(ClassMetadata::class);

@@ -46,7 +46,7 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->repository    = new LeadFieldRepository($this->entityManager, $this->classMetadata);
     }
 
-    public function testCompareDateValueForContactField()
+    public function testCompareDateValueForContactField(): void
     {
         $contactId        = 12;
         $fieldAlias       = 'date_field';
@@ -139,7 +139,7 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->repository->compareDateValue($contactId, $fieldAlias, $value));
     }
 
-    public function testCompareDateValueForCompanyField()
+    public function testCompareDateValueForCompanyField(): void
     {
         $contactId        = 12;
         $fieldAlias       = 'date_field';

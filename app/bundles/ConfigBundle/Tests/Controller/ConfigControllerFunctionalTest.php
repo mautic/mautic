@@ -132,7 +132,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         return str_replace('%', '%%', $value);
     }
 
-    public function testConfigNotFoundPageConfiguration()
+    public function testConfigNotFoundPageConfiguration(): void
     {
         // insert published record
         $this->connection->insert($this->prefix.'pages', [

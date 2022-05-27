@@ -54,7 +54,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     private $output;
 
     /**
-     * @var GeneratedColumns
+     * @var GeneratedColumns<GeneratedColumn>
      */
     private $generatedColumns;
 
@@ -87,7 +87,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->generatedColumns->add(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
     }
 
-    public function testAddGeneratedColumnsWillRunOnlyForMigrationCommand()
+    public function testAddGeneratedColumnsWillRunOnlyForMigrationCommand(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -99,7 +99,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->addGeneratedColumns($this->event);
     }
 
-    public function testAddGeneratedColumnsWhenNotSupported()
+    public function testAddGeneratedColumnsWhenNotSupported(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -115,7 +115,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->addGeneratedColumns($this->event);
     }
 
-    public function testAddGeneratedColumnsWhenExistsAlready()
+    public function testAddGeneratedColumnsWhenExistsAlready(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -139,7 +139,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->addGeneratedColumns($this->event);
     }
 
-    public function testAddGeneratedColumnsWhenDoesNotExist()
+    public function testAddGeneratedColumnsWhenDoesNotExist(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
