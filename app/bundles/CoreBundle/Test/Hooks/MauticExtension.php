@@ -42,10 +42,10 @@ class MauticExtension implements AfterTestHook, BeforeFirstTestHook
     public function executeBeforeFirstTest(): void
     {
         if (!defined('MAUTIC_TABLE_PREFIX')) {
-            $x = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            $prefix = substr(str_shuffle(str_repeat($x, (int)ceil(4 / strlen($x)))),1,4) . '_';
-            define('MAUTIC_TABLE_PREFIX', 'prefix' . $prefix);
-            echo "using db prefix " . $prefix . PHP_EOL;
+            $x      = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $prefix = substr(str_shuffle(str_repeat($x, (int) ceil(4 / strlen($x)))), 1, 4).'_';
+            define('MAUTIC_TABLE_PREFIX', 'prefix'.$prefix);
+            echo 'using db prefix '.$prefix.PHP_EOL;
         }
     }
 }
