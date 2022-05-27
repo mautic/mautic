@@ -51,9 +51,6 @@
     <env name="KERNEL_CLASS" value="AppKernel" />
     <const name="IS_PHPUNIT" value="true"/>
     <const name="MAUTIC_ENV" value="test"/>
-    <!-- we need to set the prefix here, to ensure unit tests that test the buildup of queries are correct. -->
-    <!-- ideally this would be done via the .env file that is read in for all tests (unit and functional) -->
-    <const name="MAUTIC_TABLE_PREFIX" value="prefix_"/>
     <server name="KERNEL_DIR" value="app"/>
     <server name="APP_DEBUG" value="0"/>
     <ini name="error_reporting" value="E_ALL" />
@@ -62,6 +59,6 @@
     <listener class="\Mautic\CoreBundle\Test\Listeners\CleanupListener" />
   </listeners>
   <extensions>
-    <extension class="\Mautic\CoreBundle\Test\Hooks\ExecuteTestAfterExtension" />
+    <extension class="\Mautic\CoreBundle\Test\Hooks\MauticExtension" />
   </extensions>
 </phpunit>
