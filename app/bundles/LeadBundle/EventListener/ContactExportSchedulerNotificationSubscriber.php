@@ -29,34 +29,14 @@ class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInt
     {
         return [
             LeadEvents::POST_CONTACT_EXPORT_SCHEDULED  => 'onContactExportScheduled',
-            LeadEvents::POST_CONTACT_EXPORT_SEND_EMAIL => 'onContactExportEmailSent',
         ];
     }
 
     public function onContactExportScheduled(ContactExportSchedulerEvent $event): void
     {
-        $data    = $event->getContactExportScheduler()->getData();
-        $message = $this->translator->trans('mautic.lead.export.being.prepared', ['%file_type%' => $data['fileType']]);
         $user    = $event->getContactExportScheduler()->getUser();
         \assert($user instanceof User);
-
-        $this->notificationModel->addNotification(
-            $message,
-            null,
-            false,
-            null,
-            null,
-            null,
-            $user
-        );
-    }
-
-    public function onContactExportEmailSent(ContactExportSchedulerEvent $event): void
-    {
-        $data    = $event->getContactExportScheduler()->getData();
-        $message = $this->translator->trans('mautic.lead.export.prepared', ['%file_type%' => $data['fileType']]);
-        $user    = $event->getContactExportScheduler()->getUser();
-        \assert($user instanceof User);
+        $message = $this->translator->trans('mautic.lead.export.being.prepared', ['%user_email%' => $user->getEmail()]);
 
         $this->notificationModel->addNotification(
             $message,

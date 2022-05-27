@@ -40,7 +40,7 @@ class ButtonSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $exportRoute = $this->router->generate('mautic_contact_action', ['objectAction' => 'contactExportScheduler']);
+        $exportRoute = $this->router->generate('mautic_contact_action', ['objectAction' => 'batchExport']);
 
         $event->addButton(
             [
@@ -87,10 +87,8 @@ class ButtonSubscriber implements EventSubscriberInterface
         $event->addButton(
             [
                 'attr'      => [
-                    'href'        => 'javascript:void(0);',
-                    'data-toggle' => 'ajax',
-                    'data-action' => $exportRoute.'?filetype=xlsx',
-                    'onclick'     => 'Mautic.onContactExport(this);',
+                    'href'        => $exportRoute.'?filetype=xlsx',
+                    'data-toggle' => null,
                 ],
                 'btnText'   => $this->translator->trans('mautic.core.export.xlsx'),
                 'iconClass' => 'fa fa-file-excel-o',
@@ -101,10 +99,8 @@ class ButtonSubscriber implements EventSubscriberInterface
         $event->addButton(
             [
                 'attr'      => [
-                    'href'        => 'javascript:void(0);',
-                    'data-toggle' => 'ajax',
-                    'data-action' => $exportRoute.'?filetype=csv',
-                    'onclick'     => 'Mautic.onContactExport(this);',
+                    'href'        => $exportRoute.'?filetype=csv',
+                    'data-toggle' => null,
                 ],
                 'btnText'   => $this->translator->trans('mautic.core.export.csv'),
                 'iconClass' => 'fa fa-file-text-o',

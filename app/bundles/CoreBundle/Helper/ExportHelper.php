@@ -62,38 +62,24 @@ class ExportHelper
             throw new \Exception('No or invalid data given');
         }
 
-        switch ($type) {
-            case self::EXPORT_TYPE_CSV:
-                return $this->exportAsCsv($data, $filename);
-
-            case self::EXPORT_TYPE_EXCEL:
-                return $this->exportAsExcel($data, $filename);
-
-            default:
-                throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
+        if (self::EXPORT_TYPE_EXCEL === $type) {
+            return $this->exportAsExcel($data, $filename);
         }
+
+        throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
     }
 
-    private function getSpreadsheetGeneric(Iterator $data, string $filename): Spreadsheet
+    public function exportDataIntoFile(IteratorExportDataModel $data, string $type, string $fileName): string
     {
-        $spreadsheet = new Spreadsheet();
-        $spreadsheet->getProperties()->setTitle($filename);
-        $spreadsheet->createSheet();
-
-        $rowCount = 2;
-        foreach ($data as $key => $row) {
-            if (0 === $key) {
-                // Build the header row from keys in the current row.
-                $spreadsheet->getActiveSheet()->fromArray(array_keys($row), null, 'A1');
-            }
-
-            $spreadsheet->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
-
-            // Increment row
-            ++$rowCount;
+        if (!$data->valid()) {
+            throw new \Exception('No or invalid data given');
         }
 
-        return $spreadsheet;
+        if (self::EXPORT_TYPE_CSV === $type) {
+            return $this->exportAsCsvIntoFile($data, $fileName);
+        }
+
+        throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
     }
 
     private function exportAsExcel(Iterator $data, string $filename): StreamedResponse
@@ -118,46 +104,26 @@ class ExportHelper
         return $response;
     }
 
-    private function exportAsCsv(Iterator $data, string $filename): StreamedResponse
+    private function getSpreadsheetGeneric(Iterator $data, string $filename): Spreadsheet
     {
-        $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet->getProperties()->setTitle($filename);
+        $spreadsheet->createSheet();
 
-        $objWriter = new Csv($spreadsheet);
-        $objWriter->setPreCalculateFormulas(false);
-        // For UTF-8 support
-        $objWriter->setUseBOM(true);
-
-        $response = new StreamedResponse(
-            function () use ($objWriter) {
-                $objWriter->save('php://output');
+        $rowCount = 2;
+        foreach ($data as $key => $row) {
+            if (0 === $key) {
+                // Build the header row from keys in the current row.
+                $spreadsheet->getActiveSheet()->fromArray(array_keys($row), null, 'A1');
             }
-        );
 
-        $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
-        $response->headers->set('Expires', 0);
-        $response->headers->set('Cache-Control', 'must-revalidate');
-        $response->headers->set('Pragma', 'public');
+            $spreadsheet->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
 
-        return $response;
-    }
-
-    public function exportDataIntoFile(IteratorExportDataModel $data, string $type, string $fileName): string
-    {
-        if (!$data->valid()) {
-            throw new \Exception('No or invalid data given');
+            // Increment row
+            ++$rowCount;
         }
 
-        switch ($type) {
-            case self::EXPORT_TYPE_CSV:
-                return $this->exportAsCsvIntoFile($data, $fileName);
-
-            case self::EXPORT_TYPE_EXCEL:
-                return $this->exportAsExcelIntoFile($data, $fileName);
-
-            default:
-                throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
-        }
+        return $spreadsheet;
     }
 
     /**
@@ -169,20 +135,6 @@ class ExportHelper
         $objWriter   = new Csv($spreadsheet);
         $objWriter->setPreCalculateFormulas(false);
         $objWriter->setUseBOM(true); // For UTF-8 support
-        $filePath = $this->getValidContactExportFileName($fileName);
-        $objWriter->save($filePath);
-
-        return $filePath;
-    }
-
-    /**
-     * @param Iterator<mixed> $data
-     */
-    private function exportAsExcelIntoFile(Iterator $data, string $fileName): string
-    {
-        $spreadsheet = $this->getSpreadsheetGeneric($data, $fileName);
-        $objWriter   = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $objWriter->setPreCalculateFormulas(false);
         $filePath = $this->getValidContactExportFileName($fileName);
         $objWriter->save($filePath);
 

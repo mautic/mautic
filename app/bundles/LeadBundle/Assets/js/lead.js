@@ -1544,37 +1544,3 @@ Mautic.lazyLoadContactListOnSegmentDetail = function() {
         Mautic.processPageContent(response);
     });
 };
-
-Mautic.onContactExport = function (el) {
-    mQuery('#dropdown').dropdown('toggle');
-    const action = mQuery(el).attr('data-action');
-
-    if (!action) {
-        return;
-    }
-
-    if (typeof Mautic.activeActions == 'undefined') {
-        Mautic.activeActions = {};
-    } else if (typeof Mautic.activeActions[action] != 'undefined') {
-        // Action is currently being executed
-        return;
-    }
-
-    Mautic.activeActions[action] = true;
-
-    mQuery.ajax({
-        showLoadingBar: true,
-        url: action,
-        type: "POST",
-        dataType: "json",
-        success: function (response) {
-            Mautic.processPageContent(response);
-        },
-        error: function (request, textStatus, errorThrown) {
-            Mautic.processAjaxError(request, textStatus, errorThrown);
-        },
-        complete: function () {
-            delete Mautic.activeActions[action]
-        }
-    });
-}

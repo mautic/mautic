@@ -222,13 +222,10 @@ class ContactExportSchedulerModel extends AbstractCommonModel
     {
         $ext = pathinfo($fileName, PATHINFO_EXTENSION);
 
-        switch ($ext) {
-            case ExportHelper::EXPORT_TYPE_CSV:
-                return 'text/csv';
-            case ExportHelper::EXPORT_TYPE_EXCEL:
-                return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-            default:
-                throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $ext]));
+        if (ExportHelper::EXPORT_TYPE_CSV === $ext) {
+            return 'text/csv';
         }
+
+        throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $ext]));
     }
 }
