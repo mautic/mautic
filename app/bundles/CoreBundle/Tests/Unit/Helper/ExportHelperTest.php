@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Exception;
-use InvalidArgumentException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -66,36 +64,41 @@ class ExportHelperTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * Test if exportDataAs() correctly generates a CSV file when we input some array data.
-     */
-    public function testCsvExport(): void
+    public function testSupportedExportTypes(): void
     {
-        $stream = $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_CSV, 'demo-file.csv');
-        Assert::assertSame(200, $stream->getStatusCode());
-        Assert::assertFalse($stream->isEmpty());
-
-        ob_start();
-        $stream->sendContent();
-        $content = ob_get_clean();
-
-        $lines = explode(PHP_EOL, $this->removeBomUtf8($content));
-
-        $this->assertSame('"id","firstname","lastname","email"', $lines[0]);
-        $this->assertSame('"1","Mautibot","Mautic","mautibot@mautic.org"', $lines[1]);
-        $this->assertSame('"2","Demo","Mautic","demo@mautic.org"', $lines[2]);
+        $fileTypes = [
+            ExportHelper::EXPORT_TYPE_CSV,
+            ExportHelper::EXPORT_TYPE_EXCEL,
+        ];
+        Assert::assertSame($fileTypes, $this->exportHelper->getSupportedExportTypes());
     }
 
-    /**
-     * Test if exportDataAs() correctly generates an Excel file when we input some array data.
-     */
-    public function testExcelExport(): void
+    public function testExportDataAsInvalidData(): void
     {
-        $stream = $this->exportHelper->exportDataAs(
-            $this->dummyData,
-            ExportHelper::EXPORT_TYPE_EXCEL,
-            'demo-file.xlsx'
-        );
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('No or invalid data given');
+        $this->exportHelper->exportDataAs([], ExportHelper::EXPORT_TYPE_EXCEL, 'demo.xlsx');
+    }
+
+    public function testExportDataAsInvalidFileType(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->translatorInterfaceMock->expects($this->once())
+            ->method('trans')
+            ->with('mautic.error.invalid.specific.export.type', [
+                '%type%'          => ExportHelper::EXPORT_TYPE_CSV,
+                '%expected_type%' => ExportHelper::EXPORT_TYPE_EXCEL,
+            ])
+            ->willReturn(
+                'Invalid export type "'.ExportHelper::EXPORT_TYPE_CSV.
+                '". Must be of "'.ExportHelper::EXPORT_TYPE_EXCEL.'".'
+            );
+        $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_CSV, 'demo.csv');
+    }
+
+    public function testExportDataAsExcel(): void
+    {
+        $stream = $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_EXCEL, 'demo.xlsx');
         Assert::assertSame(200, $stream->getStatusCode());
         Assert::assertFalse($stream->isEmpty());
 
@@ -104,9 +107,9 @@ class ExportHelperTest extends TestCase
         $content = ob_get_clean();
 
         // We need to write to a temp file as PhpSpreadsheet can only read from files
-        file_put_contents('./demo-file.xlsx', $content);
-        $spreadsheet = IOFactory::load('./demo-file.xlsx');
-        unlink('./demo-file.xlsx');
+        file_put_contents('demo.xlsx', $content);
+        $spreadsheet       = IOFactory::load('demo.xlsx');
+        $this->filePaths[] = 'demo.xlsx';
 
         $this->assertSame(1, $spreadsheet->getActiveSheet()->getCell('A2')->getValue());
         $this->assertSame('Mautibot', $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
@@ -114,111 +117,128 @@ class ExportHelperTest extends TestCase
         $this->assertSame('Demo', $spreadsheet->getActiveSheet()->getCell('B3')->getValue());
     }
 
-    /**
-     * @dataProvider getExportDataIntoFileProvider
-     */
-    public function testExportDataIntoFile(string $type, string $fileName, string $expectedFilePath): void
-    {
-        $this->coreParametersHelperMock
-            ->method('get')
-            ->with('contact_export_dir')
-            ->willReturn('/tmp');
-        $iteratorExportDataModelMock = $this->getIteratorExportDataModelMock();
-        $this->filePaths[]           = $filePath = $this->exportHelper->exportDataIntoFile(
-            $iteratorExportDataModelMock,
-            $type,
-            $fileName
-        );
-        Assert::assertSame($filePath, $expectedFilePath);
-    }
-
-    /**
-     * @dataProvider getExportDataIntoFileProvider
-     */
-    public function testExportDataIntoFileInvalidData(string $type, string $fileName): void
+    public function testExportDataIntoFileInvalidData(): void
     {
         $this->expectException(Exception::class);
-        $iteratorExportDataModelMock = $this->createMock(IteratorExportDataModel::class);
-        $this->filePaths[]           = $this->exportHelper->exportDataIntoFile(
+        $this->expectExceptionMessage('No or invalid data given');
+        $iteratorExportDataModelMock = $this->iteratorDataMock();
+        $this->exportHelper->exportDataIntoFile(
             $iteratorExportDataModelMock,
-            $type,
-            $fileName
+            ExportHelper::EXPORT_TYPE_CSV,
+            'demo.csv'
         );
     }
 
-    /**
-     * @return iterable<mixed>
-     */
-    public function getExportDataIntoFileProvider(): iterable
+    public function testExportDataIntoFileInvalidFileType(): void
     {
-        yield [ExportHelper::EXPORT_TYPE_CSV, 'contact_1.csv', '/tmp/contact_1.csv'];
-        yield [ExportHelper::EXPORT_TYPE_EXCEL, 'contact_1.xlsx', '/tmp/contact_1.xlsx'];
+        $this->expectException(\InvalidArgumentException::class);
+        $this->translatorInterfaceMock->expects($this->once())
+            ->method('trans')
+            ->with('mautic.error.invalid.specific.export.type', [
+                '%type%'          => ExportHelper::EXPORT_TYPE_EXCEL,
+                '%expected_type%' => ExportHelper::EXPORT_TYPE_CSV,
+            ])
+            ->willReturn(
+                'Invalid export type "'.ExportHelper::EXPORT_TYPE_EXCEL.
+                '". Must be of "'.ExportHelper::EXPORT_TYPE_CSV.'".'
+            );
+        $iteratorExportDataModelMock = $this->iteratorDataMock($this->dummyData);
+        $this->exportHelper->exportDataIntoFile(
+            $iteratorExportDataModelMock,
+            ExportHelper::EXPORT_TYPE_EXCEL,
+            'demo.xlsx'
+        );
     }
 
-    public function testExportDataIntoExistingFile(): void
+    public function testExportDataIntoFileCsvWithExistingFileName(): void
     {
         $this->coreParametersHelperMock
             ->method('get')
             ->with('contact_export_dir')
             ->willReturn('/tmp');
-        $iteratorExportDataModelMock1 = $this->getIteratorExportDataModelMock();
-        $filePath1                    = $this->exportHelper->exportDataIntoFile(
+
+        $this->filePathResolver
+            ->method('createDirectory')
+            ->with('/tmp');
+
+        $iteratorExportDataModelMock1 = $this->iteratorDataMock($this->dummyData);
+        $this->filePaths[]            = $filePath  = $this->exportHelper->exportDataIntoFile(
             $iteratorExportDataModelMock1,
             ExportHelper::EXPORT_TYPE_CSV,
-            'contact_1.csv'
+            'demo.csv'
         );
-        Assert::assertSame($filePath1, '/tmp/contact_1.csv');
+        Assert::assertFileExists($filePath);
+        $spreadsheet = IOFactory::load('/tmp/demo.csv');
+        $this->assertSame(1, $spreadsheet->getActiveSheet()->getCell('A2')->getValue());
+        $this->assertSame('Mautibot', $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
+        $this->assertSame(2, $spreadsheet->getActiveSheet()->getCell('A3')->getValue());
+        $this->assertSame('Demo', $spreadsheet->getActiveSheet()->getCell('B3')->getValue());
 
-        $iteratorExportDataModelMock2 = $this->getIteratorExportDataModelMock();
-        $filePath2                    = $this->exportHelper->exportDataIntoFile(
+        $iteratorExportDataModelMock2 = $this->iteratorDataMock($this->dummyData);
+        $this->filePaths[]            = $filePath  = $this->exportHelper->exportDataIntoFile(
             $iteratorExportDataModelMock2,
             ExportHelper::EXPORT_TYPE_CSV,
-            'contact_1.csv'
+            'demo.csv' // give same file name
         );
-        Assert::assertSame($filePath2, '/tmp/contact_1_1.csv');
-        $this->filePaths[] = $filePath1;
-        $this->filePaths[] = $filePath2;
-    }
-
-    public function testExportDataIntoFileInvalidType(): void
-    {
-        $type = 'txt';
-        $this->expectException(InvalidArgumentException::class);
-        $iteratorExportDataModelMock = $this->getIteratorExportDataModelMock();
-        $this->translatorInterfaceMock->expects(self::once())
-            ->method('trans')
-            ->with('mautic.error.invalid.export.type', ['%type%' => $type])
-            ->willReturn('Invalid export type "'.$type.'" Must be one of "csv" or "xlsx".');
-        $this->filePaths[] = $this->exportHelper->exportDataIntoFile(
-            $iteratorExportDataModelMock,
-            $type,
-            'contact_1.csv'
-        );
+        Assert::assertSame('/tmp/demo_1.csv', $filePath);
+        Assert::assertFileExists($filePath);
+        $spreadsheet = IOFactory::load('/tmp/demo_1.csv');
+        $this->assertSame(1, $spreadsheet->getActiveSheet()->getCell('A2')->getValue());
+        $this->assertSame('Mautibot', $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
+        $this->assertSame(2, $spreadsheet->getActiveSheet()->getCell('A3')->getValue());
+        $this->assertSame('Demo', $spreadsheet->getActiveSheet()->getCell('B3')->getValue());
     }
 
     /**
-     * Needed to remove the BOM that we add in our CSV exports (for UTF-8 parsing in Excel).
+     * @param array<mixed> $data
      */
-    private function removeBomUtf8(string $s): string
+    private function iteratorDataMock(array $data = []): IteratorExportDataModel
     {
-        if (substr($s, 0, 3) == chr(hexdec('EF')).chr(hexdec('BB')).chr(hexdec('BF'))) {
-            return substr($s, 3);
-        }
+        $iteratorExportDataModelMock = $this->createMock(IteratorExportDataModel::class);
+        $iteratorData                = new \stdClass();
+        $iteratorData->array         = $data;
+        $iteratorData->position      = 0;
 
-        return $s;
-    }
+        $iteratorExportDataModelMock->expects($this->any())
+            ->method('rewind')
+            ->willReturnCallback(
+                function () use ($iteratorData) {
+                    $iteratorData->position = 0;
+                }
+            );
 
-    private function getIteratorExportDataModelMock(): IteratorExportDataModel
-    {
-        $leadModelMock = $this->createMock(LeadModel::class);
-        $leadModelMock
-            ->method('getEntities')
-            ->willReturn(['results' => []]);
-        $args          = ['limit' => 1000];
-        $callback      = function ($var) {
-            return $var;
-        };
+        $iteratorExportDataModelMock->expects($this->any())
+            ->method('current')
+            ->willReturnCallback(
+                function () use ($iteratorData) {
+                    return $iteratorData->array[$iteratorData->position];
+                }
+            );
 
-        return new IteratorExportDataModel($leadModelMock, $args, $callback);
+        $iteratorExportDataModelMock->expects($this->any())
+            ->method('key')
+            ->willReturnCallback(
+                function () use ($iteratorData) {
+                    return $iteratorData->position;
+                }
+            );
+
+        $iteratorExportDataModelMock->expects($this->any())
+            ->method('next')
+            ->willReturnCallback(
+                function () use ($iteratorData) {
+                    ++$iteratorData->position;
+                }
+            );
+
+        $iteratorExportDataModelMock->expects($this->any())
+            ->method('valid')
+            ->willReturnCallback(
+                function () use ($iteratorData) {
+                    return isset($iteratorData->array[$iteratorData->position]);
+                }
+            );
+
+        return $iteratorExportDataModelMock;
     }
 }
