@@ -33,6 +33,7 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
         $filter             = $this->createFilter($operator, $parameterValue);
         $filterQueryBuilder = new DoNotContactFilterQueryBuilder(new RandomParameterName(), new EventDispatcher());
 
+        $expectedQuery = str_replace('__MAUTIC_TABLE_PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
         Assert::assertSame($queryBuilder, $filterQueryBuilder->applyQuery($queryBuilder, $filter));
         Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
@@ -42,10 +43,10 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
      */
     public function dataApplyQuery(): iterable
     {
-        yield ['eq', '1', 'SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'leads l WHERE l.id IN (SELECT par0.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
-        yield ['eq', '0', 'SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
-        yield ['neq', '1', 'SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
-        yield ['neq', '0', 'SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'leads l WHERE l.id IN (SELECT par0.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
+        yield ['eq', '1', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
+        yield ['eq', '0', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
+        yield ['neq', '1', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
+        yield ['neq', '0', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
     }
 
     private function createConnection(): Connection
