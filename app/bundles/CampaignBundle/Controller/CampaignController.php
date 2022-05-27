@@ -1005,9 +1005,9 @@ class CampaignController extends AbstractStandardFormController
                         'mautic.campaign.connection.trigger.interval.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
                         [
                             '%number%' => $event['triggerInterval'],
-                            '%unit%'   => $translator->transChoice(
+                            '%unit%'   => $translator->trans(
                                 'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
-                                $event['triggerInterval']
+                                ['%count%' => $event['triggerInterval']]
                             ),
                         ]
                     );

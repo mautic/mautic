@@ -464,7 +464,7 @@ class ListModel extends FormModel
                 $start += $limit;
 
                 // Dispatch batch event
-                if (count($newLeadList[$leadList->getId()]) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
+                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
                     $this->dispatcher->dispatch(
                         LeadEvents::LEAD_LIST_BATCH_CHANGE,
                         new ListChangeEvent($newLeadList[$leadList->getId()], $leadList, true)

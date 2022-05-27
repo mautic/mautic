@@ -414,7 +414,7 @@ class CompanyController extends FormController
                             '%url%'       => $this->generateUrl(
                                 'mautic_company_action',
                                 [
-                                    'objectAction' => 'edit',
+                                    'objectAction' => 'view',
                                     'objectId'     => $entity->getId(),
                                 ]
                             ),
@@ -791,7 +791,6 @@ class CompanyController extends FormController
                 $this->addFlash(
                     'mautic.company.notice.batch_deleted',
                     [
-                        'pluralCount' => $deleted,
                         '%count%'     => $deleted,
                     ]
                 );
