@@ -13,37 +13,39 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\Helper\InactiveHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class InactiveHelperTest extends \PHPUnit\Framework\TestCase
+class InactiveHelperTest extends TestCase
 {
     /**
-     * @var EventScheduler
+     * @var EventScheduler|MockObject
      */
     private $scheduler;
 
     /**
-     * @var InactiveContactFinder
+     * @var InactiveContactFinder|MockObject
      */
     private $inactiveContactFinder;
 
     /**
-     * @var LeadEventLogRepository
+     * @var LeadEventLogRepository|MockObject
      */
     private $eventLogRepository;
 
     /**
-     * @var EventRepository
+     * @var EventRepository|MockObject
      */
     private $eventRepository;
 
     /**
-     * @var LeadRepository
+     * @var LeadRepository|MockObject
      */
     private $leadRepository;
 
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface|MockObject
      */
     private $logger;
 
@@ -88,7 +90,7 @@ class InactiveHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveContactsThatAreNotApplicable()
+    public function testRemoveContactsThatAreNotApplicable(): void
     {
         $lastActiveEventId = 6;
 
