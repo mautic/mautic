@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Psr\Log\LoggerInterface;
@@ -33,6 +34,11 @@ class InactiveHelper
     private $eventRepository;
 
     /**
+     * @var LeadRepository
+     */
+    private $leadRepository;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -50,12 +56,14 @@ class InactiveHelper
         InactiveContactFinder $inactiveContactFinder,
         LeadEventLogRepository $eventLogRepository,
         EventRepository $eventRepository,
+        LeadRepository $leadRepository,
         LoggerInterface $logger
     ) {
         $this->scheduler               = $scheduler;
         $this->inactiveContactFinder   = $inactiveContactFinder;
         $this->eventLogRepository      = $eventLogRepository;
         $this->eventRepository         = $eventRepository;
+        $this->leadRepository          = $leadRepository;
         $this->logger                  = $logger;
     }
 
@@ -85,14 +93,35 @@ class InactiveHelper
         \DateTime $now,
         ArrayCollection $contacts,
         $lastActiveEventId,
-        ArrayCollection $negativeChildren
+        ArrayCollection $negativeChildren,
+        Event $event
     ) {
         $contactIds                 = $contacts->getKeys();
         $lastActiveDates            = $this->getLastActiveDates($lastActiveEventId, $contactIds);
         $this->earliestInactiveDate = $now;
 
-        /* @var Event $event */
+        $parentEvent = $event->getParent();
+
         foreach ($contactIds as $contactId) {
+            if (null !== $parentEvent && null !== $event->getDecisionPath()) {
+                $rotation    = $this->leadRepository->getContactRotations([$contactId], $event->getCampaign()->getId());
+                $log         = $parentEvent->getLogByContactAndRotation($contacts->get($contactId), $rotation);
+
+                if (null === $log) {
+                    $contacts->remove($contactId);
+                }
+
+                $pathTaken   = (int) $log->getNonActionPathTaken();
+
+                if (1 === $pathTaken && !$parentEvent->getNegativeChildren()->contains($event)) {
+                    $contacts->remove($contactId);
+                    continue;
+                } elseif (0 === $pathTaken && !$parentEvent->getPositiveChildren()->contains($event)) {
+                    $contacts->remove($contactId);
+                    continue;
+                }
+            }
+
             if (!isset($lastActiveDates[$contactId])) {
                 // This contact does not have a last active date so likely the event is scheduled
                 $contacts->remove($contactId);

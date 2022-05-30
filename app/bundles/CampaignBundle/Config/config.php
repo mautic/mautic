@@ -484,6 +484,7 @@ return [
                     'mautic.campaign.contact_finder.inactive',
                     'mautic.campaign.repository.lead_event_log',
                     'mautic.campaign.repository.event',
+                    'mautic.campaign.repository.lead',
                     'monolog.logger.mautic',
                 ],
             ],
