@@ -38,9 +38,9 @@ if (!$latestVersion) {
 if ($latestVersion && $latestVersion->issues) {
     $buttons[] = [
         'attr' => [
-            'href'   => $latestVersion->issues,
-            'target' => '_blank',
-            'rel'    => 'noopener noreferrer',
+            'href'        => $latestVersion->issues,
+            'target'      => '_blank',
+            'rel'         => 'noopener noreferrer',
             'data-toggle' => '',
         ],
         'btnText'   => $view['translator']->trans('marketplace.package.issue.tracker'),
@@ -52,9 +52,9 @@ if ($latestVersion && $latestVersion->issues) {
 if ($latestVersion && $latestVersion->wiki) {
     $buttons[] = [
         'attr' => [
-            'href'   => $latestVersion->wiki,
-            'target' => '_blank',
-            'rel'    => 'noopener noreferrer',
+            'href'        => $latestVersion->wiki,
+            'target'      => '_blank',
+            'rel'         => 'noopener noreferrer',
             'data-toggle' => '',
         ],
         'btnText'   => $view['translator']->trans('marketplace.package.wiki'),

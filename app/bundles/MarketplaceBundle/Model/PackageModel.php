@@ -21,9 +21,9 @@ class PackageModel
 
     public function getPackageDetail(string $name): PackageDetail
     {
-        $allowlist = $this->allowlist->getAllowList();
+        $allowlist      = $this->allowlist->getAllowList();
         $allowedPackage = $allowlist->findPackageByName($name);
-        $payload = $this->connection->getPackage($name);
+        $payload        = $this->connection->getPackage($name);
 
         return PackageDetail::fromArray($payload['package'] + $allowedPackage->toArray());
     }
