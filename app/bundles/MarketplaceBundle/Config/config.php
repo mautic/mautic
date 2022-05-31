@@ -29,6 +29,11 @@ return [
                 'controller' => 'MarketplaceBundle:Package\Remove:view',
                 'method'     => 'GET|POST',
             ],
+            RouteProvider::ROUTE_CLEAR_CACHE => [
+                'path'       => '/marketplace/clear/cache',
+                'controller' => 'MarketplaceBundle:Cache:clear',
+                'method'     => 'GET',
+            ],
         ],
     ],
     'services' => [
@@ -84,6 +89,19 @@ return [
                     'marketplace.service.route_provider',
                     'mautic.security',
                     'marketplace.service.config',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container',
+                    ],
+                ],
+            ],
+            'marketplace.controller.cache' => [
+                'class'     => \Mautic\MarketplaceBundle\Controller\CacheController::class,
+                'arguments' => [
+                    'mautic.security',
+                    'marketplace.service.config',
+                    'marketplace.service.allowlist',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
