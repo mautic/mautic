@@ -15,6 +15,10 @@ use Mautic\MarketplaceBundle\Service\Allowlist;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 final class DetailControllerTest extends AbstractMauticTestCase
 {
     /**

@@ -14,6 +14,10 @@ use Mautic\MarketplaceBundle\DTO\Allowlist as DTOAllowlist;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use PHPUnit\Framework\Assert;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 final class ListControllerTest extends MauticMysqlTestCase
 {
     public function testMarketplaceListTableWithNoAllowList(): void
