@@ -64,7 +64,16 @@ class InstallCommand extends Command
         $result = $this->composer->install($input->getArgument('package'), $dryRun);
 
         if (0 !== $result->exitCode) {
-            throw new InstallException('Error while installing this plugin: '.$result->output);
+            $output->writeln('<error>Error while installing this plugin.</error>');
+
+            if ($result->output) {
+                $output->writeln($result->output);
+            } else {
+                // If the output is empty then tell the user where to find more details.
+                $output->writeln('Check the logs for more details or run again with the -vvv parameter.');
+            }
+
+            return $result->exitCode;
         }
 
         $output->writeln('All done! '.$input->getArgument('package').' has successfully been installed.');
