@@ -6,27 +6,21 @@ namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\DTO\Allowlist as DTOAllowlist;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use PHPUnit\Framework\Assert;
 
-/**
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- */
-final class ListControllerTest extends MauticMysqlTestCase
+final class ListControllerTest extends AbstractMauticTestCase
 {
     public function testMarketplaceListTableWithNoAllowList(): void
     {
-        $requests     = [];
-        $history      = Middleware::history($requests);
-        $response     = new Response(200, [], file_get_contents(__DIR__.'/../../ApiResponse/list.json'));
-        $handlerStack = HandlerStack::create(new MockHandler([$response]));
-        $handlerStack->push($history);
+        /** @var MockHandler $handlerStack */
+        $handlerStack = self::$container->get('mautic.http.client.mock_handler');
+        $handlerStack->append(
+            new Response(200, [], file_get_contents(__DIR__.'/../../ApiResponse/list.json'))
+        );
         self::$container->set('mautic.http.client', new Client(['handler' => $handlerStack]));
         $allowlist = $this->createMock(Allowlist::class);
         $allowlist->method('getAllowList')->willReturn(null);
@@ -54,13 +48,13 @@ final class ListControllerTest extends MauticMysqlTestCase
     public function testMarketplaceListTableWithAllowList(): void
     {
         $mockResults  = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/list.json'), true)['results'];
-        $requests     = [];
-        $history      = Middleware::history($requests);
-        $handlerStack = HandlerStack::create(new MockHandler([
+
+        /** @var MockHandler $handlerStack */
+        $handlerStack = self::$container->get('mautic.http.client.mock_handler');
+        $handlerStack->append(
             new Response(200, [], json_encode(['results' => [$mockResults[1]]])), // mautic-recaptcha-bundle
             new Response(200, [], json_encode(['results' => [$mockResults[3]]])), // mautic-referrals-bundle
-        ]));
-        $handlerStack->push($history);
+        );
         self::$container->set('mautic.http.client', new Client(['handler' => $handlerStack]));
         $allowlist = $this->createMock(Allowlist::class);
         $allowlist->method('getAllowList')->willReturn(

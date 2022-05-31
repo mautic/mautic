@@ -6,8 +6,6 @@ namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\DTO\Allowlist as AllowlistDTO;
@@ -15,10 +13,6 @@ use Mautic\MarketplaceBundle\Service\Allowlist;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
-/**
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- */
 final class DetailControllerTest extends AbstractMauticTestCase
 {
     /**
@@ -26,11 +20,12 @@ final class DetailControllerTest extends AbstractMauticTestCase
      */
     public function testMarketplaceDetailPage(string $requestedPackage, int $responseCode, string $foundPackageName, string $foundPackageDesc, string $latestVersion = ''): void
     {
-        $requests     = [];
-        $history      = Middleware::history($requests);
-        $response     = new Response(200, [], file_get_contents(__DIR__.'/../../ApiResponse/detail.json'));
-        $handlerStack = HandlerStack::create(new MockHandler([$response]));
-        $handlerStack->push($history);
+        /** @var MockHandler $handlerStack */
+        $handlerStack = self::$container->get('mautic.http.client.mock_handler');
+        $handlerStack->append(
+            new Response(200, [], file_get_contents(__DIR__.'/../../ApiResponse/detail.json'))
+        );
+
         self::$container->set('mautic.http.client', new Client(['handler' => $handlerStack]));
 
         $allowlist = $this->createMock(Allowlist::class);
