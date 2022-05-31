@@ -14,11 +14,17 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class ListControllerTest extends AbstractMauticTestCase
 {
+    protected function setUp(): void
+    {
+        if ('testMarketplaceListTableWithNoAllowList' === $this->getName()) {
+            $this->configParams[Config::MARKETPLACE_ALLOWLIST_URL] = '0'; // Empty string results in null for some reason.
+        }
+
+        parent::setUp();
+    }
+
     public function testMarketplaceListTableWithNoAllowList(): void
     {
-        $this->configParams[Config::MARKETPLACE_ALLOWLIST_URL] = '0'; // Empty string results in null for some reason.
-        $this->setUp(); // Booting Symfony with updated config params.
-
         /** @var MockHandler $handlerStack */
         $handlerStack = self::$container->get('mautic.http.client.mock_handler');
         $handlerStack->append(
