@@ -27,6 +27,7 @@ final class ListControllerTest extends AbstractMauticTestCase
     {
         /** @var MockHandler $handlerStack */
         $handlerStack = self::$container->get('mautic.http.client.mock_handler');
+        $handlerStack->reset();
         $handlerStack->append(
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/list.json'))  // Getting the package list from Packagist API.
         );
@@ -52,6 +53,7 @@ final class ListControllerTest extends AbstractMauticTestCase
                 $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
             )
         );
+        $handlerStack->reset();
     }
 
     public function testMarketplaceListTableWithAllowList(): void

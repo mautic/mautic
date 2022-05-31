@@ -20,6 +20,7 @@ final class DetailControllerTest extends AbstractMauticTestCase
     {
         /** @var MockHandler $handlerStack */
         $handlerStack = self::$container->get('mautic.http.client.mock_handler');
+        $handlerStack->reset();
         $handlerStack->append(
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json')), // Getting Allow list from Github API.
             new Response(200, [], file_get_contents(__DIR__.'/../../ApiResponse/detail.json')) // Getting package detail from Packagist API.
@@ -37,6 +38,7 @@ final class DetailControllerTest extends AbstractMauticTestCase
         Assert::assertStringContainsString($foundPackageDesc, $responseContent);
         Assert::assertStringContainsString($foundPackageName, $responseContent);
         Assert::assertStringContainsString($latestVersion, $responseContent);
+        $handlerStack->reset();
     }
 
     /**
