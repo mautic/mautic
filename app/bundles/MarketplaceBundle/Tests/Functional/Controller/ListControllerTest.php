@@ -7,22 +7,27 @@ namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
-use Mautic\MarketplaceBundle\DTO\Allowlist as DTOAllowlist;
 use Mautic\MarketplaceBundle\Service\Allowlist;
+use Mautic\MarketplaceBundle\Service\Config;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class ListControllerTest extends AbstractMauticTestCase
 {
     public function testMarketplaceListTableWithNoAllowList(): void
     {
+        $this->configParams[Config::MARKETPLACE_ALLOWLIST_URL] = '0'; // Empty string results in null for some reason.
+        $this->setUp(); // Booting Symfony with updated config params.
+
         /** @var MockHandler $handlerStack */
         $handlerStack = self::$container->get('mautic.http.client.mock_handler');
         $handlerStack->append(
-            new Response(200, [], file_get_contents(__DIR__.'/../../ApiResponse/list.json'))
+            new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/list.json'))  // Getting the package list from Packagist API.
         );
-        $allowlist = $this->createMock(Allowlist::class);
-        $allowlist->method('getAllowList')->willReturn(null);
-        self::$container->set('marketplace.service.allowlist', $allowlist);
+
+        /** @var Allowlist $allowlist */
+        $allowlist = self::$container->get('marketplace.service.allowlist');
+        $allowlist->clearCache();
 
         $crawler = $this->client->request('GET', 's/marketplace');
 
@@ -45,20 +50,20 @@ final class ListControllerTest extends AbstractMauticTestCase
 
     public function testMarketplaceListTableWithAllowList(): void
     {
-        $mockResults  = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/list.json'), true)['results'];
+        $mockResults = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/list.json'), true)['results'];
 
         /** @var MockHandler $handlerStack */
         $handlerStack = self::$container->get('mautic.http.client.mock_handler');
         $handlerStack->append(
-            new Response(200, [], json_encode(['results' => [$mockResults[1]]])), // mautic-recaptcha-bundle
-            new Response(200, [], json_encode(['results' => [$mockResults[3]]])), // mautic-referrals-bundle
+            new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json')), // Getting Allow list from Github API.
+            new Response(SymfonyResponse::HTTP_OK, [], json_encode(['results' => [$mockResults[1]]])), // mautic-recaptcha-bundle
+            new Response(SymfonyResponse::HTTP_OK, [], json_encode(['results' => [$mockResults[3]]])), // mautic-referrals-bundle
         );
-        $allowlist = $this->createMock(Allowlist::class);
-        $allowlist->method('getAllowList')->willReturn(
-            DTOAllowlist::fromArray(json_decode(file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json'), true))
-        );
-        self::$container->set('marketplace.service.allowlist', $allowlist);
 
+        /** @var Allowlist $allowlist */
+        $allowlist = self::$container->get('marketplace.service.allowlist');
+        $allowlist->clearCache();
+            
         $crawler = $this->client->request('GET', 's/marketplace');
 
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());

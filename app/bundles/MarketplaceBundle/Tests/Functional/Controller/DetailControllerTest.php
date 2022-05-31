@@ -7,7 +7,6 @@ namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
-use Mautic\MarketplaceBundle\DTO\Allowlist as AllowlistDTO;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -22,14 +21,13 @@ final class DetailControllerTest extends AbstractMauticTestCase
         /** @var MockHandler $handlerStack */
         $handlerStack = self::$container->get('mautic.http.client.mock_handler');
         $handlerStack->append(
-            new Response(200, [], file_get_contents(__DIR__.'/../../ApiResponse/detail.json'))
+            new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json')), // Getting Allow list from Github API.
+            new Response(200, [], file_get_contents(__DIR__.'/../../ApiResponse/detail.json')) // Getting package detail from Packagist API.
         );
 
-        $allowlist = $this->createMock(Allowlist::class);
-        $allowlist->method('getAllowList')->willReturn(
-            AllowlistDTO::fromArray(json_decode(file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json'), true))
-        );
-        self::$container->set('marketplace.service.allowlist', $allowlist);
+        /** @var Allowlist $allowlist */
+        $allowlist = self::$container->get('marketplace.service.allowlist');
+        $allowlist->clearCache();
 
         $this->client->request('GET', "s/marketplace/detail/{$requestedPackage}");
 
