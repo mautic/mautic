@@ -63,7 +63,7 @@ final class ListControllerTest extends AbstractMauticTestCase
         /** @var Allowlist $allowlist */
         $allowlist = self::$container->get('marketplace.service.allowlist');
         $allowlist->clearCache();
-            
+
         $crawler = $this->client->request('GET', 's/marketplace');
 
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
