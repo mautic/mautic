@@ -146,7 +146,7 @@ return [
         'models' => [
             'marketplace.model.package' => [
                 'class'     => \Mautic\MarketplaceBundle\Model\PackageModel::class,
-                'arguments' => ['marketplace.api.connection'],
+                'arguments' => ['marketplace.api.connection', 'marketplace.service.allowlist'],
             ],
         ],
         'other' => [

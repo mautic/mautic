@@ -70,7 +70,7 @@ final class ListControllerTest extends MauticMysqlTestCase
 
         Assert::assertSame(
             [
-                'Recaptcha',
+                'KocoCaptcha',
                 'Mautic Referrals Bundle',
             ],
             array_map(

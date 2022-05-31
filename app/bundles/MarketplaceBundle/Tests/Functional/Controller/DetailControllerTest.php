@@ -9,12 +9,18 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\MarketplaceBundle\DTO\Allowlist as AllowlistDTO;
+use Mautic\MarketplaceBundle\Service\Allowlist;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
-final class DetailControllerTest extends MauticMysqlTestCase
+final class DetailControllerTest extends AbstractMauticTestCase
 {
-    public function testMarketplaceListTable(): void
+    /**
+     * @dataProvider dataProvider
+     */
+    public function testMarketplaceDetailPage(string $requestedPackage, int $responseCode, string $foundPackageName, string $foundPackageDesc, string $latestVersion = ''): void
     {
         $requests     = [];
         $history      = Middleware::history($requests);
@@ -23,13 +29,42 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $handlerStack->push($history);
         self::$container->set('mautic.http.client', new Client(['handler' => $handlerStack]));
 
-        $this->client->request('GET', 's/marketplace/detail/koco/mautic-recaptcha-bundle');
-
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-
-        Assert::assertStringContainsString(
-            'This plugin brings reCAPTCHA integration to mautic.',
-            $this->client->getResponse()->getContent()
+        $allowlist = $this->createMock(Allowlist::class);
+        $allowlist->method('getAllowList')->willReturn(
+            AllowlistDTO::fromArray(json_decode(file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json'), true))
         );
+        self::$container->set('marketplace.service.allowlist', $allowlist);
+
+        $this->client->request('GET', "s/marketplace/detail/{$requestedPackage}");
+
+        $responseContent = $this->client->getResponse()->getContent();
+
+        Assert::assertSame($responseCode, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString($foundPackageDesc, $responseContent);
+        Assert::assertStringContainsString($foundPackageName, $responseContent);
+        Assert::assertStringContainsString($latestVersion, $responseContent);
+    }
+
+    /**
+     * @return iterable<array<string|int>>
+     */
+    public function dataProvider(): iterable
+    {
+        // Package that do not exist in the allowlist.
+        yield [
+            'mautic/unicorn',
+            SymfonyResponse::HTTP_NOT_FOUND,
+            'mautic/unicorn',
+            'Package \'mautic/unicorn\' not found in allowlist.',
+        ];
+
+        // Package that exists in the allowlist with display name.
+        yield [
+            'koco/mautic-recaptcha-bundle',
+            SymfonyResponse::HTTP_OK,
+            'KocoCaptcha',
+            'This plugin brings reCAPTCHA integration to mautic.',
+            '<a href="https://github.com/KonstantinCodes/mautic-recaptcha/releases/tag/3.0.1" id="latest-version" target="_blank" rel="noopener noreferrer">',
+        ];
     }
 }

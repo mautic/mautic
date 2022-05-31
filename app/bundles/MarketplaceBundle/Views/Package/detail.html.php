@@ -132,7 +132,7 @@ $view['slots']->set(
                         <?php echo $view['translator']->trans('marketplace.latest.version.missing'); ?>
                     </div>
                 <?php else : ?>
-                    <a href="<?php echo $view->escape($packageDetail->packageBase->repository); ?>/releases/tag/<?php echo $view->escape($latestVersion->version); ?>" target="_blank" rel="noopener noreferrer" >
+                    <a href="<?php echo $view->escape($packageDetail->packageBase->repository); ?>/releases/tag/<?php echo $view->escape($latestVersion->version); ?>" id="latest-version" target="_blank" rel="noopener noreferrer">
                         <strong><?php echo $view->escape($latestVersion->version); ?></strong>
                     </a>
                 <?php endif; ?>
