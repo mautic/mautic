@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4316e6261314a94a0ea5b6043b79b3bd",
+    "content-hash": "beecb815e53b3386f72ceeeddd308446",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2780,22 +2780,6 @@
                 "source": "https://github.com/ezyang/htmlpurifier/tree/v4.14.0"
             },
             "time": "2021-12-25T01:21:49+00:00"
-        },
-        {
-            "name": "freshconsulting/wcag_linter",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/FreshConsulting/FreshConsulting-WCAG-Linter.git",
-                "reference": "a3e03be9cf90e09583cb080e79d4c48ea57cb8f7"
-            },
-            "default-branch": true,
-            "type": "library",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "A PHP_CodeSniffer custom rule (sniff) to detect obvious WCAG 2.0 accessibility violations.",
-            "time": "2019-07-17T17:10:17+00:00"
         },
         {
             "name": "friendsofphp/proxy-manager-lts",
@@ -5625,7 +5609,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "e298afdcc51aa2665cbf75a05cb8acd79186abf8"
+                "reference": "6f844fd51595612e537e85e171d79540b8d404db"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5643,7 +5627,6 @@
                 "ext-imap": "*",
                 "ext-zip": "*",
                 "ext-zlib": "*",
-                "freshconsulting/wcag_linter": "dev-master",
                 "friendsofsymfony/oauth-server-bundle": "dev-doctrine-fix",
                 "friendsofsymfony/rest-bundle": "^3.0.2",
                 "gaufrette/aws-s3-adapter": "^0.4.0",
@@ -5675,7 +5658,6 @@
                 "sendgrid/sendgrid": "~6.0",
                 "simshaun/recurr": "^3.0",
                 "sparkpost/sparkpost": "^2.3",
-                "squizlabs/php_codesniffer": "^3.6",
                 "stack/builder": "^1.0",
                 "stack/run": "^1.0",
                 "symfony/asset": "~4.4.0",
@@ -8640,62 +8622,6 @@
                 "source": "https://github.com/SparkPost/php-sparkpost/tree/2.3.0"
             },
             "time": "2021-03-17T13:59:30+00:00"
-        },
-        {
-            "name": "squizlabs/php_codesniffer",
-            "version": "3.6.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "5e4e71592f69da17871dba6e80dd51bce74a351a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/5e4e71592f69da17871dba6e80dd51bce74a351a",
-                "reference": "5e4e71592f69da17871dba6e80dd51bce74a351a",
-                "shasum": ""
-            },
-            "require": {
-                "ext-simplexml": "*",
-                "ext-tokenizer": "*",
-                "ext-xmlwriter": "*",
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0"
-            },
-            "bin": [
-                "bin/phpcs",
-                "bin/phpcbf"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.x-dev"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Greg Sherwood",
-                    "role": "lead"
-                }
-            ],
-            "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
-            "homepage": "https://github.com/squizlabs/PHP_CodeSniffer",
-            "keywords": [
-                "phpcs",
-                "standards"
-            ],
-            "support": {
-                "issues": "https://github.com/squizlabs/PHP_CodeSniffer/issues",
-                "source": "https://github.com/squizlabs/PHP_CodeSniffer",
-                "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
-            },
-            "time": "2021-12-12T21:44:58+00:00"
         },
         {
             "name": "stack/builder",
@@ -14465,6 +14391,22 @@
     ],
     "packages-dev": [
         {
+            "name": "freshconsulting/wcag_linter",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FreshConsulting/FreshConsulting-WCAG-Linter.git",
+                "reference": "a3e03be9cf90e09583cb080e79d4c48ea57cb8f7"
+            },
+            "default-branch": true,
+            "type": "library",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "A PHP_CodeSniffer custom rule (sniff) to detect obvious WCAG 2.0 accessibility violations.",
+            "time": "2019-07-17T17:10:17+00:00"
+        },
+        {
             "name": "friendsofphp/php-cs-fixer",
             "version": "v2.19.3",
             "source": {
@@ -16950,6 +16892,62 @@
             "time": "2020-09-28T06:39:44+00:00"
         },
         {
+            "name": "squizlabs/php_codesniffer",
+            "version": "3.6.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
+                "reference": "5e4e71592f69da17871dba6e80dd51bce74a351a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/5e4e71592f69da17871dba6e80dd51bce74a351a",
+                "reference": "5e4e71592f69da17871dba6e80dd51bce74a351a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-simplexml": "*",
+                "ext-tokenizer": "*",
+                "ext-xmlwriter": "*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0"
+            },
+            "bin": [
+                "bin/phpcs",
+                "bin/phpcbf"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Greg Sherwood",
+                    "role": "lead"
+                }
+            ],
+            "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
+            "homepage": "https://github.com/squizlabs/PHP_CodeSniffer",
+            "keywords": [
+                "phpcs",
+                "standards"
+            ],
+            "support": {
+                "issues": "https://github.com/squizlabs/PHP_CodeSniffer/issues",
+                "source": "https://github.com/squizlabs/PHP_CodeSniffer",
+                "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
+            },
+            "time": "2021-12-12T21:44:58+00:00"
+        },
+        {
             "name": "symfony/browser-kit",
             "version": "v4.4.37",
             "source": {
@@ -17483,7 +17481,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "freshconsulting/wcag_linter": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
