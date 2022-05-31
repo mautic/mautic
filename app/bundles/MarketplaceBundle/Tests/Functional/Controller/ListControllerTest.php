@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
@@ -21,7 +20,6 @@ final class ListControllerTest extends AbstractMauticTestCase
         $handlerStack->append(
             new Response(200, [], file_get_contents(__DIR__.'/../../ApiResponse/list.json'))
         );
-        self::$container->set('mautic.http.client', new Client(['handler' => $handlerStack]));
         $allowlist = $this->createMock(Allowlist::class);
         $allowlist->method('getAllowList')->willReturn(null);
         self::$container->set('marketplace.service.allowlist', $allowlist);
@@ -55,7 +53,6 @@ final class ListControllerTest extends AbstractMauticTestCase
             new Response(200, [], json_encode(['results' => [$mockResults[1]]])), // mautic-recaptcha-bundle
             new Response(200, [], json_encode(['results' => [$mockResults[3]]])), // mautic-referrals-bundle
         );
-        self::$container->set('mautic.http.client', new Client(['handler' => $handlerStack]));
         $allowlist = $this->createMock(Allowlist::class);
         $allowlist->method('getAllowList')->willReturn(
             DTOAllowlist::fromArray(json_decode(file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json'), true))

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
@@ -25,8 +24,6 @@ final class DetailControllerTest extends AbstractMauticTestCase
         $handlerStack->append(
             new Response(200, [], file_get_contents(__DIR__.'/../../ApiResponse/detail.json'))
         );
-
-        self::$container->set('mautic.http.client', new Client(['handler' => $handlerStack]));
 
         $allowlist = $this->createMock(Allowlist::class);
         $allowlist->method('getAllowList')->willReturn(
