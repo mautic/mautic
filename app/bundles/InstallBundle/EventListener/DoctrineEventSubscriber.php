@@ -3,6 +3,7 @@
 namespace Mautic\InstallBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
+use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -18,13 +19,18 @@ class DoctrineEventSubscriber implements EventSubscriber
 
     public function postGenerateSchema(GenerateSchemaEventArgs $args): void
     {
-        $schema = $args->getSchema();
-
-        $fieldGroups['leads']     = FieldModel::$coreFields;
-        $fieldGroups['companies'] = FieldModel::$coreCompanyFields;
+        $fieldGroups = [
+            'leads'     => FieldModel::$coreFields,
+            'companies' => FieldModel::$coreCompanyFields,
+        ];
 
         foreach ($fieldGroups as $tableName => $fields) {
-            $table = $schema->getTable(MAUTIC_TABLE_PREFIX.$tableName);
+            try {
+                $table = $args->getSchema()->getTable(MAUTIC_TABLE_PREFIX.$tableName);
+            } catch (SchemaException $e) {
+                // Ignore during plugin installations as not all tables are present in the schema.
+                continue;
+            }
 
             foreach ($fields as $alias => $field) {
                 if (!$table->hasColumn($alias)) {
