@@ -581,7 +581,8 @@ ul{height:115px}#report_filters
 auto;background:#fff}.mautic-logo > svg.mautic-logo-figure
 .circle{fill:#4e5e9e}.mautic-logo > svg.mautic-logo-figure .m,
 .mautic-logo > svg.mautic-logo-figure .m-arrow{fill:#fdb933}input:-webkit-autofill{-webkit-box-shadow:0 0 0px 1000px white inset}span.input-group-addon
-i.fa{width:20px}.inline-login .login-form{margin:20px}.focus-builder .website-preview .viewport-switcher{position:absolute;left:0;top:75px;z-index:1025}.focus-builder .website-preview .viewport-switcher .btn-viewport{height:50px;width:50px;display:table}.focus-builder .website-preview .viewport-switcher .btn-viewport
+i.fa{width:20px}.inline-login .login-form{margin:20px}.fa.form-control-feedback{line-height:32px;right:15px}.panel .btn-group{z-index:1000}input[type=checkbox].form-control{height:auto}.drop-here
+input{width:100% !important}.drop-here input[type="radio"]{width:initial !important}.focus-builder .website-preview .viewport-switcher{position:absolute;left:0;top:75px;z-index:1025}.focus-builder .website-preview .viewport-switcher .btn-viewport{height:50px;width:50px;display:table}.focus-builder .website-preview .viewport-switcher .btn-viewport
 i{display:table-cell;vertical-align:middle}.focus-builder .website-preview .website-placeholder{z-index:1020}.focus-builder .website-preview .website-placeholder.has-error input, .focus-builder .website-preview .website-placeholder.has-error
 button{border-color:#a94442}.focus-builder
 #websiteScreenshot{position:absolute;top:0;bottom:0;right:0;left:0;margin:auto}.focus-builder #websiteScreenshot.css-device .screenshot-container{height:392px}.builder-panel-focus{overflow-y:scroll}.builder-panel-focus
