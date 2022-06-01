@@ -35,13 +35,13 @@ class DoctrineEventSubscriberTest extends TestCase
 
     public function testSubscriberWillAddCorrectIndexes(): void
     {
-        $idColumn       = new Column('id', new BigIntType());
-        $textColumn     = new Column('firstname', new TextType());
-        $textColumn     = new Column('date_added', new DateTimeType());
-        $table          = new Table(MAUTIC_TABLE_PREFIX.'leads', [$idColumn, $textColumn]);
-        $schema         = new Schema([$table]);
-        $args           = new GenerateSchemaEventArgs($this->entityManager, $schema);
-        $subscriber     = new DoctrineEventSubscriber();
+        $idColumn   = new Column('id', new BigIntType());
+        $textColumn = new Column('firstname', new TextType());
+        $dateColumn = new Column('date_added', new DateTimeType());
+        $table      = new Table(MAUTIC_TABLE_PREFIX.'leads', [$idColumn, $textColumn, $dateColumn]);
+        $schema     = new Schema([$table]);
+        $args       = new GenerateSchemaEventArgs($this->entityManager, $schema);
+        $subscriber = new DoctrineEventSubscriber();
         $subscriber->postGenerateSchema($args);
 
         Assert::assertTrue($schema->hasTable(MAUTIC_TABLE_PREFIX.'leads'));
