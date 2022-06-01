@@ -153,14 +153,14 @@ final class InstallCommandTest extends AbstractMauticTestCase
             ->willReturn($this->getPackageDetail());
 
         $command = new InstallCommand($this->composerHelper, $this->packageModel);
-
-        $this->expectException(InstallException::class);
-
-        $result = $this->testSymfonyCommand(
+        $result  = $this->testSymfonyCommand(
             'mautic:marketplace:install',
             ['package' => $packageName],
             $command
         );
+
+        Assert::assertSame(1, $result->getStatusCode());
+        Assert::assertSame("Installing mautic/crash-package, this might take a while...\nError while installing this plugin.\nSomething went wrong during the installation\n", $result->getDisplay());
     }
 
     private function getPackageDetail(): PackageDetail
