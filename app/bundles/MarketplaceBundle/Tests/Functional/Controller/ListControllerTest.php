@@ -6,13 +6,13 @@ namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use Mautic\MarketplaceBundle\Service\Config;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
-final class ListControllerTest extends AbstractMauticTestCase
+final class ListControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -27,7 +27,6 @@ final class ListControllerTest extends AbstractMauticTestCase
     {
         /** @var MockHandler $handlerStack */
         $handlerStack = self::$container->get('mautic.http.client.mock_handler');
-        $handlerStack->reset();
         $handlerStack->append(
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/list.json'))  // Getting the package list from Packagist API.
         );
@@ -53,7 +52,6 @@ final class ListControllerTest extends AbstractMauticTestCase
                 $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
             )
         );
-        $handlerStack->reset();
     }
 
     public function testMarketplaceListTableWithAllowList(): void

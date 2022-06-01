@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Command\InstallCommand;
 use Mautic\MarketplaceBundle\DTO\PackageDetail;
 use Mautic\MarketplaceBundle\Exception\ApiException;
-use Mautic\MarketplaceBundle\Exception\InstallException;
 use Mautic\MarketplaceBundle\Model\ConsoleOutputModel;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use PHPUnit\Framework\Assert;

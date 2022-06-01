@@ -6,7 +6,6 @@ use Exception;
 use InvalidArgumentException;
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\MarketplaceBundle\Exception\ApiException;
-use Mautic\MarketplaceBundle\Exception\InstallException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
