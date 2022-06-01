@@ -114,7 +114,7 @@
       "@auto-scripts",
       "@remove-git-submodules"
     ],
-    "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
+    "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --debug",
     "phpstan": "php -d memory_limit=4G bin/phpstan analyse",
     "cs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --diff",
     "fixcs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no -v",
