@@ -25,12 +25,12 @@ class DoctrineEventSubscriber implements EventSubscriber
         ];
 
         foreach ($fieldGroups as $tableName => $fields) {
-            try {
-                $table = $args->getSchema()->getTable(MAUTIC_TABLE_PREFIX.$tableName);
-            } catch (SchemaException $e) {
+            $fullTableName = MAUTIC_TABLE_PREFIX.$tableName;
+            if (!$args->getSchema()->hasTable($fullTableName)) {
                 // Ignore during plugin installations as not all tables are present in the schema.
                 continue;
             }
+            $table = $args->getSchema()->getTable($fullTableName);
 
             foreach ($fields as $alias => $field) {
                 if (!$table->hasColumn($alias)) {
