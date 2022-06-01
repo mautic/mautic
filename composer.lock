@@ -786,75 +786,6 @@
             "time": "2021-04-07T13:37:33+00:00"
         },
         {
-            "name": "composer/metadata-minifier",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/composer/metadata-minifier.git",
-                "reference": "c549d23829536f0d0e984aaabbf02af91f443207"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/composer/metadata-minifier/zipball/c549d23829536f0d0e984aaabbf02af91f443207",
-                "reference": "c549d23829536f0d0e984aaabbf02af91f443207",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.3.2 || ^7.0 || ^8.0"
-            },
-            "require-dev": {
-                "composer/composer": "^2",
-                "phpstan/phpstan": "^0.12.55",
-                "symfony/phpunit-bridge": "^4.2 || ^5"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "1.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Composer\\MetadataMinifier\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jordi Boggiano",
-                    "email": "j.boggiano@seld.be",
-                    "homepage": "http://seld.be"
-                }
-            ],
-            "description": "Small utility library that handles metadata minification and expansion.",
-            "keywords": [
-                "composer",
-                "compression"
-            ],
-            "support": {
-                "issues": "https://github.com/composer/metadata-minifier/issues",
-                "source": "https://github.com/composer/metadata-minifier/tree/1.0.0"
-            },
-            "funding": [
-                {
-                    "url": "https://packagist.com",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/composer",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/composer/composer",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2021-04-07T13:37:33+00:00"
-        },
-        {
             "name": "composer/package-versions-deprecated",
             "version": "1.11.99.1",
             "source": {
@@ -5229,6 +5160,7 @@
                 "issues": "https://github.com/lightsaml/lightsaml/issues",
                 "source": "https://github.com/lightSAML/lightSAML"
             },
+            "abandoned": "litesaml/lightsaml",
             "time": "2018-05-28T11:21:22+00:00"
         },
         {
@@ -5678,7 +5610,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "11188a9f9bdab1f49c5ee3d63ef83ab43163089a"
+                "reference": "6f844fd51595612e537e85e171d79540b8d404db"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5786,6 +5718,7 @@
                         "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
                         "[project-root]/app/.htaccess": "assets/scaffold/files/deny.htaccess",
+                        "[project-root]/autoload.php": "assets/scaffold/files/autoload.php",
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
                         "[web-root]/index.php": "assets/scaffold/files/index.php",
                         "[web-root]/index_dev.php": "assets/scaffold/files/index_dev.php",
@@ -5798,6 +5731,11 @@
                         "[web-root]/media/dashboards/default.json": "assets/scaffold/media/dashboards/default.json",
                         "[web-root]/media/dashboards/email-overview.json": "assets/scaffold/media/dashboards/email-overview.json",
                         "[web-root]/media/dashboards/stats-overview.json": "assets/scaffold/media/dashboards/stats-overview.json",
+                        "[web-root]/media/js/mautic-form-src.js": "assets/js/mautic-form-src.js",
+                        "[web-root]/media/css/mediaelementplayer.css": "assets/css/mediaelementplayer.css",
+                        "[web-root]/media/css/mediaelementplayer.min.css": "assets/css/mediaelementplayer.min.css",
+                        "[web-root]/media/css/modal.css": "assets/css/modal.css",
+                        "[web-root]/media/css/modal.min.css": "assets/css/modal.min.css",
                         "[web-root]/media/files/.htaccess": "assets/scaffold/media/files/.htaccess",
                         "[web-root]/media/images/.htaccess": "assets/scaffold/media/images/.htaccess",
                         "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
@@ -8227,56 +8165,6 @@
                 }
             ],
             "time": "2022-02-11T10:27:51+00:00"
-        },
-        {
-            "name": "react/promise",
-            "version": "v2.8.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/reactphp/promise.git",
-                "reference": "f3cff96a19736714524ca0dd1d4130de73dbbbc4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/f3cff96a19736714524ca0dd1d4130de73dbbbc4",
-                "reference": "f3cff96a19736714524ca0dd1d4130de73dbbbc4",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^7.0 || ^6.5 || ^5.7 || ^4.8.36"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "src/functions_include.php"
-                ],
-                "psr-4": {
-                    "React\\Promise\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jan Sorgalla",
-                    "email": "jsorgalla@gmail.com"
-                }
-            ],
-            "description": "A lightweight implementation of CommonJS Promises/A for PHP",
-            "keywords": [
-                "promise",
-                "promises"
-            ],
-            "support": {
-                "issues": "https://github.com/reactphp/promise/issues",
-                "source": "https://github.com/reactphp/promise/tree/v2.8.0"
-            },
-            "time": "2020-05-12T15:16:56+00:00"
         },
         {
             "name": "robrichards/xmlseclibs",
@@ -17527,5 +17415,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
