@@ -30,6 +30,8 @@ trait UuidTrait
      *     "segment:read", "segment:write",
      *     "email:read", "email:write"
      * })
+     * 
+     * @var string|null
      */
     private $uuid;
 
