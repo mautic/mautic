@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 class DoctrineEventSubscriberTest extends TestCase
 {
     /**
-     * @var MockObject&EntityManagerInterface $entityManager
+     * @var MockObject&EntityManagerInterface
      */
     private $entityManager;
 
