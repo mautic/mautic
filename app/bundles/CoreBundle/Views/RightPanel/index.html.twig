@@ -1,0 +1,32 @@
+<div class="offcanvas-container" data-toggle="offcanvas" data-options='{"openerClass":"offcanvas-opener", "closerClass":"offcanvas-closer"}'>
+    <!-- START Wrapper -->
+    <div class="offcanvas-wrapper">
+       <div class="offcanvas-main" id="OffCanvasMain">
+            <!-- start: sidebar header -->
+            <div class="sidebar-header box-layout"  id="OffCanvasMainHeader">
+                <div class="col-xs-12 pt-lg text-center">
+                    <h4>{% trans %}mautic.core.settings{% endtrans %}</h4>
+                </div>
+
+                <!-- start: loading bar -->
+                <div class="canvas-loading-bar">
+                    {% trans %}mautic.core.loading{% endtrans %}
+                </div>
+                <!--/ end: loading bar -->
+            </div>
+            <!--/ end: sidebar header -->
+
+            <!-- start: sidebar content -->
+            <div class="sidebar-content">
+                <!-- scroll-content -->
+                <div class="scroll-content slimscroll" id="OffCanvasMainContent">
+                    <nav class="nav-sidebar">
+                        {{ menuRender('admin') }}
+                    </nav>
+                </div>
+            </div>
+            <!--/ end: sidebar content -->
+        </div>
+    </div>
+    <!--/ END Wrapper -->
+</div>

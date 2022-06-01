@@ -10,6 +10,8 @@ use Symfony\Component\Templating\Helper\Helper;
 
 /**
  * Class SidebarCanvasHelper.
+ *
+ * @deprecated Deprecated in Mautic 4.3. Will be removed in Mautic 5.0
  */
 class SidebarCanvasHelper extends Helper
 {
