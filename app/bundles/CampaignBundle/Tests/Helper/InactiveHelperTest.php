@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Tests\Helper;
 
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -98,22 +99,32 @@ class InactiveHelperTest extends TestCase
         $leadNegative = new Lead();
         $leadNegative->setId(9);
 
+        // lead not applicable because of parent positive path taken
+        $leadNegative2 = new Lead();
+        $leadNegative2->setId(10);
+
         // applicable lead
         $leadPositive = new Lead();
-        $leadPositive->setId(10);
+        $leadPositive->setId(12);
+
+        // lead not applicable because of no parent event log
+        $leadNegative3 = new Lead();
+        $leadNegative3->setId(11);
 
         $this->eventLogRepository->expects($this->once())
             ->method('getDatesExecuted')
             ->willReturn(new ArrayCollection([
-                $leadNegative->getId() => \DateTime::createFromFormat('Y-m-d H:i:s', '2017-08-31 11:00:00'),
-                $leadPositive->getId() => \DateTime::createFromFormat('Y-m-d H:i:s', '2017-08-31 11:00:00'),
+                $leadNegative->getId()  => DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
+                $leadNegative2->getId() => DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
+                $leadPositive->getId()  => DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
+                $leadNegative3->getId() => DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
             ]));
 
         $log = $this->getMockBuilder(LeadEventLog::class)
             ->getMock();
-        $log->expects($this->exactly(2))
+        $log->expects($this->exactly(3))
             ->method('getNonActionPathTaken')
-            ->will($this->onConsecutiveCalls(1, 0));
+            ->will($this->onConsecutiveCalls(1, 0, 1));
 
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
@@ -123,41 +134,44 @@ class InactiveHelperTest extends TestCase
 
         $parentEvent = $this->getMockBuilder(Event::class)
             ->getMock();
-        $parentEvent->expects($this->exactly(2))
+        $parentEvent->expects($this->exactly(4))
             ->method('getLogByContactAndRotation')
-            ->willReturn($log);
+            ->will($this->onConsecutiveCalls($log, $log, $log, null));
 
         $event = $this->getMockBuilder(Event::class)
             ->getMock();
         $event->expects($this->once())
             ->method('getParent')
             ->willReturn($parentEvent);
-        $event->expects($this->exactly(2))
+        $event->expects($this->exactly(4))
             ->method('getDecisionPath')
             ->willReturn('yes');
-        $event->expects($this->exactly(2))
+        $event->expects($this->exactly(4))
             ->method('getCampaign')
             ->willReturn($campaign);
 
-        $parentEvent->expects($this->once())
+        $parentEvent->expects($this->any())
             ->method('getNegativeChildren')
-            ->willReturn(new ArrayCollection([]));
-        $parentEvent->expects($this->once())
-            ->method('getPositiveChildren')
-            ->willReturn(new ArrayCollection([$event]));
+            ->will($this->onConsecutiveCalls(new ArrayCollection(), new ArrayCollection([$event])));
 
-        $this->leadRepository->expects($this->exactly(2))
+        $parentEvent->expects($this->any())
+            ->method('getPositiveChildren')
+            ->will($this->onConsecutiveCalls(new ArrayCollection(), new ArrayCollection()));
+
+        $this->leadRepository->expects($this->exactly(4))
             ->method('getContactRotations')
             ->willReturn([]);
 
         $this->scheduler->expects($this->any())
             ->method('getExecutionDateTime')
-            ->willReturn(\DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-30 12:00:00'));
+            ->willReturn(DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-30 12:00:00'));
 
-        $now      = \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-31 12:00:00');
+        $now      = DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-31 12:00:00');
         $contacts = new ArrayCollection([
-            $leadNegative->getId() => $leadNegative,
-            $leadPositive->getId() => $leadPositive,
+            $leadNegative->getId()  => $leadNegative,
+            $leadNegative2->getId() => $leadNegative2,
+            $leadPositive->getId()  => $leadPositive,
+            $leadNegative3->getId() => $leadNegative3,
         ]);
 
         $this->inactiveHelper->removeContactsThatAreNotApplicable(

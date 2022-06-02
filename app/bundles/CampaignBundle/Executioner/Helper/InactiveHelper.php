@@ -109,6 +109,7 @@ class InactiveHelper
 
                 if (null === $log) {
                     $contacts->remove($contactId);
+                    continue;
                 }
 
                 $pathTaken   = (int) $log->getNonActionPathTaken();
