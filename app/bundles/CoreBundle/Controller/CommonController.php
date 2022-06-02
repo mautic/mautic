@@ -524,7 +524,7 @@ class CommonController extends Controller implements MauticController
     /**
      * Updates list filters, order, limit.
      *
-     * @param null $name
+     * @param string|null $name
      */
     protected function setListFilters($name = null)
     {
