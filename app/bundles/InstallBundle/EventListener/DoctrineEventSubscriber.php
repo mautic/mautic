@@ -3,7 +3,6 @@
 namespace Mautic\InstallBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
-use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Model\FieldModel;
