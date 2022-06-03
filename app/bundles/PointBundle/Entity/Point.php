@@ -9,14 +9,13 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\IntHelper;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Mautic\PointBundle\Entity\PointRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Point.
- *
  * @ApiResource(
  *   attributes={
  *     "security"="false",
@@ -38,6 +37,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class Point extends FormEntity implements UuidInterface
 {
+    use UuidTrait;
+
     /**
      * @var int
      */
@@ -110,7 +111,7 @@ class Point extends FormEntity implements UuidInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('points')
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\PointRepository')
+            ->setCustomRepositoryClass(PointRepository::class)
             ->addIndex(['type'], 'point_type_search');
 
         $builder->addIdColumns();
