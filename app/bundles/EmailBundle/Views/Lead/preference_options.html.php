@@ -54,7 +54,7 @@ JS;
                     <tr>
                         <td>
                             <div class="text-left">
-                                <input type="hidden" id="<?php echo $channel->value; ?>"
+                                <input type="hidden" id="<?php echo $channel->value; ?>-hidden"
                                        name="lead_contact_frequency_rules[lead_channels][subscribed_channels][<?php echo $key; ?>]"
                                        value="">
                                 <input type="checkbox" id="<?php echo $channel->value; ?>"
