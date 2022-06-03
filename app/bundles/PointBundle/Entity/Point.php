@@ -8,36 +8,12 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\CoreBundle\Entity\UuidInterface;
-use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\IntHelper;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "point:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "point:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
-class Point extends FormEntity implements UuidInterface
+class Point extends FormEntity
 {
-    use UuidTrait;
-
     /**
      * @var int
      */
