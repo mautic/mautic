@@ -50,8 +50,6 @@ class ListModelTest extends TestCase
 
     protected function setUp(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $eventDispatcherInterfaceMock = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcherInterfaceMock->method('dispatch');
         $loggerMock                   = $this->createMock(Logger::class);

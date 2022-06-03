@@ -29,8 +29,6 @@ class DoctrineEventSubscriberTest extends TestCase
         parent::setUp();
 
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
     }
 
     public function testSubscriberWillAddCorrectIndexes(): void
