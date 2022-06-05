@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "173d73534de293e80cb03695c4c29c1a",
+    "content-hash": "a3244b4b71984f0663a4bb3b053cd914",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2868,13 +2868,13 @@
             "version": "dev-doctrine-fix",
             "source": {
                 "type": "git",
-                "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git",
-                "reference": "605d20721fa2e1925d5ec8329dbac8f7d9a6be0c"
+                "url": "https://github.com/mollux/FOSOAuthServerBundle.git",
+                "reference": "33bc2f43bcd100d00afd03d39c05bdebd14467ca"
             },
             "require": {
                 "friendsofsymfony/oauth2-php": "~1.1",
                 "paragonie/random_compat": "^1|^2",
-                "php": "^5.5|^7.0",
+                "php": "^7.2|^8.0",
                 "symfony/dependency-injection": "^2.8|~3.0|^4.0",
                 "symfony/framework-bundle": "~2.8|~3.0|^4.0",
                 "symfony/security-bundle": "~2.8|~3.0|^4.0"
@@ -2938,7 +2938,7 @@
                 "oauth2",
                 "server"
             ],
-            "time": "2021-03-28T16:46:43+00:00"
+            "time": "2022-06-06T06:52:29+00:00"
         },
         {
             "name": "friendsofsymfony/oauth2-php",
@@ -4283,21 +4283,21 @@
         },
         {
             "name": "joomla/filter",
-            "version": "1.3.5",
+            "version": "1.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/filter.git",
-                "reference": "ee1d870b5c188056745e1dd3cece21522e2158b8"
+                "reference": "09733d70db6c6d91e53e0e0d0fcde9b8638175c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/filter/zipball/ee1d870b5c188056745e1dd3cece21522e2158b8",
-                "reference": "ee1d870b5c188056745e1dd3cece21522e2158b8",
+                "url": "https://api.github.com/repos/joomla-framework/filter/zipball/09733d70db6c6d91e53e0e0d0fcde9b8638175c4",
+                "reference": "09733d70db6c6d91e53e0e0d0fcde9b8638175c4",
                 "shasum": ""
             },
             "require": {
                 "joomla/string": "~1.3|~2.0",
-                "php": "^5.3.10|~7.0"
+                "php": "^5.3.10|~7.0|^8.0"
             },
             "require-dev": {
                 "joomla/coding-standards": "~2.0@alpha",
@@ -4331,45 +4331,49 @@
             ],
             "support": {
                 "issues": "https://github.com/joomla-framework/filter/issues",
-                "source": "https://github.com/joomla-framework/filter/tree/master"
+                "source": "https://github.com/joomla-framework/filter/tree/1.4.4"
             },
-            "time": "2018-05-26T15:48:53+00:00"
+            "funding": [
+                {
+                    "url": "https://community.joomla.org/sponsorship-campaigns.html",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/joomla",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-03-29T12:14:25+00:00"
         },
         {
             "name": "joomla/string",
-            "version": "2.0.0",
+            "version": "1.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/string.git",
-                "reference": "778682c04a1909323da6a453a5b3030d7a7a2fa9"
+                "reference": "728ba9e39a8f1bd15b75ab878f57fa505184b8ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/string/zipball/778682c04a1909323da6a453a5b3030d7a7a2fa9",
-                "reference": "778682c04a1909323da6a453a5b3030d7a7a2fa9",
+                "url": "https://api.github.com/repos/joomla-framework/string/zipball/728ba9e39a8f1bd15b75ab878f57fa505184b8ab",
+                "reference": "728ba9e39a8f1bd15b75ab878f57fa505184b8ab",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2.5",
-                "symfony/deprecation-contracts": "^2.1"
-            },
-            "conflict": {
-                "doctrine/inflector": "<1.2"
+                "php": "^5.3.10|^7.0|^8.0"
             },
             "require-dev": {
-                "doctrine/inflector": "1.2",
-                "joomla/coding-standards": "^3.0@dev",
-                "joomla/test": "^2.0",
-                "phpunit/phpunit": "^8.5|^9.0"
+                "joomla/coding-standards": "^2.0@alpha",
+                "joomla/test": "^1.0",
+                "phpunit/phpunit": "^4.8.35|^5.4.3|^6.0|^7.0|^8.0"
             },
             "suggest": {
-                "doctrine/inflector": "To use the string inflector",
                 "ext-mbstring": "For improved processing"
             },
             "type": "joomla-package",
             "extra": {
                 "branch-alias": {
-                    "dev-2.0-dev": "2.0-dev"
+                    "dev-master": "1.x-dev"
                 }
             },
             "autoload": {
@@ -4407,7 +4411,7 @@
             ],
             "support": {
                 "issues": "https://github.com/joomla-framework/string/issues",
-                "source": "https://github.com/joomla-framework/string/tree/2.0.0"
+                "source": "https://github.com/joomla-framework/string/tree/1.4.6"
             },
             "funding": [
                 {
@@ -4419,7 +4423,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-08-10T18:57:12+00:00"
+            "time": "2022-01-25T15:16:52+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -5611,7 +5615,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "e05007453398ca880a68dd9a4b7fe776b6d6db2f"
+                "reference": "4207cb5d87687bab633f1770e6707857cd07e3da"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5640,7 +5644,7 @@
                 "ip2location/ip2location-php": "^7.2",
                 "jbroadway/urlify": "^1.0",
                 "jms/serializer-bundle": "^4.0",
-                "joomla/filter": "~1.3.5",
+                "joomla/filter": "~1.4.4",
                 "kamermans/guzzle-oauth2-subscriber": "^1.0",
                 "knplabs/gaufrette": "~0.9.0",
                 "knplabs/knp-menu-bundle": "^3.0",

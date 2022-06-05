@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ImportControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     private string $csvFile;
     /**
      * @var array|string[][]
