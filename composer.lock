@@ -3504,20 +3504,21 @@
         },
         {
             "name": "guzzlehttp/oauth-subscriber",
-            "version": "0.5.0",
+            "version": "0.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/oauth-subscriber.git",
-                "reference": "c7a04dd4f2a319d954da58363709c25388cc06a2"
+                "reference": "8d6cab29f8397e5712d00a383eeead36108a3c1f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/oauth-subscriber/zipball/c7a04dd4f2a319d954da58363709c25388cc06a2",
-                "reference": "c7a04dd4f2a319d954da58363709c25388cc06a2",
+                "url": "https://api.github.com/repos/guzzle/oauth-subscriber/zipball/8d6cab29f8397e5712d00a383eeead36108a3c1f",
+                "reference": "8d6cab29f8397e5712d00a383eeead36108a3c1f",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.5|^7.2",
+                "guzzlehttp/psr7": "^1.7|^2.0",
                 "php": ">=5.5.0"
             },
             "require-dev": {
@@ -3529,7 +3530,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.5-dev"
+                    "dev-master": "0.6-dev"
                 }
             },
             "autoload": {
@@ -3556,9 +3557,9 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/oauth-subscriber/issues",
-                "source": "https://github.com/guzzle/oauth-subscriber/tree/0.5.0"
+                "source": "https://github.com/guzzle/oauth-subscriber/tree/0.6.0"
             },
-            "time": "2021-03-07T09:39:26+00:00"
+            "time": "2021-07-13T12:01:32+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -5160,6 +5161,7 @@
                 "issues": "https://github.com/lightsaml/lightsaml/issues",
                 "source": "https://github.com/lightSAML/lightSAML"
             },
+            "abandoned": "litesaml/lightsaml",
             "time": "2018-05-28T11:21:22+00:00"
         },
         {
@@ -5609,7 +5611,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "9b05a66b449980154fb2fb1416b8342a6aea74ba"
+                "reference": "e05007453398ca880a68dd9a4b7fe776b6d6db2f"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5633,7 +5635,7 @@
                 "gaufrette/extras": "^0.1.0",
                 "geoip2/geoip2": "~2.0",
                 "guzzlehttp/guzzle": "^7.2",
-                "guzzlehttp/oauth-subscriber": "^0.5.0",
+                "guzzlehttp/oauth-subscriber": "^0.6.0",
                 "helios-ag/fm-elfinder-bundle": "^10.1",
                 "ip2location/ip2location-php": "^7.2",
                 "jbroadway/urlify": "^1.0",
