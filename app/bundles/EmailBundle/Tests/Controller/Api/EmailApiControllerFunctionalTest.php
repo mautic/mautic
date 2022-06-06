@@ -248,7 +248,10 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
         $this->assertTrue($responseData['success']);
 
-        $stat = $this->em->getRepository(Stat::class)->findOneBy(['email' => $email->getId(), 'lead' => $contact->getId()]);
+        $stat = $this->em->getRepository(Stat::class)->findOneBy([
+            'email' => $email->getId(),
+            'lead' => $contact->getId(),
+        ]);
         $this->assertNotEmpty($stat);
     }
 }
