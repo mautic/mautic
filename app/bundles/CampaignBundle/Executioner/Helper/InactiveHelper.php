@@ -6,8 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
+use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Psr\Log\LoggerInterface;
 
@@ -34,14 +34,14 @@ class InactiveHelper
     private $eventRepository;
 
     /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
+
+    /**
+     * @var DecisionHelper
+     */
+    private $decisionHelper;
 
     /**
      * @var \DateTime
@@ -56,15 +56,15 @@ class InactiveHelper
         InactiveContactFinder $inactiveContactFinder,
         LeadEventLogRepository $eventLogRepository,
         EventRepository $eventRepository,
-        LeadRepository $leadRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        DecisionHelper $decisionHelper
     ) {
         $this->scheduler               = $scheduler;
         $this->inactiveContactFinder   = $inactiveContactFinder;
         $this->eventLogRepository      = $eventLogRepository;
         $this->eventRepository         = $eventRepository;
-        $this->leadRepository          = $leadRepository;
         $this->logger                  = $logger;
+        $this->decisionHelper          = $decisionHelper;
     }
 
     /**
@@ -100,27 +100,13 @@ class InactiveHelper
         $lastActiveDates            = $this->getLastActiveDates($lastActiveEventId, $contactIds);
         $this->earliestInactiveDate = $now;
 
-        $parentEvent = $event->getParent();
-
         foreach ($contactIds as $contactId) {
-            if (null !== $parentEvent && null !== $event->getDecisionPath()) {
-                $rotation    = $this->leadRepository->getContactRotations([$contactId], $event->getCampaign()->getId());
-                $log         = $parentEvent->getLogByContactAndRotation($contacts->get($contactId), $rotation);
-
-                if (null === $log) {
-                    $contacts->remove($contactId);
-                    continue;
-                }
-
-                $pathTaken   = (int) $log->getNonActionPathTaken();
-
-                if (1 === $pathTaken && !$parentEvent->getNegativeChildren()->contains($event)) {
-                    $contacts->remove($contactId);
-                    continue;
-                } elseif (0 === $pathTaken && !$parentEvent->getPositiveChildren()->contains($event)) {
-                    $contacts->remove($contactId);
-                    continue;
-                }
+            try {
+                $this->decisionHelper->checkIsDecisionApplicableForContact($event, $contacts->get($contactId));
+            } catch (DecisionNotApplicableException $e) {
+                $this->logger->debug($e->getMessage());
+                $contacts->remove($contactId);
+                continue;
             }
 
             if (!isset($lastActiveDates[$contactId])) {

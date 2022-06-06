@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
+use Mautic\CampaignBundle\Executioner\Helper\DecisionHelper;
 use Mautic\CampaignBundle\Executioner\Helper\InactiveHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
@@ -55,22 +56,27 @@ class InactiveHelperTest extends TestCase
      */
     private $inactiveHelper;
 
+    /**
+     * @var DecisionHelper
+     */
+    private $decisionHelper;
+
     protected function setUp(): void
     {
-        $this->scheduler = $this->createMock(EventScheduler::class);
+        $this->scheduler             = $this->createMock(EventScheduler::class);
         $this->inactiveContactFinder = $this->createMock(InactiveContactFinder::class);
-        $this->eventLogRepository = $this->createMock(LeadEventLogRepository::class);
-        $this->eventRepository = $this->createMock(EventRepository::class);
-        $this->leadRepository = $this->createMock(LeadRepository::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
-
-        $this->inactiveHelper = new InactiveHelper(
+        $this->eventLogRepository    = $this->createMock(LeadEventLogRepository::class);
+        $this->eventRepository       = $this->createMock(EventRepository::class);
+        $this->leadRepository        = $this->createMock(LeadRepository::class);
+        $this->logger                = $this->createMock(LoggerInterface::class);
+        $this->decisionHelper        = new DecisionHelper($this->leadRepository);
+        $this->inactiveHelper        = new InactiveHelper(
             $this->scheduler,
             $this->inactiveContactFinder,
             $this->eventLogRepository,
             $this->eventRepository,
-            $this->leadRepository,
-            $this->logger
+            $this->logger,
+            $this->decisionHelper
         );
     }
 
@@ -125,6 +131,7 @@ class InactiveHelperTest extends TestCase
         $event->setParent($parentEvent);
         $event->setDecisionPath('yes');
         $event->setCampaign($campaign);
+        $event->setEventType(Event::TYPE_DECISION);
 
         $parentEvent->expects($this->any())
             ->method('getNegativeChildren')
