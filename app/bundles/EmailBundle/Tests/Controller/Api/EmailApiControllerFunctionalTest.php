@@ -250,7 +250,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $stat = $this->em->getRepository(Stat::class)->findOneBy([
             'email' => $email->getId(),
-            'lead' => $contact->getId(),
+            'lead'  => $contact->getId(),
         ]);
         $this->assertNotEmpty($stat);
     }
