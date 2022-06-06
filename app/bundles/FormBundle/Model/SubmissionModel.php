@@ -572,7 +572,7 @@ class SubmissionModel extends CommonFormModel
                 $response->headers->set('Content-Type', 'application/force-download');
                 $response->headers->set('Content-Type', 'application/octet-stream');
                 $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
-                $response->headers->set('Expires', 0);
+                $response->headers->set('Expires', '0');
                 $response->headers->set('Cache-Control', 'must-revalidate');
                 $response->headers->set('Pragma', 'public');
 
@@ -654,7 +654,7 @@ class SubmissionModel extends CommonFormModel
                     $response->headers->set('Content-Type', 'application/force-download');
                     $response->headers->set('Content-Type', 'application/octet-stream');
                     $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
-                    $response->headers->set('Expires', 0);
+                    $response->headers->set('Expires', '0');
                     $response->headers->set('Cache-Control', 'must-revalidate');
                     $response->headers->set('Pragma', 'public');
 
@@ -726,7 +726,7 @@ class SubmissionModel extends CommonFormModel
 
                 $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
                 $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
-                $response->headers->set('Expires', 0);
+                $response->headers->set('Expires', '0');
                 $response->headers->set('Cache-Control', 'must-revalidate');
                 $response->headers->set('Pragma', 'public');
 
@@ -790,7 +790,7 @@ class SubmissionModel extends CommonFormModel
                 );
                 $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
                 $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
-                $response->headers->set('Expires', 0);
+                $response->headers->set('Expires', '0');
                 $response->headers->set('Cache-Control', 'must-revalidate');
                 $response->headers->set('Pragma', 'public');
 

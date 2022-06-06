@@ -73,7 +73,7 @@ class AssetGenerationHelper
 
             if ($loadAll || $forceRegeneration) {
                 if ('prod' == $env) {
-                    ini_set('max_execution_time', 300);
+                    ini_set('max_execution_time', '300');
 
                     $inProgressFile = "$assetsFullPath/generation_in_progress.txt";
 
