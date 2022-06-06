@@ -57,29 +57,12 @@ class InactiveHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->scheduler = $this->getMockBuilder(EventScheduler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->inactiveContactFinder = $this->getMockBuilder(InactiveContactFinder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->eventLogRepository = $this->getMockBuilder(LeadEventLogRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->eventRepository = $this->getMockBuilder(EventRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->leadRepository = $this->getMockBuilder(LeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->logger = $this->getMockBuilder(LoggerInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->scheduler = $this->createMock(EventScheduler::class);
+        $this->inactiveContactFinder = $this->createMock(InactiveContactFinder::class);
+        $this->eventLogRepository = $this->createMock(LeadEventLogRepository::class);
+        $this->eventRepository = $this->createMock(EventRepository::class);
+        $this->leadRepository = $this->createMock(LeadRepository::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->inactiveHelper = new InactiveHelper(
             $this->scheduler,
@@ -120,35 +103,28 @@ class InactiveHelperTest extends TestCase
                 $leadNegative3->getId() => DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
             ]));
 
-        $log = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        /** @var LeadEventLog&MockObject */
+        $log = $this->createMock(LeadEventLog::class);
         $log->expects($this->exactly(3))
             ->method('getNonActionPathTaken')
             ->will($this->onConsecutiveCalls(1, 0, 1));
 
-        $campaign = $this->getMockBuilder(Campaign::class)
-            ->getMock();
+        /** @var Campaign&MockObject */
+        $campaign = $this->createMock(Campaign::class);
         $campaign->expects($this->any())
             ->method('getId')
             ->willReturn(2);
 
-        $parentEvent = $this->getMockBuilder(Event::class)
-            ->getMock();
+        /** @var Event&MockObject */
+        $parentEvent = $this->createMock(Event::class);
         $parentEvent->expects($this->exactly(4))
             ->method('getLogByContactAndRotation')
             ->will($this->onConsecutiveCalls($log, $log, $log, null));
 
-        $event = $this->getMockBuilder(Event::class)
-            ->getMock();
-        $event->expects($this->once())
-            ->method('getParent')
-            ->willReturn($parentEvent);
-        $event->expects($this->exactly(4))
-            ->method('getDecisionPath')
-            ->willReturn('yes');
-        $event->expects($this->exactly(4))
-            ->method('getCampaign')
-            ->willReturn($campaign);
+        $event = new Event();
+        $event->setParent($parentEvent);
+        $event->setDecisionPath('yes');
+        $event->setCampaign($campaign);
 
         $parentEvent->expects($this->any())
             ->method('getNegativeChildren')
