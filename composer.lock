@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a3244b4b71984f0663a4bb3b053cd914",
+    "content-hash": "18c810239b16e7a63b7514bf61b0539f",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2868,7 +2868,7 @@
             "version": "dev-doctrine-fix",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mollux/FOSOAuthServerBundle.git",
+                "url": "https://github.com/mautic/FOSOAuthServerBundle.git",
                 "reference": "33bc2f43bcd100d00afd03d39c05bdebd14467ca"
             },
             "require": {
@@ -5615,7 +5615,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "4207cb5d87687bab633f1770e6707857cd07e3da"
+                "reference": "3e7a938c18f6adbf4dec4f29e0f9be362c55f40a"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
