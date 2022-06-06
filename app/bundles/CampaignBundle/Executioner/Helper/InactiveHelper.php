@@ -38,10 +38,7 @@ class InactiveHelper
      */
     private $logger;
 
-    /**
-     * @var DecisionHelper
-     */
-    private $decisionHelper;
+    private DecisionHelper $decisionHelper;
 
     /**
      * @var \DateTime

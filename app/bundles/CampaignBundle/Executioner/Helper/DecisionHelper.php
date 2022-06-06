@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Executioner\Helper;
 
 use Mautic\CampaignBundle\Entity\Event;
@@ -9,10 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class DecisionHelper
 {
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private LeadRepository $leadRepository;
 
     public function __construct(
         LeadRepository $leadRepository
@@ -21,12 +20,9 @@ class DecisionHelper
     }
 
     /**
-     * @param string|null $channel
-     * @param int|null    $channelId
-     *
      * @throws DecisionNotApplicableException
      */
-    public function checkIsDecisionApplicableForContact(Event $event, Lead $contact, $channel = null, $channelId = null): void
+    public function checkIsDecisionApplicableForContact(Event $event, Lead $contact, ?string $channel = null, ?int $channelId = null): void
     {
         if (Event::TYPE_DECISION !== $event->getEventType()) {
             @trigger_error(
