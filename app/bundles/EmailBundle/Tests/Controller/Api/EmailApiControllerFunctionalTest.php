@@ -12,9 +12,12 @@
 namespace Mautic\EmailBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
 
 class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -215,53 +218,26 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSendEmailToDNCLead(): void
     {
-        // Create a couple of segments first:
-        $payload = [
-            [
-                'name'        => 'API segment A',
-                'description' => 'Segment created via API test',
-            ],
-        ];
+        $email = new Email();
+        $email->setName('test');
+        $email->setSubject('test');
+        $this->em->persist($email);
+        $this->em->flush();
 
-        $this->client->request('POST', '/api/segments/batch/new', $payload);
-        $clientResponse  = $this->client->getResponse();
-        $segmentResponse = json_decode($clientResponse->getContent(), true);
-        $segmentAId      = $segmentResponse['lists'][0]['id'];
+        $contact = new Lead();
+        $contact->setEmail('john@doe.email');
+        $this->em->persist($contact);
+        $this->em->flush();
 
-        $this->assertSame(201, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        $this->assertGreaterThan(0, $segmentAId);
-
-        // Create email with the new segment:
-        $payload = [
-            'name'       => 'API email',
-            'subject'    => 'Email created via API test',
-            'emailType'  => 'list',
-            'lists'      => [$segmentAId],
-            'customHtml' => '<h1>Email content created by an API test</h1>',
-        ];
-
-        $this->client->request('POST', '/api/emails/new', $payload);
-        $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-        $emailId        = $response['email']['id'];
-
-        // Create new lead
-        $payload = [
-            'email' => 'apiemail1@email.com',
-        ];
-
-        $this->client->request('POST', '/api/contacts/new', $payload);
-        $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-        $contactId      = $response['contact']['id'];
-
-        // Add DNC to lead
-        $this->client->request('POST', "/api/contacts/{$contactId}/dnc/email/add");
-        $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $contactDNC = new DoNotContact();
+        $contactDNC->setLead($contact);
+        $contactDNC->setReason(DoNotContact::UNSUBSCRIBED);
+        $contactDNC->setChannel('email');
+        $this->em->persist($contact);
+        $this->em->flush();
 
         $this->client->request('POST',
-            "/api/emails/{$emailId}/contact/{$contactId}/send",
+            "/api/emails/{$email->getId()}/contact/{$contact->getId()}/send",
             [
                 'ignoreDNC' => true,
             ]
@@ -271,5 +247,8 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
         $this->assertTrue($responseData['success']);
+
+        $stat = $this->em->getRepository(Stat::class)->findOneBy(['email' => $email->getId(), 'lead' => $contact->getId()]);
+        $this->assertNotEmpty($stat);
     }
 }
