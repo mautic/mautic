@@ -1089,6 +1089,33 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
+     * Check Lead segments by ids.
+     *
+     * @param array<integer> $stages
+     */
+    public function checkLeadStage(Lead $lead, array $stages = []): bool
+    {
+        if (empty($stages)) {
+            return false;
+        }
+
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('s.id')
+            ->from(MAUTIC_TABLE_PREFIX.'stages', 's');
+        $q->join('s', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.stage_id = s.id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('s.id', ':stageIds'),
+                    $q->expr()->eq('l.id', ':leadId')
+                )
+            )
+            ->setParameter('stageIds', implode(',', $stages))
+            ->setParameter('leadId', $lead->getId());
+
+        return (bool) $q->execute()->fetchColumn();
+    }
+
+    /**
      * Check lead owner.
      *
      * @param array $ownerIds
