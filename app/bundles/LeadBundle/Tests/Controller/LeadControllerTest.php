@@ -36,13 +36,6 @@ class LeadControllerTest extends MauticMysqlTestCase
         return $leadCompany;
     }
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-    }
-
     protected function beforeBeginTransaction(): void
     {
         $this->resetAutoincrement([

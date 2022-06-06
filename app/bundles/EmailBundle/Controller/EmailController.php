@@ -694,8 +694,7 @@ class EmailController extends FormController
                                     'objectId'     => $entity->getId(),
                                 ]
                             ),
-                        ],
-                        'warning'
+                        ]
                     );
                 }
             } else {
