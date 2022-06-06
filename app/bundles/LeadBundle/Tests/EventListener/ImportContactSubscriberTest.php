@@ -34,7 +34,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(
                 [
                     'name' => 'Bud',
-                    'tags' => new ArrayCollection([$tag])
+                    'tags' => new ArrayCollection([$tag]),
                 ]
             );
 
