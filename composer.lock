@@ -5615,7 +5615,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "9b05a66b449980154fb2fb1416b8342a6aea74ba"
+                "reference": "e05007453398ca880a68dd9a4b7fe776b6d6db2f"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
