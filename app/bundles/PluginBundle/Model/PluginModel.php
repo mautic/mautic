@@ -150,6 +150,10 @@ class PluginModel extends FormModel
 
         foreach ($pluginsMetadata as $bundleName => $pluginMetadata) {
             foreach ($pluginMetadata as $meta) {
+                if ($meta->isInheritanceTypeSingleTable() && !$meta->isRootEntity()) {
+                    continue;
+                }
+
                 $table = $meta->getTableName();
 
                 if (!isset($installedPluginsTables[$bundleName])) {
