@@ -472,8 +472,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         $qbcut->andWhere($qb->expr()->in('cut2.channel_id', ":{$filterParam}"));
                         $qb->setParameter($filterParam, $event->getFilterValues('e.id'), Connection::PARAM_INT_ARRAY);
                     }
-
-                    $qb->leftJoin(
+                    $qb->join(
                         self::EMAIL_STATS_PREFIX,
                         "({$qbcut->getSQL()})",
                         self::CLICK_PREFIX,
