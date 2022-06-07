@@ -78,7 +78,7 @@ class PageType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'redirectUrl' => 'url']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'redirectUrl' => 'url', 'headScript' => 'html', 'footerScript' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('page.page', $options));
 
         $builder->add(
@@ -98,9 +98,11 @@ class PageType extends AbstractType
                 'label'    => 'mautic.page.form.customhtml',
                 'required' => false,
                 'attr'     => [
+                    'tooltip'              => 'mautic.page.form.customhtml.help',
                     'class'                => 'form-control editor-builder-tokens builder-html',
                     'data-token-callback'  => 'page:getBuilderTokens',
                     'data-token-activator' => '{',
+                    'rows'                 => '25',
                 ],
             ]
         );
@@ -257,6 +259,34 @@ class PageType extends AbstractType
                 'label'      => 'mautic.page.form.metadescription',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control', 'maxlength' => 160],
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'headScript',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.page.form.headscript',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                    'rows'  => '8',
+                ],
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'footerScript',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.page.form.footerscript',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                    'rows'  => '8',
+                ],
                 'required'   => false,
             ]
         );

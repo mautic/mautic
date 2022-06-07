@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright  2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -12,7 +14,6 @@
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\AbstractCustomRequestEvent;
-use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -21,37 +22,40 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
     /**
      * Please refer to ListModel.php, inside getChoiceFields method, for examples of choices.
      *
-     * @var array
+     * @var mixed
      */
     protected $choices;
 
     /**
      * Please refer to ListModel.php, inside getChoiceFields method, for default operators availabled.
      *
-     * @var array
+     * @var mixed[]
      */
     protected $operators;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
+    private string $search;
+
     /**
-     * @param array $choices
-     * @param array $operators
+     * @param mixed[] $choices
+     * @param mixed[] $operators
      */
-    public function __construct($choices, $operators, TranslatorInterface $translator, Request $request = null)
+    public function __construct($choices, $operators, TranslatorInterface $translator, Request $request = null, string $search = '')
     {
         parent::__construct($request);
 
         $this->choices    = $choices;
         $this->operators  = $operators;
         $this->translator = $translator;
+        $this->search     = $search;
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getChoices()
     {
@@ -59,7 +63,7 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getOperators()
     {
@@ -67,30 +71,46 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @return Translator
+     * @return TranslatorInterface
      */
     public function getTranslator()
     {
         return $this->translator;
     }
 
+    public function getSearch(): string
+    {
+        return $this->search;
+    }
+
     /**
      * Add a new choice for list filters
      * Please refer to ListModel.php, inside getChoiceFields method, for examples of choices.
      *
-     * @param string $object
-     * @param string $choiceKey
-     * @param array  $choiceConfig
+     * @param string  $object
+     * @param string  $choiceKey
+     * @param mixed[] $choiceConfig
      */
     public function addChoice($object, $choiceKey, $choiceConfig)
     {
         if (!isset($this->choices[$object])) {
             $this->choices[$object] = [];
         }
-
         if (!array_key_exists($choiceKey, $this->choices[$object])) {
             $this->choices[$object][$choiceKey] = $choiceConfig;
         }
+    }
+
+    /**
+     * @param mixed[] $choiceConfig
+     */
+    public function setChoice(string $object, string $choiceKey, array $choiceConfig): void
+    {
+        if (!isset($this->choices[$object])) {
+            $this->choices[$object] = [];
+        }
+
+        $this->choices[$object][$choiceKey] = $choiceConfig;
     }
 
     /**

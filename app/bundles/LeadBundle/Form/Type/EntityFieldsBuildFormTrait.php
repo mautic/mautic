@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Form\Type\TimezoneType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Form\FieldAliasToFqcnMap;
+use Mautic\LeadBundle\Form\Validator\Constraints\EmailAddress;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Validator\Constraints\Length;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -255,6 +256,7 @@ trait EntityFieldsBuildFormTrait
                     switch ($type) {
                         case LookupType::class:
                             $attr['data-target'] = $alias;
+                            $constraints[]       = new Length(['max' => 191]);
                             if (!empty($properties['list'])) {
                                 $attr['data-options'] = FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, array_keys(FormFieldHelper::parseList($properties['list'])));
                             }
@@ -262,11 +264,7 @@ trait EntityFieldsBuildFormTrait
                         case EmailType::class:
                             // Enforce a valid email
                             $attr['data-encoding'] = 'email';
-                            $constraints[]         = new Email(
-                                [
-                                    'message' => 'mautic.core.email.required',
-                                ]
-                            );
+                            $constraints[]         = new EmailAddress();
                             break;
                         case TextType::class:
                             $constraints[] = new Length(['max' => 191]);

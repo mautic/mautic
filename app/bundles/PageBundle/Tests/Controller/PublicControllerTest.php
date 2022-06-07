@@ -20,7 +20,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -43,12 +43,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
 
-class PublicControllerTest extends AbstractMauticTestCase
+class PublicControllerTest extends MauticMysqlTestCase
 {
     /** @var PublicControllerTest */
     private $controller;
 
-    /** @var Container */
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|Container
+     */
     private $internalContainer;
 
     /** @var Logger */
@@ -355,26 +357,17 @@ class PublicControllerTest extends AbstractMauticTestCase
             ->method('generate')
             ->willReturn('/asset/');
 
-        $this->internalContainer->expects(self::exactly(7))
+        $this->internalContainer
             ->method('get')
-            ->withConsecutive(
-                ['monolog.logger.mautic'],
-                ['mautic.model.factory'],
-                ['mautic.helper.ip_lookup'],
-                ['mautic.model.factory'],
-                ['mautic.model.factory'],
-                ['mautic.lead.helper.primary_company'],
-                ['router']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->logger,
-                $this->modelFactory,
-                $this->ipLookupHelper,
-                $this->modelFactory,
-                $this->modelFactory,
-                $this->primaryCompanyHelper,
-                $routerMock
-            );
+            ->willReturnMap([
+                ['monolog.logger.mautic', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->logger],
+                ['mautic.model.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->modelFactory],
+                ['mautic.helper.ip_lookup', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->ipLookupHelper],
+                ['mautic.model.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->modelFactory],
+                ['mautic.model.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->modelFactory],
+                ['mautic.lead.helper.primary_company', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->primaryCompanyHelper],
+                ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $routerMock],
+            ]);
 
         $this->request->query->set('ct', $clickTrough);
 
@@ -437,26 +430,17 @@ class PublicControllerTest extends AbstractMauticTestCase
             ->with('mautic_asset_download')
             ->willReturn('/asset');
 
-        $this->internalContainer->expects(self::exactly(7))
+        $this->internalContainer
             ->method('get')
-            ->withConsecutive(
-                ['monolog.logger.mautic'],
-                ['mautic.model.factory'],
-                ['mautic.helper.ip_lookup'],
-                ['mautic.model.factory'],
-                ['mautic.model.factory'],
-                ['mautic.lead.helper.primary_company'],
-                ['router']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->logger,
-                $this->modelFactory,
-                $this->ipLookupHelper,
-                $this->modelFactory,
-                $this->modelFactory,
-                $this->primaryCompanyHelper,
-                $routerMock
-            );
+            ->willReturnMap([
+                ['monolog.logger.mautic', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->logger],
+                ['mautic.model.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->modelFactory],
+                ['mautic.helper.ip_lookup', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->ipLookupHelper],
+                ['mautic.model.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->modelFactory],
+                ['mautic.model.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->modelFactory],
+                ['mautic.lead.helper.primary_company', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->primaryCompanyHelper],
+                ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $routerMock],
+            ]);
 
         $this->request->query->set('ct', $clickThrough);
 

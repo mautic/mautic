@@ -101,7 +101,13 @@ class EventLogApiController extends CommonApiController
             // Check that contact is part of the campaign
             $membership = $campaign->getContactMembership($contact);
             if (0 === count($membership)) {
-                return $this->returnError('mautic.campaign.error.contact_not_in_campaign', Response::HTTP_CONFLICT);
+                return $this->returnError(
+                    $this->translator->trans(
+                        'mautic.campaign.error.contact_not_in_campaign',
+                        ['%campaign%' => $campaignId, '%contact%' => $contactId]
+                    ),
+                    Response::HTTP_CONFLICT
+                );
             }
 
             $this->campaign           = $campaign;
