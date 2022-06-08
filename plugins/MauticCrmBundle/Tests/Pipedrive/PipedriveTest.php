@@ -81,7 +81,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $settings = array_merge(
             [
                 'import' => [
-                    'enabled',
+                    ['create', 'update'],
                 ],
             ],
             $settings
