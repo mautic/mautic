@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -12,6 +21,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Form\Type\AddToCompanyActionType;
+use Mautic\LeadBundle\Form\Type\CampaignConditionLeadPageHitType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType;
@@ -33,7 +43,6 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Mautic\LeadBundle\Form\Type\CampaignConditionLeadPageHitType;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -512,19 +521,17 @@ class CampaignSubscriber implements EventSubscriberInterface
             }
         } elseif ($event->checkContext('lead.pageHit')) {
             $startDate = $event->getConfig()['startDate'] ?? null;
-            $endDate = $event->getConfig()['endDate'] ?? null;
-            $page = $event->getConfig()['page'] ?? null;
-            $url = $event->getConfig()['page_url'] ?? null;
+            $endDate   = $event->getConfig()['endDate'] ?? null;
+            $page      = $event->getConfig()['page'] ?? null;
+            $url       = $event->getConfig()['page_url'] ?? null;
 
-            $filter = array(
-                'search' => '',
-                'includeEvents' =>
-                    array(
-                        0 => 'page.hit',
-                    ),
-                'excludeEvents' =>
-                    array(),
-            );
+            $filter = [
+                'search'        => '',
+                'includeEvents' => [
+                    0 => 'page.hit',
+                ],
+                'excludeEvents' => [],
+            ];
 
             if ($startDate) {
                 if (!is_a($startDate, 'DateTime')) {
@@ -537,25 +544,39 @@ class CampaignSubscriber implements EventSubscriberInterface
                 if (!is_a($endDate, 'DateTime')) {
                     $endDate = new \DateTime($endDate);
                 }
-                $filter['dateTo'] = $endDate->modify("+1 minutes");
+                $filter['dateTo'] = $endDate->modify('+1 minutes');
             }
 
-            $orderby = array(
+            $orderby = [
                 0 => 'timestamp',
                 1 => 'DESC',
-            );
+            ];
 
-            $leadTimeline = $this->leadModel->getEngagements($lead, $filter, $orderby, 1, 255, false);
-            $totalSpentTime = $event->getConfig()['accumulative_time'] ?? null;
+            $leadTimeline       = $this->leadModel->getEngagements($lead, $filter, $orderby, 1, 255, false);
+            $totalSpentTime     = $event->getConfig()['accumulative_time'] ?? null;
             $eventsLeadTimeline = $leadTimeline[0]['events'] ?? null;
-            foreach ($eventsLeadTimeline as $eventLeadTimeline) {
-                $hit = $eventLeadTimeline['details']['hit'] ?? null;
-                $pageHitUrl = $hit['url'] ?? null;
-                $pageId = $hit['page_id'] ?? null;
+            if (!empty($eventsLeadTimeline)) {
+                foreach ($eventsLeadTimeline as $eventLeadTimeline) {
+                    $hit        = $eventLeadTimeline['details']['hit'] ?? null;
+                    $pageHitUrl = $hit['url'] ?? null;
+                    $pageId     = $hit['page_id'] ?? null;
 
-                if (!empty($url)) {
-                    $pageUrl = html_entity_decode($pageHitUrl);
-                    if (fnmatch($url, $pageUrl)) {
+                    if (!empty($url)) {
+                        $pageUrl = html_entity_decode($pageHitUrl);
+                        if (fnmatch($url, $pageUrl)) {
+                            if ($hit['dateLeft'] && $totalSpentTime) {
+                                $realTotalSpentTime = (new \DateTime($hit['dateLeft']->format('Y-m-d H:i')))->getTimestamp() -
+                                    (new \DateTime($hit['dateHit']->format('Y-m-d H:i')))->getTimestamp();
+                                if ($realTotalSpentTime >= $totalSpentTime) {
+                                    return $event->setResult(true);
+                                }
+                            } elseif (!$totalSpentTime) {
+                                return $event->setResult(true);
+                            }
+                        }
+                    }
+
+                    if (!empty($page) && (int) $page === (int) $pageId) {
                         if ($hit['dateLeft'] && $totalSpentTime) {
                             $realTotalSpentTime = (new \DateTime($hit['dateLeft']->format('Y-m-d H:i')))->getTimestamp() -
                                 (new \DateTime($hit['dateHit']->format('Y-m-d H:i')))->getTimestamp();
@@ -565,18 +586,6 @@ class CampaignSubscriber implements EventSubscriberInterface
                         } elseif (!$totalSpentTime) {
                             return $event->setResult(true);
                         }
-                    }
-                }
-
-                if (!empty($page) && (int)$page === (int)$pageId) {
-                    if ($hit['dateLeft'] && $totalSpentTime) {
-                        $realTotalSpentTime = (new \DateTime($hit['dateLeft']->format('Y-m-d H:i')))->getTimestamp() -
-                            (new \DateTime($hit['dateHit']->format('Y-m-d H:i')))->getTimestamp();
-                        if ($realTotalSpentTime >= $totalSpentTime) {
-                            return $event->setResult(true);
-                        }
-                    } elseif (!$totalSpentTime) {
-                        return $event->setResult(true);
                     }
                 }
             }
