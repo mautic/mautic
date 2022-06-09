@@ -7,14 +7,8 @@ use PHPUnit\Framework\Assert;
 
 class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testNormalizeValueBooleans()
+    private function runNormalizeValueBooleans(array $fieldParams)
     {
-        $fieldParams = [
-            'type'      => CustomFieldValueHelper::TYPE_BOOLEAN,
-            'value'     => 1,
-            'properties'=> 'a:2:{s:2:"no";s:2:"No";s:3:"yes";s:3:"Yes";}',
-        ];
-
         $fields['core']['test'] = $fieldParams;
 
         $fieldParams['value']    = 0;
@@ -28,6 +22,28 @@ class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Yes', $normalizedFields['core']['test']['normalizedValue']);
         $this->assertEquals('No', $normalizedFields['core']['test2']['normalizedValue']);
         $this->assertEquals('', $normalizedFields['core']['test3']['normalizedValue']);
+    }
+
+    public function testNormalizeValueBooleans()
+    {
+        $fieldParams = [
+            'type'      => CustomFieldValueHelper::TYPE_BOOLEAN,
+            'value'     => 1,
+            'properties'=> 'a:2:{s:2:"no";s:2:"No";s:3:"yes";s:3:"Yes";}',
+        ];
+
+        $this->runNormalizeValueBooleans($fieldParams);
+    }
+
+    public function testNormalizeValueBooleansWithDifferentProperties()
+    {
+        $fieldParams = [
+            'type'      => CustomFieldValueHelper::TYPE_BOOLEAN,
+            'value'     => 1,
+            'properties'=> 'a:2:{;s:3:"yes";s:1:"Y";s:2:"no";s:1:"N"}',
+        ];
+
+        $this->runNormalizeValueBooleans($fieldParams);
     }
 
     public function testNormalizeValueSelect()
