@@ -15,7 +15,6 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Event\SubmissionEvent;
-use Mautic\FormBundle\Tests\FormTestAbstract;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FormModel;
@@ -37,7 +36,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class SubmissionModelTest extends FormTestAbstract
+class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var string
