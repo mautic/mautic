@@ -2,8 +2,7 @@
 
 namespace Mautic\FormBundle\Tests\Model;
 
-use Mautic\FormBundle\Entity\Field;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -11,6 +10,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
@@ -38,11 +39,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var string
-     */
-    private $mockTrackingId;
-
     /**
      * @var MockObject|IpLookupHelper
      */
@@ -114,7 +110,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     private $userHelper;
 
     /**
-     * @var MockObject|EntityManagerInterface
+     * @var MockObject|EntityManager
      */
     private $entityManager;
 
@@ -159,6 +155,11 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     private $router;
 
     /**
+     * @var MockObject|ContactTracker
+     */
+    private $contactTracker;
+
+    /**
      * @var SubmissionModel
      */
     private $submissionModel;
@@ -167,7 +168,6 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->mockTrackingId           = hash('sha1', uniqid(mt_rand()));
         $this->ipLookupHelper           = $this->createMock(IpLookupHelper::class);
         $this->templatingHelperMock     = $this->createMock(TemplatingHelper::class);
         $this->formModel                = $this->createMock(FormModel::class);
@@ -182,7 +182,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->translator               = $this->createMock(TranslatorInterface::class);
         $this->dateHelper               = $this->createMock(DateHelper::class);
         $this->userHelper               = $this->createMock(UserHelper::class);
-        $this->entityManager            = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager            = $this->createMock(EntityManager::class);
         $this->formRepository           = $this->createMock(FormRepository::class);
         $this->leadRepository           = $this->createMock(LeadRepository::class);
         $this->mockLogger               = $this->createMock(Logger::class);
@@ -191,6 +191,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->deviceTrackingService    = $this->createMock(DeviceTrackingServiceInterface::class);
         $this->file1Mock                = $this->createMock(UploadedFile::class);
         $this->router                   = $this->createMock(RouterInterface::class);
+        $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->submissionModel          = new SubmissionModel(
             $this->ipLookupHelper,
             $this->templatingHelperMock,
@@ -206,7 +207,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->formUploaderMock,
             $this->deviceTrackingService,
             new FieldValueTransformer($this->router),
-            $this->dateHelper
+            $this->dateHelper,
+            $this->contactTracker
         );
 
         $this->submissionModel->setDispatcher($this->dispatcher);
@@ -216,12 +218,11 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->submissionModel->setLogger($this->mockLogger);
     }
 
-    public function testSaveSubmission()
+    public function testSaveSubmission(): void
     {
-        $this->leadModel->expects($this->any())
-            ->method('getCurrentLead')
-            ->with($this->logicalOr(false, true))
-            ->will($this->returnCallback([$this, 'getCurrentLead']));
+        $this->contactTracker->expects($this->any())
+            ->method('getContact')
+            ->willReturn(new Lead());
 
         $this->userHelper->expects($this->any())
             ->method('getUser')
@@ -244,6 +245,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->leadFieldModel->expects($this->any())
             ->method('getFieldListWithProperties')
             ->willReturn($mockLeadField);
+
+        $this->companyModel->method('fetchCompanyFields')->willReturn([]);
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
@@ -314,9 +317,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
     public function testNormalizeValues()
     {
-        $submissionModel     = $this->getSubmissionModel();
-        $reflection          = new \ReflectionClass(SubmissionModel::class);
-        $method              = $reflection->getMethod('normalizeValue');
+        $reflection = new \ReflectionClass(SubmissionModel::class);
+        $method     = $reflection->getMethod('normalizeValue');
         $method->setAccessible(true);
         $fieldSession          = 'mautic_'.sha1(uniqid(mt_rand(), true));
         $fields[$fieldSession] = [
@@ -332,9 +334,9 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         ];
 
         $field = new Field();
-        $this->assertEquals('', $method->invokeArgs($submissionModel, ['', $field]));
-        $this->assertEquals(1, $method->invokeArgs($submissionModel, [1, $field]));
-        $this->assertEquals('1, 2', $method->invokeArgs($submissionModel, [[1, 2], $field]));
+        $this->assertEquals('', $method->invokeArgs($this->submissionModel, ['', $field]));
+        $this->assertEquals(1, $method->invokeArgs($this->submissionModel, [1, $field]));
+        $this->assertEquals('1, 2', $method->invokeArgs($this->submissionModel, [[1, 2], $field]));
 
         // field wiht list
         $field = new Field();
@@ -354,13 +356,41 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
                     ],
             ]
         );
-        $this->assertEquals('', $method->invokeArgs($submissionModel, ['', $field]));
-        $this->assertEquals('First', $method->invokeArgs($submissionModel, [1, $field]));
-        $this->assertEquals('First, Second', $method->invokeArgs($submissionModel, [[1, 2], $field]));
+        $this->assertEquals('', $method->invokeArgs($this->submissionModel, ['', $field]));
+        $this->assertEquals('First', $method->invokeArgs($this->submissionModel, [1, $field]));
+        $this->assertEquals('First, Second', $method->invokeArgs($this->submissionModel, [[1, 2], $field]));
     }
 
-    public function getCurrentLead($tracking)
+    /**
+     * @return mixed[]
+     */
+    private function getTestFormFields(): array
     {
-        return $tracking ? [new Lead(), $this->mockTrackingId, true] : new Lead();
+        $fieldSession          = 'mautic_'.sha1(uniqid(mt_rand(), true));
+        $fields[$fieldSession] = [
+            'label'        => 'Email',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'email',
+            'type'         => 'email',
+            'mappedField'  => 'email',
+            'mappedObject' => 'contact',
+            'id'           => $fieldSession,
+        ];
+
+        $fields['file'] = [
+            'label'                   => 'File',
+            'showLabel'               => 1,
+            'saveResult'              => 1,
+            'defaultValue'            => false,
+            'alias'                   => 'file',
+            'type'                    => 'file',
+            'id'                      => 'file',
+            'allowed_file_size'       => 1,
+            'allowed_file_extensions' => ['jpg', 'gif'],
+        ];
+
+        return $fields;
     }
 }
