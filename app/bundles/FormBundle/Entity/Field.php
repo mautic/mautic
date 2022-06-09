@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
-use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\LeadBundle\Entity\Lead;
 
 class Field

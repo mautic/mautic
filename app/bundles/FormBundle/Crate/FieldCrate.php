@@ -2,40 +2,20 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Crate;
 
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 
 final class FieldCrate
 {
-    /**
-     * @var string
-     */
-    private $key;
+    private string $key;
+    private string $name;
+    private string $type;
 
     /**
-     * @var string
+     * @var mixed[]
      */
-    private $name;
-
-    /**
-     * @var string
-     */
-    private $type;
-
-    /**
-     * @var array
-     */
-    private $properties;
+    private array $properties;
 
     public function __construct(string $key, string $name, string $type, array $properties)
     {
@@ -60,6 +40,9 @@ final class FieldCrate
         return $this->type;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getProperties(): array
     {
         return $this->properties;

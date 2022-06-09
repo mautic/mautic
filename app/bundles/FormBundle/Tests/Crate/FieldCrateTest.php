@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests\Crate;
 
 use Mautic\FormBundle\Crate\FieldCrate;
@@ -18,7 +9,7 @@ use PHPUnit\Framework\Assert;
 
 final class FieldCrateTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGettersForEmailField()
+    public function testGettersForEmailField(): void
     {
         $field = new FieldCrate('6', 'Email', 'email', []);
 
@@ -29,7 +20,7 @@ final class FieldCrateTest extends \PHPUnit\Framework\TestCase
         Assert::assertFalse($field->isListType());
     }
 
-    public function testGettersForSelectField()
+    public function testGettersForSelectField(): void
     {
         $properties = [
             'list' => [

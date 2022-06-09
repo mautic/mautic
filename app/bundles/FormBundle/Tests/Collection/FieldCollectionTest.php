@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests\Collection;
 
 use Mautic\FormBundle\Collection\FieldCollection;
@@ -19,7 +10,7 @@ use Mautic\FormBundle\Exception\FieldNotFoundException;
 
 final class FieldCollectionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testToChoicesWithObjects()
+    public function testToChoicesWithObjects(): void
     {
         $collection = new FieldCollection(
             [
@@ -37,14 +28,14 @@ final class FieldCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToChoicesWithoutObjects()
+    public function testToChoicesWithoutObjects(): void
     {
         $collection = new FieldCollection();
 
         $this->assertSame([], $collection->toChoices());
     }
 
-    public function testGetFieldByKey()
+    public function testGetFieldByKey(): void
     {
         $field6     = new FieldCrate('6', 'email', 'email', []);
         $field7     = new FieldCrate('7', 'first_name', 'text', []);
@@ -57,7 +48,7 @@ final class FieldCollectionTest extends \PHPUnit\Framework\TestCase
         $collection->getFieldByKey('8');
     }
 
-    public function testRemoveFieldsWithKeysWithNoKeyToKeep()
+    public function testRemoveFieldsWithKeysWithNoKeyToKeep(): void
     {
         $field6             = new FieldCrate('6', 'email', 'email', []);
         $field7             = new FieldCrate('7', 'first_name', 'text', []);
@@ -71,7 +62,7 @@ final class FieldCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($field7, $resultCollection->getFieldByKey('7'));
     }
 
-    public function testRemoveFieldsWithKeysWithKeyToKeep()
+    public function testRemoveFieldsWithKeysWithKeyToKeep(): void
     {
         $field6             = new FieldCrate('6', 'email', 'email', []);
         $field7             = new FieldCrate('7', 'first_name', 'text', []);

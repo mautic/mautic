@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\LeadBundle\Entity\LeadField;
 
 class LeadFieldRepository extends CommonRepository
 {
