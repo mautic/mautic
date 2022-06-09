@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    {% include('MauticCoreBundle:Default:head.html.twig') %}
+    <body>
+        {{ outputScripts('bodyOpen') }}
+        <section id="app-content" class="container content-only">
+            {{ include('MauticCoreBundle:Notification:flashes.html.twig', {
+                alertType: 'standard'
+            }) }}
+            {{ include('MauticCoreBundle:Default:output.html.twig') }}
+        </section>
+        {{ include('MauticCoreBundle:Helper:modal.html.twig', {
+            id: 'MauticSharedModal',
+            footerButtons: true
+        }) }}
+        {{ outputScripts('bodyClose') }}
+        <script>
+            Mautic.onPageLoad('body');
+        </script>
+    </body>
+</html>
