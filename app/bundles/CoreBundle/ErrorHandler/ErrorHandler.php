@@ -42,9 +42,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private static $root;
 
-        /**
-         * ErrorHandler constructor.
-         */
         public function __construct()
         {
             self::$root = realpath(__DIR__.'/../../../../');
@@ -422,8 +419,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param      $error
-         * @param bool $inTemplate
+         * @param mixed[] $error
+         * @param bool    $inTemplate
+         *
          * @return mixed|string
          */
         private function generateResponse($error, $inTemplate = false)
