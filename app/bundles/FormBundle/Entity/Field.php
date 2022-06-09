@@ -8,7 +8,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
-use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\LeadBundle\Entity\Lead;
 
 class Field

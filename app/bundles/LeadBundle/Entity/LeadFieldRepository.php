@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\LeadBundle\Entity\LeadField;
 
 /**
  * @extends CommonRepository<LeadField>

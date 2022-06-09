@@ -103,17 +103,17 @@ class FormModel extends CommonFormModel
         TableSchemaHelper $tableSchemaHelper,
         MappedObjectCollectorInterface $mappedObjectCollector
     ) {
-        $this->requestStack        = $requestStack;
-        $this->templatingHelper    = $templatingHelper;
-        $this->themeHelper         = $themeHelper;
-        $this->formActionModel     = $formActionModel;
-        $this->formFieldModel      = $formFieldModel;
-        $this->fieldHelper         = $fieldHelper;
-        $this->leadFieldModel      = $leadFieldModel;
-        $this->formUploader        = $formUploader;
-        $this->contactTracker      = $contactTracker;
-        $this->columnSchemaHelper  = $columnSchemaHelper;
-        $this->tableSchemaHelper   = $tableSchemaHelper;
+        $this->requestStack          = $requestStack;
+        $this->templatingHelper      = $templatingHelper;
+        $this->themeHelper           = $themeHelper;
+        $this->formActionModel       = $formActionModel;
+        $this->formFieldModel        = $formFieldModel;
+        $this->fieldHelper           = $fieldHelper;
+        $this->leadFieldModel        = $leadFieldModel;
+        $this->formUploader          = $formUploader;
+        $this->contactTracker        = $contactTracker;
+        $this->columnSchemaHelper    = $columnSchemaHelper;
+        $this->tableSchemaHelper     = $tableSchemaHelper;
         $this->mappedObjectCollector = $mappedObjectCollector;
     }
 
@@ -528,18 +528,18 @@ class FormModel extends CommonFormModel
         $html               = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
             [
-                'fieldSettings' => $this->getCustomComponents()['fields'],
+                'fieldSettings'  => $this->getCustomComponents()['fields'],
                 'viewOnlyFields' => $this->getCustomComponents()['viewOnlyFields'],
-                'fields'        => $fields,
-                'mappedFields'  => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
-                'form'          => $entity,
-                'theme'         => $theme,
-                'submissions'   => $submissions,
-                'lead'          => $lead,
-                'formPages'     => $pages,
-                'lastFormPage'  => $lastPage,
-                'style'         => $style,
-                'inBuilder'     => false,
+                'fields'         => $fields,
+                'mappedFields'   => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
+                'form'           => $entity,
+                'theme'          => $theme,
+                'submissions'    => $submissions,
+                'lead'           => $lead,
+                'formPages'      => $pages,
+                'lastFormPage'   => $lastPage,
+                'style'          => $style,
+                'inBuilder'      => false,
             ]
         );
 

@@ -2,32 +2,16 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Event;
 
 use Mautic\FormBundle\Collection\FieldCollection;
 use Mautic\FormBundle\Crate\FieldCrate;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 final class FieldCollectEvent extends Event
 {
-    /**
-     * @var string
-     */
-    private $object;
-
-    /**
-     * @var FieldCollection
-     */
-    private $fields;
+    private string $object;
+    private FieldCollection $fields;
 
     public function __construct(string $object)
     {

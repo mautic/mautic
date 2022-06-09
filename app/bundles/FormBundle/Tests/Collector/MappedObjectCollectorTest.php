@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests\Collector;
 
 use Mautic\FormBundle\Collection\FieldCollection;
@@ -21,10 +12,11 @@ use PHPUnit\Framework\Assert;
 
 final class MappedObjectCollectorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testBuildCollectionForNoObject()
+    public function testBuildCollectionForNoObject(): void
     {
-        $fieldCollector                        = new class() implements FieldCollectorInterface {
-            public $getFieldsMethodCallCounter = 0;
+        $fieldCollector = new class() implements FieldCollectorInterface {
+
+            public int $getFieldsMethodCallCounter = 0;
 
             public function getFields(string $object): FieldCollection
             {
@@ -41,10 +33,11 @@ final class MappedObjectCollectorTest extends \PHPUnit\Framework\TestCase
         Assert::assertEquals(0, $fieldCollector->getFieldsMethodCallCounter);
     }
 
-    public function testBuildCollectionForOneObject()
+    public function testBuildCollectionForOneObject(): void
     {
-        $fieldCollector                        = new class() implements FieldCollectorInterface {
-            public $getFieldsMethodCallCounter = 0;
+        $fieldCollector = new class() implements FieldCollectorInterface {
+       
+            public int $getFieldsMethodCallCounter = 0;
 
             public function getFields(string $object): FieldCollection
             {
@@ -62,10 +55,11 @@ final class MappedObjectCollectorTest extends \PHPUnit\Framework\TestCase
         Assert::assertEquals(1, $fieldCollector->getFieldsMethodCallCounter);
     }
 
-    public function testBuildCollectionForMultipleObjects()
+    public function testBuildCollectionForMultipleObjects(): void
     {
-        $fieldCollector                        = new class() implements FieldCollectorInterface {
-            public $getFieldsMethodCallCounter = 0;
+        $fieldCollector = new class() implements FieldCollectorInterface {
+
+            public int $getFieldsMethodCallCounter = 0;
 
             public function getFields(string $object): FieldCollection
             {

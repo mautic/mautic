@@ -53,10 +53,10 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->emailModel     = $this->createMock(EmailModel::class);
-        $this->leadModel      = $this->createMock(LeadModel::class);
-        $this->contactTracker = $this->createMock(ContactTracker::class);
-        $this->ipLookupHelper = $this->createMock(IpLookupHelper::class);
+        $this->emailModel         = $this->createMock(EmailModel::class);
+        $this->leadModel          = $this->createMock(LeadModel::class);
+        $this->contactTracker     = $this->createMock(ContactTracker::class);
+        $this->ipLookupHelper     = $this->createMock(IpLookupHelper::class);
         $this->leadFieldRepostory = $this->createMock(LeadFieldRepository::class);
         $this->subscriber         = new FormSubscriber(
           $this->emailModel,
@@ -65,24 +65,19 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
           $this->ipLookupHelper,
           $this->leadFieldRepostory
       );
-
     }
 
-    public function testOnFormSubmitActionChangePoints()
+    public function testOnFormSubmitActionChangePoints(): void
     {
         $this->contactTracker->method('getContact')->willReturn(new Lead());
 
         $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress());
-        
+
         $submission = new Submission();
         $submission->setForm(new Form());
         $submission->setLead(new Lead());
 
-        $request = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $submissionEvent = new SubmissionEvent($submission, [], [], $request);
+        $submissionEvent = new SubmissionEvent($submission, [], [], new Request());
 
         $action = new Action();
         $action->setType('lead.pointschange');

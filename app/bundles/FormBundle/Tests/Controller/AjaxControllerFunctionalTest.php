@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -20,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testGetFieldsForObjectAction()
+    public function testGetFieldsForObjectAction(): void
     {
         $this->client->request(
             Request::METHOD_GET,

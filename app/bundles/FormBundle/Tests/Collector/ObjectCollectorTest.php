@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests\Collector;
 
 use Mautic\FormBundle\Collection\ObjectCollection;
@@ -23,10 +14,11 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 final class ObjectCollectorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testBuildCollectionForNoObject()
+    public function testBuildCollectionForNoObject(): void
     {
-        $dispatcher                           = new class() extends EventDispatcher {
-            public $dispatchMethodCallCounter = 0;
+        $dispatcher = new class() extends EventDispatcher {
+
+            public int $dispatchMethodCallCounter = 0;
 
             /**
              * @param ObjectCollectEvent $event

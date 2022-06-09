@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Collector;
 
 use Mautic\FormBundle\Collection\ObjectCollection;
@@ -20,15 +11,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ObjectCollector implements ObjectCollectorInterface
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
     /**
      * @var ObjectCollection|null
      */
-    private $objects;
+    private ?array $objects = null;
 
     public function __construct(EventDispatcherInterface $dispatcher)
     {

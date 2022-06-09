@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Collector;
 
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
@@ -22,10 +13,7 @@ final class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorIn
 {
     private const EXPIRATION_IN_SECONDS = 18000; // 5 hours
 
-    /**
-     * @var CacheProviderInterface
-     */
-    private $cacheProvider;
+    private CacheProviderInterface $cacheProvider;
 
     public function __construct(CacheProviderInterface $cacheProvider)
     {

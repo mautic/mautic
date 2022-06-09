@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests\Event\Service;
 
 use Mautic\FormBundle\Entity\Field;
@@ -45,8 +36,9 @@ final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testTransformValuesAfterSubmitWithFileFieldMatchesAndTokens(): void
     {
-        $router                               = new class() extends Router {
-            public $generateMethodCallCounter = 0;
+        $router = new class() extends Router {
+           
+            public int $generateMethodCallCounter = 0;
 
             public function __construct()
             {
