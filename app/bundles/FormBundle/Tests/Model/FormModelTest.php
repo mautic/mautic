@@ -63,7 +63,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
      */
     private $formModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack          = $this->createMock(RequestStack::class);
         $this->templatingHelperMock  = $this->createMock(TemplatingHelper::class);
