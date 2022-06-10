@@ -1,6 +1,10 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+<<<<<<< HEAD
 [![All Contributors](https://img.shields.io/badge/all_contributors-82-orange.svg?style=flat-square)](#contributors-)
+=======
+[![All Contributors](https://img.shields.io/badge/all_contributors-79-orange.svg?style=flat-square)](#contributors-)
+>>>>>>> 3a46c81620 (docs: add uzegonemad as a contributor for code (#11244))
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
