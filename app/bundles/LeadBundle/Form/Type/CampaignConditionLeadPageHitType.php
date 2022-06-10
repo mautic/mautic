@@ -12,6 +12,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * @codeCoverageIgnore
+ */
 class CampaignConditionLeadPageHitType extends AbstractType
 {
     /**
