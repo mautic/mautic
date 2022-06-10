@@ -1,10 +1,18 @@
 <?php
 
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Illuminate\Support\Collection;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -1633,7 +1641,7 @@ class LeadModel extends FormModel
     {
         // known "synonym" fields expected
         $synonyms = ['useragent'  => 'user_agent',
-                     'remotehost' => 'remote_host', ];
+            'remotehost' => 'remote_host', ];
 
         // convert 'query' option to an array if necessary
         if (isset($params['query']) && !is_array($params['query'])) {
@@ -1810,34 +1818,25 @@ class LeadModel extends FormModel
     /**
      * Modify companies for lead.
      *
-     * @param int[] $companies
+     * @param $companies
      */
-    public function modifyCompanies(Lead $lead, array $companies)
+    public function modifyCompanies(Lead $lead, $companies)
     {
         // See which companies belong to the lead already
         $leadCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
 
-        $requestedCompanies = new Collection($companies);
-        $currentCompanies   = (new Collection($leadCompanies))->keyBy('company_id');
-
-        // Remove companies that are not in the array of given companies
-        $removeCompanies = $currentCompanies->reject(
-            function (array $company) use ($requestedCompanies) {
-                // Reject if the found company is still in the list of companies given
-                return $requestedCompanies->contains($company['company_id']);
+        foreach ($leadCompanies as $leadCompany) {
+            if (false === array_search($leadCompany['company_id'], $companies)) {
+                $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead);
             }
-        );
-        if ($removeCompanies->count()) {
-            $this->companyModel->removeLeadFromCompany($removeCompanies->keys()->toArray(), $lead);
         }
 
-        // Add companies that are not in the array of found companies
-        $addCompanies = $requestedCompanies->reject(
-            // Reject if the lead is already in the given company
-            fn ($companyId) => $currentCompanies->has($companyId)
-        );
-        if ($addCompanies->count()) {
-            $this->companyModel->addLeadToCompany($addCompanies->toArray(), $lead);
+        if (count($companies)) {
+            $this->companyModel->addLeadToCompany($companies, $lead);
+        } else {
+            // update the lead's company name to nothing
+            $lead->addUpdatedField('company', '');
+            $this->getRepository()->saveEntity($lead);
         }
     }
 
@@ -2117,11 +2116,8 @@ class LeadModel extends FormModel
     /**
      * Get timeline/engagement data.
      *
-     * @param Lead|null $lead
-     * @param array|null $filters
-     * @param array|null $orderBy
-     * @param int $page
-     * @param int $limit
+     * @param int  $page
+     * @param int  $limit
      * @param bool $forTimeline
      *
      * @return array

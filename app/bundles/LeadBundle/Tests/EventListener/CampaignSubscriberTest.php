@@ -33,12 +33,14 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'companemail' => 'mautic@mautic.com',
     ];
 
+    /** @var array<string, string> */
     private $configTo = [
         'id'          => '112',
         'companyname' => 'Mautic2',
         'companemail' => 'mautic@mauticsecond.com',
     ];
 
+    /** @var array<string, string> */
     private $configPageHit = [
         'startDate'         => '',
         'endDate'           => '',
@@ -47,6 +49,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'accumulative_time' => '5',
     ];
 
+    /** @var array<string, string> */
     private $configUrlPageHit = [
         'startDate'         => '',
         'endDate'           => '',
@@ -55,7 +58,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'accumulative_time' => '5',
     ];
 
-    public function testOnCampaignTriggerActiononUpdateCompany()
+    public function testOnCampaignTriggerActiononUpdateCompany(): void
     {
         $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
         $mockLeadModel      = $this->createMock(LeadModel::class);
@@ -110,7 +113,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCoreParametersHelper
         );
 
-        /** @var LeadModel $leadModel */
         $lead = new Lead();
         $lead->setId(99);
         $lead->setPrimaryCompany($this->configFrom);
@@ -140,7 +142,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->configTo['companyname'], $primaryCompany['companyname']);
     }
 
-    public function testOnCampaignTriggerConditionLeadLandingPageHit()
+    public function testOnCampaignTriggerConditionLeadLandingPageHit(): void
     {
         $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
         $mockLeadModel      = $this->createMock(LeadModel::class);
@@ -164,7 +166,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCoreParametersHelper
         );
 
-        /** @var LeadModel $leadModel */
         $lead = new Lead();
         $lead->setId(99);
         $leadTimeline = [
@@ -206,7 +207,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($event->getResult());
     }
 
-    public function testOnCampaignTriggerConditionLeadPageUrlHit()
+    public function testOnCampaignTriggerConditionLeadPageUrlHit(): void
     {
         $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
         $mockLeadModel      = $this->createMock(LeadModel::class);
@@ -230,7 +231,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCoreParametersHelper
         );
 
-        /** @var LeadModel $leadModel */
         $lead = new Lead();
         $lead->setId(99);
         $leadTimeline = [
