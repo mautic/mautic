@@ -2110,7 +2110,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param array<int, mixed> $filters
+     * @param array<mixed, mixed>|null $filters
      */
     public function getEngagements(?Lead $lead = null, ?array $filters = null, ?array $orderBy = null, int $page = 1, int $limit = 25, bool $forTimeline = true): array
     {
