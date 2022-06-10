@@ -43,7 +43,7 @@ class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
         $fieldParams = [
             'type'      => CustomFieldValueHelper::TYPE_BOOLEAN,
             'value'     => 1,
-            'properties'=> 'a:2:{;s:3:"yes";s:1:"Y";s:2:"no";s:1:"N"}',
+            'properties'=> 'a:2:{s:3:"yes";s:3:"Yes";s:2:"no";s:2:"No";}',
         ];
 
         $this->runNormalizeValueBooleans($fieldParams);
