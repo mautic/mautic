@@ -1,0 +1,32 @@
+{% set request = app.request %}
+{% set contentOnly = request.get('contentOnly', false) or (contentOnly is defined and contentOnly is not empty) %}
+{% set modalView = request.get('modal', false) or (modalView is defined and modalView is not empty) %}
+{{- '' -}}
+{# Fallback in case the child template didn't set these blocks #}
+{% block modal %}{% endblock %}
+{% block pageTitle %}{% endblock %}
+{% block publishStatus %}{% endblock %}
+{% block actions %}{% endblock %}
+{% block toolbar %}{% endblock %}
+{{- '' -}}
+{# load base template #}
+{% set template = null %}
+{% if not request.isXmlHttpRequest() and not modalView %}
+    {% set template = contentOnly ? 'MauticCoreBundle:Default:slim.html.twig' :  'MauticCoreBundle:Default:base.html.twig' %}
+{% elseif not modalView %}
+    {% set template = 'MauticCoreBundle:Default:output.html.twig' %}
+{% endif %}
+{{- '' -}}
+{% if template is not empty %}
+    {{- include(template, {
+        content: block('content'),
+        modal: block('modal'),
+        headerTitle: block('headerTitle'),
+        pageTitle: block('pageTitle'),
+        publishStatus: block('publishStatus'),
+        actions: block('actions'),
+        toolbar: block('toolbar')
+    }) -}}
+{% else %}
+    {{ block('content') }}
+{% endif %}

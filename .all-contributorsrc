@@ -723,6 +723,42 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "deborahsalves",
+      "name": "Déborah Salves",
+      "avatar_url": "https://avatars.githubusercontent.com/u/79517214?v=4",
+      "profile": "https://github.com/deborahsalves",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "automatyzuj",
+      "name": "automatyzuj",
+      "avatar_url": "https://avatars.githubusercontent.com/u/104569506?v=4",
+      "profile": "https://github.com/automatyzuj",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "poweriguana",
+      "name": "poweriguana",
+      "avatar_url": "https://avatars.githubusercontent.com/u/86078621?v=4",
+      "profile": "https://github.com/poweriguana",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "IrisAmrein",
+      "name": "Iris Amrein",
+      "avatar_url": "https://avatars.githubusercontent.com/u/70972871?v=4",
+      "profile": "https://github.com/IrisAmrein",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,

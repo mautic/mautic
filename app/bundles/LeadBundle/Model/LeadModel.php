@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\NonUniqueResultException;
@@ -66,12 +57,9 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Countries;
+use Tightenco\Collect\Support\Collection;
 
-/**
- * Class LeadModel
- * {@inheritdoc}
- */
 class LeadModel extends FormModel
 {
     use DefaultValueTrait;
@@ -1641,7 +1629,7 @@ class LeadModel extends FormModel
     {
         // known "synonym" fields expected
         $synonyms = ['useragent'  => 'user_agent',
-            'remotehost' => 'remote_host', ];
+                     'remotehost' => 'remote_host', ];
 
         // convert 'query' option to an array if necessary
         if (isset($params['query']) && !is_array($params['query'])) {
@@ -1828,6 +1816,15 @@ class LeadModel extends FormModel
         $requestedCompanies = new Collection($companies);
         $currentCompanies   = (new Collection($leadCompanies))->keyBy('company_id');
 
+        // Add companies that are not in the array of found companies
+        $addCompanies = $requestedCompanies->reject(
+            // Reject if the lead is already in the given company
+            fn ($companyId) => $currentCompanies->has($companyId)
+        );
+        if ($addCompanies->count()) {
+            $this->companyModel->addLeadToCompany($addCompanies->toArray(), $lead);
+        }
+
         // Remove companies that are not in the array of given companies
         $removeCompanies = $currentCompanies->reject(
             function (array $company) use ($requestedCompanies) {
@@ -1837,15 +1834,6 @@ class LeadModel extends FormModel
         );
         if ($removeCompanies->count()) {
             $this->companyModel->removeLeadFromCompany($removeCompanies->keys()->toArray(), $lead);
-        }
-
-        // Add companies that are not in the array of found companies
-        $addCompanies = $requestedCompanies->reject(
-        // Reject if the lead is already in the given company
-            fn ($companyId) => $currentCompanies->has($companyId)
-        );
-        if ($addCompanies->count()) {
-            $this->companyModel->addLeadToCompany($addCompanies->toArray(), $lead);
         }
     }
 
@@ -1977,10 +1965,10 @@ class LeadModel extends FormModel
      * Get leads count per country name.
      * Can't use entity, because country is a custom field.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
-     * @param bool   $canViewOthers
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param mixed[]   $filters
+     * @param bool      $canViewOthers
      *
      * @return array
      */
@@ -2000,9 +1988,8 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
-
-        $countries = array_flip(Intl::getRegionBundle()->getCountryNames('en'));
+        $results   = $q->execute()->fetchAllAssociative();
+        $countries = array_flip(Countries::getNames('en'));
         $mapData   = [];
 
         // Convert country names to 2-char code
