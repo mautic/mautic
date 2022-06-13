@@ -608,9 +608,9 @@ class LeadModel extends FormModel
         }
 
         if (isset($data['owner'])) {
-            $userRepo = $this->em->getRepository('MauticUserBundle:User');
-            $user     = $userRepo->findBy(['email' => $data['owner']])[0];
-            if ($user) {
+            $userRepo = $this->em->getRepository(User::class);
+            $user     = $userRepo->findOneBy(['email' => $data['owner']]);
+            if (null !== $user) {
                 $lead->setOwner($user);
             }
         }
