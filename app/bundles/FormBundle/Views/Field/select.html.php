@@ -57,7 +57,7 @@ $optionsHtml = $optionBuilder($list, $emptyOption);
 $html        = <<<HTML
 
             <div $containerAttr>{$label}{$help}
-                <select $inputAttr>$optionsHtml
+                <select $inputAttr aria-label="Select field">$optionsHtml
                 </select>
                 <span class="mauticform-errormsg" style="display: none;">$validationMessage</span>
             </div>

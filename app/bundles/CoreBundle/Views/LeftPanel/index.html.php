@@ -54,7 +54,7 @@ $extraMenu = $view['menu']->render('extra');
     </a>
     <?php if (!empty($extraMenu)): ?>
         <div class="dropdown extra-menu">
-            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle" aria-label="Dropdown toggle">
                 <i class="fa fa-chevron-down fa-lg"></i>
             </a>
             <?php echo $extraMenu; ?>

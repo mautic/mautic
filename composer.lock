@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ac01c6e56ac3f9e884c57232824c8ca5",
+    "content-hash": "beecb815e53b3386f72ceeeddd308446",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -5609,7 +5609,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "11188a9f9bdab1f49c5ee3d63ef83ab43163089a"
+                "reference": "6f844fd51595612e537e85e171d79540b8d404db"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5717,6 +5717,7 @@
                         "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
                         "[project-root]/app/.htaccess": "assets/scaffold/files/deny.htaccess",
+                        "[project-root]/autoload.php": "assets/scaffold/files/autoload.php",
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
                         "[web-root]/index.php": "assets/scaffold/files/index.php",
                         "[web-root]/index_dev.php": "assets/scaffold/files/index_dev.php",
@@ -5729,6 +5730,11 @@
                         "[web-root]/media/dashboards/default.json": "assets/scaffold/media/dashboards/default.json",
                         "[web-root]/media/dashboards/email-overview.json": "assets/scaffold/media/dashboards/email-overview.json",
                         "[web-root]/media/dashboards/stats-overview.json": "assets/scaffold/media/dashboards/stats-overview.json",
+                        "[web-root]/media/js/mautic-form-src.js": "assets/js/mautic-form-src.js",
+                        "[web-root]/media/css/mediaelementplayer.css": "assets/css/mediaelementplayer.css",
+                        "[web-root]/media/css/mediaelementplayer.min.css": "assets/css/mediaelementplayer.min.css",
+                        "[web-root]/media/css/modal.css": "assets/css/modal.css",
+                        "[web-root]/media/css/modal.min.css": "assets/css/modal.min.css",
                         "[web-root]/media/files/.htaccess": "assets/scaffold/media/files/.htaccess",
                         "[web-root]/media/images/.htaccess": "assets/scaffold/media/images/.htaccess",
                         "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
@@ -14385,6 +14391,22 @@
     ],
     "packages-dev": [
         {
+            "name": "freshconsulting/wcag_linter",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FreshConsulting/FreshConsulting-WCAG-Linter.git",
+                "reference": "a3e03be9cf90e09583cb080e79d4c48ea57cb8f7"
+            },
+            "default-branch": true,
+            "type": "library",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "A PHP_CodeSniffer custom rule (sniff) to detect obvious WCAG 2.0 accessibility violations.",
+            "time": "2019-07-17T17:10:17+00:00"
+        },
+        {
             "name": "friendsofphp/php-cs-fixer",
             "version": "v2.19.3",
             "source": {
@@ -16870,6 +16892,62 @@
             "time": "2020-09-28T06:39:44+00:00"
         },
         {
+            "name": "squizlabs/php_codesniffer",
+            "version": "3.6.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
+                "reference": "5e4e71592f69da17871dba6e80dd51bce74a351a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/5e4e71592f69da17871dba6e80dd51bce74a351a",
+                "reference": "5e4e71592f69da17871dba6e80dd51bce74a351a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-simplexml": "*",
+                "ext-tokenizer": "*",
+                "ext-xmlwriter": "*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0"
+            },
+            "bin": [
+                "bin/phpcs",
+                "bin/phpcbf"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Greg Sherwood",
+                    "role": "lead"
+                }
+            ],
+            "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
+            "homepage": "https://github.com/squizlabs/PHP_CodeSniffer",
+            "keywords": [
+                "phpcs",
+                "standards"
+            ],
+            "support": {
+                "issues": "https://github.com/squizlabs/PHP_CodeSniffer/issues",
+                "source": "https://github.com/squizlabs/PHP_CodeSniffer",
+                "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
+            },
+            "time": "2021-12-12T21:44:58+00:00"
+        },
+        {
             "name": "symfony/browser-kit",
             "version": "v4.4.37",
             "source": {
@@ -17403,10 +17481,12 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "freshconsulting/wcag_linter": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }

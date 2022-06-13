@@ -10,7 +10,7 @@ echo $view['form']->start($form, ['attr' => $attr]);
     <tr >
         <th>
             <input type="checkbox" id="contact_channels_subscribed_channels_0" name="check_all"
-                   onclick="Mautic.togglePreferredChannel('all');" value="all">
+                   onclick="Mautic.togglePreferredChannel('all');" value="all" aria-label="Contact channels">
         </th>
         <th>
             <?php echo $view['translator']->trans('mautic.lead.contact.channels'); ?>

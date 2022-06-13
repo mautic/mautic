@@ -142,7 +142,7 @@ $conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErr
                         <?php $fieldGroups = $form['leadField']->vars['choices'];
                               $data        = $form['leadField']->vars['data'];
                         ?>
-                        <select id="formfield_leadField" name="formfield[leadField]" class="form-control" autocomplete="false" style="display: none;">
+                        <select id="formfield_leadField" name="formfield[leadField]" class="form-control" autocomplete="false" style="display: none;" aria-label="Lead fields">
                             <option value=""></option>
                             <?php
                             foreach ($fieldGroups as $object => $group):

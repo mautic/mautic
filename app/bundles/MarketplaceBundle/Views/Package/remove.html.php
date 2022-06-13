@@ -29,7 +29,7 @@ try {
         'marketplace.package.remove.html.failed',
         ['%packagename%' => $packageDetail->packageBase->getHumanPackageName()]
         ); ?></p>
-    <textarea class="form-control" readonly id="marketplace-removal-failed-details"></textarea>
+    <textarea class="form-control" readonly id="marketplace-removal-failed-details" aria-label="Marketplace removal failed details"></textarea>
 </div>
 <div style="display: none" class="text-center" id="marketplace-removal-success">
     <p><?php echo $view['translator']->trans(

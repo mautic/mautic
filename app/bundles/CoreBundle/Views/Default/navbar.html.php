@@ -20,10 +20,10 @@
     <!-- start: left nav -->
     <ul class="nav navbar-nav navbar-left">
         <li class="hidden-xs" data-toggle="tooltip" data-placement="right" title="Minimize Sidebar">
-            <a href="javascript:void(0)" data-toggle="minimize" class="sidebar-minimizer"><span class="arrow fs-14"></span></a>
+            <a href="javascript:void(0)" data-toggle="minimize" class="sidebar-minimizer" aria-label="Minimize sidebar"><span class="arrow fs-14"></span></a>
         </li>
         <li class="visible-xs">
-            <a href="javascript: void(0);" data-toggle="sidebar" data-direction="ltr">
+            <a href="javascript: void(0);" data-toggle="sidebar" data-direction="ltr" aria-label="Show left sidebar">
                 <i class="fa fa-navicon fs-16"></i>
             </a>
         </li>
@@ -36,7 +36,7 @@
     <ul class="nav navbar-nav navbar-right">
         <?php echo $view->render('MauticCoreBundle:Menu:profile.html.php'); ?>
         <li>
-            <a href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl">
+            <a href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl" aria-label="Show right sidebar">
                 <i class="fa fa-cog fs-16"></i>
             </a>
         </li>

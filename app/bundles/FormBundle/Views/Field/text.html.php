@@ -18,13 +18,13 @@ HTML;
 if ('textarea' == $containerType):
 $textInput = <<<HTML
 
-                <textarea $inputAttr>{$field['defaultValue']}</textarea>
+                <textarea $inputAttr aria-label="Text area field">{$field['defaultValue']}</textarea>
 HTML;
 
 else:
 $textInput = <<<HTML
 
-                <input {$inputAttr} type="$containerType" />
+                <input {$inputAttr} type="$containerType" aria-label="Input field" />
 HTML;
 endif;
 

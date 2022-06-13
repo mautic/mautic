@@ -25,11 +25,11 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param null $channel
-     * @param null $ids
-     * @param null $reason
-     * @param null $listId
-     * @param bool $combined
+     * @param string|null                 $channel
+     * @param array<int|string>|null      $ids
+     * @param int|null                    $reason
+     * @param array<int|string>|bool|null $listId
+     * @param bool                        $combined
      *
      * @return array|int
      */
@@ -63,7 +63,7 @@ class DoNotContactRepository extends CommonRepository
             if (!$combined) {
                 $q->innerJoin('dnc', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'cs', 'cs.lead_id = dnc.lead_id');
 
-                if (true === $listId && !$combined) {
+                if (true === $listId) {
                     $q->addSelect('cs.leadlist_id')
                         ->groupBy('cs.leadlist_id');
                 } elseif (is_array($listId)) {
@@ -71,10 +71,8 @@ class DoNotContactRepository extends CommonRepository
                         $q->expr()->in('cs.leadlist_id', array_map('intval', $listId))
                     );
 
-                    if (!$combined) {
-                        $q->addSelect('cs.leadlist_id')
-                            ->groupBy('cs.leadlist_id');
-                    }
+                    $q->addSelect('cs.leadlist_id')
+                        ->groupBy('cs.leadlist_id');
                 } else {
                     $q->andWhere('cs.leadlist_id = :list_id')
                         ->setParameter('list_id', $listId);

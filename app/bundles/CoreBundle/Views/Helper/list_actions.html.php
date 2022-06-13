@@ -28,7 +28,7 @@ if (is_array($item)) {
     </span>
 
     <div class="input-group-btn">
-        <button type="button" class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
+        <button type="button" class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown" aria-label="Dropdown toggle">
             <i class="fa fa-angle-down "></i>
         </button>
         <?php if (!empty($tooltip)): ?> <i class="fa fa-question-circle"></i><?php endif; ?>

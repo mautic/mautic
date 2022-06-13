@@ -43,7 +43,7 @@ if (!empty($checkall)):
         </span>
 
         <div class="input-group-btn">
-            <button type="button" disabled class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
+            <button type="button" disabled class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown" aria-label="Dropdown toggle">
                 <i class="fa fa-angle-down "></i>
             </button>
             <ul class="pull-<?php echo $pull; ?> page-list-actions dropdown-menu" role="menu">

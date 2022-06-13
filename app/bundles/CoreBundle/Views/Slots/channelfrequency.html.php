@@ -73,7 +73,7 @@ $channelNumber = 0;
     <tr>
         <td>
             <div class="text-left">
-                <input type="checkbox" checked="">
+                <input type="checkbox" checked="" aria-label="Receiving channel">
                 <label class="control-label">
                     <?php echo $view['translator']->trans('mautic.lead.contact.me.label'); ?></label>
             </div>
@@ -84,16 +84,16 @@ $channelNumber = 0;
             <div id="frequency_email" class="text-left row">
                 <div class="col-xs-6">
                     <label class="text-muted label1"><?php echo $view['translator']->trans('mautic.lead.list.frequency.number'); ?></label>
-                    <input type="text" class="frequency form-control">
+                    <input type="text" class="frequency form-control" aria-label="Number">
                     <label class="text-muted fw-n frequency-label label2"><?php echo $view['translator']->trans('mautic.lead.list.frequency.times'); ?></label>
-                    <select class="form-control">
+                    <select class="form-control" aria-label="Time">
                         <option value="" selected="selected"></option>
                     </select></div>
                 <div class="col-xs-6">
                     <label class="text-muted label3"><?php echo  $view['translator']->trans('mautic.lead.frequency.dates.label'); ?></label>
-                    <input type="date" class="form-control">
+                    <input type="date" class="form-control" aria-label="Date">
                     <label class="frequency-label text-muted fw-n label4"><?php echo  $view['translator']->trans('mautic.lead.frequency.contact.end.date'); ?></label>
-                    <input type="date" class="form-control">
+                    <input type="date" class="form-control" aria-label="Contact">
                 </div>
             </div>
         </td>

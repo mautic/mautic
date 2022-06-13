@@ -26,7 +26,7 @@ else :
                 <?php echo $view['translator']->trans('mautic.lead.list.frequency.preferred.channel'); ?>
             </label>
             <div class="choice-wrapper">
-                <select class="form-control">
+                <select class="form-control" aria-label="Preferred channel">
                     <option value="email" selected="selected"><?php echo $view['translator']->trans('mautic.email.email'); ?></option>
                 </select></div>
         </div>

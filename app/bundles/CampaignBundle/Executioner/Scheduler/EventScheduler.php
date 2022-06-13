@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Executioner\Scheduler;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -242,13 +243,13 @@ class EventScheduler
     }
 
     /**
-     * @param ArrayCollection|Event[] $events
+     * @param Collection<int|string, mixed>|ArrayCollection|Event[] $events
      *
      * @return array
      *
      * @throws NotSchedulableException
      */
-    public function getSortedExecutionDates(ArrayCollection $events, \DateTime $lastActiveDate)
+    public function getSortedExecutionDates(Collection $events, \DateTime $lastActiveDate)
     {
         $eventExecutionDates = [];
 

@@ -53,7 +53,7 @@ class SlotsHelper extends BaseSlotsHelper
             foreach ($names as $n) {
                 // strip tags used to ensure we don't have empty tags.
                 // Caused a bug with hasContent returning incorrectly. Whitelisted img to fix
-                $hasContent = (bool) strip_tags(trim($this->slots[$n]), '<img><iframe>');
+                $hasContent = (bool) strip_tags(trim($this->slots[$n]), '<img alt="Allowed image"><iframe>');
                 if ($hasContent) {
                     return true;
                 }

@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Executioner\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
@@ -77,15 +78,15 @@ class InactiveHelper
     }
 
     /**
-     * @param int $lastActiveEventId
+     * @param Collection<int|string, mixed>|ArrayCollection $negativeChildren
      *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
     public function removeContactsThatAreNotApplicable(
         \DateTime $now,
         ArrayCollection $contacts,
-        $lastActiveEventId,
-        ArrayCollection $negativeChildren
+        ?int $lastActiveEventId,
+        Collection $negativeChildren
     ) {
         $contactIds                 = $contacts->getKeys();
         $lastActiveDates            = $this->getLastActiveDates($lastActiveEventId, $contactIds);
@@ -151,11 +152,13 @@ class InactiveHelper
     }
 
     /**
+     * @param Collection<int|string, mixed>|ArrayCollection $negativeChildren
+     *
      * @return \DateTime|null
      *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function getEarliestInactiveDate(ArrayCollection $negativeChildren, \DateTime $lastActiveDate)
+    public function getEarliestInactiveDate(Collection $negativeChildren, \DateTime $lastActiveDate)
     {
         $earliestDate = null;
         foreach ($negativeChildren as $event) {
