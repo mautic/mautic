@@ -595,6 +595,7 @@ class LeadModel extends FormModel
             if ((int) $newLeadStageIdOrName !== $currentLeadStageId && $newLeadStageIdOrName !== $currentLeadStageName) {
                 $newStage = $this->em->getRepository(Stage::class)->findByIdOrName($newLeadStageIdOrName);
                 if ($newStage) {
+                    $lead->setStage($newStage);
                     $lead->stageChangeLogEntry(
                         $newStage,
                         $newStage->getId().':'.$newStage->getName(),
@@ -603,6 +604,14 @@ class LeadModel extends FormModel
                 } else {
                     throw new ImportFailedException($this->translator->trans('mautic.lead.import.stage.not.exists', ['id' => $newLeadStageIdOrName]));
                 }
+            }
+        }
+
+        if (isset($data['owner'])) {
+            $userRepo = $this->em->getRepository('MauticUserBundle:User');
+            $user     = $userRepo->findBy(['email' => $data['owner']])[0];
+            if ($user) {
+                $lead->setOwner($user);
             }
         }
 

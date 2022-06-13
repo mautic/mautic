@@ -942,7 +942,38 @@ class FieldModel extends FormModel
             ];
         }
 
-        return $fields;
+        return array_merge($fields, $this->getSystemLeadFields());
+    }
+
+    /**
+     * Get the owner and stage fields.
+     *
+     * @return array<string, mixed>
+     */
+    public function getSystemLeadFields(): array
+    {
+        return [
+            'owner' => [
+                'label'        => 'Owner by email',
+                'alias'        => 'owner',
+                'type'         => 'email',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
+            'stage' => [
+                'label'        => 'Stage',
+                'alias'        => 'stage',
+                'type'         => 'text',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
+        ];
     }
 
     /**
