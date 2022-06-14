@@ -25,10 +25,7 @@ class Copy
      */
     private $body;
 
-    /**
-     * @var string
-     */
-    private $bodyText;
+    private ?string $bodyText;
 
     /**
      * @var string|null
@@ -40,7 +37,7 @@ class Copy
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('email_copies')
-            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\CopyRepository');
+            ->setCustomRepositoryClass(CopyRepository::class);
 
         $builder->createField('id', 'string')
             ->isPrimaryKey()
@@ -143,18 +140,12 @@ class Copy
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getBodyText()
+    public function getBodyText(): ?string
     {
         return $this->bodyText;
     }
 
-    /**
-     * @param string $bodyText
-     */
-    public function setBodyText($bodyText)
+    public function setBodyText(?string $bodyText): self
     {
         $bodyText       = EmojiHelper::toShort($bodyText);
         $this->bodyText = $bodyText;

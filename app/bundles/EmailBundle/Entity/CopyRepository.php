@@ -6,16 +6,13 @@ use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 
-/**
- * Class CopyRepository.
- */
 class CopyRepository extends CommonRepository
 {
     /**
-     * @param $hash
-     * @param $subject
-     * @param $body
-     * @param $bodyText
+     * @param string $hash
+     * @param string $subject
+     * @param string $body
+     * @param string $bodyText
      */
     public function saveCopy($hash, $subject, $body, $bodyText)
     {
