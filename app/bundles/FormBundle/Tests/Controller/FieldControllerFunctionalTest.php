@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testNewEmailFieldFormIsPreMapped()
+    public function testNewEmailFieldFormIsPreMapped(): void
     {
         $this->client->request(
             Request::METHOD_GET,

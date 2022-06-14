@@ -12,7 +12,7 @@ use Symfony\Component\Cache\CacheItem;
 final class AlreadyMappedFieldCollectorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|CacheProviderInterface
+     * @var MockObject&CacheProviderInterface
      */
     private $cacheProvider;
 
@@ -29,7 +29,7 @@ final class AlreadyMappedFieldCollectorTest extends \PHPUnit\Framework\TestCase
         $this->collector     = new AlreadyMappedFieldCollector($this->cacheProvider);
     }
 
-    public function testWorkflow()
+    public function testWorkflow(): void
     {
         $cacheItem = new CacheItem();
         $formId    = '3';

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -21,7 +23,7 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -29,32 +31,83 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class FormModelTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject&RequestStack
+     */
     private $requestStack;
+
+    /**
+     * @var MockObject&TemplatingHelper
+     */
     private $templatingHelperMock;
+
+    /**
+     * @var MockObject&ThemeHelper
+     */
     private $themeHelper;
+
+    /**
+     * @var MockObject&ActionModel
+     */
     private $formActionModel;
+
+    /**
+     * @var MockObject&FieldModel
+     */
     private $formFieldModel;
+
+    /**
+     * @var MockObject&EventDispatcher
+     */
     private $dispatcher;
+
+    /**
+     * @var MockObject&Translator
+     */
     private $translator;
+
+    /**
+     * @var MockObject&EntityManager
+     */
     private $entityManager;
+
+    /**
+     * @var MockObject&FormUploader
+     */
     private $formUploaderMock;
+
+    /**
+     * @var MockObject&ColumnSchemaHelper
+     */
     private $columnSchemaHelper;
+
+    /**
+     * @var MockObject&TableSchemaHelper
+     */
     private $tableSchemaHelper;
+
+    /**
+     * @var MockObject&FormRepository
+     */
     private $formRepository;
+
+    /**
+     * @var MockObject&LeadFieldModel
+     */
     private $leadFieldModel;
 
     /**
-     * @var MockObject|LeadModel
+     * @var MockObject&ContactTracker
      */
-    private $leadModel;
+    private $contactTracker;
 
     /**
-     * @var MockObject|FormFieldHelper
+     * @var MockObject&FormFieldHelper
      */
     private $fieldHelper;
 
     /**
-     * @var MockObject|MappedObjectCollectorInterface
+     * @var MockObject&MappedObjectCollectorInterface
      */
     private $mappedObjectCollector;
 
@@ -70,7 +123,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->themeHelper           = $this->createMock(ThemeHelper::class);
         $this->formActionModel       = $this->createMock(ActionModel::class);
         $this->formFieldModel        = $this->createMock(FieldModel::class);
-        $this->leadModel             = $this->createMock(LeadModel::class);
+        $this->contactTracker        = $this->createMock(ContactTracker::class);
         $this->fieldHelper           = $this->createMock(FormFieldHelper::class);
         $this->dispatcher            = $this->createMock(EventDispatcher::class);
         $this->translator            = $this->createMock(Translator::class);
@@ -99,10 +152,10 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             $this->themeHelper,
             $this->formActionModel,
             $this->formFieldModel,
-            $this->leadModel,
             $this->fieldHelper,
             $this->leadFieldModel,
             $this->formUploaderMock,
+            $this->contactTracker,
             $this->columnSchemaHelper,
             $this->tableSchemaHelper,
             $this->mappedObjectCollector
@@ -113,7 +166,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->formModel->setEntityManager($this->entityManager);
     }
 
-    public function testSetFields()
+    public function testSetFields(): void
     {
         $form   = new Form();
         $fields = $this->getTestFormFields();
@@ -153,25 +206,25 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(4, $newChildField->getOrder());
     }
 
-    public function testGetComponentsFields()
+    public function testGetComponentsFields(): void
     {
         $components = $this->formModel->getCustomComponents();
         $this->assertArrayHasKey('fields', $components);
     }
 
-    public function testGetComponentsActions()
+    public function testGetComponentsActions(): void
     {
         $components = $this->formModel->getCustomComponents();
         $this->assertArrayHasKey('actions', $components);
     }
 
-    public function testGetComponentsValidators()
+    public function testGetComponentsValidators(): void
     {
         $components = $this->formModel->getCustomComponents();
         $this->assertArrayHasKey('validators', $components);
     }
 
-    public function testGetEntityForNotFoundContactField()
+    public function testGetEntityForNotFoundContactField(): void
     {
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
@@ -200,7 +253,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['syncList' => true], $formField->getProperties());
     }
 
-    public function testGetEntityForNotLinkedSelectField()
+    public function testGetEntityForNotLinkedSelectField(): void
     {
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
@@ -224,7 +277,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->formModel->getEntity(5);
     }
 
-    public function testGetEntityForNotSyncedSelectField()
+    public function testGetEntityForNotSyncedSelectField(): void
     {
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
@@ -250,7 +303,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->formModel->getEntity(5);
     }
 
-    public function testGetEntityForSyncedBooleanFieldFromNotLeadObject()
+    public function testGetEntityForSyncedBooleanFieldFromNotLeadObject(): void
     {
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
@@ -281,7 +334,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->formModel->getEntity(5);
     }
 
-    public function testGetEntityForSyncedBooleanField()
+    public function testGetEntityForSyncedBooleanField(): void
     {
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
@@ -316,35 +369,38 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['lunch?', 'dinner?'], $formField->getProperties()['list']['list']);
     }
 
-    public function testGetEntityForSyncedCountryField()
+    public function testGetEntityForSyncedCountryField(): void
     {
         $formField = $this->standardSyncListStaticFieldTest('country');
 
         $this->assertArrayHasKey('Czech Republic', $formField->getProperties()['list']['list']);
     }
 
-    public function testGetEntityForSyncedRegionField()
+    public function testGetEntityForSyncedRegionField(): void
     {
         $formField = $this->standardSyncListStaticFieldTest('region');
 
         $this->assertArrayHasKey('Canada', $formField->getProperties()['list']['list']);
     }
 
-    public function testGetEntityForSyncedTimezoneField()
+    public function testGetEntityForSyncedTimezoneField(): void
     {
         $formField = $this->standardSyncListStaticFieldTest('timezone');
 
         $this->assertArrayHasKey('Africa', $formField->getProperties()['list']['list']);
     }
 
-    public function testGetEntityForSyncedLocaleField()
+    public function testGetEntityForSyncedLocaleField(): void
     {
         $formField = $this->standardSyncListStaticFieldTest('locale');
 
         $this->assertArrayHasKey('Czech (Czechia)', $formField->getProperties()['list']['list']);
     }
 
-    public function fieldTypeProvider()
+    /**
+     * @return array<string[]>
+     */
+    public function fieldTypeProvider(): array
     {
         return [
             ['select'],
@@ -356,7 +412,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fieldTypeProvider
      */
-    public function testSyncListField($type)
+    public function testSyncListField(string $type): void
     {
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
@@ -395,7 +451,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($options, $formField->getProperties()['list']['list']);
     }
 
-    private function standardSyncListStaticFieldTest($type)
+    private function standardSyncListStaticFieldTest(string $type): Field
     {
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
@@ -474,8 +530,8 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $emailField->setIsAutoFill(false);
         $form->addField(123, $emailField);
 
-        $this->leadModel->expects($this->never())
-            ->method('getCurrentLead');
+        $this->contactTracker->expects($this->never())
+            ->method('getContact');
 
         $this->formModel->populateValuesWithLead($form, $formHtml);
     }
@@ -490,8 +546,8 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $emailField->setIsAutoFill(true);
         $form->addField(123, $emailField);
 
-        $this->leadModel->expects($this->never())
-            ->method('getCurrentLead');
+        $this->contactTracker->expects($this->never())
+            ->method('getContact');
 
         $this->formModel->populateValuesWithLead($form, $formHtml);
     }
@@ -506,8 +562,8 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $emailField->setIsAutoFill(true);
         $form->addField(123, $emailField);
 
-        $this->leadModel->expects($this->once())
-            ->method('getCurrentLead')
+        $this->contactTracker->expects($this->once())
+            ->method('getContact')
             ->willReturn(null);
 
         $this->fieldHelper->expects($this->never())
@@ -524,8 +580,8 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $emailField->setIsAutoFill(true);
         $form->addField(123, $emailField);
 
-        $this->leadModel->expects($this->never())
-            ->method('getCurrentLead');
+        $this->contactTracker->expects($this->never())
+            ->method('getContact');
 
         $this->formModel->populateValuesWithLead($form, $formHtml);
     }
@@ -548,7 +604,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $emailField->setIsAutoFill(true);
         $form->addField(123, $emailField);
 
-        $this->leadModel->method('getCurrentLead')
+        $this->contactTracker->method('getContact')
             ->willReturn($contact);
 
         $this->fieldHelper->expects($this->never())
@@ -575,7 +631,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $emailField->setIsAutoFill(true);
         $form->addField(123, $emailField);
 
-        $this->leadModel->method('getCurrentLead')
+        $this->contactTracker->method('getContact')
             ->willReturn($contact);
 
         $this->fieldHelper->expects($this->once())
@@ -585,10 +641,13 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->formModel->populateValuesWithLead($form, $formHtml);
     }
 
-    private function getTestFormFields()
+    /**
+     * @return mixed[]
+     */
+    private function getTestFormFields(): array
     {
-        $fieldSession          = 'mautic_'.sha1(uniqid(mt_rand(), true));
-        $fieldSession2         = 'mautic_'.sha1(uniqid(mt_rand(), true));
+        $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fieldSession2         = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
         $fields[$fieldSession] = [
             'label'        => 'Email',
             'showLabel'    => 1,

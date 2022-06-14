@@ -502,7 +502,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @param $key
+     * @param int|string $key
      *
      * @return Form
      */
@@ -517,7 +517,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @param $key
+     * @param int|string $key
      */
     public function removeField($key, Field $field)
     {
@@ -617,7 +617,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @param $key
+     * @param int|string $key
      *
      * @return Form
      */

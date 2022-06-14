@@ -412,7 +412,8 @@ class FieldController extends CommonFormController
     }
 
     /**
-     * @param $formId
+     * @param int     $formId
+     * @param mixed[] $formField
      *
      * @return mixed
      */

@@ -17,6 +17,9 @@ final class FieldCrate
      */
     private array $properties;
 
+    /**
+     * @param mixed[] $properties
+     */
     public function __construct(string $key, string $name, string $type, array $properties)
     {
         $this->key        = $key;

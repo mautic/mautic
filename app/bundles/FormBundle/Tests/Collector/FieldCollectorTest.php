@@ -9,26 +9,22 @@ use Mautic\FormBundle\Collector\FieldCollector;
 use Mautic\FormBundle\Event\FieldCollectEvent;
 use Mautic\FormBundle\FormEvents;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Contracts\EventDispatcher\Event;
 
 final class FieldCollectorTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuildCollectionForNoObject(): void
     {
-        $dispatcher = new class() extends EventDispatcher {
-            
+        $dispatcher                               = new class() extends EventDispatcher {
             public int $dispatchMethodCallCounter = 0;
 
-            /**
-             * @param FieldCollectEvent $event
-             */
             public function dispatch($eventName, Event $event = null)
             {
                 ++$this->dispatchMethodCallCounter;
 
+                \assert($event instanceof FieldCollectEvent);
                 Assert::assertSame(FormEvents::ON_FIELD_COLLECT, $eventName);
-                Assert::assertInstanceOf(FieldCollectEvent::class, $event);
                 Assert::assertSame('contact', $event->getObject());
 
                 return new FieldCollection();
