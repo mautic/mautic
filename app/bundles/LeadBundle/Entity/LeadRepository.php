@@ -1093,7 +1093,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @param array<integer> $stages
      */
-    public function checkLeadStage(Lead $lead, array $stages = []): bool
+    public function isContactInOneOfStages(Lead $lead, array $stages = []): bool
     {
         if (empty($stages)) {
             return false;
