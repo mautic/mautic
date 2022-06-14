@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field;
 
@@ -17,27 +10,9 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class IdentifierFields
 {
-    /**
-     * @var FieldsWithUniqueIdentifier
-     */
-    private $fieldsWithUniqueIdentifier;
+    private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
+    private FieldList $fieldList;
 
-    /**
-     * @var FieldList
-     */
-    private $fieldList;
-
-    /**
-     * @var string
-     */
-    private $object;
-
-    /**
-     * IdentifierFields constructor.
-     *
-     * @param FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
-     * @param FieldList                  $fieldList
-     */
     public function __construct(FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier, FieldList $fieldList)
     {
         $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
@@ -45,31 +20,24 @@ class IdentifierFields
     }
 
     /**
-     * @param $object
-     * @param $entityClass
-     *
-     * @return array
+     * @return string[]
      */
-    public function getFieldList($object, $entityClass = null)
+    public function getFieldList(string $object, ?object $entityClass = null): array
     {
-        $this->object = $object;
-
         return array_merge(
-            $this->getDefaultFields($entityClass),
-            $this->getUniqueIdentifierFields(),
-            $this->getSocialFields()
+            $this->getDefaultFields($object, $entityClass),
+            $this->getUniqueIdentifierFields($object),
+            $this->getSocialFields($object)
         );
     }
 
     /**
-     * @param $entityClass
-     *
-     * @return array
+     * @return string[]
      */
-    public function getDefaultFields($entityClass)
+    private function getDefaultFields(string $object, ?object $entityClass): array
     {
         if (null === $entityClass) {
-            switch ($this->object) {
+            switch ($object) {
                 case 'lead':
                     $entityClass = Lead::class;
                     break;
@@ -90,13 +58,13 @@ class IdentifierFields
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    private function getUniqueIdentifierFields()
+    private function getUniqueIdentifierFields(string $object): array
     {
         $fields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(
             [
-                'object' => $this->object,
+                'object' => $object,
             ]
         );
 
@@ -104,16 +72,16 @@ class IdentifierFields
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    private function getSocialFields()
+    private function getSocialFields(string $object): array
     {
         $fields = $this->fieldList->getFieldList(
             true,
             false,
             [
                 'isPublished' => true,
-                'object'      => $this->object,
+                'object'      => $object,
             ]
         );
 

@@ -9,8 +9,8 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\IdentifierFields;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -46,10 +46,18 @@ class FieldType extends AbstractType
     private $identifierFields;
 
     /**
-     * @param EntityManagerInterface $em
-     * @param TranslatorInterface    $translator
-     * @param IdentifierFields       $identifierFields
+     * For which types will be character limits applicable.
+     *
+     * @var string[]
      */
+    private $indexableFieldsWithLimits = [
+        'text',
+        'select',
+        'phone',
+        'url',
+        'email',
+    ];
+
     public function __construct(EntityManagerInterface $em, TranslatorInterface $translator, IdentifierFields $identifierFields)
     {
         $this->em               = $em;
@@ -83,7 +91,7 @@ class FieldType extends AbstractType
                     'mautic.lead.field.group.personal'     => 'personal',
                     'mautic.lead.field.group.professional' => 'professional',
                 ],
-                'attr'        => [
+                'attr' => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.field.form.group.help',
                 ],
@@ -105,18 +113,18 @@ class FieldType extends AbstractType
             'type',
             ChoiceType::class,
             [
-                'choices'           => $fieldHelper->getChoiceList(),
-                'expanded'          => false,
-                'multiple'          => false,
-                'label'             => 'mautic.lead.field.type',
-                'placeholder'       => false,
-                'disabled'          => ($disabled || !$new),
-                'attr'              => [
+                'choices'     => $fieldHelper->getChoiceList(),
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.lead.field.type',
+                'placeholder' => false,
+                'disabled'    => ($disabled || !$new),
+                'attr'        => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.updateLeadFieldProperties(this.value);',
                 ],
-                'data'        => $default,
-                'required'    => false,
+                'data'     => $default,
+                'required' => false,
             ]
         );
 
@@ -167,12 +175,12 @@ class FieldType extends AbstractType
                 'default_template_'.$listType,
                 ChoiceType::class,
                 [
-                    'choices'     => $choices,
-                    'label'       => 'mautic.core.defaultvalue',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'attr'        => ['class' => 'form-control not-chosen'],
-                    'required'    => false,
-                    'mapped'      => false,
+                    'choices'    => $choices,
+                    'label'      => 'mautic.core.defaultvalue',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => ['class' => 'form-control not-chosen'],
+                    'required'   => false,
+                    'mapped'     => false,
                 ]
             );
         }
@@ -457,8 +465,11 @@ class FieldType extends AbstractType
             }
         );
 
+        /** @var LeadFieldRepository $leadFieldRepository */
+        $leadFieldRepository = $this->em->getRepository(LeadField::class);
+
         //get order list
-        $transformer = new FieldToOrderTransformer($this->em->getRepository(Field::class));
+        $transformer = new FieldToOrderTransformer($leadFieldRepository);
         $builder->add(
             $builder->create(
                 'order',
@@ -469,10 +480,7 @@ class FieldType extends AbstractType
                     'choice_label'  => 'label',
                     'label_attr'    => ['class' => 'control-label'],
                     'attr'          => ['class' => 'form-control'],
-                    'query_builder' => function (EntityRepository $er) {
-                        return $er->createQueryBuilder('f')
-                            ->orderBy('f.order', 'ASC');
-                    },
+                    'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('f')->orderBy('f.order', 'ASC'),
                     'required'      => false,
                 ]
             )->addModelTransformer($transformer)
@@ -556,7 +564,7 @@ class FieldType extends AbstractType
                     'tooltip'  => 'mautic.lead.field.form.isuniqueidentifer.tooltip',
                     'onchange' => 'Mautic.displayUniqueIdentifierWarning(this)',
                 ],
-                'data'  => (!empty($data)),
+                'data' => (!empty($data)),
             ]
         );
 
@@ -575,19 +583,17 @@ class FieldType extends AbstractType
             'object',
             ChoiceType::class,
             [
-                'choices'           => [
+                'choices' => [
                     'mautic.lead.contact'    => 'lead',
                     'mautic.company.company' => 'company',
                 ],
-                'expanded'          => false,
-                'multiple'          => false,
-                'label'             => 'mautic.lead.field.object',
-                'placeholder'       => false,
-                'attr'              => [
-                    'class' => 'form-control',
-                ],
-                'required'          => false,
-                'disabled'          => ($disabled || !$new),
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.lead.field.object',
+                'placeholder' => false,
+                'attr'        => ['class' => 'form-control'],
+                'required'    => false,
+                'disabled'    => ($disabled || !$new),
             ]
         );
 

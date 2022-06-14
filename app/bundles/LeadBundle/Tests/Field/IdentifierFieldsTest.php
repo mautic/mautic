@@ -1,39 +1,40 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field;
 
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Field\IdentifierFields;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class IdentifierFieldsTest extends \PHPUnit_Framework_TestCase
+class IdentifierFieldsTest extends TestCase
 {
     /**
-     * @var FieldsWithUniqueIdentifier|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldsWithUniqueIdentifier&MockObject
      */
     private $fieldsWithUniqueIdentifiers;
 
     /**
-     * @var FieldList|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldList&MockObject
      */
     private $fieldList;
 
-    protected function setUp()
+    /**
+     * @var IdentifierFields
+     */
+    private $identifierFields;
+
+    protected function setUp(): void
     {
         $this->fieldsWithUniqueIdentifiers = $this->createMock(FieldsWithUniqueIdentifier::class);
         $this->fieldList                   = $this->createMock(FieldList::class);
+        $this->identifierFields            = new IdentifierFields($this->fieldsWithUniqueIdentifiers, $this->fieldList);
     }
 
-    public function testLeadObjectReturnsDefaultFields()
+    public function testLeadObjectReturnsDefaultFields(): void
     {
         $this->fieldsWithUniqueIdentifiers->expects($this->once())
             ->method('getFieldsWithUniqueIdentifier')
@@ -45,7 +46,7 @@ class IdentifierFieldsTest extends \PHPUnit_Framework_TestCase
             ->with(true, false, ['isPublished' => true, 'object' => 'lead'])
             ->willReturn([]);
 
-        $fields = $this->getIdentifierFields()->getFieldList('lead');
+        $fields = $this->identifierFields->getFieldList('lead');
 
         $this->assertEquals(
             [
@@ -58,7 +59,7 @@ class IdentifierFieldsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testCompanyObjectReturnsDefaultFields()
+    public function testCompanyObjectReturnsDefaultFields(): void
     {
         $this->fieldsWithUniqueIdentifiers->expects($this->once())
             ->method('getFieldsWithUniqueIdentifier')
@@ -70,7 +71,7 @@ class IdentifierFieldsTest extends \PHPUnit_Framework_TestCase
             ->with(true, false, ['isPublished' => true, 'object' => 'company'])
             ->willReturn([]);
 
-        $fields = $this->getIdentifierFields()->getFieldList('company');
+        $fields = $this->identifierFields->getFieldList('company');
 
         $this->assertEquals(
             [
@@ -85,7 +86,7 @@ class IdentifierFieldsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testUniqueIdentifiersAreIncluded()
+    public function testUniqueIdentifiersAreIncluded(): void
     {
         $this->fieldsWithUniqueIdentifiers->expects($this->once())
             ->method('getFieldsWithUniqueIdentifier')
@@ -101,7 +102,7 @@ class IdentifierFieldsTest extends \PHPUnit_Framework_TestCase
             ->with(true, false, ['isPublished' => true, 'object' => 'lead'])
             ->willReturn([]);
 
-        $fields = $this->getIdentifierFields()->getFieldList('lead');
+        $fields = $this->identifierFields->getFieldList('lead');
 
         $this->assertEquals(
             [
@@ -115,7 +116,7 @@ class IdentifierFieldsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSocialFieldsAreIncluded()
+    public function testSocialFieldsAreIncluded(): void
     {
         $this->fieldsWithUniqueIdentifiers->expects($this->once())
             ->method('getFieldsWithUniqueIdentifier')
@@ -148,7 +149,7 @@ class IdentifierFieldsTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $fields = $this->getIdentifierFields()->getFieldList('lead');
+        $fields = $this->identifierFields->getFieldList('lead');
 
         $this->assertEquals(
             [
@@ -161,13 +162,5 @@ class IdentifierFieldsTest extends \PHPUnit_Framework_TestCase
             ],
             $fields
         );
-    }
-
-    /**
-     * @return IdentifierFields
-     */
-    private function getIdentifierFields()
-    {
-        return new IdentifierFields($this->fieldsWithUniqueIdentifiers, $this->fieldList);
     }
 }

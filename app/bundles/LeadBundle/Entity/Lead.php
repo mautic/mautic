@@ -454,10 +454,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->build();
     }
 
-    /**
-     * @return array
-     */
-    public static function getDefaultIdentifierFields()
+    public static function getDefaultIdentifierFields(): array
     {
         return [
             'firstname',

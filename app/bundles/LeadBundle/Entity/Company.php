@@ -9,9 +9,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Entity\User;
 
-/**
- * Class Company.
- */
 class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
@@ -29,12 +26,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     private $score = 0;
 
     /**
-     * @var \Mautic\UserBundle\Entity\User
+     * @var User
      */
     private $owner;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $socialCache = [];
 
@@ -70,9 +67,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * Get social cache.
-     *
-     * @return mixed
+     * @return mixed[]
      */
     public function getSocialCache()
     {
@@ -80,9 +75,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * Set social cache.
-     *
-     * @param $cache
+     * @param mixed[] $cache
      */
     public function setSocialCache($cache)
     {
@@ -93,7 +86,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('companies')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\CompanyRepository');
+            ->setCustomRepositoryClass(CompanyRepository::class);
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()
@@ -171,10 +164,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             ->build();
     }
 
-    /**
-     * @return array
-     */
-    public static function getDefaultIdentifierFields()
+    public static function getDefaultIdentifierFields(): array
     {
         return [
             'companyname',
@@ -211,8 +201,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -235,8 +223,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * Set owner.
-     *
      * @param User $owner
      *
      * @return Company
@@ -250,8 +236,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * Get owner.
-     *
      * @return User
      */
     public function getOwner()
@@ -270,8 +254,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * Set score.
-     *
      * @param User $score
      *
      * @return Company
@@ -287,8 +269,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * Get score.
-     *
      * @return int
      */
     public function getScore()
