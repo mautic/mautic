@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Unit\Model;
 
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -67,7 +58,7 @@ final class ReportModelTest extends MauticMysqlTestCase
         Assert::assertCount(1, $reportData['data']);
     }
 
-    private function makeSubmission(Form $form, IpAddress $ipAddress, \DateTimeInterface $dateSubmitted): Submission
+    private function makeSubmission(Form $form, IpAddress $ipAddress, \DateTime $dateSubmitted): Submission
     {
         $submission = new Submission();
         $submission->setForm($form);
