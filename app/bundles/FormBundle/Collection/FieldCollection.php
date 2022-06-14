@@ -7,8 +7,14 @@ namespace Mautic\FormBundle\Collection;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Exception\FieldNotFoundException;
 
+/**
+ * @extends \ArrayIterator<int,FieldCrate>
+ */
 final class FieldCollection extends \ArrayIterator
 {
+    /**
+     * @return array<string,string>
+     */
     public function toChoices(): array
     {
         $choices = [];
@@ -33,6 +39,9 @@ final class FieldCollection extends \ArrayIterator
         throw new FieldNotFoundException("Field with key {$key} was not found.");
     }
 
+    /**
+     * @param string[] $keys
+     */
     public function removeFieldsWithKeys(array $keys, string $keyToKeep = null): FieldCollection
     {
         return new self(

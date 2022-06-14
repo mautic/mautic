@@ -953,7 +953,7 @@ class Field
         return $this->mappedObject;
     }
 
-    public function setMappedObject(?string $mappedObject)
+    public function setMappedObject(?string $mappedObject): void
     {
         $this->mappedObject = $mappedObject;
     }
@@ -963,7 +963,7 @@ class Field
         return $this->mappedField;
     }
 
-    public function setMappedField(?string $mappedField)
+    public function setMappedField(?string $mappedField): void
     {
         $this->mappedField = $mappedField;
     }

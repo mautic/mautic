@@ -160,7 +160,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param null $id
+     * @param int|null $id
      *
      * @return Form
      */
@@ -1078,7 +1078,7 @@ class FormModel extends CommonFormModel
     /**
      * Finds out whether the.
      */
-    private function addMappedFieldOptions(Field $formField)
+    private function addMappedFieldOptions(Field $formField): void
     {
         $formFieldProps   = $formField->getProperties();
         $mappedFieldAlias = $formField->getMappedField();

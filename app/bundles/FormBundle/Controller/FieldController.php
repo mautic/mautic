@@ -23,7 +23,7 @@ class FieldController extends CommonFormController
     private $formModel;
 
     /**
-     * @var FormFieldModel
+     * @var FormFieldModel|AbstractCommonModel
      */
     private $formFieldModel;
 
@@ -404,7 +404,8 @@ class FieldController extends CommonFormController
     }
 
     /**
-     * @param $formId
+     * @param int     $formId
+     * @param mixed[] $formField
      *
      * @return mixed
      */

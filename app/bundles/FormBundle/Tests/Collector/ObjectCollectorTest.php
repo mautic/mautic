@@ -9,20 +9,16 @@ use Mautic\FormBundle\Collector\ObjectCollector;
 use Mautic\FormBundle\Event\ObjectCollectEvent;
 use Mautic\FormBundle\FormEvents;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Contracts\EventDispatcher\Event;
 
 final class ObjectCollectorTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuildCollectionForNoObject(): void
     {
-        $dispatcher = new class() extends EventDispatcher {
-
+        $dispatcher                               = new class() extends EventDispatcher {
             public int $dispatchMethodCallCounter = 0;
 
-            /**
-             * @param ObjectCollectEvent $event
-             */
             public function dispatch($eventName, Event $event = null)
             {
                 ++$this->dispatchMethodCallCounter;

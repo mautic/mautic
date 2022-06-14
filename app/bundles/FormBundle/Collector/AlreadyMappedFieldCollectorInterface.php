@@ -8,6 +8,8 @@ interface AlreadyMappedFieldCollectorInterface
 {
     /**
      * @param string $formId can be a string hash for new forms
+     *
+     * @return mixed[]
      */
     public function getFields(string $formId, string $object): array;
 

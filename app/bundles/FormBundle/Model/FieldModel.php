@@ -35,7 +35,7 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * @param object                              $entity
+     * @param object|mixed[]                      $entity
      * @param \Symfony\Component\Form\FormFactory $formFactory
      * @param null                                $action
      * @param array                               $options

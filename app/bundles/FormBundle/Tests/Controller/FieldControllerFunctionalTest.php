@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testNewEmailFieldFormIsPreMapped()
+    public function testNewEmailFieldFormIsPreMapped(): void
     {
         $this->client->request(
             Request::METHOD_GET,
@@ -27,7 +27,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('<option value="email"  selected="selected">', $payload['newContent']);
     }
 
-    public function testNewCaptchaFieldFormCanBeSaved()
+    public function testNewCaptchaFieldFormCanBeSaved(): void
     {
         $payload = [
             'name'        => 'Submission test form',

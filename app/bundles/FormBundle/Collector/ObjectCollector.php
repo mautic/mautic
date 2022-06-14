@@ -12,11 +12,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class ObjectCollector implements ObjectCollectorInterface
 {
     private EventDispatcherInterface $dispatcher;
-
-    /**
-     * @var ObjectCollection|null
-     */
-    private ?array $objects = null;
+    private ?ObjectCollection $objects = null;
 
     public function __construct(EventDispatcherInterface $dispatcher)
     {

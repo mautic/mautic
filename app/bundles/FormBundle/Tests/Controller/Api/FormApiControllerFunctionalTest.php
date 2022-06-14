@@ -85,7 +85,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         ],
     ];
 
-    public function testFormWorkflow()
+    public function testFormWorkflow(): void
     {
         $payload = [
             'name'        => 'Form API test',
@@ -147,7 +147,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
-    public function testSingleFormWorkflow()
+    public function testSingleFormWorkflow(): void
     {
         $payload    = self::TEST_PAYLOAD;
         $fieldCount = count($payload['fields']);
@@ -167,26 +167,38 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['fields'][0]['type'], $response['form']['fields'][0]['type']);
         $this->assertEquals($payload['fields'][0]['mappedObject'], $response['form']['fields'][0]['mappedObject']);
         $this->assertEquals($payload['fields'][0]['mappedField'], $response['form']['fields'][0]['mappedField']);
-        $this->assertEquals($payload['fields'][0]['mappedField'], $response['form']['fields'][0]['leadField']); // @deprecated leadField was replaced by mappedField. Check for BC.
+        $this->assertEquals(
+            $payload['fields'][0]['mappedField'],
+            $response['form']['fields'][0]['leadField']
+        ); // @deprecated leadField was replaced by mappedField. Check for BC.
         $this->assertEquals($payload['fields'][0]['showLabel'], $response['form']['fields'][0]['showLabel']);
         $this->assertEquals($payload['fields'][0]['isRequired'], $response['form']['fields'][0]['isRequired']);
         $this->assertEquals($payload['fields'][1]['label'], $response['form']['fields'][1]['label']);
         $this->assertEquals($payload['fields'][1]['type'], $response['form']['fields'][1]['type']);
         $this->assertEquals('contact', $response['form']['fields'][1]['mappedObject']);
         $this->assertEquals('points', $response['form']['fields'][1]['mappedField']);
-        $this->assertEquals($payload['fields'][1]['leadField'], $response['form']['fields'][1]['leadField']); // @deprecated leadField was replaced by mappedField. Check for BC.
+        $this->assertEquals(
+            $payload['fields'][1]['leadField'],
+            $response['form']['fields'][1]['leadField']
+        ); // @deprecated leadField was replaced by mappedField. Check for BC.
         $this->assertTrue($response['form']['fields'][1]['showLabel']);
         $this->assertFalse($response['form']['fields'][1]['isRequired']);
         $this->assertEquals($payload['fields'][2]['label'], $response['form']['fields'][2]['label']);
         $this->assertEquals($payload['fields'][2]['type'], $response['form']['fields'][2]['type']);
         $this->assertEquals('contact', $response['form']['fields'][2]['mappedObject']);
         $this->assertEquals('company', $response['form']['fields'][2]['mappedField']);
-        $this->assertEquals($payload['fields'][2]['leadField'], $response['form']['fields'][2]['leadField']); // @deprecated leadField was replaced by mappedField. Check for BC.
+        $this->assertEquals(
+            $payload['fields'][2]['leadField'],
+            $response['form']['fields'][2]['leadField']
+        ); // @deprecated leadField was replaced by mappedField. Check for BC.
         $this->assertEquals($payload['fields'][3]['label'], $response['form']['fields'][3]['label']);
         $this->assertEquals($payload['fields'][3]['type'], $response['form']['fields'][3]['type']);
         $this->assertEquals('company', $response['form']['fields'][3]['mappedObject']);
         $this->assertEquals('companyphone', $response['form']['fields'][3]['mappedField']);
-        $this->assertEquals($payload['fields'][3]['leadField'], $response['form']['fields'][3]['leadField']); // @deprecated leadField was replaced by mappedField. Check for BC.
+        $this->assertEquals(
+            $payload['fields'][3]['leadField'],
+            $response['form']['fields'][3]['leadField']
+        ); // @deprecated leadField was replaced by mappedField. Check for BC.
 
         // Edit PATCH:
         $patchPayload = [
@@ -226,8 +238,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Edit PUT:
         $payload['description'] .= ' renamed';
-        $payload['fields']       = []; // Set fields to an empty array as it would duplicate all fields.
-        $payload['postAction']   = 'return'; // Must be present for PUT as all empty values are being cleared.
+        $payload['fields']      = []; // Set fields to an empty array as it would duplicate all fields.
+        $payload['postAction']  = 'return'; // Must be present for PUT as all empty values are being cleared.
         $this->client->request(Request::METHOD_PUT, "/api/forms/{$formId}/edit", $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
@@ -244,23 +256,13 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertSame($formId, $response['form']['id'], 'ID of the created form does not match with the fetched one.');
-        $this->assertEquals('Form API renamed', $response['form']['name']);
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame($formId, $response['form']['id']);
+        $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertCount($fieldCount, $response['form']['fields']);
         $this->assertEquals($payload['formType'], $response['form']['formType']);
-        $this->assertEquals($payload['isPublished'], $response['form']['isPublished']);
-        $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
-        $this->assertIsArray($response['form']['fields']);
-        $this->assertCount(count($payload['fields']), $response['form']['fields']);
-        for ($i = 0; $i < count($payload['fields']); ++$i) {
-            $this->assertEquals($payload['fields'][$i]['label'], $response['form']['fields'][$i]['label']);
-            $this->assertEquals($payload['fields'][$i]['alias'], $response['form']['fields'][$i]['alias']);
-            $this->assertEquals($payload['fields'][$i]['type'], $response['form']['fields'][$i]['type']);
-            $this->assertEquals($payload['fields'][$i]['leadField'], $response['form']['fields'][$i]['leadField']);
-        }
 
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");

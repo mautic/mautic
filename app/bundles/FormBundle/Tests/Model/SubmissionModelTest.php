@@ -320,7 +320,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $reflection = new \ReflectionClass(SubmissionModel::class);
         $method     = $reflection->getMethod('normalizeValue');
         $method->setAccessible(true);
-        $fieldSession          = 'mautic_'.sha1(uniqid(mt_rand(), true));
+        $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
         $fields[$fieldSession] = [
             'label'        => 'Email',
             'showLabel'    => 1,
@@ -366,7 +366,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
      */
     private function getTestFormFields(): array
     {
-        $fieldSession          = 'mautic_'.sha1(uniqid(mt_rand(), true));
+        $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
         $fields[$fieldSession] = [
             'label'        => 'Email',
             'showLabel'    => 1,
