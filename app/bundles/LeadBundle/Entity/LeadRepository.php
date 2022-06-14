@@ -1109,7 +1109,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $q->expr()->eq('l.id', ':leadId')
                 )
             )
-            ->setParameter('stageIds', implode(',', $stages))
+            ->setParameter('stageIds', $stages, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
             ->setParameter('leadId', $lead->getId());
 
         return (bool) $q->execute()->fetchColumn();
