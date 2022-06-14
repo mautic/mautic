@@ -44,10 +44,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->channelListHelper  = $this->createMock(ChannelListHelper::class);
         $this->companyReportData  = $this->createMock(CompanyReportData::class);
         $this->downloadRepository = $this->createMock(DownloadRepository::class);
-
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', '');
-        }
     }
 
     public function testOnReportBuilderWithUnknownContext(): void

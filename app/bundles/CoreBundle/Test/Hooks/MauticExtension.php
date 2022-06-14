@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Test\Hooks;
 use PHPUnit\Framework\TestFailure;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Runner\AfterTestHook;
+use PHPUnit\Runner\BeforeFirstTestHook;
 
 /**
  * This extension allows you to run an arbitrary test after every test in the current suite which is
@@ -15,7 +16,7 @@ use PHPUnit\Runner\AfterTestHook;
  *
  * Example of usage: `MAUTIC_TEST_EXECUTE_TEST_AFTER="Fully\\Qualified\\Class\\NameTest" bin/phpunit`.
  */
-class ExecuteTestAfterExtension implements AfterTestHook
+class MauticExtension implements AfterTestHook, BeforeFirstTestHook
 {
     public function executeAfterTest(string $test, float $time): void
     {
@@ -35,6 +36,16 @@ class ExecuteTestAfterExtension implements AfterTestHook
             }, array_merge($result->failures(), $result->errors()));
 
             exit(sprintf('The previous test was: "%s". Your test errored with: %s', $test, implode(PHP_EOL, $failures)));
+        }
+    }
+
+    public function executeBeforeFirstTest(): void
+    {
+        if (!defined('MAUTIC_TABLE_PREFIX')) {
+            $x      = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $prefix = substr(str_shuffle(str_repeat($x, (int) ceil(4 / strlen($x)))), 1, 4).'_';
+            define('MAUTIC_TABLE_PREFIX', 'prefix'.$prefix);
+            echo 'using db prefix '.$prefix.PHP_EOL;
         }
     }
 }

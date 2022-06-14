@@ -8,16 +8,10 @@ use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 
 class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-    }
-
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getField
      */
-    public function testGetField()
+    public function testGetField(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -37,7 +31,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getTable
      */
-    public function testGetTableLead()
+    public function testGetTableLead(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -51,7 +45,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getTable
      */
-    public function testGetTableCompany()
+    public function testGetTableCompany(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -65,7 +59,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getOperator
      */
-    public function testGetOperatorEqual()
+    public function testGetOperatorEqual(): void
     {
         $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
         $contactSegmentFilterOperator->expects($this->once())
@@ -85,7 +79,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getOperator
      */
-    public function testGetOperatorStartsWith()
+    public function testGetOperatorStartsWith(): void
     {
         $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
         $contactSegmentFilterOperator->expects($this->once())
@@ -105,7 +99,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getOperator
      */
-    public function testGetOperatorEndsWith()
+    public function testGetOperatorEndsWith(): void
     {
         $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
         $contactSegmentFilterOperator->expects($this->once())
@@ -125,7 +119,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getOperator
      */
-    public function testGetOperatorContainsWith()
+    public function testGetOperatorContainsWith(): void
     {
         $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
         $contactSegmentFilterOperator->expects($this->once())
@@ -145,7 +139,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getQueryType
      */
-    public function testGetQueryType()
+    public function testGetQueryType(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -157,7 +151,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterHolder
      */
-    public function testGetParameterHolderSingle()
+    public function testGetParameterHolderSingle(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -169,7 +163,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterHolder
      */
-    public function testGetParameterHolderArray()
+    public function testGetParameterHolderArray(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -192,7 +186,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
      */
-    public function testGetParameterValueBoolean()
+    public function testGetParameterValueBoolean(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -214,7 +208,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
      */
-    public function testGetParameterValueNumber()
+    public function testGetParameterValueNumber(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -229,7 +223,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
      */
-    public function testGetParameterValueLikeNoPercent()
+    public function testGetParameterValueLikeNoPercent(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -245,7 +239,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
      */
-    public function testGetParameterValueNotLike()
+    public function testGetParameterValueNotLike(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -261,7 +255,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
      */
-    public function testGetParameterValueLikeWithOnePercent()
+    public function testGetParameterValueLikeWithOnePercent(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -277,7 +271,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
      */
-    public function testGetParameterValueLikeWithTwoPercent()
+    public function testGetParameterValueLikeWithTwoPercent(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -293,7 +287,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
      */
-    public function testGetParameterValueStartsWith()
+    public function testGetParameterValueStartsWith(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -309,7 +303,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
      */
-    public function testGetParameterValueEndsWith()
+    public function testGetParameterValueEndsWith(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -325,7 +319,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
      */
-    public function testGetParameterValueContains()
+    public function testGetParameterValueContains(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -341,7 +335,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
      */
-    public function testGetParameterValueContainsShouldNotBeEscaped()
+    public function testGetParameterValueContainsShouldNotBeEscaped(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -358,7 +352,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
      */
-    public function testGetParameterValueRegex()
+    public function testGetParameterValueRegex(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -374,7 +368,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
      */
-    public function testGetParameterValueNotRegex()
+    public function testGetParameterValueNotRegex(): void
     {
         $baseDecorator = $this->getDecorator();
 
@@ -390,7 +384,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::getParameterValue
      */
-    public function testGetParameterValueMultiselect()
+    public function testGetParameterValueMultiselect(): void
     {
         $baseDecorator = $this->getDecorator();
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ac01c6e56ac3f9e884c57232824c8ca5",
+    "content-hash": "173d73534de293e80cb03695c4c29c1a",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -3504,20 +3504,21 @@
         },
         {
             "name": "guzzlehttp/oauth-subscriber",
-            "version": "0.5.0",
+            "version": "0.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/oauth-subscriber.git",
-                "reference": "c7a04dd4f2a319d954da58363709c25388cc06a2"
+                "reference": "8d6cab29f8397e5712d00a383eeead36108a3c1f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/oauth-subscriber/zipball/c7a04dd4f2a319d954da58363709c25388cc06a2",
-                "reference": "c7a04dd4f2a319d954da58363709c25388cc06a2",
+                "url": "https://api.github.com/repos/guzzle/oauth-subscriber/zipball/8d6cab29f8397e5712d00a383eeead36108a3c1f",
+                "reference": "8d6cab29f8397e5712d00a383eeead36108a3c1f",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.5|^7.2",
+                "guzzlehttp/psr7": "^1.7|^2.0",
                 "php": ">=5.5.0"
             },
             "require-dev": {
@@ -3529,7 +3530,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.5-dev"
+                    "dev-master": "0.6-dev"
                 }
             },
             "autoload": {
@@ -3556,9 +3557,9 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/oauth-subscriber/issues",
-                "source": "https://github.com/guzzle/oauth-subscriber/tree/0.5.0"
+                "source": "https://github.com/guzzle/oauth-subscriber/tree/0.6.0"
             },
-            "time": "2021-03-07T09:39:26+00:00"
+            "time": "2021-07-13T12:01:32+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -5160,6 +5161,7 @@
                 "issues": "https://github.com/lightsaml/lightsaml/issues",
                 "source": "https://github.com/lightSAML/lightSAML"
             },
+            "abandoned": "litesaml/lightsaml",
             "time": "2018-05-28T11:21:22+00:00"
         },
         {
@@ -5605,11 +5607,11 @@
         },
         {
             "name": "mautic/core-lib",
-            "version": "4.1.0",
+            "version": "4.3.x-dev",
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "11188a9f9bdab1f49c5ee3d63ef83ab43163089a"
+                "reference": "e05007453398ca880a68dd9a4b7fe776b6d6db2f"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5633,7 +5635,7 @@
                 "gaufrette/extras": "^0.1.0",
                 "geoip2/geoip2": "~2.0",
                 "guzzlehttp/guzzle": "^7.2",
-                "guzzlehttp/oauth-subscriber": "^0.5.0",
+                "guzzlehttp/oauth-subscriber": "^0.6.0",
                 "helios-ag/fm-elfinder-bundle": "^10.1",
                 "ip2location/ip2location-php": "^7.2",
                 "jbroadway/urlify": "^1.0",
@@ -5717,6 +5719,7 @@
                         "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
                         "[project-root]/app/.htaccess": "assets/scaffold/files/deny.htaccess",
+                        "[project-root]/autoload.php": "assets/scaffold/files/autoload.php",
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
                         "[web-root]/index.php": "assets/scaffold/files/index.php",
                         "[web-root]/index_dev.php": "assets/scaffold/files/index_dev.php",
@@ -5729,6 +5732,11 @@
                         "[web-root]/media/dashboards/default.json": "assets/scaffold/media/dashboards/default.json",
                         "[web-root]/media/dashboards/email-overview.json": "assets/scaffold/media/dashboards/email-overview.json",
                         "[web-root]/media/dashboards/stats-overview.json": "assets/scaffold/media/dashboards/stats-overview.json",
+                        "[web-root]/media/js/mautic-form-src.js": "assets/js/mautic-form-src.js",
+                        "[web-root]/media/css/mediaelementplayer.css": "assets/css/mediaelementplayer.css",
+                        "[web-root]/media/css/mediaelementplayer.min.css": "assets/css/mediaelementplayer.min.css",
+                        "[web-root]/media/css/modal.css": "assets/css/modal.css",
+                        "[web-root]/media/css/modal.min.css": "assets/css/modal.min.css",
                         "[web-root]/media/files/.htaccess": "assets/scaffold/media/files/.htaccess",
                         "[web-root]/media/images/.htaccess": "assets/scaffold/media/images/.htaccess",
                         "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
