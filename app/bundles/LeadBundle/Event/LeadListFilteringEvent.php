@@ -1,24 +1,13 @@
 <?php
 
-/*
- * @copyright  2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\CommonEvent;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
- * Class LeadListFilteringEvent.
- *
- * Please refer to LeadListRepository.php, inside getListFilterExprCombined method, for examples
+ * Please refer to LeadListRepository.php, inside getListFilterExprCombined method, for examples.
  */
 class LeadListFilteringEvent extends CommonEvent
 {
@@ -57,6 +46,8 @@ class LeadListFilteringEvent extends CommonEvent
      */
     protected $func;
 
+    private string $leadsTableAlias;
+
     /**
      * @param array        $details
      * @param int          $leadId
@@ -74,6 +65,7 @@ class LeadListFilteringEvent extends CommonEvent
         $this->em              = $entityManager;
         $this->isFilteringDone = false;
         $this->subQuery        = '';
+        $this->leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
     }
 
     /**
@@ -164,5 +156,10 @@ class LeadListFilteringEvent extends CommonEvent
     public function setDetails($details)
     {
         $this->details = $details;
+    }
+
+    public function getLeadsTableAlias(): string
+    {
+        return $this->leadsTableAlias;
     }
 }

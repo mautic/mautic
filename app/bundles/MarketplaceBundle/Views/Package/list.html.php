@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Mautic\MarketplaceBundle\Collection\PackageCollection;
-use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 
 if ('index' === $tmpl) {
@@ -11,19 +10,8 @@ if ('index' === $tmpl) {
 }
 
 $buttons = [];
-
-if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) {
-    $buttons[] = [
-        'attr' => [
-            'data-toggle'      => 'confirmation',
-            'data-message'     => $view['translator']->trans('marketplace.install.coming.soon'),
-            'data-cancel-text' => $view['translator']->trans('mautic.core.close'),
-        ],
-        'btnText'   => $view['translator']->trans('mautic.core.theme.install'),
-        'iconClass' => 'fa fa-download',
-    ];
-}
-
+/** @var bool $isComposerEnabled */
+$isComposerEnabled = $isComposerEnabled;
 ?>
 <?php if (count($items)): ?>
     <div class="table-responsive">
@@ -86,7 +74,7 @@ if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) 
                     </td>
                     <td class="package-name">
                         <div>
-                            <a href="<?php echo $view['router']->path(
+                            <a data-toggle="ajax" href="<?php echo $view['router']->path(
                                     RouteProvider::ROUTE_DETAIL,
                                     [
                                         'vendor'  => $view->escape($item->getVendorName()),

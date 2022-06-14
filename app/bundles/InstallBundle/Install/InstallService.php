@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
@@ -440,31 +441,34 @@ class InstallService
             return $messages;
         }
 
+        $validations  = [];
+
         $emailConstraint          = new Assert\Email();
-        $emailConstraint->message = $this->translator->trans('mautic.core.email.required',
-            [],
-            'validators'
-        );
+        $emailConstraint->message = $this->translator->trans('mautic.core.email.required', [], 'validators');
 
-        $errors = $this->validator->validate(
-            $data['email'],
-            $emailConstraint
-        );
+        $passwordConstraint             = new Assert\Length(['min' => 6]);
+        $passwordConstraint->minMessage = $this->translator->trans('mautic.install.password.minlength', [], 'validators');
 
-        if (0 !== count($errors)) {
+        $validations[] = $this->validator->validate($data['email'], $emailConstraint);
+        $validations[] = $this->validator->validate($data['password'], $passwordConstraint);
+
+        $messages = [];
+        foreach ($validations as $errors) {
             foreach ($errors as $error) {
                 $messages[] = $error->getMessage();
             }
+        }
 
+        if (!empty($messages)) {
             return $messages;
         }
 
         $encoder = $this->encoder;
 
-        $user->setFirstName($data['firstname']);
-        $user->setLastName($data['lastname']);
-        $user->setUsername($data['username']);
-        $user->setEmail($data['email']);
+        $user->setFirstName(InputHelper::clean($data['firstname']));
+        $user->setLastName(InputHelper::clean($data['lastname']));
+        $user->setUsername(InputHelper::clean($data['username']));
+        $user->setEmail(InputHelper::email($data['email']));
         $user->setPassword($encoder->encodePassword($user, $data['password']));
 
         $adminRole = null;

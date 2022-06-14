@@ -186,8 +186,8 @@ class EmailController extends FormController
             }
         }
 
-        $orderBy    = $session->get('mautic.email.orderby', 'e.subject');
-        $orderByDir = $session->get('mautic.email.orderbydir', 'DESC');
+        $orderBy    = $session->get('mautic.email.orderby', 'e.dateModified');
+        $orderByDir = $session->get('mautic.email.orderbydir', $this->getDefaultOrderDirection());
 
         $emails = $model->getEntities(
             [
@@ -694,8 +694,7 @@ class EmailController extends FormController
                                     'objectId'     => $entity->getId(),
                                 ]
                             ),
-                        ],
-                        'warning'
+                        ]
                     );
                 }
             } else {
@@ -1531,5 +1530,15 @@ class EmailController extends FormController
             'email',
             'email_id'
         );
+    }
+
+    public function getModelName(): string
+    {
+        return 'email';
+    }
+
+    protected function getDefaultOrderDirection(): string
+    {
+        return 'DESC';
     }
 }

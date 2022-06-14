@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
@@ -20,8 +11,19 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 
 class EmailRepositoryTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $mockConnection;
+
+    /**
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $em;
+
+    /**
+     * @var ClassMetadata<EmailRepository>|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $cm;
 
     /**
@@ -32,8 +34,6 @@ class EmailRepositoryTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->mockConnection = $this->createMock(Connection::class);
         $this->em             = $this->createMock(EntityManager::class);
@@ -65,7 +65,7 @@ class EmailRepositoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->mockConnection);
     }
 
-    public function testGetEmailPendingQueryForSimpleCount()
+    public function testGetEmailPendingQueryForSimpleCount(): void
     {
         $emailId         = 5;
         $variantIds      = null;
@@ -87,12 +87,12 @@ class EmailRepositoryTest extends \PHPUnit\Framework\TestCase
             $countWithMaxMin
         );
 
-        $expectedQuery = "SELECT count(*) as count FROM leads l WHERE (EXISTS (SELECT null FROM lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id = 5))) AND (NOT EXISTS (SELECT null FROM message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
+        $expectedQuery = 'SELECT count(*) as count FROM '.MAUTIC_TABLE_PREFIX.'leads l WHERE (EXISTS (SELECT null FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM '.MAUTIC_TABLE_PREFIX."lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM ".MAUTIC_TABLE_PREFIX.'email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id = 5))) AND (NOT EXISTS (SELECT null FROM '.MAUTIC_TABLE_PREFIX."message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
         $this->assertEquals($expectedQuery, $query->getSql());
         $this->assertEquals(['false' => false], $query->getParameters());
     }
 
-    public function testGetEmailPendingQueryForMaxMinIdCount()
+    public function testGetEmailPendingQueryForMaxMinIdCount(): void
     {
         $emailId         = 5;
         $variantIds      = null;
@@ -114,12 +114,12 @@ class EmailRepositoryTest extends \PHPUnit\Framework\TestCase
             $countWithMaxMin
         );
 
-        $expectedQuery = "SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM leads l WHERE (EXISTS (SELECT null FROM lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id = 5))) AND (NOT EXISTS (SELECT null FROM message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
+        $expectedQuery = 'SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM '.MAUTIC_TABLE_PREFIX.'leads l WHERE (EXISTS (SELECT null FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM '.MAUTIC_TABLE_PREFIX."lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM ".MAUTIC_TABLE_PREFIX.'email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id = 5))) AND (NOT EXISTS (SELECT null FROM '.MAUTIC_TABLE_PREFIX."message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
         $this->assertEquals($expectedQuery, $query->getSql());
         $this->assertEquals(['false' => false], $query->getParameters());
     }
 
-    public function testGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined()
+    public function testGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined(): void
     {
         $emailId         = 5;
         $variantIds      = null;
@@ -141,7 +141,7 @@ class EmailRepositoryTest extends \PHPUnit\Framework\TestCase
             $countWithMaxMin
         );
 
-        $expectedQuery = "SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM leads l WHERE (EXISTS (SELECT null FROM lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id = 5))) AND (NOT EXISTS (SELECT null FROM message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND (l.id >= :minContactId) AND (l.id <= :maxContactId) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
+        $expectedQuery = 'SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM '.MAUTIC_TABLE_PREFIX.'leads l WHERE (EXISTS (SELECT null FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM '.MAUTIC_TABLE_PREFIX."lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM ".MAUTIC_TABLE_PREFIX.'email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id = 5))) AND (NOT EXISTS (SELECT null FROM '.MAUTIC_TABLE_PREFIX."message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND (l.id >= :minContactId) AND (l.id <= :maxContactId) AND ((l.email IS NOT NULL) AND (l.email <> ''))";
 
         $expectedParams = [
             'false'        => false,

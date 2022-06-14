@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
@@ -31,10 +23,8 @@ class SearchSubscriberTest extends TestCase
     /**
      * Tests emailread search command.
      */
-    public function testOnBuildSearchCommands()
+    public function testOnBuildSearchCommands(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $contactRepository = $this->createMock(LeadRepository::class);
         $emailRepository   = $this->createMock(EmailRepository::class);
         $connection        = $this->createMock(Connection::class);
@@ -129,7 +119,7 @@ class SearchSubscriberTest extends TestCase
         $event = new LeadBuildSearchEvent('1', 'email_queued', $alias, false, new QueryBuilder($connection));
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
-        $this->assertEquals('SELECT  WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status = ?) GROUP BY l.id', $sql);
+        $this->assertEquals('SELECT  WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status IN (?, ?)) GROUP BY l.id', $sql);
 
         // test sms sent
         $event = new LeadBuildSearchEvent('1', 'sms_sent', $alias, false, new QueryBuilder($connection));
