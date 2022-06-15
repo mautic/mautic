@@ -268,56 +268,6 @@ class EmailRepository extends CommonRepository
 
     /**
      * @param int        $emailId
-     * @param int        $batchSize
-     * @param \DateTime  $maxDate
-     * @param int[]|null $variantIds
-     * @param int[]|null $listIds
-     *
-     * @return mixed[]
-     */
-    public function getEmailPendingLeadsIdRange(
-        $emailId,
-        $batchSize,
-        $maxDate,
-        $variantIds = null,
-        $listIds = null
-    ) {
-        $countOnly = false;
-        $limit     = null;
-
-        $pq = $this->getEmailPendingQuery(
-            $emailId,
-            $variantIds,
-            $listIds,
-            $countOnly,
-            $limit,
-            null,
-            null,
-            false,
-            $maxDate
-        );
-
-        $pq->orderBy('id');
-        $pq->setMaxResults($batchSize);
-
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $q->select('COUNT(l.id) as count, MIN(l.id) as min_id, MAX(l.id) as max_id');
-        $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-        $q->innerJoin('l', '('.$pq->getSQL().')', 's', $q->expr()->eq('l.id', 's.id'));
-        $q->setParameter('false', false, 'boolean');
-
-        if (null !== $maxDate) {
-            $q->setParameter('max_date', $maxDate, \Doctrine\DBAL\Types\Type::DATETIME);
-        }
-
-        $results = $q->execute()->fetch();
-
-        return $results;
-    }
-
-    /**
-     * @param int        $emailId
      * @param int[]|null $variantIds
      * @param int[]|null $listIds
      * @param bool       $countOnly
