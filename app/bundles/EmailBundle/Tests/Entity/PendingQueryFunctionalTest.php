@@ -60,8 +60,8 @@ class PendingQueryFunctionalTest extends MauticMysqlTestCase
             $contacts[] = $contact;
         }
 
-        /** @var LeadModel $contactModel */
-        $contactModel = $this->container->get('mautic.lead.model.lead');
+        $contactModel = self::$container->get('mautic.lead.model.lead');
+        \assert($contactModel instanceof LeadModel);
         $contactModel->saveEntities($contacts);
 
         return $contacts;

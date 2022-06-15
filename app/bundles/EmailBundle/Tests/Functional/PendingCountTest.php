@@ -27,6 +27,7 @@ final class PendingCountTest extends MauticMysqlTestCase
 
         $segment = new LeadList();
         $segment->setName('Segment A');
+        $segment->setPublicName('Segment A');
         $segment->setAlias('segment-a');
 
         $segmentRef = new ListLead();
