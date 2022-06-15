@@ -44,8 +44,8 @@ final class ReportModelTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        /** @var ReportModel $reportModel */
-        $reportModel = $this->container->get('mautic.report.model.report');
+        $reportModel = self::$container->get('mautic.report.model.report');
+        \assert($reportModel instanceof ReportModel);
 
         $aDayAgoBeginningOfTheDay = (clone $aDayAgo)->setTime(0, 0, 0);
 
