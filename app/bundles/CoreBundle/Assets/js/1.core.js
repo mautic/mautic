@@ -540,6 +540,12 @@ var Mautic = {
         Mautic.dismissConfirmation();
 
         if (action.indexOf('batchExport') >= 0) {
+            if (action.indexOf('filetype=csv') >= 0) {
+                Mautic.processCsvContactExport(action);
+                delete Mautic.activeActions[action]
+                return true;
+            }
+            delete Mautic.activeActions[action]
             Mautic.initiateFileDownload(action);
             return;
         }
