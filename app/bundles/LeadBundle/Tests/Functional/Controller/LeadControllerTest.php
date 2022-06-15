@@ -45,15 +45,13 @@ class LeadControllerTest extends MauticMysqlTestCase
         $contactExportSchedulerRows = $this->checkContactExportScheduler(1);
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler     = $contactExportSchedulerRows[0];
-        $contactExportSchedulerData = $contactExportScheduler->getData();
         $this->runCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = self::$container->get('mautic.helper.core_parameters');
-        $fileType             = $contactExportSchedulerData['fileType'];
-        $fileName             = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()
-                ->format('Y_m_d_H_i_s').'.'.$fileType;
-        $this->filePaths[] = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$fileName;
+        $coreParametersHelper    = self::$container->get('mautic.helper.core_parameters');
+        $zipFileName             = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()
+                ->format('Y_m_d_H_i_s').'.zip';
+        $this->filePaths[] = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
         Assert::assertFileExists($filePath);
 
         $link = $this->router->generate(

@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
@@ -289,10 +290,13 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
         $contactExportScheduler = $this->em->getRepository(ContactExportScheduler::class)->findOneBy([]);
         $data                   = $contactExportScheduler->getData();
+        /** @var CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = self::$container->get('mautic.helper.core_parameters');
+
         Assert::assertSame(
             [
                 'start'          => 0,
-                'limit'          => 200,
+                'limit'          => $coreParametersHelper->get('contact_export_batch_size', 1000),
                 'filter'         => [
                     'string' => '',
                     'force'  => [
