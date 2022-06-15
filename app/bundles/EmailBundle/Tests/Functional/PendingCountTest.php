@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Functional;
 
 use DateTime;
@@ -29,7 +20,7 @@ final class PendingCountTest extends MauticMysqlTestCase
      * There was an issue that if there is a lead_id = null in the email_stats associated with an email
      * then the pending count was always 0 even if there are contacts waiting for sent.
      */
-    public function testPendingCountWithDeletedContactsInEmailStats()
+    public function testPendingCountWithDeletedContactsInEmailStats(): void
     {
         $contact = new Lead();
         $contact->setEmail('john@doe.email');

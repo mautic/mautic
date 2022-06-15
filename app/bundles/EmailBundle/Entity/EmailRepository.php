@@ -156,7 +156,8 @@ class EmailRepository extends CommonRepository
         $limit = null,
         $minContactId = null,
         $maxContactId = null,
-        $countWithMaxMin = false
+        $countWithMaxMin = false,
+        $maxDate = null
     ) {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -184,7 +185,7 @@ class EmailRepository extends CommonRepository
 
         if ($variantIds) {
             if (!in_array($emailId, $variantIds)) {
-                $variantIds[] = (int) $emailId;
+                $variantIds[] = (string) $emailId;
             }
             $statQb->andWhere($statQb->expr()->in('stat.email_id', $variantIds));
             $mqQb->andWhere($mqQb->expr()->in('mq.channel_id', $variantIds));
@@ -203,10 +204,7 @@ class EmailRepository extends CommonRepository
                 ->execute()
                 ->fetchAll();
 
-            $listIds = [];
-            foreach ($lists as $list) {
-                $listIds[] = $list['leadlist_id'];
-            }
+            $listIds = array_column($lists, 'leadlist_id');
 
             if (empty($listIds)) {
                 // Prevent fatal error
@@ -226,6 +224,11 @@ class EmailRepository extends CommonRepository
                     $segmentQb->expr()->eq('ll.manually_removed', ':false')
                 )
             );
+
+        if (null !== $maxDate) {
+            $segmentQb->andWhere($segmentQb->expr()->lte('ll.date_added', ':max_date'));
+            $segmentQb->setParameter('max_date', $maxDate, \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
+        }
 
         // Main query
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -270,7 +273,7 @@ class EmailRepository extends CommonRepository
      * @param int[]|null $variantIds
      * @param int[]|null $listIds
      *
-     * @return array
+     * @return mixed[]
      */
     public function getEmailPendingLeadsIdRange(
         $emailId,
@@ -536,13 +539,13 @@ class EmailRepository extends CommonRepository
     /**
      * Resets variant_start_date, variant_read_count, variant_sent_count.
      *
-     * @param int[]|int $relatedIds
-     * @param string    $date
+     * @param string[]|string|int $relatedIds
+     * @param string              $date
      */
     public function resetVariants($relatedIds, $date)
     {
         if (!is_array($relatedIds)) {
-            $relatedIds = [(int) $relatedIds];
+            $relatedIds = [(string) $relatedIds];
         }
 
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();

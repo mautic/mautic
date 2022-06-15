@@ -2,29 +2,33 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Entity;
 
 use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 
 class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
 {
+    private EmailRepository $emailRepository;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        /** @var EmailRepository $repository */
+        $repository = $this->em->getRepository(Email::class);
+
+        $this->emailRepository = $repository;
+    }
+
     public function testGetDoNotEmailListEmpty(): void
     {
-        $result = $this->em->getRepository(Email::class)->getDoNotEmailList();
+        $result = $this->emailRepository->getDoNotEmailList();
 
         Assert::assertSame([], $result);
     }
@@ -42,24 +46,23 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($doNotContact);
 
         $this->em->flush();
-        $emailRepository = $this->em->getRepository(Email::class);
 
         // no $leadIds
-        $result = $emailRepository->getDoNotEmailList();
+        $result = $this->emailRepository->getDoNotEmailList();
         Assert::assertSame([$lead->getId() => $lead->getEmail()], $result);
 
         // matching $leadIds
-        $result = $emailRepository->getDoNotEmailList([$lead->getId()]);
+        $result = $this->emailRepository->getDoNotEmailList([$lead->getId()]);
         Assert::assertSame([$lead->getId() => $lead->getEmail()], $result);
 
         // mismatching $leadIds
-        $result = $emailRepository->getDoNotEmailList([-1]);
+        $result = $this->emailRepository->getDoNotEmailList([-1]);
         Assert::assertSame([], $result);
     }
 
     public function testCheckDoNotEmailNonExistent(): void
     {
-        $result = $this->em->getRepository(Email::class)->checkDoNotEmail('name@domain.tld');
+        $result = $this->emailRepository->checkDoNotEmail('name@domain.tld');
 
         Assert::assertFalse($result);
     }
@@ -80,7 +83,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $result = $this->em->getRepository(Email::class)->checkDoNotEmail('name@domain.tld');
+        $result = $this->emailRepository->checkDoNotEmail('name@domain.tld');
 
         Assert::assertSame([
             'id'           => (string) $doNotContact->getId(),

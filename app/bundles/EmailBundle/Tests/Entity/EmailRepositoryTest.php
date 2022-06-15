@@ -55,6 +55,8 @@ class EmailRepositoryTest extends TestCase
 
     /**
      * @dataProvider dataGetEmailPendingQueryForCount
+     *
+     * @param int[]|null $variantIds
      */
     public function testGetEmailPendingQueryForCount(?array $variantIds, bool $countWithMaxMin, string $expectedQuery): void
     {
@@ -80,6 +82,9 @@ class EmailRepositoryTest extends TestCase
         $this->assertEquals(['false' => false], $query->getParameters());
     }
 
+    /**
+     * @return iterable<mixed[]>
+     */
     public function dataGetEmailPendingQueryForCount(): iterable
     {
         yield [null, false, [], "SELECT count(*) as count FROM leads l WHERE (l.id IN (SELECT ll.lead_id FROM lead_lists_leads ll WHERE (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (l.id NOT IN (SELECT dnc.lead_id FROM lead_donotcontact dnc WHERE dnc.channel = 'email')) AND (l.id NOT IN (SELECT stat.lead_id FROM email_stats stat WHERE (stat.lead_id IS NOT NULL) AND (stat.email_id = 5))) AND (l.id NOT IN (SELECT mq.lead_id FROM message_queue mq WHERE (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];

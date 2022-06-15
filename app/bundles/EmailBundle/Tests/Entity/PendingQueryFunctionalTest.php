@@ -107,6 +107,9 @@ class PendingQueryFunctionalTest extends MauticMysqlTestCase
         return $email;
     }
 
+    /**
+     * @param Lead[] $contacts
+     */
     private function emulateEmailSend(Email $email, array $contacts): void
     {
         foreach ($contacts as $contact) {
