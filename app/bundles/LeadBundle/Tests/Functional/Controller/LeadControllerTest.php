@@ -61,6 +61,14 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
         $this->client->request(Request::METHOD_GET, $link);
         Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $notFoundLink = $this->router->generate(
+            'mautic_contact_export_download',
+            ['fileName' => 'non_existing.zip'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $this->client->request(Request::METHOD_GET, $notFoundLink);
+        Assert::assertTrue($this->client->getResponse()->isNotFound());
     }
 
     private function createContacts(): void
