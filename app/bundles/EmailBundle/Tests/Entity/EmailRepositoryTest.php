@@ -36,25 +36,13 @@ class EmailRepositoryTest extends TestCase
         $this->repo       = new EmailRepository($entityManager, $classMetadata);
 
         $this->connection->method('createQueryBuilder')
-            ->willReturnCallback(
-                function () {
-                    return new QueryBuilder($this->connection);
-                }
-            );
+            ->willReturnCallback(fn () => new QueryBuilder($this->connection));
 
         $this->connection->method('getExpressionBuilder')
-            ->willReturnCallback(
-                function () {
-                    return new ExpressionBuilder($this->connection);
-                }
-            );
+            ->willReturnCallback(fn () => new ExpressionBuilder($this->connection));
 
         $this->connection->method('quote')
-            ->willReturnCallback(
-                function ($value) {
-                    return "'$value'";
-                }
-            );
+            ->willReturnCallback(fn ($value) => "'$value'");
 
         $entityManager->method('getConnection')
             ->willReturn($this->connection);
@@ -156,9 +144,7 @@ class EmailRepositoryTest extends TestCase
     private function mockExcludedListIds(array $excludedListIds): void
     {
         $this->connection->method('executeQuery')
-            ->willReturn(new ArrayStatement(array_map(function (int $id) {
-                return [$id];
-            }, $excludedListIds)));
+            ->willReturn(new ArrayStatement(array_map(fn (int $id) => [$id], $excludedListIds)));
     }
 
     private function replaceQueryPrefix(string $query): string
