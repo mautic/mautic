@@ -92,7 +92,7 @@ class EmailRepositoryTest extends TestCase
 
     /**
      * @dataProvider dataGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined
-     * 
+     *
      * @param int[] $excludedListIds
      */
     public function testGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined(array $excludedListIds, string $expectedQuery): void
