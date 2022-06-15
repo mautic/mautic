@@ -15,10 +15,16 @@ class DataExporterHelper
      *
      * @return array
      */
-    public function getDataForExport($start, AbstractCommonModel $model, array $args, callable $resultsCallback = null)
-    {
-        $args['limit'] = $args['limit'] < 200 ? 200 : $args['limit'];
-        $args['start'] = $start;
+    public function getDataForExport(
+        $start,
+        AbstractCommonModel $model,
+        array $args,
+        callable $resultsCallback = null,
+        bool $skipOrdering = false
+    ) {
+        $args['limit']        = max($args['limit'], 200);
+        $args['start']        = $start;
+        $args['skipOrdering'] = $skipOrdering;
 
         $results = $model->getEntities($args);
         $items   = $results['results'];

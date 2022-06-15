@@ -6,12 +6,13 @@ namespace Mautic\CoreBundle\Helper;
 
 use ArrayIterator;
 use Iterator;
+use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use ZipArchive;
 
 /**
  * Provides several functions for export-related tasks,
@@ -82,6 +83,22 @@ class ExportHelper
         throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.specific.export.type', ['%type%'          => $type, '%expected_type%' => self::EXPORT_TYPE_CSV]));
     }
 
+    public function zipFile(string $filePath): string
+    {
+        $zipFilePath = str_replace('.csv', '.zip', $filePath);
+        $zipArchive  = new ZipArchive();
+
+        if (true === $zipArchive->open($zipFilePath, ZipArchive::OVERWRITE | ZipArchive::CREATE)) {
+            $zipArchive->addFile($filePath, 'contacts_export.csv');
+            $zipArchive->close();
+            $this->filePathResolver->delete($filePath);
+
+            return $zipFilePath;
+        }
+
+        throw new FilePathException("Could not create zip archive at $zipFilePath. {$zipArchive->getStatusString()}");
+    }
+
     private function exportAsExcel(Iterator $data, string $filename): StreamedResponse
     {
         $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
@@ -131,12 +148,18 @@ class ExportHelper
      */
     private function exportAsCsvIntoFile(Iterator $data, string $fileName): string
     {
-        $spreadsheet = $this->getSpreadsheetGeneric($data, $fileName);
-        $objWriter   = new Csv($spreadsheet);
-        $objWriter->setPreCalculateFormulas(false);
-        $objWriter->setUseBOM(true); // For UTF-8 support
         $filePath = $this->getValidContactExportFileName($fileName);
-        $objWriter->save($filePath);
+        $handler  = @fopen($filePath, 'ab+');
+
+        foreach ($data as $key => $row) {
+            if (0 === $key) {
+                fputcsv($handler, array_keys($row));
+            }
+
+            fputcsv($handler, $row);
+        }
+
+        fclose($handler);
 
         return $filePath;
     }

@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -2057,9 +2058,12 @@ class LeadController extends FormController
 
         /** @var ContactExportSchedulerModel $model */
         $model = $this->getModel('lead.export_scheduler');
-        \assert($model instanceof ContactExportSchedulerModel);
 
-        return $model->getExportFileToDownload($fileName);
+        try {
+            return $model->getExportFileToDownload($fileName);
+        } catch (FileNotFoundException $exception) {
+            return $this->notFound();
+        }
     }
 
     /**
@@ -2068,8 +2072,7 @@ class LeadController extends FormController
     private function contactExportCSVScheduler(array $permissions): Response
     {
         /** @var ContactExportSchedulerModel $model */
-        $model = $this->getModel('lead.export_scheduler');
-        \assert($model instanceof ContactExportSchedulerModel);
+        $model                  = $this->getModel('lead.export_scheduler');
         $data                   = $model->prepareData($permissions);
         $contactExportScheduler = $model->saveEntity($data);
 

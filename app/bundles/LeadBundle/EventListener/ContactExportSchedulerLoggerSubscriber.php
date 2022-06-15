@@ -58,8 +58,8 @@ class ContactExportSchedulerLoggerSubscriber implements EventSubscriberInterface
 
     private function getContactExportScheduledDateTimeStr(ContactExportScheduler $contactExportScheduler): string
     {
+        /** @var DateTimeImmutable $scheduledDateTime */
         $scheduledDateTime = $contactExportScheduler->getScheduledDateTime();
-        \assert($scheduledDateTime instanceof DateTimeImmutable);
 
         return $scheduledDateTime->setTimezone(new DateTimeZone('UTC'))->format(DateTimeHelper::FORMAT_DB);
     }

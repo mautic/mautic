@@ -27,6 +27,7 @@ trait CustomFieldRepositoryTrait
      */
     public function getEntitiesWithCustomFields($object, $args, $resultsCallback = null)
     {
+        $skipOrdering           = $args['skipOrdering'] ?? false;
         [$fields, $fixedFields] = $this->getCustomFieldList($object);
 
         //Fix arguments if necessary
@@ -72,6 +73,14 @@ trait CustomFieldRepositoryTrait
             $this->buildSelectClause($dq, $args);
 
             $results = $dq->execute()->fetchAll();
+
+            if ($skipOrdering) {
+                return [
+                    'count'   => $total,
+                    'results' => $results,
+                ];
+            }
+
             if (isset($args['route']) && ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) {
                 unset($args['select']); //Our purpose of getting list of ids has already accomplished. We no longer need this.
             }
