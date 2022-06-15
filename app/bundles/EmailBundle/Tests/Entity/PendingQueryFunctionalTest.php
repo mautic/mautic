@@ -23,8 +23,8 @@ class PendingQueryFunctionalTest extends MauticMysqlTestCase
 {
     public function testDelayedSends(): void
     {
-        /** @var EmailRepository */
         $emailRepository = $this->em->getRepository(Email::class);
+        \assert($emailRepository instanceof EmailRepository);
 
         $contactCount  = 4;
         $oneBatchCount = $contactCount / 2;
@@ -71,6 +71,7 @@ class PendingQueryFunctionalTest extends MauticMysqlTestCase
     {
         $segment = new LeadList();
         $segment->setName('Segment A');
+        $segment->setPublicName('Segment A');
         $segment->setAlias('segment-a');
         $this->em->persist($segment);
         $this->em->flush();
