@@ -418,7 +418,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
-                'email' => 'john..doe@email.com',
+                'lead[email]' => 'john..doe@email.com',
             ]
         );
 
