@@ -83,27 +83,25 @@ class BuilderSubscriber implements EventSubscriberInterface
      */
     private $pageModel;
 
-    const pageTokenRegex           = '{pagelink=(.*?)}';
-    const dwcTokenRegex            = '{dwc=(.*?)}';
-    const langBarRegex             = '{langbar}';
-    const shareButtonsRegex        = '{sharebuttons}';
-    const titleRegex               = '{pagetitle}';
-    const descriptionRegex         = '{pagemetadescription}';
-    const segmentListRegex         = '{segmentlist}';
-    const categoryListRegex        = '{categorylist}';
-    const channelfrequency         = '{channelfrequency}';
-    const preferredchannel         = '{preferredchannel}';
-    const saveprefsRegex           = '{saveprefsbutton}';
-    const successmessage           = '{successmessage}';
-    const identifierToken          = '{leadidentifier}';
-    const saveButtonContainerClass = 'prefs-saveprefs';
-    const firstSlotAttribute       = ' data-prefs-center-first="1"';
+    public const pageTokenRegex           = '{pagelink=(.*?)}';
+    public const dwcTokenRegex            = '{dwc=(.*?)}';
+    public const langBarRegex             = '{langbar}';
+    public const shareButtonsRegex        = '{sharebuttons}';
+    public const titleRegex               = '{pagetitle}';
+    public const descriptionRegex         = '{pagemetadescription}';
+    public const segmentListRegex         = '{segmentlist}';
+    public const categoryListRegex        = '{categorylist}';
+    public const channelfrequency         = '{channelfrequency}';
+    public const preferredchannel         = '{preferredchannel}';
+    public const saveprefsRegex           = '{saveprefsbutton}';
+    public const successmessage           = '{successmessage}';
+    public const identifierToken          = '{leadidentifier}';
+    public const saveButtonContainerClass = 'prefs-saveprefs';
+    public const firstSlotAttribute       = ' data-prefs-center-first="1"';
+    public const prefCenterAttribute      = ' data-prefs-center="1"';
 
     private $renderedContentCache  = [];
 
-    /**
-     * BuilderSubscriber constructor.
-     */
     public function __construct(
         CorePermissions $security,
         TokenHelper $tokenHelper,
@@ -513,7 +511,8 @@ class BuilderSubscriber implements EventSubscriberInterface
             'MauticCoreBundle:Slots:segmentlist.html.php',
             $params,
             '<div class="pref-segmentlist"%s>{templateContent}</div>',
-            static::firstSlotAttribute
+            static::firstSlotAttribute,
+            static::prefCenterAttribute
         );
     }
 
@@ -523,7 +522,8 @@ class BuilderSubscriber implements EventSubscriberInterface
             'MauticCoreBundle:Slots:categorylist.html.php',
             $params,
             '<div class="pref-categorylist"%s>{templateContent}</div>',
-            static::firstSlotAttribute
+            static::firstSlotAttribute,
+            static::prefCenterAttribute
         );
     }
 
@@ -532,7 +532,8 @@ class BuilderSubscriber implements EventSubscriberInterface
         return $this->renderTemplate(
             'MauticCoreBundle:Slots:preferredchannel.html.php',
             $params,
-            '<div class="pref-preferredchannel">{templateContent}</div>'
+            '<div class="pref-preferredchannel"%s>{templateContent}</div>',
+            static::prefCenterAttribute
         );
     }
 
@@ -541,7 +542,8 @@ class BuilderSubscriber implements EventSubscriberInterface
         return $this->renderTemplate(
             'MauticCoreBundle:Slots:channelfrequency.html.php',
             $params,
-            '<div class="pref-channelfrequency">{templateContent}</div>'
+            '<div class="pref-channelfrequency"%s>{templateContent}</div>',
+            static::prefCenterAttribute
         );
     }
 
@@ -552,7 +554,8 @@ class BuilderSubscriber implements EventSubscriberInterface
             $params,
             '<div class="%s"%s>{templateContent}</div>',
             static::saveButtonContainerClass,
-            static::firstSlotAttribute
+            static::firstSlotAttribute,
+            static::prefCenterAttribute
         );
     }
 
