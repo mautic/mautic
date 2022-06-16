@@ -133,22 +133,22 @@ export default class ButtonApplyCommand {
     const mode = ContentService.getMode(editor);
 
     if (mode === ContentService.modeEmailHtml || mode === ContentService.modeEmailMjml) {
-      const formEmailSubject = ButtonsService.getFormItemById('emailform_subject');
-      const formEmailName = ButtonsService.getFormItemById('emailform_name');
+      let formEmailSubject = ButtonsService.getElementValue('emailform_subject');
+      let formEmailName = ButtonsService.getElementValue('emailform_name');
 
-      if (formEmailSubject.value === '') {
-        formEmailSubject.value = ButtonsService.getDefaultValue(mode.split('-')[0]);
+      if (formEmailSubject.lenght === 0) {
+        formEmailSubject = ButtonsService.getDefaultValue(mode.split('-')[0]);
       }
-      if (formEmailName.value === '') {
-        formEmailName.value = ButtonsService.getDefaultValue(mode.split('-')[0]);
+      if (formEmailName.length === 0) {
+        formEmailName = ButtonsService.getDefaultValue(mode.split('-')[0]);
       }
     }
 
     if (mode === ContentService.modePageHtml) {
-      const formPageTitle = ButtonsService.getFormItemById('page_title');
+      let formPageTitle = ButtonsService.getElementValue('page_title');
 
-      if (formPageTitle.value === '') {
-        formPageTitle.value = ButtonsService.getDefaultValue(mode.split('-')[0]);
+      if (formPageTitle.length === 0) {
+        formPageTitle = ButtonsService.getDefaultValue(mode.split('-')[0]);
       }
     }
   }

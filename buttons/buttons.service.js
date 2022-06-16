@@ -11,12 +11,17 @@ export default class ButtonService {
   }
 
   /**
-   * Get the form item by ID
-   *
-   * @return object
+   * Get a form fields value by ID
+   * @param string elementId
+   * @return string
    */
-  static getFormItemById(itemId) {
-    return document.getElementById(itemId);
+  static getElementValue(elementId) {
+    const field = document.getElementById(elementId);
+    if (!field) {
+      throw new Error(`Element '${elementId}' not found`);
+    }
+
+    return field.value;
   }
 
   /**

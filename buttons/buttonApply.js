@@ -24,11 +24,11 @@ export default class ButtonApply {
     let command = ButtonApply.getCommand();
 
     if (mode === ContentService.modeEmailHtml || mode === ContentService.modeEmailMjml) {
-      const emailFormList = ButtonsService.getFormItemById('emailform_lists');
-      const emailType = ButtonsService.getFormItemById('emailform_emailType');
+      const emailFormList = ButtonsService.getElementValue('emailform_lists');
+      const emailType = ButtonsService.getElementValue('emailform_emailType');
       const emailTypeSegment = 'list';
 
-      if (emailType.value === emailTypeSegment && !emailFormList.value.length) {
+      if (emailType === emailTypeSegment && emailFormList.length === 0) {
         title = Mautic.translate('grapesjsbuilder.panelsViewsButtonsApplyTitleError');
         disable = true;
         command = '';
