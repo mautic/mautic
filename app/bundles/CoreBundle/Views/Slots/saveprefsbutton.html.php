@@ -16,13 +16,13 @@ if (isset($form)) {
     echo '<script src="'.$view['assets']->getUrl('app/bundles/PageBundle/Assets/js/prefcenter.js').'"></script>';
 }
 ?>
-    <a href="javascript:void(null)"
+    <button href="javascript:void(null)"
         class="button btn btn-default btn-save"
         <?php if (isset($form)) : ?>onclick="saveUnsubscribePreferences('<?php echo $form->vars['id']; ?>')"<?php endif; ?>
         style="<?php echo $style; ?>"
         background="<?php echo $background; ?>">
         <?php echo $view['translator']->trans('mautic.page.form.saveprefs'); ?>
-    </a>
+    </button>
     <div style="clear:both"></div>
 <?php
 if (isset($form)) {
