@@ -10,28 +10,31 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList as Segment;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class BuilderSubscriberTest extends AbstractMauticTestCase
 {
     // Custom preference center page
-    const CUSTOM_SEGMENT_SELECTOR           = '.pref-segmentlist';
-    const CUSTOM_CATEGORY_SELECTOR          = '.pref-categorylist';
-    const CUSTOM_PREFERRED_CHANNEL_SELECTOR = '.pref-preferredchannel';
-    const CUSTOM_CHANNEL_FREQ_SELECTOR      = '.pref-channelfrequency';
-    const CUSTOM_SAVE_BUTTON_SELECTOR       = '.prefs-saveprefs';
+    public const CUSTOM_SEGMENT_SELECTOR           = '.pref-segmentlist';
+    public const CUSTOM_CATEGORY_SELECTOR          = '.pref-categorylist';
+    public const CUSTOM_PREFERRED_CHANNEL_SELECTOR = '.pref-preferredchannel';
+    public const CUSTOM_CHANNEL_FREQ_SELECTOR      = '.pref-channelfrequency';
+    public const CUSTOM_SAVE_BUTTON_TEXT           = 'Save preferences';
 
     // Default preference center page
-    const DEFAULT_SEGMENT_SELECTOR           = '#contact-segments';
-    const DEFAULT_CATEGORY_SELECTOR          = '#global-categories';
-    const DEFAULT_PREFERRED_CHANNEL_SELECTOR = '#preferred_channel';
-    const DEFAULT_CHANNEL_FREQ_SELECTOR      = '[data-contact-frequency="1"]';
-    const DEFAULT_PAUSE_DATES_SELECTOR       = '[data-contact-pause-dates="1"]';
-    const DEFAULT_SAVE_BUTTON_SELECTOR       = '#lead_contact_frequency_rules_buttons_save';
+    public const DEFAULT_SEGMENT_SELECTOR           = '#contact-segments';
+    public const DEFAULT_CATEGORY_SELECTOR          = '#global-categories';
+    public const DEFAULT_PREFERRED_CHANNEL_SELECTOR = '#preferred_channel';
+    public const DEFAULT_CHANNEL_FREQ_SELECTOR      = '[data-contact-frequency="1"]';
+    public const DEFAULT_PAUSE_DATES_SELECTOR       = '[data-contact-pause-dates="1"]';
+    public const DEFAULT_SAVE_BUTTON_TEXT           = 'Save';
 
     // Common to both custom and default
     const TOKEN_SELECTOR = '#lead_contact_frequency_rules__token';
@@ -42,12 +45,12 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
      *
      * @dataProvider frequencyFormRenderingDataProvider
      */
-    public function testUnsubscribeFormRendersPreferenceCenterPageCorrectly(array $configParams, array $selectorsAndExpectedCounts, bool $hasPreferenceCenter): void
+    public function testUnsubscribeFormRendersPreferenceCenterPageCorrectly(array $configParams, array $selectorsAndExpectedCounts, bool $hasPreferenceCenter = false, bool $useTokens = false): void
     {
         $this->setUpSymfony(array_merge(['show_contact_preferences' => 1], $configParams));
 
         $emailStat = $this->createStat(
-            $this->createEmail($hasPreferenceCenter),
+            $this->createEmail($configParams, $hasPreferenceCenter, $useTokens),
             $lead = $this->createLead()
         );
 
@@ -85,14 +88,49 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         Assert::assertCount(1, $form->filter(static::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token. %s', $html));
 
         if ($hasPreferenceCenter) {
-            Assert::assertCount(1, $form->filter(static::CUSTOM_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
+            $button = $form->selectButton(static::CUSTOM_SAVE_BUTTON_TEXT);
+            Assert::assertCount(1, $button, sprintf('The following HTML does not contain the save button with text "%s". %s', static::CUSTOM_SAVE_BUTTON_TEXT, $html));
         } else {
-            Assert::assertCount(1, $form->filter(static::DEFAULT_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
+            $button = $form->selectButton(static::DEFAULT_SAVE_BUTTON_TEXT);
+            Assert::assertCount(1, $button, sprintf('The following HTML does not contain the save button with text "%s". %s', static::DEFAULT_SAVE_BUTTON_TEXT, $html));
+        }
+
+        if ($configParams['show_contact_frequency']) {
+            $prefForm      = $button->form();
+            $prefForm->get('lead_contact_frequency_rules[lead_channels][subscribed_channels][0]')->untick();
+            $this->client->submit($prefForm);
+
+            Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+
+            $doNotContactRepository = $this->em->getRepository(DoNotContact::class);
+            \assert($doNotContactRepository instanceof DoNotContactRepository);
+
+            $dncRecords = $doNotContactRepository->getEntriesByLeadAndChannel($lead, 'email');
+            Assert::assertCount(1, $dncRecords);
         }
     }
 
     public function frequencyFormRenderingDataProvider(): Generator
     {
+        // Custom Preference Center: All preferences enabled with tokens instead of slots
+        yield [
+            [
+                'show_contact_segments'           => 0,
+                'show_contact_categories'         => 0,
+                'show_contact_preferred_channels' => 0,
+                'show_contact_frequency'          => 1,
+                'show_contact_pause_dates'        => 0,
+            ],
+            [
+                static::CUSTOM_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                static::CUSTOM_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                static::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 1, // determined by EITHER show_contact_frequency & show_contact_pause_dates
+            ],
+            true,
+            true,
+        ];
+
         // Custom Preference Center: All preferences enabled
         yield [
             [
@@ -217,7 +255,6 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
                 static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 1, // determined by show_contact_frequency. This differs from a custom page.
                 static::DEFAULT_PAUSE_DATES_SELECTOR       => 1, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
             ],
-            false,
         ];
 
         // Default Preference Center: Segments & Categories disabled
@@ -236,7 +273,6 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
                 static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 1, // determined by show_contact_frequency. This differs from a custom page.
                 static::DEFAULT_PAUSE_DATES_SELECTOR       => 1, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
             ],
-            false,
         ];
 
         // Default Preference Center: Preferred Channels & Frequency disabled
@@ -255,7 +291,6 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
                 static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency. This differs from a custom page.
                 static::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
             ],
-            false,
         ];
 
         // Default Preference Center: Frequency enabled & Pause Dates disabled
@@ -274,7 +309,6 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
                 static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 1, // determined by show_contact_frequency. This differs from a custom page.
                 static::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
             ],
-            false,
         ];
 
         // Default Preference Center: Frequency disabled & Pause Dates enabled
@@ -293,7 +327,6 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
                 static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency. This differs from a custom page.
                 static::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
             ],
-            false,
         ];
 
         // Default Preference Center: All preferences disabled
@@ -312,7 +345,6 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
                 static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency. This differs from a custom page.
                 static::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
             ],
-            false,
         ];
     }
 
@@ -329,13 +361,14 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         return $stat;
     }
 
-    private function createEmail(bool $hasPreferenceCenter = true): Email
+    private function createEmail(array $configParams, bool $hasPreferenceCenter = true, bool $useTokens): Email
     {
         $email = new Email();
         $email->setName('Example');
 
         if ($hasPreferenceCenter) {
-            $email->setPreferenceCenter($this->createPage());
+            $content = $useTokens ? $this->getPageContentWithTokens($configParams) : $this->getPageContentWithSlots($configParams);
+            $email->setPreferenceCenter($this->createPage($content));
         }
 
         $this->em->persist($email);
@@ -375,22 +408,28 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         return $category;
     }
 
-    private function createPage(): Page
+    private function createPage(string $content): Page
     {
         $page = new Page();
         $page->setTitle('Preference Center');
         $page->setAlias('preference-center');
         $page->setIsPreferenceCenter(true);
-        $page->setContent($this->getPageContent());
-        $page->setCustomHtml($this->getPageContent());
+        $page->setContent($content);
+        $page->setCustomHtml($content);
         $page->setIsPublished(true);
         $this->em->persist($page);
 
         return $page;
     }
 
-    private function getPageContent(): string
+    private function getPageContentWithSlots(array $configParams): string
     {
+        $slots = '';
+        $slots .= $configParams['show_contact_segments'] ? '<div><div data-slot="segmentlist"></div></div>' : '';
+        $slots .= $configParams['show_contact_categories'] ? '<div><div data-slot="categorylist"></div></div>' : '';
+        $slots .= $configParams['show_contact_preferred_channels'] ? '<div><div data-slot="preferredchannel"></div></div>' : '';
+        $slots .= $configParams['show_contact_frequency'] || $configParams['show_contact_pause_dates'] ? '<div><div data-slot="channelfrequency"></div></div>' : '';
+
         return <<<PAGE
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
@@ -405,21 +444,38 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
     </div>
     <div>
         {successmessage}
-        <div>
-            <div data-slot="segmentlist"></div>
-        </div>
-        <div>
-            <div data-slot="categorylist"></div>
-        </div>
-        <div>
-            <div data-slot="preferredchannel"></div>
-        </div>
-        <div>
-            <div data-slot="channelfrequency"></div>
-        </div>
-        <div>
-            <div data-slot="saveprefsbutton"></div>
-        </div>
+        {$slots}
+        <div><div data-slot="saveprefsbutton"></div></div>
+    </div>
+</body>
+</html>
+PAGE;
+    }
+
+    private function getPageContentWithTokens(array $configParams): string
+    {
+        $tokens = '';
+        $tokens .= $configParams['show_contact_segments'] ? '<div>{segmentlist}</div>' : '';
+        $tokens .= $configParams['show_contact_categories'] ? '<div>{categorylist}</div>' : '';
+        $tokens .= $configParams['show_contact_preferred_channels'] ? '<div>{preferredchannel}</div>' : '';
+        $tokens .= $configParams['show_contact_frequency'] || $configParams['show_contact_pause_dates'] ? '<div>{channelfrequency}</div>' : '';
+
+        return <<<PAGE
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>{pagetitle}</title>
+    <meta name="description" content="{pagemetadescription}">
+</head>
+<body>
+    <div>
+        {langbar}
+        {sharebuttons}
+    </div>
+    <div>
+        {successmessage}
+        {$tokens}        
+        <div>{saveprefsbutton}</div>
     </div>
 </body>
 </html>
