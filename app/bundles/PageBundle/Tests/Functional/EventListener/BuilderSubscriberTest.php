@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList as Segment;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -44,6 +45,9 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
      * Tests both the default and custom preference center pages.
      *
      * @dataProvider frequencyFormRenderingDataProvider
+     *
+     * @param array<string,int> $configParams
+     * @param array<string,int> $selectorsAndExpectedCounts
      */
     public function testUnsubscribeFormRendersPreferenceCenterPageCorrectly(array $configParams, array $selectorsAndExpectedCounts, bool $hasPreferenceCenter = false, bool $useTokens = false): void
     {
@@ -96,8 +100,10 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         }
 
         if ($configParams['show_contact_frequency']) {
-            $prefForm      = $button->form();
-            $prefForm->get('lead_contact_frequency_rules[lead_channels][subscribed_channels][0]')->untick();
+            $prefForm = $button->form();
+            $checkbox = $prefForm->get('lead_contact_frequency_rules[lead_channels][subscribed_channels][0]');
+            \assert($checkbox instanceof ChoiceFormField);
+            $checkbox->untick();
             $this->client->submit($prefForm);
 
             Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
@@ -361,6 +367,9 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         return $stat;
     }
 
+    /**
+     * @param array<string,int> $configParams
+     */
     private function createEmail(array $configParams, bool $hasPreferenceCenter = true, bool $useTokens): Email
     {
         $email = new Email();
@@ -422,6 +431,9 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         return $page;
     }
 
+    /**
+     * @param array<string,int> $configParams
+     */
     private function getPageContentWithSlots(array $configParams): string
     {
         $slots = '';
@@ -452,6 +464,9 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
 PAGE;
     }
 
+    /**
+     * @param array<string,int> $configParams
+     */
     private function getPageContentWithTokens(array $configParams): string
     {
         $tokens = '';
