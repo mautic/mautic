@@ -17,6 +17,7 @@ export default class ButtonApply {
    * Add the save button before the close button
    */
   addButton() {
+    const emailTypeSegment = 'list';
     const mode = ContentService.getMode(this.editor);
 
     let title = Mautic.translate('grapesjsbuilder.panelsViewsButtonsApplyTitle');
@@ -24,14 +25,16 @@ export default class ButtonApply {
     let command = ButtonApply.getCommand();
 
     if (mode === ContentService.modeEmailHtml || mode === ContentService.modeEmailMjml) {
-      const emailFormList = ButtonsService.getElementValue('emailform_lists');
       const emailType = ButtonsService.getElementValue('emailform_emailType');
-      const emailTypeSegment = 'list';
 
-      if (emailType === emailTypeSegment && emailFormList.length === 0) {
-        title = Mautic.translate('grapesjsbuilder.panelsViewsButtonsApplyTitleError');
-        disable = true;
-        command = '';
+      // if it is a segment email, check if segment field is filled
+      if (emailType === emailTypeSegment) {
+        const emailFormList = ButtonsService.getElementValue('emailform_lists');
+        if (emailFormList.length === 0) {
+          title = Mautic.translate('grapesjsbuilder.panelsViewsButtonsApplyTitleError');
+          disable = true;
+          command = '';
+        }
       }
     }
 
