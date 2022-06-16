@@ -274,7 +274,7 @@ class LeadSubscriberTest extends TestCase
 
     public function testOnLeadPostDelete(): void
     {
-        $deletedId       = '5';
+        $deletedId       = 5;
         $lead            = new Lead();
         $lead->deletedId = $deletedId;
         $lead->setEmail('john@doe.email');
@@ -284,7 +284,7 @@ class LeadSubscriberTest extends TestCase
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
+            ->with((int) $deletedId, Lead::class);
 
         $this->objectMappingRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
@@ -295,7 +295,7 @@ class LeadSubscriberTest extends TestCase
 
     public function testOnLeadPostDeleteForAnonymousLeads(): void
     {
-        $deletedId       = '5';
+        $deletedId       = 5;
         $lead            = new Lead();
         $lead->deletedId = $deletedId;
 
@@ -424,7 +424,7 @@ class LeadSubscriberTest extends TestCase
 
     public function testOnCompanyPostDelete(): void
     {
-        $deletedId       = '5';
+        $deletedId       = 5;
         $lead            = new Company();
         $lead->deletedId = $deletedId;
 
