@@ -66,6 +66,32 @@ class Download
      */
     private $email;
 
+    /**
+     * @var string
+     */
+    private $utmCampaign;
+
+    /**
+     * @var string
+     */
+    private $utmContent;
+
+    /**
+     * @var string
+     */
+    private $utmMedium;
+
+    /**
+     * @var string
+     */
+    private $utmSource;
+
+    /**
+     * @var string
+     */
+    private $utmTerm;
+
+
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -111,6 +137,31 @@ class Download
 
         $builder->createManyToOne('email', 'Mautic\EmailBundle\Entity\Email')
             ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
+            ->build();
+
+        $builder->createField('utmCampaign', 'string')
+            ->columnName('utm_campaign')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmContent', 'string')
+            ->columnName('utm_content')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmMedium', 'string')
+            ->columnName('utm_medium')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmSource', 'string')
+            ->columnName('utm_source')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmTerm', 'string')
+            ->columnName('utm_term')
+            ->nullable()
             ->build();
     }
 
@@ -328,5 +379,95 @@ class Download
     public function setEmail(Email $email)
     {
         $this->email = $email;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUtmCampaign()
+    {
+        return $this->utmCampaign;
+    }
+
+    /**
+     * @param string $utmCampaign
+     */
+    public function setUtmCampaign($utmCampaign)
+    {
+        $this->utmCampaign = $utmCampaign;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUtmContent()
+    {
+        return $this->utmContent;
+    }
+
+    /**
+     * @param string $utmContent
+     */
+    public function setUtmContent($utmContent)
+    {
+        $this->utmContent = $utmContent;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUtmMedium()
+    {
+        return $this->utmMedium;
+    }
+
+    /**
+     * @param string $utmMedium
+     */
+    public function setUtmMedium($utmMedium)
+    {
+        $this->utmMedium = $utmMedium;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUtmSource()
+    {
+        return $this->utmSource;
+    }
+
+    /**
+     * @param string $utmSource
+     */
+    public function setUtmSource($utmSource)
+    {
+        $this->utmSource = $utmSource;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUtmTerm()
+    {
+        return $this->utmTerm;
+    }
+
+    /**
+     * @param string $utmTerm
+     */
+    public function setUtmTerm($utmTerm)
+    {
+        $this->utmTerm = $utmTerm;
+
+        return $this;
     }
 }

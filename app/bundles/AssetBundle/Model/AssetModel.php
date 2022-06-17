@@ -159,6 +159,11 @@ class AssetModel extends FormModel
 
         $download = new Download();
         $download->setDateDownload(new \Datetime());
+        $download->setUtmCampaign($request->get('utm_campaign') ?? null);
+        $download->setUtmContent($request->get('utm_content') ?? null);
+        $download->setUtmMedium($request->get('utm_medium') ?? null);
+        $download->setUtmSource($request->get('utm_source') ?? null);
+        $download->setUtmTerm($request->get('utm_term') ?? null);
 
         // Download triggered by lead
         if (empty($systemEntry)) {

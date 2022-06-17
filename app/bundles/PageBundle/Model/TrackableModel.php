@@ -363,6 +363,7 @@ class TrackableModel extends AbstractCommonModel
         /** @var \DOMElement $link */
         foreach ($links as $link) {
             $url = $link->getAttribute('href');
+            $url = preg_replace('/{(\S+?)}/i', '', $url);
 
             // Check for a do not track
             if ($link->hasAttribute('mautic:disable-tracking')) {
