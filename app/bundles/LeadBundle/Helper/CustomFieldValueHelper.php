@@ -54,9 +54,15 @@ class CustomFieldValueHelper
             }
             switch ($type) {
                 case self::TYPE_BOOLEAN:
-                    $values = array_values($properties);
-                    if (isset($values[$value])) {
-                        $value = $values[$value];
+                    foreach ($properties as $key => $property) {
+                        if ('yes' === $key && !isset($properties[1])) {
+                            $properties[1] = $property;
+                        } elseif ('no' === $key && !isset($properties[0])) {
+                            $properties[0] = $property;
+                        }
+                    }
+                    if (isset($properties[$value])) {
+                        $value = $properties[$value];
                     }
                     break;
                 case self::TYPE_SELECT:

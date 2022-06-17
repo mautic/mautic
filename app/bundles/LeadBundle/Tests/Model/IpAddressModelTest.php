@@ -15,15 +15,24 @@ use Psr\Log\LoggerInterface;
 
 class IpAddressModelTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $entityManager;
+
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
+     */
     private $logger;
+
+    /**
+     * @var IpAddressModel
+     */
     private $ipAddressModel;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->entityManager  = $this->createMock(EntityManager::class);
         $this->logger         = $this->createMock(LoggerInterface::class);
@@ -33,7 +42,7 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
     /**
      * This test ensures it won't fail if there are no IP addresses.
      */
-    public function testSaveIpAddressReferencesForContactWhenNoIps()
+    public function testSaveIpAddressReferencesForContactWhenNoIps(): void
     {
         $this->entityManager->expects($this->never())
             ->method('getConnection');
@@ -41,7 +50,7 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
         $this->ipAddressModel->saveIpAddressesReferencesForContact(new Lead());
     }
 
-    public function testSaveIpAddressReferencesForContactThatHasIpsButNoChanges()
+    public function testSaveIpAddressReferencesForContactThatHasIpsButNoChanges(): void
     {
         $contact      = $this->createMock(Lead::class);
         $ipAddress    = $this->createMock(IpAddress::class);
@@ -59,7 +68,7 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
         $this->ipAddressModel->saveIpAddressesReferencesForContact($contact);
     }
 
-    public function testSaveIpAddressReferencesForContactThatHasIpsWithSomeAdded()
+    public function testSaveIpAddressReferencesForContactThatHasIpsWithSomeAdded(): void
     {
         $contact        = $this->createMock(Lead::class);
         $ipAddressAdded = $this->createMock(IpAddress::class);
@@ -111,7 +120,7 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(2, $contact->getIpAddresses());
     }
 
-    public function testSaveIpAddressReferencesForContactWhenSomeIpsIfTheReferenceExistsAlready()
+    public function testSaveIpAddressReferencesForContactWhenSomeIpsIfTheReferenceExistsAlready(): void
     {
         $contact      = $this->createMock(Lead::class);
         $ipAddress    = $this->createMock(IpAddress::class);
