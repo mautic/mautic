@@ -118,6 +118,8 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'clicked-link-in-any-email-on-specific-date'                         => 2,
             'clicked-link-in-any-sms'                                            => 3,
             'clicked-link-in-any-sms-on-specific-date'                           => 2,
+            'tags-empty'                                                         => 54,
+            'tags-not-empty'                                                     => 0,
         ];
     }
 
