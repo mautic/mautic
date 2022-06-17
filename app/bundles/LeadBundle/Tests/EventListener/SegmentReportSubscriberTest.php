@@ -153,10 +153,6 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testReportGenerate(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', '');
-        }
-
         $channelListHelperMock   = $this->createMock(ChannelListHelper::class);
         $fieldsBuilderMock       = $this->createMock(FieldsBuilder::class);
         $segmentReportSubscriber = new SegmentReportSubscriber($fieldsBuilderMock);
