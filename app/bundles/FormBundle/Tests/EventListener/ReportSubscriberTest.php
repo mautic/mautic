@@ -159,6 +159,7 @@ class ReportSubscriberTest extends TestCase
                 'addCampaignByChannelJoin',
                 'applyDateFilters',
                 'setQueryBuilder',
+                'getReport',
             ])
             ->getMock();
 
@@ -177,6 +178,10 @@ class ReportSubscriberTest extends TestCase
         $mockEvent->expects($this->once())
             ->method('getContext')
             ->willReturn('form.submissions');
+
+        $mockEvent->expects($this->once())
+            ->method('getReport')
+            ->willReturn(new Report());
 
         $this->subscriber->onReportGenerate($mockEvent);
     }
@@ -266,7 +271,6 @@ class ReportSubscriberTest extends TestCase
         $subscriber         = new ReportSubscriber($this->companyReportData, $this->submissionRepository);
         $this->queryBuilder->method('from')->willReturn($this->queryBuilder);
         $this->queryBuilder->method('leftJoin')->willReturn($this->queryBuilder);
-
         $this->assertFalse($event->hasGroupBy());
 
         $subscriber->onReportGenerate($event);
