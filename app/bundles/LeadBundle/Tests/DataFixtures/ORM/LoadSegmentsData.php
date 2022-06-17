@@ -1011,7 +1011,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                         'field'      => 'company',
                         'operator'   => '!empty',
                         'properties' => ['filter' => null],
-                    ]
+                    ],
                 ],
                 'populate' => true,
             ],
@@ -1027,7 +1027,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                         'field'      => 'company',
                         'operator'   => 'empty',
                         'properties' => ['filter' => null],
-                    ]
+                    ],
                 ],
                 'populate' => true,
             ],

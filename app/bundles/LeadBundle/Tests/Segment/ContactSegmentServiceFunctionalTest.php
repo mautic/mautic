@@ -54,7 +54,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
                 LoadUserData::class,
                 LoadDncData::class,
                 LoadClickData::class,
-                LoadTagData::class
+                LoadTagData::class,
             ],
             false
         )->getReferenceRepository();
