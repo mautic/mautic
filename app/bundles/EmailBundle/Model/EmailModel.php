@@ -1123,15 +1123,24 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $leadCount         = count($leads);
 
             while ($leadCount) {
-                $sentCount += $leadCount;
-
                 if (null != $limit) {
                     // Only retrieve the difference between what has already been sent and the limit
                     $limit -= $leadCount;
                 }
-                if (null !== $limit && $limit <= 0) {
-                    break;
+
+                if (null !== $limit && $limit <= 0 && null !== $batch) {
+                    if (0 === $limit) {
+                        break;
+                    }
+                    //recalculate because we should stop If limit is hit, but need process diff
+                    $leadCountOld = $leadCount;
+                    $leadCount    = $leadCountOld + $limit;
+                    $limit += $leadCountOld;
+                    $leads        = array_slice($leads, $leadCount);
+                    $limit -= $leadCount;
                 }
+
+                $sentCount += $leadCount;
 
                 $listErrors = $this->sendEmail($email, $leads, $options);
 
