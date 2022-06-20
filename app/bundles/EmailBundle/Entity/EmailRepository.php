@@ -15,10 +15,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
  */
 class EmailRepository extends CommonRepository
 {
-    /**
-     * @var bool
-     */
-    protected $segmentEmailOnceToEmailAddress;
+    private bool $segmentEmailOnceToEmailAddress = false;
 
     /**
      * Get an array of do not email emails.
