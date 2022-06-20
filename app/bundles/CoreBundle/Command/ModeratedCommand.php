@@ -147,7 +147,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         }
 
         $pid = fgets($fp, 8192);
-        if ($pid && posix_getpgid($pid)) {
+        if ($pid && posix_getpgid((int) $pid)) {
             $this->output->writeln('<info>Script with pid '.$pid.' in progress.</info>');
 
             flock($fp, LOCK_UN);
@@ -160,7 +160,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         ftruncate($fp, 0);
         rewind($fp);
 
-        fputs($fp, getmypid());
+        fputs($fp, (string) getmypid());
         fflush($fp);
 
         flock($fp, LOCK_UN);

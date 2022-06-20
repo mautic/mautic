@@ -25,4 +25,11 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->rule(\Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector::class);
     $rectorConfig->rule(\Rector\DeadCode\Rector\ClassConst\RemoveUnusedPrivateClassConstantRector::class);
     // $rectorConfig->rule(\Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector::class); // @todo enable this in a separate PR. A few files changed.
+
+    // temp workaround to prevent rector to fail due to an undefined const.
+    // This doesn't make much sense, and is probably fixed in a more recent version of Rector.
+    if (!defined('MAUTIC_TABLE_PREFIX')) {
+        //set the table prefix before boot
+        define('MAUTIC_TABLE_PREFIX', '');
+    }
 };

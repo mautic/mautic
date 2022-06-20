@@ -58,7 +58,7 @@ class MailHelper
     public $message;
 
     /**
-     * @var null
+     * @var string|array<string, string>
      */
     protected $from;
 
