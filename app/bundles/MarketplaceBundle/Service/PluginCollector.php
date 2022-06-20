@@ -27,7 +27,7 @@ class PluginCollector
         $this->allowlist  = $allowlist;
     }
 
-    public function collectPackages(int $page = 1, int $limit, string $query = ''): PackageCollection
+    public function collectPackages(int $page, int $limit, string $query = ''): PackageCollection
     {
         $allowlist = $this->allowlist->getAllowList();
 
@@ -83,7 +83,7 @@ class PluginCollector
      *
      * @return array<string,mixed>
      */
-    private function getAllowlistedPackages(int $page = 1, int $limit, string $query = ''): array
+    private function getAllowlistedPackages(int $page, int $limit, string $query = ''): array
     {
         $total   = count($this->allowlistedPackages);
         $results = [];

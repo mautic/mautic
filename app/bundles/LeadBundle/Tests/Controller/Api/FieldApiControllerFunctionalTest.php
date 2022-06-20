@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     protected function setUp(): void
     {
         $this->configParams['create_custom_field_in_background'] = 'testFieldApiEndpointsWithBackgroundProcessingEnabled' === $this->getName();
