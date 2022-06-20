@@ -127,10 +127,16 @@ class CampaignController extends AbstractStandardFormController
         $session = $this->get('session');
         $session->set('mautic.campaign.contact.page', $page);
 
+        $permissions = [
+            'campaign:campaigns:view',
+            'lead:leads:viewown',
+            'lead:leads:viewother',
+        ];
+
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            'campaign:campaigns:view',
+            $permissions,
             'campaign',
             'campaign_leads',
             null,
