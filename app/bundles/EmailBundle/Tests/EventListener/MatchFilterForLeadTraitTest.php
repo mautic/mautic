@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\TestCase;
 
 class MatchFilterForLeadTraitTest extends TestCase
@@ -107,6 +108,104 @@ class MatchFilterForLeadTraitTest extends TestCase
         yield [$date, 'empty', false];
         yield [$date, '!empty', true];
         yield [null, '!empty', false];
+    }
+
+    /**
+     * @dataProvider dataForInNotInOperatorFilter
+     *
+     * @param array<string,string> $fieldDetails
+     * @param array<string,string> $filterDetails
+     */
+    public function testCheckLeadValueIsInFilter(array $fieldDetails, array $filterDetails, bool $expected): void
+    {
+        $lead = [
+            'id'                    => 1,
+            $fieldDetails['name']   => $fieldDetails['value'],
+        ];
+
+        $filter = [
+            0 => [
+                'display'   => null,
+                'field'     => $fieldDetails['name'],
+                'filter'    => $filterDetails['value'],
+                'glue'      => 'and',
+                'object'    => 'lead',
+                'operator'  => $filterDetails['operator'],
+                'type'      => $fieldDetails['type'],
+            ],
+        ];
+
+        $trait = new MatchFilterForLeadTraitTestable();
+
+        $this->assertSame($expected, $trait->match($filter, $lead));
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function dataForInNotInOperatorFilter(): iterable
+    {
+        // field details, filter details, expected.
+        yield [
+            [
+                'name'  => 'field_select',
+                'type'  => 'select',
+                'value' => 'one',
+            ],
+            [
+                'operator'  => OperatorOptions::IN,
+                'value'     => 'one',
+            ],
+            true,
+        ];
+        yield [
+            [
+                'name'  => 'field_multiselect',
+                'type'  => 'multiselect',
+                'value' => 'one|two',
+            ],
+            [
+                'operator'  => OperatorOptions::NOT_IN,
+                'value'     => 'three',
+            ],
+            true,
+        ];
+        yield [
+            [
+                'name'  => 'field_multiselect',
+                'type'  => 'multiselect',
+                'value' => 'one|two|three',
+            ],
+            [
+                'operator'  => OperatorOptions::NOT_IN,
+                'value'     => 'one|four',
+            ],
+            false,
+        ];
+        yield [
+            [
+                'name'  => 'field_country',
+                'type'  => 'country',
+                'value' => 'Some country',
+            ],
+            [
+                'operator'  => OperatorOptions::IN,
+                'value'     => 'Some country',
+            ],
+            true,
+        ];
+        yield [
+            [
+                'name'  => 'field_country',
+                'type'  => 'country',
+                'value' => 'Some country',
+            ],
+            [
+                'operator'  => OperatorOptions::IN,
+                'value'     => 'Some other country',
+            ],
+            false,
+        ];
     }
 }
 

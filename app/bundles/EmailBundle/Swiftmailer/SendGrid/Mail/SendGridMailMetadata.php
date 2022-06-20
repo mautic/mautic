@@ -35,7 +35,7 @@ class SendGridMailMetadata
         }
 
         if ($message->getReplyTo()) {
-            $replyTo = new ReplyTo(key($message->getReplyTo()));
+            $replyTo = new ReplyTo(key((array) $message->getReplyTo()));
             $mail->setReplyTo($replyTo);
         }
         if ($message->getBcc()) {

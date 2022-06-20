@@ -93,7 +93,7 @@
     },
     {
       "type": "git",
-      "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
+      "url": "https://github.com/mautic/FOSOAuthServerBundle.git"
     }
   ],
   "conflict": {

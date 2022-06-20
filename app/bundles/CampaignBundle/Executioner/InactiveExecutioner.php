@@ -252,7 +252,7 @@ class InactiveExecutioner implements ExecutionerInterface
                     $this->counter->advanceEvaluated($contacts->count());
 
                     $inactiveEvents = $decisionEvent->getNegativeChildren();
-                    $this->helper->removeContactsThatAreNotApplicable($now, $contacts, $parentEventId, $inactiveEvents);
+                    $this->helper->removeContactsThatAreNotApplicable($now, $contacts, $parentEventId, $inactiveEvents, $decisionEvent);
                     $earliestLastActiveDateTime = $this->helper->getEarliestInactiveDateTime();
 
                     $this->logger->debug(

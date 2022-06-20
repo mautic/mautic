@@ -452,7 +452,7 @@ class MailHelperTest extends TestCase
         // From address is set
         $email->setFromAddress('from@nowhere.com');
         $mailer->setEmail($email);
-        $replyTo = key($mailer->message->getReplyTo());
+        $replyTo = key((array) $mailer->message->getReplyTo());
         // Expect from address in reply to
         $this->assertEquals('admin@mautic.com', $replyTo);
     }

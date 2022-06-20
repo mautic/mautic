@@ -43,7 +43,7 @@ class EventsToArrayTransformer implements DataTransformerInterface
     {
         // Get a list of existing events and types
 
-        /** @var PersistentCollection $events */
+        //  /** @v ar PersistentCollection[] $events */
         $events     = $this->webhook->getEvents();
         $eventTypes = $events->getKeys();
 

@@ -9,6 +9,8 @@ use Mautic\LeadBundle\Entity\LeadField;
 
 class FieldFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     /**
      * @var string
      */
