@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -579,6 +580,17 @@ class Form extends FormEntity
      */
     public function getFields()
     {
+        return $this->fields;
+    }
+
+    /**
+     * @return array<int,Field>|ArrayCollection<int,Field>
+     */
+    public function getOrderedFields()
+    {
+        $criteria = Criteria::create()
+            ->orderBy(['field_order', 'ASC']);
+
         return $this->fields;
     }
 
