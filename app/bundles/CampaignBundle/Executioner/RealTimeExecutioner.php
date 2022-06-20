@@ -5,12 +5,12 @@ namespace Mautic\CampaignBundle\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
-use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner as Executioner;
 use Mautic\CampaignBundle\Executioner\Exception\CampaignNotExecutableException;
 use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
+use Mautic\CampaignBundle\Executioner\Helper\DecisionHelper;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Helper\ChannelExtractor;
@@ -77,9 +77,9 @@ class RealTimeExecutioner
     private $responses;
 
     /**
-     * @var LeadRepository
+     * @var DecisionHelper
      */
-    private $leadRepository;
+    private $decisionHelper;
 
     /**
      * RealTimeExecutioner constructor.
@@ -93,7 +93,7 @@ class RealTimeExecutioner
         EventCollector $collector,
         EventScheduler $scheduler,
         ContactTracker $contactTracker,
-        LeadRepository $leadRepository
+        DecisionHelper $decisionHelper
     ) {
         $this->logger              = $logger;
         $this->leadModel           = $leadModel;
@@ -103,7 +103,7 @@ class RealTimeExecutioner
         $this->collector           = $collector;
         $this->scheduler           = $scheduler;
         $this->contactTracker      = $contactTracker;
-        $this->leadRepository      = $leadRepository;
+        $this->decisionHelper      = $decisionHelper;
     }
 
     /**
@@ -215,43 +215,7 @@ class RealTimeExecutioner
     {
         $this->logger->debug('CAMPAIGN: Executing '.$event->getType().' ID '.$event->getId().' for contact ID '.$this->contact->getId());
 
-        if (Event::TYPE_DECISION !== $event->getEventType()) {
-            @trigger_error(
-                "{$event->getType()} is not assigned to a decision and no longer supported. ".
-                'Check that you are executing RealTimeExecutioner::execute for an event registered as a decision.',
-                E_USER_DEPRECATED
-            );
-
-            throw new DecisionNotApplicableException("Event {$event->getId()} is not a decision.");
-        }
-
-        // If channels do not match up at all (not even fuzzy logic i.e. page vs page.redirect), there's no need to go further
-        if ($channel && $event->getChannel() && false === strpos($channel, $event->getChannel())) {
-            throw new DecisionNotApplicableException("Channels, $channel and {$event->getChannel()}, do not match.");
-        }
-
-        if ($channel && $channelId && $event->getChannelId() && $channelId !== $event->getChannelId()) {
-            throw new DecisionNotApplicableException("Channel IDs, $channelId and {$event->getChannelId()}, do not match for $channel.");
-        }
-
-        // Check if parent taken path is the path of this event, otherwise exit
-        $parentEvent = $event->getParent();
-        if (null !== $parentEvent && null !== $event->getDecisionPath()) {
-            $rotation    = $this->leadRepository->getContactRotations([$this->contact->getId()], $event->getCampaign()->getId());
-            $log         = $parentEvent->getLogByContactAndRotation($this->contact, $rotation);
-
-            if (null === $log) {
-                throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} has not been fired, event {$event->getId()} should not be fired.");
-            }
-
-            $pathTaken   = (int) $log->getNonActionPathTaken();
-
-            if (1 === $pathTaken && !$parentEvent->getNegativeChildren()->contains($event)) {
-                throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take negative path, event {$event->getId()} is on positive path.");
-            } elseif (0 === $pathTaken && !$parentEvent->getPositiveChildren()->contains($event)) {
-                throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take positive path, event {$event->getId()} is on negative path.");
-            }
-        }
+        $this->decisionHelper->checkIsDecisionApplicableForContact($event, $this->contact, $channel, $channelId);
 
         /** @var DecisionAccessor $config */
         $config = $this->collector->getEventConfig($event);

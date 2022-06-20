@@ -759,6 +759,34 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "IrisAmrein",
+      "name": "Iris Amrein",
+      "avatar_url": "https://avatars.githubusercontent.com/u/70972871?v=4",
+      "profile": "https://github.com/IrisAmrein",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "pety-dc",
+      "name": "peter.osvath",
+      "avatar_url": "https://avatars.githubusercontent.com/u/25766885?v=4",
+      "profile": "https://github.com/pety-dc",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "poweriguana",
+      "name": "poweriguana",
+      "avatar_url": "https://avatars.githubusercontent.com/u/86078621?v=4",
+      "profile": "https://github.com/poweriguana",
+      "contributions": [
+        "userTesting",
+        "projectManagement"
+      ]
     }
   ],
   "contributorsPerLine": 7,
