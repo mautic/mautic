@@ -27,8 +27,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->prefix = MAUTIC_TABLE_PREFIX;
 
         $configPath = $this->getConfigPath();
@@ -134,7 +132,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         return str_replace('%', '%%', $value);
     }
 
-    public function testConfigNotFoundPageConfiguration()
+    public function testConfigNotFoundPageConfiguration(): void
     {
         // insert published record
         $this->connection->insert($this->prefix.'pages', [
