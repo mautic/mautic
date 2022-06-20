@@ -91,7 +91,7 @@
     "sendgrid/sendgrid": "~6.0",
     "noxlogic/ratelimit-bundle": "^1.11",
     "knplabs/knp-menu-bundle": "^3.0",
-    "guzzlehttp/oauth-subscriber": "^0.5.0",
+    "guzzlehttp/oauth-subscriber": "^0.6.0",
     "helios-ag/fm-elfinder-bundle": "^10.1",
     "leezy/pheanstalk-bundle": "^4.0",
     "tightenco/collect": "^8.16.0",

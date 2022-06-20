@@ -53,15 +53,12 @@
     <const name="MAUTIC_ENV" value="test"/>
     <server name="KERNEL_DIR" value="app"/>
     <server name="APP_DEBUG" value="0"/>
-    <server name="DB_PASSWORD" value="root"/>
-    <const name="DB_PASSWORD" value="root"/>
-    <env name="DB_PASSWORD" value="root"/>
     <ini name="error_reporting" value="E_ALL" />
   </php>
   <listeners>
     <listener class="\Mautic\CoreBundle\Test\Listeners\CleanupListener" />
   </listeners>
   <extensions>
-    <extension class="\Mautic\CoreBundle\Test\Hooks\ExecuteTestAfterExtension" />
+    <extension class="\Mautic\CoreBundle\Test\Hooks\MauticExtension" />
   </extensions>
 </phpunit>
