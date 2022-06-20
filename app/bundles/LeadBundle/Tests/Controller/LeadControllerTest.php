@@ -405,6 +405,22 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('firstname: This field is required.', $clientResponse->getContent());
     }
 
+    public function testAddContactsErrorMessageForEmailWithTwoDots(): void
+    {
+        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues(
+            [
+                'lead[email]' => 'john..doe@email.com',
+            ]
+        );
+
+        $this->client->submit($form);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertStringContainsString('email: john..doe@email.com is invalid.', $clientResponse->getContent());
+    }
+
     public function testCompanyIdSearchCommand(): void
     {
         $contactA = $this->createContact('contact@a.email');
