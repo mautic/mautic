@@ -276,10 +276,6 @@ class OrderDAO
         foreach ($this->changedObjects as $objectChanges) {
             /** @var ObjectChangeDAO $objectChange */
             foreach ($objectChanges as $objectChange) {
-                if (isset($this->retryTheseLater[$objectChange->getMappedObject()])) {
-                    continue;
-                }
-
                 if (isset($this->retryTheseLater[$objectChange->getMappedObject()][$objectChange->getMappedObjectId()])) {
                     continue;
                 }
