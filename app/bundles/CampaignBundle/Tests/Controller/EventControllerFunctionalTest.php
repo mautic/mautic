@@ -10,7 +10,10 @@ use Symfony\Component\DomCrawler\Crawler;
 
 final class EventControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testCreateContactConditionOnStateField(): void
+    /**
+     * @dataProvider fieldAndValueProvider
+     */
+    public function testCreateContactConditionOnStateField(string $field, string $value): void
     {
         // Fetch the campaign condition form.
         $uri = '/s/campaigns/events/new?type=lead.field_value&eventType=condition&campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775&anchor=leadsource&anchorEventType=source';
@@ -25,9 +28,9 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $form->setValues(
             [
                 'campaignevent[anchor]'               => 'leadsource',
-                'campaignevent[properties][field]'    => 'state',
+                'campaignevent[properties][field]'    => $field,
                 'campaignevent[properties][operator]' => '=',
-                'campaignevent[properties][value]'    => 'Arizona',
+                'campaignevent[properties][value]'    => $value,
                 'campaignevent[type]'                 => 'lead.field_value',
                 'campaignevent[eventType]'            => 'condition',
                 'campaignevent[anchorEventType]'      => 'source',
@@ -40,5 +43,18 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertTrue($response->isOk(), $response->getContent());
         $responseData = json_decode($response->getContent(), true);
         Assert::assertSame(1, $responseData['success'], $response->getContent());
+    }
+
+    /**
+     * @return string[][]
+     */
+    public function fieldAndValueProvider(): array
+    {
+        return [
+            'country'  => ['country', 'India'],
+            'region'   => ['state', 'Arizona'],
+            'timezone' => ['timezone', 'Marigot'],
+            'locale'   => ['preferred_locale', 'Afrikaans'],
+        ];
     }
 }
