@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Command;
 
-use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -66,6 +65,6 @@ class ContactScheduledExportCommand extends Command
 
         $output->writeln('Contact export email(s) sent: '.$count);
 
-        return ExitCode::SUCCESS;
+        return 0;
     }
 }
