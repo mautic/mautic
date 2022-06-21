@@ -515,14 +515,16 @@ class LeadModel extends FormModel
         if (empty($fieldValues) || $bindWithForm) {
             // Lead is new or they haven't been populated so let's build the fields now
             if (empty($this->flattenedFields)) {
-                $this->flattenedFields = $this->leadFieldModel->getEntities(
+                /** @var Paginator<mixed[]> $paginator */
+                $paginator = $this->leadFieldModel->getEntities(
                     [
                         'filter'         => ['isPublished' => true, 'object' => 'lead'],
                         'hydration_mode' => 'HYDRATE_ARRAY',
                         'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
                     ]
                 );
-                $this->fieldsByGroup = $this->organizeFieldsByGroup($this->flattenedFields);
+                $this->flattenedFields = iterator_to_array($paginator->getIterator());
+                $this->fieldsByGroup   = $this->organizeFieldsByGroup($this->flattenedFields);
             }
 
             if (empty($fieldValues)) {

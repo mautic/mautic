@@ -3,6 +3,9 @@
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\DynamicContentBundle\Entity\Stat as StatDC;
+use Mautic\EmailBundle\Entity\Stat as StatEmail;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
@@ -45,7 +48,9 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testBatchNewEndpointDoesNotCreateDuplicates(): void
     {
-        $payload = [
+        $companyA = $this->createCompany('CompanyA corp');
+        $companyB = $this->createCompany('CompanyB corp');
+        $payload  = [
             [
                 'email'            => 'batchemail1@email.com',
                 'firstname'        => 'BatchUpdate',
@@ -57,6 +62,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
                 'preferred_locale' => 'es_SV',
                 'timezone'         => 'America/Chicago',
                 'owner'            => 1,
+                'company'          => $companyA->getId(),
             ],
             [
                 'email'            => 'batchemail2@email.com',
@@ -141,6 +147,11 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(null, $response['contacts'][1]['owner']);
         $this->assertEquals(null, $response['contacts'][2]['owner']);
 
+        // Assert company
+        $this->assertEquals($companyA->getId(), (int) $response['contacts'][0]['fields']['all']['company']);
+        $this->assertEquals(null, $response['contacts'][1]['fields']['all']['company']);
+        $this->assertEquals(null, $response['contacts'][2]['fields']['all']['company']);
+
         // Emulate an unsanitized email to ensure that doesn't cause duplicates
         $payload[0]['email'] = 'batchemail1@email.com,';
 
@@ -155,6 +166,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload[0]['state']            = 'California';
         $payload[0]['timezone']         = 'America/Los_Angeles';
         $payload[0]['preferred_locale'] = 'en_US';
+        $payload[0]['company']          = $companyB->getId();
 
         // Update owner
         $payload[0]['owner'] = null;
@@ -233,6 +245,11 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(null, $response['contacts'][0]['owner']);
         $this->assertEquals($payload[1]['owner'], $response['contacts'][1]['owner']['id']);
         $this->assertEquals(null, $response['contacts'][2]['owner']);
+
+        // Assert company
+        $this->assertEquals($companyB->getId(), (int) $response['contacts'][0]['fields']['all']['company']);
+        $this->assertEquals(null, $response['contacts'][1]['fields']['all']['company']);
+        $this->assertEquals(null, $response['contacts'][2]['fields']['all']['company']);
     }
 
     /**
@@ -863,5 +880,16 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('DELETE', "/api/contacts/$contactId/delete");
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
+
+    private function createCompany(string $name): Company
+    {
+        $company = new Company();
+        $company->setName($name);
+
+        $this->em->persist($company);
+        $this->em->flush();
+
+        return $company;
     }
 }

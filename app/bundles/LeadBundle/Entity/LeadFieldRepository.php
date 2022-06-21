@@ -424,16 +424,90 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
+     * @return string[]
+     */
+    public function getSearchCommands(): array
+    {
+        $commands = [
+            'mautic.core.searchcommand.ispublished',
+            'mautic.core.searchcommand.isunpublished',
+            'mautic.core.searchcommand.ismine',
+            'mautic.lead.field.searchcommand.isindexed',
+            'mautic.lead.field.searchcommand.isunique',
+            'mautic.lead.field.searchcommand.type',
+            'mautic.lead.field.searchcommand.group',
+        ];
+
+        return array_merge($commands, parent::getSearchCommands());
+    }
+
+    /**
      * @return mixed[]
      */
     public function getFieldSchemaData(string $object): array
     {
         return $this->_em->createQueryBuilder()
-            ->select('f.alias, f.label, f.type, f.isUniqueIdentifer')
-            ->from($this->getEntityName(), 'f', 'f.alias')
+            ->select('f.alias, f.label, f.type, f.isUniqueIdentifer, f.charLengthLimit')
+            ->from($this->_entityName, 'f', 'f.alias')
             ->where('f.object = :object')
             ->setParameter('object', $object)
             ->getQuery()
             ->execute();
+    }
+
+    /**
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     */
+    protected function addSearchCommandWhereClause($q, $filter): array
+    {
+        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+
+        $command         = $filter->command;
+        $unique          = $this->generateRandomParameterName();
+        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $prefix          = $this->getTableAlias();
+
+        switch ($command) {
+            case $this->translator->trans('mautic.lead.field.searchcommand.isindexed'):
+                $expr            = $q->expr()->eq($prefix.'.isIndex', ":$unique");
+                $forceParameters = [$unique => true];
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.lead.field.searchcommand.isunique'):
+                $expr            = $q->expr()->eq($prefix.'.isUniqueIdentifer', ":$unique");
+                $forceParameters = [$unique => true];
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.lead.field.searchcommand.type'):
+                $forceParameters = [
+                    $unique     => $filter->string,
+                ];
+                $expr            = $q->expr()->like($prefix.'.type', ":$unique");
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.lead.field.searchcommand.group'):
+                $forceParameters = [
+                    $unique     => $filter->string,
+                ];
+                $expr            = $q->expr()->like($prefix.'.group', ":$unique");
+                $returnParameter = true;
+                break;
+        }
+
+        if ($expr && $filter->not) {
+            $expr = $q->expr()->not($expr);
+        }
+
+        if (!empty($forceParameters)) {
+            $parameters = $forceParameters;
+        } elseif ($returnParameter) {
+            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $parameters = ["$unique" => $string];
+        }
+
+        return [$expr, $parameters];
     }
 }

@@ -67,6 +67,7 @@ class FrequencyRule extends CommonEntity
         $builder->setTable('lead_frequencyrules')
             ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\FrequencyRuleRepository::class)
             ->addIndex(['channel'], 'channel_frequency');
+            ->addIndex(['lead_id', 'date_added'], 'idx_frequency_date_added');
 
         $builder->addId();
 

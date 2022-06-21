@@ -18,9 +18,16 @@ trait CustomFieldsApiControllerTrait
     private ?RequestStack $requestStack = null;
 
     /**
+     * @var mixed[]
+     */
+    private $fieldCache = [];
+
+    /**
      * Remove IpAddress and lastActive as it'll be handled outside the form.
      *
-     * @param Lead $entity
+     * @param mixed[]      $parameters
+     * @param Lead|Company $entity
+     * @param string       $action
      *
      * @return mixed|void
      */
@@ -71,6 +78,11 @@ trait CustomFieldsApiControllerTrait
         }
     }
 
+    /**
+     * @param mixed[] $fields
+     *
+     * @return mixed[]
+     */
     private function fixNumbers(array $fields): array
     {
         $numberFields = [];
@@ -116,6 +128,11 @@ trait CustomFieldsApiControllerTrait
     protected function getEntityFormOptions(): array
     {
         $object = ('company' === $this->entityNameOne) ? 'company' : 'lead';
+
+        if ($this->fieldCache[$object]) {
+            return $this->fieldCache[$object];
+        }
+
         $fields = $this->getModel('lead.field')->getEntities(
             [
                 'filter' => [
@@ -137,14 +154,18 @@ trait CustomFieldsApiControllerTrait
             ]
         );
 
-        return ['fields' => $fields];
+        $this->fieldCache[$object] = ['fields' => $fields->getIterator()];
+
+        return $this->fieldCache[$object];
     }
 
     /**
      * @param Lead|Company $entity
      * @param Form         $form
-     * @param array        $parameters
+     * @param mixed[]      $parameters
      * @param bool         $isPostOrPatch
+     *
+     * @return bool|void
      */
     protected function setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch = false)
     {
