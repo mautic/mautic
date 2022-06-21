@@ -122,14 +122,6 @@ return [
                     'router',
                 ],
             ],
-            'mautic.campaign.calendarbundle.subscriber' => [
-                'class'     => \Mautic\CampaignBundle\EventListener\CalendarSubscriber::class,
-                'arguments' => [
-                    'doctrine.dbal.default_connection',
-                    'translator',
-                    'router',
-                ],
-            ],
             'mautic.campaign.pointbundle.subscriber'    => [
                 'class' => \Mautic\CampaignBundle\EventListener\PointSubscriber::class,
             ],
