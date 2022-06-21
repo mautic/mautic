@@ -8,11 +8,35 @@ use Predis\Replication\ReplicationStrategy;
 
 class MasterOnlyStrategy extends ReplicationStrategy
 {
+    private StrategyConfig $config;
+
+    public function __construct(StrategyConfig $config)
+    {
+        parent::__construct();
+
+        $this->config = $config;
+    }
+
     /**
      * @return mixed[]
      */
     protected function getReadOnlyOperations(): array
     {
-        return [];
+        if ($this->config->primaryOnly) {
+            return [];
+        }
+
+        return parent::getReadOnlyOperations();
+    }
+
+    /**
+     * @return mixed[]
+     */
+    protected function getDisallowedOperations(): array
+    {
+        $operations = parent::getDisallowedOperations();
+        unset($operations['INFO']); // removed to avoid "The command 'INFO' is not allowed in replication mode." error when executing bin/console cache:clear. INFO is safe if you only have one master that handles all operations.
+
+        return $operations;
     }
 }

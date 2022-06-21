@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Predis\Replication\MasterOnlyStrategy;
+use Mautic\CoreBundle\Predis\Replication\StrategyConfig;
 use Predis\Client;
 use Predis\Connection\Aggregate\SentinelReplication;
 
@@ -75,23 +76,19 @@ class PRedisConnectionHelper
      * @param mixed[] $endpoints
      * @param mixed[] $options
      */
-    public static function createClient(array $endpoints, array $options): Client
+    public static function createClient(array $endpoints, array $inputOptions): Client
     {
-        $replication = $options['replication'] ?? null;
+        $replication = $inputOptions['replication'] ?? null;
 
         if ('sentinel' === $replication) {
-            $options['aggregate'] = function () {
-                return function ($sentinels, $options) {
-                    return new SentinelReplication(
-                        $options->service,
-                        $sentinels,
-                        $options->connections,
-                        new MasterOnlyStrategy()
-                    );
-                };
-            };
+            $options['aggregate'] = fn () => fn ($sentinels, $options) => new SentinelReplication(
+                $options->service,
+                $sentinels,
+                $options->connections,
+                new MasterOnlyStrategy(StrategyConfig::fromArray($inputOptions))
+            );
         }
 
-        return new Client($endpoints, $options);
+        return new Client($endpoints, $inputOptions);
     }
 }
