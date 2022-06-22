@@ -23,6 +23,9 @@ use RecursiveIteratorIterator;
  */
 class JsPlumbFormatter implements NodeFormatterInterface
 {
+    /**
+     * @return mixed[]
+     */
     public function format(NodeInterface $node): array
     {
         $iterator = new RecursiveIteratorIterator($node, RecursiveIteratorIterator::SELF_FIRST);
@@ -35,6 +38,11 @@ class JsPlumbFormatter implements NodeFormatterInterface
         return $data;
     }
 
+    /**
+     * @param mixed[] $data
+     *
+     * @return mixed[]
+     */
     private function addNodeAndEdges(NodeInterface $parentNode, array $data, int $depth): array
     {
         $parentParentId = $parentNode->getParent() ? $parentNode->getParent()->getValue() : 0;

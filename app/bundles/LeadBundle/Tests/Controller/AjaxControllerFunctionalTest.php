@@ -76,9 +76,6 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(1, $response['success']);
     }
 
-    /**
-     * @throws MappingException
-     */
     public function testSegmentDependencyTreeWithNotExistingSegment(): void
     {
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getSegmentDependencyTree&id=9999');

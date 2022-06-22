@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper\Tree;
 
-use RecursiveIterator;
-
 class IntNode implements NodeInterface
 {
     /**
@@ -24,7 +22,7 @@ class IntNode implements NodeInterface
     private $children = [];
 
     /**
-     * @var array
+     * @var array<string,mixed>
      */
     private $params = [];
 
@@ -76,7 +74,7 @@ class IntNode implements NodeInterface
         return $this->children;
     }
 
-    public function getChildren(): RecursiveIterator
+    public function getChildren(): NodeInterface
     {
         return $this->current();
     }
