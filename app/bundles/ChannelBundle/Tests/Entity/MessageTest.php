@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class MessageTest extends TestCase
 {
-    public function testMessageUpdatesReflectsInChanges()
+    public function testMessageUpdatesReflectsInChanges(): void
     {
         $category = new Category();
         $category->setTitle('New Category');

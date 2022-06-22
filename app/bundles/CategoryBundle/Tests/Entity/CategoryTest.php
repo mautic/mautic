@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class CategoryTest extends TestCase
 {
-    public function testCategoryUpdatesReflectsInChanges()
+    public function testCategoryUpdatesReflectsInChanges(): void
     {
         $category = new Category();
         $category->setTitle('New Category');
