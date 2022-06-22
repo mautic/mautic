@@ -262,7 +262,7 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
         $message->setBody('Hello');
 
         $sparkpost = new SparkpostTransport('abc123', $this->translator, $this->transportCallback, $this->sparkpostFactory, $this->logger, $this->coreParametersHelper);
-        $message = $sparkpost->getSparkPostMessage($message);
+        $message   = $sparkpost->getSparkPostMessage($message);
 
         $this->assertEquals($message['campaign_id'], 'Campaign Test');
     }
@@ -306,7 +306,7 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
         $message->setBody('Hello');
 
         $sparkpost = new SparkpostTransport('abc123', $this->translator, $this->transportCallback, $this->sparkpostFactory, $this->logger, $this->coreParametersHelper);
-        $message = $sparkpost->getSparkPostMessage($message);
+        $message   = $sparkpost->getSparkPostMessage($message);
 
         $this->assertEquals($message['campaign_id'], '20:Campaign Test Email');
     }

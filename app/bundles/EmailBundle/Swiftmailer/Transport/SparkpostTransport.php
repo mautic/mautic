@@ -92,9 +92,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         return $this->apiKey;
     }
 
-    /**
-     * @param string $region
-     */
     public function setHost(string $region)
     {
         $this->host = self::SPARK_POST_HOSTS[$region] ?? self::SPARK_POST_HOSTS['us'];
