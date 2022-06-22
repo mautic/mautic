@@ -88,22 +88,27 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     {
         $segmentA = new LeadList();
         $segmentA->setName('Segment A');
+        $segmentA->setPublicName('Segment A');
         $segmentA->setAlias('segment-a');
 
         $segmentB = new LeadList();
         $segmentB->setName('Segment B');
+        $segmentB->setPublicName('Segment B');
         $segmentB->setAlias('segment-b');
 
         $segmentC = new LeadList();
         $segmentC->setName('Segment C');
+        $segmentC->setPublicName('Segment C');
         $segmentC->setAlias('segment-c');
 
         $segmentD = new LeadList();
         $segmentD->setName('Segment D');
+        $segmentD->setPublicName('Segment D');
         $segmentD->setAlias('segment-d');
 
         $segmentE = new LeadList();
         $segmentE->setName('Segment E');
+        $segmentE->setPublicName('Segment E');
         $segmentE->setAlias('segment-e');
 
         $this->em->persist($segmentA);
@@ -190,22 +195,27 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     {
         $segmentA = new LeadList();
         $segmentA->setName('Segment A');
+        $segmentA->setPublicName('Segment A');
         $segmentA->setAlias('segment-a');
 
         $segmentB = new LeadList();
         $segmentB->setName('Segment B');
+        $segmentB->setPublicName('Segment B');
         $segmentB->setAlias('segment-b');
 
         $segmentC = new LeadList();
         $segmentC->setName('Segment C');
+        $segmentC->setPublicName('Segment C');
         $segmentC->setAlias('segment-c');
 
         $segmentD = new LeadList();
         $segmentD->setName('Segment D');
+        $segmentD->setPublicName('Segment D');
         $segmentD->setAlias('segment-d');
 
         $segmentE = new LeadList();
         $segmentE->setName('Segment E');
+        $segmentE->setPublicName('Segment E');
         $segmentE->setAlias('segment-e');
 
         $this->em->persist($segmentA);
