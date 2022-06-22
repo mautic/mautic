@@ -43,21 +43,22 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      */
     private $logger;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    public const SPARK_POST_HOSTS = [
+        'us' => 'api.sparkpost.com',
+        'eu' => 'api.eu.sparkpost.com',
+    ];
 
     /**
      * @param string $apiKey
+     * @param $region
      */
     public function __construct(
         $apiKey,
+        $region,
         TranslatorInterface $translator,
         TransportCallback $transportCallback,
         SparkpostFactoryInterface $sparkpostFactory,
-        LoggerInterface $logger,
-        CoreParametersHelper $coreParametersHelper
+        LoggerInterface $logger
     ) {
         $this->setApiKey($apiKey);
 
@@ -65,7 +66,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->transportCallback    = $transportCallback;
         $this->sparkpostFactory     = $sparkpostFactory;
         $this->logger               = $logger;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -84,9 +84,9 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         return $this->apiKey;
     }
 
-    public function setHost(string $host)
+    public function setHost(string $region)
     {
-        $this->host = $host;
+        $this->host = self::SPARK_POST_HOSTS[$region] ?? '';;
     }
 
     /**
@@ -125,9 +125,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
 
         if ('' === $host) {
-            if ('eu' === $this->coreParametersHelper->get('mailer_sparkpost_region')) {
-                $host = $this->setHost('api.eu.sparkpost.com');
-            }
+            $host = $this->getHost();
         }
 
         return $this->sparkpostFactory->create($host, $apiKey);

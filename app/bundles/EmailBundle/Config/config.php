@@ -620,6 +620,7 @@ return [
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
                     '%mautic.mailer_api_key%',
+                    '%mautic.mailer_amazon_region%',
                     'translator',
                     'mautic.email.model.transport_callback',
                     'mautic.sparkpost.factory',
