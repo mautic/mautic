@@ -131,6 +131,7 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
         $segment->setName('Test Segment');
         $segment->setAlias('test_segment');
         $segment->isPublished(true);
+        $segment->setPublicName('Test Segment');
 
         $this->em->persist($segment);
         $this->em->flush();
