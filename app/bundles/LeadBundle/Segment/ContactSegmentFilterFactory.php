@@ -47,9 +47,6 @@ class ContactSegmentFilterFactory
 
         $filters = $leadList->getFilters();
         foreach ($filters as $filter) {
-            if (!in_array($filter['operator'], $this->operatorsWithEmptyValuesAllowed) && empty($filter['filter']) && !is_numeric($filter['filter'])) {
-                continue; // If no value set for the filter, don't consider it
-            }
             $contactSegmentFilters->addContactSegmentFilter($this->factorSegmentFilter($filter, $batchLimiters));
         }
 
