@@ -43,11 +43,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      */
     private $logger;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
     public const SPARK_POST_HOSTS = [
         'us' => 'api.sparkpost.com',
         'eu' => 'api.eu.sparkpost.com',
@@ -55,7 +50,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * @param string $apiKey
-     * @param $region
      */
     public function __construct(
         $apiKey,
@@ -71,7 +65,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->transportCallback    = $transportCallback;
         $this->sparkpostFactory     = $sparkpostFactory;
         $this->logger               = $logger;
-        $this->coreParametersHelper = $coreParametersHelper;
 
         $this->setHost($coreParametersHelper->get('mailer_sparkpost_region'));
     }
@@ -92,7 +85,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         return $this->apiKey;
     }
 
-    public function setHost(string $region)
+    public function setHost(?string $region): void
     {
         $this->host = self::SPARK_POST_HOSTS[$region] ?? self::SPARK_POST_HOSTS['us'];
     }

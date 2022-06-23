@@ -52,6 +52,9 @@ class SparkpostTransportTest extends TestCase
         $this->coreParametersHelper      = $this->createMock(CoreParametersHelper::class);
     }
 
+    /**
+     * @return mixed[] iterable
+     */
     public function dataGetHostProvider(): iterable
     {
         yield ['us', 'api.sparkpost.com'];
@@ -61,7 +64,7 @@ class SparkpostTransportTest extends TestCase
     /**
      * @dataProvider dataGetHostProvider
      */
-    public function testGetHost($region, $expected)
+    public function testGetHost(string $region, string $expected): void
     {
         $this->coreParametersHelper->method('get')
             ->with('mailer_sparkpost_region')
