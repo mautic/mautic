@@ -41,9 +41,12 @@ class SparkpostTransportTest extends TestCase
 
     private string $apiKey;
 
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
-        parent::__construct();
+        parent::__construct($name, $data, $dataName);
 
         $this->apiKey                    = 'test_key';
         $this->translator                = $this->createMock(TranslatorInterface::class);
@@ -54,7 +57,7 @@ class SparkpostTransportTest extends TestCase
     }
 
     /**
-     * @return mixed[] iterable
+     * @return iterable<mixed[]>
      */
     public function dataGetHostProvider(): iterable
     {
