@@ -23,12 +23,12 @@ class SparkpostTransportTest extends TestCase
     private $transportCallback;
 
     /**
-     * @var MockObject|LoggerInterface
+     * @var MockObject|SparkpostFactoryInterface
      */
     private $sparkpostFactory;
 
     /**
-     * @var MockObject|SparkpostFactoryInterface
+     * @var MockObject|LoggerInterface
      */
     private $logger;
 
@@ -41,9 +41,10 @@ class SparkpostTransportTest extends TestCase
 
     private string $apiKey;
 
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    public function __construct()
     {
-        parent::__construct($name, $data, $dataName);
+        parent::__construct();
+
         $this->apiKey                    = 'test_key';
         $this->translator                = $this->createMock(TranslatorInterface::class);
         $this->transportCallback         = $this->createMock(TransportCallback::class);

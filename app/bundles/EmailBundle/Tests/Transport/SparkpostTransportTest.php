@@ -82,6 +82,11 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
      */
     private $logger;
 
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
     protected function setUp(): void
     {
         parent::setUp();
