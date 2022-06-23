@@ -101,4 +101,29 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onEmailResend($queueEmailEvent);
         $this->assertFalse($queueEmailEvent->shouldTryAgain());
     }
+
+    public function testOnEmailFailed(): void
+    {
+        $this->mockSwiftMessage->leadIdHash = 'idhash';
+
+        $queueEmailEvent = new QueueEmailEvent($this->mockSwiftMessage);
+
+        $stat = new Stat();
+
+        $this->emailModel->expects($this->once())
+            ->method('getEmailStatus')
+            ->willReturn($stat);
+
+        $this->emailModel->expects($this->once())
+            ->method('getStatRepository')
+            ->willReturn(new class(){
+                public function saveEntity(Stat $stat)
+                {
+
+                }
+            });
+
+        $this->subscriber->onEmailFailed($queueEmailEvent);
+        $this->assertTrue($stat->isFailed());
+    }
 }

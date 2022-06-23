@@ -114,11 +114,9 @@ class EmailSubscriber implements EventSubscriberInterface
         if (isset($message->leadIdHash)) {
             $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
 
-            if (null !== $stat) {
-                $reason = $this->translator->trans('mautic.email.dnc.failed', [
-                    '%subject%' => EmojiHelper::toShort($message->getSubject()),
-                ]);
-                $this->emailModel->setDoNotContact($stat, $reason);
+            if (null !== $stat && $stat->getIsFailed() !== true) {
+                $stat->setIsFailed(true);
+                $this->emailModel->getStatRepository()->saveEntity($stat);
             }
         }
     }
