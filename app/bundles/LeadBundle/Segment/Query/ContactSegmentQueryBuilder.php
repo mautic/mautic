@@ -196,10 +196,6 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param int $leadListId
-     *
-     * @return QueryBuilder
-     *
      * @throws QueryException
      */
     public function addManuallyUnsubscribedQuery(QueryBuilder $queryBuilder, int $leadListId): QueryBuilder
