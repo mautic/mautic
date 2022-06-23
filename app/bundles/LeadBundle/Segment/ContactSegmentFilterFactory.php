@@ -55,7 +55,6 @@ class ContactSegmentFilterFactory
 
     /**
      * @param array<string, mixed> $filter
-     *
      * @param array<string, mixed> $batchLimiters
      *
      * @throws Exception
