@@ -151,6 +151,7 @@ class SubmissionModel extends CommonFormModel
         $leadFieldMatches = [];
         $validationErrors = [];
         $filesToUpload    = new UploadFileCrate();
+        $company          = null;
 
         /** @var Field $f */
         foreach ($fields as $f) {
@@ -259,6 +260,14 @@ class SubmissionModel extends CommonFormModel
                 $leadFieldMatches[$mappedField] = $leadValue;
             }
 
+            if ('companyLookup' === $f->getType() && !empty($value)) {
+                /** @var Company $company */
+                $company       = $this->companyModel->getEntity($value);
+                if ($company instanceof Company) {
+                    $value         = $company->getName();
+                }
+            }
+
             $tokens["{formfield={$alias}}"] = $this->normalizeValue($value, $f);
 
             // convert array from checkbox groups and multiple selects
@@ -304,7 +313,7 @@ class SubmissionModel extends CommonFormModel
 
         // Create/update lead
         if (!empty($leadFieldMatches)) {
-            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
+            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields, $company);
         }
 
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
@@ -859,7 +868,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @throws ORMException
      */
-    protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields): Lead
+    protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields, Company $companyEntity = null): Lead
     {
         // set the mapped data
         $inKioskMode   = $form->isInKioskMode();
@@ -1034,6 +1043,10 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
+        if ($companyEntity) {
+            unset($data['company']);
+        }
+
         // set the mapped fields
         $this->leadModel->setFieldValues($lead, $data, false, true, true);
 
@@ -1055,6 +1068,12 @@ class SubmissionModel extends CommonFormModel
         } else {
             // Set system current lead which will still allow execution of events without generating tracking cookies
             $this->contactTracker->setSystemContact($lead);
+        }
+
+        if ($companyEntity instanceof Company) {
+            $this->companyModel->addLeadToCompany($companyEntity, $lead);
+
+            return $lead;
         }
 
         $companyFieldMatches = $getCompanyData($leadFieldMatches);

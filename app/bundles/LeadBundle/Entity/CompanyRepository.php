@@ -443,12 +443,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         // Published only
-        if ($reflection->hasMethod('getIsPublished')) {
-            $q->andWhere(
-                $q->expr()->eq($prefix.'is_published', ':true')
-            )
-                ->setParameter('true', true, 'boolean');
-        }
+        $this->publishedOnly($reflection, $q, $prefix);
 
         return $q->executeQuery()->fetchAllAssociative();
     }
@@ -537,5 +532,49 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         return $entities;
+    }
+
+    /**
+     * @param array<string> $parameters
+     *
+     * @return mixed[]
+     */
+    public function getFieldLookupData(CompositeExpression $expr = null, array $parameters = []): array
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $tableName = $this->_em->getClassMetadata($this->getEntityName())->getTableName();
+
+        $class      = '\\'.$this->getClassName();
+        $reflection = new \ReflectionClass(new $class());
+
+        $q->select('id, companyname as value, companycity, companystate')
+            ->from($tableName)
+            ->orderBy('companyname');
+
+        if (null !== $expr && $expr->count()) {
+            $q->where($expr);
+        }
+
+        if (!empty($parameters)) {
+            $q->setParameters($parameters);
+        }
+
+        // Published only
+        $this->publishedOnly($reflection, $q);
+
+        $q->setMaxResults(5);
+
+        return $q->execute()->fetchAll();
+    }
+
+    private function publishedOnly(\ReflectionClass $reflection, \Doctrine\DBAL\Query\QueryBuilder $q, string $prefix = ''): void
+    {
+        if ($reflection->hasMethod('getIsPublished')) {
+            $q->andWhere(
+                $q->expr()->eq($prefix.'is_published', ':status')
+            )
+                ->setParameter('status', true, 'boolean');
+        }
     }
 }

@@ -9,6 +9,7 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -413,5 +414,25 @@ class PublicController extends CommonFormController
         }
 
         return str_replace(array_keys($this->tokens), array_values($this->tokens), $string);
+    }
+
+    public function lookupCompanyAction(Request $request): JsonResponse
+    {
+        $search   = InputHelper::clean($request->request->get('search'));
+        $response = new JsonResponse();
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = $this->getModel('lead.company');
+
+        $results = $companyModel->getCompanyNameFieldLookupResults($search);
+        if (empty($results)) {
+            $response->setData([]);
+
+            return $response;
+        }
+
+        $response->setData($results);
+
+        return $response;
     }
 }
