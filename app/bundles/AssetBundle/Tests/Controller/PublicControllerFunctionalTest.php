@@ -7,11 +7,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicControllerFunctionalTest extends AbstractAssetTest
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     /**
      * Download action should return the file content.
      */

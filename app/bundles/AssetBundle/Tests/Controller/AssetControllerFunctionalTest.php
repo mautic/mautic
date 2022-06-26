@@ -11,11 +11,6 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
 {
     use ControllerTrait;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     /**
      * Index action should return status code 200.
      */

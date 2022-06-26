@@ -15,12 +15,15 @@ abstract class AbstractAssetTest extends MauticMysqlTestCase
     protected string $expectedMimeType;
     protected string $expectedContentDisposition;
     protected string $expectedPngContent;
+    protected string $csvPath;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+
+        $this->generateCsv();
 
         $assetData = [
             'title'     => 'Asset controller test. Preview action',
@@ -29,14 +32,23 @@ abstract class AbstractAssetTest extends MauticMysqlTestCase
             'updatedAt' => new \DateTime('2022-05-05 22:30:00'),
             'createdBy' => 'User',
             'storage'   => 'local',
-            'path'      => basename($this->getPngFilenameFromFixtures()),
+            'path'      => basename($this->csvPath),
             'extension' => 'png',
         ];
         $this->asset = $this->createAsset($assetData);
 
-        $this->expectedMimeType           = 'image/png';
+        $this->expectedMimeType           = 'text/plain; charset=UTF-8';
         $this->expectedContentDisposition = 'attachment;filename="';
-        $this->expectedPngContent         = file_get_contents($this->getPngFilenameFromFixtures());
+        $this->expectedPngContent         = file_get_contents($this->csvPath);
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        if (file_exists($this->csvPath)) {
+            unlink($this->csvPath);
+        }
     }
 
     /**
@@ -67,10 +79,29 @@ abstract class AbstractAssetTest extends MauticMysqlTestCase
     }
 
     /**
-     * Path to the png test asset.
+     * Generate the csv asset and return the path of the asset.
      */
-    protected function getPngFilenameFromFixtures(): string
+    protected function generateCsv(): void
     {
-        return realpath(dirname(__FILE__).'/../../../CoreBundle/Tests/Fixtures/').'/png-test.png';
+        $uploadDir  = self::$container->get('mautic.helper.core_parameters')->get('upload_dir') ?? sys_get_temp_dir();
+        $tmpFile    = tempnam($uploadDir, 'mautic_asset_test_');
+        $file       = fopen($tmpFile, 'w');
+
+        $initialList = [
+            ['email', 'firstname', 'lastname'],
+            ['john.doe@his-site.com.email', 'John', 'Doe'],
+            ['john.smith@his-site.com.email', 'John', 'Smith'],
+            ['jim.doe@his-site.com.email', 'Jim', 'Doe'],
+            [''],
+            ['jim.smith@his-site.com.email', 'Jim', 'Smith'],
+        ];
+
+        foreach ($initialList as $line) {
+            fputcsv($file, $line);
+        }
+
+        fclose($file);
+
+        $this->csvPath = $tmpFile;
     }
 }
