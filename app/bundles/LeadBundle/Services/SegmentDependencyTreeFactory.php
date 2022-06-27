@@ -80,7 +80,9 @@ class SegmentDependencyTreeFactory
         $childSegmentIds = [];
 
         foreach ($segmentMembershipFilters as $filter) {
-            foreach ($filter['properties']['filter'] as $childSegmentId) {
+            // Old segments don't use properties array.
+            $segmentIds = $filter['properties']['filter'] ?? $filter['filter'];
+            foreach ($segmentIds as $childSegmentId) {
                 $childSegmentIds[] = (int) $childSegmentId;
             }
         }
