@@ -244,7 +244,11 @@ class FieldType extends AbstractType
                         $properties = $data->getProperties();
                     }
 
-                    $form->add(
+                if (isset($properties['list'])) {
+                    $properties['list'] = 'lookup' === $type ? array_flip(array_filter($properties['list'])) : $properties['list'];
+                }
+                
+                $form->add(
                         'properties',
                         SortableListType::class,
                         [
