@@ -59,7 +59,7 @@ class LeadPointLog
         $builder->createField('internalId', Types::BIGINT)
             ->columnName('internal_id')
             ->option('unsigned', true)
-            ->nullable()
+            ->makePrimaryKey()
             ->build();
     }
 
@@ -127,12 +127,12 @@ class LeadPointLog
         $this->point = $point;
     }
 
-    public function getInternalId(): ?int
+    public function getInternalId(): int
     {
         return $this->internalId;
     }
 
-    public function setInternalId(?int $internalId): void
+    public function setInternalId(int $internalId): void
     {
         $this->internalId = $internalId;
     }

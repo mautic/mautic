@@ -23,6 +23,7 @@ class PointSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
+        /** @var LeadRepository contactRepository */
         $this->contactRepository  = $this->em->getRepository(Lead::class);
     }
 
@@ -142,11 +143,11 @@ class PointSubscriberFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->request('GET', '/email/'.$stats[0]->getTrackingHash().'.gif');
-        $updatedLead = $this->contactRepository->getEntity($lead->getId());
+        $updatedLead    = $this->contactRepository->getEntity($lead->getId());
         $this->assertEquals(1, $updatedLead->getPoints());
 
         $this->client->request('GET', '/email/'.$stats[1]->getTrackingHash().'.gif');
-        $updatedLead = $this->contactRepository->getEntity($lead->getId());
+        $updatedLead    = $this->contactRepository->getEntity($lead->getId());
         $this->assertEquals(2, $updatedLead->getPoints());
     }
 
@@ -184,6 +185,9 @@ class PointSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(2, $updatedLead->getPoints());
     }
 
+    /**
+     * @var mixed[]
+     */
     protected function createPointAction(array $properties, int $delta, bool $isRepeatable = false): Point
     {
         $point = new Point();
