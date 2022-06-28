@@ -244,9 +244,7 @@ class FieldType extends AbstractType
                         $properties = $data->getProperties();
                     }
 
-                if (isset($properties['list'])) {
-                    $properties['list'] = 'lookup' === $type ? array_flip(array_filter($properties['list'])) : $properties['list'];
-                }
+                $propertiesList['list'] = isset($properties['list']) && 'lookup' === $type ? array_flip(array_filter($properties['list'])) : $properties['list'];
 
                 $form->add(
                         'properties',
@@ -254,7 +252,7 @@ class FieldType extends AbstractType
                         [
                             'required'          => false,
                             'label'             => 'mautic.lead.field.form.properties.select',
-                            'data'              => $properties,
+                            'data'              => $propertiesList,
                             'with_labels'       => ('lookup' !== $type),
                             'option_constraint' => [],
                         ]
