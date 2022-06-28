@@ -23,8 +23,10 @@ class PointSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        /** @var LeadRepository contactRepository */
-        $this->contactRepository  = $this->em->getRepository(Lead::class);
+        $contactRepository = $this->em->getRepository(Lead::class);
+        \assert($contactRepository instanceof LeadRepository);
+
+        $this->contactRepository = $contactRepository;
     }
 
     public function testPointsForAnyEmailReadRepeatable(): void
@@ -186,7 +188,7 @@ class PointSubscriberFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @var mixed[]
+     * @param mixed[] $properties
      */
     protected function createPointAction(array $properties, int $delta, bool $isRepeatable = false): Point
     {
