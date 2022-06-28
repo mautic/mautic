@@ -161,7 +161,7 @@ class oAuthHelper
      * @param bool $encode
      * @param bool $returnarray
      *
-     * @return string
+     * @return string|array<string,string>
      */
     private function normalizeParameters($parameters, $encode = false, $returnarray = false, $normalized = [], $key = '')
     {
