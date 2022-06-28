@@ -10,9 +10,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Mautic\AssetBundle\Form\Type\AssetListType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
+
 
 class EmailType extends AbstractType
 {
@@ -105,6 +108,59 @@ class EmailType extends AbstractType
                     'onchange' => 'Mautic.getLeadEmailContent(this)',
                 ],
                 'multiple' => false,
+            ]
+        );
+
+        $builder->add(
+            'assetAttachments',
+            AssetListType::class,
+            [
+                'label'      => 'mautic.email.attachments',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control',
+                    'onchange' => 'Mautic.getTotalAttachmentSize();',
+                    'tooltip'  => 'mautic.email.attachments.help',
+                ],
+                'multiple' => true,
+                'expanded' => false,
+            ]
+        );
+
+        $builder->add(
+            'attachments',
+            FileType::class,
+            [
+                'label'      => 'mautic.email.attachments',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control'
+                ],
+                'multiple' => true
+            ]
+        );
+
+        $builder->add(
+            'cc',
+            TextType::class,
+            [
+                'label'       => 'cc',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'required'    => false,
+                'data'        => ''
+            ]
+        );
+
+        $builder->add(
+            'bcc',
+            TextType::class,
+            [
+                'label'       => 'bcc',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'required'    => false,
+                'data'        => ''
             ]
         );
 
