@@ -33,7 +33,7 @@ class PluginCollector
 
         if (!empty($allowlist)) {
             $this->allowlistedPackages = $this->filterAllowlistedPackagesForCurrentMauticVersion($allowlist->entries);
-            $payload                   = $this->getAllowlistedPackages($page, $limit, $query);
+            $payload                   = $this->getAllowlistedPackages($page, $limit);
         } else {
             $payload = $this->connection->getPlugins($page, $limit, $query);
         }
