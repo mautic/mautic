@@ -633,7 +633,12 @@ return [
             ],
             'mautic.form.type.leadfield' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\FieldType::class,
-                'arguments' => ['translator', 'mautic.lead.repository.field'],
+                'arguments' => [
+                    'doctrine.orm.default_entity_manager',
+                    'translator',
+                    'mautic.lead.field.identifier_fields',
+                ],
+                'alias'     => 'leadfield',
             ],
             'mautic.form.type.lead.submitaction.pointschange' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType::class,
@@ -1477,6 +1482,13 @@ return [
                 'arguments' => [
                     'mautic.lead.repository.field',
                     'translator',
+                ],
+            ],
+            'mautic.lead.field.identifier_fields' => [
+                'class'     => \Mautic\LeadBundle\Field\IdentifierFields::class,
+                'arguments' => [
+                    'mautic.lead.field.fields_with_unique_identifier',
+                    'mautic.lead.field.field_list',
                 ],
             ],
             'mautic.lead.field.lead_field_saver' => [
