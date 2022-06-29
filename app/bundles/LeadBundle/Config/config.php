@@ -1596,6 +1596,11 @@ return [
                 'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
                 'optional'  => true,
             ],
+            'mautic.lead.fixture.test.tag' => [
+                'class'     => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'optional'  => true,
+            ],
         ],
     ],
     'parameters' => [
