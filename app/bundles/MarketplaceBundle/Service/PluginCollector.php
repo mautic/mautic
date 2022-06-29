@@ -27,7 +27,7 @@ class PluginCollector
         $this->allowlist  = $allowlist;
     }
 
-    public function collectPackages(int $page = 1, int $limit, string $query = ''): PackageCollection
+    public function collectPackages(int $page, int $limit, string $query = ''): PackageCollection
     {
         $allowlist = $this->allowlist->getAllowList();
 
@@ -58,23 +58,21 @@ class PluginCollector
         $mauticVersion = ThisRelease::getMetadata()->getVersion();
 
         return array_filter($entries, function (AllowlistEntry $entry) use ($mauticVersion) {
-            $shouldReturn = true;
-
             if (
                 !empty($entry->minimumMauticVersion) &&
                 !version_compare($mauticVersion, $entry->minimumMauticVersion, '>=')
             ) {
-                $shouldReturn = false;
+                return false;
             }
 
             if (
                 !empty($entry->maximumMauticVersion) &&
                 !version_compare($mauticVersion, $entry->maximumMauticVersion, '<=')
             ) {
-                $shouldReturn = false;
+                return false;
             }
 
-            return $shouldReturn;
+            return true;
         });
     }
 
@@ -109,8 +107,8 @@ class PluginCollector
 
             $payload = $this->connection->getPlugins(1, 1, $entry->package);
 
-            if (!empty($payload['results'])) {
-                $results[] = $payload['results'][0];
+            if (isset($payload['results'][0])) {
+                $results[] = $payload['results'][0] + $entry->toArray();
             }
         }
 

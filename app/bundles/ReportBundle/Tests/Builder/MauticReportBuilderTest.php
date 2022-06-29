@@ -53,6 +53,8 @@ final class MauticReportBuilderTest extends TestCase
 
     public function testColumnSanitization(): void
     {
+        $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
+
         $report = new Report();
         $report->setColumns(['a.b', 'b.c']);
         $builder = $this->buildBuilder($report);
