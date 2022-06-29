@@ -40,21 +40,27 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $crawler     = $this->client->request(Request::METHOD_GET, "/s/forms/field/new?type=captcha&tmpl=field&formId={$formId}&inBuilder=1", [], [], $this->createAjaxHeaders());
-        $content     = $this->client->getResponse()->getContent();
+        $this->client->request(
+            Request::METHOD_GET,
+            "/s/forms/field/new?type=captcha&tmpl=field&formId={$formId}&inBuilder=1",
+            [],
+            [],
+            $this->createAjaxHeaders()
+        );
+
+        $content = $this->client->getResponse()->getContent();
+        Assert::assertTrue($this->client->getResponse()->isOk(), $content);
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
-        $formCrawler = $crawler->filter('form[name=formfield]');
-        $this::assertSame(1, $formCrawler->count(), $this->client->getResponse()->getContent());
+        $formCrawler = $crawler->filter('form');
+        Assert::assertSame(1, $formCrawler->count(), $this->client->getResponse()->getContent());
         $form = $formCrawler->form();
-        $form->setValues(
-            [
-                'formfield[formId]'              => $formId,
-                'formfield[type]'                => 'captcha',
-                'formfield[label]'               => 'What is the capital of Czech Republic?',
-                'formfield[properties][captcha]' => 'Prague',
-            ]
-        );
+
+        // Save new Send Form Results action
+        $form->setValues([
+            'formfield[label]'               => 'What is the capital of Czech Republic?',
+            'formfield[properties][captcha]' => 'Prague',
+        ]);
         $this->client->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), $form->getPhpFiles(), $this->createAjaxHeaders());
 
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
