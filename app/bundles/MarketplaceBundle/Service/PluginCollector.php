@@ -83,7 +83,7 @@ class PluginCollector
      *
      * @return array<string,mixed>
      */
-    private function getAllowlistedPackages(int $page = 1, int $limit, string $query = ''): array
+    private function getAllowlistedPackages(int $page, int $limit): array
     {
         $total   = count($this->allowlistedPackages);
         $results = [];
