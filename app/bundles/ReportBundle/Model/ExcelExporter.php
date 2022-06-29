@@ -26,7 +26,7 @@ class ExcelExporter
     /**
      * @throws \Exception
      */
-    public function export(array $reportData, string $name, $output = 'php://output')
+    public function export(array $reportData, string $name, string $output = 'php://output')
     {
         if (!class_exists(Spreadsheet::class)) {
             throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');

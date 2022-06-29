@@ -253,9 +253,9 @@ class Fixtures
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public static function getValidReportResultWithAggregatedColumns()
+    public static function getValidReportResultWithAggregatedColumns(): array
     {
         return [
             'totalResults' => '2',
@@ -299,9 +299,9 @@ class Fixtures
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public static function getValidReportDataAggregatedColumns()
+    public static function getValidReportDataAggregatedColumns(): array
     {
         return [
             [
