@@ -52,6 +52,8 @@ class EmailListType extends AbstractType
                 'top_level'      => 'variant',
                 'variant_parent' => null,
                 'ignore_ids'     => [],
+
+                'email' => null,
             ]
         );
     }

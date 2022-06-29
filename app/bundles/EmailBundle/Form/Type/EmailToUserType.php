@@ -20,6 +20,7 @@ class EmailToUserType extends AbstractType
                 'attr'  => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.choose.emails_descr',
+                    'email'   => $options['data'] && $options['data']['useremail'] ? $options['data']['useremail']['email'] : null,
                 ],
                 'update_select' => empty($options['update_select']) ? 'formaction_properties_useremail_email' : $options['update_select'],
             ]
