@@ -12,9 +12,9 @@ class MasterOnlyStrategy extends ReplicationStrategy
 
     public function __construct(StrategyConfig $config)
     {
-        parent::__construct();
-
         $this->config = $config;
+
+        parent::__construct();
     }
 
     /**

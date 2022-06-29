@@ -74,14 +74,14 @@ class PRedisConnectionHelper
 
     /**
      * @param mixed[] $endpoints
-     * @param mixed[] $options
+     * @param mixed[] $inputOptions
      */
     public static function createClient(array $endpoints, array $inputOptions): Client
     {
         $replication = $inputOptions['replication'] ?? null;
 
         if ('sentinel' === $replication) {
-            $options['aggregate'] = fn () => fn ($sentinels, $options) => new SentinelReplication(
+            $inputOptions['aggregate'] = fn () => fn ($sentinels, $options) => new SentinelReplication(
                 $options->service,
                 $sentinels,
                 $options->connections,

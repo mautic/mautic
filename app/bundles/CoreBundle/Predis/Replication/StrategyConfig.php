@@ -12,6 +12,9 @@ final class StrategyConfig
      */
     public bool $primaryOnly = false;
 
+    /**
+     * @param mixed[] $options
+     */
     public static function fromArray(array $options): self
     {
         $self              = new StrategyConfig();
