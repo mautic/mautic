@@ -19,7 +19,7 @@ class RedisTagAwareAdapter extends TagAwareAdapter
 
         $options = array_key_exists('options', $servers) ? $servers['options'] : [];
 
-        $options['redis_primary_only'] = $primaryOnly;
+        $options['primaryOnly'] = $primaryOnly;
 
         $client = PRedisConnectionHelper::createClient(PRedisConnectionHelper::getRedisEndpoints($servers['dsn']), $options);
 
