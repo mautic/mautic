@@ -106,7 +106,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
 
         return [
             'start'          => 0,
-            'limit'          => $this->coreParametersHelper->get('contact_export_batch_size', 1000),
+            'limit'          => $this->coreParametersHelper->get('contact_export_batch_size', 300),
             'filter'         => $filter,
             'orderBy'        => $orderBy,
             'orderByDir'     => $orderByDir,
@@ -134,12 +134,12 @@ class ContactExportSchedulerModel extends AbstractCommonModel
 
     public function processAndGetExportFilePath(ContactExportScheduler $contactExportScheduler): string
     {
-        $data              = $contactExportScheduler->getData();
-        $fileType          = $data['fileType'];
-        $resultsCallback   = function ($contact) {
+        $data            = $contactExportScheduler->getData();
+        $fileType        = $data['fileType'];
+        $resultsCallback = function ($contact) {
             return $contact->getProfileFields();
         };
-        $iterator          = new IteratorExportDataModel(
+        $iterator = new IteratorExportDataModel(
             $this->leadModel,
             $contactExportScheduler->getData(),
             $resultsCallback,

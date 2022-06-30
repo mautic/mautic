@@ -81,7 +81,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
 
-        $form    = $crawler->filterXPath('//form[@name="leadlist"]')->form();
+        $form = $crawler->filterXPath('//form[@name="leadlist"]')->form();
         $form->setValues(
             [
                 'leadlist[name]'               => 'Segment 1',
@@ -295,9 +295,9 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         Assert::assertSame(
             [
-                'start'          => 0,
-                'limit'          => $coreParametersHelper->get('contact_export_batch_size', 1000),
-                'filter'         => [
+                'start'  => 0,
+                'limit'  => $coreParametersHelper->get('contact_export_batch_size', 300),
+                'filter' => [
                     'string' => '',
                     'force'  => [
                         [

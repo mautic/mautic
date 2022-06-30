@@ -158,6 +158,7 @@ class ExportHelper
                 $headerSet = true;
             }
 
+            $this->echoTouchJob();
             fputcsv($handler, $row);
         }
 
@@ -183,5 +184,12 @@ class ExportHelper
         }
 
         return $filePath;
+    }
+
+    private function echoTouchJob(): void
+    {
+        if (MAUTIC_ENV !== 'test') {
+            file_put_contents('php://stdout', "touch job\n");
+        }
     }
 }
