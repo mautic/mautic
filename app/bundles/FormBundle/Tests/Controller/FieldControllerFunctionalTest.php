@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     public function testNewCaptchaFieldFormCanBeSaved(): void
     {
         $payload = [
@@ -61,6 +63,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
             'formfield[label]'               => 'What is the capital of Czech Republic?',
             'formfield[properties][captcha]' => 'Prague',
         ]);
+
         $this->client->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), $form->getPhpFiles(), $this->createAjaxHeaders());
 
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
