@@ -102,9 +102,8 @@ class IteratorExportDataModel implements \Iterator
 
     private function getDataForExport(): void
     {
-        $data              = new DataExporterHelper();
-        $this->callback    = $this->skipOrdering ? null : $this->callback;
-        $this->data        = $data->getDataForExport(
+        $data       = new DataExporterHelper();
+        $this->data = $data->getDataForExport(
             $this->total,
             $this->model,
             $this->args,
@@ -113,6 +112,6 @@ class IteratorExportDataModel implements \Iterator
         );
         $this->totalResult = $this->data ? count($this->data) : 0;
         $this->total += $this->totalResult;
-        $this->position    = 0;
+        $this->position = 0;
     }
 }
