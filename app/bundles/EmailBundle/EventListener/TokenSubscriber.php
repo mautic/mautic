@@ -52,11 +52,11 @@ class TokenSubscriber implements EventSubscriberInterface
 
         // Find and replace encoded tokens for trackable URL conversion
         $content = $event->getContent();
-        $content = preg_replace('/(%7B)(.*?)(%7D)/i', '{$2}', $content, -1, $count);
+        $content = $this->urlDecodeTokens($content);
         $event->setContent($content);
 
         if ($plainText = $event->getPlainText()) {
-            $plainText = preg_replace('/(%7B)(.*?)(%7D)/i', '{$2}', $plainText);
+            $plainText = $this->urlDecodeTokens($plainText);
             $event->setPlainText($plainText);
         }
 
@@ -129,5 +129,10 @@ class TokenSubscriber implements EventSubscriberInterface
 
             $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $untokenizedContent);
         }
+    }
+
+    private function urlDecodeTokens(string $content): string
+    {
+        return preg_replace('/(%7B)(.*?)(%3D|=)(.*?)(%7D)/i', '{$2=$4}', $content);
     }
 }
