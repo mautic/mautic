@@ -22,7 +22,7 @@ class MasterOnlyStrategy extends ReplicationStrategy
      */
     protected function getReadOnlyOperations(): array
     {
-        if ($this->config->primaryOnly) {
+        if ($this->config->usePrimaryOnly()) {
             return [];
         }
 

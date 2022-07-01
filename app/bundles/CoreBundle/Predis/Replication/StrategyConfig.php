@@ -6,20 +6,27 @@ namespace Mautic\CoreBundle\Predis\Replication;
 
 final class StrategyConfig
 {
-    /**
-     * Use primary Redis server for reads and writes only.
-     * The secondary Redis replicas will not be used at all when TRUE.
-     */
-    public bool $primaryOnly = false;
+    private bool $primaryOnly = false;
+
+    public function __construct(bool $primaryOnly)
+    {
+        $this->primaryOnly = $primaryOnly;
+    }
 
     /**
      * @param mixed[] $options
      */
     public static function fromArray(array $options): self
     {
-        $self              = new StrategyConfig();
-        $self->primaryOnly = $options['primaryOnly'] ?? false;
+        return new StrategyConfig($options['primaryOnly'] ?? false);
+    }
 
-        return $self;
+    /**
+     * Use primary Redis server for reads and writes only.
+     * The secondary Redis replicas will not be used at all when TRUE.
+     */
+    public function usePrimaryOnly(): bool
+    {
+        return $this->primaryOnly;
     }
 }
