@@ -36,6 +36,7 @@ class EmailTriggerTest extends MauticMysqlTestCase
         self::assertEquals($email->getId(), $form->get('pointtriggerevent[properties][useremail][email]')->getValue(), 'Current email should be selected.');
         self::assertNull($crawler->selectButton('Preview')->attr('disabled'), 'Preview button should not be disabled.');
         self::assertNull($crawler->selectButton('Edit Email')->attr('disabled'), 'Edit Email button should not be disabled.');
+        self::assertStringContainsString('"origin":"#pointtriggerevent_properties_useremail_email"', $crawler->selectButton('Preview')->attr('onclick'), 'The origin value should be correct.');
     }
 
     public function testButtonsAreDisabledWhenEmailIsNotSelected(): void
