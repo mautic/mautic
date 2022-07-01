@@ -33,7 +33,7 @@ class PluginCollector
 
         if (!empty($allowlist)) {
             $this->allowlistedPackages = $this->filterAllowlistedPackagesForCurrentMauticVersion($allowlist->entries);
-            $payload                   = $this->getAllowlistedPackages($page, $limit, $query);
+            $payload                   = $this->getAllowlistedPackages($page, $limit);
         } else {
             $payload = $this->connection->getPlugins($page, $limit, $query);
         }
@@ -83,7 +83,7 @@ class PluginCollector
      *
      * @return array<string,mixed>
      */
-    private function getAllowlistedPackages(int $page, int $limit, string $query = ''): array
+    private function getAllowlistedPackages(int $page, int $limit): array
     {
         $total   = count($this->allowlistedPackages);
         $results = [];
