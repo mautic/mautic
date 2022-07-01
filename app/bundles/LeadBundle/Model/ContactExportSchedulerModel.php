@@ -106,7 +106,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
 
         return [
             'start'          => 0,
-            'limit'          => $this->coreParametersHelper->get('contact_export_batch_size', 300),
+            'limit'          => $this->coreParametersHelper->get('contact_export_batch_size', 1000),
             'filter'         => $filter,
             'orderBy'        => $orderBy,
             'orderByDir'     => $orderByDir,

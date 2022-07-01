@@ -296,7 +296,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertSame(
             [
                 'start'  => 0,
-                'limit'  => $coreParametersHelper->get('contact_export_batch_size', 300),
+                'limit'  => $coreParametersHelper->get('contact_export_batch_size', 1000),
                 'filter' => [
                     'string' => '',
                     'force'  => [
