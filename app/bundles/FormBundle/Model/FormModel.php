@@ -158,7 +158,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param mixed $id
+     * @param string|int|null $id
      *
      * @return Form|object|null
      */
