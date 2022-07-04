@@ -63,11 +63,9 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @param arrat $vars
-     *
-     * @return CustomTemplateEvent
+     * @param array<string, mixed> $vars
      */
-    public function setVars($vars)
+    public function setVars(array $vars): CustomTemplateEvent
     {
         $this->vars = $vars;
 
