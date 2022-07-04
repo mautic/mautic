@@ -3,9 +3,12 @@
 namespace Mautic\EmailBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
 
 class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -202,5 +205,44 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($stat->getId(), $fetchedStatData['stats'][0]['id']);
         $this->assertSame('1', $fetchedStatData['stats'][0]['is_read']);
         $this->assertMatchesRegularExpression('/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/', $fetchedStatData['stats'][0]['date_read']);
+    }
+
+    public function testSendEmailToDNCLead(): void
+    {
+        $email = new Email();
+        $email->setName('test');
+        $email->setSubject('test');
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $contact = new Lead();
+        $contact->setEmail('john@doe.email');
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $contactDNC = new DoNotContact();
+        $contactDNC->setLead($contact);
+        $contactDNC->setReason(DoNotContact::UNSUBSCRIBED);
+        $contactDNC->setChannel('email');
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $this->client->request('POST',
+            "/api/emails/{$email->getId()}/contact/{$contact->getId()}/send",
+            [
+                'ignoreDNC' => true,
+            ]
+        );
+        $response     = $this->client->getResponse();
+        $responseData = json_decode($response->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertTrue($responseData['success']);
+
+        $stat = $this->em->getRepository(Stat::class)->findOneBy([
+            'email' => $email->getId(),
+            'lead'  => $contact->getId(),
+        ]);
+        $this->assertNotEmpty($stat);
     }
 }
