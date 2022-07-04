@@ -164,18 +164,12 @@ class Fixtures
         return 'string';
     }
 
-    /**
-     * @return string
-     */
-    public static function getIntegerType()
+    public static function getIntegerType(): string
     {
         return 'int';
     }
 
-    /**
-     * @return string
-     */
-    public static function getBooleanType()
+    public static function getBooleanType(): string
     {
         return 'bool';
     }
