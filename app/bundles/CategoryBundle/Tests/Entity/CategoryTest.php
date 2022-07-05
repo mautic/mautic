@@ -17,6 +17,8 @@ class CategoryTest extends TestCase
         $category->setTitle('Title Changed of Category');
         $category->setAlias('changed alias of category');
         $category->setBundle('campaigns');
+        $category->setColor('Blue');
+        $category->setDescription('My Description');
 
         $this->assertIsArray($category->getChanges());
         $this->assertNotEmpty($category->getChanges());
