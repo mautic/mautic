@@ -31,10 +31,18 @@ class ThemeListType extends AbstractType
         $resolver->setDefaults(
             [
                 'choices'           => function (Options $options) {
-                    $themes                     = $this->themeHelper->getInstalledThemes($options['feature']);
-                    $themes['mautic_code_mode'] = 'Code Mode';
+                    $themesLists                     = $this->themeHelper->getInstalledThemes($options['feature'], true);
+                    $themes = [];
+                    foreach ($themesLists as $themeInfo) {
+                        $themeKey        = $themeInfo['key'];
+                        $isSelected = ($options['selected'] === $themeKey);
+                        if (!empty($themeInfo['config']['onlyForBC']) && !$isSelected) {
+                            continue;
+                        }
+                        $themes[$themeInfo['name']] = $themeKey;
+                    }
 
-                    return array_flip($themes);
+                    return $themes;
                 },
                 'expanded'          => false,
                 'multiple'          => false,
@@ -46,6 +54,7 @@ class ThemeListType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'feature'           => 'all',
+                'selected'          => null,
             ]
         );
     }

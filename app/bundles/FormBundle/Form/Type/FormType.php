@@ -79,6 +79,7 @@ class FormType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.form.form.template.help',
             ],
+            'selected' => $options['data']->getTemplate() ?? null
         ]);
 
         if (!empty($options['data']) && $options['data']->getId()) {
