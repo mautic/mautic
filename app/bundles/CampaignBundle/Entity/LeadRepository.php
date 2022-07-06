@@ -549,14 +549,14 @@ class LeadRepository extends CommonRepository
 
         if ($campaignCanBeRestarted) {
             $alreadyInCampaign                  = $qb->expr()->eq('cl.manually_removed', 0);
-            $removedFromCampaignBySegmentFilter = $qb->expr()->and(
+            $removedFromCampaignManually        = $qb->expr()->and(
                 $qb->expr()->eq('cl.manually_removed', 1),
                 $qb->expr()->isNull('cl.date_last_exited'),
             );
 
             $membershipConditions = $qb->expr()->and(
                     $membershipConditions,
-                    $qb->expr()->or($alreadyInCampaign, $removedFromCampaignBySegmentFilter)
+                    $qb->expr()->or($alreadyInCampaign, $removedFromCampaignManually)
                 );
         }
 
