@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "18c810239b16e7a63b7514bf61b0539f",
+    "content-hash": "ac01c6e56ac3f9e884c57232824c8ca5",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2868,13 +2868,13 @@
             "version": "dev-doctrine-fix",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mautic/FOSOAuthServerBundle.git",
-                "reference": "33bc2f43bcd100d00afd03d39c05bdebd14467ca"
+                "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git",
+                "reference": "605d20721fa2e1925d5ec8329dbac8f7d9a6be0c"
             },
             "require": {
                 "friendsofsymfony/oauth2-php": "~1.1",
                 "paragonie/random_compat": "^1|^2",
-                "php": "^7.2|^8.0",
+                "php": "^5.5|^7.0",
                 "symfony/dependency-injection": "^2.8|~3.0|^4.0",
                 "symfony/framework-bundle": "~2.8|~3.0|^4.0",
                 "symfony/security-bundle": "~2.8|~3.0|^4.0"
@@ -2938,7 +2938,7 @@
                 "oauth2",
                 "server"
             ],
-            "time": "2022-06-06T06:52:29+00:00"
+            "time": "2021-03-28T16:46:43+00:00"
         },
         {
             "name": "friendsofsymfony/oauth2-php",
@@ -3504,21 +3504,20 @@
         },
         {
             "name": "guzzlehttp/oauth-subscriber",
-            "version": "0.6.0",
+            "version": "0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/oauth-subscriber.git",
-                "reference": "8d6cab29f8397e5712d00a383eeead36108a3c1f"
+                "reference": "c7a04dd4f2a319d954da58363709c25388cc06a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/oauth-subscriber/zipball/8d6cab29f8397e5712d00a383eeead36108a3c1f",
-                "reference": "8d6cab29f8397e5712d00a383eeead36108a3c1f",
+                "url": "https://api.github.com/repos/guzzle/oauth-subscriber/zipball/c7a04dd4f2a319d954da58363709c25388cc06a2",
+                "reference": "c7a04dd4f2a319d954da58363709c25388cc06a2",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.5|^7.2",
-                "guzzlehttp/psr7": "^1.7|^2.0",
                 "php": ">=5.5.0"
             },
             "require-dev": {
@@ -3530,7 +3529,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.6-dev"
+                    "dev-master": "0.5-dev"
                 }
             },
             "autoload": {
@@ -3557,9 +3556,9 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/oauth-subscriber/issues",
-                "source": "https://github.com/guzzle/oauth-subscriber/tree/0.6.0"
+                "source": "https://github.com/guzzle/oauth-subscriber/tree/0.5.0"
             },
-            "time": "2021-07-13T12:01:32+00:00"
+            "time": "2021-03-07T09:39:26+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -4283,21 +4282,21 @@
         },
         {
             "name": "joomla/filter",
-            "version": "1.4.4",
+            "version": "1.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/filter.git",
-                "reference": "09733d70db6c6d91e53e0e0d0fcde9b8638175c4"
+                "reference": "ee1d870b5c188056745e1dd3cece21522e2158b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/filter/zipball/09733d70db6c6d91e53e0e0d0fcde9b8638175c4",
-                "reference": "09733d70db6c6d91e53e0e0d0fcde9b8638175c4",
+                "url": "https://api.github.com/repos/joomla-framework/filter/zipball/ee1d870b5c188056745e1dd3cece21522e2158b8",
+                "reference": "ee1d870b5c188056745e1dd3cece21522e2158b8",
                 "shasum": ""
             },
             "require": {
                 "joomla/string": "~1.3|~2.0",
-                "php": "^5.3.10|~7.0|^8.0"
+                "php": "^5.3.10|~7.0"
             },
             "require-dev": {
                 "joomla/coding-standards": "~2.0@alpha",
@@ -4331,49 +4330,45 @@
             ],
             "support": {
                 "issues": "https://github.com/joomla-framework/filter/issues",
-                "source": "https://github.com/joomla-framework/filter/tree/1.4.4"
+                "source": "https://github.com/joomla-framework/filter/tree/master"
             },
-            "funding": [
-                {
-                    "url": "https://community.joomla.org/sponsorship-campaigns.html",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/joomla",
-                    "type": "github"
-                }
-            ],
-            "time": "2022-03-29T12:14:25+00:00"
+            "time": "2018-05-26T15:48:53+00:00"
         },
         {
             "name": "joomla/string",
-            "version": "1.4.6",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/string.git",
-                "reference": "728ba9e39a8f1bd15b75ab878f57fa505184b8ab"
+                "reference": "778682c04a1909323da6a453a5b3030d7a7a2fa9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/string/zipball/728ba9e39a8f1bd15b75ab878f57fa505184b8ab",
-                "reference": "728ba9e39a8f1bd15b75ab878f57fa505184b8ab",
+                "url": "https://api.github.com/repos/joomla-framework/string/zipball/778682c04a1909323da6a453a5b3030d7a7a2fa9",
+                "reference": "778682c04a1909323da6a453a5b3030d7a7a2fa9",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.3.10|^7.0|^8.0"
+                "php": "^7.2.5",
+                "symfony/deprecation-contracts": "^2.1"
+            },
+            "conflict": {
+                "doctrine/inflector": "<1.2"
             },
             "require-dev": {
-                "joomla/coding-standards": "^2.0@alpha",
-                "joomla/test": "^1.0",
-                "phpunit/phpunit": "^4.8.35|^5.4.3|^6.0|^7.0|^8.0"
+                "doctrine/inflector": "1.2",
+                "joomla/coding-standards": "^3.0@dev",
+                "joomla/test": "^2.0",
+                "phpunit/phpunit": "^8.5|^9.0"
             },
             "suggest": {
+                "doctrine/inflector": "To use the string inflector",
                 "ext-mbstring": "For improved processing"
             },
             "type": "joomla-package",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.x-dev"
+                    "dev-2.0-dev": "2.0-dev"
                 }
             },
             "autoload": {
@@ -4411,7 +4406,7 @@
             ],
             "support": {
                 "issues": "https://github.com/joomla-framework/string/issues",
-                "source": "https://github.com/joomla-framework/string/tree/1.4.6"
+                "source": "https://github.com/joomla-framework/string/tree/2.0.0"
             },
             "funding": [
                 {
@@ -4423,7 +4418,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-01-25T15:16:52+00:00"
+            "time": "2021-08-10T18:57:12+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -5611,11 +5606,11 @@
         },
         {
             "name": "mautic/core-lib",
-            "version": "4.3.x-dev",
+            "version": "4.1.0",
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "3e7a938c18f6adbf4dec4f29e0f9be362c55f40a"
+                "reference": "6f844fd51595612e537e85e171d79540b8d404db"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5639,12 +5634,12 @@
                 "gaufrette/extras": "^0.1.0",
                 "geoip2/geoip2": "~2.0",
                 "guzzlehttp/guzzle": "^7.2",
-                "guzzlehttp/oauth-subscriber": "^0.6.0",
+                "guzzlehttp/oauth-subscriber": "^0.5.0",
                 "helios-ag/fm-elfinder-bundle": "^10.1",
                 "ip2location/ip2location-php": "^7.2",
                 "jbroadway/urlify": "^1.0",
                 "jms/serializer-bundle": "^4.0",
-                "joomla/filter": "~1.4.4",
+                "joomla/filter": "~1.3.5",
                 "kamermans/guzzle-oauth2-subscriber": "^1.0",
                 "knplabs/gaufrette": "~0.9.0",
                 "knplabs/knp-menu-bundle": "^3.0",
@@ -9423,7 +9418,6 @@
                     "type": "tidelift"
                 }
             ],
-            "abandoned": "symfony/error-handler",
             "time": "2022-04-12T15:19:55+00:00"
         },
         {
@@ -9514,7 +9508,7 @@
         },
         {
             "name": "symfony/deprecation-contracts",
-            "version": "v2.5.1",
+            "version": "v2.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/deprecation-contracts.git",
@@ -9561,7 +9555,7 @@
             "description": "A generic function and convention to trigger deprecation notices",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/deprecation-contracts/tree/v2.5.1"
+                "source": "https://github.com/symfony/deprecation-contracts/tree/v2.5.2"
             },
             "funding": [
                 {

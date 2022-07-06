@@ -12,11 +12,6 @@ final class AllowlistEntry
     public string $package;
 
     /**
-     * Human readable name.
-     */
-    public string $displayName;
-
-    /**
      * Minimum Mautic version in semver format (e.g. 4.1.2).
      */
     public ?string $minimumMauticVersion;
@@ -26,10 +21,9 @@ final class AllowlistEntry
      */
     public ?string $maximumMauticVersion;
 
-    public function __construct(string $package, string $displayName, ?string $minimumMauticVersion, ?string $maximumMauticVersion)
+    public function __construct(string $package, ?string $minimumMauticVersion, ?string $maximumMauticVersion)
     {
         $this->package              = $package;
-        $this->displayName          = $displayName;
         $this->minimumMauticVersion = $minimumMauticVersion;
         $this->maximumMauticVersion = $maximumMauticVersion;
     }
@@ -41,22 +35,8 @@ final class AllowlistEntry
     {
         return new self(
             $array['package'],
-            $array['display_name'] ?? '',
             $array['minimum_mautic_version'],
             $array['maximum_mautic_version']
         );
-    }
-
-    /**
-     * @return array<string,string>
-     */
-    public function toArray(): array
-    {
-        return [
-            'package'                => $this->package,
-            'display_name'           => $this->displayName,
-            'minimum_mautic_version' => $this->minimumMauticVersion,
-            'maximum_mautic_version' => $this->maximumMauticVersion,
-        ];
     }
 }

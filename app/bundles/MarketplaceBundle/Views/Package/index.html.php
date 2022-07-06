@@ -1,25 +1,10 @@
 <?php declare(strict_types=1);
 
-use Mautic\MarketplaceBundle\Service\RouteProvider;
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'Package');
 $view['slots']->set('headerTitle', $view['translator']->trans('marketplace.title'));
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
-    'customButtons' => [
-        [
-            'attr' => [
-                'class'       => 'btn btn-default btn-nospin',
-                'data-toggle' => 'ajax',
-                'href'        => $view['router']->path(RouteProvider::ROUTE_CLEAR_CACHE),
-            ],
-            'iconClass' => 'fa fa-trash',
-            'btnText'   => 'marketplace.clear.cache',
-            'tooltip'   => 'marketplace.clear.cache.tooltip',
-        ],
-    ],
-]));
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php'));
 
 if (true === $isComposerEnabled):
 ?>

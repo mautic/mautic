@@ -29,11 +29,6 @@ return [
                 'controller' => 'MarketplaceBundle:Package\Remove:view',
                 'method'     => 'GET|POST',
             ],
-            RouteProvider::ROUTE_CLEAR_CACHE => [
-                'path'       => '/marketplace/clear/cache',
-                'controller' => 'MarketplaceBundle:Cache:clear',
-                'method'     => 'GET',
-            ],
         ],
     ],
     'services' => [
@@ -96,19 +91,6 @@ return [
                     ],
                 ],
             ],
-            'marketplace.controller.cache' => [
-                'class'     => \Mautic\MarketplaceBundle\Controller\CacheController::class,
-                'arguments' => [
-                    'mautic.security',
-                    'marketplace.service.config',
-                    'marketplace.service.allowlist',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
             'marketplace.controller.ajax' => [
                 'class'     => \Mautic\MarketplaceBundle\Controller\AjaxController::class,
                 'arguments' => [
@@ -164,7 +146,7 @@ return [
         'models' => [
             'marketplace.model.package' => [
                 'class'     => \Mautic\MarketplaceBundle\Model\PackageModel::class,
-                'arguments' => ['marketplace.api.connection', 'marketplace.service.allowlist'],
+                'arguments' => ['marketplace.api.connection'],
             ],
         ],
         'other' => [

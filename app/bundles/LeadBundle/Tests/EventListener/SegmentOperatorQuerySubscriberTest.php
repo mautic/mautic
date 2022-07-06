@@ -39,6 +39,8 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     {
         parent::setUp();
 
+        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+
         $this->queryBuilder         = $this->createMock(QueryBuilder::class);
         $this->expressionBuilder    = $this->createMock(ExpressionBuilder::class);
         $this->contactSegmentFilter = $this->createMock(ContactSegmentFilter::class);

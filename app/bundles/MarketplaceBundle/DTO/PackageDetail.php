@@ -45,8 +45,7 @@ final class PackageDetail
                 $array['description'],
                 (int) $array['downloads']['total'],
                 (int) $array['favers'],
-                $array['type'] ?? null,
-                $array['display_name'] ?? null
+                $array['type'] ?? null
             ),
             VersionCollection::fromArray($array['versions']),
             MaintainerCollection::fromArray($array['maintainers']),

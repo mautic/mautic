@@ -6,6 +6,7 @@ use Exception;
 use InvalidArgumentException;
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\MarketplaceBundle\Exception\ApiException;
+use Mautic\MarketplaceBundle\Exception\InstallException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -63,16 +64,7 @@ class InstallCommand extends Command
         $result = $this->composer->install($input->getArgument('package'), $dryRun);
 
         if (0 !== $result->exitCode) {
-            $output->writeln('<error>Error while installing this plugin.</error>');
-
-            if ($result->output) {
-                $output->writeln($result->output);
-            } else {
-                // If the output is empty then tell the user where to find more details.
-                $output->writeln('Check the logs for more details or run again with the -vvv parameter.');
-            }
-
-            return $result->exitCode;
+            throw new InstallException('Error while installing this plugin: '.$result->output);
         }
 
         $output->writeln('All done! '.$input->getArgument('package').' has successfully been installed.');

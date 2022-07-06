@@ -7,11 +7,16 @@ use Mautic\MarketplaceBundle\DTO\PackageDetail;
 /** @var PackageDetail $packageDetail */
 $packageDetail = $packageDetail;
 
+try {
+    $latestVersion = $packageDetail->versions->findLatestVersionPackage();
+} catch (\Throwable $e) {
+    $latestVersionException = $e;
+}
 ?>
 <div class="text-center" id="marketplace-installation-in-progress">
     <p><?php echo $view['translator']->trans(
         'marketplace.package.install.html.in.progress',
-        ['%packagename%' => $view->escape($packageDetail->packageBase->getHumanPackageName())]
+        ['%packagename%' => $packageDetail->packageBase->getHumanPackageName()]
         ); ?></p>
     <div class="spinner">
         <i class="fa fa-spin fa-spinner"></i>
@@ -20,14 +25,14 @@ $packageDetail = $packageDetail;
 <div style="display: none" class="text-center" id="marketplace-installation-failed">
     <p><?php echo $view['translator']->trans(
         'marketplace.package.install.html.failed',
-        ['%packagename%' => $view->escape($packageDetail->packageBase->getHumanPackageName())]
+        ['%packagename%' => $packageDetail->packageBase->getHumanPackageName()]
         ); ?></p>
     <textarea class="form-control" readonly id="marketplace-installation-failed-details"></textarea>
 </div>
 <div style="display: none" class="text-center" id="marketplace-installation-success">
     <p><?php echo $view['translator']->trans(
         'marketplace.package.install.html.success',
-        ['%packagename%' => $view->escape($packageDetail->packageBase->getHumanPackageName())]
+        ['%packagename%' => $packageDetail->packageBase->getHumanPackageName()]
         ); ?></p>
     <p><a class="btn btn-primary" href="<?php echo $view['router']->path('mautic_plugin_reload'); ?>"><?php echo $view['translator']->trans(
         'marketplace.package.install.html.success.continue'); ?></a></p>

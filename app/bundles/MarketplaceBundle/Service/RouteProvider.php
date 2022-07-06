@@ -16,8 +16,6 @@ class RouteProvider
 
     public const ROUTE_REMOVE = 'mautic_marketplace_remove';
 
-    public const ROUTE_CLEAR_CACHE = 'mautic_marketplace_clear_cache';
-
     private RouterInterface $router;
 
     public function __construct(RouterInterface $router)
@@ -51,13 +49,6 @@ class RouteProvider
         return $this->router->generate(
             static::ROUTE_REMOVE,
             ['vendor' => $vendor, 'package' => $package]
-        );
-    }
-
-    public function buildClearCacheRoute(): string
-    {
-        return $this->router->generate(
-            static::ROUTE_CLEAR_CACHE
         );
     }
 }

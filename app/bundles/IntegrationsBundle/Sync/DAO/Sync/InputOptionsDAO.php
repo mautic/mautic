@@ -33,6 +33,11 @@ class InputOptionsDAO
     private $disablePull;
 
     /**
+     * @var bool
+     */
+    private $disableActivityPush;
+
+    /**
      * @var ObjectIdsDAO|null
      */
     private $mauticObjectIds;
@@ -61,6 +66,7 @@ class InputOptionsDAO
      *      'first-time-sync' => true,
      *      'disable-push' => false,
      *      'disable-pull' => false,
+     *      'disable-activity-push' => false,
      *      'mautic-object-id' => ['contact:12', 'contact:13'] or a ObjectIdsDAO object,
      *      'integration-object-id' => ['Lead:hfskjdhf', 'Lead:hfskjdhr'] or a ObjectIdsDAO object,
      *      'start-datetime' => '2019-09-12T12:01:20' or a DateTimeInterface object, Expecting UTC timezone
@@ -79,6 +85,7 @@ class InputOptionsDAO
         $this->firstTimeSync        = (bool) ($input['first-time-sync'] ?? false);
         $this->disablePush          = (bool) ($input['disable-push'] ?? false);
         $this->disablePull          = (bool) ($input['disable-pull'] ?? false);
+        $this->disableActivityPush  = (bool) ($input['disable-activity-push'] ?? false);
         $this->startDateTime        = $this->validateDateTime($input, 'start-datetime');
         $this->endDateTime          = $this->validateDateTime($input, 'end-datetime');
         $this->mauticObjectIds      = $this->validateObjectIds($input, 'mautic-object-id');
@@ -99,6 +106,11 @@ class InputOptionsDAO
     public function pullIsEnabled(): bool
     {
         return !$this->disablePull;
+    }
+
+    public function activityPushIsEnabled(): bool
+    {
+        return !$this->disableActivityPush;
     }
 
     public function pushIsEnabled(): bool

@@ -10,22 +10,19 @@ final class PackageBase
      * Original name in format "vendor/name".
      */
     public string $name;
-    public ?string $displayName;
     public string $url;
     public string $repository;
     public string $description;
     public int $downloads;
     public int $favers;
-
     /**
      * E.g. mautic-plugin.
      */
     public ?string $type;
 
-    public function __construct(string $name, string $url, string $repository, string $description, int $downloads, int $favers, ?string $type, ?string $displayName = null)
+    public function __construct(string $name, string $url, string $repository, string $description, int $downloads, int $favers, ?string $type)
     {
         $this->name        = $name;
-        $this->displayName = $displayName;
         $this->url         = $url;
         $this->repository  = $repository;
         $this->description = $description;
@@ -43,8 +40,7 @@ final class PackageBase
             $array['description'],
             (int) $array['downloads'],
             (int) $array['favers'],
-            $array['type'] ?? null,
-            $array['display_name'] ?? null
+            $array['type'] ?? null
         );
     }
 
@@ -66,23 +62,19 @@ final class PackageBase
 
     public function getPackageName(): string
     {
-        [, $packageName] = explode('/', $this->name);
+        list(, $packageName) = explode('/', $this->name);
 
         return $packageName;
     }
 
     public function getHumanPackageName(): string
     {
-        if ($this->displayName) {
-            return $this->displayName;
-        }
-
-        return utf8_ucwords(str_replace('-', ' ', $this->getPackageName()));
+        return utf8_ucfirst(str_replace('-', ' ', $this->getPackageName()));
     }
 
     public function getVendorName(): string
     {
-        [$vendor] = explode('/', $this->name);
+        list($vendor) = explode('/', $this->name);
 
         return $vendor;
     }

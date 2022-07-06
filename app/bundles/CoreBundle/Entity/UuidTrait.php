@@ -30,8 +30,10 @@ trait UuidTrait
      *     "segment:read", "segment:write",
      *     "email:read", "email:write"
      * })
+     *
+     * @var string|null
      */
-    private ?string $uuid = null;
+    private $uuid;
 
     public static function addUuidField(ClassMetadataBuilder $builder): void
     {
