@@ -542,20 +542,29 @@ class LeadRepository extends CommonRepository
      */
     private function updateQueryWithExistingMembershipExclusion($campaignId, QueryBuilder $qb, $campaignCanBeRestarted = false)
     {
-        $membershipConditions = [
+        $membershipConditions = $qb->expr()->and(
             $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
-            $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
-        ];
+            $qb->expr()->eq('cl.campaign_id', (int) $campaignId)
+        );
 
         if ($campaignCanBeRestarted) {
-            $membershipConditions[] = $qb->expr()->eq('cl.manually_removed', 0);
+            $alreadyInCampaign                  = $qb->expr()->eq('cl.manually_removed', 0);
+            $removedFromCampaignBySegmentFilter = $qb->expr()->and(
+                $qb->expr()->eq('cl.manually_removed', 1),
+                $qb->expr()->isNull('cl.date_last_exited'),
+            );
+
+            $membershipConditions = $qb->expr()->and(
+                    $membershipConditions,
+                    $qb->expr()->or($alreadyInCampaign, $removedFromCampaignBySegmentFilter)
+                );
         }
 
         $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
-                $qb->expr()->andX(...$membershipConditions)
+                $qb->expr()->andX($membershipConditions)
             );
 
         $qb->andWhere(
