@@ -2,21 +2,31 @@
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
+use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\LeadEvents;
 use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Response;
 
 class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     private LeadRepository $contactRepository;
+    private EventDispatcher $dispatcher;
 
+    /**
+     * @var array<string, string|int>
+     */
     private array $contacts = [
         [
             'email'     => 'contact1@email.com',
@@ -37,6 +47,9 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         ],
     ];
 
+    /**
+     * @var array<string, string|int>
+     */
     private array $stages = [
         [
             'name'        => 'novice',
@@ -57,6 +70,19 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->contactRepository  = $this->em->getRepository(Lead::class);
+        $this->dispatcher         = self::$container->get('event_dispatcher');
+    }
+
+    /**
+     * Clean up after the tests.
+     *
+     * @throws DBALException
+     */
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->truncateTables('leads', 'stages', 'campaigns', 'campaign_events');
     }
 
     public function testUpdateLeadAction(): void
@@ -124,7 +150,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $contactIds = $this->createContacts();
         $stageIds   = $this->createStages();
-        $this->addContacsToStage($contactIds, $stageIds[0]);
+        $this->addStageToContacts($contactIds, $stageIds[0]);
         $campaign   = $this->createCampaignWithStageConditionEvent($contactIds);
 
         // Force Doctrine to re-fetch the entities otherwise the campaign won't know about any events.
@@ -141,39 +167,40 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(0, $exitCode, $applicationTester->getDisplay());
     }
 
-    /**
-     * @return int[]
-     */
-    private function createStages(): array
+    public function testIsContactInOneOfStages(): void
     {
-        foreach ($this->stages as $key => $stage) {
-            $this->client->request('POST', '/api/stages/new', $stage);
-            $clientResponse = $this->client->getResponse();
-            $response       = json_decode($clientResponse->getContent(), true);
+        $contactIds = $this->createContacts();
+        $stageIds   = $this->createStages();
+        $this->addStageToContacts($contactIds, $stageIds[0]);
 
-            $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
-            $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
+        $args = [
+            'event' => [
+                'type'       => 'lead.stages',
+                'properties' => [
+                    'type'   => 'lead.stages',
+                    'stages' => [0 => '1'],
+                ],
+            ],
+            'eventDetails'    => [],
+            'systemTriggered' => true,
+            'eventSettings'   => [],
+        ];
 
-            $stages[$key] = $response['stages'][0]['id'];
-        }
-
-        return $stages ?? [];
-    }
-
-    private function addContacsToStage(array $contactIds, int $stageId): void
-    {
         foreach ($contactIds as $contactId) {
-            $this->client->request('POST', '/stages/'.$stageId.'/contact/'.$contactId.'/add');
-            $clientResponse = $this->client->getResponse();
-            $response       = json_decode($clientResponse->getContent(), true);
+            $args['lead'] = $this->contactRepository->getEntity($contactId);
 
-            $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
-            $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
+            $event  = new CampaignExecutionEvent($args, true);
+            $result = $this->dispatcher->dispatch(
+                LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+                $event
+            );
+
+            Assert::assertSame(true, $event->getResult());
         }
     }
 
     /**
-     * @return int[]
+     * @return array<int, int>
      */
     private function createContacts(): array
     {
@@ -193,6 +220,43 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
+    /**
+     * @return array<int, int>
+     */
+    private function createStages(): array
+    {
+        foreach ($this->stages as $key => $stage) {
+            $this->client->request('POST', '/api/stages/new', $stage);
+            $clientResponse = $this->client->getResponse();
+            $response       = json_decode($clientResponse->getContent(), true);
+
+            $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+            $stages[$key] = $response['stage']['id'];
+        }
+
+        return $stages ?? [];
+    }
+
+    /**
+     * @param array<int, int> $contactIds
+     */
+    private function addStageToContacts(array $contactIds, int $stageId): void
+    {
+        foreach ($contactIds as $contactId) {
+            $this->client->request('POST', "/api/stages/$stageId/contact/$contactId/add");
+            $clientResponse = $this->client->getResponse();
+
+            $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        }
+    }
+
+    /**
+     * @param array<int, int> $contactIds
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
     private function createCampaign(array $contactIds): Campaign
     {
         $campaign = new Campaign();
@@ -394,6 +458,12 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         return $campaign;
     }
 
+    /**
+     * @param array<int, int> $contactIds
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
     private function createCampaignWithStageConditionEvent(array $contactIds): Campaign
     {
         $campaign = new Campaign();
@@ -425,7 +495,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                     'droppedX' => '696',
                     'droppedY' => '155',
                 ],
-                'name'                       => '',
+                'name'                       => 'Contact stages',
                 'triggerMode'                => 'immediate',
                 'triggerDate'                => null,
                 'triggerInterval'            => '1',
@@ -433,21 +503,16 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'triggerHour'                => '',
                 'triggerRestrictedStartHour' => '',
                 'triggerRestrictedStopHour'  => '',
+                'order'                      => 1,
                 'anchor'                     => 'leadsource',
-                'properties'                 => [
-                    'field'    => 'stages',
-                    'operator' => '=',
-                    'value'    => '1',
-                ],
+                'properties'                 => ['stages' => [0 => '1']],
                 'type'                       => 'lead.stages',
                 'eventType'                  => 'condition',
-                'anchorEventType'            => 'condition',
+                'anchorEventType'            => 'source',
                 'campaignId'                 => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
                 '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
                 'buttons'                    => ['save' => ''],
-                'field'                      => 'stage',
-                'operator'                   => '=',
-                'value'                      => '1',
+                'stages'                     => [0 => '1'],
             ]
         );
 
@@ -456,8 +521,8 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $event2 = new Event();
         $event2->setCampaign($campaign);
-        $event2->setName('Update the stage field');
-        $event2->setType('lead.updatelead');
+        $event2->setName('Change contact\'s stage');
+        $event2->setType('stage.change');
         $event2->setEventType('action');
         $event2->setTriggerMode('immediate');
         $event2->setProperties(
@@ -474,21 +539,16 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'triggerHour'                => '',
                 'triggerRestrictedStartHour' => '',
                 'triggerRestrictedStopHour'  => '',
-                'anchor'                     => 'leadsource',
-                'properties'                 => [
-                    'sourceId'               => 'lists',
-                    'targetId'               => '14',
-                    'anchors'                => ['source' => 'leadsource', 'target' => 'top'],
-                ],
-                'type'                       => 'lead.updatelead',
+                'order'                      => 2,
+                'anchor'                     => 'bottom',
+                'properties'                 => ['stage' => '2'],
+                'type'                       => 'stage.change',
                 'eventType'                  => 'action',
-                'anchorEventType'            => 'source',
+                'anchorEventType'            => 'action',
                 'campaignId'                 => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
                 '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
                 'buttons'                    => ['save' => ''],
-                'sourceId'                   => 'lists',
-                'targetId'                   => '14',
-                'anchors'                    => ['source' => 'leadsource', 'target' => 'top'],
+                'stage'                      => 2,
             ]
         );
 
