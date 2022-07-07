@@ -15,12 +15,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var LeadRepository
-     */
-    private $contactRepository;
+    private LeadRepository $contactRepository;
 
-    private $contacts = [
+    private array $contacts = [
         [
             'email'     => 'contact1@email.com',
             'firstname' => 'Isaac',
@@ -37,6 +34,21 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             'firstname' => 'Arthur C.',
             'lastname'  => 'Clarke',
             'points'    => 1,
+        ],
+    ];
+
+    private array $stages = [
+        [
+            'name'        => 'novice',
+            'weight'      => 1,
+            'description' => 'This is the first stage',
+            'isPublished' => 1,
+        ],
+        [
+            'name'        => 'advanced beginner',
+            'weight'      => 2,
+            'description' => 'This is the second stage',
+            'isPublished' => 1,
         ],
     ];
 
@@ -102,6 +114,62 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         );
 
         Assert::assertSame(0, $exitCode, $applicationTester->getDisplay());
+    }
+
+    public function testLeadFieldStageValueCondition(): void
+    {
+        $application = new Application(self::$kernel);
+        $application->setAutoExit(false);
+        $applicationTester = new ApplicationTester($application);
+
+        $contactIds = $this->createContacts();
+        $stageIds   = $this->createStages();
+        $this->addContacsToStage($contactIds, $stageIds[0]);
+        $campaign   = $this->createCampaignWithStageConditionEvent($contactIds);
+
+        // Force Doctrine to re-fetch the entities otherwise the campaign won't know about any events.
+        $this->em->clear();
+
+        // Execute the campaign.
+        $exitCode = $applicationTester->run(
+            [
+                'command'       => 'mautic:campaigns:trigger',
+                '--campaign-id' => $campaign->getId(),
+            ]
+        );
+
+        Assert::assertSame(0, $exitCode, $applicationTester->getDisplay());
+    }
+
+    /**
+     * @return int[]
+     */
+    private function createStages(): array
+    {
+        foreach ($this->stages as $key => $stage) {
+            $this->client->request('POST', '/api/stages/new', $stage);
+            $clientResponse = $this->client->getResponse();
+            $response       = json_decode($clientResponse->getContent(), true);
+
+            $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+            $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
+
+            $stages[$key] = $response['stages'][0]['id'];
+        }
+
+        return $stages ?? [];
+    }
+
+    private function addContacsToStage(array $contactIds, int $stageId): void
+    {
+        foreach ($contactIds as $contactId) {
+            $this->client->request('POST', '/stages/'.$stageId.'/contact/'.$contactId.'/add');
+            $clientResponse = $this->client->getResponse();
+            $response       = json_decode($clientResponse->getContent(), true);
+
+            $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+            $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
+        }
     }
 
     /**
@@ -303,6 +371,153 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                     [
                         'sourceId' => 'lists',
                         'targetId' => $event->getId(),
+                        'anchors'  => [
+                            'source' => 'leadsource',
+                            'target' => 'top',
+                        ],
+                    ],
+                    [
+                        'sourceId' => 'lists',
+                        'targetId' => $event2->getId(),
+                        'anchors'  => [
+                            'source' => 'leadsource',
+                            'target' => 'top',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        return $campaign;
+    }
+
+    private function createCampaignWithStageConditionEvent(array $contactIds): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Test Update contact');
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        foreach ($contactIds as $key => $contactId) {
+            $campaignLead = new CampaignLead();
+            $campaignLead->setCampaign($campaign);
+            $campaignLead->setLead($this->em->getReference(Lead::class, $contactId));
+            $campaignLead->setDateAdded(new \DateTime());
+            $this->em->persist($campaignLead);
+            $campaign->addLead($key, $campaignLead);
+        }
+
+        $this->em->flush();
+
+        $event1 = new Event();
+        $event1->setCampaign($campaign);
+        $event1->setName('Check if the contact on one of the stage(s)');
+        $event1->setType('lead.stages');
+        $event1->setEventType('condition');
+        $event1->setTriggerMode('immediate');
+        $event1->setProperties(
+            [
+                'canvasSettings'             => [
+                    'droppedX' => '696',
+                    'droppedY' => '155',
+                ],
+                'name'                       => '',
+                'triggerMode'                => 'immediate',
+                'triggerDate'                => null,
+                'triggerInterval'            => '1',
+                'triggerIntervalUnit'        => 'd',
+                'triggerHour'                => '',
+                'triggerRestrictedStartHour' => '',
+                'triggerRestrictedStopHour'  => '',
+                'anchor'                     => 'leadsource',
+                'properties'                 => [
+                    'field'    => 'stages',
+                    'operator' => '=',
+                    'value'    => '1',
+                ],
+                'type'                       => 'lead.stages',
+                'eventType'                  => 'condition',
+                'anchorEventType'            => 'condition',
+                'campaignId'                 => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
+                '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
+                'buttons'                    => ['save' => ''],
+                'field'                      => 'stage',
+                'operator'                   => '=',
+                'value'                      => '1',
+            ]
+        );
+
+        $this->em->persist($event1);
+        $this->em->flush();
+
+        $event2 = new Event();
+        $event2->setCampaign($campaign);
+        $event2->setName('Update the stage field');
+        $event2->setType('lead.updatelead');
+        $event2->setEventType('action');
+        $event2->setTriggerMode('immediate');
+        $event2->setProperties(
+            [
+                'canvasSettings'             => [
+                    'droppedX' => '696',
+                    'droppedY' => '155',
+                ],
+                'name'                       => '',
+                'triggerMode'                => 'immediate',
+                'triggerDate'                => null,
+                'triggerInterval'            => '1',
+                'triggerIntervalUnit'        => 'd',
+                'triggerHour'                => '',
+                'triggerRestrictedStartHour' => '',
+                'triggerRestrictedStopHour'  => '',
+                'anchor'                     => 'leadsource',
+                'properties'                 => [
+                    'sourceId'               => 'lists',
+                    'targetId'               => '14',
+                    'anchors'                => ['source' => 'leadsource', 'target' => 'top'],
+                ],
+                'type'                       => 'lead.updatelead',
+                'eventType'                  => 'action',
+                'anchorEventType'            => 'source',
+                'campaignId'                 => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
+                '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
+                'buttons'                    => ['save' => ''],
+                'sourceId'                   => 'lists',
+                'targetId'                   => '14',
+                'anchors'                    => ['source' => 'leadsource', 'target' => 'top'],
+            ]
+        );
+
+        $this->em->persist($event2);
+        $this->em->flush();
+
+        $campaign->setCanvasSettings(
+            [
+                'nodes'       => [
+                    [
+                        'id'        => $event2->getId(),
+                        'positionX' => '696',
+                        'positionY' => '155',
+                    ],
+                    [
+                        'id'        => $event2->getId(),
+                        'positionX' => '696',
+                        'positionY' => '155',
+                    ],
+                    [
+                        'id'        => 'lists',
+                        'positionX' => '796',
+                        'positionY' => '50',
+                    ],
+                ],
+                'connections' => [
+                    [
+                        'sourceId' => 'lists',
+                        'targetId' => $event1->getId(),
                         'anchors'  => [
                             'source' => 'leadsource',
                             'target' => 'top',
