@@ -608,7 +608,8 @@ class FieldType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => LeadField::class,
+                'data_class'         => LeadField::class,
+                'allow_extra_fields' => true,
             ]
         );
     }
