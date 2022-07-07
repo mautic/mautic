@@ -257,3 +257,30 @@ ul.tag-cloud li {
     line-height: 250px;
     font-size: 24px;
 }
+
+.segment-node {
+    border: grey solid 1px;
+    border-radius: 6px;
+    text-align: center;
+    margin: 20px;
+    flex: 1 200px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 200px;
+    flex-flow: column wrap;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+}
+
+.segment-node.has-message {
+    border: red solid 4px;
+}
+
+.segment-level {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+}
