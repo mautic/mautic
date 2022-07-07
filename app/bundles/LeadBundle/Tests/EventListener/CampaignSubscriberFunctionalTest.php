@@ -16,16 +16,15 @@ use Mautic\LeadBundle\LeadEvents;
 use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     private LeadRepository $contactRepository;
-    private EventDispatcher $dispatcher;
 
     /**
-     * @var array<string, string|int>
+     * @var array<int, array<string, int|string>>
      */
     private array $contacts = [
         [
@@ -48,7 +47,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     ];
 
     /**
-     * @var array<string, string|int>
+     * @var array<int, array<string, int|string>>
      */
     private array $stages = [
         [
@@ -70,7 +69,6 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->contactRepository  = $this->em->getRepository(Lead::class);
-        $this->dispatcher         = self::$container->get('event_dispatcher');
     }
 
     /**
@@ -190,7 +188,10 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             $args['lead'] = $this->contactRepository->getEntity($contactId);
 
             $event  = new CampaignExecutionEvent($args, true);
-            $result = $this->dispatcher->dispatch(
+
+            /** @var EventDispatcherInterface $dispatcher */
+            $dispatcher = self::$container->get('event_dispatcher');
+            $result     = $dispatcher->dispatch(
                 LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
                 $event
             );
@@ -221,7 +222,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, int>
+     * @return array<int, mixed>
      */
     private function createStages(): array
     {
