@@ -53,6 +53,8 @@ $view['slots']->set(
     $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $list])
 );
 
+$hasSegmentMembershipFilter = $list->hasFilterTypeOf('leadlist');
+
 ?>
 
 <!-- start: box layout -->
@@ -157,6 +159,13 @@ $view['slots']->set(
                         <?php echo $view['translator']->trans('mautic.lead.leads'); ?>
                     </a>
                 </li>
+                <?php if ($hasSegmentMembershipFilter) : ?>
+                <li>
+                    <a id="segment-dependencies" href="#segment-dependencies-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.lead.segment.dependencies'); ?>
+                    </a>
+                </li>
+                <?php endif; ?>
                 <li>
                     <a id="campaign-share-tab" href="#campaign-container" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.lead.campaign.share'); ?>
@@ -177,6 +186,12 @@ $view['slots']->set(
 
             <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
             </div>
+
+            <?php if ($hasSegmentMembershipFilter) : ?>
+            <div class="tab-pane bdr-w-0 page-list" id="segment-dependencies-container">
+            </div>
+            <?php endif; ?>
+
             <div class="tab-pane bdr-w-0 page-list" id="campaign-container">
                 <div id="campaign-share-container" style="position: relative">
                     <table id="campaign-share-table" class="table table-bordered table-striped mb-0">
