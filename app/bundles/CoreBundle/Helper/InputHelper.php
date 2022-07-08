@@ -543,4 +543,15 @@ class InputHelper
 
         return \URLify::transliterate((string) $value);
     }
+
+    public static function transliterateFilename(string $filename)
+    {
+        $pathInfo = pathinfo($filename);
+        $filename = self::alphanum(self::transliterate($pathInfo['filename']), false, '-');
+        if (isset($pathInfo['extension'])) {
+            $filename .= '.'.$pathInfo['extension'];
+        }
+
+        return $filename;
+    }
 }

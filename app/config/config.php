@@ -320,8 +320,7 @@ $container->loadFromExtension('fm_elfinder', [
                 'plugins' => [
                     'Sanitizer' => [
                         'enable'   => true,
-                        'targets'  => [' ', '\\', '/', ':', '*', '?', '"', '<', '>', '|'], // target chars
-                        'replace'  => '-', // replace to this
+                        'callBack' => '\Mautic\CoreBundle\Helper\InputHelper::transliterateFilename',
                     ],
                 ],
                 'roots' => [

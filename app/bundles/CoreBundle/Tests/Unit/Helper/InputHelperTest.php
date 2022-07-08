@@ -211,4 +211,47 @@ class InputHelperTest extends TestCase
         // fragment is not included
         yield ['http://www.mautic.org#abc123', 'http://www.mautic.org', true];
     }
+
+    /**
+     * @dataProvider filenameProvider
+     */
+    public function testFilenameSanitization(string $inputFilename, string $outputFilename): void
+    {
+        $cleanedUrl = InputHelper::transliterateFilename($inputFilename);
+
+        Assert::assertEquals($cleanedUrl, $outputFilename);
+    }
+
+    public function filenameProvider(): iterable
+    {
+        yield [
+            'dirname',
+            'dirname',
+        ];
+
+        yield [
+            'file.png',
+            'file.png',
+        ];
+
+        yield [
+            'dirname with space',
+            'dirname-with-space',
+        ];
+
+        yield [
+            'filename with space.png',
+            'filename-with-space.png',
+        ];
+
+        yield [
+            'directory with čšťĺé',
+            'directory-with-cstle',
+        ];
+
+        yield [
+            'filename with čšťĺé.png',
+            'filename-with-cstle.png',
+        ];
+    }
 }
