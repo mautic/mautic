@@ -1176,6 +1176,13 @@ return [
                     'event_dispatcher',
                 ],
             ],
+            'mautic.lead.service.segment_dependency_tree_factory' => [
+                'class'     => \Mautic\LeadBundle\Services\SegmentDependencyTreeFactory::class,
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'router',
+                ],
+            ],
             'mautic.lead.repository.lead_segment_query_builder' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder::class,
                 'arguments' => [

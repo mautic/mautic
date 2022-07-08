@@ -273,6 +273,17 @@ class LeadList extends FormEntity
         return $this->filters;
     }
 
+    public function hasFilterTypeOf(string $type): bool
+    {
+        foreach ($this->getFilters() as $filter) {
+            if ($filter['type'] === $type) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @param bool $isGlobal
      *
