@@ -520,7 +520,17 @@ class SalesforceApi extends CrmApi
             }
 
             foreach ($response as $lineItem) {
-                if (is_array($lineItem) && !empty($lineItem['errorCode']) && $error = $this->processError($lineItem, $isRetry)) {
+                if (!is_array($lineItem)) {
+                    continue;
+                }
+                $lineItemForInvalidSession              = $lineItem;
+                $lineItemForInvalidSession['errorCode'] = 'INVALID_SESSION_ID';
+                if (!empty($lineItemForInvalidSession['message']) && false !== strpos($lineItemForInvalidSession['message'], '"errorCode":"INVALID_SESSION_ID"') && $error = $this->processError($lineItemForInvalidSession, $isRetry)) {
+                    $errors[] = $error;
+                    continue;
+                }
+
+                if (!empty($lineItem['errorCode']) && $error = $this->processError($lineItem, $isRetry)) {
                     $errors[] = $error;
                 }
             }

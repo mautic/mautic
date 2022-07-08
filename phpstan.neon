@@ -12,7 +12,7 @@ parameters:
 		- app/bundles
 		- app/migrations
 		- plugins
-	excludes_analyse:
+	excludePaths:
 		- *.html.php
 		- *.js.php
 		- *.less.php

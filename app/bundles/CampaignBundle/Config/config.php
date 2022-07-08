@@ -565,6 +565,8 @@ return [
                     'mautic.campaign.executioner.inactive',
                     'monolog.logger.mautic',
                     'mautic.helper.template.formatter',
+                    'mautic.lead.model.list',
+                    'mautic.helper.segment.count.cache',
                 ],
                 'tag' => 'console.command',
             ],
