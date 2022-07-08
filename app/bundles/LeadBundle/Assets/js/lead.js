@@ -1527,7 +1527,113 @@ Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, 
 
 Mautic.listOnLoad = function(container, response) {
     Mautic.lazyLoadContactListOnSegmentDetail();
+
+    const segmentDependenciesTab = mQuery('a#segment-dependencies');
+    let segmentDependenciesLoaded = false;
+    let jsPlumbData = null;
+    
+    if (segmentDependenciesTab.length) {
+        mQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+            if (!mQuery(e.target).attr('id') === 'segment-dependencies') {
+                return;
+            }
+
+            if (!segmentDependenciesLoaded) {
+                segmentDependenciesLoaded = true;
+                mQuery.ajax({
+                    showLoadingBar: true,
+                    url: mauticAjaxUrl,
+                    type: 'GET',
+                    data: {
+                        action: 'lead:getSegmentDependencyTree',
+                        id: mQuery('input#entityId').val()
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        Mautic.stopPageLoadingBar();
+                        Mautic.renderSegmentTree('#segment-dependencies-container', response);
+                        jsPlumbData = response;
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                        Mautic.processAjaxError(request, textStatus, errorThrown);
+                    }
+                });
+            } else if (jsPlumbData) {
+                Mautic.renderSegmentTree('#segment-dependencies-container', jsPlumbData);
+            }
+        });
+
+        mQuery(document).on('hide.bs.tab', 'a[data-toggle="tab"]', function (e) {
+            if (!mQuery(e.target).attr('id') !== 'segment-dependencies') {
+                Mautic.cleanSegmentDependencies();
+            }
+        });
+    }
 };
+
+Mautic.listOnUnload = function() {
+    Mautic.cleanSegmentDependencies();
+}
+
+/**
+ *  JsPlumb has a problem with z-index when using tabs or change content by ajax so we need to re-initialize it.
+ */
+Mautic.cleanSegmentDependencies = function() {
+    mQuery('.jtk-connector').remove();
+    mQuery('#segment-dependencies-container').empty();
+}
+
+Mautic.renderSegmentTree = function(containerId, data) {
+    Mautic.cleanSegmentDependencies(); // Make sure there is no tree rendered already
+
+    const plumbInstance = jsPlumb.getInstance({
+        elementsDraggable:false,
+        container: document.querySelector(containerId)
+    });
+
+    const wrapper = mQuery(containerId);
+    const nodes = {};
+
+    for (let level = 0; level < data.levels.length; level++) {
+        const row = mQuery('<div class="segment-level" id="segment-level-'+level+'"></div>');
+        wrapper.append(row);
+        for (let index = 0; index < data.levels[level].nodes.length; index++) {
+            const nodeData = data.levels[level].nodes[index];
+            const node = Mautic.buildSegmentDependencyNode(nodeData);
+            row.append(node);
+            nodes[nodeData['id']] = node;
+        }
+    }
+
+    for (let index = 0; index < data.edges.length; index++) {
+        const edge = data.edges[index];
+        plumbInstance.connect({
+            source:nodes[edge.source],
+            target:nodes[edge.target],
+            connector: 'Flowchart',
+            anchor: ['Top', 'Bottom'],
+            endpoint:"Blank",
+        });
+    }
+
+    return plumbInstance;
+}
+
+Mautic.buildSegmentDependencyNode = function(nodeData) {
+    let message = '';
+    let hasMessageClass = '';
+
+    if (nodeData['message']) {
+        message = '<span class="segment-dependency-message text-danger">'+nodeData['message']+'</span>';
+        hasMessageClass = ' has-message';
+    }
+
+    const link = '<a href="'+nodeData['link']+'" data-toggle="ajax">'+nodeData['name']+'</a>';
+
+    const node = mQuery('<div class="segment-node'+hasMessageClass+'" id="segment-node'+nodeData['id']+'">'+link+message+'</div>');
+
+    return node;
+}
 
 Mautic.lazyLoadContactListOnSegmentDetail = function() {
     const containerId = '#contacts-container';
