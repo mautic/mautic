@@ -249,13 +249,13 @@ class PointModel extends CommonFormModel
                 if (!$event->canChangePoints()) {
                     continue;
                 }
-            } elseif (!$action->getRepeatable()) {
+            } else {
                 // 2. step - can change points from callback
                 if (!$this->invokeCallback($action, $lead, $eventDetails, $settings)) {
                     continue;
                 }
                 // 3. step - can change points from log
-                if (isset($completedActions[$action->getId()])) {
+                if (!$action->getRepeatable() && isset($completedActions[$action->getId()])) {
                     continue;
                 }
             }
