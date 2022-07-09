@@ -45,19 +45,6 @@ class FieldType extends AbstractType
      */
     private $identifierFields;
 
-    /**
-     * For which types will be character limits applicable.
-     *
-     * @var string[]
-     */
-    private $indexableFieldsWithLimits = [
-        'text',
-        'select',
-        'phone',
-        'url',
-        'email',
-    ];
-
     public function __construct(EntityManagerInterface $em, TranslatorInterface $translator, IdentifierFields $identifierFields)
     {
         $this->em               = $em;
@@ -455,10 +442,6 @@ class FieldType extends AbstractType
                 if ('social' === $data['group'] || !empty($data['isUniqueIdentifer']) || $disableDefaultValue) {
                     // Don't allow a default for social or unique identifiers
                     $data['defaultValue'] = null;
-                }
-
-                if (isset($data['type']) && !in_array($data['type'], $this->indexableFieldsWithLimits)) {
-                    $data['charLengthLimit'] = null;
                 }
 
                 $event->setData($data);
