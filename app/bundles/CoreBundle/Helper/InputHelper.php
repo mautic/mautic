@@ -213,7 +213,7 @@ class InputHelper
     /**
      * Strips non-alphanumeric characters.
      *
-     * @param              $value
+     * @param string       $value
      * @param bool|false   $urldecode
      * @param string|false $convertSpacesTo
      * @param array        $allowedCharacters
