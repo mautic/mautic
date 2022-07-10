@@ -213,10 +213,10 @@ class InputHelper
     /**
      * Strips non-alphanumeric characters.
      *
-     * @param            $value
-     * @param bool|false $urldecode
-     * @param bool|false $convertSpacesTo
-     * @param array      $allowedCharacters
+     * @param              $value
+     * @param bool|false   $urldecode
+     * @param string|false $convertSpacesTo
+     * @param array        $allowedCharacters
      *
      * @return string
      */
@@ -544,7 +544,7 @@ class InputHelper
         return \URLify::transliterate((string) $value);
     }
 
-    public static function transliterateFilename(string $filename)
+    public static function transliterateFilename(string $filename): string
     {
         $pathInfo = pathinfo($filename);
         $filename = self::alphanum(self::transliterate($pathInfo['filename']), false, '-');

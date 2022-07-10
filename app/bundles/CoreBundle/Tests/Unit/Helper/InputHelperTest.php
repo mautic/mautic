@@ -222,6 +222,9 @@ class InputHelperTest extends TestCase
         Assert::assertEquals($cleanedUrl, $outputFilename);
     }
 
+    /**
+     * @return iterable<array<string>>
+     */
     public function filenameProvider(): iterable
     {
         yield [
