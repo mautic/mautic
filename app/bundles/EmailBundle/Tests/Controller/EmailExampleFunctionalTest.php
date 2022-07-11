@@ -421,7 +421,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
     {
         return new class() implements Swift_Transport {
             /**
-             * @var array
+             * @var array <mixed>
              */
             public $messages = [];
 
