@@ -2,6 +2,8 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Validator\Constraints\Length;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -58,7 +60,8 @@ class EmailUtmTagsType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'required' => false,
+                'required'          => false,
+                'constraints'       => new Length(['max' => ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH]),
             ]
         );
     }
