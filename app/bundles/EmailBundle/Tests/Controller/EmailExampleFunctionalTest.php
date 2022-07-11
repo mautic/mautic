@@ -99,8 +99,8 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         // Asserting email data
         self::assertInstanceOf('Swift_Message', $message);
         self::assertSame('admin@yoursite.com', key($message->getTo()));
-        self::assertStringContainsString('Email subject', $message->getSubject());
-        self::assertStringContainsString('Contact emails is [Email]', $message->getBody());
+        self::assertStringContainsString('Email subject for [First Name] [Last Name], living in [Address Line 1], [Address Line 2], [City], [Country]. Contact number: [Mobile]', $message->getSubject());
+        self::assertStringContainsString('Email body for [First Name] [Last Name], living in [Address Line 1], [Address Line 2], [City], [Country]. Contact number: [Mobile]', $message->getBody());
     }
 
     /**
