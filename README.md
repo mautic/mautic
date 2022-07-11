@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-77-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-78-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -173,6 +173,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/alinmbb"><img src="https://avatars.githubusercontent.com/u/86683952?v=4?s=100" width="100px;" alt=""/><br /><sub><b>alinmbb</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=alinmbb" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/deborahsalves"><img src="https://avatars.githubusercontent.com/u/79517214?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Déborah Salves</b></sub></a><br /><a href="#userTesting-deborahsalves" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/automatyzuj"><img src="https://avatars.githubusercontent.com/u/104569506?v=4?s=100" width="100px;" alt=""/><br /><sub><b>automatyzuj</b></sub></a><br /><a href="#userTesting-automatyzuj" title="User Testing">📓</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://www.oldschoolhack.me"><img src="https://avatars.githubusercontent.com/u/1666336?v=4?s=100" width="100px;" alt=""/><br /><sub><b>KN4CK3R</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=KN4CK3R" title="Code">💻</a></td>
   </tr>
 </table>
 

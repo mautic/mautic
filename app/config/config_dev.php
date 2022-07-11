@@ -76,6 +76,10 @@ $container->loadFromExtension('monolog', [
     ],
 ]);
 
+$container->loadFromExtension('maker', [
+    'root_namespace' => 'Mautic',
+]);
+
 // Allow overriding config without a requiring a full bundle or hacks
 if (file_exists(__DIR__.'/config_override.php')) {
     $loader->import('config_override.php');
