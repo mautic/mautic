@@ -14,6 +14,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class EmailTriggerTest extends MauticMysqlTestCase
 {
+    /**
+     * @runInSeparateProcess
+     */
     public function testButtonsAreEnabledOnEditSendEmailToUserWhenEmailIsSelected(): void
     {
         $email = new Email();
@@ -39,6 +42,9 @@ class EmailTriggerTest extends MauticMysqlTestCase
         self::assertStringContainsString('"origin":"#pointtriggerevent_properties_useremail_email"', $crawler->selectButton('Preview')->attr('onclick'), 'The origin value should be correct.');
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testButtonsAreDisabledWhenEmailIsNotSelected(): void
     {
         $trigger      = $this->createTrigger();

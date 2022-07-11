@@ -99,9 +99,6 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
         $this->triggerModel->setEntityManager($this->entityManager);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testTriggerEvent(): void
     {
         $triggerEvent = new TriggerEvent();
