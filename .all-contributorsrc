@@ -741,6 +741,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "KN4CK3R",
+      "name": "KN4CK3R",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1666336?v=4",
+      "profile": "https://www.oldschoolhack.me",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
