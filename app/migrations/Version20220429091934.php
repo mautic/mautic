@@ -22,12 +22,12 @@ class Version20220429091934 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $userIdFK     = $this->generatePropertyName('users', 'fk', ['user_id']);
+        $userIdFK = $this->generatePropertyName('users', 'fk', ['user_id']);
 
-        $contactExportSchedulerTableName  = "{$this->prefix}contact_export_scheduler";
-        $usersTableName  = "{$this->prefix}users";
+        $contactExportSchedulerTableName = "{$this->prefix}contact_export_scheduler";
+        $usersTableName                  = "{$this->prefix}users";
 
-        $usersIdDataType       = $this->getColumnDataType($schema->getTable($usersTableName), 'id');
+        $usersIdDataType = $this->getColumnDataType($schema->getTable($usersTableName), 'id');
 
         $this->addSql(
             "# Creating table {$this->prefix}contact_export_scheduler
@@ -59,7 +59,7 @@ class Version20220429091934 extends PreUpAssertionMigration
      */
     private function getColumnDataType(Table $table, string $columnName): string
     {
-        $column  = $table->getColumn($columnName);
+        $column = $table->getColumn($columnName);
 
         return $column->getUnsigned() ? self::UNSIGNED : self::SIGNED;
     }
