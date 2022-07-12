@@ -47,7 +47,7 @@ class FieldType extends AbstractType
             'inputAttributes'     => 'string',
             'containerAttributes' => 'string',
             'label'               => 'strict_html',
-            'helpMessage'         => 'html',
+            'helpMessage'         => 'strict_html',
         ];
 
         $addHelpMessage         =
