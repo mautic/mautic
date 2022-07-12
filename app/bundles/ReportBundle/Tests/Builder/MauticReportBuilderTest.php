@@ -181,6 +181,41 @@ final class MauticReportBuilderTest extends TestCase
         ')), $query->getSql());
     }
 
+    public function testReportWithPreciseAvg(): void
+    {
+        $report = new Report();
+        $report->setColumns(['a.id']);
+        $report->setGroupBy(['a.id']);
+        $report->setAggregators([
+            [
+                'column'    => 'a.bounced',
+                'function'  => 'AVG',
+            ],
+        ]);
+
+        $builder = $this->buildBuilder($report);
+        $query   = $builder->getQuery([
+            'columns' => [
+                'a.id'      => [],
+                'a.bounced' => [
+                    'formula' => 'IF(dnc.id IS NOT NULL AND dnc.reason=2, 1, 0)',
+                ],
+            ],
+            'aggregators' => [
+                'a.bounced' => [
+                    'label' => 'AVG bounced',
+                    'type'  => 'float',
+                    'alias' => 'avgBounced',
+                ],
+            ],
+            'groupBy' => ['a.id'],
+        ]);
+
+        Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+            SELECT `a`.`id`, AVG(IF(dnc.id IS NOT NULL AND dnc.reason=2, 1, 0)) AS \'AVG a.bounced\' GROUP BY a.id
+        ')), $query->getSql());
+    }
+
     private function buildBuilder(Report $report): MauticReportBuilder
     {
         return new MauticReportBuilder(
