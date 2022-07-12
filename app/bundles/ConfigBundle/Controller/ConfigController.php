@@ -129,6 +129,8 @@ class ConfigController extends FormController
                         } catch (\RuntimeException $exception) {
                             $this->addFlash('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
                         }
+
+                        $this->setLocale($params);
                     }
                 } elseif (!$isWritabale) {
                     $form->addError(
@@ -281,5 +283,20 @@ class ConfigController extends FormController
                 }
             }
         }
+    }
+
+    /**
+     * @param array<string, string> $params
+     */
+    private function setLocale(array $params): void
+    {
+        $me     = $this->get('security.token_storage')->getToken()->getUser();
+        $locale = $me->getLocale();
+
+        if (empty($locale)) {
+            $locale = $params['locale'] ?? $this->get('mautic.helper.core_parameters')->get('locale');
+        }
+
+        $this->get('session')->set('_locale', $locale);
     }
 }
