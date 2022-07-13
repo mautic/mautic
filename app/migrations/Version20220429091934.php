@@ -37,8 +37,7 @@ class Version20220429091934 extends PreUpAssertionMigration
                 user_id INT {$usersIdDataType} NOT NULL,
                 scheduled_datetime DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
                 data LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)',
-                PRIMARY KEY(id),
-                FOREIGN KEY (user_id) REFERENCES {$usersTableName} (id)
+                PRIMARY KEY(id)
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;"
         );
 
