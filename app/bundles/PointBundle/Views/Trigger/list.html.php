@@ -131,6 +131,7 @@ if ('index' == $tmpl) {
                     </td>
                     <td><?php echo $item->getPoints(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
+                    <?php echo $view->render('MauticCoreBundle:Helper:list_actions_quick_icons.html.php'); ?>
                 </tr>
             <?php endforeach; ?>
             </tbody>

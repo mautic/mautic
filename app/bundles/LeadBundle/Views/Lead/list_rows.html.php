@@ -102,5 +102,6 @@
                     );
                 }
                 ?>
+                <?php echo $view->render('MauticCoreBundle:Helper:list_actions_quick_icons.html.php'); ?>
             </tr>
         <?php endforeach; ?>

@@ -1,0 +1,40 @@
+.page-list tr {
+  position: relative;
+
+  .quick-actions {
+    display: flex;
+    opacity: 0;
+    transition: opacity .1s ease-out;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding-left: 70px !important;
+    height: 100%;
+    width: auto;
+    vertical-align: middle;
+    align-items: center;
+    white-space: nowrap;
+    background: linear-gradient(to right, transparent, fade( @body-bg, 93%) 7%, @body-bg);
+    border-left: none;
+    border-top: none;
+    z-index: 10;
+
+    .icons-block {
+      margin: 6px;
+      padding: 3px;
+
+      & > li {
+        opacity: .85;
+        display: inline-flex;
+        cursor: pointer;
+        list-style: none;
+        padding: 0 10px;
+      }
+    }
+  }
+
+  &:hover .quick-actions {
+    opacity: 1;
+    transition-delay: 0s;
+  }
+}
