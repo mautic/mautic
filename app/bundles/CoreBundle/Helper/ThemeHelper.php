@@ -600,6 +600,7 @@ class ThemeHelper
 
             // If not from storage
             if (!$zipper->count()) {
+                $this->finder = new Finder();
                 $this->finder->files()->in($themePath);
                 foreach ($this->finder as $file) {
                     $filePath  = $file->getRealPath();
