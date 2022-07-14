@@ -114,7 +114,7 @@ class EmailSubscriber implements EventSubscriberInterface
         if (isset($message->leadIdHash)) {
             $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
 
-            if (null !== $stat && $stat->getIsFailed() !== true) {
+            if (null !== $stat && true !== $stat->getIsFailed()) {
                 $stat->setIsFailed(true);
                 $this->emailModel->getStatRepository()->saveEntity($stat);
             }
