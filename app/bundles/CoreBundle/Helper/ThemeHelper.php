@@ -657,7 +657,7 @@ class ThemeHelper
         static $dir;
 
         if (!$this->themesLoadedFromFilesystem || $ignoreCache === true) {
-            $this->themesLoadedFromFilesystem = false;
+            $this->themesLoadedFromFilesystem = true;
             // prevent the finder from duplicating directories in its internal state
             // https://symfony.com/doc/current/components/finder.html#usage
             $dir            = $this->pathsHelper->getSystemPath('themes', true);
