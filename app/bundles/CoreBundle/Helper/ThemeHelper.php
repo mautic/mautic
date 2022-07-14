@@ -377,7 +377,7 @@ class ThemeHelper
         // Use a concatenated key since $includeDirs changes what's returned ($includeDirs used by API controller to prevent from exposing file paths)
         $key = $specificFeature.(int) $includeDirs;
         if (empty($this->themes[$key]) || $ignoreCache) {
-            $this->loadThemes($specificFeature, $includeDirs, $key);
+            $this->loadThemes($specificFeature, $includeDirs, $key, $ignoreCache);
         }
 
         if ($extended) {
@@ -651,14 +651,13 @@ class ThemeHelper
         }
     }
 
-    private function loadThemes(string $specificFeature, bool $includeDirs, string $key): void
+    private function loadThemes(string $specificFeature, bool $includeDirs, string $key, bool $ignoreCache = false): void
     {
         static $themes;
-        static $directoryEvent;
         static $dir;
 
-        if (!$this->themesLoadedFromFilesystem) {
-            $this->themesLoadedFromFilesystem = true;
+        if (!$this->themesLoadedFromFilesystem || $ignoreCache === true) {
+            $this->themesLoadedFromFilesystem = false;
             // prevent the finder from duplicating directories in its internal state
             // https://symfony.com/doc/current/components/finder.html#usage
             $dir            = $this->pathsHelper->getSystemPath('themes', true);
