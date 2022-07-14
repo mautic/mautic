@@ -15,6 +15,11 @@ class MauticMessage extends \Swift_Message
     protected $attachments = [];
 
     /**
+     * @var string|int
+     */
+    public $leadIdHash;
+
+    /**
      * Create a new Message.
      *
      * @param string $subject
