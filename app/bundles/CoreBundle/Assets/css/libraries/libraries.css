@@ -5307,15 +5307,15 @@ a.thumbnail.active {
   padding-left: 0;
   list-style: none;
 }
-form[name="lead"] .media-body {
-  width: 100%;
-}
 .media-list .media-body {
   width: auto;
 }
 .media-list .media-object {
   padding-right: 0;
   margin-right: 10px;
+}
+form[name="lead"] .media-body {
+  width: 100%;
 }
 .list-group {
   margin-bottom: 20px;
