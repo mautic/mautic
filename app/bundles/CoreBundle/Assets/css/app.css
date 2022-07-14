@@ -2583,7 +2583,6 @@ ul.line-legend li {
   padding: 3px;
 }
 .page-list tr .quick-actions .icons-block > li {
-  opacity: 0.85;
   display: inline-flex;
   cursor: pointer;
   list-style: none;
