@@ -55,23 +55,6 @@ class EmailTokenTest extends MauticMysqlTestCase
             Time: {contactfield=timelead}
             Timezone: {contactfield=timezonelead}
             URL: {contactfield=urllead}
-            
-            Company:
-            Bool: {contactfield=boolcompany},
-            Date: {contactfield=datecompany},
-            Date/Time: {contactfield=datetimecompany}
-            Email: {contactfield=emailcompany}
-            HTML: {contactfield=htmlcompany}
-            Country: {contactfield=countrycompany}
-            Locale: {contactfield=localecompany}
-            Number: {contactfield=numbercompany}
-            Phone: {contactfield=phonecompany}
-            Region: {contactfield=regioncompany}
-            Text: {contactfield=textcompany}
-            Textarea: {contactfield=textareacompany}
-            Time: {contactfield=timecompany}
-            Timezone: {contactfield=timezonecompany}
-            URL: {contactfield=urlcompany}
         ');
 
         $this->em->persist($email);
@@ -165,7 +148,10 @@ class EmailTokenTest extends MauticMysqlTestCase
         );
     }
 
-    private function customFieldTypes()
+    /**
+     * @return array <mixed>
+     */
+    private function customFieldTypes(): array
     {
         return [
             'bool'     => ['boolean', true],
@@ -200,23 +186,16 @@ class EmailTokenTest extends MauticMysqlTestCase
         $lead->setCity('Pune');
         $lead->setCountry('India');
         $lead->setEmail('test@domain.tld');
+        $lead->setCompany('Acquia');
 
         foreach ($this->customFieldTypes() as $alias => [$type, $value]) {
-            $customFieldLead = new LeadField(); //TODO: add company and assert for the same
+            $customFieldLead = new LeadField();
             $customFieldLead->setLabel($alias.'lead');
             $customFieldLead->setAlias($alias.'lead');
             $customFieldLead->setType($type);
             $customFieldLead->setObject('lead');
             $customFieldLead->setIsPublished(true);
             $fieldModel->saveEntity($customFieldLead);
-
-            $customFieldCompany = new LeadField();
-            $customFieldCompany->setLabel($alias.'company');
-            $customFieldCompany->setAlias($alias.'company');
-            $customFieldCompany->setType($type);
-            $customFieldCompany->setObject('company');
-            $customFieldCompany->setIsPublished(true);
-            $fieldModel->saveEntity($customFieldCompany);
 
             $lead->addUpdatedField($customFieldLead->getAlias(), $value);
         }
