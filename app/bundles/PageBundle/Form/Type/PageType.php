@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
@@ -52,16 +53,23 @@ class PageType extends AbstractType
      */
     private $canViewOther = false;
 
+    /**
+     * @var ThemeHelperInterface
+     */
+    private $themeHelper;
+
     public function __construct(
         EntityManager $entityManager,
         PageModel $pageModel,
         CorePermissions $corePermissions,
-        UserHelper $userHelper
+        UserHelper $userHelper,
+        ThemeHelperInterface $themeHelper
     ) {
         $this->em           = $entityManager;
         $this->model        = $pageModel;
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
         $this->user         = $userHelper->getUser();
+        $this->themeHelper  = $themeHelper;
     }
 
     /**
@@ -89,12 +97,18 @@ class PageType extends AbstractType
                 'label'    => 'mautic.page.form.customhtml',
                 'required' => false,
                 'attr'     => [
+                    'tooltip'              => 'mautic.page.form.customhtml.help',
                     'class'                => 'form-control editor-builder-tokens builder-html',
                     'data-token-callback'  => 'page:getBuilderTokens',
                     'data-token-activator' => '{',
+                    'rows'                 => '25',
                 ],
             ]
         );
+
+        $template = $options['data']->getTemplate() ?? 'blank';
+        // If theme does not exist, set empty
+        $template = $this->themeHelper->getCurrentTheme($template, 'page');
 
         $builder->add(
             'template',
@@ -106,7 +120,7 @@ class PageType extends AbstractType
                     'tooltip' => 'mautic.page.form.template.help',
                 ],
                 'placeholder' => 'mautic.core.none',
-                'data'        => $options['data']->getTemplate() ? $options['data']->getTemplate() : 'blank',
+                'data'        => $template,
             ]
         );
 

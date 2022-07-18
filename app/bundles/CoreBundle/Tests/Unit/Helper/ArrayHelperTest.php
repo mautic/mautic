@@ -64,4 +64,28 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
         yield [[''], []];
         yield [['value A', ''], ['value A']];
     }
+
+    public function testflipArray(): void
+    {
+        $array = [
+            'first' => 'Custom first',
+            'second'=> 'Custom second',
+        ];
+
+        $this->assertSame(array_flip($array), ArrayHelper::flipArray($array));
+
+        $array = [
+            'group1' => [
+                'first' => 'Custom first',
+            ],
+            'group2' => [
+                'second' => 'Custom second',
+            ],
+        ];
+
+        $flippedArray = ArrayHelper::flipArray($array);
+
+        $this->assertEquals('Custom first', key($flippedArray['group1']));
+        $this->assertEquals('first', end($flippedArray['group1']));
+    }
 }

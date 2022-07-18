@@ -197,7 +197,7 @@ abstract class AbstractFormFieldHelper
     {
         $choices = [];
         foreach ($list as $value => $label) {
-            if (is_array($label) && isset($label['value'])) {
+            if (is_array($label) && array_key_exists('value', $label)) {
                 $value = $label['value'];
                 $label = $label['label'];
 

@@ -17,7 +17,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['7.4']
+        php-versions: ['7.4', '8.0']
         db-types: ['mysql', 'mariadb']
   
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -113,9 +113,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'scaffolded files mismatch', 'PHPStan baseline changes']
+        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install']
+        php-versions: ['7.4', '8.0']
 
-    name: ${{ matrix.commands }}
+    name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 
     steps:
     - uses: actions/checkout@v2
@@ -129,7 +130,7 @@ jobs:
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
       with:
-        php-version: 7.4
+        php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Install dependencies
@@ -144,7 +145,7 @@ jobs:
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           composer rector -- --dry-run --no-progress-bar
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
-          for file in ${{ steps.changed-files.outputs.all_modified_files }}; do
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             if [[ $file == *.php ]]; then
               cs_fix_files="${cs_fix_files} $file"
             fi
@@ -173,6 +174,21 @@ jobs:
               exit 1
             fi
           fi
+        elif [[ "${{ matrix.commands }}" == "composer install" ]]; then
+          # create a temp dir and mimic a composer install via mautic/recommended-project
+          mkdir test_composer
+          cd test_composer
+          cp ../.github/ci-files/composer.json ./
+          composer install
+          
+          # test if console works by generating assets for next step
+          php ./bin/console mautic:assets:generate
+          
+          # test if media/css and media/js folder contain the same files as the tarball releases
+          test -z "$(comm -23 <(ls ../media/js  | sort) <(ls docroot/media/js  | sort))"
+          test -z "$(comm -23 <(ls ../media/css | sort) <(ls docroot/media/css | sort))"
+
+          php ./bin/console cache:clear
         else
           echo "Invalid command"
           exit 1

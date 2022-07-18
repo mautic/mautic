@@ -251,3 +251,9 @@ ul.tag-cloud li {
     font-family: "FontAwesome";
     padding-right: 3px;
 }
+
+#leads-container .spinner {
+    text-align: center;
+    line-height: 250px;
+    font-size: 24px;
+}
