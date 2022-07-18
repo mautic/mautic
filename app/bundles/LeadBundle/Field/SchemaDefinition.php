@@ -73,6 +73,9 @@ class SchemaDefinition
         ];
     }
 
+    /**
+     * @param mixed[] $schemaDefinition
+     */
     public static function getFieldCharLengthLimit(array $schemaDefinition): ?int
     {
         $length = $schemaDefinition['options']['length'] ?? null;

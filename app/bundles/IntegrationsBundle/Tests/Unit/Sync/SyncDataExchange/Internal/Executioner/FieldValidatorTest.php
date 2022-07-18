@@ -122,6 +122,9 @@ class FieldValidatorTest extends TestCase
         Assert::assertInstanceOf(FieldDAO::class, $secondChangedObject->getField('bool'));
     }
 
+    /**
+     * @return \PHPUnit\Framework\Constraint\Constraint[]
+     */
     private function getNotificationAssertion(string $message, ObjectChangeDAO $changedObject, string $fieldName, string $type): array
     {
         return [

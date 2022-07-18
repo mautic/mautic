@@ -368,7 +368,7 @@ class OrderExecutionerTest extends TestCase
         Assert::assertCount(2, $orderMappings->getNewMappings());
     }
 
-    public function testEmptyObjectsForUpdateDoesNothing()
+    public function testEmptyObjectsForUpdateDoesNothing(): void
     {
         $syncOrder = new OrderDAO(new DateTimeImmutable(), false, self::INTEGRATION_NAME);
         $syncOrder->addObjectChange(new ObjectChangeDAO(self::INTEGRATION_NAME, 'bar', null, 'bar', 4));
@@ -380,7 +380,7 @@ class OrderExecutionerTest extends TestCase
         $this->orderExecutioner->execute($syncOrder);
     }
 
-    public function testEmptyObjectsForCreateDoesNothing()
+    public function testEmptyObjectsForCreateDoesNothing(): void
     {
         $syncOrder = new OrderDAO(new DateTimeImmutable(), false, self::INTEGRATION_NAME);
         $syncOrder->addObjectChange(new ObjectChangeDAO(self::INTEGRATION_NAME, 'bar', 4, 'bar', 4));
@@ -392,7 +392,7 @@ class OrderExecutionerTest extends TestCase
         $this->orderExecutioner->execute($syncOrder);
     }
 
-    public function testObjectNotFoundExceptionIsLoggedAndNothingElse()
+    public function testObjectNotFoundExceptionIsLoggedAndNothingElse(): void
     {
         $syncOrder = $this->getSyncOrder('foo');
         $syncOrder->addObjectChange(new ObjectChangeDAO(self::INTEGRATION_NAME, 'bar', 4, 'bar', 4));

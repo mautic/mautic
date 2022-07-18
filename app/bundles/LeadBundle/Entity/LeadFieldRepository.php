@@ -382,6 +382,9 @@ class LeadFieldRepository extends CommonRepository
         return $this->findBy(['type' => $type]);
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getFieldSchemaData(string $object): array
     {
         return $this->_em->createQueryBuilder()

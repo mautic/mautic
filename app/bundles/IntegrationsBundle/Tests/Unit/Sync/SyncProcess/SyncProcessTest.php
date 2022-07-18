@@ -106,7 +106,7 @@ class SyncProcessTest extends TestCase
      */
     private $syncProcess;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->syncDateHelper              = $this->createMock(SyncDateHelper::class);
         $this->mappingHelper               = $this->createMock(MappingHelper::class);
@@ -137,7 +137,7 @@ class SyncProcessTest extends TestCase
         );
     }
 
-    public function testBatchSyncEventsAreDispatched()
+    public function testBatchSyncEventsAreDispatched(): void
     {
         $this->inputOptionsDAO->expects($this->once())
             ->method('pullIsEnabled')

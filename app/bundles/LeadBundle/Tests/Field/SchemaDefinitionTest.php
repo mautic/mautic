@@ -13,6 +13,7 @@ class SchemaDefinitionTest extends TestCase
 {
     /**
      * @dataProvider dataGetSchemaDefinition
+     * @param mixed[] $expected
      */
     public function testGetSchemaDefinition(string $alias, string $type, bool $isUnique, ?int $length, array $expected): void
     {
@@ -20,6 +21,9 @@ class SchemaDefinitionTest extends TestCase
         Assert::assertSame($expected, (new SchemaDefinition())->getSchemaDefinitionNonStatic($alias, $type, $isUnique, $length));
     }
 
+    /**
+     * @return mixed[]
+     */
     public function dataGetSchemaDefinition(): iterable
     {
         foreach (['datetime', 'date', 'time', 'boolean'] as $type) {
@@ -137,12 +141,16 @@ class SchemaDefinitionTest extends TestCase
 
     /**
      * @dataProvider dataGetFieldCharLengthLimit
+     * @param mixed[] $schemaDefinition
      */
     public function testGetFieldCharLengthLimit(array $schemaDefinition, ?int $expected): void
     {
         Assert::assertSame($expected, SchemaDefinition::getFieldCharLengthLimit($schemaDefinition));
     }
 
+    /**
+     * @return mixed[]
+     */
     public function dataGetFieldCharLengthLimit(): iterable
     {
         yield [
