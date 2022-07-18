@@ -484,6 +484,15 @@ return [
                     'mautic.integrations.sync.notification.user_notification_builder',
                 ],
             ],
+            'mautic.integrations.sync.notification.user_notification_builder' => [
+                'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationBuilder::class,
+                'arguments' => [
+                    'mautic.integrations.sync.notification.helper_user',
+                    'mautic.integrations.sync.notification.helper.owner_provider',
+                    'mautic.integrations.sync.notification.helper_route',
+                    'translator',
+                ],
+            ],
             'mautic.integrations.sync.notification.helper_user_summary_notification' => [
                 'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper::class,
                 'arguments' => [

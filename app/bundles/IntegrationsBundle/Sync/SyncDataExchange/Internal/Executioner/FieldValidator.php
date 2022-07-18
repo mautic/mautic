@@ -24,7 +24,7 @@ final class FieldValidator implements FieldValidatorInterface
     private $bulkNotification;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $fieldSchemaData = [];
 
@@ -77,6 +77,9 @@ final class FieldValidator implements FieldValidatorInterface
         $this->bulkNotification->flush();
     }
 
+    /**
+     * @param mixed[] $schemaDefinition
+     */
     private function isFieldLengthValid(array $schemaDefinition, string $normalizedValue): bool
     {
         $schemaLength = SchemaDefinition::getFieldCharLengthLimit($schemaDefinition);
@@ -90,6 +93,9 @@ final class FieldValidator implements FieldValidatorInterface
         return $actualLength <= $schemaLength;
     }
 
+    /**
+     * @param mixed[] $schemaDefinition
+     */
     private function isFieldTypeValid(array $schemaDefinition, NormalizedValueDAO $field): bool
     {
         switch ($schemaDefinition['type']) {
@@ -110,6 +116,7 @@ final class FieldValidator implements FieldValidatorInterface
     }
 
     /**
+     * @return mixed[]
      * @throws FieldSchemaNotFoundException
      */
     private function getFieldSchema(string $object, string $alias): array

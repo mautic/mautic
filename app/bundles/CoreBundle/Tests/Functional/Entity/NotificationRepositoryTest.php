@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Entity;
 
 use DateTime;
 use Mautic\CoreBundle\Entity\Notification;
+use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
@@ -27,8 +28,9 @@ class NotificationRepositoryTest extends MauticMysqlTestCase
 
     private function assertDuplicate(bool $expectedIsDuplicate, int $userId, string $deduplicate, DateTime $from): void
     {
-        $isDuplicate = $this->em->getRepository(Notification::class)
-            ->isDuplicate($userId, md5($deduplicate), $from);
+        /** @var NotificationRepository $notificationRepository */
+        $notificationRepository = $this->em->getRepository(Notification::class);
+        $isDuplicate            = $notificationRepository->isDuplicate($userId, md5($deduplicate), $from);
 
         Assert::assertSame($expectedIsDuplicate, $isDuplicate);
     }

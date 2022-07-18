@@ -139,7 +139,7 @@ class ObjectChangeDAO
     /**
      * @param string $name
      *
-     * @return FieldDAO
+     * @return FieldDAO|null
      */
     public function getField($name)
     {
@@ -214,5 +214,11 @@ class ObjectChangeDAO
         $this->changeDateTime = $changeDateTime;
 
         return $this;
+    }
+
+    public function removeField(string $field): void
+    {
+        unset($this->fields[$field]);
+        unset($this->fieldsByState[ReportFieldDAO::FIELD_CHANGED][$field]);
     }
 }
