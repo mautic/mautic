@@ -11,15 +11,12 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
 class EmailTokenTest extends MauticMysqlTestCase
 {
-    use CustomObjectsTrait;
-
     public function testEmailTokens(): void
     {
         $lead = $this->createLeadWithAllFields();
