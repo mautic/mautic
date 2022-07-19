@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 
 class OrderResultsDAOTest extends TestCase
 {
-    public function testObjectsOrganizedByObjectName()
+    public function testObjectsOrganizedByObjectName(): void
     {
         $newObjectMapping1 = new ObjectMapping();
         $newObjectMapping1->setIntegrationObjectName('foo');
@@ -78,7 +78,7 @@ class OrderResultsDAOTest extends TestCase
         Assert::assertEquals('bar1', $barDeletedObjects[0]->getObjectId());
     }
 
-    public function testExceptionThrownIfObjectNotFoundForNewObjectMappings()
+    public function testExceptionThrownIfObjectNotFoundForNewObjectMappings(): void
     {
         $this->expectException(ObjectNotFoundException::class);
 
@@ -86,7 +86,7 @@ class OrderResultsDAOTest extends TestCase
         $orderResults->getNewObjectMappings('foo');
     }
 
-    public function testExceptionThrownIfObjectNotFoundForUpdatedObjectMappings()
+    public function testExceptionThrownIfObjectNotFoundForUpdatedObjectMappings(): void
     {
         $this->expectException(ObjectNotFoundException::class);
 
@@ -94,7 +94,7 @@ class OrderResultsDAOTest extends TestCase
         $orderResults->getUpdatedObjectMappings('foo');
     }
 
-    public function testExceptionThrownIfObjectNotFoundForRemappedObjects()
+    public function testExceptionThrownIfObjectNotFoundForRemappedObjects(): void
     {
         $this->expectException(ObjectNotFoundException::class);
 
@@ -102,7 +102,7 @@ class OrderResultsDAOTest extends TestCase
         $orderResults->getRemappedObjects('foo');
     }
 
-    public function testExceptionThrownIfObjectNotFoundForDeletedObjects()
+    public function testExceptionThrownIfObjectNotFoundForDeletedObjects(): void
     {
         $this->expectException(ObjectNotFoundException::class);
 
@@ -110,7 +110,7 @@ class OrderResultsDAOTest extends TestCase
         $orderResults->getDeletedObjects('foo');
     }
 
-    public function testGetObjectMappingsReturnsMergedNewAndUpdated()
+    public function testGetObjectMappingsReturnsMergedNewAndUpdated(): void
     {
         $newObjectMapping = new ObjectMapping();
         $newObjectMapping->setIntegrationObjectName('foo');

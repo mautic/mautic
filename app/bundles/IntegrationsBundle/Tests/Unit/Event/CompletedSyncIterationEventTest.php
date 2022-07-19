@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
 
 class CompletedSyncIterationEventTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $mappingManual = new MappingManualDAO('foobar');
         $orderResults  = new OrderResultsDAO([], [], [], []);

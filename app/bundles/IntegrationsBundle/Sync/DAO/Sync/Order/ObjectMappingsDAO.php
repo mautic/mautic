@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Order;
 
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
@@ -37,11 +28,17 @@ class ObjectMappingsDAO
         $this->newMappings[] = $objectMapping;
     }
 
+    /**
+     * @return ObjectMapping[]
+     */
     public function getUpdatedMappings(): array
     {
         return $this->updatedMappings;
     }
 
+    /**
+     * @return ObjectMapping[]
+     */
     public function getNewMappings(): array
     {
         return $this->newMappings;

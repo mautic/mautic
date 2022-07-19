@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 
 class ObjectMappingsDAOTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $objectMappings = new ObjectMappingsDAO();
 

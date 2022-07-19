@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 
 class ObjectChangeDAOTest extends TestCase
 {
-    public function testGetUnchangedFields()
+    public function testGetUnchangedFields(): void
     {
         $fieldDAO = new FieldDAO('email', new NormalizedValueDAO('email', 'test@test.com'));
 
@@ -36,7 +36,7 @@ class ObjectChangeDAOTest extends TestCase
         Assert::assertSame($fieldDAO, $unchangedFields['email']);
     }
 
-    public function testSetAndGetObjectMapping()
+    public function testSetAndGetObjectMapping(): void
     {
         $objectChangeDAO = new ObjectChangeDAO('foo', 'bar', 1, 'contact', 1);
         $objectMapping   = new ObjectMapping();

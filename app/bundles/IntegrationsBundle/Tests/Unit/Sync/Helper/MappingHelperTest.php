@@ -330,12 +330,12 @@ class MappingHelperTest extends TestCase
         $this->mappingHelper->findIntegrationObject('Test', $objectName, new ObjectDAO('Contact', 1));
     }
 
-    public function testObjectMappingIsInjectedIntoUpdatedObjectMappingDAO()
+    public function testObjectMappingIsInjectedIntoUpdatedObjectMappingDAO(): void
     {
         $objectMapping = new ObjectMapping();
         $objectMapping->setIntegration('foobar');
         $objectMapping->setIntegrationObjectName('foo');
-        $objectMapping->setIntegrationObjectId(1);
+        $objectMapping->setIntegrationObjectId('1');
 
         $this->objectMappingRepository->expects($this->once())
             ->method('findOneBy')
@@ -355,7 +355,7 @@ class MappingHelperTest extends TestCase
         Assert::assertSame($objectMapping, $updatedObjectMappingDAO->getObjectMapping());
     }
 
-    public function testObjectMappingIsNotSetIfObjectMappingNotFoundWhenAttemptingToUpdate()
+    public function testObjectMappingIsNotSetIfObjectMappingNotFoundWhenAttemptingToUpdate(): void
     {
         $this->objectMappingRepository->expects($this->once())
             ->method('findOneBy')
