@@ -150,6 +150,12 @@ return [
                     'mautic.core.model.notification',
                 ],
             ],
+            'mautic.core.service.bulk_notification' => [
+                'class'     => \Mautic\CoreBundle\Service\BulkNotification::class,
+                'arguments' => [
+                    'mautic.core.model.notification',
+                ],
+            ],
             'mautic.core.service.local_file_adapter' => [
                 'class'     => \Mautic\CoreBundle\Service\LocalFileAdapterService::class,
                 'arguments' => [

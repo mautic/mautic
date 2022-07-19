@@ -493,6 +493,14 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.integrations.sync.notification.bulk_notification' => [
+                'class'     => \Mautic\IntegrationsBundle\Sync\Notification\BulkNotification::class,
+                'arguments' => [
+                    'mautic.core.service.bulk_notification',
+                    'mautic.integrations.sync.notification.user_notification_builder',
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
             'mautic.integrations.sync.notification.helper_user_summary_notification' => [
                 'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper::class,
                 'arguments' => [
