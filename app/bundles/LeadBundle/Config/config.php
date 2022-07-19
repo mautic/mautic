@@ -731,6 +731,9 @@ return [
             'mautic.form.type.campaignevent_lead_segments' => [
                 'class' => \Mautic\LeadBundle\Form\Type\CampaignEventLeadSegmentsType::class,
             ],
+            'mautic.form.type.campaignevent_lead_stages' => [
+                'class' => \Mautic\LeadBundle\Form\Type\CampaignEventLeadStagesType::class,
+            ],
             'mautic.form.type.campaignevent_lead_campaigns' => [
                 'class'     => Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType::class,
                 'arguments' => ['mautic.lead.model.list'],
