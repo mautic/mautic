@@ -57,17 +57,18 @@ class SchemaDefinitionTest extends TestCase
 
         foreach (['timezone', 'locale', 'country', 'email', 'lookup', 'select', 'region', 'tel', 'text'] as $type) {
             foreach ([75, null] as $length) {
+                $maxLength = ('text' == $type || !is_null($length)) ? $length : SchemaDefinition::MAX_VARCHAR_LENGTH;
                 yield [
                     'some',
                     $type,
                     false,
-                    $length,
+                    $maxLength,
                     [
                         'name'    => 'some',
                         'type'    => 'string',
                         'options' => [
                             'notnull' => false,
-                            'length'  => $length,
+                            'length'  => $maxLength,
                         ],
                     ],
                 ];
@@ -91,7 +92,19 @@ class SchemaDefinitionTest extends TestCase
             ];
         }
 
-        foreach (['multiselect', 'html', 'unknown'] as $type) {
+        yield [
+            'some',
+            'multiselect',
+            false,
+            80,
+            [
+                'name'    => 'some',
+                'type'    => 'text',
+                'options' => ['notnull' => false, 'length' => 65535],
+            ],
+        ];
+
+        foreach (['html', 'unknown'] as $type) {
             yield [
                 'some',
                 $type,
