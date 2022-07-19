@@ -3,6 +3,7 @@
 namespace Mautic\ReportBundle\Builder;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -385,6 +386,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     }
                 }
 
+                if ('tag' === $filter['column']) {
+                    $this->applyTagFilter($filter, $groupExpr);
+                    continue;
+                }
+
                 switch ($exprFunction) {
                     case 'notEmpty':
                         $groupExpr->add(
@@ -510,6 +516,25 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         return false;
+    }
+
+    private function applyTagFilter(array $filter, CompositeExpression $groupExpr): void
+    {
+        $tagSubQuery = $this->db->createQueryBuilder();
+        $tagSubQuery->select('DISTINCT lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx')
+            ->where($tagSubQuery->expr()->in('ltx.tag_id', $filter['value']));
+        $tagSubQuerySql = $tagSubQuery->getSQL();
+
+        if ('in' === $filter['condition']) {
+            $groupExpr->add(
+                $tagSubQuery->expr()->in('l.id', $tagSubQuerySql)
+            );
+        } elseif ('notIn' === $filter['condition']) {
+            $groupExpr->add(
+                $tagSubQuery->expr()->notIn('l.id', $tagSubQuerySql)
+            );
+        }
     }
 
     /**
