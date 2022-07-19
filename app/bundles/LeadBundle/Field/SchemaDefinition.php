@@ -50,6 +50,7 @@ class SchemaDefinition
             case 'select':
             case 'region':
             case 'tel':
+            case 'url':
                 $schemaType        = 'string';
                 $options['length'] = $length ?: self::MAX_VARCHAR_LENGTH;
                 break;
