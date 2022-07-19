@@ -117,6 +117,7 @@ final class FieldValidator implements FieldValidatorInterface
 
     /**
      * @return mixed[]
+     *
      * @throws FieldSchemaNotFoundException
      */
     private function getFieldSchema(string $object, string $alias): array

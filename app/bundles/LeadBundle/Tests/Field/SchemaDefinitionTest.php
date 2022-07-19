@@ -13,6 +13,7 @@ class SchemaDefinitionTest extends TestCase
 {
     /**
      * @dataProvider dataGetSchemaDefinition
+     *
      * @param mixed[] $expected
      */
     public function testGetSchemaDefinition(string $alias, string $type, bool $isUnique, ?int $length, array $expected): void
@@ -141,6 +142,7 @@ class SchemaDefinitionTest extends TestCase
 
     /**
      * @dataProvider dataGetFieldCharLengthLimit
+     *
      * @param mixed[] $schemaDefinition
      */
     public function testGetFieldCharLengthLimit(array $schemaDefinition, ?int $expected): void
