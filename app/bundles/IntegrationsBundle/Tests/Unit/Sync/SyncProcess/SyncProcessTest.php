@@ -178,20 +178,33 @@ class SyncProcessTest extends TestCase
             ->method('executeSyncOrder')
             ->willReturn($objectMappings);
 
-        // the integration to mautic batch event should be dispatched
-        $this->eventDispatcher->expects($this->at(0))
+        $this->eventDispatcher
             ->method('dispatch')
-            ->with(
-                IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC,
-                $this->callback(function (CompletedSyncIterationEvent $event) {
-                    $orderResult = $event->getOrderResults();
-                    Assert::assertCount(1, $orderResult->getUpdatedObjectMappings('bar'));
-                    Assert::assertCount(1, $orderResult->getNewObjectMappings('foo'));
-                    Assert::assertCount(1, $orderResult->getDeletedObjects('foo'));
-                    Assert::assertCount(1, $orderResult->getRemappedObjects('bar'));
+            ->withConsecutive(
+                [
+                    // the integration to mautic batch event should be dispatched
+                    IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC,
+                    $this->callback(function (CompletedSyncIterationEvent $event) {
+                        $orderResult = $event->getOrderResults();
+                        Assert::assertCount(1, $orderResult->getUpdatedObjectMappings('bar'));
+                        Assert::assertCount(1, $orderResult->getNewObjectMappings('foo'));
+                        Assert::assertCount(1, $orderResult->getDeletedObjects('foo'));
+                        Assert::assertCount(1, $orderResult->getRemappedObjects('bar'));
 
-                    return true;
-                })
+                        return true;
+                    }),
+                ],
+                [
+                    // the integration to mautic batch event should be dispatched
+                    IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION,
+                    $this->callback(function (CompletedSyncIterationEvent $event) {
+                        $orderResult = $event->getOrderResults();
+                        Assert::assertCount(1, $orderResult->getNewObjectMappings('bar'));
+                        Assert::assertCount(1, $orderResult->getUpdatedObjectMappings('foo'));
+
+                        return true;
+                    }),
+                ]
             );
 
         // Mautic to integration
@@ -245,20 +258,6 @@ class SyncProcessTest extends TestCase
         $this->internalSyncDataExchange->expects($this->once())
             ->method('executeSyncOrder')
             ->willReturn($objectMappings);
-
-        // the integration to mautic batch event should be dispatched
-        $this->eventDispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(
-                IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION,
-                $this->callback(function (CompletedSyncIterationEvent $event) {
-                    $orderResult = $event->getOrderResults();
-                    Assert::assertCount(1, $orderResult->getNewObjectMappings('bar'));
-                    Assert::assertCount(1, $orderResult->getUpdatedObjectMappings('foo'));
-
-                    return true;
-                })
-            );
 
         $this->syncProcess->execute();
     }
