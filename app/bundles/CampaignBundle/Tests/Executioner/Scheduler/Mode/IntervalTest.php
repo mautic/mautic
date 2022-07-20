@@ -169,11 +169,11 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
             'test on after end time range'               => [new \DateTime('2018-10-19 12:00'), new \DateTime('2018-10-19 12:00'), null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')],
             'test on after end time range previous day'  => [new \DateTime('2018-10-18 12:00'), new \DateTime('2018-10-18 12:00'), null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')],
             'test on after end time range next day'      => [new \DateTime('2018-10-20 12:00'), new \DateTime('2018-10-20 12:00'), null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')],
-            'test on allowed day'                        => [new \DateTime('2018-10-21 08:01'), new \DateTime('2018-10-21 8:00'), null, null, null, [0]],
-            'test on restricted days'                    => [new \DateTime('2018-10-21 08:01'), new \DateTime('2018-10-21 08:00'), null, null, null, [3, 5]],
+            'test on allowed day'                        => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-21 8:00'), null, null, null, [0]],
+            'test on restricted days'                    => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-21 08:00'), null, null, null, [3, 5]],
             'test on all restricted days'                => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-21 08:00'), null, null, null, []],
             'test in between wrong start/end time order' => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 8:00')],
-            'test combination of rules'                  => [new \DateTime('2018-10-20 12:01'), new \DateTime('2018-10-20 12:00'), null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00'), [5, 6]],
+            'test combination of rules'                  => [new \DateTime('2018-10-20 12:00'), new \DateTime('2018-10-20 12:00'), null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00'), [5, 6]],
         ];
     }
 
