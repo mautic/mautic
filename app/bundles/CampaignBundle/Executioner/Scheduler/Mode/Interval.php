@@ -146,7 +146,7 @@ class Interval implements ScheduleModeInterface
      */
     public function isContactSpecificExecutionDateRequired(Event $event)
     {
-        if (Event::TRIGGER_MODE_INTERVAL !== $event->getTriggerMode()) {
+        if (!$this->isTriggerModeInterval($event)) {
             return false;
         }
 
@@ -164,6 +164,11 @@ class Interval implements ScheduleModeInterface
         }
 
         return true;
+    }
+
+    private function isTriggerModeInterval(Event $event): bool
+    {
+        return Event::TRIGGER_MODE_INTERVAL === $event->getTriggerMode();
     }
 
     /**
