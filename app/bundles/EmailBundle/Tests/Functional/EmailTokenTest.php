@@ -27,10 +27,10 @@ class EmailTokenTest extends MauticMysqlTestCase
         $email->setSubject('CO token test email');
         $email->setCustomHtml('
             
-            Dear {contactfield=firstname} {contactfield=lastname},
+            Dear %7Bcontactfield=firstname%7D {contactfield=lastname},
             
             Check these fields:
-            Mobile: {contactfield=mobile}
+            Mobile: %7Bcontactfield%3Dmobile%7D
             Address: {contactfield=address1}, {contactfield=address2}, {contactfield=city}, {contactfield=country}
             Email: {contactfield=email} 
             

@@ -395,7 +395,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $email->setName('Email name');
         $email->setSubject('Email subject for {contactfield=firstname} {contactfield=lastname}, living in {contactfield=address1}, {contactfield=address2}, {contactfield=city}, {contactfield=country}. Contact number: {contactfield=mobile}');
         $email->setTemplate('Blank');
-        $email->setCustomHtml('Email body for {contactfield=firstname} {contactfield=lastname}, living in {contactfield=address1}, {contactfield=address2}, {contactfield=city}, {contactfield=country}. Contact number: {contactfield=mobile}');
+        $email->setCustomHtml('Email body for %7Bcontactfield=firstname%7D %7Bcontactfield%3Dlastname%7D, living in {contactfield=address1}, {contactfield=address2}, {contactfield=city}, {contactfield=country}. Contact number: {contactfield=mobile}');
         $this->em->persist($email);
 
         return $email;
