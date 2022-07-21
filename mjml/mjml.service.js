@@ -46,7 +46,11 @@ export default class MjmlService {
    * @todo show validation erros in the UI
    * @returns string
    */
-  static mjmlToHtml(mjml) {
+  static mjmlToHtml(mjml, endpoint = null, token = null) {
+    if (endpoint !== null && token !== null) {
+      return MjmlService.mjmlToHtmlViaEndpoint(mjml, endpoint, token);
+    }
+
     try {
       if (typeof mjml !== 'string' || !mjml.includes('<mjml>')) {
         throw new Error('No valid MJML provided');
@@ -59,5 +63,20 @@ export default class MjmlService {
       console.warn(error);
       return null;
     }
+  }
+
+  /**
+   * Transform MJML to HTML via endpoint
+   * @returns string|null
+   */
+  static mjmlToHtmlViaEndpoint(mjml, endpoint, token) {
+    const xmlHttpRequest = new XMLHttpRequest();
+    xmlHttpRequest.open('POST', endpoint, false);
+    xmlHttpRequest.setRequestHeader('Content-type', 'application/json');
+    xmlHttpRequest.setRequestHeader('Access-Token', token);
+    xmlHttpRequest.send(JSON.stringify({ mjml }));
+    const result = JSON.parse(xmlHttpRequest.responseText);
+
+    return result.html ?? null;
   }
 }
