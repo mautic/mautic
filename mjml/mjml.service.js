@@ -46,9 +46,9 @@ export default class MjmlService {
    * @todo show validation erros in the UI
    * @returns string
    */
-  static mjmlToHtml(mjml, endpoint = null, token = null) {
-    if (endpoint !== null && token !== null) {
-      return MjmlService.mjmlToHtmlViaEndpoint(mjml, endpoint, token);
+  static mjmlToHtml(mjml, endpoint = null) {
+    if (endpoint !== null) {
+      return MjmlService.mjmlToHtmlViaEndpoint(mjml, endpoint);
     }
 
     try {
@@ -69,14 +69,12 @@ export default class MjmlService {
    * Transform MJML to HTML via endpoint
    * @returns string|null
    */
-  static mjmlToHtmlViaEndpoint(mjml, endpoint, token) {
+  static mjmlToHtmlViaEndpoint(mjml, endpoint) {
     const xmlHttpRequest = new XMLHttpRequest();
     xmlHttpRequest.open('POST', endpoint, false);
     xmlHttpRequest.setRequestHeader('Content-type', 'application/json');
-    xmlHttpRequest.setRequestHeader('Access-Token', token);
     xmlHttpRequest.send(JSON.stringify({ mjml }));
-    const result = JSON.parse(xmlHttpRequest.responseText);
 
-    return result.html ?? null;
+    return xmlHttpRequest.responseText ? JSON.parse(xmlHttpRequest.responseText) : null;
   }
 }
