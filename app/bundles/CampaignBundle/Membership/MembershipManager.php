@@ -16,8 +16,8 @@ use Symfony\Component\Console\Helper\ProgressBar;
 
 class MembershipManager
 {
-    const ACTION_ADDED   = 'added';
-    const ACTION_REMOVED = 'removed';
+    public const ACTION_ADDED   = 'added';
+    public const ACTION_REMOVED = 'removed';
 
     /**
      * @var Adder
@@ -92,7 +92,8 @@ class MembershipManager
             } catch (ContactCannotBeAddedToCampaignException $exception) {
                 // Do nothing
                 $this->logger->debug(
-                    "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}."
+                    "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}.",
+                    $this->getExceptionAsArray($exception)
                 );
             }
 
@@ -105,7 +106,8 @@ class MembershipManager
         } catch (ContactCannotBeAddedToCampaignException $exception) {
             // Do nothing
             $this->logger->debug(
-                "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}."
+                "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}.",
+                $this->getExceptionAsArray($exception)
             );
 
             return;
@@ -129,6 +131,12 @@ class MembershipManager
         foreach ($contacts as $contact) {
             $this->advanceProgressBar();
 
+            $this->logger->debug(
+                'CAMPAIGN: Contacts: '.count($contacts),
+                $contacts->toArray()
+            );
+
+            // is the contact an existing campaign member? update and continue
             if (isset($campaignMembers[$contact->getId()])) {
                 try {
                     $this->adder->updateExistingMembership($campaignMembers[$contact->getId()], $isManualAction);
@@ -139,7 +147,8 @@ class MembershipManager
                     $contacts->remove($contact->getId());
 
                     $this->logger->debug(
-                        "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}."
+                        "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}.",
+                        $this->getExceptionAsArray($exception)
                     );
                 }
 
@@ -191,7 +200,10 @@ class MembershipManager
         } catch (ContactAlreadyRemovedFromCampaignException $exception) {
             // Do nothing
 
-            $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was already removed from campaign ID {$campaign->getId()}.");
+            $this->logger->debug(
+                "CAMPAIGN: Contact ID {$contact->getId()} was already removed from campaign ID {$campaign->getId()}.",
+                $this->getExceptionAsArray($exception)
+            );
         }
     }
 
@@ -225,7 +237,10 @@ class MembershipManager
                 // Contact was already removed from this campaign
                 $contacts->remove($contact->getId());
 
-                $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was already removed from campaign ID {$campaign->getId()}.");
+                $this->logger->debug(
+                    "CAMPAIGN: Contact ID {$contact->getId()} was already removed from campaign ID {$campaign->getId()}.",
+                    $this->getExceptionAsArray($exception)
+                );
             }
         }
 
@@ -248,5 +263,18 @@ class MembershipManager
         if ($this->progressBar) {
             $this->progressBar->advance();
         }
+    }
+
+    /**
+     * Transform an Exception to an array to pass to the logger.
+     */
+    private function getExceptionAsArray(\Exception $exception): array
+    {
+        return [
+            'message' => $exception->getMessage(),
+            'file'    => $exception->getFile(),
+            'line'    => $exception->getLine(),
+            'trace'   => $exception->getTraceAsString(),
+        ];
     }
 }

@@ -383,10 +383,12 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param      $campaignId
-     * @param bool $campaignCanBeRestarted
+     * Get all contacts based on the campaigns segment
+     * a limit for how many contacts to process at one time
+     * and the campaign setting if a contact is allowed to restart
+     * a campaign.
      *
-     * @return array
+     * @return array<int|string, string>
      */
     public function getCampaignContactsBySegments($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false)
     {
