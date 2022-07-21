@@ -362,6 +362,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $filter
+     */
     public function applyTagFilter(CompositeExpression $groupExpr, array $filter): void
     {
         $tagSubQuery = $this->queryBuilder->getConnection()->createQueryBuilder();
