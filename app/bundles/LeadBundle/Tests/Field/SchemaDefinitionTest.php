@@ -68,14 +68,14 @@ class SchemaDefinitionTest extends TestCase
                         'type'    => 'string',
                         'options' => [
                             'notnull' => false,
-                            'length'  => $maxLength,
+                            'length'  => $maxLength ?? 191,
                         ],
                     ],
                 ];
             }
         }
 
-        foreach (['description' => 'text', 'articleDescription' => 'string', 'descriptionOfArticle' => 'text'] as $alias => $type) {
+        foreach (['description' => 'text', 'descriptionOfArticle' => 'text'] as $alias => $type) {
             yield [
                 $alias,
                 'text',
@@ -91,6 +91,21 @@ class SchemaDefinitionTest extends TestCase
                 ],
             ];
         }
+
+        yield [
+            'articleDescription',
+            'text',
+            false,
+            null,
+            [
+                'name'    => 'articleDescription',
+                'type'    => 'string',
+                'options' => [
+                    'notnull' => false,
+                    'length'  => 191,
+                ],
+            ],
+        ];
 
         yield [
             'some',
