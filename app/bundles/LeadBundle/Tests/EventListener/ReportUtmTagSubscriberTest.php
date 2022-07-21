@@ -128,7 +128,8 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
                         'alias' => 'utm_term',
                     ],
                 ],
-                'group' => 'contacts',
+                'filters' => null,
+                'group'   => 'contacts',
             ],
         ];
 

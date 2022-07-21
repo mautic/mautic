@@ -3,7 +3,6 @@
 namespace Mautic\ReportBundle\Builder;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -197,7 +196,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Build WHERE clause
         if (!empty($standardFilters)) {
             if (!$filterExpr = $event->getFilterExpression()) {
-                $this->applyFilters($standardFilters, $queryBuilder, $options['filters']);
+                $this->applyFilters($standardFilters, $queryBuilder, $options['filters'], $event);
             } else {
                 $queryBuilder->andWhere($filterExpr);
             }
@@ -368,7 +367,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * @return bool
      */
-    private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions)
+    private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions, ReportGeneratorEvent $event)
     {
         $expr      = $queryBuilder->expr();
         $groups    = [];
@@ -387,7 +386,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 }
 
                 if ('tag' === $filter['column']) {
-                    $this->applyTagFilter($filter, $groupExpr);
+                    $event->applyTagFilter($groupExpr, $filter);
                     continue;
                 }
 
@@ -518,33 +517,14 @@ final class MauticReportBuilder implements ReportBuilderInterface
         return false;
     }
 
-    private function applyTagFilter(array $filter, CompositeExpression $groupExpr): void
-    {
-        $tagSubQuery = $this->db->createQueryBuilder();
-        $tagSubQuery->select('DISTINCT lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx')
-            ->where($tagSubQuery->expr()->in('ltx.tag_id', $filter['value']));
-        $tagSubQuerySql = $tagSubQuery->getSQL();
-
-        if ('in' === $filter['condition']) {
-            $groupExpr->add(
-                $tagSubQuery->expr()->in('l.id', $tagSubQuerySql)
-            );
-        } elseif ('notIn' === $filter['condition']) {
-            $groupExpr->add(
-                $tagSubQuery->expr()->notIn('l.id', $tagSubQuerySql)
-            );
-        }
-    }
-
     /**
      * We must sanitize the table aliases as they might be auto generated.
      * Aliases like "8e296a06" makes MySql to think it is a number.
      * Expects param in format "table_alias.column_name".
      */
-    private function sanitizeColumnName(string $fullCollumnName): string
+    private function sanitizeColumnName(string $fullColumnName): string
     {
-        [$tableAlias, $columnName] = explode('.', $fullCollumnName);
+        [$tableAlias, $columnName] = explode('.', $fullColumnName);
 
         return "`{$tableAlias}`.`{$columnName}`";
     }
