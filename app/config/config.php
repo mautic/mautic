@@ -301,7 +301,7 @@ $container->loadFromExtension('fm_elfinder', [
     'assets_path' => 'media/assets',
     'instances'   => [
         'default' => [
-            'locale'          => 'LANG',
+            'locale'          => '%mautic.locale%',
             'editor'          => 'custom',
             'editor_template' => '@bundles/CoreBundle/Assets/js/libraries/filemanager/index.html.twig',
             'fullscreen'      => true,

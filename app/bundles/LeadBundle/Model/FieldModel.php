@@ -912,6 +912,7 @@ class FieldModel extends FormModel
                 'group_label'  => $this->translator->trans('mautic.lead.field.group.'.$contactField['group']),
                 'defaultValue' => $contactField['defaultValue'],
                 'properties'   => $contactField['properties'],
+                'isPublished'  => $contactField['isPublished'],
             ];
         }
 

@@ -833,6 +833,30 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 'populate' => false,
             ],
             [ // ID 40
+                'name'    => 'Include segment membership with or',
+                'alias'   => 'segment-test-include-segment-with-or',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'country',
+                        'operator' => '=',
+                        'filter'   => 'United Kingdom',
+                        'display'  => '',
+                    ],
+                    [
+                        'glue'     => 'or',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => 'in',
+                        'filter'   => [8],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 41
                 'name'     => 'Manually unsubscribed SMS',
                 'alias'    => 'manually-unsubscribed-sms-test',
                 'public'   => true,
@@ -850,7 +874,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => false,
             ],
-            [ // ID 41 email_id (bc for email_clicked_link
+            [ // ID 42 email_id (bc for email_clicked_link
                 'name'     => 'Clicked link in any email',
                 'alias'    => 'clicked-link-in-any-email',
                 'public'   => true,
@@ -869,7 +893,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 'populate' => false,
             ],
             [
-                // ID 42 email_id (bc for email_clicked_link
+                // ID 43 email_id (bc for email_clicked_link
                 'name'     => 'Did not click link in any email',
                 'alias'    => 'did-not-click-link-in-any-email',
                 'public'   => true,
@@ -887,7 +911,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => false,
             ],
-            [ // ID 43 email_clicked_link_date
+            [ // ID 44 email_clicked_link_date
                 'name'     => 'Clicked link in any email on specific date',
                 'alias'    => 'clicked-link-in-any-email-on-specific-date',
                 'public'   => true,
@@ -905,7 +929,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => false,
             ],
-            [ // ID 44 sms_clicked_link
+            [ // ID 45 sms_clicked_link
                 'name'     => 'Clicked link in any sms',
                 'alias'    => 'clicked-link-in-any-sms',
                 'public'   => true,
@@ -923,7 +947,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => false,
             ],
-            [ // ID 45 sms_clicked_link_date
+            [ // ID 46 sms_clicked_link_date
                 'name'     => 'Clicked link in any sms on specific date',
                 'alias'    => 'clicked-link-in-any-sms-on-specific-date',
                 'public'   => true,
@@ -940,6 +964,72 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                     ],
                 ],
                 'populate' => false,
+            ],
+            [ // ID 47
+                'name'     => 'Tags empty',
+                'alias'    => 'tags-empty',
+                'public'   => true,
+                'filters'  => [
+                    [
+                        'glue'       => 'and',
+                        'type'       => 'tags',
+                        'field'      => 'tags',
+                        'operator'   => 'empty',
+                        'properties' => [
+                            'filter' => '',
+                        ],
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 48
+                'name'     => 'Tags not empty',
+                'alias'    => 'tags-not-empty',
+                'public'   => true,
+                'filters'  => [
+                    [
+                        'glue'       => 'and',
+                        'type'       => 'tags',
+                        'field'      => 'tags',
+                        'operator'   => 'notEmpty',
+                        'properties' => [
+                            'filter' => '',
+                        ],
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 49
+                'name'     => 'Has company',
+                'alias'    => 'segment-having-company',
+                'public'   => true,
+                'filters'  => [
+                    [
+                        'glue'       => 'and',
+                        'type'       => 'text',
+                        'object'     => 'lead',
+                        'field'      => 'company',
+                        'operator'   => '!empty',
+                        'properties' => ['filter' => null],
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 50
+                'name'     => 'Has no company',
+                'alias'    => 'segment-not-having-company',
+                'public'   => true,
+                'filters'  => [
+                    [
+                        'glue'       => 'and',
+                        'type'       => 'text',
+                        'object'     => 'lead',
+                        'field'      => 'company',
+                        'operator'   => 'empty',
+                        'properties' => ['filter' => null],
+                    ],
+                ],
+                'populate' => true,
             ],
         ];
 

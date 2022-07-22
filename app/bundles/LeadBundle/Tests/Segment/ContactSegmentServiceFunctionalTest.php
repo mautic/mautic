@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadDncData;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData;
+use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
@@ -53,6 +54,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
                 LoadUserData::class,
                 LoadDncData::class,
                 LoadClickData::class,
+                LoadTagData::class,
             ],
             false
         )->getReferenceRepository();
@@ -118,6 +120,10 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'clicked-link-in-any-email-on-specific-date'                         => 2,
             'clicked-link-in-any-sms'                                            => 3,
             'clicked-link-in-any-sms-on-specific-date'                           => 2,
+            'tags-empty'                                                         => 52,
+            'tags-not-empty'                                                     => 2,
+            'segment-having-company'                                             => 50,
+            'segment-not-having-company'                                         => 4,
         ];
     }
 
@@ -158,6 +164,20 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             0,
             $segmentContacts[$segmentTest3Ref->getId()]['count'],
             'There should be no contacts in the segment-test-3 segment after removing contact titles and rebuilding from the command line.'
+        );
+
+        $segmentTest40Ref      = $this->getReference('segment-test-include-segment-with-or');
+        $this->runCommand('mautic:segments:update', [
+            '-i'    => $segmentTest40Ref->getId(),
+            '--env' => 'test',
+        ]);
+
+        $segmentContacts = $this->contactSegmentService->getTotalLeadListLeadsCount($segmentTest40Ref);
+
+        $this->assertEquals(
+            11,
+            $segmentContacts[$segmentTest40Ref->getId()]['count'],
+            'There should be 11 contacts in the segment-test-include-segment-with-or segment after rebuilding from the command line.'
         );
     }
 

@@ -8,6 +8,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Helper\IntHelper;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -85,7 +86,7 @@ class Point extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('points')
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\PointRepository')
+            ->setCustomRepositoryClass(PointRepository::class)
             ->addIndex(['type'], 'point_type_search');
 
         $builder->addIdColumns();
@@ -125,6 +126,11 @@ class Point extends FormEntity
 
         $metadata->addPropertyConstraint('delta', new Assert\NotBlank([
             'message' => 'mautic.point.delta.notblank',
+        ]));
+
+        $metadata->addPropertyConstraint('delta', new Assert\Range([
+            'min' => IntHelper::MIN_INTEGER_VALUE,
+            'max' => IntHelper::MAX_INTEGER_VALUE,
         ]));
     }
 

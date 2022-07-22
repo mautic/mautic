@@ -104,7 +104,8 @@ class DateTimeHelper
     public function toUtcString($format = null)
     {
         if ($this->datetime) {
-            $utc = ('UTC' == $this->timezone) ? $this->datetime : $this->datetime->setTimezone($this->utc);
+            $dateTime = clone $this->datetime;
+            $utc      = ('UTC' == $this->timezone) ? $dateTime : $dateTime->setTimezone($this->utc);
             if (empty($format)) {
                 $format = $this->format;
             }
@@ -364,7 +365,7 @@ class DateTimeHelper
         // Sanitize input
         $offset = (int) $offset;
 
-        $timezone = timezone_name_from_abbr('', $offset, false);
+        $timezone = timezone_name_from_abbr('', $offset, 0);
 
         // In case http://bugs.php.net/44780 bug happens
         if (empty($timezone)) {
