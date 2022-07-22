@@ -741,6 +741,33 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "KN4CK3R",
+      "name": "KN4CK3R",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1666336?v=4",
+      "profile": "https://www.oldschoolhack.me",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "benji07",
+      "name": "Benjamin Lévêque",
+      "avatar_url": "https://avatars.githubusercontent.com/u/166890?v=4",
+      "profile": "http://benjamin.leveque.me",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "OnyXxL",
+      "name": "OnyXxL",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19322954?v=4",
+      "profile": "https://github.com/OnyXxL",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,

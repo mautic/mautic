@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -21,6 +22,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
+use Mautic\LeadBundle\Services\SegmentDependencyTreeFactory;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -966,6 +968,26 @@ class AjaxController extends CommonAjaxController
         $leadCount  = $leadCounts[$id];
 
         return new JsonResponse($this->prepareJsonResponse($leadCount));
+    }
+
+    protected function getSegmentDependencyTreeAction(Request $request): JsonResponse
+    {
+        /** @var ListModel $model */
+        $model   = $this->getModel('lead.list');
+        $id      = (int) $request->get('id');
+        $segment = $model->getEntity($id);
+
+        if (!$segment) {
+            return new JsonResponse(['message' => "Segment {$id} could not be found."], Response::HTTP_NOT_FOUND);
+        }
+
+        /** @var SegmentDependencyTreeFactory $segmentDependencyTreeFactory */
+        $segmentDependencyTreeFactory = $this->get('mautic.lead.service.segment_dependency_tree_factory');
+
+        $parentNode = $segmentDependencyTreeFactory->buildTree($segment);
+        $formatter  = new JsPlumbFormatter();
+
+        return new JsonResponse($formatter->format($parentNode));
     }
 
     /**

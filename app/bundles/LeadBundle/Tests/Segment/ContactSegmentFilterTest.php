@@ -34,7 +34,7 @@ class ContactSegmentFilterTest extends TestCase
     private $tableSchemaColumnCache;
 
     /**
-     * @var FilterQueryBuilderInterface&MockObject
+     * @var FilterQueryBuilderInterface|MockObject
      */
     private $filterQueryBuilder;
 
@@ -417,6 +417,24 @@ class ContactSegmentFilterTest extends TestCase
         $filter                          = $this->createContactSegmentFilter();
 
         self::assertEquals($doesColumnSupportEmptyValue, $filter->doesColumnSupportEmptyValue());
+    }
+
+    public function testBatchLimitersAreSetCorrectly(): void
+    {
+        $filter = new ContactSegmentFilter(
+            $this->contactSegmentFilterCrate,
+            $this->filterDecorator,
+            $this->tableSchemaColumnCache,
+            $this->filterQueryBuilder,
+            [
+                'minId' => 1,
+                'maxId' => 1,
+            ]
+        );
+        self::assertSame([
+            'minId' => 1,
+            'maxId' => 1,
+        ], $filter->getBatchLimiters());
     }
 
     /**
