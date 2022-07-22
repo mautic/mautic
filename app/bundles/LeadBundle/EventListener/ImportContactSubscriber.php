@@ -196,7 +196,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
         $missingRequiredFields = array_diff_key($requiredFields, array_flip($matchedFields));
 
         // Check for the presense of company mapped fields
-        $companyFields = array_filter($matchedFields, fn ($fieldname) => 0 === strpos($fieldname, 'company'));
+        $companyFields = array_filter($matchedFields, fn ($fieldname) => is_string($fieldname) && 0 === strpos($fieldname, 'company'));
 
         // If we have any, ensure all required company fields are mapped.
         if (count($companyFields)) {
