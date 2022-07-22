@@ -333,14 +333,6 @@ class PageController extends FormController
                 'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], UrlGeneratorInterface::ABSOLUTE_URL),
                 'logs'          => $logs,
                 'dateRangeForm' => $dateRangeForm->createView(),
-                'pageLeads'     => $this->forward(
-                    'MauticPageBundle:Page:contacts',
-                    [
-                        'objectId'   => $activePage->getId(),
-                        'page'       => $this->get('session')->get('mautic.page.contact.page', 1),
-                        'ignoreAjax' => true,
-                    ]
-                )->getContent(),
             ],
             'contentTemplate' => 'MauticPageBundle:Page:details.html.php',
             'passthroughVars' => [

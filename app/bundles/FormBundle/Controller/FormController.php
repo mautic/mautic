@@ -239,14 +239,6 @@ class FormController extends CommonFormController
                     'formScript'        => htmlspecialchars($model->getFormScript($activeForm), ENT_QUOTES, 'UTF-8'),
                     'formContent'       => htmlspecialchars($model->getContent($activeForm, false), ENT_QUOTES, 'UTF-8'),
                     'availableActions'  => $customComponents['actions'],
-                    'formLeads'         => $this->forward(
-                        'MauticFormBundle:Form:contacts',
-                        [
-                            'objectId'   => $activeForm->getId(),
-                            'page'       => $this->get('session')->get('mautic.form.contact.page', 1),
-                            'ignoreAjax' => true,
-                        ]
-                    )->getContent(),
                 ],
                 'contentTemplate' => 'MauticFormBundle:Form:details.html.php',
                 'passthroughVars' => [

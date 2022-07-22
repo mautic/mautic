@@ -205,14 +205,6 @@ class AssetController extends FormController
                 'assetDownloadUrl' => $model->generateUrl($activeAsset, true),
                 'logs'             => $logs,
                 'dateRangeForm'    => $dateRangeForm->createView(),
-                'assetLeads'       => $this->forward(
-                    'MauticAssetBundle:Asset:contacts',
-                    [
-                        'objectId'   => $activeAsset->getId(),
-                        'page'       => $this->get('session')->get('mautic.asset.contact.page', 1),
-                        'ignoreAjax' => true,
-                    ]
-                )->getContent(),
             ],
             'contentTemplate' => 'MauticAssetBundle:Asset:'.$tmpl.'.html.php',
             'passthroughVars' => [

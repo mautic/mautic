@@ -178,7 +178,7 @@ $firstTab    = $showActions ? 'actions' : 'fields';
                     </a>
                 </li>
                 <li class="">
-                    <a href="#leads-container" role="tab" data-toggle="tab">
+                    <a href="#contacts-container" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.form.tab.leads'); ?>
                     </a>
                 </li>
@@ -265,12 +265,17 @@ $firstTab    = $showActions ? 'actions' : 'fields';
                 </ul>
             </div>
             <!--/ #fields-container -->
-            <!-- #leads-container -->
-            <div class="tab-pane page-list fade bdr-w-0" id="leads-container">
-                <?php echo $formLeads; ?>
+            <!-- #contacts-container -->
+            <div class="tab-pane page-list fade bdr-w-0" id="contacts-container" data-target-url="<?php
+            echo $view['router']->url('mautic_form_contacts', [
+                'objectId' => $activeForm->getId(),
+                'page'     => $app->getSession()->get('mautic.form.contact.page', 1),
+            ]);
+            ?>">
+                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                 <div class="clearfix"></div>
             </div>
-            <!--/ #leads-container -->
+            <!--/ #contacts-container -->
 
         </div>
         <!--/ end: tab-content -->

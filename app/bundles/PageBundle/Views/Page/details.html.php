@@ -198,7 +198,7 @@ $view['slots']->set(
                     </li>
                 <?php endif; ?>
                 <li>
-                    <a href="#leads-container" role="tab" data-toggle="tab">
+                    <a href="#contacts-container" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.page.leads'); ?>
                     </a>
                 </li>
@@ -239,9 +239,14 @@ $view['slots']->set(
             <!--/ #abtest-container -->
         <?php endif; ?>
 
-            <!-- #leads-container -->
-            <div class="tab-pane page-list bdr-w-0" id="leads-container">
-                <?php echo $pageLeads; ?>
+            <!-- #contacts-container -->
+            <div class="tab-pane page-list bdr-w-0" id="contacts-container" data-target-url="<?php
+            echo $view['router']->url('mautic_page_contacts', [
+                'objectId' => $activePage->getId(),
+                'page'     => $app->getSession()->get('mautic.page.contact.page', 1),
+            ]);
+            ?>">
+                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                 <div class="clearfix"></div>
             </div>
             <!--/ #leads-container  -->

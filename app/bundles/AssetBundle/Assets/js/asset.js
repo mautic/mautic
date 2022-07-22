@@ -3,6 +3,11 @@ Mautic.assetOnLoad = function (container) {
     if (typeof mauticAssetUploadEndpoint !== 'undefined' && typeof Mautic.assetDropzone == 'undefined' && mQuery('div#dropzone').length) {
         Mautic.initializeDropzone();
     }
+
+    // Load the contacts tab using the Segment detail lazy loader
+    if (typeof Mautic.lazyLoadContactListOnSegmentDetail === 'function') {
+        Mautic.lazyLoadContactListOnSegmentDetail();
+    }
 };
 
 Mautic.assetOnUnload = function(id) {
