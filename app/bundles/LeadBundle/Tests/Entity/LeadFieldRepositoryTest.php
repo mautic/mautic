@@ -30,11 +30,6 @@ final class LeadFieldRepositoryTest extends TestCase
     private $connection;
 
     /**
-     * @var AbstractQuery|MockObject
-     */
-    private $query;
-
-    /**
      * @var LeadFieldRepository
      */
     private $repository;
@@ -51,19 +46,6 @@ final class LeadFieldRepositoryTest extends TestCase
         /** @var ClassMetadata<LeadFieldRepository>|MockObject $classMetadata */
         $classMetadata    = $this->createMock(ClassMetadata::class);
         $this->repository = new LeadFieldRepository($this->entityManager, $classMetadata);
-
-        // This is terrible, but the Query class is final and AbstractQuery doesn't have some methods used.
-        $this->query = $this->getMockBuilder(AbstractQuery::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['setParameters', 'setFirstResult', 'setMaxResults', 'getSingleResult', 'getSQL', '_doExecute', 'execute'])
-            ->getMock();
-
-        $ormBuilder = new OrmQueryBuilder($this->entityManager);
-        $this->entityManager->method('createQueryBuilder')->willReturn($ormBuilder);
-        $this->entityManager->method('createQuery')->willReturn($this->query);
-        $this->query->method('setParameters')->willReturnSelf();
-        $this->query->method('setFirstResult')->willReturnSelf();
-        $this->query->method('setMaxResults')->willReturnSelf();
     }
 
     public function testCompareDateValueForContactField()
@@ -261,25 +243,27 @@ final class LeadFieldRepositoryTest extends TestCase
 
     public function testGetListablePublishedFields(): void
     {
+        $query = $this->createQueryMock();
         $this->entityManager->expects($this->once())
             ->method('createQuery')
             ->with('SELECT f FROM  f INDEX BY f.id WHERE f.isListable = 1 AND f.isPublished = 1 ORDER BY f.object ASC')
-            ->willReturn($this->query);
+            ->willReturn($query);
 
-        $this->query->method('execute')->willReturn([]);
+        $query->method('execute')->willReturn([]);
 
         $this->assertInstanceOf(ArrayCollection::class, $this->repository->getListablePublishedFields());
     }
 
     public function testGetFieldSchemaData(): void
     {
+        $query = $this->createQueryMock();
         $this->entityManager->expects($this->once())
             ->method('createQuery')
             ->with('SELECT f.alias, f.label, f.type, f.isUniqueIdentifer, f.charLengthLimit FROM  f INDEX BY f.alias WHERE f.object = :object')
-            ->willReturn($this->query);
+            ->willReturn($query);
 
         $result = [];
-        $this->query->method('execute')->willReturn($result);
+        $query->method('execute')->willReturn($result);
 
         $this->assertSame($result, $this->repository->getFieldSchemaData('lead'));
     }
@@ -337,5 +321,31 @@ final class LeadFieldRepositoryTest extends TestCase
             $leadField,
             $this->repository->getFieldThatIsMissingColumn()
         );
+    }
+
+    private function createQueryMock(): MockObject
+    {
+        // This is terrible, but the Query class is final and AbstractQuery doesn't have some methods used.
+        $query = $this->getMockBuilder(AbstractQuery::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'setParameters',
+                'setFirstResult',
+                'setMaxResults',
+                'getSingleResult',
+                'getSQL',
+                '_doExecute',
+                'execute',
+            ])
+            ->getMock();
+
+        $ormBuilder = new OrmQueryBuilder($this->entityManager);
+        $this->entityManager->method('createQueryBuilder')->willReturn($ormBuilder);
+        $this->entityManager->method('createQuery')->willReturn($query);
+        $query->method('setParameters')->willReturnSelf();
+        $query->method('setFirstResult')->willReturnSelf();
+        $query->method('setMaxResults')->willReturnSelf();
+
+        return $query;
     }
 }
