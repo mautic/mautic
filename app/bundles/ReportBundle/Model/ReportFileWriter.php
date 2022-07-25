@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -35,10 +26,6 @@ class ReportFileWriter
     }
 
     /**
-     * @param Scheduler           $scheduler
-     * @param ReportDataResult    $reportDataResult
-     * @param ReportExportOptions $reportExportOptions
-     *
      * @throws FileIOException
      */
     public function writeReportData(Scheduler $scheduler, ReportDataResult $reportDataResult, ReportExportOptions $reportExportOptions)
@@ -56,8 +43,6 @@ class ReportFileWriter
     }
 
     /**
-     * @param Scheduler $scheduler
-     *
      * @return string
      *
      * @throws FileIOException
@@ -70,8 +55,6 @@ class ReportFileWriter
     }
 
     /**
-     * @param Scheduler $scheduler
-     *
      * @return string
      */
     private function getFileName(Scheduler $scheduler)

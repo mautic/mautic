@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
@@ -40,8 +31,6 @@ class PipedriveController extends CommonController
     const USER_UPDATE_EVENT = 'updated.user';
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     public function webhookAction(Request $request)
@@ -67,10 +56,6 @@ class PipedriveController extends CommonController
 
         try {
             switch ($params['event']) {
-                case self::LEAD_ADDED_EVENT:
-                    $leadImport = $this->getLeadImport($pipedriveIntegration);
-                    $leadImport->create($data);
-                    break;
                 case self::LEAD_UPDATE_EVENT:
                     $leadImport = $this->getLeadImport($pipedriveIntegration);
                     $leadImport->update($data);
@@ -78,10 +63,6 @@ class PipedriveController extends CommonController
                 case self::LEAD_DELETE_EVENT:
                     $leadImport = $this->getLeadImport($pipedriveIntegration);
                     $leadImport->delete($params['previous']);
-                    break;
-                case self::COMPANY_ADD_EVENT:
-                    $companyImport = $this->getCompanyImport($pipedriveIntegration);
-                    $companyImport->create($data);
                     break;
                 case self::COMPANY_UPDATE_EVENT:
                     $companyImport = $this->getCompanyImport($pipedriveIntegration);
@@ -91,10 +72,9 @@ class PipedriveController extends CommonController
                     $companyImport = $this->getCompanyImport($pipedriveIntegration);
                     $companyImport->delete($params['previous']);
                     break;
-                case self::USER_ADD_EVENT:
                 case self::USER_UPDATE_EVENT:
-                $ownerImport = $this->getOwnerImport($pipedriveIntegration);
-                $ownerImport->create($data[0]);
+                    $ownerImport = $this->getOwnerImport($pipedriveIntegration);
+                    $ownerImport->create($data[0]);
                     break;
                 default:
                     $response = [
@@ -105,10 +85,22 @@ class PipedriveController extends CommonController
             return new JsonResponse([
                 'status'  => 'error',
                 'message' => $e->getMessage(),
-            ], $e->getCode());
+            ], $this->getErrorCodeFromException($e));
         }
 
         return new JsonResponse($response, Response::HTTP_OK);
+    }
+
+    /**
+     * Transform unknown Exception codes into 500 code.
+     *
+     * @return int
+     */
+    private function getErrorCodeFromException(\Exception $e)
+    {
+        $code = $e->getCode();
+
+        return (is_int($code) && $code >= 400 && $code < 600) ? $code : 500;
     }
 
     /**
@@ -154,9 +146,6 @@ class PipedriveController extends CommonController
     }
 
     /**
-     * @param Request              $request
-     * @param PipedriveIntegration $pipedriveIntegration
-     *
      * @return bool
      */
     private function validCredential(Request $request, PipedriveIntegration $pipedriveIntegration)

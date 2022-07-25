@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -26,9 +17,7 @@ class WebhookQueueEvent extends CommonEvent
     protected $webhook;
 
     /**
-     * @param WebhookQueue $webhookQueue
-     * @param Webhook      $webhook
-     * @param bool         $isNew
+     * @param bool $isNew
      */
     public function __construct(WebhookQueue $webhookQueue, Webhook $webhook, $isNew = false)
     {
@@ -49,8 +38,6 @@ class WebhookQueueEvent extends CommonEvent
 
     /**
      * Sets the WebhookQueue entity.
-     *
-     * @param WebhookQueue $webhookQueue
      */
     public function setWebhookQueue(WebhookQueue $webhookQueue)
     {
@@ -69,8 +56,6 @@ class WebhookQueueEvent extends CommonEvent
 
     /**
      * Sets the Webhook entity.
-     *
-     * @param Webhook $webhook
      */
     public function setWebhook(Webhook $webhook)
     {

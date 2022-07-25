@@ -1,25 +1,13 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\ReportBundle\Model\ReportModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ChannelSubscriber.
- */
-class ChannelSubscriber extends CommonSubscriber
+class ChannelSubscriber implements EventSubscriberInterface
 {
     /**
      * @return array
@@ -31,9 +19,6 @@ class ChannelSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param ChannelEvent $event
-     */
     public function onAddChannel(ChannelEvent $event)
     {
         $event->addChannel(

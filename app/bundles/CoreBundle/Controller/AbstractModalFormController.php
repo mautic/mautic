@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Component\Form\Form;
@@ -35,7 +26,6 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
 
     /**
      * @param      $data
-     * @param Form $form
      * @param      $action
      * @param null $objectId
      *
@@ -75,7 +65,7 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
         }
 
         $dataArray = ['success' => 0];
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $session         = $this->get('session');
             $formData        = $session->get($this->getSessionBase().'.data', []);
             $deletedFormData = $session->get($this->getSessionBase().'.data.deleted', []);
@@ -112,7 +102,7 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
         }
 
         $dataArray = ['success' => 0];
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $session         = $this->get('session');
             $formData        = $session->get($this->getSessionBase().'.data', []);
             $deletedFormData = $session->get($this->getSessionBase().'.data.deleted', []);
@@ -137,12 +127,12 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
     }
 
     /**
-     * @param $args
-     * @param $action
+     * @param array       $args
+     * @param string|null $action
      *
      * @return mixed
      */
-    protected function getResponseVars($args, $action)
+    protected function getResponseVars($args, $action = null)
     {
         return $args;
     }
@@ -172,7 +162,7 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
         $this->beforeFormProcessed($data, $form, $action, 'POST' === $method);
 
         //Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     if (!$this->processFormData($data, $form, $action, $objectId)) {
@@ -240,7 +230,6 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
     /**
      * @param      $isValid
      * @param      $data
-     * @param Form $form
      * @param      $action
      * @param bool $objectId
      */

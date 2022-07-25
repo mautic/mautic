@@ -1,37 +1,21 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\EmailBundle\Form\Type\ConfigType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ConfigSubscriber.
- */
-class ConfigSubscriber extends CommonSubscriber
+class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
-    /**
-     * ConfigSubscriber constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
@@ -48,22 +32,17 @@ class ConfigSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param ConfigBuilderEvent $event
-     */
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
         $event->addForm([
             'bundle'     => 'EmailBundle',
+            'formType'   => ConfigType::class,
             'formAlias'  => 'emailconfig',
             'formTheme'  => 'MauticEmailBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticEmailBundle'),
         ]);
     }
 
-    /**
-     * @param ConfigEvent $event
-     */
     public function onConfigBeforeSave(ConfigEvent $event)
     {
         $event->unsetIfEmpty(
@@ -76,14 +55,14 @@ class ConfigSubscriber extends CommonSubscriber
         $data = $event->getConfig('emailconfig');
 
         // Get the original data so that passwords aren't lost
-        $monitoredEmail = $this->coreParametersHelper->getParameter('monitored_email');
+        $monitoredEmail = $this->coreParametersHelper->get('monitored_email');
         if (isset($data['monitored_email'])) {
             foreach ($data['monitored_email'] as $key => $monitor) {
                 if (empty($monitor['password']) && !empty($monitoredEmail[$key]['password'])) {
                     $data['monitored_email'][$key]['password'] = $monitoredEmail[$key]['password'];
                 }
 
-                if ($key != 'general') {
+                if ('general' != $key) {
                     if (empty($monitor['host']) || empty($monitor['address']) || empty($monitor['folder'])) {
                         // Reset to defaults
                         $data['monitored_email'][$key]['override_settings'] = 0;

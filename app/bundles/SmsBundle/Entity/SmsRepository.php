@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\ORM\Query;
@@ -22,8 +13,6 @@ class SmsRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
-     *
-     * @param array $args
      *
      * @return Paginator
      */
@@ -41,6 +30,53 @@ class SmsRepository extends CommonRepository
         $args['qb'] = $q;
 
         return parent::getEntities($args);
+    }
+
+    /**
+     * @param null $id
+     *
+     * @return \Doctrine\ORM\Internal\Hydration\IterableResult
+     */
+    public function getPublishedBroadcasts($id = null)
+    {
+        $qb   = $this->createQueryBuilder($this->getTableAlias());
+        $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
+
+        $expr->add(
+            $qb->expr()->eq($this->getTableAlias().'.smsType', $qb->expr()->literal('list'))
+        );
+
+        if (!empty($id)) {
+            $expr->add(
+                $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)
+            );
+        }
+        $qb->where($expr);
+
+        return $qb->getQuery()->iterate();
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function getSegmentsContactsQuery(int $smsId)
+    {
+        // Main query
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->from(MAUTIC_TABLE_PREFIX.'sms_message_list_xref', 'sml')
+            ->join('sml', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = sml.leadlist_id and ll.is_published = 1')
+            ->join('ll', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.leadlist_id = sml.leadlist_id and lll.manually_removed = 0')
+            ->join('lll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'lll.lead_id = l.id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('sml.sms_id', ':smsId')
+                )
+            )
+            ->setParameter('smsId', $smsId)
+            // Order by ID so we can query by greater than X contact ID when batching
+            ->orderBy('lll.lead_id');
+
+        return $q;
     }
 
     /**

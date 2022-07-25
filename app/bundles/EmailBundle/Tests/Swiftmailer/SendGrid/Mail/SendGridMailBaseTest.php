@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
@@ -16,7 +7,7 @@ use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailBase;
 use SendGrid\Content;
 use SendGrid\Email;
 
-class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
+class SendGridMailBaseTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider contentTypeProvider
@@ -29,7 +20,8 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
 
         $sendGridMailBase = new SendGridMailBase($plainTextMessageHelper);
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $message->expects($this->once())
@@ -92,7 +84,8 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
 
         $sendGridMailBase = new SendGridMailBase($plainTextMessageHelper);
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $message->expects($this->once())
@@ -143,7 +136,8 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
 
         $sendGridMailBase = new SendGridMailBase($plainTextMessageHelper);
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $message->expects($this->once())

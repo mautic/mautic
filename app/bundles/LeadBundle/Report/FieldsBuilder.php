@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Report;
 
 use Mautic\LeadBundle\Entity\LeadField;
@@ -87,10 +78,15 @@ class FieldsBuilder
         ];
 
         $ownerPrefix           = $prefix.'owner_id';
+        $ownersList            = [];
+        $owners                = $this->userModel->getUserList('', 0);
+        foreach ($owners as $owner) {
+            $ownersList[$owner['id']] = sprintf('%s %s', $owner['firstName'], $owner['lastName']);
+        }
         $filters[$ownerPrefix] = [
             'label' => 'mautic.lead.list.filter.owner',
             'type'  => 'select',
-            'list'  => $this->userModel->getUserList('', 0),
+            'list'  => $ownersList,
         ];
 
         return $filters;
@@ -115,7 +111,7 @@ class FieldsBuilder
      */
     private function getBaseLeadColumns()
     {
-        $columns = [
+        return [
             'l.id' => [
                 'label' => 'mautic.lead.report.contact_id',
                 'type'  => 'int',
@@ -148,8 +144,6 @@ class FieldsBuilder
                 'type'  => 'string',
             ],
         ];
-
-        return $columns;
     }
 
     /**
@@ -157,7 +151,7 @@ class FieldsBuilder
      */
     private function getBaseCompanyColumns()
     {
-        $columns = [
+        return [
             'comp.id' => [
                 'label' => 'mautic.lead.report.company.company_id',
                 'type'  => 'int',
@@ -189,8 +183,6 @@ class FieldsBuilder
                 'link'  => 'mautic_company_action',
             ],
         ];
-
-        return $columns;
     }
 
     /**
@@ -247,7 +239,7 @@ class FieldsBuilder
      */
     private function sanitizePrefix($prefix)
     {
-        if (strpos($prefix, '.') === false) {
+        if (false === strpos($prefix, '.')) {
             $prefix .= '.';
         }
 

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
@@ -30,8 +21,6 @@ class PrimaryCompanyHelper
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return array
      */
     public function getProfileFieldsWithPrimaryCompany(Lead $lead)
@@ -43,8 +32,7 @@ class PrimaryCompanyHelper
     }
 
     /**
-     * @param       $contactId
-     * @param array $profileFields
+     * @param $contactId
      *
      * @return array
      */
@@ -57,9 +45,6 @@ class PrimaryCompanyHelper
     }
 
     /**
-     * @param array $companies
-     * @param array $profileFields
-     *
      * @return array
      */
     private function mergeInPrimaryCompany(array $companies, array $profileFields)

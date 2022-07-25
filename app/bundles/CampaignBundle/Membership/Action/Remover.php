@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Membership\Action;
 
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
@@ -39,11 +30,6 @@ class Remover
 
     /**
      * Remover constructor.
-     *
-     * @param LeadRepository         $leadRepository
-     * @param LeadEventLogRepository $leadEventLogRepository
-     * @param TranslatorInterface    $translator
-     * @param DateHelper             $dateHelper
      */
     public function __construct(
         LeadRepository $leadRepository,
@@ -59,8 +45,7 @@ class Remover
     }
 
     /**
-     * @param CampaignMember $campaignMember
-     * @param bool           $isExit
+     * @param bool $isExit
      *
      * @throws ContactAlreadyRemovedFromCampaignException
      */

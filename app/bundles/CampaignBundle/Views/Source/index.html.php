@@ -13,7 +13,7 @@
 <div id="CampaignEvent_<?php echo $sourceType; ?>" data-type="source" class="draggable list-campaign-source list-campaign-leadsource">
 <?php endif; ?>
     <div class="campaign-event-content">
-        <div><span class="campaign-event-name ellipsis"><i class="mr-sm fa fa-<?php echo ($sourceType == 'lists') ? 'list' : 'pencil-square-o'; ?>"></i><?php echo $names; ?></span></div>
+        <div><span class="campaign-event-name ellipsis"><i class="mr-sm fa fa-<?php echo ('lists' == $sourceType) ? 'list' : 'pencil-square-o'; ?>"></i><?php echo $names; ?></span></div>
     </div>
 <?php if (empty($update)): ?>
     <div class="campaign-event-buttons hide">

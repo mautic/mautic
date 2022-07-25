@@ -1,15 +1,6 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-namespace Mautic\EmailBundle\Test\EventListener;
+namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Entity\Email;
@@ -20,7 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
+class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testDynamicContentCustomTokens()
     {
@@ -101,7 +92,7 @@ CONTENT
         /** @var TokenSubscriber $subscriber */
         $subscriber = $this->getMockBuilder(TokenSubscriber::class)
             ->setConstructorArgs([$dispatcher, $primaryCompanyHelper])
-            ->setMethods(null)
+            ->onlyMethods([])
             ->getMock();
 
         $dispatcher->addSubscriber($subscriber);

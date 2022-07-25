@@ -1,33 +1,16 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Helper;
 
 use Mautic\PageBundle\Model\PageModel;
 
-/**
- * Class TokenHelper.
- */
 class TokenHelper
 {
     /**
-     * @var
+     * @var PageModel
      */
     protected $model;
 
-    /**
-     * TokenHelper constructor.
-     *
-     * @param PageModel $model
-     */
     public function __construct(PageModel $model)
     {
         $this->model = $model;

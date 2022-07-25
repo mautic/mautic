@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Bounce\Mapper;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\CategoryNotFound;
@@ -16,7 +7,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category as De
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 
-class CategoryMapperTest extends \PHPUnit_Framework_TestCase
+class CategoryMapperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that the Category object is returned

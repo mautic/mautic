@@ -12,7 +12,13 @@ if (file_exists(__DIR__.'/security_local.php')) {
 $container->loadFromExtension('twig', [
     'cache'            => false,
     'debug'            => '%kernel.debug%',
-    'strict_variables' => '%kernel.debug%',
+    'strict_variables' => true,
+    'paths'            => [
+        '%kernel.root_dir%/bundles' => 'bundles',
+    ],
+    'form_themes' => [
+        '@MauticCore/FormTheme/mautic_form_layout.html.twig',
+    ],
 ]);
 
 $container->loadFromExtension('framework', [
@@ -68,6 +74,10 @@ $container->loadFromExtension('monolog', [
             ],
         ],
     ],
+]);
+
+$container->loadFromExtension('maker', [
+    'root_namespace' => 'Mautic',
 ]);
 
 // Allow overriding config without a requiring a full bundle or hacks

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO;
 
 /**
@@ -24,7 +15,7 @@ final class FromDTO implements \JsonSerializable
     /**
      * @var string|null
      */
-    private $name = null;
+    private $name;
 
     /**
      * FromDTO constructor.
@@ -56,7 +47,7 @@ final class FromDTO implements \JsonSerializable
         $json = [
             'email' => $this->email,
         ];
-        if ($this->name !== null) {
+        if (null !== $this->name) {
             $json['name'] = $this->name;
         }
 

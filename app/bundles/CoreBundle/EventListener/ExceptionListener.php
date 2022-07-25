@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
 use LightSaml\Error\LightSamlException;
@@ -38,9 +29,7 @@ class ExceptionListener extends KernelExceptionListener
     /**
      * ExceptionListener constructor.
      *
-     * @param Router               $router
-     * @param LoggerInterface      $controller
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $controller
      */
     public function __construct(Router $router, $controller, LoggerInterface $logger = null)
     {
@@ -49,9 +38,6 @@ class ExceptionListener extends KernelExceptionListener
         $this->router = $router;
     }
 
-    /**
-     * @param GetResponseForExceptionEvent $event
-     */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();

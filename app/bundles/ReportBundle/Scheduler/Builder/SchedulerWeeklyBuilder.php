@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Scheduler\Builder;
 
 use Mautic\ReportBundle\Scheduler\BuilderInterface;
@@ -22,9 +13,6 @@ use Recurr\Rule;
 class SchedulerWeeklyBuilder implements BuilderInterface
 {
     /**
-     * @param Rule               $rule
-     * @param SchedulerInterface $scheduler
-     *
      * @return Rule
      *
      * @throws InvalidSchedulerException

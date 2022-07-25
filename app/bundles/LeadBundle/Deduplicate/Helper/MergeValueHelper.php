@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Deduplicate\Helper;
 
 use Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException;
@@ -18,13 +9,15 @@ class MergeValueHelper
     /**
      * @param mixed $newerValue
      * @param mixed $olderValue
-     * @param null  $currentValue
+     * @param mixed $currentValue
+     * @param mixed $defaultValue
+     * @param bool  $newIsAnonymous
      *
      * @return mixed
      *
      * @throws ValueNotMergeableException
      */
-    public static function getMergeValue($newerValue, $olderValue, $currentValue = null)
+    public static function getMergeValue($newerValue, $olderValue, $currentValue = null, $defaultValue = null, $newIsAnonymous = false)
     {
         if ($newerValue === $olderValue) {
             throw new ValueNotMergeableException($newerValue, $olderValue);
@@ -34,7 +27,9 @@ class MergeValueHelper
             throw new ValueNotMergeableException($newerValue, $olderValue);
         }
 
-        if (self::isNotEmpty($newerValue)) {
+        $isDefaultValue = null !== $defaultValue && $newerValue === $defaultValue;
+
+        if (self::isNotEmpty($newerValue) && !($newIsAnonymous && $isDefaultValue)) {
             return $newerValue;
         }
 

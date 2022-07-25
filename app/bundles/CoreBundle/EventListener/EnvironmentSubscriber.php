@@ -1,40 +1,22 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-/**
- * Class EnvironmentSubscriber.
- */
-class EnvironmentSubscriber extends CommonSubscriber
+class EnvironmentSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CookieHelper
-     */
-    protected $cookieHelper;
-
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
-    public function __construct(CookieHelper $cookieHelper)
+    public function __construct(CoreParametersHelper $coreParametersHelper)
     {
-        $this->cookieHelper = $cookieHelper;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -55,8 +37,6 @@ class EnvironmentSubscriber extends CommonSubscriber
 
     /**
      * Set timezone.
-     *
-     * @param GetResponseEvent $event
      */
     public function onKernelRequestSetTimezone(GetResponseEvent $event)
     {
@@ -66,13 +46,11 @@ class EnvironmentSubscriber extends CommonSubscriber
         }
 
         // Set date/time
-        date_default_timezone_set($request->getSession()->get('_timezone', $this->params['default_timezone']));
+        date_default_timezone_set($request->getSession()->get('_timezone', $this->coreParametersHelper->get('default_timezone')));
     }
 
     /**
      * Set default locale.
-     *
-     * @param GetResponseEvent $event
      */
     public function onKernelRequestSetLocale(GetResponseEvent $event)
     {
@@ -86,7 +64,7 @@ class EnvironmentSubscriber extends CommonSubscriber
         if ($locale = $request->attributes->get('_locale')) {
             $request->getSession()->set('_locale', $locale);
         } else {
-            $request->setLocale($request->getSession()->get('_locale', $this->params['locale']));
+            $request->setLocale($request->getSession()->get('_locale', $this->coreParametersHelper->get('locale')));
         }
     }
 }

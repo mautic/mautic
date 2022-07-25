@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Scheduler\Entity;
 
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
@@ -22,17 +13,17 @@ class SchedulerEntity implements SchedulerInterface
     private $isScheduled = false;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $scheduleUnit;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $scheduleDay;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $scheduleMonthFrequency;
 
@@ -53,7 +44,7 @@ class SchedulerEntity implements SchedulerInterface
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getScheduleUnit()
     {
@@ -61,7 +52,7 @@ class SchedulerEntity implements SchedulerInterface
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getScheduleDay()
     {
@@ -69,30 +60,35 @@ class SchedulerEntity implements SchedulerInterface
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getScheduleMonthFrequency()
     {
         return $this->scheduleMonthFrequency;
     }
 
+    public function isScheduledNow(): bool
+    {
+        return SchedulerEnum::UNIT_NOW === $this->getScheduleUnit();
+    }
+
     public function isScheduledDaily()
     {
-        return $this->getScheduleUnit() === SchedulerEnum::UNIT_DAILY;
+        return SchedulerEnum::UNIT_DAILY === $this->getScheduleUnit();
     }
 
     public function isScheduledWeekly()
     {
-        return $this->getScheduleUnit() === SchedulerEnum::UNIT_WEEKLY;
+        return SchedulerEnum::UNIT_WEEKLY === $this->getScheduleUnit();
     }
 
     public function isScheduledMonthly()
     {
-        return $this->getScheduleUnit() === SchedulerEnum::UNIT_MONTHLY;
+        return SchedulerEnum::UNIT_MONTHLY === $this->getScheduleUnit();
     }
 
     public function isScheduledWeekDays()
     {
-        return $this->getScheduleDay() === SchedulerEnum::DAY_WEEK_DAYS;
+        return SchedulerEnum::DAY_WEEK_DAYS === $this->getScheduleDay();
     }
 }

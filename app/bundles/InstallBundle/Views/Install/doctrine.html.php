@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticInstallBundle:Install:content.html.php');
 }
 
@@ -28,7 +28,7 @@ if ($tmpl == 'index') {
     <?php echo $view['form']->row($form['driver']); ?>
 
     <?php $driver = $form['driver']->vars['data']; ?>
-    <div id="DatabaseSettings"<?php if ($driver == 'pdo_sqlite') {
+    <div id="DatabaseSettings"<?php if ('pdo_sqlite' == $driver) {
     echo ' class="hide"';
 } ?>>
         <div class="row">

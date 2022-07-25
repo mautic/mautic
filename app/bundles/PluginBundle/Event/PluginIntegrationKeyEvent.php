@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Event;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 /**
  * Class PluginIntegrationKeyEvent.
@@ -23,13 +14,7 @@ class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
      */
     private $keys;
 
-    /**
-     * PluginIntegrationKeyEvent constructor.
-     *
-     * @param AbstractIntegration $integration
-     * @param array|null          $keys
-     */
-    public function __construct(AbstractIntegration $integration, array $keys = null)
+    public function __construct(UnifiedIntegrationInterface $integration, array $keys = null)
     {
         $this->integration = $integration;
         $this->keys        = $keys;

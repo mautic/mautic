@@ -10,7 +10,7 @@
  */
 
 //for main
-if ($canvas == 'Main') {
+if ('Main' == $canvas) {
     if (!$hasLeft && !$hasRight) {
         $class = 'col-xs-12';
     } elseif ($hasLeft && $hasRight) {
@@ -23,7 +23,7 @@ if ($canvas == 'Main') {
 
 <!-- start: sidebar header -->
 <div class="sidebar-header box-layout"  id="OffCanvas<?php echo $canvas; ?>Header">
-    <?php if ($canvas == 'Left'): ?>
+    <?php if ('Left' == $canvas): ?>
     <div class="col-xs-11 pt-lg text-center">
         <h4><?php echo $view['translator']->trans($canvasContent['header']); ?></h4>
     </div>
@@ -31,7 +31,7 @@ if ($canvas == 'Main') {
         <a href="javascript:void(0);" class="offcanvas-closer"><span class="fa fa-arrow-right fs-16"></span></a>
     </div>
 
-    <?php elseif ($canvas == 'Right'): ?>
+    <?php elseif ('Right' == $canvas): ?>
     <div class="col-xs-1 pt-lg text-left">
         <a href="javascript:void(0);" class="offcanvas-closer"><span class="fa fa-arrow-left fs-16"></span></a>
     </div>
@@ -39,9 +39,9 @@ if ($canvas == 'Main') {
         <h4><?php echo $view['translator']->trans($canvasContent['header']); ?></h4>
     </div>
 
-    <?php elseif ($canvas == 'Main'): ?>
+    <?php elseif ('Main' == $canvas): ?>
         <?php if ($hasLeft): ?>
-            <?php $icon = ($canvasContent['header'] != 'mautic.core.settings') ? 'fa-gears' : 'fa-arrow-left'; ?>
+            <?php $icon = ('mautic.core.settings' != $canvasContent['header']) ? 'fa-gears' : 'fa-arrow-left'; ?>
             <div class="col-xs-1 pt-lg text-left">
                 <a href="javascript:void(0);" class="offcanvas-opener offcanvas-open-ltr"><span class="fa <?php echo $icon; ?> fs-16"></span></a>
             </div>

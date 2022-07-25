@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -59,9 +50,6 @@ class PointsChangeLog
      */
     private $dateAdded;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -70,7 +58,7 @@ class PointsChangeLog
             ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\PointsChangeLogRepository')
             ->addIndex(['date_added'], 'point_date_added');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->addLead(false, 'CASCADE', false, 'pointsChangeLog');
 
@@ -226,11 +214,9 @@ class PointsChangeLog
     /**
      * Set lead.
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     *
      * @return PointsChangeLog
      */
-    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function setLead(Lead $lead)
     {
         $this->lead = $lead;
 
@@ -249,8 +235,6 @@ class PointsChangeLog
 
     /**
      * Set ipAddress.
-     *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
      *
      * @return PointsChangeLog
      */

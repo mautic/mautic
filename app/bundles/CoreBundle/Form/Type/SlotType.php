@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -19,15 +11,11 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class SlotType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'padding-top',
-            'number',
+            NumberType::class,
             [
                 'label'      => 'mautic.core.padding.top',
                 'label_attr' => ['class' => 'control-label'],
@@ -42,7 +30,7 @@ class SlotType extends AbstractType
 
         $builder->add(
             'padding-bottom',
-            'number',
+            NumberType::class,
             [
                 'label'      => 'mautic.core.padding.bottom',
                 'label_attr' => ['class' => 'control-label'],
@@ -59,7 +47,7 @@ class SlotType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'slot';
     }

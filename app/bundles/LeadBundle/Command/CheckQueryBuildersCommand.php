@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
@@ -54,7 +45,7 @@ class CheckQueryBuildersCommand extends ModeratedCommand
 
         $failed = $ok = 0;
 
-        if ($id && substr($id, strlen($id) - 1, 1) != '+') {
+        if ($id && '+' != substr($id, strlen($id) - 1, 1)) {
             $list = $listModel->getEntity($id);
 
             if (!$list) {
@@ -76,11 +67,11 @@ class CheckQueryBuildersCommand extends ModeratedCommand
                 ]
             );
 
-            while (($l = $lists->next()) !== false) {
+            while (false !== ($l = $lists->next())) {
                 // Get first item; using reset as the key will be the ID and not 0
                 $l = reset($l);
 
-                if (substr($id, strlen($id) - 1, 1) == '+' and $l->getId() < intval(trim($id, '+'))) {
+                if ('+' == substr($id, strlen($id) - 1, 1) and $l->getId() < intval(trim($id, '+'))) {
                     continue;
                 }
                 $response = $this->runSegment($output, $verbose, $l, $listModel);

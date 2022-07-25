@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Model;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -37,10 +28,6 @@ class TransportCallback
 
     /**
      * TransportCallback constructor.
-     *
-     * @param DoNotContact   $dncModel
-     * @param ContactFinder  $finder
-     * @param StatRepository $statRepository
      */
     public function __construct(DoNotContact $dncModel, ContactFinder $finder, StatRepository $statRepository)
     {
@@ -101,8 +88,7 @@ class TransportCallback
     }
 
     /**
-     * @param Stat $stat
-     * @param      $comments
+     * @param $comments
      */
     private function updateStatDetails(Stat $stat, $comments, $dncReason)
     {

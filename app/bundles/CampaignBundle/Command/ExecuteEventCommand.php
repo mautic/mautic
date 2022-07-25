@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
@@ -43,10 +34,6 @@ class ExecuteEventCommand extends Command
 
     /**
      * ExecuteEventCommand constructor.
-     *
-     * @param ScheduledExecutioner $scheduledExecutioner
-     * @param TranslatorInterface  $translator
-     * @param FormatterHelper      $formatterHelper
      */
     public function __construct(ScheduledExecutioner $scheduledExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
     {
@@ -76,9 +63,6 @@ class ExecuteEventCommand extends Command
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return int|null
      *
      * @throws \Exception

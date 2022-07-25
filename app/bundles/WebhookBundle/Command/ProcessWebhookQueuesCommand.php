@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -21,12 +12,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProcessWebhookQueuesCommand extends ContainerAwareCommand
 {
-    /**
-     * {@inheritdoc}
-     */
+    public const COMMAND_NAME = 'mautic:webhooks:process';
+
     protected function configure()
     {
-        $this->setName('mautic:webhooks:process')
+        $this->setName(self::COMMAND_NAME)
             ->setDescription('Process queued webhook payloads')
             ->addOption(
                 '--webhook-id',
@@ -37,9 +27,6 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
@@ -57,7 +44,7 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
 
         if ($id) {
             $webhook  = $model->getEntity($id);
-            $webhooks = ($webhook !== null && $webhook->isPublished()) ? [$id => $webhook] : [];
+            $webhooks = (null !== $webhook && $webhook->isPublished()) ? [$id => $webhook] : [];
         } else {
             // make sure we only get published webhook entities
             $webhooks = $model->getEntities(
@@ -87,6 +74,7 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
             $model->processWebhooks($webhooks);
         } catch (\Exception $e) {
             $output->writeLn('<error>'.$e->getMessage().'</error>');
+            $output->writeLn('<error>'.$e->getTraceAsString().'</error>');
 
             return 1;
         }

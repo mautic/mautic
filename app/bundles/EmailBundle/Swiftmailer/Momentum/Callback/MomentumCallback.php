@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Callback;
 
 use Mautic\EmailBundle\Model\TransportCallback;
@@ -25,17 +16,12 @@ final class MomentumCallback implements MomentumCallbackInterface
 
     /**
      * MomentumCallback constructor.
-     *
-     * @param TransportCallback $transportCallback
      */
     public function __construct(TransportCallback $transportCallback)
     {
         $this->transportCallback = $transportCallback;
     }
 
-    /**
-     * @param Request $request
-     */
     public function processCallbackRequest(Request $request)
     {
         $responseItems = new ResponseItems($request);
@@ -50,12 +36,9 @@ final class MomentumCallback implements MomentumCallbackInterface
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     * @param array               $response
-     *
      * @return mixed|void
      */
-    public function processImmediateFeedback(\Swift_Mime_Message $message, array $response)
+    public function processImmediateFeedback(\Swift_Mime_SimpleMessage $message, array $response)
     {
         if (!empty($response['errors'][0]['code']) && 1902 == (int) $response['errors'][0]['code']) {
             $comments     = $response['errors'][0]['description'];

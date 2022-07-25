@@ -1,29 +1,19 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class CampaignEventLeadFieldValueType.
- */
 class CampaignEventLeadFieldValueType extends AbstractType
 {
     /**
@@ -41,13 +31,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
      */
     protected $fieldModel;
 
-    /**
-     * CampaignEventLeadFieldValueType constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param LeadModel           $leadModel
-     * @param FieldModel          $fieldModel
-     */
     public function __construct(TranslatorInterface $translator, LeadModel $leadModel, FieldModel $fieldModel)
     {
         $this->translator = $translator;
@@ -62,15 +45,16 @@ class CampaignEventLeadFieldValueType extends AbstractType
     {
         $builder->add(
             'field',
-            'leadfields_choices',
+            LeadFieldsType::class,
             [
-                'label'       => 'mautic.lead.campaign.event.field',
-                'label_attr'  => ['class' => 'control-label'],
-                'multiple'    => false,
-                'with_tags'   => true,
-                'with_utm'    => true,
-                'empty_value' => 'mautic.core.select',
-                'attr'        => [
+                'label'                 => 'mautic.lead.campaign.event.field',
+                'label_attr'            => ['class' => 'control-label'],
+                'multiple'              => false,
+                'with_company_fields'   => true,
+                'with_tags'             => true,
+                'with_utm'              => true,
+                'placeholder'           => 'mautic.core.select',
+                'attr'                  => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.lead.campaign.event.field_descr',
                     'onchange' => 'Mautic.updateLeadFieldValues(this)',
@@ -104,7 +88,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     if (!empty($properties['list'])) {
                         // Lookup/Select options
                         $fieldValues = FormFieldHelper::parseList($properties['list']);
-                    } elseif (!empty($properties) && $fieldType == 'boolean') {
+                    } elseif (!empty($properties) && 'boolean' == $fieldType) {
                         // Boolean options
                         $fieldValues = [
                             0 => $properties['no'],
@@ -167,12 +151,12 @@ class CampaignEventLeadFieldValueType extends AbstractType
             if (!empty($fieldValues) && $supportsChoices) {
                 $form->add(
                     'value',
-                    'choice',
+                    ChoiceType::class,
                     [
-                        'choices'    => $fieldValues,
-                        'label'      => 'mautic.form.field.form.value',
-                        'label_attr' => ['class' => 'control-label'],
-                        'attr'       => [
+                        'choices'           => array_flip($fieldValues),
+                        'label'             => 'mautic.form.field.form.value',
+                        'label_attr'        => ['class' => 'control-label'],
+                        'attr'              => [
                             'class'                => 'form-control',
                             'onchange'             => 'Mautic.updateLeadFieldValueOptions(this)',
                             'data-toggle'          => $fieldType,
@@ -200,7 +184,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
 
                 $form->add(
                     'value',
-                    'text',
+                    TextType::class,
                     [
                         'label'       => 'mautic.form.field.form.value',
                         'label_attr'  => ['class' => 'control-label'],
@@ -216,14 +200,14 @@ class CampaignEventLeadFieldValueType extends AbstractType
 
             $form->add(
                 'operator',
-                'choice',
+                ChoiceType::class,
                 [
-                    'label'      => 'mautic.lead.lead.submitaction.operator',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
+                    'choices'           => $this->leadModel->getOperatorsForFieldType(null == $fieldType ? 'default' : $fieldType, ['date']),
+                    'label'             => 'mautic.lead.lead.submitaction.operator',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'attr'              => [
                         'onchange' => 'Mautic.updateLeadFieldValues(this)',
                     ],
-                    'choices' => $this->leadModel->getOperatorsForFieldType(null == $fieldType ? 'default' : $fieldType, ['date']),
                 ]
             );
         };
@@ -236,7 +220,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_lead_field_value';
     }

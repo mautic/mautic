@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Crate;
 
 class ReportDataResult
@@ -95,9 +86,15 @@ class ReportDataResult
 
         $row = $this->data[0];
         foreach ($row as $k => $v) {
-            $dataColumn = $data['dataColumns'][$k];
+            $dataColumn      = $data['dataColumns'][$k];
+            $label           = $data['columns'][$dataColumn]['label'];
 
-            $this->headers[] = $data['columns'][$dataColumn]['label'];
+            // Aggregated column
+            if (isset($data['aggregatorColumns'][$k])) {
+                $this->headers[] = str_replace($dataColumn, $label, $k);
+            } else {
+                $this->headers[] = $data['columns'][$dataColumn]['label'];
+            }
         }
     }
 
@@ -112,9 +109,12 @@ class ReportDataResult
 
         $row = $this->data[0];
         foreach ($row as $k => $v) {
-            $dataColumn = $data['dataColumns'][$k];
-
-            $this->types[$k] = $data['columns'][$dataColumn]['type'];
+            if (isset($data['aggregatorColumns']) && array_key_exists($k, $data['aggregatorColumns'])) {
+                $this->types[$k] = 'int';
+            } else {
+                $dataColumn      = $data['dataColumns'][$k];
+                $this->types[$k] = $data['columns'][$dataColumn]['type'];
+            }
         }
     }
 }

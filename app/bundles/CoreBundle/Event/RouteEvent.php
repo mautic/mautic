@@ -1,23 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Routing\RouteCollection;
 
-/**
- * Class RouteEvent.
- */
 class RouteEvent extends Event
 {
     /**
@@ -31,13 +19,10 @@ class RouteEvent extends Event
     protected $collection;
 
     /**
-     * @var
+     * @var string
      */
     protected $type;
 
-    /**
-     * @param Loader $loader
-     */
     public function __construct(Loader $loader, $type = 'main')
     {
         $this->loader     = $loader;
@@ -46,7 +31,7 @@ class RouteEvent extends Event
     }
 
     /**
-     * @param mixed $path
+     * @param string $path
      */
     public function addRoutes($path)
     {
@@ -62,7 +47,7 @@ class RouteEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getType()
     {

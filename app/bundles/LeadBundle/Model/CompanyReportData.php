@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\FormBundle\Entity\Field;
@@ -29,9 +20,6 @@ class CompanyReportData
 
     /**
      * CompanyReportData constructor.
-     *
-     * @param FieldModel          $fieldModel
-     * @param TranslatorInterface $translator
      */
     public function __construct(FieldModel $fieldModel, TranslatorInterface $translator)
     {
@@ -57,14 +45,10 @@ class CompanyReportData
             ],
         ]);
 
-        $companyColumns = array_merge($companyColumns, $this->getFieldColumns($companyFields, 'comp.'));
-
-        return $companyColumns;
+        return array_merge($companyColumns, $this->getFieldColumns($companyFields, 'comp.'));
     }
 
     /**
-     * @param ReportGeneratorEvent $event
-     *
      * @return bool
      */
     public function eventHasCompanyColumns(ReportGeneratorEvent $event)
@@ -86,6 +70,7 @@ class CompanyReportData
     {
         return [
             'comp.id' => [
+                'alias' => 'comp_id',
                 'label' => 'mautic.lead.report.company.company_id',
                 'type'  => 'int',
                 'link'  => 'mautic_company_action',
@@ -93,6 +78,10 @@ class CompanyReportData
             'companies_lead.is_primary' => [
                 'label' => 'mautic.lead.report.company.is_primary',
                 'type'  => 'bool',
+            ],
+            'companies_lead.date_added' => [
+                'label' => 'mautic.lead.report.company.date_added',
+                'type'  => 'datetime',
             ],
         ];
     }

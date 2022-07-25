@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticEmailBundle:Email:index.html.php');
 }
 ?>
@@ -37,7 +37,6 @@ if ($tmpl == 'index') {
                         'orderBy'    => 'e.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-email-name',
-                        'default'    => true,
                     ]
                 );
 
@@ -54,6 +53,41 @@ if ($tmpl == 'index') {
 
                 <th class="visible-sm visible-md visible-lg col-email-stats"><?php echo $view['translator']->trans('mautic.core.stats'); ?></th>
 
+                <?php
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'email',
+                        'orderBy'    => 'e.dateAdded',
+                        'text'       => 'mautic.lead.import.label.dateAdded',
+                        'class'      => 'visible-lg col-email-dateAdded',
+                    ]
+                );
+                ?>
+                <?php
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'email',
+                        'orderBy'    => 'e.dateModified',
+                        'defaultDir' => 'DESC',
+                        'text'       => 'mautic.lead.import.label.dateModified',
+                        'class'      => 'visible-lg col-email-dateModified',
+                        'default'    => true,
+                    ]
+                );
+                ?>
+                <?php
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'email',
+                        'orderBy'    => 'e.createdByUser',
+                        'text'       => 'mautic.core.createdby',
+                        'class'      => 'visible-lg col-email-createdByUser',
+                    ]
+                );
+                ?>
                 <?php
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
@@ -83,7 +117,7 @@ if ($tmpl == 'index') {
                             $permissions['email:emails:editother'],
                             $item->getCreatedBy()
                         );
-                        $customButtons = ($type == 'list') ? [
+                        $customButtons = ('list' == $type) ? [
                             [
                                 'attr' => [
                                     'data-toggle' => 'ajax',
@@ -136,7 +170,7 @@ if ($tmpl == 'index') {
                                     <i class="fa fa-fw fa-language"></i>
                                 </span>
                                 <?php endif; ?>
-                                <?php if ($type == 'list'): ?>
+                                <?php if ('list' == $type): ?>
                                 <span data-toggle="tooltip" title="<?php echo $view['translator']->trans(
                                         'mautic.email.icon_tooltip.list_email'
                                     ); ?>">
@@ -162,23 +196,27 @@ if ($tmpl == 'index') {
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats" data-stats="<?php echo $item->getId(); ?>">
                         <?php echo $view['content']->getCustomContent('email.stats.above', $mauticTemplateVars); ?>
-                        <span class="mt-xs label label-default hide has-click-event clickable-stat"
+                        <span class="mt-xs label label-default has-click-event clickable-stat<?php echo $item->getPendingCount() > 0 && 'list' === $item->getEmailType() ? '' : ' hide'; ?>"
                               id="pending-<?php echo $item->getId(); ?>"
                               data-toggle="tooltip"
                               title="<?php echo $view['translator']->trans('mautic.email.stat.leadcount.tooltip'); ?>">
                             <a href="<?php echo $view['router']->path(
                                 'mautic_contact_index',
                                 ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_pending').':'.$item->getId()]
-                            ); ?>"></a>
+                            ); ?>">
+                                <?php echo $view['translator']->trans('mautic.email.stat.leadcount', ['%count%' => $item->getPendingCount()]); ?>
+                            </a>
                         </span>
-                        <span class="mt-xs label label-default hide has-click-event clickable-stat"
+                        <span class="mt-xs label label-default has-click-event clickable-stat<?php echo $item->getQueuedCount() > 0 ? '' : ' hide'; ?>"
                               id="queued-<?php echo $item->getId(); ?>"
                               data-toggle="tooltip"
                               title="<?php echo $view['translator']->trans('mautic.email.stat.queued.tooltip'); ?>">
                             <a href="<?php echo $view['router']->path(
                                 'mautic_contact_index',
                                 ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_queued').':'.$item->getId()]
-                            ); ?>"></a>
+                            ); ?>">
+                                <?php echo $view['translator']->trans('mautic.email.stat.queued', ['%count%' => $item->getQueuedCount()]); ?>
+                            </a>
                         </span>
                         <span class="mt-xs label label-warning has-click-event clickable-stat"
                               id="sent-count-<?php echo $item->getId(); ?>">
@@ -187,9 +225,7 @@ if ($tmpl == 'index') {
                                 ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_sent').':'.$item->getId()]
                             ); ?>" data-toggle="tooltip"
                                title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
-                                <div style="width: 50px;">
-                                    <i class="fa fa-spin fa-spinner"></i>
-                                </div>
+                                <?php echo $view['translator']->trans('mautic.email.stat.sentcount', ['%count%' => $item->getSentCount(true)]); ?>
                             </a>
                         </span>
                         <span class="mt-xs label label-success has-click-event clickable-stat"
@@ -199,9 +235,7 @@ if ($tmpl == 'index') {
                                 ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_read').':'.$item->getId()]
                             ); ?>" data-toggle="tooltip"
                                title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
-                                <div style="width: 50px;">
-                                    <i class="fa fa-spin fa-spinner"></i>
-                                </div>
+                                <?php echo $view['translator']->trans('mautic.email.stat.readcount', ['%count%' => $item->getReadCount(true)]); ?>
                             </a>
                         </span>
                         <span class="mt-xs label label-primary has-click-event clickable-stat"
@@ -211,14 +245,19 @@ if ($tmpl == 'index') {
                                 ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_read').':'.$item->getId()]
                             ); ?>" data-toggle="tooltip"
                                title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
-                                <div style="width: 50px;">
-                                    <i class="fa fa-spin fa-spinner"></i>
-                                </div>
+                                <?php echo $view['translator']->trans('mautic.email.stat.readpercent', ['%count%' => $item->getReadPercentage(true)]); ?>
                             </a>
                         </span>
                         <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
                         <?php echo $view['content']->getCustomContent('email.stats.below', $mauticTemplateVars); ?>
                     </td>
+                    <td class="visible-lg" title="<?php echo $item->getDateAdded() ? $view['date']->toFullConcat($item->getDateAdded()) : ''; ?>">
+                        <?php echo $item->getDateAdded() ? $view['date']->toDate($item->getDateAdded()) : ''; ?>
+                    </td>
+                    <td class="visible-lg" title="<?php echo $item->getDateModified() ? $view['date']->toFullConcat($item->getDateModified()) : ''; ?>">
+                        <?php echo $item->getDateModified() ? $view['date']->toDate($item->getDateModified()) : ''; ?>
+                    </td>
+                    <td class="visible-lg"><?php echo $view->escape($item->getCreatedByUser()); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -33,7 +24,7 @@ class ImportRepository extends CommonRepository
             ->andWhere($q->expr()->lt($this->getTableAlias().'.dateModified', ':delay'))
             ->setParameter('delay', (new \DateTime())->modify('-'.$ghostDelay.' hours'));
 
-        if ($limit !== null) {
+        if (null !== $limit) {
             $q->setFirstResult(0)
                 ->setMaxResults($limit);
         }
@@ -44,8 +35,7 @@ class ImportRepository extends CommonRepository
     /**
      * Count how many imports with the status is there.
      *
-     * @param array $statuses
-     * @param int   $limit
+     * @param int $limit
      *
      * @return array
      */
@@ -56,7 +46,7 @@ class ImportRepository extends CommonRepository
             ->orderBy($this->getTableAlias().'.priority', 'ASC')
             ->addOrderBy($this->getTableAlias().'.dateAdded', 'DESC');
 
-        if ($limit !== null) {
+        if (null !== $limit) {
             $q->setFirstResult(0)
                 ->setMaxResults($limit);
         }
@@ -66,8 +56,6 @@ class ImportRepository extends CommonRepository
 
     /**
      * Count how many imports with the status is there.
-     *
-     * @param array $statuses
      *
      * @return int
      */

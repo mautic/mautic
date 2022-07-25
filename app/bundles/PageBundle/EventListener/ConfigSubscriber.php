@@ -1,25 +1,15 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\PageBundle\Form\Type\ConfigTrackingPageType;
+use Mautic\PageBundle\Form\Type\ConfigType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ConfigSubscriber.
- */
-class ConfigSubscriber extends CommonSubscriber
+class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
      * @return array
@@ -40,6 +30,7 @@ class ConfigSubscriber extends CommonSubscriber
         $event->addForm([
             'bundle'     => 'PageBundle',
             'formAlias'  => 'pageconfig',
+            'formType'   => ConfigType::class,
             'formTheme'  => 'MauticPageBundle:FormTheme\Config',
             // parameters must be defined directly in case there are 2 config forms per bundle.
             // $event->getParametersFromConfig('MauticPageBundle') would return all params for PageBundle
@@ -56,18 +47,21 @@ class ConfigSubscriber extends CommonSubscriber
         $event->addForm([
             'bundle'     => 'PageBundle',
             'formAlias'  => 'trackingconfig',
+            'formType'   => ConfigTrackingPageType::class,
             'formTheme'  => 'MauticPageBundle:FormTheme\Config',
             // parameters defined this way because of the reason as above.
             'parameters' => [
+                'anonymize_ip'                          => false,
                 'track_contact_by_ip'                   => false,
                 'track_by_tracking_url'                 => false,
-                'track_by_fingerprint'                  => false,
                 'facebook_pixel_id'                     => null,
                 'facebook_pixel_trackingpage_enabled'   => false,
                 'facebook_pixel_landingpage_enabled'    => false,
                 'google_analytics_id'                   => null,
                 'google_analytics_trackingpage_enabled' => false,
                 'google_analytics_landingpage_enabled'  => false,
+                'google_analytics_anonymize_ip'         => false,
+                'do_not_track_404_anonymous'            => false,
             ],
         ]);
     }

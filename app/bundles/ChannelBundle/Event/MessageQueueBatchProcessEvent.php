@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
@@ -24,9 +15,8 @@ class MessageQueueBatchProcessEvent extends Event
     /**
      * MessageQueueBatchProcessEvent constructor.
      *
-     * @param array $messages
-     * @param       $channel
-     * @param       $channelId
+     * @param $channel
+     * @param $channelId
      */
     public function __construct(array $messages, $channel, $channelId)
     {

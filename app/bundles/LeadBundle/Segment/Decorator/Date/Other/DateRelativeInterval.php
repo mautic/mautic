@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Other;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
@@ -28,19 +20,25 @@ class DateRelativeInterval implements FilterDecoratorInterface
     private $originalValue;
 
     /**
-     * @param DateDecorator $dateDecorator
-     * @param string        $originalValue
+     * @var DateOptionParameters
      */
-    public function __construct(DateDecorator $dateDecorator, $originalValue)
-    {
-        $this->dateDecorator = $dateDecorator;
-        $this->originalValue = $originalValue;
+    private $dateOptionParameters;
+
+    /**
+     * @param string $originalValue
+     */
+    public function __construct(
+        DateDecorator $dateDecorator,
+        $originalValue,
+        DateOptionParameters $dateOptionParameters
+    ) {
+        $this->dateDecorator        = $dateDecorator;
+        $this->originalValue        = $originalValue;
+        $this->dateOptionParameters = $dateOptionParameters;
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return null|string
+     * @return string|null
      */
     public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
@@ -48,8 +46,6 @@ class DateRelativeInterval implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -58,16 +54,14 @@ class DateRelativeInterval implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        if ($contactSegmentFilterCrate->getOperator() === '=') {
+        if ('=' === $contactSegmentFilterCrate->getOperator()) {
             return 'like';
         }
-        if ($contactSegmentFilterCrate->getOperator() === '!=') {
+        if ('!=' === $contactSegmentFilterCrate->getOperator()) {
             return 'notLike';
         }
 
@@ -75,8 +69,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     * @param array|string              $argument
+     * @param array|string $argument
      *
      * @return array|string
      */
@@ -86,27 +79,23 @@ class DateRelativeInterval implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return array|bool|float|null|string
+     * @return array|bool|float|string|null
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $date = $this->dateDecorator->getDefaultDate();
+        $date = $this->dateOptionParameters->getDefaultDate();
         $date->modify($this->originalValue);
 
         $operator = $this->getOperator($contactSegmentFilterCrate);
         $format   = 'Y-m-d';
-        if ($operator === 'like' || $operator === 'notLike') {
+        if ('like' === $operator || 'notLike' === $operator) {
             $format .= '%';
         }
 
-        return $date->toUtcString($format);
+        return $date->toLocalString($format);
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -115,8 +104,6 @@ class DateRelativeInterval implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return bool|string
      */
     public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -125,9 +112,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|null|string
+     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

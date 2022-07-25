@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Scheduler;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -19,6 +10,7 @@ use Mautic\CampaignBundle\Event\ScheduledBatchEvent;
 use Mautic\CampaignBundle\Event\ScheduledEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CampaignBundle\Executioner\Exception\IntervalNotConfiguredException;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime;
@@ -67,13 +59,6 @@ class EventScheduler
 
     /**
      * EventScheduler constructor.
-     *
-     * @param LoggerInterface          $logger
-     * @param EventLogger              $eventLogger
-     * @param Interval                 $intervalScheduler
-     * @param DateTime                 $dateTimeScheduler
-     * @param EventCollector           $collector
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         LoggerInterface $logger,
@@ -93,11 +78,6 @@ class EventScheduler
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param Event     $event
-     * @param \DateTime $executionDate
-     * @param Lead      $contact
-     */
     public function scheduleForContact(Event $event, \DateTime $executionDate, Lead $contact)
     {
         $contacts = new ArrayCollection([$contact]);
@@ -106,10 +86,7 @@ class EventScheduler
     }
 
     /**
-     * @param Event           $event
-     * @param \DateTime       $executionDate
-     * @param ArrayCollection $contacts
-     * @param bool            $isInactiveEvent
+     * @param bool $isInactiveEvent
      */
     public function schedule(Event $event, \DateTime $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
     {
@@ -118,40 +95,27 @@ class EventScheduler
         // Load the rotations for creating new log entries
         $this->eventLogger->hydrateContactRotationsForNewLogs($contacts->getKeys(), $event->getCampaign()->getId());
 
-        foreach ($contacts as $contact) {
-            // Create the entry
-            $log = $this->eventLogger->buildLogEntry($event, $contact, $isInactiveEvent);
+        // If this is relative to a specific hour, process the contacts in batches by contacts' timezone
+        if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
+            $groupedExecutionDates = $this->intervalScheduler->groupContactsByDate($event, $contacts, $executionDate);
 
-            // Schedule it
-            $log->setTriggerDate($executionDate);
+            foreach ($groupedExecutionDates as $groupExecutionDateDAO) {
+                $this->scheduleEventForContacts(
+                    $event,
+                    $config,
+                    $groupExecutionDateDAO->getExecutionDate(),
+                    $groupExecutionDateDAO->getContacts(),
+                    $isInactiveEvent
+                );
+            }
 
-            // Add it to the queue to persist to the DB
-            $this->eventLogger->queueToPersist($log);
-
-            //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
-            $this->logger->debug(
-                'CAMPAIGN: '.ucfirst($event->getEventType()).' ID# '.$event->getId().' for contact ID# '.$contact->getId()
-                .' has timing that is not appropriate and thus scheduled for '.$executionDate->format('Y-m-d H:m:i T')
-            );
-
-            $this->dispatchScheduledEvent($config, $log);
+            return;
         }
 
-        // Persist any pending in the queue
-        $logs = $this->eventLogger->persistQueuedLogs();
-
-        // Send out a batch event
-        $this->dispatchBatchScheduledEvent($config, $event, $logs);
-
-        // Update log entries and clear from memory
-        $this->eventLogger->persistCollection($logs)
-            ->clearCollection($logs);
+        // Otherwise just schedule as the default
+        $this->scheduleEventForContacts($event, $config, $executionDate, $contacts, $isInactiveEvent);
     }
 
-    /**
-     * @param LeadEventLog $log
-     * @param \DateTime    $toBeExecutedOn
-     */
     public function reschedule(LeadEventLog $log, \DateTime $toBeExecutedOn)
     {
         $log->setTriggerDate($toBeExecutedOn);
@@ -165,7 +129,6 @@ class EventScheduler
 
     /**
      * @param ArrayCollection|LeadEventLog[] $logs
-     * @param \DateTime                      $toBeExecutedOn
      */
     public function rescheduleLogs(ArrayCollection $logs, \DateTime $toBeExecutedOn)
     {
@@ -182,48 +145,29 @@ class EventScheduler
     }
 
     /**
-     * @param LeadEventLog $log
+     * @deprecated since Mautic 3. To be removed in Mautic 4. Use rescheduleFailures instead.
      */
     public function rescheduleFailure(LeadEventLog $log)
     {
-        if (!$interval = $this->coreParametersHelper->getParameter('campaign_time_wait_on_event_false')) {
-            return;
-        }
-
         try {
-            $date = new \DateTime();
-            $date->add(new \DateInterval($interval));
-        } catch (\Exception $exception) {
-            // Bad interval
-            return;
+            $this->reschedule($log, $this->getRescheduleDate($log));
+        } catch (IntervalNotConfiguredException $e) {
+            // Do not reschedule if an interval was not configured.
         }
-
-        $this->reschedule($log, $date);
     }
 
-    /**
-     * @param ArrayCollection $logs
-     */
     public function rescheduleFailures(ArrayCollection $logs)
     {
-        if (!$interval = $this->coreParametersHelper->getParameter('campaign_time_wait_on_event_false')) {
-            return;
-        }
-
         if (!$logs->count()) {
             return;
         }
 
-        try {
-            $date = new \DateTime();
-            $date->add(new \DateInterval($interval));
-        } catch (\Exception $exception) {
-            // Bad interval
-            return;
-        }
-
         foreach ($logs as $log) {
-            $this->reschedule($log, $date);
+            try {
+                $this->reschedule($log, $this->getRescheduleDate($log));
+            } catch (IntervalNotConfiguredException $e) {
+                // Do not reschedule if an interval was not configured.
+            }
         }
 
         // Send out a batch event
@@ -234,10 +178,6 @@ class EventScheduler
     }
 
     /**
-     * @param Event          $event
-     * @param \DateTime|null $compareFromDateTime
-     * @param \DateTime|null $comparedToDateTime
-     *
      * @return \DateTime
      *
      * @throws NotSchedulableException
@@ -274,8 +214,35 @@ class EventScheduler
     }
 
     /**
+     * @return \DateTime
+     *
+     * @throws NotSchedulableException
+     */
+    public function validateExecutionDateTime(LeadEventLog $log, \DateTime $currentDateTime)
+    {
+        if (!$scheduledDateTime = $log->getTriggerDate()) {
+            throw new NotSchedulableException();
+        }
+
+        $event = $log->getEvent();
+
+        switch ($event->getTriggerMode()) {
+            case Event::TRIGGER_MODE_IMMEDIATE:
+            case null: // decision
+                $this->logger->debug('CAMPAIGN: ('.$event->getId().') Executing immediately');
+
+                return $currentDateTime;
+            case Event::TRIGGER_MODE_INTERVAL:
+                return $this->intervalScheduler->validateExecutionDateTime($log, $currentDateTime);
+            case Event::TRIGGER_MODE_DATE:
+                return $this->dateTimeScheduler->getExecutionDateTime($event, $currentDateTime, $scheduledDateTime);
+        }
+
+        throw new NotSchedulableException();
+    }
+
+    /**
      * @param ArrayCollection|Event[] $events
-     * @param \DateTime               $lastActiveDate
      *
      * @return array
      *
@@ -304,16 +271,9 @@ class EventScheduler
         return $eventExecutionDates;
     }
 
-    /**
-     * @param \DateTime $eventExecutionDate
-     * @param \DateTime $earliestExecutionDate
-     * @param \DateTime $now
-     *
-     * @return \DateTime
-     */
-    public function getExecutionDateForInactivity(\DateTime $eventExecutionDate, \DateTime $earliestExecutionDate, \DateTime $now)
+    public function getExecutionDateForInactivity(\DateTime $eventExecutionDate, \DateTime $earliestExecutionDate, \DateTime $now): \DateTime
     {
-        if ($earliestExecutionDate->getTimestamp() === $eventExecutionDate->getTimestamp()) {
+        if ($eventExecutionDate->getTimestamp() === $earliestExecutionDate->getTimestamp()) {
             // Inactivity is based on the "wait" period so execute now
             return clone $now;
         }
@@ -321,13 +281,7 @@ class EventScheduler
         return $eventExecutionDate;
     }
 
-    /**
-     * @param \DateTime $executionDate
-     * @param \DateTime $now
-     *
-     * @return bool
-     */
-    public function shouldSchedule(\DateTime $executionDate, \DateTime $now)
+    public function shouldSchedule(\DateTime $executionDate, \DateTime $now): bool
     {
         // Mainly for functional tests so we don't have to wait minutes but technically can be used in an environment as well if this behavior
         // is desired by system admin
@@ -340,10 +294,56 @@ class EventScheduler
         return $executionDate > $now;
     }
 
+    public function shouldScheduleEvent(Event $event, \DateTime $executionDate, \DateTime $now): bool
+    {
+        if (null !== $event) {
+            if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
+                // Event has days in week specified. Needs to be recalculated to the next day configured
+                return true;
+            }
+        }
+
+        return $this->shouldSchedule($executionDate, $now);
+    }
+
     /**
-     * @param AbstractEventAccessor $config
-     * @param LeadEventLog          $log
-     * @param bool                  $isReschedule
+     * @throws NotSchedulableException
+     */
+    public function validateAndScheduleEventForContacts(Event $event, \DateTime $executionDateTime, ArrayCollection $contacts, \DateTime $comparedFromDateTime)
+    {
+        if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
+            $this->logger->debug(
+                'CAMPAIGN: Event ID# '.$event->getId().
+                ' has to be scheduled based on contact specific parameters '.
+                ' compared to '.$executionDateTime->format('Y-m-d H:i:s')
+            );
+
+            $groupedExecutionDates = $this->intervalScheduler->groupContactsByDate($event, $contacts, $executionDateTime);
+            $config                = $this->collector->getEventConfig($event);
+
+            foreach ($groupedExecutionDates as $groupExecutionDateDAO) {
+                $this->scheduleEventForContacts(
+                    $event,
+                    $config,
+                    $groupExecutionDateDAO->getExecutionDate(),
+                    $groupExecutionDateDAO->getContacts()
+                );
+            }
+
+            return;
+        }
+
+        if ($this->shouldSchedule($executionDateTime, $comparedFromDateTime)) {
+            $this->schedule($event, $executionDateTime, $contacts);
+
+            return;
+        }
+
+        throw new NotSchedulableException();
+    }
+
+    /**
+     * @param bool $isReschedule
      */
     private function dispatchScheduledEvent(AbstractEventAccessor $config, LeadEventLog $log, $isReschedule = false)
     {
@@ -354,10 +354,7 @@ class EventScheduler
     }
 
     /**
-     * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $logs
-     * @param bool                  $isReschedule
+     * @param bool $isReschedule
      */
     private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, $isReschedule = false)
     {
@@ -369,5 +366,66 @@ class EventScheduler
             CampaignEvents::ON_EVENT_SCHEDULED_BATCH,
             new ScheduledBatchEvent($config, $event, $logs, $isReschedule)
         );
+    }
+
+    /**
+     * @param bool $isInactiveEvent
+     */
+    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTime $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
+    {
+        foreach ($contacts as $contact) {
+            // Create the entry
+            $log = $this->eventLogger->buildLogEntry($event, $contact, $isInactiveEvent);
+
+            // Schedule it
+            $log->setTriggerDate($executionDate);
+
+            // Add it to the queue to persist to the DB
+            $this->eventLogger->queueToPersist($log);
+
+            //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
+            $this->logger->debug(
+                'CAMPAIGN: '.ucfirst($event->getEventType()).' ID# '.$event->getId().' for contact ID# '.$contact->getId()
+                .' has timing that is not appropriate and thus scheduled for '.$executionDate->format('Y-m-d H:i:s T')
+            );
+
+            $this->dispatchScheduledEvent($config, $log);
+        }
+
+        // Persist any pending in the queue
+        $logs = $this->eventLogger->persistQueuedLogs();
+
+        // Send out a batch event
+        $this->dispatchBatchScheduledEvent($config, $event, $logs);
+
+        // Update log entries and clear from memory
+        $this->eventLogger->persistCollection($logs)
+            ->clearCollection($logs);
+    }
+
+    /**
+     * @throws IntervalNotConfiguredException
+     */
+    private function getRescheduleDate(LeadEventLog $leadEventLog): \DateTimeInterface
+    {
+        $rescheduleDate = new \DateTime();
+        $logInterval    = $leadEventLog->getRescheduleInterval();
+
+        if ($logInterval) {
+            return $rescheduleDate->add($logInterval);
+        }
+
+        $defaultIntervalString = $this->coreParametersHelper->get('campaign_time_wait_on_event_false');
+
+        if (!$defaultIntervalString) {
+            throw new IntervalNotConfiguredException('No Interval has been set on the lead event log nor as campaign_time_wait_on_event_false config value.');
+        }
+
+        try {
+            return $rescheduleDate->add(new \DateInterval($defaultIntervalString));
+        } catch (\Exception $exception) {
+            // Bad interval
+            throw new IntervalNotConfiguredException("'{$defaultIntervalString}' is not valid interval string for campaign_time_wait_on_event_false config key.");
+        }
     }
 }

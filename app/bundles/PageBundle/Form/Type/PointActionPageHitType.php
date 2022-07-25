@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -24,7 +15,7 @@ class PointActionPageHitType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('pages', 'page_list', [
+        $builder->add('pages', PageListType::class, [
             'label'      => 'mautic.page.point.action.form.pages',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -37,7 +28,7 @@ class PointActionPageHitType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'pointaction_pagehit';
     }

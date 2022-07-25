@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CalendarBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -70,7 +61,7 @@ class DefaultController extends FormController
         ];
 
         //not found
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -99,7 +90,7 @@ class DefaultController extends FormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['formName' => $event->getFormName()]);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {

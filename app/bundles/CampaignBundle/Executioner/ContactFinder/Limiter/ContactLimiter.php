@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\ContactFinder\Limiter;
 
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
@@ -59,15 +50,25 @@ class ContactLimiter
     private $maxThreads;
 
     /**
+     * @var int|null
+     */
+    private $campaignLimit;
+
+    /**
+     * @var int|null
+     */
+    private $campaignLimitUsed;
+
+    /**
      * ContactLimiter constructor.
      *
      * @param int      $batchLimit
      * @param int|null $contactId
      * @param int|null $minContactId
      * @param int|null $maxContactId
-     * @param array    $contactIdList
      * @param int|null $threadId
      * @param int|null $maxThreads
+     * @param int|null $campaignLimit
      */
     public function __construct(
         $batchLimit,
@@ -76,7 +77,8 @@ class ContactLimiter
         $maxContactId = null,
         array $contactIdList = [],
         $threadId = null,
-        $maxThreads = null
+        $maxThreads = null,
+        $campaignLimit = null
     ) {
         $this->batchLimit    = ($batchLimit) ? (int) $batchLimit : 100;
         $this->contactId     = ($contactId) ? (int) $contactId : null;
@@ -91,6 +93,11 @@ class ContactLimiter
             if ($threadId > $maxThreads) {
                 throw new \InvalidArgumentException('$threadId cannot be larger than $maxThreads');
             }
+        }
+
+        if ($campaignLimit) {
+            $this->campaignLimit     = $campaignLimit;
+            $this->campaignLimitUsed = 0;
         }
     }
 
@@ -187,5 +194,64 @@ class ContactLimiter
     public function getThreadId()
     {
         return $this->threadId;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getCampaignLimit()
+    {
+        return $this->campaignLimit;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasCampaignLimit()
+    {
+        return null !== $this->campaignLimit;
+    }
+
+    /**
+     * @return int
+     *
+     * @throws \Exception
+     */
+    public function getCampaignLimitRemaining()
+    {
+        if (!$this->hasCampaignLimit()) {
+            throw new \Exception('Campaign Limit was not set');
+        }
+
+        return $this->campaignLimit - $this->campaignLimitUsed;
+    }
+
+    /**
+     * @param $reduction
+     *
+     * @return $this
+     *
+     * @throws \Exception
+     */
+    public function reduceCampaignLimitRemaining($reduction)
+    {
+        if (!$this->hasCampaignLimit()) {
+            throw new \Exception('Campaign Limit was not set');
+        } elseif ($this->campaignLimit < ($this->campaignLimitUsed + $reduction)) {
+            throw new \Exception('Campaign Limit exceeded');
+        }
+        $this->campaignLimitUsed += $reduction;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function resetCampaignLimitRemaining()
+    {
+        $this->campaignLimitUsed = 0;
+
+        return $this;
     }
 }

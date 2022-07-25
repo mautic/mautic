@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tracker\Service\ContactTrackingService;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
@@ -16,7 +7,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -47,18 +37,12 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
     private $mergeRecordRepository;
 
     /**
-     * @var Request|null
+     * @var RequestStack
      */
-    private $request;
+    private $requestStack;
 
     /**
      * ContactTrackingService constructor.
-     *
-     * @param CookieHelper          $cookieHelper
-     * @param LeadDeviceRepository  $leadDeviceRepository
-     * @param LeadRepository        $leadRepository
-     * @param MergeRecordRepository $mergeRecordRepository
-     * @param RequestStack          $requestStack
      */
     public function __construct(
         CookieHelper $cookieHelper,
@@ -71,7 +55,7 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
         $this->leadDeviceRepository  = $leadDeviceRepository;
         $this->leadRepository        = $leadRepository;
         $this->mergeRecordRepository = $mergeRecordRepository;
-        $this->request               = $requestStack->getCurrentRequest();
+        $this->requestStack          = $requestStack;
     }
 
     /**
@@ -79,29 +63,31 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
      */
     public function getTrackedLead()
     {
-        if ($this->request === null) {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (null === $request) {
             return null;
         }
 
         $trackingId = $this->getTrackedIdentifier();
-        if ($trackingId === null) {
+        if (null === $trackingId) {
             return null;
         }
 
         $leadId = $this->cookieHelper->getCookie($trackingId, null);
-        if ($leadId === null) {
-            $leadId = $this->request->get('mtc_id', null);
-            if ($leadId === null) {
+        if (null === $leadId) {
+            $leadId = $request->get('mtc_id', null);
+            if (null === $leadId) {
                 return null;
             }
         }
 
         $lead = $this->leadRepository->getEntity($leadId);
-        if ($lead === null) {
+        if (null === $lead) {
             // Check if this contact was merged into another and if so, return the new contact
             $lead = $this->mergeRecordRepository->findMergedContact($leadId);
 
-            if ($lead === null) {
+            if (null === $lead) {
                 return null;
             }
 

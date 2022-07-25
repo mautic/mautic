@@ -1,24 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\EventListener;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Mautic\ReportBundle\Form\Type\ReportWidgetType;
 use Mautic\ReportBundle\Model\ReportModel;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -45,7 +34,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $types = [
         'report' => [
-            'formAlias' => 'report_widget',
+            'formAlias' => ReportWidgetType::class,
         ],
     ];
 
@@ -67,14 +56,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
 
-        if ($event->getType() == 'report') {
+        if ('report' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
             if (!$event->isCached()) {
@@ -95,6 +82,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                     if (isset($reportData['graphs'][$graph])) {
                         $graphData = $reportData['graphs'][$graph];
+                        if (!isset($graphData['data']['data'])) {
+                            $graphData['data']['data'] = $graphData['data'];
+                        }
                         $event->setTemplateData(
                             [
                                 'chartData'   => $graphData['data'],

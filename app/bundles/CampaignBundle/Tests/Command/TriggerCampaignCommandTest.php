@@ -1,34 +1,36 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Command;
+
+use Exception;
+use Mautic\CampaignBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
+use PHPUnit\Framework\Assert;
 
 class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
-    public function setUp()
+    private ?SegmentCountCacheHelper $segmentCountCacheHelper = null;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
+
+        $this->segmentCountCacheHelper = self::$container->get('mautic.helper.segment.count.cache');
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=0');
+
+        $this->segmentCountCacheHelper = null;
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testCampaignExecutionForAll()
     {
@@ -36,7 +38,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
 
         // Let's analyze
-        $byEvent = $this->getCampaignEventLogs([1, 2, 11, 12, 13]);
+        $byEvent = $this->getCampaignEventLogs([1, 2, 11, 12, 13, 16]);
         $tags    = $this->getTagCounts();
 
         // Everyone should have been tagged with CampaignTest and have been sent Campaign Test Email 1
@@ -60,6 +62,10 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         // 8 contacts are from the US and should be labeled with US:Action
         $this->assertCount(8, $byEvent[12]);
         $this->assertEquals(8, $tags['US:Action']);
+
+        // Those tagged with US:Action should also be tagged with ChainedAction by a chained event.
+        $this->assertCount(8, $byEvent[16]);
+        $this->assertEquals(8, $tags['ChainedAction']);
 
         // The rest (42) contacts are not from the US and should be labeled with NonUS:Action
         $this->assertCount(42, $byEvent[13]);
@@ -102,7 +108,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         // Now let's simulate email opens
         foreach ($stats as $stat) {
             $this->client->request('GET', '/email/'.$stat['tracking_hash'].'.gif');
-            $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), var_export($this->client->getResponse()->getContent()));
+            $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), var_export($this->client->getResponse()->getContent(), true));
         }
 
         $byEvent = $this->getCampaignEventLogs([3, 4, 5, 10, 14, 15]);
@@ -190,14 +196,14 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testCampaignExecutionForOne()
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // Let's analyze
-        $byEvent = $this->getCampaignEventLogs([1, 2, 11, 12, 13]);
+        $byEvent = $this->getCampaignEventLogs([1, 2, 11, 12, 13, 16]);
         $tags    = $this->getTagCounts();
 
         // Everyone should have been tagged with CampaignTest and have been sent Campaign Test Email 1
@@ -221,6 +227,10 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         // 0 contacts are from the US and should be labeled with US:Action
         $this->assertCount(0, $byEvent[12]);
         $this->assertTrue(empty($tags['US:Action']));
+
+        // None tagged with US:Action, so none should be tagged with ChainedAction by a chained event.
+        $this->assertCount(0, $byEvent[16]);
+        $this->assertTrue(empty($tags['ChainedAction']));
 
         // The rest (1) contacts are not from the US and should be labeled with NonUS:Action
         $this->assertCount(1, $byEvent[13]);
@@ -263,7 +273,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         // Now let's simulate email opens
         foreach ($stats as $stat) {
             $this->client->request('GET', '/email/'.$stat['tracking_hash'].'.gif');
-            $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), var_export($this->client->getResponse()->getContent()));
+            $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), var_export($this->client->getResponse()->getContent(), true));
         }
 
         $byEvent = $this->getCampaignEventLogs([3, 4, 5, 10, 14, 15]);
@@ -352,7 +362,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
         // Let's analyze
-        $byEvent = $this->getCampaignEventLogs([1, 2, 11, 12, 13]);
+        $byEvent = $this->getCampaignEventLogs([1, 2, 11, 12, 13, 16]);
         $tags    = $this->getTagCounts();
 
         // Everyone should have been tagged with CampaignTest and have been sent Campaign Test Email 1
@@ -376,6 +386,10 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         // 1 contacts are from the US and should be labeled with US:Action
         $this->assertCount(1, $byEvent[12]);
         $this->assertEquals(1, $tags['US:Action']);
+
+        // Those tagged with US:Action should also be tagged with ChainedAction by a chained event.
+        $this->assertCount(1, $byEvent[16]);
+        $this->assertEquals(1, $tags['ChainedAction']);
 
         // The rest (4) contacts are not from the US and should be labeled with NonUS:Action
         $this->assertCount(4, $byEvent[13]);
@@ -418,7 +432,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         // Now let's simulate email opens
         foreach ($stats as $stat) {
             $this->client->request('GET', '/email/'.$stat['tracking_hash'].'.gif');
-            $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), var_export($this->client->getResponse()->getContent()));
+            $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), var_export($this->client->getResponse()->getContent(), true));
         }
 
         $byEvent = $this->getCampaignEventLogs([3, 4, 5, 10, 14, 15]);
@@ -505,6 +519,42 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertFalse(isset($tags['EmailNotOpen']));
     }
 
+    public function testCampaignActionChangeMembership(): void
+    {
+        $campaign1 = $this->createCampaign('Campaign 1');
+        $campaign2 = $this->createCampaign('Campaign 2');
+        $lead      = $this->createLead('Lead');
+        $this->createCampaignLead($campaign1, $lead);
+        $this->createCampaignLead($campaign2, $lead);
+        $this->em->flush();
+        $property = ['addTo' => [$campaign2->getId()], 'removeFrom' => ['this']];
+        $this->createEvent('Event', $campaign1, 'campaign.addremovelead', 'action', $property);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign1->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
+
+        $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
+
+        Assert::assertCount(2, $campaignLeads);
+        Assert::assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
+        Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
+        Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
+        Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testSegmentCacheCount(): void
+    {
+        // Execute the command again to trigger related events.
+        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1]);
+        // Segment cache count should be 50.
+        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
+        self::assertEquals(50, $count);
+    }
+
     /**
      * @return array
      */
@@ -527,8 +577,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @param array $logs
-     *
      * @return int
      */
     private function getNonActionPathTakenCount(array $logs)

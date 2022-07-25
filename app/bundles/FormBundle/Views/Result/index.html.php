@@ -8,6 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'formresult');
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.form.result.header.index', [
@@ -30,7 +33,6 @@ $buttons[] = [
 
 $buttons[] = [
     'attr' => [
-        'data-toggle' => 'download',
         'data-toggle' => '',
         'class'       => 'btn btn-default btn-nospin',
         'href'        => $view['router']->path('mautic_form_export', ['objectId' => $form->getId(), 'format' => 'csv']),
@@ -40,10 +42,9 @@ $buttons[] = [
     'primary'   => true,
 ];
 
-if (class_exists('PHPExcel')) {
+if (class_exists(Spreadsheet::class)) {
     $buttons[] = [
         'attr' => [
-            'data-toggle' => 'download',
             'data-toggle' => '',
             'class'       => 'btn btn-default btn-nospin',
             'href'        => $view['router']->path('mautic_form_export', ['objectId' => $form->getId(), 'format' => 'xlsx']),

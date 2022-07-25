@@ -2,8 +2,27 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Mautic\LeadBundle\Entity\Lead;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\DoNotContact;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PluginBundle\Model\IntegrationEntityModel;
+use MauticPlugin\MauticCrmBundle\Api\CrmApi;
+use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\LeadExport;
+use MauticPlugin\MauticCrmBundle\Services\Transport;
+use Monolog\Logger;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class PipedriveIntegration extends CrmAbstractIntegration
 {
@@ -13,11 +32,68 @@ class PipedriveIntegration extends CrmAbstractIntegration
     const ORGANIZATION_ENTITY_TYPE = 'organization';
     const COMPANY_ENTITY_TYPE      = 'company';
 
+    /**
+     * @var Transport
+     */
+    private $transport;
+
+    /**
+     * @var LeadExport
+     */
+    private $leadExport;
+
+    /**
+     * @var CrmApi
+     */
     private $apiHelper;
 
     private $requiredFields = [
-        'organization' => ['name'],
+        'person'        => ['firstname', 'lastname', 'email'],
+        'organization'  => ['name'],
     ];
+
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        CacheStorageHelper $cacheStorageHelper,
+        EntityManager $entityManager,
+        Session $session,
+        RequestStack $requestStack,
+        Router $router,
+        TranslatorInterface $translator,
+        Logger $logger,
+        EncryptionHelper $encryptionHelper,
+        LeadModel $leadModel,
+        CompanyModel $companyModel,
+        PathsHelper $pathsHelper,
+        NotificationModel $notificationModel,
+        FieldModel $fieldModel,
+        IntegrationEntityModel $integrationEntityModel,
+        DoNotContact $doNotContact,
+        Transport $transport,
+        LeadExport $leadExport
+    ) {
+        parent::__construct(
+            $eventDispatcher,
+            $cacheStorageHelper,
+            $entityManager,
+            $session,
+            $requestStack,
+            $router,
+            $translator,
+            $logger,
+            $encryptionHelper,
+            $leadModel,
+            $companyModel,
+            $pathsHelper,
+            $notificationModel,
+            $fieldModel,
+            $integrationEntityModel,
+            $doNotContact
+        );
+
+        $this->transport  = $transport;
+        $this->leadExport = $leadExport;
+    }
 
     /**
      * @return string
@@ -95,7 +171,9 @@ class PipedriveIntegration extends CrmAbstractIntegration
 
     public function getApiUrl()
     {
-        return $this->getKeys()['url'];
+        if (isset($this->getKeys()['url'])) {
+            return $this->getKeys()['url'];
+        }
     }
 
     /**
@@ -119,9 +197,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        $fields = $this->getAvailableLeadFields(self::ORGANIZATION_ENTITY_TYPE);
-
-        return $fields;
+        return $this->getAvailableLeadFields(self::ORGANIZATION_ENTITY_TYPE);
     }
 
     /**
@@ -132,6 +208,14 @@ class PipedriveIntegration extends CrmAbstractIntegration
     public function getFormLeadFields($settings = [])
     {
         $fields = $this->getAvailableLeadFields(self::PERSON_ENTITY_TYPE);
+
+        if (empty($fields)) {
+            return [];
+        }
+
+        if (isset($fields['org_id'])) {
+            unset($fields['org_id']);
+        }
 
         // handle fields with are available in Pipedrive, but not listed
         return array_merge($fields, [
@@ -190,9 +274,8 @@ class PipedriveIntegration extends CrmAbstractIntegration
     public function getApiHelper()
     {
         if (empty($this->apiHelper)) {
-            $client          = $this->factory->get('mautic_integration.service.transport');
             $class           = '\\MauticPlugin\\MauticCrmBundle\\Api\\'.$this->getName().'Api'; //TODO replace with service
-            $this->apiHelper = new $class($this, $client);
+            $this->apiHelper = new $class($this, $this->transport);
         }
 
         return $this->apiHelper;
@@ -205,38 +288,52 @@ class PipedriveIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features') {
+        if ('features' == $formArea) {
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
-                    'choices' => [
-                        'company' => 'mautic.pipedrive.object.organization',
+                    'choices'     => [
+                        'mautic.pipedrive.object.organization'  => 'company',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.pipedrive.form.objects_to_pull_from',
-                    'label_attr'  => ['class' => ''],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.pipedrive.form.objects_to_pull_from',
+                    'label_attr'        => ['class' => ''],
+                    'placeholder'       => false,
+                    'required'          => false,
+                ]
+            );
+
+            $builder->add(
+                'import',
+                ChoiceType::class,
+                [
+                    'choices'     => [
+                        'mautic.pipedrive.add.edit.contact.import.enabled' => 'enabled',
+                    ],
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.pipedrive.add.edit.contact.import',
+                    'label_attr'        => ['class' => ''],
+                    'placeholder'       => false,
+                    'required'          => false,
                 ]
             );
         }
     }
 
-    public function isCompanySupportEnabled()
-    {
-        $supportedFeatures = $this->getIntegrationSettings()->getFeatureSettings();
-
-        return isset($supportedFeatures['objects']) && in_array('company', $supportedFeatures['objects']);
-    }
-
+    /**
+     * @param array|\Mautic\LeadBundle\Entity\Lead $lead
+     * @param array                                $config
+     *
+     * @return mixed
+     */
     public function pushLead($lead, $config = [])
     {
-        $leadExport = $this->factory->get('mautic_integration.pipedrive.export.lead');
-        $leadExport->setIntegration($this);
+        $this->leadExport->setIntegration($this);
 
-        return $leadExport->create($lead);
+        return $this->leadExport->create($lead);
     }
 
     /**
@@ -248,13 +345,59 @@ class PipedriveIntegration extends CrmAbstractIntegration
      */
     public function getFormNotes($section)
     {
-        $router     = $this->factory->get('router');
+        $router     = $this->router;
         $translator = $this->getTranslator();
 
-        if ($section == 'authorization') {
-            return [$translator->trans('mautic.pipedrive.webhook_callback').$router->generate('mautic_integration.pipedrive.webhook', [], UrlGeneratorInterface::ABSOLUTE_URL), 'info'];
+        if ('authorization' == $section) {
+            return [
+                $translator->trans('mautic.pipedrive.webhook_callback').$router->generate(
+                    'mautic_integration.pipedrive.webhook',
+                    [],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+                'info',
+            ];
         }
 
         return parent::getFormNotes($section);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCompanySupportEnabled()
+    {
+        $supportedFeatures = $this->getIntegrationSettings()->getFeatureSettings();
+
+        return isset($supportedFeatures['objects']) && in_array('company', $supportedFeatures['objects']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function shouldImportDataToPipedrive()
+    {
+        if (!$this->getIntegrationSettings()->getIsPublished() || empty($this->getIntegrationSettings()->getFeatureSettings()['import'])) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Driver\Statement|int
+     */
+    public function removeIntegrationEntities()
+    {
+        $qb = $this->em->getConnection()->createQueryBuilder();
+
+        return $qb->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('integration', ':integration')
+                )
+            )
+            ->setParameter('integration', $this->getName())
+            ->execute();
     }
 }

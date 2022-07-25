@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Validator;
 
 use Mautic\CoreBundle\Exception\FileInvalidException;
@@ -31,7 +22,6 @@ class FileUploadValidator
      * @param int    $fileSize          In bytes
      * @param string $fileExtension
      * @param int    $maxUploadSize     In bytes
-     * @param array  $allowedExtensions
      * @param string $extensionErrorMsg
      * @param string $sizeErrorMsg
      *
@@ -61,7 +51,6 @@ class FileUploadValidator
 
     /**
      * @param string $extension
-     * @param array  $allowedExtensions
      * @param string $extensionErrorMsg
      *
      * @throws FileInvalidException

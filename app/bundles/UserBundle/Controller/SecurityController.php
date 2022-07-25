@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
@@ -52,7 +43,7 @@ class SecurityController extends CommonController
         // the cache is cleared by upgrade.php
         if ($this->request->cookies->has('mautic_update')) {
             $step = $this->request->cookies->get('mautic_update');
-            if ($step == 'clearCache') {
+            if ('clearCache' == $step) {
                 // Run migrations
                 $this->request->query->set('finalize', 1);
 
@@ -61,7 +52,7 @@ class SecurityController extends CommonController
                         'request' => $this->request,
                     ]
                 );
-            } elseif ($step == 'schemaMigration') {
+            } elseif ('schemaMigration' == $step) {
                 // Done so finalize
                 return $this->forward('MauticCoreBundle:Ajax:updateFinalization',
                     [

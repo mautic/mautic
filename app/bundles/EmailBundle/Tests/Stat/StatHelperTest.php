@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Stat;
 
 use Mautic\EmailBundle\Entity\Email;
@@ -18,7 +9,7 @@ use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
 use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\LeadBundle\Entity\Lead;
 
-class StatHelperTest extends \PHPUnit_Framework_TestCase
+class StatHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testStatsAreCreatedAndDeleted()
     {

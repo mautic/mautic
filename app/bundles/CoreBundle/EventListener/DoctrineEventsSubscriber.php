@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
@@ -16,31 +7,26 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
 
-/**
- * Class DoctrineEventsSubscriber.
- */
 class DoctrineEventsSubscriber implements EventSubscriber
 {
-    protected $tablePrefix;
-
     /**
-     * @var
+     * @var string
      */
-    protected $deprecatedEntityTables = [];
+    private $tablePrefix;
 
     /**
-     * DoctrineEventsSubscriber constructor.
-     *
-     * @param $tablePrefix
+     * @var array
+     */
+    private $deprecatedEntityTables = [];
+
+    /**
+     * @param string $tablePrefix
      */
     public function __construct($tablePrefix)
     {
         $this->tablePrefix = $tablePrefix;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSubscribedEvents()
     {
         return [
@@ -49,9 +35,6 @@ class DoctrineEventsSubscriber implements EventSubscriber
         ];
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $args
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
         //in the installer
@@ -97,7 +80,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
             );
 
             foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
-                if ($mapping['type'] == \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY
+                if (\Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY == $mapping['type']
                     && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])
                 ) {
                     $mappedTableName                                                     = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
@@ -132,9 +115,6 @@ class DoctrineEventsSubscriber implements EventSubscriber
         }
     }
 
-    /**
-     * @param GenerateSchemaEventArgs $args
-     */
     public function postGenerateSchema(GenerateSchemaEventArgs $args)
     {
         $schema = $args->getSchema();
@@ -145,6 +125,28 @@ class DoctrineEventsSubscriber implements EventSubscriber
                 // remove table from schema
                 $schema->dropTable($table->getName());
             }
+            // Check tables for obsolete indexes.
+            // Single column indexes that are the leftmost column of another index are obsolete.
+            // That leftmost column is available to look up rows.
+            // @see https://dev.mysql.com/doc/refman/5.7/en/multiple-column-indexes.html
+            $pk              = $table->getPrimaryKey();
+            $pk_first_column = $this->trimQuotes(strtolower($pk->getColumns()[0]));
+
+            foreach ($table->getIndexes() as $id => $index) {
+                $index_first_column = $this->trimQuotes(strtolower($index->getColumns()[0]));
+
+                if (!$index->isPrimary() && 1 == count($index->getColumns()) && $index_first_column === $pk_first_column) {
+                    $table->dropIndex($id);
+                }
+            }
         }
+    }
+
+    /**
+     * Trim quotes from the identifier.
+     */
+    private function trimQuotes(string $identifier): string
+    {
+        return str_replace(['`', '"', '[', ']'], '', $identifier);
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -79,12 +70,6 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
 
     /**
      * MonitorTwitterBaseCommand constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param TranslatorInterface      $translator
-     * @param IntegrationHelper        $integrationHelper
-     * @param TwitterCommandHelper     $twitterCommandHelper
-     * @param CoreParametersHelper     $coreParametersHelper
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
@@ -98,7 +83,7 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
         $this->integrationHelper    = $integrationHelper;
         $this->twitterCommandHelper = $twitterCommandHelper;
 
-        $this->translator->setLocale($coreParametersHelper->getParameter('locale', 'en_US'));
+        $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
 
         parent::__construct();
     }
@@ -162,9 +147,6 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
     /**
      * Main execution method. Gets the integration settings, processes the search criteria.
      *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return int|null
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -175,7 +157,7 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
         $this->queryCount = $this->input->getOption('query-count');
         $this->twitter    = $this->integrationHelper->getIntegrationObject('Twitter');
 
-        if ($this->twitter === false || $this->twitter->getIntegrationSettings()->getIsPublished() === false) {
+        if (false === $this->twitter || false === $this->twitter->getIntegrationSettings()->getIsPublished()) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.not.published'));
 
             return 1;
@@ -231,7 +213,7 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
     {
         $results = $this->getTweets($monitor);
 
-        if ($results === false || !isset($results['statuses'])) {
+        if (false === $results || !isset($results['statuses'])) {
             $this->output->writeln('No statuses found');
 
             if (!empty($results['errors'])) {
@@ -341,48 +323,5 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
         $this->printQueryMetadata($results['search_metadata']);
         $this->printTweets($results['statuses']);
         $this->output->writeln('------------------------');
-    }
-
-    /**
-     * Processes a list of tweets and creates / updates leads in Mautic.
-     *
-     * @deprecated 2.12 to be removed in 3.0 Use the TwitterCommandHelper directly
-     *
-     * @param array      $statusList
-     * @param Monitoring $monitor
-     *
-     * @return int
-     */
-    protected function createLeadsFromStatuses($statusList, $monitor)
-    {
-        return $this->twitterCommandHelper->createLeadsFromStatuses($statusList, $monitor);
-    }
-
-    /**
-     * Gets the twitter integration object and returns the settings.
-     *
-     * @deprecated 2.12 to be removed in 3.0 Use $this->twitter directly
-     *
-     * @return TwitterIntegration
-     */
-    protected function getTwitterIntegration()
-    {
-        return $this->twitter;
-    }
-
-    /**
-     * takes an array of query params for twitter and gives a list back.
-     *
-     * URL Encoding done in makeRequest()
-     *
-     * @deprecated 2.12 to be removed in 3.0 Just implode directly in your code
-     *
-     * @param array $query
-     *
-     * @return string
-     */
-    protected function buildTwitterSearchQuery(array $query)
-    {
-        return implode(' ', $query);
     }
 }

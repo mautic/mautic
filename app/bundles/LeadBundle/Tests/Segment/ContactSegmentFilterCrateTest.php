@@ -1,19 +1,10 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
-class ContactSegmentFilterCrateTest extends \PHPUnit_Framework_TestCase
+class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate

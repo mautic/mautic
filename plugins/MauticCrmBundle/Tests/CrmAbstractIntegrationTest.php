@@ -1,23 +1,14 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\EmailBundle\Helper\EmailValidator;
+use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
-use Symfony\Component\HttpFoundation\Session\Session;
 
-class CrmAbstractIntegrationTest extends \PHPUnit_Framework_TestCase
+class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 {
     public function testFieldMatchingPriority()
     {
@@ -63,34 +54,24 @@ class CrmAbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function testCompanyDataIsMappedForNewCompanies()
     {
-        $integration = $this->getMockBuilder(StubIntegration::class)
-            ->disableOriginalConstructor()
-            ->setMethodsExcept(['getMauticCompany', 'setCompanyModel', 'setFieldModel', 'hydrateCompanyName'])
-            ->getMock();
-
         $data = [
             'custom_company_name' => 'Some Business',
             'some_custom_field'   => 'some value',
         ];
 
-        $integration->expects($this->once())
-            ->method('populateMauticLeadData')
-            ->willReturn($data);
-
-        $fieldModel = $this->getMockBuilder(FieldModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $session = $this->getMockBuilder(Session::class)
-            ->disableOriginalConstructor()
-            ->getMock();
         $emailValidator = $this->getMockBuilder(EmailValidator::class)
             ->disableOriginalConstructor()
             ->getMock();
 
+        $companyDeduper = $this->createMock(CompanyDeduper::class);
+
         $companyModel = $this->getMockBuilder(CompanyModel::class)
             ->setMethodsExcept(['setFieldValues'])
-            ->setConstructorArgs([$fieldModel, $session, $emailValidator])
+            ->setConstructorArgs([$this->fieldModel, $this->session, $emailValidator, $companyDeduper])
             ->getMock();
+        $companyModel->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([]);
         $companyModel->expects($this->once())
             ->method('organizeFieldsByGroup')
             ->willReturn([
@@ -109,14 +90,66 @@ class CrmAbstractIntegrationTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
             ]);
-        $integration->setCompanyModel($companyModel);
 
-        $integration->setFieldModel($fieldModel);
+        $integration = $this->getMockBuilder(StubIntegration::class)
+            ->setConstructorArgs([
+                $this->dispatcher,
+                $this->cache,
+                $this->em,
+                $this->session,
+                $this->request,
+                $this->router,
+                $this->translator,
+                $this->logger,
+                $this->encryptionHelper,
+                $this->leadModel,
+                $companyModel,
+                $this->pathsHelper,
+                $this->notificationModel,
+                $this->fieldModel,
+                $this->integrationEntityModel,
+                $this->doNotContact,
+            ])
+            ->setMethodsExcept(['getMauticCompany', 'setCompanyModel', 'setFieldModel', 'hydrateCompanyName'])
+            ->getMock();
+
+        $integration->expects($this->once())
+            ->method('populateMauticLeadData')
+            ->willReturn($data);
 
         $company = $integration->getMauticCompany($data);
 
         $this->assertEquals('Some Business', $company->getName());
         $this->assertEquals('Some Business', $company->getFieldValue('custom_company_name'));
         $this->assertEquals('some value', $company->getFieldValue('some_custom_field'));
+    }
+
+    public function testLimitString()
+    {
+        $integration = $this->getMockBuilder(StubIntegration::class)
+            ->disableOriginalConstructor()
+            ->setMethodsExcept(['limitString'])
+            ->getMock();
+
+        $methodLimitString = new \ReflectionMethod(StubIntegration::class, 'limitString');
+        $methodLimitString->setAccessible(true);
+
+        $string = 'SomeRandomString';
+
+        $result = $methodLimitString->invokeArgs($integration, [str_repeat($string, 100), 'text']);
+        $this->assertSame(strlen($result), 255);
+
+        $result = $methodLimitString->invokeArgs($integration, [$string, 'text']);
+        $this->assertSame(strlen($result), strlen($string));
+        $this->assertSame($result, $string);
+
+        $result = $methodLimitString->invokeArgs($integration, [true, 'text']);
+        $this->assertSame($result, true);
+
+        $result = $methodLimitString->invokeArgs($integration, [false, 'text']);
+        $this->assertSame($result, false);
+
+        $result = $methodLimitString->invokeArgs($integration, [[1, 2, 3]]);
+        $this->assertSame($result, [1, 2, 3]);
     }
 }

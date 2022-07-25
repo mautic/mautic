@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -34,14 +25,14 @@ class TwitterHashtagType extends TwitterAbstractType
 
         $builder->add('checknames', ChoiceType::class, [
             'choices' => [
-                '0' => 'mautic.social.monitoring.twitter.no',
-                '1' => 'mautic.social.monitoring.twitter.yes',
+                'mautic.social.monitoring.twitter.no'  => '0',
+                'mautic.social.monitoring.twitter.yes' => '1',
             ],
-            'label'       => 'mautic.social.monitoring.twitter.namematching',
-            'required'    => false,
-            'empty_value' => false,
-            'label_attr'  => ['class' => 'control-label'],
-            'attr'        => [
+            'label'             => 'mautic.social.monitoring.twitter.namematching',
+            'required'          => false,
+            'placeholder'       => false,
+            'label_attr'        => ['class' => 'control-label'],
+            'attr'              => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.social.monitoring.twitter.namematching.tooltip',
             ],
@@ -51,7 +42,7 @@ class TwitterHashtagType extends TwitterAbstractType
         parent::buildForm($builder, $options);
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'twitter_hashtag';
     }

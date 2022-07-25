@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Entity\LeadField;
@@ -16,19 +7,19 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 
-class FieldAliasHelperTest extends \PHPUnit_Framework_TestCase
+class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
 {
     private $fieldModel;
     private $fieldRepository;
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->fieldRepository = $this->createMock(LeadFieldRepository::class);
         $this->fieldModel      = $this->getMockBuilder(FieldModel::class)
-            ->setMethods(['cleanAlias', 'getRepository'])
+            ->onlyMethods(['cleanAlias', 'getRepository'])
             ->disableOriginalConstructor()
             ->getMock();
 

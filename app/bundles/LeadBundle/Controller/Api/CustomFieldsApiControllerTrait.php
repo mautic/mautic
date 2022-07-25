@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller\Api;
 
 use Mautic\LeadBundle\Entity\Company;
@@ -60,7 +51,6 @@ trait CustomFieldsApiControllerTrait
     /**
      * Flatten fields into an 'all' key for dev convenience.
      *
-     * @param        $entity
      * @param string $action
      */
     protected function preSerializeEntity(&$entity, $action = 'view')
@@ -68,8 +58,53 @@ trait CustomFieldsApiControllerTrait
         if ($entity instanceof CustomFieldEntityInterface) {
             $fields        = $entity->getFields();
             $fields['all'] = $entity->getProfileFields();
+
+            // Temporary hack to address numbers being type casted to float which broke some API implementations because M2 used to return
+            // these as strings and values are normalized in a dozen differneet ways throughout LeadModel::setFieldValues methods and became
+            // too risky to hotfix
+            $fields = $this->fixNumbers($fields);
+
             $entity->setFields($fields);
         }
+    }
+
+    private function fixNumbers(array $fields): array
+    {
+        $numberFields = [];
+        foreach ($fields as $group => $groupFields) {
+            if ('all' === $group) {
+                continue;
+            }
+
+            foreach ($groupFields as $field => $fieldDefinition) {
+                if ('points' === $field) {
+                    // Points were always a number in M2
+                    $numberFields[$field] = (int) $fields[$group][$field]['value'];
+                }
+
+                if ('number' !== $fieldDefinition['type'] || null === $fields[$group][$field]['value']) {
+                    continue;
+                }
+
+                // Some requests don't seem to have properties unserialized by default (even in M2)
+                if (!isset($fieldDefinition['properties'])) {
+                    $fieldDefinition['properties'] = [];
+                }
+                $properties = is_string($fieldDefinition['properties']) ? unserialize($fieldDefinition['properties']) : $fieldDefinition['properties'];
+
+                $fields[$group][$field]['value']           = empty($properties['scale']) ? (int) $fields[$group][$field]['value']
+                    : (float) $fields[$group][$field]['value'];
+                $fields[$group][$field]['normalizedValue'] = empty($properties['scale']) ? (int) $fields[$group][$field]['normalizedValue']
+                    : (float) $fields[$group][$field]['normalizedValue'];
+
+                $numberFields[$field] = $fields[$group][$field]['value'];
+            }
+        }
+
+        // Fix "all" fields
+        $fields['all'] = array_merge($fields['all'], $numberFields);
+
+        return $fields;
     }
 
     /**
@@ -105,9 +140,9 @@ trait CustomFieldsApiControllerTrait
      * @param Lead|Company $entity
      * @param Form         $form
      * @param array        $parameters
-     * @param bool         $isPost
+     * @param bool         $isPostOrPatch
      */
-    protected function setCustomFieldValues($entity, $form, $parameters, $isPost = false)
+    protected function setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch = false)
     {
         //set the custom field values
         //pull the data from the form in order to apply the form's formatting
@@ -115,14 +150,14 @@ trait CustomFieldsApiControllerTrait
             $parameters[$f->getName()] = $f->getData();
         }
 
-        if ($isPost) {
+        if ($isPostOrPatch) {
             // Don't overwrite the contacts accumulated points
             if (isset($parameters['points']) && empty($parameters['points'])) {
                 unset($parameters['points']);
             }
 
-            // When merging a contact because of a unique identifier match in POST /api/contacts//new, all 0 values must be unset because
-            // we have to assume 0 was not meant to overwrite an existing value. Other empty values will be caught by LeadModel::setCustomFieldValues
+            // When merging a contact because of a unique identifier match in POST /api/contacts//new or PATCH /api/contacts//edit all 0 values must be unset because
+            // we have to assume 0 was not meant to overwrite an existing value. Other empty values will be caught by LeadModel::setFieldValues
             $parameters = array_filter(
                 $parameters,
                 function ($value) {
@@ -135,6 +170,25 @@ trait CustomFieldsApiControllerTrait
             );
         }
 
-        $this->model->setFieldValues($entity, $parameters, !$isPost);
+        $overwriteWithBlank = !$isPostOrPatch;
+        if (isset($parameters['overwriteWithBlank']) && !empty($parameters['overwriteWithBlank'])) {
+            $overwriteWithBlank = true;
+            unset($parameters['overwriteWithBlank']);
+        }
+
+        $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
+    }
+
+    /**
+     * @param string $object
+     */
+    protected function setCleaningRules($object = 'lead')
+    {
+        $fields = $this->getModel('lead.field')->getFieldListWithProperties($object);
+        foreach ($fields as $field) {
+            if (!empty($field['properties']['allowHtml'])) {
+                $this->dataInputMasks[$field['alias']]  = 'html';
+            }
+        }
     }
 }

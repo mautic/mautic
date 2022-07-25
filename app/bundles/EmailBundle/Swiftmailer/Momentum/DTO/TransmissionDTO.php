@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO;
@@ -23,7 +14,7 @@ class TransmissionDTO implements \JsonSerializable
     /**
      * @var OptionsDTO|null
      */
-    private $options = null;
+    private $options;
 
     /**
      * @var RecipientDTO[]
@@ -33,12 +24,12 @@ class TransmissionDTO implements \JsonSerializable
     /**
      * @var string|null
      */
-    private $campaignId = null;
+    private $campaignId;
 
     /**
      * @var string|null
      */
-    private $description = null;
+    private $description;
 
     /**
      * @var string
@@ -53,9 +44,7 @@ class TransmissionDTO implements \JsonSerializable
     /**
      * TransmissionDTO constructor.
      *
-     * @param ContentDTO      $content
-     * @param string          $returnPath
-     * @param OptionsDTO|null $options
+     * @param string $returnPath
      */
     public function __construct(ContentDTO $content, $returnPath, OptionsDTO $options = null)
     {
@@ -65,8 +54,6 @@ class TransmissionDTO implements \JsonSerializable
     }
 
     /**
-     * @param RecipientDTO $recipientDTO
-     *
      * @return TransmissionDTO
      */
     public function addRecipient(RecipientDTO $recipientDTO)
@@ -94,7 +81,7 @@ class TransmissionDTO implements \JsonSerializable
             'recipients'  => $this->recipients,
             'content'     => $this->content,
         ];
-        if ($this->options !== null) {
+        if (null !== $this->options) {
             $json['options'] = $this->options;
         }
         if (!empty($this->campaignId)) {

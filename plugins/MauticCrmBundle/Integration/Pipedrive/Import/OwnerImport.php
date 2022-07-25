@@ -7,8 +7,6 @@ use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
 class OwnerImport extends AbstractImport
 {
     /**
-     * @param array $data
-     *
      * @return bool
      *
      * @throws \Doctrine\ORM\OptimisticLockException

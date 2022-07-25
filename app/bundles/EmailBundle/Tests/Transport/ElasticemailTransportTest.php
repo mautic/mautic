@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Transport;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -18,13 +9,13 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\Request;
 
-class ElasticemailTransportTest extends \PHPUnit_Framework_TestCase
+class ElasticemailTransportTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $transportCallback;
     private $logger;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()

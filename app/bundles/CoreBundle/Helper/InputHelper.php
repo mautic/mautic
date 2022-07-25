@@ -1,21 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Joomla\Filter\InputFilter;
 
-/**
- * Class InputHelper.
- */
 class InputHelper
 {
     /**
@@ -33,9 +21,34 @@ class InputHelper
     private static $htmlFilter;
 
     /**
-     * @var
+     * @var InputFilter
      */
     private static $strictHtmlFilter;
+
+    /**
+     * Adjust the boolean values from text to boolean.
+     * Do not convert null to false.
+     * Do not convert invalid values to false, but return null.
+     *
+     * @param bool|int|string|null $value
+     *
+     * @return bool|null
+     */
+    public static function boolean($value)
+    {
+        // Common strings used that filter_var does not parse yet.
+        switch (strtoupper((string) $value)) {
+            case 'T':
+            case 'Y':
+                return true;
+
+            case 'F':
+            case 'N':
+                return false;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    }
 
     /**
      * @param bool $html
@@ -142,7 +155,7 @@ class InputHelper
 
                 if (is_array($v)) {
                     $v = self::_($v, $useMask, $urldecode);
-                } elseif ($useMask == 'filter') {
+                } elseif ('filter' == $useMask) {
                     $v = self::getFilter()->clean($v, $useMask);
                 } else {
                     $v = self::$useMask($v, $urldecode);
@@ -300,43 +313,46 @@ class InputHelper
         $value = filter_var($value, FILTER_SANITIZE_URL);
         $parts = parse_url($value);
 
-        if ($parts && !empty($parts['path'])) {
-            if (isset($parts['scheme'])) {
-                if (!in_array($parts['scheme'], $allowedProtocols)) {
-                    $parts['scheme'] = $defaultProtocol;
-                }
-            } else {
-                $parts['scheme'] = $defaultProtocol;
-            }
-
-            if (!empty($removeQuery) && !empty($parts['query'])) {
-                parse_str($parts['query'], $query);
-                foreach ($removeQuery as $q) {
-                    if (isset($query[$q])) {
-                        unset($query[$q]);
-                    }
-                }
-                $parts['query'] = http_build_query($query);
-            }
-
-            $value =
-                (!empty($parts['scheme']) ? $parts['scheme'].'://' : '').
-                (!empty($parts['user']) ? $parts['user'].':' : '').
-                (!empty($parts['pass']) ? $parts['pass'].'@' : '').
-                (!empty($parts['host']) ? $parts['host'] : '').
-                (!empty($parts['port']) ? ':'.$parts['port'] : '').
-                (!empty($parts['path']) ? $parts['path'] : '').
-                (!empty($parts['query']) ? '?'.$parts['query'] : '').
-                (!$ignoreFragment && !empty($parts['fragment']) ? '#'.$parts['fragment'] : '');
-        } else {
-            //must have a really bad URL since parse_url returned false so let's just clean it
-            $value = self::clean($value);
+        if (!$parts || !filter_var($value, FILTER_VALIDATE_URL)) {
+            // This is a bad URL so just clean the whole thing and return it
+            return self::clean($value);
         }
 
-        //since a URL allows <>, let's add a safety step to remove <script> tags
-        $value = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $value);
+        $parts['scheme'] = $parts['scheme'] ?? $defaultProtocol;
+        if (!in_array($parts['scheme'], $allowedProtocols)) {
+            $parts['scheme'] = $defaultProtocol;
+        }
 
-        return $value;
+        if (!empty($parts['query'])) {
+            parse_str($parts['query'], $query);
+
+            // remove specified keys from the query
+            foreach ($removeQuery as $q) {
+                if (isset($query[$q])) {
+                    unset($query[$q]);
+                }
+            }
+
+            // http_build_query urlencodes by default
+            $parts['query'] = http_build_query($query);
+        }
+
+        return
+            // already clean due to the exclusion list above
+            (!empty($parts['scheme']) ? $parts['scheme'].'://' : '').
+            // strip tags that could be embedded in the username or password
+            (!empty($parts['user']) ? strip_tags($parts['user']).':' : '').
+            (!empty($parts['pass']) ? strip_tags($parts['pass']).'@' : '').
+            // should be caught by FILTER_VALIDATE_URL if the host has invalid characters
+            (!empty($parts['host']) ? $parts['host'] : '').
+            // type cast to int
+            (!empty($parts['port']) ? ':'.(int) $parts['port'] : '').
+            // strip tags that could be embedded in a path
+            (!empty($parts['path']) ? strip_tags($parts['path']) : '').
+            // cleaned through the parse_str (urldecode) and http_build_query (urlencode) above
+            (!empty($parts['query']) ? '?'.$parts['query'] : '').
+            // strip tags that could be embedded in the fragment
+            (!$ignoreFragment && !empty($parts['fragment']) ? '#'.strip_tags($parts['fragment']) : '');
     }
 
     /**
@@ -401,12 +417,25 @@ class InputHelper
         } else {
             // Special handling for doctype
             $doctypeFound = preg_match('/(<!DOCTYPE(.*?)>)/is', $value, $doctype);
-
             // Special handling for CDATA tags
             $value = str_replace(['<![CDATA[', ']]>'], ['<mcdata>', '</mcdata>'], $value, $cdataCount);
-
             // Special handling for conditional blocks
-            $value = preg_replace("/<!--\[if(.*?)\]>(.*?)<!\[endif\]-->/is", '<mcondition><mif>$1</mif>$2</mcondition>', $value, -1, $conditionsFound);
+            preg_match_all("/<!--\[if(.*?)\]>(.*?)(?:\<\!\-\-)?<!\[endif\]-->/is", $value, $matches);
+            if (!empty($matches[0])) {
+                $from = [];
+                $to   = [];
+                foreach ($matches[0] as $key=>$match) {
+                    $from[]   = $match;
+                    $startTag = '<mcondition>';
+                    $endTag   = '</mcondition>';
+                    if (false !== strpos($match, '<!--<![endif]-->')) {
+                        $startTag = '<mconditionnonoutlook>';
+                        $endTag   = '</mconditionnonoutlook>';
+                    }
+                    $to[] = $startTag.'<mif>'.$matches[1][$key].'</mif>'.$matches[2][$key].$endTag;
+                }
+                $value = str_replace($from, $to, $value);
+            }
 
             // Slecial handling for XML tags used in Outlook optimized emails <o:*/> and <w:/>
             $value = preg_replace_callback(
@@ -425,9 +454,18 @@ class InputHelper
                 $value, -1, $needsScriptDecoding);
 
             // Special handling for HTML comments
-            $value = str_replace(['<!--', '-->'], ['<mcomment>', '</mcomment>'], $value, $commentCount);
+            $value = str_replace(['<!-->', '<!--', '-->'], ['<mcomment></mcomment>', '<mcomment>', '</mcomment>'], $value, $commentCount);
+
+            // detect if there is any unicode character in the passed string
+            $hasUnicode = strlen($value) != strlen(utf8_decode($value));
+
+            // Encode the incoming value before cleaning, it convert unicode to encoded strings
+            $value = $hasUnicode ? rawurlencode($value) : $value;
 
             $value = self::getFilter(true)->clean($value, 'html');
+
+            // After cleaning encode the value
+            $value = $hasUnicode ? rawurldecode($value) : $value;
 
             // Was a doctype found?
             if ($doctypeFound) {
@@ -438,8 +476,9 @@ class InputHelper
                 $value = str_replace(['<mcdata>', '</mcdata>'], ['<![CDATA[', ']]>'], $value);
             }
 
-            if ($conditionsFound) {
+            if (!empty($matches[0])) {
                 // Special handling for conditional blocks
+                $value = preg_replace("/<mconditionnonoutlook><mif>(.*?)<\/mif>(.*?)<\/mconditionnonoutlook>/is", '<!--[if$1]>$2<!--<![endif]-->', $value);
                 $value = preg_replace("/<mcondition><mif>(.*?)<\/mif>(.*?)<\/mcondition>/is", '<!--[if$1]>$2<![endif]-->', $value);
             }
 
@@ -502,6 +541,6 @@ class InputHelper
             return $trans->transliterate($value);
         }
 
-        return \URLify::transliterate($value);
+        return \URLify::transliterate((string) $value);
     }
 }

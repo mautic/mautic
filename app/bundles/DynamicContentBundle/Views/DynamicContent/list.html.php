@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticDynamicContentBundle:DynamicContent:index.html.php');
 }
 /* @var \Mautic\DynamicContentBundle\Entity\DynamicContent[] $items */
@@ -109,7 +109,7 @@ if ($tmpl == 'index') {
                             'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                             ['item' => $item, 'model' => 'dynamicContent']
                         ); ?>
-                        <a href="<?php echo $view['router']->generate(
+                        <a href="<?php echo $view['router']->url(
                             'mautic_dynamicContent_action',
                             ['objectAction' => 'view', 'objectId' => $item->getId()]
                         ); ?>" data-toggle="ajax">
@@ -157,7 +157,7 @@ if ($tmpl == 'index') {
                     'page'       => $page,
                     'limit'      => $limit,
                     'menuLinkId' => 'mautic_dynamicContent_index',
-                    'baseUrl'    => $view['router']->generate('mautic_dynamicContent_index'),
+                    'baseUrl'    => $view['router']->url('mautic_dynamicContent_index'),
                     'sessionVar' => 'dynamicContent',
                 ]
             ); ?>

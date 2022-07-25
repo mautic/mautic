@@ -1,19 +1,9 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Model;
 
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
@@ -47,24 +37,9 @@ class SendEmailToContact
     private $translator;
 
     /**
-     * @var null|string
+     * @var string|null
      */
-    private $singleEmailMode = null;
-
-    /**
-     * @var Stat[]
-     */
-    private $statEntities = [];
-
-    /**
-     * @var Stat[]
-     */
-    private $saveEntities = [];
-
-    /**
-     * @var Stat[]
-     */
-    private $deleteEntities = [];
+    private $singleEmailMode;
 
     /**
      * @var array
@@ -87,17 +62,17 @@ class SendEmailToContact
     private $emailSentCounts = [];
 
     /**
-     * @var
+     * @var array|null
      */
     private $emailEntityErrors;
 
     /**
-     * @var null|int
+     * @var int|null
      */
     private $emailEntityId;
 
     /**
-     * @var null|int
+     * @var int|null
      */
     private $listId;
 
@@ -113,11 +88,6 @@ class SendEmailToContact
 
     /**
      * SendEmailToContact constructor.
-     *
-     * @param MailHelper          $mailer
-     * @param StatRepository      $statRepository
-     * @param DoNotContact        $dncModel
-     * @param TranslatorInterface $translator
      */
     public function __construct(MailHelper $mailer, StatHelper $statHelper, DoNotContact $dncModel, TranslatorInterface $translator)
     {
@@ -168,14 +138,11 @@ class SendEmailToContact
     /**
      * Use an Email entity to populate content, from, etc.
      *
-     * @param Email $email
-     * @param array $channel          ['channelName', 'channelId']
-     * @param array $assetAttachments
-     * @param array $slots            @deprecated to be removed in 3.0; support for old email template format
+     * @param array $channel ['channelName', 'channelId']
      *
      * @return $this
      */
-    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [], array $slots = [])
+    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [])
     {
         // Flush anything that's pending from a previous email
         $this->flush();
@@ -183,7 +150,7 @@ class SendEmailToContact
         // Enable the queue if applicable to the transport
         $this->mailer->enableQueue();
 
-        if ($this->mailer->setEmail($email, true, $slots, $assetAttachments)) {
+        if ($this->mailer->setEmail($email, true, [], $assetAttachments)) {
             $this->mailer->setSource($channel);
             $this->mailer->setCustomHeaders($customHeaders);
 
@@ -199,7 +166,7 @@ class SendEmailToContact
     }
 
     /**
-     * @param null|int $id
+     * @param int|null $id
      *
      * @return $this
      */
@@ -211,9 +178,6 @@ class SendEmailToContact
     }
 
     /**
-     * @param array $contact
-     * @param array $tokens
-     *
      * @return $this
      *
      * @throws FailedToSendToContactException
@@ -270,9 +234,9 @@ class SendEmailToContact
      */
     public function reset()
     {
-        $this->saveEntities      = [];
-        $this->deleteEntities    = [];
-        $this->statEntities      = [];
+        [];
+        [];
+        [];
         $this->badEmails         = [];
         $this->errorMessages     = [];
         $this->failedContacts    = [];
@@ -314,8 +278,8 @@ class SendEmailToContact
     }
 
     /**
-     * @param bool   $hasBadEmail
-     * @param string $errorMessages
+     * @param bool  $hasBadEmail
+     * @param array $errorMessages
      *
      * @throws FailedToSendToContactException
      */
@@ -324,6 +288,8 @@ class SendEmailToContact
         if (null === $errorMessages) {
             // Clear the errors so it doesn't stop the next send
             $errorMessages = implode('; ', (array) $this->mailer->getErrors());
+        } elseif (is_array($errorMessages)) {
+            $errorMessages = implode('; ', $errorMessages);
         }
 
         $this->errorMessages[$this->contact['id']]  = $errorMessages;
@@ -452,10 +418,10 @@ class SendEmailToContact
         // Dispatch the event to generate the tokens
         $this->mailer->dispatchSendEvent();
 
-        // Create the stat to ensure it is availble for emails sent
+        // Create the stat to ensure it is available for emails sent
         $this->createContactStatEntry($this->contact['email']);
 
         // Now send but don't redispatch the event
-        return $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
+        return $this->mailer->queue(false, MailHelper::QUEUE_RETURN_ERRORS);
     }
 }

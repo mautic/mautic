@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
@@ -35,7 +26,7 @@ class AuditlogController extends CommonController
         $this->setListFilters();
 
         $session = $this->get('session');
-        if ($request->getMethod() == 'POST' && $request->request->has('search')) {
+        if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->get('includeEvents', [])),
@@ -87,7 +78,7 @@ class AuditlogController extends CommonController
         $this->setListFilters();
 
         $session = $this->get('session');
-        if ($request->getMethod() == 'POST' && $request->request->has('search')) {
+        if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->get('includeEvents', [])),

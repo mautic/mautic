@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -35,9 +26,6 @@ class ProcessFetchEmailCommand extends Command
 
     /**
      * ProcessFetchEmailCommand constructor.
-     *
-     * @param CoreParametersHelper $parametersHelper
-     * @param Fetcher              $fetcher
      */
     public function __construct(CoreParametersHelper $parametersHelper, Fetcher $fetcher)
     {
@@ -71,15 +59,12 @@ EOT
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $limit     = $input->getOption('message-limit');
-        $mailboxes = $this->parametersHelper->getParameter('monitored_email');
+        $mailboxes = $this->parametersHelper->get('monitored_email');
         unset($mailboxes['general']);
         $mailboxes = array_keys($mailboxes);
 

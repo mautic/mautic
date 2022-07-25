@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\EmailBundle\EmailEvents;
@@ -48,9 +39,6 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
 
     /**
      * ProcessUnsubscribeSubscriber constructor.
-     *
-     * @param Unsubscribe  $unsubscriber
-     * @param FeedbackLoop $looper
      */
     public function __construct(Unsubscribe $unsubscriber, FeedbackLoop $looper)
     {
@@ -58,17 +46,11 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
         $this->looper       = $looper;
     }
 
-    /**
-     * @param MonitoredEmailEvent $event
-     */
     public function onEmailConfig(MonitoredEmailEvent $event)
     {
         $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.unsubscribe_folder');
     }
 
-    /**
-     * @param ParseEmailEvent $event
-     */
     public function onEmailParse(ParseEmailEvent $event)
     {
         if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY)) {
@@ -84,8 +66,6 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
 
     /**
      * Add an unsubscribe email to the List-Unsubscribe header if applicable.
-     *
-     * @param EmailSendEvent $event
      */
     public function onEmailSend(EmailSendEvent $event)
     {
@@ -94,7 +74,15 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
             $headers          = $event->getTextHeaders();
             $existing         = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
             $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
-            $updatedHeader    = ($existing) ? $unsubscribeEmail.', '.$existing : $unsubscribeEmail;
+            if ($existing) {
+                if (false === strpos($existing, $unsubscribeEmail)) {
+                    $updatedHeader = $unsubscribeEmail.', '.$existing;
+                } else {
+                    $updatedHeader = $existing;
+                }
+            } else {
+                $updatedHeader = $unsubscribeEmail;
+            }
 
             $event->addTextHeader('List-Unsubscribe', $updatedHeader);
         }

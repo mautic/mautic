@@ -1,22 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class CampaignEventLeadSegmentsType.
- */
 class CampaignEventLeadSegmentsType extends AbstractType
 {
     /**
@@ -26,7 +14,7 @@ class CampaignEventLeadSegmentsType extends AbstractType
     {
         $builder->add(
             'segments',
-            'leadlist_choices',
+            LeadListType::class,
             [
                 'global_only' => true,
                 'label'       => 'mautic.lead.lead.lists',
@@ -40,7 +28,7 @@ class CampaignEventLeadSegmentsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_lead_segments';
     }

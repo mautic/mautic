@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO\AttachementDTO;
@@ -32,22 +23,22 @@ final class ContentDTO implements \JsonSerializable
     /**
      * @var string|null
      */
-    private $html = null;
+    private $html;
 
     /**
      * @var string|null
      */
-    private $inlineCss = null;
+    private $inlineCss;
 
     /**
      * @var string|null
      */
-    private $text = null;
+    private $text;
 
     /**
      * @var string|null
      */
-    private $replyTo = null;
+    private $replyTo;
 
     /**
      * @var array
@@ -62,8 +53,7 @@ final class ContentDTO implements \JsonSerializable
     /**
      * ContentDTO constructor.
      *
-     * @param         $subject
-     * @param FromDTO $from
+     * @param $subject
      */
     public function __construct($subject, FromDTO $from)
     {
@@ -72,7 +62,7 @@ final class ContentDTO implements \JsonSerializable
     }
 
     /**
-     * @param null|string $html
+     * @param string|null $html
      *
      * @return ContentDTO
      */
@@ -96,7 +86,7 @@ final class ContentDTO implements \JsonSerializable
     }
 
     /**
-     * @param null|string $text
+     * @param string|null $text
      *
      * @return ContentDTO
      */
@@ -121,8 +111,6 @@ final class ContentDTO implements \JsonSerializable
     }
 
     /**
-     * @param AttachementDTO $attachementDTO
-     *
      * @return $this
      */
     public function addAttachment(AttachementDTO $attachementDTO)
@@ -141,22 +129,22 @@ final class ContentDTO implements \JsonSerializable
             'subject' => $this->subject,
             'from'    => $this->from,
         ];
-        if ($this->html !== null) {
+        if (null !== $this->html) {
             $json['html'] = $this->html;
         }
-        if ($this->text !== null) {
+        if (null !== $this->text) {
             $json['text'] = $this->text;
         }
-        if ($this->replyTo !== null) {
+        if (null !== $this->replyTo) {
             $json['reply_to'] = $this->replyTo;
         }
-        if (count($this->headers) !== 0) {
+        if (0 !== count($this->headers)) {
             $json['headers'] = $this->headers;
         }
-        if (count($this->attachments) !== 0) {
+        if (0 !== count($this->attachments)) {
             $json['attachments'] = $this->attachments;
         }
-        if ($this->inlineCss !== null) {
+        if (null !== $this->inlineCss) {
             $json['inline_css'] = $this->inlineCss;
         }
 

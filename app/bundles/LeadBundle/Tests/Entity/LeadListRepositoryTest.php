@@ -1,443 +1,180 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Statement;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Schema\Column;
-use Doctrine\DBAL\Schema\MySqlSchemaManager;
-use Doctrine\DBAL\Types\TextType;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\Expr;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
+class LeadListRepositoryTest extends TestCase
 {
-    public function testIncludeSegmentFilterWithFiltersAppendInOrGroups()
+    /**
+     * @var Connection|MockObject
+     */
+    private $connection;
+
+    /**
+     * @var MockObject
+     */
+    private $stmt;
+
+    /**
+     * @var LeadListRepository
+     */
+    private $repository;
+
+    /**
+     * @var QueryBuilder|MockObject
+     */
+    private $queryBuilderMock;
+
+    /**
+     * @var Expr|MockObject
+     */
+    private $expressionMock;
+
+    protected function setUp(): void
     {
-        list($mockRepository, $reflectedMethod, $connection) = $this->getReflectedGenerateSegmentExpressionMethod();
+        parent::setUp();
 
-        $parameters = [];
-        $qb         = $connection->createQueryBuilder();
-        $filters    =
-            [
-                [
-                    'glue'     => 'and',
-                    'operator' => 'in',
-                    'field'    => 'leadlist',
-                    'object'   => 'lead',
-                    'type'     => 'leadlist',
-                    'display'  => null,
-                    'filter'   => [1, 2],
-                ],
-            ];
-
-        // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
-        $expr   = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
-        $string = (string) $expr;
-
-        $found = preg_match_all('/EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'leads .*? LEFT JOIN '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
-        $this->assertEquals(2, $found, $string);
-
-        // Segment filters combined by OR to keep consistent behavior with the use of leadlist_id IN (1,2,3)
-        $found = preg_match_all('/OR \(EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'leads .*? LEFT JOIN '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
-        $this->assertEquals(1, $found, $string);
-
-        $found = preg_match_all('/\(l.email = :(.*?)\)/', $string, $matches);
-        $this->assertEquals(2, $found, $string);
-
-        $this->assertTrue(isset($parameters[$matches[1][0]]) && $parameters[$matches[1][0]] = 'blah@blah.com', $string);
-        $this->assertTrue(isset($parameters[$matches[1][1]]) && $parameters[$matches[1][1]] = 'blah2@blah.com', $string);
-    }
-
-    public function testIncludeSegmentFilterWithOutFiltersAppendMembershipSubquery()
-    {
-        list($mockRepository, $reflectedMethod, $connection) = $this->getReflectedGenerateSegmentExpressionMethod(true);
-
-        $parameters = [];
-        $qb         = $connection->createQueryBuilder();
-        $filters    =
-            [
-                [
-                    'glue'     => 'and',
-                    'operator' => 'in',
-                    'field'    => 'leadlist',
-                    'object'   => 'lead',
-                    'type'     => 'leadlist',
-                    'display'  => null,
-                    'filter'   => [1, 2],
-                ],
-            ];
-
-        // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
-        $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
-
-        $string = (string) $expr;
-
-        // Two segments included
-        $found = preg_match_all('/EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
-        $this->assertEquals(2, $found, $string);
-
-        // Segment filters combined by OR to keep consistent behavior with the use of leadlist_id IN (1,2,3)
-        $found = preg_match_all('/OR \(EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
-        $this->assertEquals(1, $found, $string);
-    }
-
-    public function testExcludeSegmentFilterWithFiltersAppendNotExistsSubQuery()
-    {
-        list($mockRepository, $reflectedMethod, $connection) = $this->getReflectedGenerateSegmentExpressionMethod();
-
-        $parameters = [];
-        $qb         = $connection->createQueryBuilder();
-        $filters    =
-            [
-                [
-                    'glue'     => 'and',
-                    'operator' => '!in',
-                    'field'    => 'leadlist',
-                    'object'   => 'lead',
-                    'type'     => 'leadlist',
-                    'display'  => null,
-                    'filter'   => [1, 2],
-                ],
-            ];
-
-        // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
-        $expr   = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
-        $string = (string) $expr;
-
-        $found = preg_match_all('/NOT EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'leads .*? LEFT JOIN '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
-        $this->assertEquals(2, $found, $string);
-
-        // Segment filters combined by AND to keep consistent behavior with the use of leadlist_id IN (1,2,3)
-        $found = preg_match_all('/AND \(NOT EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'leads .*? LEFT JOIN '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
-        $this->assertEquals(1, $found, $string);
-
-        $found = preg_match_all('/\(l.email = :(.*?)\)/', $string, $matches);
-        $this->assertEquals(2, $found, $string);
-
-        $this->assertTrue(isset($parameters[$matches[1][0]]) && $parameters[$matches[1][0]] = 'blah@blah.com', $string);
-        $this->assertTrue(isset($parameters[$matches[1][1]]) && $parameters[$matches[1][1]] = 'blah2@blah.com', $string);
-    }
-
-    public function testExcludeSegmentFilterWithOutFiltersAppendMembershipSubquery()
-    {
-        list($mockRepository, $reflectedMethod, $connection) = $this->getReflectedGenerateSegmentExpressionMethod(true);
-
-        $parameters = [];
-        $qb         = $connection->createQueryBuilder();
-        $filters    =
-            [
-                [
-                    'glue'     => 'and',
-                    'operator' => '!in',
-                    'field'    => 'leadlist',
-                    'object'   => 'lead',
-                    'type'     => 'leadlist',
-                    'display'  => null,
-                    'filter'   => [1, 2],
-                ],
-            ];
-
-        // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
-        $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
-
-        $string = (string) $expr;
-
-        // Two segments included
-        $found = preg_match_all('/NOT EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
-        $this->assertEquals(2, $found, $string);
-
-        // Segment filters combined by AND to keep consistent behavior with the use of leadlist_id NOT IN (1,2,3)
-        $found = preg_match_all('/AND \(NOT EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
-        $this->assertEquals(1, $found, $string);
-    }
-
-    public function testLikeFilterAppendsAmperstandIfNotIncluded()
-    {
-        list($mockRepository, $reflectedMethod, $connection) = $this->getReflectedGenerateSegmentExpressionMethod(true);
-
-        $parameters = [];
-        $qb         = $connection->createQueryBuilder();
-        $filters    =
-            [
-                [
-                    'glue'     => 'and',
-                    'operator' => 'like',
-                    'field'    => 'email',
-                    'object'   => 'lead',
-                    'type'     => 'text',
-                    'display'  => null,
-                    'filter'   => 'blah.com',
-                ],
-            ];
-
-        // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
-        $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
-
-        $string = (string) $expr;
-        $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
-        $this->assertEquals(1, $found, $string);
-
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == '%blah.com%', $string);
-    }
-
-    public function testLikeFilterDoesNotAppendsAmperstandIfAlreadyIncluded()
-    {
-        list($mockRepository, $reflectedMethod, $connection) = $this->getReflectedGenerateSegmentExpressionMethod(true);
-
-        $parameters = [];
-        $qb         = $connection->createQueryBuilder();
-        $filters    =
-            [
-                [
-                    'glue'     => 'and',
-                    'operator' => 'like',
-                    'field'    => 'email',
-                    'object'   => 'lead',
-                    'type'     => 'text',
-                    'display'  => null,
-                    'filter'   => 'blah.com%',
-                ],
-            ];
-
-        // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
-        $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
-
-        $string = (string) $expr;
-        $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
-        $this->assertEquals(1, $found, $string);
-
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == 'blah.com%', $string);
-    }
-
-    public function testContainsFilterAppendsAmperstandOnBothEnds()
-    {
-        list($mockRepository, $reflectedMethod, $connection) = $this->getReflectedGenerateSegmentExpressionMethod(true);
-
-        $parameters = [];
-        $qb         = $connection->createQueryBuilder();
-        $filters    =
-            [
-                [
-                    'glue'     => 'and',
-                    'operator' => 'contains',
-                    'field'    => 'email',
-                    'object'   => 'lead',
-                    'type'     => 'text',
-                    'display'  => null,
-                    'filter'   => 'blah.com',
-                ],
-            ];
-
-        // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
-        $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
-
-        $string = (string) $expr;
-        $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
-        $this->assertEquals(1, $found, $string);
-
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == '%blah.com%', $string);
-    }
-
-    public function testStartsWithFilterAppendsAmperstandAtEnd()
-    {
-        list($mockRepository, $reflectedMethod, $connection) = $this->getReflectedGenerateSegmentExpressionMethod(true);
-
-        $parameters = [];
-        $qb         = $connection->createQueryBuilder();
-        $filters    =
-            [
-                [
-                    'glue'     => 'and',
-                    'operator' => 'startsWith',
-                    'field'    => 'email',
-                    'object'   => 'lead',
-                    'type'     => 'text',
-                    'display'  => null,
-                    'filter'   => 'blah.com',
-                ],
-            ];
-
-        // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
-        $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
-
-        $string = (string) $expr;
-        $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
-        $this->assertEquals(1, $found, $string);
-
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == 'blah.com%', $string);
-    }
-
-    public function testEndsWithFilterAppendsAmperstandAtBeginning()
-    {
-        list($mockRepository, $reflectedMethod, $connection) = $this->getReflectedGenerateSegmentExpressionMethod(true);
-
-        $parameters = [];
-        $qb         = $connection->createQueryBuilder();
-        $filters    =
-            [
-                [
-                    'glue'     => 'and',
-                    'operator' => 'endsWith',
-                    'field'    => 'email',
-                    'object'   => 'lead',
-                    'type'     => 'text',
-                    'display'  => null,
-                    'filter'   => 'blah.com',
-                ],
-            ];
-
-        // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
-        $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
-
-        $string = (string) $expr;
-        $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
-        $this->assertEquals(1, $found, $string);
-
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == '%blah.com', $string);
-    }
-
-    private function getReflectedGenerateSegmentExpressionMethod($noFilters = false)
-    {
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-        $mockRepository = $this->getMockBuilder(LeadListRepository::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getEntityManager'])
-            ->getMock();
 
-        $mockConnection = $this->getMockBuilder(Connection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockConnection->method('getExpressionBuilder')
-            ->willReturnCallback(
-                function () use ($mockConnection) {
-                    return new ExpressionBuilder($mockConnection);
-                }
-            );
-        $mockConnection->method('quote')
-            ->willReturnCallback(
-                function ($value) {
-                    return "'$value'";
-                }
-            );
+        $this->connection       = $this->createMock(Connection::class);
+        $entityManager          = $this->createMock(EntityManager::class);
+        $classMetadata          = $this->createMock(ClassMetadata::class);
+        $this->stmt             = $this->createMock(ResultStatement::class);
+        $this->queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $this->expressionMock   = $this->createMock(Expr::class);
 
-        $mockSchemaManager = $this->getMockBuilder(MySqlSchemaManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockSchemaManager->method('listTableColumns')
-            ->willReturnCallback(
-                function ($table) {
-                    $mockType = $this->getMockBuilder(TextType::class)
-                        ->disableOriginalConstructor()
-                        ->getMock();
-                    switch (true) {
-                        case strpos($table, 'companies') !== false:
-                            $name = 'company_email';
-                            break;
-                        default:
-                            $name = 'email';
-                    }
+        $this->repository = new LeadListRepository($entityManager, $classMetadata);
 
-                    $column = new Column($name, $mockType);
+        $entityManager->method('getConnection')->willReturn($this->connection);
+    }
 
-                    return [
-                        $name => $column,
-                    ];
-                }
-            );
+    public function testGetMultipleLeadCounts(): void
+    {
+        $listIds = [765, 766];
+        $counts  = [100, 200];
 
-        $mockConnection->method('getSchemaManager')
-            ->willReturn($mockSchemaManager);
-
-        $mockPlatform = $this->getMockBuilder(AbstractPlatform::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockPlatform->method('getName')
-            ->willReturn('mysql');
-        $mockConnection->method('getDatabasePlatform')
-            ->willReturn($mockPlatform);
-
-        $mockEntityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockEntityManager->method('getConnection')
-            ->willReturn($mockConnection);
-
-        $mockRepository->method('getEntityManager')
-            ->willReturn($mockEntityManager);
-
-        $mockStatement = $this->getMockBuilder(Statement::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $subFilters1 = [
+        $queryResult = [
             [
-                'glue'     => 'and',
-                'operator' => '=',
-                'field'    => 'email',
-                'object'   => 'lead',
-                'type'     => 'text',
-                'display'  => null,
-                'filter'   => 'blah@blah.com',
+                'leadlist_id' => $listIds[0],
+                'thecount'    => $counts[0],
+            ],
+            [
+                'leadlist_id' => $listIds[1],
+                'thecount'    => $counts[1],
             ],
         ];
 
-        $subFilters2 = [
+        $this->mockGetLeadCount($queryResult);
+
+        $this->queryBuilderMock->expects(self::once())
+            ->method('from')
+            ->with(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
+            ->willReturnSelf();
+
+        $this->expressionMock->expects(self::once())
+            ->method('in')
+            ->with('l.leadlist_id', $listIds)
+            ->willReturnSelf();
+
+        $this->expressionMock
+            ->method('eq')
+            ->with('l.manually_removed', ':false')
+            ->willReturnSelf();
+
+        self::assertSame(array_combine($listIds, $counts), $this->repository->getLeadCount($listIds));
+    }
+
+    public function testGetSingleLeadCount(): void
+    {
+        $listIds     = [765];
+        $counts      = [100];
+        $queryResult = [
             [
-                'glue'     => 'and',
-                'operator' => '=',
-                'field'    => 'email',
-                'object'   => 'lead',
-                'type'     => 'text',
-                'display'  => null,
-                'filter'   => 'blah2@blah.com',
+                'leadlist_id' => $listIds[0],
+                'thecount'    => $counts[0],
             ],
         ];
 
-        $filters = [
+        $this->mockGetLeadCount($queryResult);
+
+        $fromPart = [
             [
-                'id'      => 1,
-                'filters' => serialize($noFilters ? [] : $subFilters1),
-            ],
-            [
-                'id'      => 2,
-                'filters' => serialize($noFilters ? [] : $subFilters2),
+                'alias' => 'l',
+                'table' => MAUTIC_TABLE_PREFIX.'lead_lists_leads',
             ],
         ];
-        $mockStatement->method('fetchAll')
-            ->willReturn($filters);
 
-        $mockConnection->method('createQueryBuilder')
-            ->willReturnCallback(
-                function () use ($mockConnection, $mockStatement) {
-                    $qb = $this->getMockBuilder(QueryBuilder::class)
-                        ->setConstructorArgs([$mockConnection])
-                        ->setMethods(['execute'])
-                        ->getMock();
+        $this->queryBuilderMock->expects(self::once())
+            ->method('getQueryPart')
+            ->willReturn($fromPart);
 
-                    $qb->method('execute')
-                        ->willReturn($mockStatement);
+        $this->queryBuilderMock->expects(self::exactly(2))
+            ->method('from')
+            ->withConsecutive(
+                [
+                    MAUTIC_TABLE_PREFIX.'lead_lists_leads',
+                    'l',
+                ],
+                [
+                    MAUTIC_TABLE_PREFIX.'lead_lists_leads',
+                    'l USE INDEX '.MAUTIC_TABLE_PREFIX.'(manually_removed)',
+                ]
+            )
+            ->willReturnOnConsecutiveCalls($this->queryBuilderMock, $this->queryBuilderMock);
 
-                    return $qb;
-                }
-            );
+        $this->expressionMock->expects(self::exactly(2))
+            ->method('eq')
+            ->withConsecutive(['l.leadlist_id', $listIds[0]], ['l.manually_removed', ':false'])
+            ->willReturnSelf();
 
-        $reflectedMockRepository = new \ReflectionObject($mockRepository);
-        $method                  = $reflectedMockRepository->getMethod('generateSegmentExpression');
-        $method->setAccessible(true);
+        self::assertSame($counts[0], $this->repository->getLeadCount($listIds));
+    }
 
-        return [$mockRepository, $method, $mockConnection];
+    /**
+     * @param array<mixed> $queryResult
+     */
+    private function mockGetLeadCount(array $queryResult): void
+    {
+        $this->connection
+            ->method('createQueryBuilder')
+            ->willReturn($this->queryBuilderMock);
+
+        $this->queryBuilderMock->expects(self::once())
+            ->method('select')
+            ->with('count(l.lead_id) as thecount, l.leadlist_id')
+            ->willReturnSelf();
+
+        $this->queryBuilderMock->expects(self::exactly(2))
+            ->method('expr')
+            ->willReturn($this->expressionMock);
+
+        $this->queryBuilderMock->expects(self::once())
+            ->method('setParameter')
+            ->with('false', false, 'boolean')
+            ->willReturnSelf();
+
+        $this->queryBuilderMock->expects(self::once())
+            ->method('where')
+            ->with($this->expressionMock)
+            ->willReturnSelf();
+
+        $this->queryBuilderMock->expects(self::once())
+            ->method('execute')
+            ->willReturn($this->stmt);
+
+        $this->stmt->expects(self::once())
+            ->method('fetchAll')
+            ->willReturn($queryResult);
     }
 }

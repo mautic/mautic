@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
@@ -30,16 +21,19 @@ class Tag
     private $tag;
 
     /**
-     * @param string $tag
+     * @var string
      */
-    public function __construct($tag = null)
-    {
-        $this->tag = $this->validateTag($tag);
-    }
+    private $description;
 
     /**
-     * @param ClassMetadata $metadata
+     * @param string $tag
+     * @param bool   $clean
      */
+    public function __construct($tag = null, $clean = true)
+    {
+        $this->tag = $clean ? $this->validateTag($tag) : $tag;
+    }
+
     public static function loadMetadata(ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -49,11 +43,9 @@ class Tag
 
         $builder->addId();
         $builder->addField('tag', Type::STRING);
+        $builder->addNamedField('description', Type::TEXT, 'description', true);
     }
 
-    /**
-     * @param ApiMetadataDriver $metadata
-     */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
         $metadata->setGroupPrefix('tag')
@@ -61,6 +53,7 @@ class Tag
                 [
                     'id',
                     'tag',
+                    'description',
                 ]
             )
             ->build();
@@ -95,12 +88,32 @@ class Tag
     }
 
     /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     *
+     * @return Tag
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
      * @param string $tag
      *
      * @return Tag
      */
     protected function validateTag($tag)
     {
-        return InputHelper::clean($tag);
+        return InputHelper::string(trim($tag));
     }
 }

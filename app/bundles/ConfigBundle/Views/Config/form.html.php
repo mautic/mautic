@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticCoreBundle:Default:content.html.php');
 }
 $view['slots']->set('mauticContent', 'config');
@@ -28,10 +28,10 @@ $configKeys = array_keys($form->children);
             <!-- Nav tabs -->
             <ul class="list-group list-group-tabs" role="tablist">
             <?php foreach ($configKeys as $i => $key) : ?>
-                <?php if (!isset($formConfigs[$key]) || !count($form[$key]->children)) {
-    continue;
-} ?>
-                <li role="presentation" class="list-group-item <?php echo $i === 0 ? 'in active' : ''; ?>">
+                <?php if (!isset($formConfigs[$key]) || !count($form[$key]->children)) : ?>
+                <?php continue; ?>
+                <?php endif; ?>
+                <li role="presentation" class="list-group-item <?php echo 0 === $i ? 'in active' : ''; ?>">
                     <?php $containsErrors = ($view['form']->containsErrors($form[$key])) ? ' text-danger' : ''; ?>
                     <a href="#<?php echo $key; ?>" aria-controls="<?php echo $key; ?>" role="tab" data-toggle="tab" class="steps<?php echo $containsErrors; ?>">
                         <?php echo $view['translator']->trans('mautic.config.tab.'.$key); ?>
@@ -60,7 +60,7 @@ $configKeys = array_keys($form->children);
                     continue;
                 endif;
             ?>
-            <div role="tabpanel" class="tab-pane fade <?php echo $i === 0 ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $key; ?>">
+            <div role="tabpanel" class="tab-pane fade <?php echo 0 === $i ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $key; ?>">
                 <div class="pt-md pr-md pl-md pb-md">
                     <?php echo $view['form']->widget($form[$key], ['formConfig' => $formConfigs[$key]]); ?>
                 </div>

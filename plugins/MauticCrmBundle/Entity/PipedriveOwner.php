@@ -1,6 +1,6 @@
 <?php
 
-namespace  MauticPlugin\MauticCrmBundle\Entity;
+namespace MauticPlugin\MauticCrmBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -22,9 +22,6 @@ class PipedriveOwner
      */
     private $ownerId;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);

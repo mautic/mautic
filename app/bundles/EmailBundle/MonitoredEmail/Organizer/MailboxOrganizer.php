@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Organizer;
 
 use Mautic\EmailBundle\Event\ParseEmailEvent;
@@ -34,9 +25,6 @@ class MailboxOrganizer
 
     /**
      * MailboxOrganizer constructor.
-     *
-     * @param ParseEmailEvent $event
-     * @param array           $mailboxes
      */
     public function __construct(ParseEmailEvent $event, array $mailboxes)
     {
@@ -85,8 +73,6 @@ class MailboxOrganizer
     }
 
     /**
-     * @param ConfigAccessor $config
-     *
      * @return MailboxContainer
      */
     protected function getContainer(ConfigAccessor $config)

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Translation;
 
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
@@ -51,7 +42,7 @@ class Translator extends BaseTranslator
      */
     protected function loadCatalogue($locale)
     {
-        if ($locale != 'en_US') {
+        if ('en_US' != $locale) {
             // Always force en_US so that it's available for fallback
             $this->addResource('mautic', null, 'en_US', 'messages');
         }

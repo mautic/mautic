@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -32,7 +23,7 @@ trait TranslationEntityTrait
     /**
      * @var TranslationEntityInterface
      **/
-    private $translationParent = null;
+    private $translationParent;
 
     /**
      * @var string
@@ -65,8 +56,6 @@ trait TranslationEntityTrait
     /**
      * Add translation.
      *
-     * @param TranslationEntityInterface $translationChildren
-     *
      * @return $this
      */
     public function addTranslationChild(TranslationEntityInterface $child)
@@ -80,8 +69,6 @@ trait TranslationEntityTrait
 
     /**
      * Remove translation.
-     *
-     * @param TranslationEntityInterface $child
      */
     public function removeTranslationChild(TranslationEntityInterface $child)
     {
@@ -100,8 +87,6 @@ trait TranslationEntityTrait
 
     /**
      * Set translation parent.
-     *
-     * @param TranslationEntityInterface $translationParent
      *
      * @return $this
      */
@@ -177,7 +162,7 @@ trait TranslationEntityTrait
         $children = $this->getTranslationChildren();
 
         if ($isChild) {
-            return ($parent === null) ? false : true;
+            return (null === $parent) ? false : true;
         } else {
             return (!empty($parent) || count($children)) ? true : false;
         }

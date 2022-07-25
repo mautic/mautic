@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventCollector;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -44,9 +35,6 @@ class EventCollector
 
     /**
      * EventCollector constructor.
-     *
-     * @param TranslatorInterface      $translator
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
@@ -71,9 +59,6 @@ class EventCollector
     }
 
     /**
-     * @param string $type
-     * @param string $key
-     *
      * @return AbstractEventAccessor
      */
     public function getEventConfig(Event $event)
@@ -86,7 +71,7 @@ class EventCollector
      *
      * @deprecated 2.13.0 to be removed in 3.0
      *
-     * @param null|string $type
+     * @param string|null $type
      *
      * @return array|mixed
      */

@@ -1,50 +1,19 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Api;
 
-use Joomla\Http\Http;
-use Joomla\Http\Response;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use GuzzleHttp\Client;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Helper\NotificationUploader;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Psr\Http\Message\ResponseInterface;
 
 abstract class AbstractNotificationApi
 {
-    /**
-     * @var string
-     */
-    protected $apiUrl;
-
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
-
-    /**
-     * @var Http
-     */
-    protected $http;
-
-    /**
-     * @var TrackableModel
-     */
-    protected $trackableModel;
-
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
+    protected Client $http;
+    protected TrackableModel $trackableModel;
+    protected IntegrationHelper $integrationHelper;
 
     /**
      * @var NotificationUploader
@@ -53,34 +22,24 @@ abstract class AbstractNotificationApi
 
     /**
      * AbstractNotificationApi constructor.
-     *
-     * @param MauticFactory        $factory
-     * @param Http                 $http
-     * @param TrackableModel       $trackableModel
-     * @param IntegrationHelper    $integrationHelper
-     * @param NotificationUploader $notificationUploader
      */
-    public function __construct(MauticFactory $factory, Http $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper, NotificationUploader $notificationUploader)
+    public function __construct(Client $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper, NotificationUploader $notificationUpload
+er)
     {
-        $this->factory              = $factory;
-        $this->http                 = $http;
-        $this->trackableModel       = $trackableModel;
-        $this->integrationHelper    = $integrationHelper;
+        $this->http              = $http;
+        $this->trackableModel    = $trackableModel;
+        $this->integrationHelper = $integrationHelper;
         $this->notificationUploader = $notificationUploader;
     }
 
     /**
      * @param string $endpoint One of "apps", "players", or "notifications"
-     * @param string $data     JSON encoded array of data to send
-     *
-     * @return Response
+     * @param array  $data     Array of data to send
      */
-    abstract public function send($endpoint, $data);
+    abstract public function send(string $endpoint, array $data): ResponseInterface;
 
     /**
-     * @param              $id
-     * @param Notification $sendNotification
-     * @param Notification $notification
+     * @param $id
      *
      * @return mixed
      */
@@ -90,7 +49,6 @@ abstract class AbstractNotificationApi
      * Convert a non-tracked url to a tracked url.
      *
      * @param string $url
-     * @param array  $clickthrough
      *
      * @return string
      */

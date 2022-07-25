@@ -11,7 +11,7 @@
 
 ?>
 <?php if (isset($form)) : ?>
-    <?php if ($showContactCategories && count($form['global_categories'])):?>
+    <?php if ($showContactCategories && isset($form['global_categories']) && count($form['global_categories'])):?>
 <div class="global-categories text-left">
     <div>
         <label class="control-label"><?php echo $view['translator']->trans('mautic.lead.form.categories'); ?></label>

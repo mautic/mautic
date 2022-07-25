@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Facade;
 
 use Mautic\PluginBundle\Helper\ReloadHelper;
@@ -17,11 +8,10 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class ReloadFacade
 {
-    /**
-     * @param PluginModel         $pluginModel
-     * @param ReloadHelper        $reloadHelper
-     * @param TranslatorInterface $translator
-     */
+    private $pluginModel;
+    private $reloadHelper;
+    private $translator;
+
     public function __construct(PluginModel $pluginModel, ReloadHelper $reloadHelper, TranslatorInterface $translator)
     {
         $this->pluginModel  = $pluginModel;

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\EmailBundle\Model\TransportCallback;
@@ -39,10 +30,6 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements CallbackTran
 
     /**
      * ElasticemailTransport constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param LoggerInterface     $logger
-     * @param TransportCallback   $transportCallback
      */
     public function __construct(TranslatorInterface $translator, LoggerInterface $logger, TransportCallback $transportCallback)
     {
@@ -56,18 +43,17 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements CallbackTran
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     * @param null                $failedRecipients
+     * @param null $failedRecipients
      *
      * @return int|void
      *
      * @throws \Exception
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         // IsTransactional header for all non bulk messages
         // https://elasticemail.com/support/guides/unsubscribe/
-        if ($message->getHeaders()->get('Precedence') != 'Bulk') {
+        if ('Bulk' != $message->getHeaders()->get('Precedence')) {
             $message->getHeaders()->addTextHeader('IsTransactional', 'True');
         }
 
@@ -86,8 +72,6 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements CallbackTran
 
     /**
      * Handle bounces & complaints from ElasticEmail.
-     *
-     * @param Request $request
      */
     public function processCallbackRequest(Request $request)
     {
@@ -102,7 +86,7 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements CallbackTran
         } elseif (in_array($category, ['NotDelivered', 'NoMailbox', 'AccountProblem', 'DNSProblem', 'Unknown'])) {
             // just hard bounces https://elasticemail.com/support/user-interface/activity/bounced-category-filters
             $this->transportCallback->addFailureByAddress($email, $category);
-        } elseif ($status == 'Error') {
+        } elseif ('Error' == $status) {
             $this->transportCallback->addFailureByAddress($email, $this->translator->trans('mautic.email.complaint.reason.unknown'));
         }
     }

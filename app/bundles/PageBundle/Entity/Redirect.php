@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -17,9 +8,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 
-/**
- * Class Redirect.
- */
 class Redirect extends FormEntity
 {
     /**
@@ -32,9 +20,6 @@ class Redirect extends FormEntity
      */
     private $redirectId;
 
-    /**
-     * @var
-     */
     private $url;
 
     /**
@@ -60,9 +45,6 @@ class Redirect extends FormEntity
         $this->trackables = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -70,7 +52,7 @@ class Redirect extends FormEntity
         $builder->setTable('page_redirects')
             ->setCustomRepositoryClass('Mautic\PageBundle\Entity\RedirectRepository');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createField('redirectId', 'string')
             ->columnName('redirect_id')
@@ -136,7 +118,7 @@ class Redirect extends FormEntity
      */
     public function setRedirectId($redirectId = null)
     {
-        if ($redirectId === null) {
+        if (null === $redirectId) {
             $redirectId = substr(hash('sha1', uniqid(mt_rand())), 0, 25);
         }
         $this->redirectId = $redirectId;

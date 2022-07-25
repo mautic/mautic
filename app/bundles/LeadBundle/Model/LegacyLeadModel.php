@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
@@ -30,8 +21,6 @@ class LegacyLeadModel
 
     /**
      * LegacyContactMerger constructor.
-     *
-     * @param Container $container
      */
     public function __construct(Container $container)
     {
@@ -39,8 +28,6 @@ class LegacyLeadModel
     }
 
     /**
-     * @param Lead $lead
-     * @param Lead $lead2
      * @param bool $autoMode
      *
      * @return Lead

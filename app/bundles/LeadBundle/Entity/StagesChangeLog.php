@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -50,9 +41,6 @@ class StagesChangeLog
      */
     private $dateAdded;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -165,11 +153,9 @@ class StagesChangeLog
     /**
      * Set lead.
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     *
      * @return StagesChangeLog
      */
-    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function setLead(Lead $lead)
     {
         $this->lead = $lead;
 
@@ -189,11 +175,9 @@ class StagesChangeLog
     /**
      * Set stage.
      *
-     * @param \Mautic\StageBundle\Entity\Stage $stage
-     *
      * @return StagesChangeLog
      */
-    public function setStage(\Mautic\StageBundle\Entity\Stage $stage)
+    public function setStage(Stage $stage)
     {
         $this->stage = $stage;
 

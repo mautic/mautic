@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -20,8 +11,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 class CampaignEvent extends CommonEvent
 {
     /**
-     * @param Campaign $campaign
-     * @param bool     $isNew
+     * @param bool $isNew
      */
     public function __construct(Campaign &$campaign, $isNew = false)
     {
@@ -41,8 +31,6 @@ class CampaignEvent extends CommonEvent
 
     /**
      * Sets the Campaign entity.
-     *
-     * @param Campaign $campaign
      */
     public function setCampaign(Campaign $campaign)
     {

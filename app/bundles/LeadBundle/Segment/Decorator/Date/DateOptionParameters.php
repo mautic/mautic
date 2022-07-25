@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
 class DateOptionParameters
@@ -36,15 +28,21 @@ class DateOptionParameters
     private $shouldUseLastDayOfRange;
 
     /**
-     * @param ContactSegmentFilterCrate $leadSegmentFilterCrate
-     * @param array                     $relativeDateStrings
+     * @var DateTimeHelper
      */
-    public function __construct(ContactSegmentFilterCrate $leadSegmentFilterCrate, array $relativeDateStrings)
-    {
+    private $dateTimeHelper;
+
+    public function __construct(
+        ContactSegmentFilterCrate $leadSegmentFilterCrate,
+        array $relativeDateStrings,
+        TimezoneResolver $timezoneResolver
+    ) {
         $this->hasTimePart             = $leadSegmentFilterCrate->hasTimeParts();
         $this->timeframe               = $this->parseTimeFrame($leadSegmentFilterCrate, $relativeDateStrings);
         $this->requiresBetween         = in_array($leadSegmentFilterCrate->getOperator(), ['=', '!='], true);
         $this->shouldUseLastDayOfRange = in_array($leadSegmentFilterCrate->getOperator(), ['gt', 'lte'], true);
+
+        $this->setDateTimeHelper($timezoneResolver);
     }
 
     /**
@@ -84,20 +82,30 @@ class DateOptionParameters
     }
 
     /**
-     * @param ContactSegmentFilterCrate $leadSegmentFilterCrate
-     * @param array                     $relativeDateStrings
-     *
+     * @return DateTimeHelper
+     */
+    public function getDefaultDate()
+    {
+        return $this->dateTimeHelper;
+    }
+
+    /**
      * @return string
      */
     private function parseTimeFrame(ContactSegmentFilterCrate $leadSegmentFilterCrate, array $relativeDateStrings)
     {
         $key = array_search($leadSegmentFilterCrate->getFilter(), $relativeDateStrings, true);
 
-        if ($key === false) {
+        if (false === $key) {
             // Time frame does not match any option from $relativeDateStrings, so return original value
             return $leadSegmentFilterCrate->getFilter();
         }
 
         return str_replace('mautic.lead.list.', '', $key);
+    }
+
+    private function setDateTimeHelper(TimezoneResolver $timezoneResolver)
+    {
+        $this->dateTimeHelper = $timezoneResolver->getDefaultDate($this->hasTimePart());
     }
 }

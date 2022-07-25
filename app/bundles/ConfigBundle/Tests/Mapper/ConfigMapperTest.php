@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Tests\Mapper;
 
 use Mautic\ConfigBundle\Exception\BadFormConfigException;
 use Mautic\ConfigBundle\Mapper\ConfigMapper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class ConfigMapperTest extends \PHPUnit_Framework_TestCase
+class ConfigMapperTest extends \PHPUnit\Framework\TestCase
 {
     private $forms = [
         'emailconfig' => [
@@ -38,7 +29,7 @@ class ConfigMapperTest extends \PHPUnit_Framework_TestCase
                 'mailer_auth_mode'             => null,
                 'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
                 'mailer_spool_type'            => 'memory',
-                'mailer_spool_path'            => '%kernel.root_dir%/spool',
+                'mailer_spool_path'            => '%kernel.root_dir%/../var/spool',
                 'mailer_spool_msg_limit'       => null,
                 'mailer_spool_time_limit'      => null,
                 'mailer_spool_recover_timeout' => 900,
@@ -207,7 +198,7 @@ class ConfigMapperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $parameterHelper->method('getParameter')
+        $parameterHelper->method('get')
             ->willReturnCallback(
                 function ($param, $defaultValue) {
                     return array_key_exists($param, $this->config) ? $this->config[$param] : $defaultValue;
@@ -276,7 +267,7 @@ class ConfigMapperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $parameterHelper->method('getParameter')
+        $parameterHelper->method('get')
             ->willReturnCallback(
                 function ($param, $defaultValue) {
                     return array_key_exists($param, $this->config) ? $this->config[$param] : $defaultValue;

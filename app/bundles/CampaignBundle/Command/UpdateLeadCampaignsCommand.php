@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -68,11 +59,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
     /**
      * UpdateLeadCampaignsCommand constructor.
-     *
-     * @param CampaignRepository  $campaignRepository
-     * @param TranslatorInterface $translator
-     * @param MembershipBuilder   $membershipBuilder
-     * @param LoggerInterface     $logger
      */
     public function __construct(
         CampaignRepository $campaignRepository,
@@ -182,7 +168,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
         if ($id) {
             $campaign = $this->campaignRepository->getEntity($id);
-            if ($campaign === null) {
+            if (null === $campaign) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
 
                 return 0;
@@ -196,7 +182,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
                 ]
             );
 
-            while (($results = $campaigns->next()) !== false) {
+            while (false !== ($results = $campaigns->next())) {
                 // Get first item; using reset as the key will be the ID and not 0
                 $campaign = reset($results);
 
@@ -212,8 +198,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     }
 
     /**
-     * @param Campaign $campaign
-     *
      * @throws \Exception
      */
     private function updateCampaign(Campaign $campaign)

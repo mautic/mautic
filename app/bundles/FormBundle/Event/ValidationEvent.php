@@ -1,23 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 
-/**
- * Class ValidationEvent.
- */
 class ValidationEvent extends CommonEvent
 {
     /**
@@ -31,7 +19,7 @@ class ValidationEvent extends CommonEvent
     private $value;
 
     /**
-     * @var
+     * @var bool
      */
     private $valid = true;
 

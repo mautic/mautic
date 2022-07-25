@@ -5,6 +5,8 @@
  * @param container
  */
 Mautic.campaignOnLoad = function (container, response) {
+    Mautic.lazyLoadContactListOnCampaignDetail();
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
     }
@@ -48,7 +50,7 @@ Mautic.campaignOnLoad = function (container, response) {
             var thisSelect = mQuery(event.target).attr('id');
             Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, false);
 
-            mQuery('#'+thisSelect+'_chosen .chosen-search input').on('keydown.toolip', function () {
+            mQuery('#'+thisSelect+'_chosen .chosen-search input').on('keydown.tooltip', function () {
                 // Destroy tooltips that are filtered out
                 Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, true);
             }).on('keyup.tooltip', function() {
@@ -64,7 +66,7 @@ Mautic.campaignOnLoad = function (container, response) {
             var thisSelect = mQuery(event.target).attr('id');
             Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, true);
 
-            mQuery('#'+thisSelect+'_chosen .chosen-search input').off('keyup.toolip')
+            mQuery('#'+thisSelect+'_chosen .chosen-search input').off('keyup.tooltip')
                 .off('keydown.tooltip');
         });
 
@@ -115,14 +117,29 @@ Mautic.campaignOnLoad = function (container, response) {
     }
 };
 
+Mautic.lazyLoadContactListOnCampaignDetail = function() {
+    let containerId = '#leads-container';
+    let container = mQuery(containerId);
+
+    // Load the contacts only if the container exists.
+    if (!container.length) {
+        return;
+    }
+
+    let campaignContactUrl = container.data('target-url');
+    mQuery.get(campaignContactUrl, function(response) {
+        response.target = containerId;
+        Mautic.processPageContent(response);
+    });
+};
+
 /**
  * Update chosen tooltips
  *
  * @param theSelect
  * @param destroy
  */
-Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, destroy)
-{
+Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, destroy) {
     mQuery('#'+theSelect+' option').each(function () {
         if (mQuery(this).attr('id')) {
             // Initiate a tooltip on each option since chosen doesn't copy over the data attributes
@@ -152,6 +169,21 @@ Mautic.campaignOnUnload = function(container) {
  * @param response
  */
 Mautic.campaignEventOnLoad = function (container, response) {
+    if (mQuery('#campaignevent_triggerHour').length) {
+        Mautic.campaignEventShowHideIntervalSettings();
+        Mautic.campaignEventUpdateIntervalHours();
+        mQuery('#campaignevent_triggerHour').on('change', Mautic.campaignEventUpdateIntervalHours);
+        mQuery('#campaignevent_triggerRestrictedStartHour').on('change', Mautic.campaignEventUpdateIntervalHours);
+        mQuery('#campaignevent_triggerRestrictedStopHour').on('change', Mautic.campaignEventUpdateIntervalHours);
+        mQuery('#campaignevent_triggerIntervalUnit').on('change', Mautic.campaignEventShowHideIntervalSettings);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_0').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_1').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_2').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_3').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_4').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_7').on('change', Mautic.campaignEventSelectDOW);
+    }
+
     if (!response.hasOwnProperty('eventId')) {
         // There's nothing for us to do, so bail
         return;
@@ -165,7 +197,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
 
     if (!response.success && Mautic.campaignBuilderConnectionRequiresUpdate) {
         // Modal exited - check to see if a connection needs to be removed
-        Mautic.campaignBuilderInstance.detach(Mautic.campaignBuilderLastConnection);
+        Mautic.campaignBuilderInstance.deleteConnection(Mautic.campaignBuilderLastConnection);
     }
     Mautic.campaignBuilderConnectionRequiresUpdate = false;
     Mautic.campaignBuilderUpdateLabel(domEventId);
@@ -234,6 +266,59 @@ Mautic.campaignEventOnLoad = function (container, response) {
     }
 
     Mautic.campaignBuilderInstance.repaintEverything();
+};
+
+/**
+ * Update the trigger hour based on the interval unit selected
+ */
+Mautic.campaignEventUpdateIntervalHours = function () {
+    var hour = mQuery('#campaignevent_triggerHour').val();
+    var start = mQuery('#campaignevent_triggerRestrictedStartHour').val();
+    var stop = mQuery('#campaignevent_triggerRestrictedStopHour').val();
+
+    if (hour) {
+        mQuery('#campaignevent_triggerRestrictedStartHour').val('');
+        mQuery('#campaignevent_triggerRestrictedStopHour').val('');
+        mQuery('#campaignevent_triggerRestrictedStartHour').prop('disabled', true);
+        mQuery('#campaignevent_triggerRestrictedStopHour').prop('disabled', true);
+    } else if (start || stop) {
+        mQuery('#campaignevent_triggerHour').val('');
+        mQuery('#campaignevent_triggerHour').prop('disabled', true);
+    } else {
+        mQuery('#campaignevent_triggerHour').val('');
+        mQuery('#campaignevent_triggerRestrictedStartHour').val('');
+        mQuery('#campaignevent_triggerRestrictedStopHour').val('');
+        mQuery('#campaignevent_triggerHour').prop('disabled', false);
+        mQuery('#campaignevent_triggerRestrictedStartHour').prop('disabled', false);
+        mQuery('#campaignevent_triggerRestrictedStopHour').prop('disabled', false);
+    }
+};
+
+/**
+ * Show/hide interval settings
+ */
+Mautic.campaignEventShowHideIntervalSettings = function() {
+    var unit = mQuery('#campaignevent_triggerIntervalUnit').val();
+    if (unit === 'i' || unit === 'h') {
+        mQuery('#interval_settings').addClass('hide');
+    } else {
+        mQuery('#interval_settings').removeClass('hide');
+    }
+};
+
+/**
+ * Update DOW for weekday selection
+ */
+Mautic.campaignEventSelectDOW = function() {
+    if (mQuery('#campaignevent_triggerRestrictedDaysOfWeek_7').prop('checked')) {
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_0').prop('checked', true);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_1').prop('checked', true);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_2').prop('checked', true);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_3').prop('checked', true);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_4').prop('checked', true);
+    }
+
+    mQuery('#campaignevent_triggerRestrictedDaysOfWeek_7').prop('checked', false);
 };
 
 /**
@@ -478,13 +563,13 @@ Mautic.campaignBuilderConnectionsMap = {
     'action': {
         'top': {
             'source': ['leadsource'],
-            'action': [],
+            'action': ['bottom'],
             'condition': ['yes', 'no'],
             'decision': ['yes', 'no']
         },
         'bottom': {
             'source': [],
-            'action': [],
+            'action': ['top'],
             'condition': ['top'],
             'decision': ['top']
         }
@@ -851,7 +936,7 @@ Mautic.campaignBeforeDropCallback = function(params) {
 
             // Replace the connection
             mQuery.each(params.dropEndpoint.connections, function(key, conn) {
-                Mautic.campaignBuilderInstance.detach(conn);
+                Mautic.campaignBuilderInstance.deleteConnection(conn);
             });
         }
     }
@@ -1801,21 +1886,23 @@ Mautic.campaignBuilderValidateConnection = function (epDetails, targetType, targ
  */
 Mautic.updateScheduledCampaignEvent = function(eventId, contactId) {
     // Convert scheduled date/time to an input
-    mQuery('#timeline-campaign-event-'+eventId+' .btn-edit').prop('disabled', true).addClass('disabled');
+    mQuery('#timeline-campaign-event-'+eventId+' .btn-reschedule').addClass('disabled');
 
     var converting = false;
     var eventWrapper = '#timeline-campaign-event-'+eventId;
     var eventSpan = '.timeline-campaign-event-date-'+eventId;
     var eventText = '#timeline-campaign-event-text-'+eventId;
+    var saveButton = '#timeline-campaign-event-save-' + eventId;
     var originalDate = mQuery(eventWrapper+' '+eventSpan).first().text();
     var revertInput = function(input) {
         converting = true;
         mQuery(input).datetimepicker('destroy');
         mQuery(eventSpan).text(originalDate);
-        mQuery(eventWrapper+' .btn').prop('disabled', false).removeClass('disabled');
+        mQuery(eventWrapper+' .btn-reschedule').removeClass('disabled');
     };
 
     var date = mQuery(eventSpan).attr('data-date');
+    mQuery(saveButton).show();
     var input = mQuery('<input type="text" id="timeline-reschedule"/>')
         .css('height', '20px')
         .css('color', '#000000')
@@ -1835,8 +1922,8 @@ Mautic.updateScheduledCampaignEvent = function(eventId, contactId) {
                         originalDate: date
                     }, function (response) {
                         mQuery(eventSpan).text(response.formattedDate);
-                        mQuery(eventSpan).attr('data-data', response.date);
-                        mQuery(eventWrapper+' .btn').prop('disabled', false).removeClass('disabled');
+                        mQuery(eventSpan).attr('data-date', response.date);
+                        mQuery(eventWrapper+' .btn-reschedule').removeClass('disabled');
 
                         if (response.success) {
                             mQuery(eventText).removeClass('text-warning').addClass('text-info');
@@ -1844,21 +1931,63 @@ Mautic.updateScheduledCampaignEvent = function(eventId, contactId) {
                             mQuery('.fa.timeline-campaign-event-cancelled-'+eventId).remove();
                             mQuery('.timeline-campaign-event-scheduled-'+eventId).removeClass('hide');
                             mQuery('.timeline-campaign-event-cancelled-'+eventId).addClass('hide');
+                            mQuery(saveButton).hide();
                         }
                     }, false
                 );
             } else if (code == 27) {
                 e.preventDefault();
                 revertInput(input);
+                mQuery(saveButton).hide();
             }
         })
         .on('blur', function (e) {
             if (!converting) {
                 revertInput(input);
             }
+            mQuery(saveButton).hide();
         });
     mQuery('#timeline-campaign-event-'+eventId+' '+eventSpan).html(input);
     Mautic.activateDateTimeInputs('#timeline-reschedule');
+    mQuery('#timeline-reschedule').focus();
+};
+
+/**
+ *
+ * @param eventId
+ * @param contactId
+ */
+Mautic.saveScheduledCampaignEvent = function (eventId, contactId) {
+    var saveButton = '#timeline-campaign-event-save-' + eventId;
+    mQuery(saveButton).addClass('disabled');
+
+    // Convert scheduled date/time to an input
+    var eventWrapper = '#timeline-campaign-event-' + eventId;
+    var eventSpan = '.timeline-campaign-event-date-' + eventId;
+    var eventText = '#timeline-campaign-event-text-' + eventId;
+
+    var date = mQuery(eventSpan).attr('data-date');
+    Mautic.ajaxActionRequest('campaign:updateScheduledCampaignEvent',
+        {
+            eventId: eventId,
+            contactId: contactId,
+            date: mQuery('#timeline-reschedule').val(),
+            originalDate: date
+        }, function (response) {
+            mQuery(eventSpan).text(response.formattedDate);
+            mQuery(eventSpan).attr('data-date', response.date);
+
+            if (response.success) {
+                mQuery(eventText).removeClass('text-warning').addClass('text-info');
+                mQuery(eventSpan).css('textDecoration', 'inherit');
+                mQuery('.fa.timeline-campaign-event-cancelled-' + eventId).remove();
+                mQuery('.timeline-campaign-event-scheduled-' + eventId).removeClass('hide');
+                mQuery('.timeline-campaign-event-cancelled-' + eventId).addClass('hide');
+            }
+
+            mQuery(saveButton).removeClass('disabled').hide();
+            mQuery(eventWrapper + ' .btn-reschedule').removeClass('disabled');
+        }, false);
 };
 
 /**
@@ -1936,5 +2065,64 @@ Mautic.highlightJumpTarget = function(event, el) {
     }
 };
 
+/**
+ * Display confirmation modal if user wishes to unpublish the campaign.
+ */
+Mautic.showCampaignConfirmation = function (el) {
+    let element = mQuery(el);
+    if (element.prop('checked') && element.val() !== "1") {
+        Mautic.showConfirmation(element);
+    }
+};
 
+/**
+ * Cancel Callback to trigger the yes button and dismiss the confirmation modal.
+ */
+Mautic.setPublishedButtonToYes = function (el) {
+    // Dismiss the confirmation
+    Mautic.dismissConfirmation();
 
+    // Find the yes button id and trigger click event
+    var yesButton  = mQuery(el).parent('.btn-no').siblings('.btn-yes').children('input');
+    var yesButtonId = mQuery(yesButton).attr('id');
+    if (yesButtonId !== undefined) {
+        mQuery('#' + yesButtonId).trigger('click');
+        mQuery(el).parent('.btn-no').removeClass('active');
+        mQuery(el).parent('.btn-no').siblings('.btn-yes').addClass('active');
+    }
+};
+
+/**
+ * Onclick Callback to show the confirmation modal during toggling campaign status.
+ */
+Mautic.confirmationCampaignPublishStatus = function (el) {
+    let element = mQuery(el);
+
+    // Add the confirmation modal, if current status is published
+    if (element.data('status') === 'published') {
+        Mautic.showConfirmation(element);
+    }
+    else {
+        // Otherwise just change the status.
+        Mautic.confirmCallbackCampaignPublishStatus('', el);
+    }
+}
+
+/**
+ * Confirm Callback to toggling campaign status if user chooses Yes.
+ */
+Mautic.confirmCallbackCampaignPublishStatus = function (action, el) {
+    let element = mQuery(el);
+
+    let idClass = element.data('id-class');
+    let model = element.data('model');
+    let itemId = element.data('item-id');
+    let query = element.data('query');
+    let backdrop = element.data('backdrop');
+
+    // Toggles published status of an campaign
+    Mautic.togglePublishStatus(event, idClass, model, itemId, query, backdrop);
+
+    // Dismiss the confirmation
+    Mautic.dismissConfirmation();
+}

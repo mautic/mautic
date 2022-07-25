@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\EntityLookupType;
@@ -34,7 +25,7 @@ class SmsListType extends AbstractType
                 'model_lookup_method' => 'getLookupResults',
                 'lookup_arguments'    => function (Options $options) {
                     return [
-                        'type'    => 'sms',
+                        'type'    => SmsType::class,
                         'filter'  => '$data',
                         'limit'   => 0,
                         'start'   => 0,
@@ -60,7 +51,7 @@ class SmsListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'sms_list';
     }

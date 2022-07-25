@@ -1,18 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Form\Type;
 
 use Mautic\ChannelBundle\Model\MessageModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
@@ -28,9 +20,6 @@ class MessageSendType extends AbstractType
 
     /**
      * MessageSendType constructor.
-     *
-     * @param RouterInterface $router
-     * @param MessageModel    $messageModel
      */
     public function __construct(RouterInterface $router, MessageModel $messageModel)
     {
@@ -38,15 +27,11 @@ class MessageSendType extends AbstractType
         $this->messageModel = $messageModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'marketingMessage',
-            'message_list',
+            MessageListType::class,
             [
                 'label'       => 'mautic.channel.send.selectmessages',
                 'label_attr'  => ['class' => 'control-label'],
@@ -72,7 +57,7 @@ class MessageSendType extends AbstractType
 
             $builder->add(
                 'newMarketingMessageButton',
-                'button',
+                ButtonType::class,
                 [
                     'attr' => [
                         'class'   => 'btn btn-primary btn-nospin',
@@ -96,7 +81,7 @@ class MessageSendType extends AbstractType
 
             $builder->add(
                 'editMessageButton',
-                'button',
+                ButtonType::class,
                 [
                     'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
@@ -110,9 +95,6 @@ class MessageSendType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(['update_select']);
@@ -121,7 +103,7 @@ class MessageSendType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'message_send';
     }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 
 class RepliedEmail
@@ -19,7 +10,7 @@ class RepliedEmail
     private $fromAddress;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $statHash;
 
@@ -44,7 +35,7 @@ class RepliedEmail
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getStatHash()
     {

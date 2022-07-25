@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -53,9 +44,6 @@ class Category extends FormEntity
      */
     private $bundle;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -78,9 +66,6 @@ class Category extends FormEntity
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
@@ -149,6 +134,7 @@ class Category extends FormEntity
      */
     public function setTitle($title)
     {
+        $this->isChanged('title', $title);
         $this->title = $title;
 
         return $this;
@@ -173,6 +159,7 @@ class Category extends FormEntity
      */
     public function setAlias($alias)
     {
+        $this->isChanged('alias', $alias);
         $this->alias = $alias;
 
         return $this;
@@ -197,6 +184,7 @@ class Category extends FormEntity
      */
     public function setDescription($description)
     {
+        $this->isChanged('description', $description);
         $this->description = $description;
 
         return $this;
@@ -221,6 +209,7 @@ class Category extends FormEntity
      */
     public function setColor($color)
     {
+        $this->isChanged('color', $color);
         $this->color = $color;
     }
 
@@ -243,6 +232,7 @@ class Category extends FormEntity
      */
     public function setBundle($bundle)
     {
+        $this->isChanged('bundle', $bundle);
         $this->bundle = $bundle;
     }
 

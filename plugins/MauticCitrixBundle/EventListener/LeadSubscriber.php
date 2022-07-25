@@ -1,21 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
-use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEvent;
@@ -23,25 +11,25 @@ use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CitrixModel
      */
-    protected $model;
+    private $model;
 
     /**
-     * LeadSubscriber constructor.
-     *
-     * @param CitrixModel $model
+     * @var TranslatorInterface
      */
-    public function __construct(CitrixModel $model)
+    private $translator;
+
+    public function __construct(CitrixModel $model, TranslatorInterface $translator)
     {
-        $this->model = $model;
+        $this->model      = $model;
+        $this->translator = $translator;
     }
 
     /**
@@ -50,24 +38,13 @@ class LeadSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            LeadEvents::TIMELINE_ON_GENERATE               => ['onTimelineGenerate', 0],
-            LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE   => ['onListChoicesGenerate', 0],
-            LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE => ['onListOperatorsGenerate', 0],
-            LeadEvents::LIST_FILTERS_ON_FILTERING          => ['onListFiltering', 0],
+            LeadEvents::TIMELINE_ON_GENERATE             => ['onTimelineGenerate', 0],
+            LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => ['onListChoicesGenerate', 0],
+            LeadEvents::LIST_FILTERS_ON_FILTERING        => ['onListFiltering', 0],
         ];
     }
 
     /**
-     * @param LeadListFiltersOperatorsEvent $event
-     */
-    public function onListOperatorsGenerate(LeadListFiltersOperatorsEvent $event)
-    {
-        // TODO: add custom operators
-    }
-
-    /**
-     * @param LeadTimelineEvent $event
-     *
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
@@ -141,14 +118,16 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param LeadListFiltersChoicesEvent $event
-     *
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \InvalidArgumentException
      */
     public function onListChoicesGenerate(LeadListFiltersChoicesEvent $event)
     {
+        if (false === strpos($event->getRoute(), 'mautic_segment_action')) {
+            return;
+        }
+
         $activeProducts = [];
         foreach (CitrixProducts::toArray() as $p) {
             if (CitrixHelper::isAuthorized('Goto'.$p)) {
@@ -172,7 +151,7 @@ class LeadSubscriber extends CommonSubscriber
             $eventNamesWithAny = array_merge(
                 [
                     '-'   => '-',
-                    'any' => $event->getTranslator()->trans('plugin.citrix.event.'.$product.'.any'),
+                    'any' => $this->translator->trans('plugin.citrix.event.'.$product.'.any'),
                 ],
                 $eventNames
             );
@@ -182,14 +161,14 @@ class LeadSubscriber extends CommonSubscriber
                     'lead',
                     $product.'-registration',
                     [
-                        'label'      => $event->getTranslator()->trans('plugin.citrix.event.'.$product.'.registration'),
+                        'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.registration'),
                         'properties' => [
                             'type' => 'select',
                             'list' => $eventNamesWithAny,
                         ],
                         'operators' => [
-                            'in'  => $event->getTranslator()->trans('mautic.core.operator.in'),
-                            '!in' => $event->getTranslator()->trans('mautic.core.operator.notin'),
+                            $this->translator->trans('mautic.core.operator.in')    => 'in',
+                            $this->translator->trans('mautic.core.operator.notin') => '!in',
                         ],
                     ]
                 );
@@ -199,14 +178,14 @@ class LeadSubscriber extends CommonSubscriber
                 'lead',
                 $product.'-attendance',
                 [
-                    'label'      => $event->getTranslator()->trans('plugin.citrix.event.'.$product.'.attendance'),
+                    'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.attendance'),
                     'properties' => [
                         'type' => 'select',
                         'list' => $eventNamesWithAny,
                     ],
                     'operators' => [
-                        'in'  => $event->getTranslator()->trans('mautic.core.operator.in'),
-                        '!in' => $event->getTranslator()->trans('mautic.core.operator.notin'),
+                        $this->translator->trans('mautic.core.operator.in')    => 'in',
+                        $this->translator->trans('mautic.core.operator.notin') => '!in',
                     ],
                 ]
             );
@@ -215,22 +194,19 @@ class LeadSubscriber extends CommonSubscriber
                 'lead',
                 $product.'-no-attendance',
                 [
-                    'label'      => $event->getTranslator()->trans('plugin.citrix.event.'.$product.'.no.attendance'),
+                    'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.no.attendance'),
                     'properties' => [
                         'type' => 'select',
                         'list' => $eventNamesWithoutAny,
                     ],
                     'operators' => [
-                        'in' => $event->getTranslator()->trans('mautic.core.operator.in'),
+                        $this->translator->trans('mautic.core.operator.in') => 'in',
                     ],
                 ]
             );
         } // foreach $product
     }
 
-    /**
-     * @param LeadListFilteringEvent $event
-     */
     public function onListFiltering(LeadListFilteringEvent $event)
     {
         $activeProducts = [];
@@ -242,6 +218,8 @@ class LeadSubscriber extends CommonSubscriber
         if (0 === count($activeProducts)) {
             return;
         }
+
+        $leadsTableAlias = $event->getLeadsTableAlias();
 
         $details           = $event->getDetails();
         $leadId            = $event->getLeadId();
@@ -257,6 +235,9 @@ class LeadSubscriber extends CommonSubscriber
 
             if (in_array($currentFilter, $eventFilters, true)) {
                 $eventNames = $details['filter'];
+                if (!is_iterable($eventNames)) {
+                    $eventNames = [$eventNames];
+                }
                 $isAnyEvent = in_array('any', $eventNames, true);
                 $eventNames = array_map(function ($v) use ($q) {
                     return $q->expr()->literal($v);
@@ -275,7 +256,7 @@ class LeadSubscriber extends CommonSubscriber
                                 $q->expr()->eq($alias.$k.'.product', $q->expr()->literal($product)),
                                 $q->expr()->eq($alias.$k.'.event_type', $q->expr()->literal($eventType)),
                                 $q->expr()->in($alias.$k.'.event_name', $eventNames),
-                                $q->expr()->eq($alias.$k.'.lead_id', 'l.id')
+                                $q->expr()->eq($alias.$k.'.lead_id', $leadsTableAlias.'.id')
                             )
                         );
                     } else {
@@ -283,7 +264,7 @@ class LeadSubscriber extends CommonSubscriber
                             $q->expr()->andX(
                                 $q->expr()->eq($alias.$k.'.product', $q->expr()->literal($product)),
                                 $q->expr()->eq($alias.$k.'.event_type', $q->expr()->literal($eventType)),
-                                $q->expr()->eq($alias.$k.'.lead_id', 'l.id')
+                                $q->expr()->eq($alias.$k.'.lead_id', $leadsTableAlias.'.id')
                             )
                         );
                     }

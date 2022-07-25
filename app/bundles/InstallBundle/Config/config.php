@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'public' => [
@@ -39,9 +30,50 @@ return [
     ],
 
     'services' => [
+        'fixtures' => [
+            'mautic.install.fixture.lead_field' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
+            'mautic.install.fixture.role' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\RoleData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
+            'mautic.install.fixture.report_data' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LoadReportData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
+            'mautic.install.fixture.grape_js' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\GrapesJsData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
+        ],
+        'forms' => [
+            \Mautic\InstallBundle\Configurator\Form\CheckStepType::class => [
+                'class' => \Mautic\InstallBundle\Configurator\Form\CheckStepType::class,
+            ],
+            \Mautic\InstallBundle\Configurator\Form\DoctrineStepType::class => [
+                'class' => \Mautic\InstallBundle\Configurator\Form\DoctrineStepType::class,
+            ],
+            \Mautic\InstallBundle\Configurator\Form\EmailStepType::class => [
+                'class'     => \Mautic\InstallBundle\Configurator\Form\EmailStepType::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.email.transport_type',
+                ],
+            ],
+            \Mautic\InstallBundle\Configurator\Form\UserStepType::class => [
+                'class'     => \Mautic\InstallBundle\Configurator\Form\UserStepType::class,
+                'arguments' => ['session'],
+            ],
+        ],
         'other' => [
             'mautic.install.configurator.step.check' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\CheckStep',
+                'class'     => \Mautic\InstallBundle\Configurator\Step\CheckStep::class,
                 'arguments' => [
                     'mautic.configurator',
                     '%kernel.root_dir%',
@@ -54,7 +86,7 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.doctrine' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\DoctrineStep',
+                'class'     => \Mautic\InstallBundle\Configurator\Step\DoctrineStep::class,
                 'arguments' => [
                     'mautic.configurator',
                 ],
@@ -64,7 +96,7 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.email' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\EmailStep',
+                'class'     => \Mautic\InstallBundle\Configurator\Step\EmailStep::class,
                 'arguments' => [
                     'session',
                 ],
@@ -74,14 +106,29 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.user' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\UserStep',
-                'arguments' => [
-                    'session',
-                ],
+                'class'        => \Mautic\InstallBundle\Configurator\Step\UserStep::class,
                 'tag'          => 'mautic.configurator.step',
                 'tagArguments' => [
                     'priority' => 2,
                 ],
+            ],
+            'mautic.install.service' => [
+                'class'     => 'Mautic\InstallBundle\Install\InstallService',
+                'arguments' => [
+                    'mautic.configurator',
+                    'mautic.helper.cache',
+                    'mautic.helper.paths',
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                    'kernel',
+                    'validator',
+                    'security.password_encoder',
+                ],
+            ],
+            'mautic.install.leadcolumns' => [
+                'class'     => \Mautic\InstallBundle\EventListener\DoctrineEventSubscriber::class,
+                'tag'       => 'doctrine.event_subscriber',
+                'arguments' => [],
             ],
         ],
     ],

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -16,9 +7,6 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -58,12 +46,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $campaignModel;
 
-    /**
-     * DashboardSubscriber constructor.
-     *
-     * @param CampaignModel $campaignModel
-     * @param EventModel    $campaignEventModel
-     */
     public function __construct(CampaignModel $campaignModel, EventModel $campaignEventModel)
     {
         $this->campaignModel      = $campaignModel;
@@ -72,15 +54,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('campaign:campaigns:viewother');
 
-        if ($event->getType() == 'events.in.time') {
+        if ('events.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -103,7 +83,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'leads.added.in.time') {
+        if ('leads.added.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 

@@ -25,7 +25,7 @@ ob_start();
         margin-top: 20px;
     }
 
-    a.mf-link, .mauticform-button {
+    a.mf-link, .mauticform-button, .mauticform-pagebreak {
         padding: 5px 15px;
         -webkit-border-radius: 4px;
         -moz-border-radius: 4px;
@@ -36,10 +36,14 @@ ob_start();
         border: none;
     }
 
-    a.mf-link:hover, .mauticform-button:hover {
+    a.mf-link:hover, .mauticform-button:hover, .mauticform-pagebreak:hover {
         opacity: 0.9;
         text-decoration: none;
         border: none;
+    }
+
+    .mauticform-pagebreak {
+        width: auto !important;
     }
 }
 
@@ -105,7 +109,7 @@ require_once __DIR__.'/../../Include/lessc.inc.php';
 $compiler = new \lessc();
 $css      = $compiler->compile($less);
 
-if (empty($preview) && $app->getEnvironment() != 'dev') {
+if (empty($preview) && 'dev' != $app->getEnvironment()) {
     $css = \Minify_CSS::minify($css);
 }
 

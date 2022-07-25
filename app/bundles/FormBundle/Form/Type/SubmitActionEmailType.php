@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
@@ -44,9 +35,6 @@ class SubmitActionEmailType extends AbstractType
 
     /**
      * SubmitActionEmailType constructor.
-     *
-     * @param TranslatorInterface  $translator
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
@@ -99,7 +87,7 @@ class SubmitActionEmailType extends AbstractType
             ]
         );
 
-        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
+        if ('file' == $this->coreParametersHelper->get('mailer_spool_type')) {
             $default = isset($options['data']['immediately']) ? $options['data']['immediately'] : false;
             $builder->add(
                 'immediately',
@@ -135,7 +123,7 @@ class SubmitActionEmailType extends AbstractType
         $default = isset($options['data']['set_replyto']) ? $options['data']['set_replyto'] : true;
         $builder->add(
             'set_replyto',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.action.sendemail.setreplyto',
                 'data'  => $default,
@@ -176,16 +164,11 @@ class SubmitActionEmailType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'form_submitaction_sendemail';
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['formFields'] = $this->getFormFields($options['attr']['data-formid']);

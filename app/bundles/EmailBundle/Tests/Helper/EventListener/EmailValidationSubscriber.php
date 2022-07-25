@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Helper\EventListener;
 
 use Mautic\EmailBundle\EmailEvents;
@@ -30,9 +21,6 @@ class EmailValidationSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param EmailValidationEvent $event
-     */
     public function onEmailValidation(EmailValidationEvent $event)
     {
         if ('bad@gmail.com' === $event->getAddress()) {

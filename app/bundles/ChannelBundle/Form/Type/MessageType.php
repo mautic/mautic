@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\Channel;
@@ -32,18 +23,12 @@ class MessageType extends AbstractFormStandardType
 
     /**
      * MessageType constructor.
-     *
-     * @param MessageModel $messageModel
      */
     public function __construct(MessageModel $messageModel)
     {
         $this->model = $messageModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Add standard fields
@@ -93,7 +78,8 @@ class MessageType extends AbstractFormStandardType
     {
         $resolver->setDefaults(
             [
-                'data_class' => Message::class,
+                'data_class'      => Message::class,
+                'category_bundle' => 'messages',
             ]
         );
     }

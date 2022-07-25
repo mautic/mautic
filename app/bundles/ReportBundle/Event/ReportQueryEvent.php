@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Event;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -37,10 +28,7 @@ class ReportQueryEvent extends AbstractReportEvent
     /**
      * ReportDataEvent constructor.
      *
-     * @param Report       $report
-     * @param QueryBuilder $query
-     * @param              $totalResults
-     * @param array        $options
+     * @param $totalResults
      */
     public function __construct(Report $report, QueryBuilder $query, $totalResults, array $options)
     {

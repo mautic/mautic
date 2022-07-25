@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Model;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -40,16 +31,10 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      */
     protected $campaignModel;
 
-    /**
-     * @var
-     */
     protected static $channels;
 
     /**
      * MessageModel constructor.
-     *
-     * @param ChannelListHelper $channelListHelper
-     * @param CampaignModel     $campaignModel
      */
     public function __construct(ChannelListHelper $channelListHelper, CampaignModel $campaignModel)
     {
@@ -100,7 +85,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Message();
         }
 

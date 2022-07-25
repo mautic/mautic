@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\ReplyNotFound;
@@ -23,8 +14,6 @@ class Parser
 
     /**
      * Parser constructor.
-     *
-     * @param Message $message
      */
     public function __construct(Message $message)
     {
@@ -40,7 +29,7 @@ class Parser
      */
     public function parse()
     {
-        if (!preg_match('/email\/(.*?)\.gif/', $this->message->textHtml, $parts)) {
+        if (!preg_match('/email\/([a-zA-Z0-9]+)\.gif/', $this->message->textHtml, $parts)) {
             throw new ReplyNotFound();
         }
 

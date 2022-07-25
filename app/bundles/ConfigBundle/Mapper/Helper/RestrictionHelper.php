@@ -1,22 +1,11 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Mapper\Helper;
 
 class RestrictionHelper
 {
     /**
      * Ensure that the array has string indexes for congruency with a nested array similar to ['db_host', 'monitored_email' => ['EmailBundle_bounces'];.
-     *
-     * @param array $restrictedParameters
      *
      * @return array
      */
@@ -33,9 +22,6 @@ class RestrictionHelper
 
     /**
      * Remove fields that are restricted.
-     *
-     * @param array $configParameters
-     * @param array $restrictedParameters
      *
      * @return array
      */

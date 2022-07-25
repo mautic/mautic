@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Helper;
 
 use Mautic\EmailBundle\EmailEvents;
@@ -34,9 +25,6 @@ class EmailValidator
 
     /**
      * EmailValidator constructor.
-     *
-     * @param TranslatorInterface      $translator
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
@@ -56,29 +44,15 @@ class EmailValidator
     public function validate($address, $doDnsCheck = false)
     {
         if (!$this->isValidFormat($address)) {
-            throw new InvalidEmailException(
-                $address,
-                $this->translator->trans(
-                    'mautic.email.address.invalid_format',
-                    [
-                        '%email%' => $address ?: '?',
-                    ]
-                )
-            );
+            throw new InvalidEmailException($address, $this->translator->trans('mautic.email.address.invalid_format', ['%email%' => $address ?: '?']));
         }
 
         if ($this->hasValidCharacters($address)) {
-            throw new InvalidEmailException(
-                $address,
-                $this->translator->trans('mautic.email.address.invalid_characters', ['%email%' => $address])
-            );
+            throw new InvalidEmailException($address, $this->translator->trans('mautic.email.address.invalid_characters', ['%email%' => $address]));
         }
 
         if ($doDnsCheck && !$this->hasValidDomain($address)) {
-            throw new InvalidEmailException(
-                $address,
-                $this->translator->trans('mautic.email.address.invalid_domain', ['%email%' => $address])
-            );
+            throw new InvalidEmailException($address, $this->translator->trans('mautic.email.address.invalid_domain', ['%email%' => $address]));
         }
 
         $this->doPluginValidation($address);
@@ -105,7 +79,7 @@ class EmailValidator
      */
     public function hasValidCharacters($address)
     {
-        $invalidChar = strpbrk($address, '\'^&*%');
+        $invalidChar = strpbrk($address, '^&*%');
 
         return $invalidChar ? substr($invalidChar, 0, 1) : $invalidChar;
     }
@@ -139,10 +113,7 @@ class EmailValidator
         );
 
         if (!$event->isValid()) {
-            throw new InvalidEmailException(
-                $address,
-                $event->getInvalidReason()
-            );
+            throw new InvalidEmailException($address, $event->getInvalidReason());
         }
     }
 }

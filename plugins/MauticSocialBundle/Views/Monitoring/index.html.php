@@ -20,7 +20,7 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
             'templateButtons' => [
-                'new' => $view['security']->isGranted('plugin:mauticSocial:monitoring:create'),
+                'new' => $view['security']->isGranted('mauticSocial:monitoring:create'),
             ],
             'routeBase' => 'social',
             'langVar'   => 'monitoring',

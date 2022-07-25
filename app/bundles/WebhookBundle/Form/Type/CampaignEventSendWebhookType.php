@@ -1,23 +1,15 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Url;
 
 /**
  * Class CampaignEventRemoteUrlType.
@@ -31,18 +23,12 @@ class CampaignEventSendWebhookType extends AbstractType
 
     /**
      * ConfigType constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -54,11 +40,6 @@ class CampaignEventSendWebhookType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'required'    => true,
                 'constraints' => [
-                    new Url(
-                        [
-                            'message' => 'mautic.form.submission.url.invalid',
-                        ]
-                    ),
                     new NotBlank(
                         [
                             'message' => 'mautic.core.value.required',
@@ -70,14 +51,14 @@ class CampaignEventSendWebhookType extends AbstractType
 
         $builder->add(
             'method',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
-                    'get'    => 'GET',
-                    'post'   => 'POST',
-                    'put'    => 'PUT',
-                    'patch'  => 'PATCH',
-                    'delete' => 'DELETE',
+                    'GET'    => 'get',
+                    'POST'   => 'post',
+                    'PUT'    => 'put',
+                    'PATCH'  => 'patch',
+                    'DELETE' => 'delete',
                 ],
                 'multiple'   => false,
                 'label_attr' => ['class' => 'control-label'],
@@ -85,9 +66,9 @@ class CampaignEventSendWebhookType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'empty_value' => false,
-                'required'    => false,
-            ]
+                'placeholder'       => false,
+                'required'          => false,
+                ]
         );
 
         $builder->add(
@@ -114,7 +95,7 @@ class CampaignEventSendWebhookType extends AbstractType
 
         $builder->add(
             'timeout',
-            'number',
+            NumberType::class,
             [
                 'label'      => 'mautic.webhook.event.sendwebhook.timeout',
                 'label_attr' => ['class' => 'control-label'],
@@ -130,7 +111,7 @@ class CampaignEventSendWebhookType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_sendwebhook';
     }

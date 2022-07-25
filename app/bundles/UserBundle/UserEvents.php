@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle;
 
 /**
@@ -137,13 +128,4 @@ final class UserEvents
      * @var string
      */
     const USER_AUTHENTICATION_CONTENT = 'mautic.user_authentication_content';
-
-    /**
-     * The mautic.user_status_change event is dispatched when a user's online status is changed.
-     *
-     * The event listener receives a Mautic\UserBundle\Event\StatusChangeEvent instance.
-     *
-     * @var string
-     */
-    const STATUS_CHANGE = 'mautic.user_status_change';
 }

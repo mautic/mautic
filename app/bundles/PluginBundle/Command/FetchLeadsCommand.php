@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Command;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -97,10 +88,11 @@ class FetchLeadsCommand extends ContainerAwareCommand
         $integrationHelper = $container->get('mautic.helper.integration');
 
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
-        if (!$integrationObject instanceof AbstractIntegration) {
-            $availableIntegrations = array_filter($integrationHelper->getIntegrationObjects(), function (AbstractIntegration $availableIntegration) {
-                return $availableIntegration->isConfigured();
-            });
+        if (!$integrationObject instanceof UnifiedIntegrationInterface) {
+            $availableIntegrations = array_filter($integrationHelper->getIntegrationObjects(),
+                function (UnifiedIntegrationInterface $availableIntegration) {
+                    return $availableIntegration->isConfigured();
+                });
             throw new \RuntimeException(sprintf('The Integration "%s" is not one of the available integrations (%s)', $integration, implode(', ', array_keys($availableIntegrations))));
         }
 
@@ -151,7 +143,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
         define('MAUTIC_DATE_MODIFIED_OVERRIDE', time());
 
         if (isset($supportedFeatures) && in_array('get_leads', $supportedFeatures)) {
-            if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
+            if (null !== $integrationObject && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                 $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
@@ -213,7 +205,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 }
             }
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && isset($config['objects'])
+            if (null !== $integrationObject && method_exists($integrationObject, 'getCompanies') && isset($config['objects'])
                 && in_array(
                     'company',
                     $config['objects']
@@ -275,7 +267,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 .'</comment>'."\n"
             );
 
-            if (method_exists($integrationObject, 'pushCompanies')) {
+            if (in_array('push_companies', $supportedFeatures) && method_exists($integrationObject, 'pushCompanies')) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.companies', ['%integration%' => $integration]).'</info>');
                 $result  = $integrationObject->pushCompanies($params);
                 $ignored = 0;

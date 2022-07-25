@@ -19,5 +19,5 @@
         <?php echo $view['translator']->trans('mautic.plugin.clearbit.public_info'); ?>
     </div>
     <input type="text" readonly="" onclick="this.setSelectionRange(0, this.value.length);"
-           value="<?php echo $mauticUrl ?>" class="form-control">
+           value="<?php echo $mauticUrl; ?>" class="form-control">
 </div>

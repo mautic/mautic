@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle;
 
 /**
@@ -120,7 +111,7 @@ final class PointEvents
     /**
      * The mautic.trigger_on_event_execute event is thrown to execute a trigger event.
      *
-     * The event listener receives a Mautic\PointBundle\Event\TriggerEvent instance.
+     * The event listener receives a Mautic\PointBundle\Event\TriggerExecutedEvent instance.
      *
      * @var string
      */

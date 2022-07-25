@@ -1,20 +1,12 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
+use Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -33,8 +25,6 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
 
     /**
      * CampaignActionChangeMembershipSubscriber constructor.
-     *
-     * @param MembershipManager $membershipManager
      */
     public function __construct(MembershipManager $membershipManager, CampaignModel $campaignModel)
     {
@@ -55,8 +45,6 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
 
     /**
      * Add change membership action.
-     *
-     * @param CampaignBuilderEvent $event
      */
     public function addAction(CampaignBuilderEvent $event)
     {
@@ -65,7 +53,7 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
             [
                 'label'           => 'mautic.campaign.event.addremovelead',
                 'description'     => 'mautic.campaign.event.addremovelead_descr',
-                'formType'        => 'campaignevent_addremovelead',
+                'formType'        => CampaignEventAddRemoveLeadType::class,
                 'formTypeOptions' => [
                     'include_this' => true,
                 ],
@@ -74,9 +62,6 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
         );
     }
 
-    /**
-     * @param PendingEvent $event
-     */
     public function changeMembership(PendingEvent $event)
     {
         $properties          = $event->getEvent()->getProperties();
@@ -102,7 +87,7 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
             /** @var Campaign $campaign */
             foreach ($campaigns as $campaign) {
                 $this->membershipManager->removeContacts(
-                    $contacts,
+                    $event->getContactsKeyedById(),
                     $campaign,
                     true
                 );
@@ -113,9 +98,6 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
     }
 
     /**
-     * @param array    $campaigns
-     * @param Campaign $executingCampaign
-     *
      * @return array
      */
     private function getCampaigns(array $campaigns, Campaign $executingCampaign)

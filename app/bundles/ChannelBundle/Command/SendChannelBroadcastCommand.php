@@ -1,21 +1,10 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Command;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Command\ModeratedCommand;
-use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Event\ChannelBroadcastEvent as BcChannelBroadcastEvent;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -73,9 +62,6 @@ EOT
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -93,7 +79,7 @@ EOT
         }
 
         $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->get('mautic.helper.core_parameters')->getParameter('locale'));
+        $translator->setLocale($this->getContainer()->get('mautic.helper.core_parameters')->get('locale'));
 
         $dispatcher = $this->getContainer()->get('event_dispatcher');
 
@@ -106,16 +92,6 @@ EOT
         $dispatcher->dispatch(ChannelEvents::CHANNEL_BROADCAST, $event);
 
         $results = $event->getResults();
-
-        // @deprecated 2.4 to be removed in 3.0; BC support
-        if ($dispatcher->hasListeners(CoreEvents::CHANNEL_BROADCAST)) {
-            /** @var BcChannelBroadcastEvent $bcEvent */
-            $bcEvent = $dispatcher->dispatch(
-                CoreEvents::CHANNEL_BROADCAST,
-                new BcChannelBroadcastEvent($channel, $channelId, $output)
-            );
-            $results = array_merge($results, $bcEvent->getResults());
-        }
 
         $rows = [];
         foreach ($results as $channel => $counts) {

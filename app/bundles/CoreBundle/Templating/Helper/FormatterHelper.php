@@ -1,49 +1,25 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
-use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class FormatHelper.
- */
 class FormatterHelper extends Helper
 {
-    /**
-     * @var AppVersion
-     */
-    private $appVersion;
-
     /**
      * @var DateHelper
      */
     private $dateHelper;
-
     /**
      * @var TranslatorInterface
      */
     private $translator;
 
-    /**
-     * @param AppVersion          $appVersion
-     * @param DateHelper          $dateHelper
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(AppVersion $appVersion, DateHelper $dateHelper, TranslatorInterface $translator)
+    public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
     {
-        $this->appVersion = $appVersion;
         $this->dateHelper = $dateHelper;
         $this->translator = $translator;
     }
@@ -60,7 +36,7 @@ class FormatterHelper extends Helper
      */
     public function _($val, $type = 'html', $textOnly = false, $round = 1)
     {
-        if (empty($val) && $type !== 'bool') {
+        if (empty($val) && 'bool' !== $type) {
             return $val;
         }
 
@@ -68,28 +44,28 @@ class FormatterHelper extends Helper
             case 'array':
                 if (!is_array($val)) {
                     //assume that it's serialized
-                    $unserialized = unserialize($val);
+                    $unserialized = Serializer::decode($val);
                     if ($unserialized) {
                         $val = $unserialized;
                     }
                 }
 
                 $stringParts = [];
-                foreach ($val as $k => $v) {
+                foreach ($val as $v) {
                     if (is_array($v)) {
                         $stringParts = $this->_($v, 'array', $textOnly, $round + 1);
                     } else {
                         $stringParts[] = $v;
                     }
                 }
-                if ($round === 1) {
+                if (1 === $round) {
                     $string = implode('; ', $stringParts);
                 } else {
                     $string = implode(', ', $stringParts);
                 }
                 break;
             case 'datetime':
-                $string = $this->dateHelper->toFull($val, 'utc');
+                $string = $this->dateHelper->toFullConcat($val, 'utc');
                 break;
             case 'time':
                 $string = $this->dateHelper->toTime($val, 'utc');
@@ -152,7 +128,6 @@ class FormatterHelper extends Helper
     }
 
     /**
-     * @param array  $array
      * @param string $delimeter
      *
      * @return string
@@ -191,22 +166,28 @@ class FormatterHelper extends Helper
     }
 
     /**
+     * Takes a string and returns a normalized representation of it.
+     *
+     * @param $string string
+     *
+     * @return string
+     */
+    public function normalizeStringValue($string)
+    {
+        $stringIsDate = \DateTime::createFromFormat('Y-m-d H:i:s', $string, new \DateTimeZone('UTC'));
+
+        if ($stringIsDate && ($string === $stringIsDate->format('Y-m-d H:i:s'))) {
+            return $this->_($stringIsDate, 'datetime');
+        }
+
+        return $string;
+    }
+
+    /**
      * @return string
      */
     public function getName()
     {
         return 'formatter';
-    }
-
-    /**
-     * @return string
-     *
-     * @deprecated - Use VersionHelper or AppVersion class
-     *
-     * @todo Remove this method and $this->appVersion in Mautic 3.0
-     */
-    public function getVersion()
-    {
-        return $this->appVersion->getVersion();
     }
 }

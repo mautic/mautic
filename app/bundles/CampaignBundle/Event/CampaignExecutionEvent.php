@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -46,7 +37,7 @@ class CampaignExecutionEvent extends Event
     protected $systemTriggered;
 
     /**
-     * @var bool|array
+     * @var bool|mixed[]|string|null
      */
     protected $result;
 
@@ -66,21 +57,17 @@ class CampaignExecutionEvent extends Event
     protected $logUpdatedByListener = false;
 
     /**
-     * @var
+     * @var string
      */
     protected $channel;
 
     /**
-     * @var
+     * @var int
      */
     protected $channelId;
 
     /**
-     * CampaignExecutionEvent constructor.
-     *
-     * @param array             $args
-     * @param bool              $result
-     * @param LeadEventLog|null $log
+     * @param bool|mixed[]|string|null $result
      */
     public function __construct(array $args, $result, LeadEventLog $log = null)
     {
@@ -155,7 +142,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return bool
+     * @return bool|mixed[]|string|null
      */
     public function getResult()
     {
@@ -163,7 +150,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @param $result
+     * @param bool|mixed[]|string|null $result
      *
      * @return $this
      */
@@ -177,7 +164,7 @@ class CampaignExecutionEvent extends Event
     /**
      * Set the result to failed.
      *
-     * @param null $reason
+     * @param string|null $reason
      *
      * @return $this
      */
@@ -201,8 +188,6 @@ class CampaignExecutionEvent extends Event
 
     /**
      * Set a custom log entry to override auto-handling of the log entry.
-     *
-     * @param LeadEventLog $log
      *
      * @return $this
      */
@@ -233,8 +218,8 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @param      $channel
-     * @param null $channelId
+     * @param string          $channel
+     * @param string|int|null $channelId
      *
      * @return $this
      */

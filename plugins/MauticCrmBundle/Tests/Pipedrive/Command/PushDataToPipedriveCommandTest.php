@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Command;
 
-use Mautic\LeadBundle\Entity\Company;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -108,7 +107,7 @@ class PushDataToPipedriveCommandTest extends PipedriveTest
 
     private function executeCommand()
     {
-        $kernel      = $this->container->get('kernel');
+        $kernel      = self::$container->get('kernel');
         $application = new Application($kernel);
         $application->setAutoExit(false);
 

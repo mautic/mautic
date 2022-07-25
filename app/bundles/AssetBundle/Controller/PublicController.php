@@ -1,25 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Controller;
 
-use Mautic\AssetBundle\AssetEvents;
-use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class PublicController.
- */
 class PublicController extends CommonFormController
 {
     /**
@@ -65,14 +51,6 @@ class PublicController extends CommonFormController
                 return $this->redirect($url, 301);
             }
 
-            //all the checks pass so provide the asset for download
-            // @deprecated 2.0 - to be removed in 3.0
-            $dispatcher = $this->get('event_dispatcher');
-            if ($dispatcher->hasListeners(AssetEvents::ASSET_ON_DOWNLOAD)) {
-                $event = new AssetEvent($entity);
-                $dispatcher->dispatch(AssetEvents::ASSET_ON_DOWNLOAD, $event);
-            }
-
             if ($entity->isRemote()) {
                 $model->trackDownload($entity, $this->request, 200);
 
@@ -81,7 +59,7 @@ class PublicController extends CommonFormController
             } else {
                 try {
                     //set the uploadDir
-                    $entity->setUploadDir($this->get('mautic.helper.core_parameters')->getParameter('upload_dir'));
+                    $entity->setUploadDir($this->get('mautic.helper.core_parameters')->get('upload_dir'));
                     $contents = $entity->getFileContents();
                     $model->trackDownload($entity, $this->request, 200);
                 } catch (\Exception $e) {

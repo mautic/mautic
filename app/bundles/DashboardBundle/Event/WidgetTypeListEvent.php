@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -34,7 +25,7 @@ class WidgetTypeListEvent extends CommonEvent
     /**
      * @var CorePermissions
      */
-    protected $security = null;
+    protected $security;
 
     /**
      * Adds a new widget type to the widget types list.
@@ -61,8 +52,6 @@ class WidgetTypeListEvent extends CommonEvent
 
     /**
      * Set translator if you want the strings to be translated.
-     *
-     * @param TranslatorInterface $translator
      */
     public function setTranslator(TranslatorInterface $translator)
     {
@@ -71,8 +60,6 @@ class WidgetTypeListEvent extends CommonEvent
 
     /**
      * Set security object to check the perimissions.
-     *
-     * @param CorePermissions $security
      */
     public function setSecurity(CorePermissions $security)
     {
@@ -81,8 +68,6 @@ class WidgetTypeListEvent extends CommonEvent
 
     /**
      * Check if the user has permission to see the widgets.
-     *
-     * @param array $permissions
      *
      * @return bool
      */

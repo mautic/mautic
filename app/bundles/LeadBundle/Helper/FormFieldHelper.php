@@ -1,18 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
@@ -24,7 +15,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
             'properties' => [],
         ],
         'textarea' => [
-            'properties' => [],
+            'properties' => [
+                'allowHtml' => [],
+            ],
         ],
         'multiselect' => [
             'properties' => [
@@ -81,7 +74,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'number' => [
             'properties' => [
                 'roundmode' => [],
-                'precision' => [],
+                'scale'     => [],
             ],
         ],
         'tel' => [
@@ -122,7 +115,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
      */
     public static function getListTypes()
     {
-        return ['select', 'boolean', 'lookup', 'country', 'region', 'timezone', 'locale'];
+        return ['select', 'multiselect', 'boolean', 'lookup', 'country', 'region', 'timezone', 'locale'];
     }
 
     /**
@@ -161,9 +154,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $countryJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/countries.json');
         $countries   = json_decode($countryJson);
 
-        $choices = array_combine($countries, $countries);
-
-        return $choices;
+        return array_combine($countries, $countries);
     }
 
     /**
@@ -173,8 +164,8 @@ class FormFieldHelper extends AbstractFormFieldHelper
     {
         $regionJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/regions.json');
         $regions    = json_decode($regionJson);
+        $choices    = [];
 
-        $choices = [];
         foreach ($regions as $country => &$regionGroup) {
             $choices[$country] = array_combine($regionGroup, $regionGroup);
         }
@@ -209,7 +200,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     $name   = $parts[0];
                 }
 
-                $timezones[$region][$timezone] = str_replace('_', ' ', $name);
+                $timezones[$region][str_replace('_', ' ', $name)] = $timezone;
             }
         }
 
@@ -219,11 +210,11 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Get locale choices.
      *
-     * @return array
+     * @return array<string,string>
      */
     public static function getLocaleChoices()
     {
-        return Intl::getLocaleBundle()->getLocaleNames();
+        return array_flip(Locales::getNames());
     }
 
     /**
@@ -233,13 +224,11 @@ class FormFieldHelper extends AbstractFormFieldHelper
      */
     public function getDateChoices()
     {
-        $options = [
-            'anniversary' => $this->translator->trans('mautic.campaign.event.timed.choice.anniversary'),
-            '+P0D'        => $this->translator->trans('mautic.campaign.event.timed.choice.today'),
-            '-P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.yesterday'),
-            '+P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow'),
+        return [
+            $this->translator->trans('mautic.campaign.event.timed.choice.anniversary') => 'anniversary',
+            $this->translator->trans('mautic.campaign.event.timed.choice.today')       => '+P0D',
+            $this->translator->trans('mautic.campaign.event.timed.choice.yesterday')   => '-P1D',
+            $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow')    => '+P1D',
         ];
-
-        return $options;
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -21,10 +12,11 @@ use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\EmailBundle\Tests\MonitoredEmail\Transport\TestTransport;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 
-class BounceTest extends \PHPUnit_Framework_TestCase
+class BounceTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that the transport interface processes the message appropriately
@@ -76,8 +68,6 @@ class BounceTest extends \PHPUnit_Framework_TestCase
         $leadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $leadModel->expects($this->once())
-            ->method('addDncForLead');
 
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
@@ -87,7 +77,9 @@ class BounceTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $bouncer = new Bounce($transport, $contactFinder, $statRepo, $leadModel, $translator, $logger);
+        $doNotContact = $this->createMock(DoNotContact::class);
+
+        $bouncer = new Bounce($transport, $contactFinder, $statRepo, $leadModel, $translator, $logger, $doNotContact);
 
         $message = new Message();
         $this->assertTrue($bouncer->process($message));
@@ -142,8 +134,6 @@ class BounceTest extends \PHPUnit_Framework_TestCase
         $leadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $leadModel->expects($this->once())
-            ->method('addDncForLead');
 
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
@@ -153,7 +143,9 @@ class BounceTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $bouncer = new Bounce($transport, $contactFinder, $statRepo, $leadModel, $translator, $logger);
+        $doNotContact = $this->createMock(DoNotContact::class);
+
+        $bouncer = new Bounce($transport, $contactFinder, $statRepo, $leadModel, $translator, $logger, $doNotContact);
 
         $message            = new Message();
         $message->to        = ['contact+bounce_123abc@test.com' => null];

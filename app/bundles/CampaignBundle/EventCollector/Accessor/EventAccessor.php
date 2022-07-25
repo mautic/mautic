@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventCollector\Accessor;
 
 use Mautic\CampaignBundle\Entity\Event;
@@ -36,11 +27,6 @@ class EventAccessor
      */
     private $decisions = [];
 
-    /**
-     * EventAccessor constructor.
-     *
-     * @param array $events
-     */
     public function __construct(array $events)
     {
         $this->buildEvents($events);
@@ -141,9 +127,6 @@ class EventAccessor
         return $this->decisions;
     }
 
-    /**
-     * @param array $events
-     */
     private function buildEvents(array $events)
     {
         if (isset($events[Event::TYPE_ACTION])) {

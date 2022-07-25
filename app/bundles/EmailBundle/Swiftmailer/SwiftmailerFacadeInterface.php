@@ -8,9 +8,7 @@ namespace Mautic\EmailBundle\Swiftmailer;
 interface SwiftmailerFacadeInterface
 {
     /**
-     * @param \Swift_Mime_Message $message
-     *
      * @throws \Swift_TransportException
      */
-    public function send(\Swift_Mime_Message $message);
+    public function send(\Swift_Mime_SimpleMessage $message);
 }

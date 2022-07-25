@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticLeadBundle:Company:index.html.php');
 }
 ?>
@@ -108,15 +108,26 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
+                            <?php if ($view['security']->hasEntityAccess(
+                                       $permissions['lead:leads:editown'],
+                                       $permissions['lead:leads:editother'],
+                                       $item->getCreatedBy()
+                                       )
+                                   ): ?>
 
-                            <a href="<?php echo $view['router']->generate(
+                            <a href="<?php echo $view['router']->url(
                                 'mautic_company_action',
-                                ['objectAction' => 'edit', 'objectId' => $item->getId()]
+                                ['objectAction' => 'view', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax">
                                 <?php if (isset($fields['core']['companyname'])) : ?>
                                     <?php echo $view->escape($fields['core']['companyname']['value']); ?>
                                 <?php endif; ?>
                             </a>
+                        <?php else: ?>
+                            <?php if (isset($fields['core']['companyname'])) : ?>
+                                <?php echo $view->escape($fields['core']['companyname']['value']); ?>
+                            <?php endif; ?>
+                        <?php endif; ?>
                         </div>
                     </td>
                     <td>
@@ -138,16 +149,15 @@ if ($tmpl == 'index') {
                         <?php echo $item->getScore(); ?>
                     </td>
                     <td class="visible-md visible-lg">
-                        <a class="label label-primary" href="<?php echo $view['router']->path(
+                        <a class="label label-primary" href="<?php
+                        echo $view['router']->path(
                             'mautic_contact_index',
                             [
-                                'search' => $view['translator']->trans('mautic.lead.lead.searchcommand.company').':"'
-                                    .$view->escape($fields['core']['companyname']['value']).'"',
+                                'search' => $view['translator']->trans('mautic.lead.lead.searchcommand.company_id').':'.$item->getId(),
                             ]
-                        ); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? 'disabled=disabled' : ''; ?>>
-                            <?php echo $view['translator']->transChoice(
+                        ); ?>" data-toggle="ajax"<?php echo (0 == $leadCounts[$item->getId()]) ? 'disabled=disabled' : ''; ?>>
+                            <?php echo $view['translator']->trans(
                                 'mautic.lead.company.viewleads_count',
-                                $leadCounts[$item->getId()],
                                 ['%count%' => $leadCounts[$item->getId()]]
                             ); ?>
                         </a>
@@ -166,7 +176,7 @@ if ($tmpl == 'index') {
                 'page'       => $page,
                 'limit'      => $limit,
                 'menuLinkId' => 'mautic_company_index',
-                'baseUrl'    => $view['router']->generate('mautic_company_index'),
+                'baseUrl'    => $view['router']->url('mautic_company_index'),
                 'sessionVar' => 'company',
             ]
         ); ?>

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -17,13 +8,15 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
+use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -53,33 +46,32 @@ class FocusModel extends FormModel
     protected $templating;
 
     /**
-     * @var
-     */
-    protected $leadModel;
-
-    /**
      * @var FieldModel
      */
     protected $leadFieldModel;
 
     /**
-     * FocusModel constructor.
-     *
-     * @param \Mautic\FormBundle\Model\FormModel $formModel
-     * @param TrackableModel                     $trackableModel
-     * @param TemplatingHelper                   $templating
-     * @param EventDispatcherInterface           $dispatcher
-     * @param LeadModel                          $leadModel
-     * @param FieldModel                         $leadFieldModel
+     * @var ContactTracker
      */
-    public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating, EventDispatcherInterface $dispatcher, LeadModel $leadModel, FieldModel $leadFieldModel)
-    {
+    protected $contactTracker;
+
+    /**
+     * FocusModel constructor.
+     */
+    public function __construct(
+        \Mautic\FormBundle\Model\FormModel $formModel,
+        TrackableModel $trackableModel,
+        TemplatingHelper $templating,
+        EventDispatcherInterface $dispatcher,
+        FieldModel $leadFieldModel,
+        ContactTracker $contactTracker
+    ) {
         $this->formModel      = $formModel;
         $this->trackableModel = $trackableModel;
         $this->templating     = $templating;
         $this->dispatcher     = $dispatcher;
-        $this->leadModel      = $leadModel;
         $this->leadFieldModel = $leadFieldModel;
+        $this->contactTracker = $contactTracker;
     }
 
     /**
@@ -95,7 +87,7 @@ class FocusModel extends FormModel
      */
     public function getPermissionBase()
     {
-        return 'plugin:focus:items';
+        return 'focus:items';
     }
 
     /**
@@ -118,7 +110,7 @@ class FocusModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('focus', $entity, $options);
+        return $formFactory->create(FocusType::class, $entity, $options);
     }
 
     /**
@@ -150,7 +142,7 @@ class FocusModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Focus();
         }
 
@@ -175,9 +167,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param Focus $focus
-     * @param bool  $preview
-     *
      * @return string
      */
     public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false)
@@ -188,7 +177,7 @@ class FocusModel extends FormModel
             $focusArray = $focus->toArray();
 
             $url = '';
-            if ($focusArray['type'] == 'link' && !empty($focusArray['properties']['content']['link_url'])) {
+            if ('link' == $focusArray['type'] && !empty($focusArray['properties']['content']['link_url'])) {
                 $trackable = $this->trackableModel->getTrackableByUrl(
                     $focusArray['properties']['content']['link_url'],
                     'focus',
@@ -226,7 +215,7 @@ class FocusModel extends FormModel
         }
 
         // Replace tokens to ensure clickthroughs, lead tokens etc are appropriate
-        $lead       = $this->leadModel->getCurrentLead();
+        $lead       = $this->contactTracker->getContact();
         $tokenEvent = new TokenReplacementEvent($cached['focus'], $lead, ['focus_id' => $focus->getId()]);
         $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
         $focusContent = $tokenEvent->getContent();
@@ -242,7 +231,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param array  $focus
      * @param bool   $isPreview
      * @param string $url
      *
@@ -250,7 +238,7 @@ class FocusModel extends FormModel
      */
     public function getContent(array $focus, $isPreview = false, $url = '#')
     {
-        $form = (!empty($focus['form'])) ? $this->formModel->getEntity($focus['form']) : null;
+        $form = (!empty($focus['form']) && 'form' === $focus['type']) ? $this->formModel->getEntity($focus['form']) : null;
 
         if (isset($focus['html_mode'])) {
             $htmlMode = $focus['html_mode'];
@@ -271,15 +259,20 @@ class FocusModel extends FormModel
         );
 
         // Form has to be generated outside of the content or else the form src will be converted to clickables
-        $formContent = (!empty($form)) ? $this->templating->getTemplating()->render(
+        $fields             = $form ? $form->getFields()->toArray() : [];
+        [$pages, $lastPage] = $this->formModel->getPages($fields);
+        $formContent        = (!empty($form)) ? $this->templating->getTemplating()->render(
             'MauticFocusBundle:Builder:form.html.php',
             [
-                'form'          => $form,
-                'style'         => $focus['style'],
-                'focusId'       => $focus['id'],
-                'preview'       => $isPreview,
-                'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
-                'companyFields' => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'form'           => $form,
+                'pages'          => $pages,
+                'lastPage'       => $lastPage,
+                'style'          => $focus['style'],
+                'focusId'        => $focus['id'],
+                'preview'        => $isPreview,
+                'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
+                'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'viewOnlyFields' => $this->formModel->getCustomComponents()['viewOnlyFields'],
             ]
         ) : '';
 
@@ -321,13 +314,30 @@ class FocusModel extends FormModel
     /**
      * Add a stat entry.
      *
-     * @param Focus $focus
-     * @param       $type
-     * @param null  $data
-     * @param null  $lead
+     * @param      $type
+     * @param null $data
+     * @param null $lead
+     *
+     * @return Stat
      */
     public function addStat(Focus $focus, $type, $data = null, $lead = null)
     {
+        if (empty($lead)) {
+            return;
+        }
+
+        if ($lead instanceof Lead && !$lead->getId()) {
+            return;
+        }
+
+        if (is_array($lead)) {
+            if (empty($lead['id'])) {
+                return;
+            }
+
+            $lead = $this->em->getReference('MauticLeadBundle:Lead', $lead['id']);
+        }
+
         switch ($type) {
             case Stat::TYPE_FORM:
                 /** @var \Mautic\FormBundle\Entity\Submission $data */
@@ -351,6 +361,8 @@ class FocusModel extends FormModel
             ->setLead($lead);
 
         $this->getStatRepository()->saveEntity($stat);
+
+        return $stat;
     }
 
     /**
@@ -398,12 +410,9 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param Focus          $focus
-     * @param                $unit
-     * @param \DateTime|null $dateFrom
-     * @param \DateTime|null $dateTo
-     * @param null           $dateFormat
-     * @param bool           $canViewOthers
+     * @param      $unit
+     * @param null $dateFormat
+     * @param bool $canViewOthers
      *
      * @return array
      */
@@ -419,8 +428,8 @@ class FocusModel extends FormModel
         $data = $query->loadAndBuildTimeData($q);
         $chart->setDataset($this->translator->trans('mautic.focus.graph.views'), $data);
 
-        if ($focus->getType() != 'notification') {
-            if ($focus->getType() == 'link') {
+        if ('notification' != $focus->getType()) {
+            if ('link' == $focus->getType()) {
                 $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['type' => Stat::TYPE_CLICK, 'focus_id' => $focus->getId()]);
                 if (!$canViewOthers) {
                     $this->limitQueryToCreator($q);
@@ -442,8 +451,6 @@ class FocusModel extends FormModel
 
     /**
      * Joins the email table and limits created_by to currently logged in user.
-     *
-     * @param QueryBuilder $q
      */
     public function limitQueryToCreator(QueryBuilder $q)
     {

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Validator\SwiftMessageValidator;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Validator\SwiftMessageValidator\SwiftMessageValidationException;
@@ -26,8 +17,6 @@ final class SwiftMessageValidator implements SwiftMessageValidatorInterface
 
     /**
      * MomentumSwiftMessageValidator constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(
         TranslatorInterface $translator
@@ -36,11 +25,9 @@ final class SwiftMessageValidator implements SwiftMessageValidatorInterface
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     *
      * @throws SwiftMessageValidationException
      */
-    public function validate(\Swift_Mime_Message $message)
+    public function validate(\Swift_Mime_SimpleMessage $message)
     {
         if (empty($message->getSubject())) {
             throw new SwiftMessageValidationException($this->translator->trans('mautic.email.subject.notblank', [], 'validators'));

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -73,9 +64,6 @@ class CitrixEvent
         $this->eventType = 'undefined';
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -229,8 +217,6 @@ class CitrixEvent
     }
 
     /**
-     * @param \DateTime $eventDate
-     *
      * @return $this
      */
     public function setEventDate(\DateTime $eventDate)
@@ -281,8 +267,6 @@ class CitrixEvent
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return CitrixEvent
      */
     public function setLead(Lead $lead)

@@ -11,7 +11,7 @@
 ?>
 
     <div class="row">
-        <?php if ($mailbox != 'general'): ?>
+        <?php if ('general' != $mailbox): ?>
         <div class="col-md-6">
             <?php echo $view['form']->row($form['folder']); ?>
         </div>
@@ -34,7 +34,7 @@
         <?php endif; ?>
     </div>
 
-    <?php if ($mailbox != 'general'): ?>
+    <?php if ('general' != $mailbox): ?>
     <div class="row">
         <div class="col-md-6">
             <?php echo $view['form']->row($form['address']); ?>

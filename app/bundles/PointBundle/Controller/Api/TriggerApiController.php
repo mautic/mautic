@@ -1,22 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-/**
- * Class TriggerApiController.
- */
 class TriggerApiController extends CommonApiController
 {
     /**
@@ -39,7 +29,7 @@ class TriggerApiController extends CommonApiController
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $method            = $this->request->getMethod();
-        $triggerEventModel = $this->getModel('point.triggerEvent');
+        $triggerEventModel = $this->getModel('point.triggerevent');
         $isNew             = false;
 
         // Set timestamps
@@ -75,7 +65,7 @@ class TriggerApiController extends CommonApiController
                     $formErrors = $this->getFormErrorMessages($triggerEventForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
 
-                    return $this->returnError('Trigger events: '.$msg, Codes::HTTP_BAD_REQUEST);
+                    return $this->returnError('Trigger events: '.$msg, Response::HTTP_BAD_REQUEST);
                 }
             }
 
@@ -83,7 +73,7 @@ class TriggerApiController extends CommonApiController
         }
 
         // Remove events which weren't in the PUT request
-        if (!$isNew && $method === 'PUT') {
+        if (!$isNew && 'PUT' === $method) {
             foreach ($currentEvents as $currentEvent) {
                 if (!in_array($currentEvent->getId(), $requestTriggerIds)) {
                     $entity->removeTriggerEvent($currentEvent);
@@ -101,7 +91,7 @@ class TriggerApiController extends CommonApiController
      */
     protected function createTriggerEventEntityForm($entity)
     {
-        return $this->getModel('point.triggerEvent')->createForm(
+        return $this->getModel('point.triggerevent')->createForm(
             $entity,
             $this->get('form.factory'),
             null,
@@ -148,7 +138,7 @@ class TriggerApiController extends CommonApiController
 
         $entity = $this->model->getEntity($triggerId);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 

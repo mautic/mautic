@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\RecipientDTO\AddressDTO;
@@ -21,7 +12,7 @@ final class RecipientDTO implements \JsonSerializable
     /**
      * @var string|null
      */
-    private $returnPath = null;
+    private $returnPath;
 
     /**
      * @var AddressDTO
@@ -46,9 +37,8 @@ final class RecipientDTO implements \JsonSerializable
     /**
      * RecipientDTO constructor.
      *
-     * @param AddressDTO $addressDTO
-     * @param array      $metadata
-     * @param array      $substitutionData
+     * @param array $metadata
+     * @param array $substitutionData
      */
     public function __construct(AddressDTO $addressDTO, $metadata = [], $substitutionData = [])
     {
@@ -58,7 +48,7 @@ final class RecipientDTO implements \JsonSerializable
     }
 
     /**
-     * @param null|string $returnPath
+     * @param string|null $returnPath
      *
      * @return RecipientDTO
      */
@@ -116,16 +106,22 @@ final class RecipientDTO implements \JsonSerializable
         $json = [
             'address' => $this->address,
         ];
-        if (count($this->tags) !== 0) {
+        if (0 !== count($this->tags)) {
             $json['tags'] = $this->tags;
         }
-        if (count($this->metadata) !== 0) {
+        if (0 !== count($this->metadata)) {
             $json['metadata'] = $this->metadata;
         }
-        if (count($this->substitutionData) !== 0) {
+
+        if (0 === count($this->substitutionData)) {
+            // `substitution_data` is required but Sparkpost will return the following error with empty arrays:
+            // field 'substitution_data' is of type 'json_array', but needs to be of type 'json_object'
+            $json['substitution_data'] = new \stdClass();
+        } else {
             $json['substitution_data'] = $this->substitutionData;
         }
-        if ($this->returnPath !== null) {
+
+        if (null !== $this->returnPath) {
             $json['return_path'] = $this->returnPath;
         }
 

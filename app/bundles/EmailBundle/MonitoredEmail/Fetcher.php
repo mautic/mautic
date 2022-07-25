@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail;
 
 use Mautic\EmailBundle\EmailEvents;
@@ -52,11 +43,6 @@ class Fetcher
 
     /**
      * Fetcher constructor.
-     *
-     * @param Mailbox                  $imapHelper
-     * @param EventDispatcherInterface $dispatcher
-     * @param TranslatorInterface      $translator
-     * @param array                    $mailboxes
      */
     public function __construct(Mailbox $imapHelper, EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
     {
@@ -66,8 +52,6 @@ class Fetcher
     }
 
     /**
-     * @param array $mailboxes
-     *
      * @return $this
      */
     public function setMailboxes(array $mailboxes)
@@ -114,10 +98,9 @@ class Fetcher
                         $this->dispatcher->dispatch(EmailEvents::EMAIL_PARSE, $event);
                     }
 
-                    $this->log[] = $this->translator->transChoice(
+                    $this->log[] = $this->translator->trans(
                         'mautic.email.fetch.processed',
-                        $processed,
-                        ['%processed%' => $processed, '%imapPath%' => $path, '%criteria%' => $criteria]
+                        ['%count%' => $processed, '%imapPath%' => $path, '%criteria%' => $criteria]
                     );
 
                     if ($limit && $this->processedMessageCounter >= $limit) {
@@ -139,9 +122,8 @@ class Fetcher
     }
 
     /**
-     * @param array $mailIds
-     * @param int   $limit
-     * @param bool  $markAsSeen
+     * @param int  $limit
+     * @param bool $markAsSeen
      *
      * @return array
      */

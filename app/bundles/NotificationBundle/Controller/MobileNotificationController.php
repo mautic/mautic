@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\NotificationBundle\Entity\Notification;
@@ -55,8 +47,8 @@ class MobileNotificationController extends FormController
         $session = $this->get('session');
 
         //set limits
-        $limit = $session->get('mautic.mobile_notification.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $limit = $session->get('mautic.mobile_notification.limit', $this->coreParametersHelper->get('default_pagelimit'));
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -96,7 +88,7 @@ class MobileNotificationController extends FormController
         $count = count($notifications);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
+            if (1 === $count) {
                 $lastPage = 1;
             } else {
                 $lastPage = (floor($count / $limit)) ?: 1;
@@ -160,7 +152,7 @@ class MobileNotificationController extends FormController
         //set the page we came from
         $page = $this->get('session')->get('mautic.mobile_notification.page', 1);
 
-        if ($notification === null) {
+        if (null === $notification) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_mobile_notification_index', ['page' => $page]);
 
@@ -192,12 +184,12 @@ class MobileNotificationController extends FormController
         }
 
         // Audit Log
-        $logs = $this->getModel('core.auditLog')->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
+        $logs = $this->getModel('core.auditlog')->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $entityViews     = $model->getHitsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
@@ -271,11 +263,11 @@ class MobileNotificationController extends FormController
         }
 
         //set the page we came from
-        $page   = $session->get('mautic.mobile_notification.page', 1);
-        $action = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'new']);
-
-        $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('notification[updateSelect]', false, true)
+        $page         = $session->get('mautic.mobile_notification.page', 1);
+        $action       = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'new']);
+        $notification = $this->request->request->get('notification', []);
+        $updateSelect = 'POST' === $method
+            ? ($notification['updateSelect'] ?? false)
             : $this->request->get('updateSelect', false);
 
         if ($updateSelect) {
@@ -286,7 +278,7 @@ class MobileNotificationController extends FormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ('POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -414,7 +406,7 @@ class MobileNotificationController extends FormController
         ];
 
         //not found
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -442,16 +434,16 @@ class MobileNotificationController extends FormController
         }
 
         //Create the form
-        $action = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-
-        $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('notification[updateSelect]', false, true)
+        $action       = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
+        $notification = $this->request->request->get('notification', []);
+        $updateSelect = 'POST' === $method
+            ? ($notification['updateSelect'] ?? false)
             : $this->request->get('updateSelect', false);
 
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $method == 'POST') {
+        if (!$ignorePost && 'POST' == $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -563,7 +555,7 @@ class MobileNotificationController extends FormController
         $model  = $this->getModel('notification');
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if (null != $entity) {
             if (!$this->get('mautic.security')->isGranted('notification:mobile_notifications:create')
                 || !$this->get('mautic.security')->hasEntityAccess(
                     'notification:mobile_notifications:viewown',
@@ -587,7 +579,7 @@ class MobileNotificationController extends FormController
     /**
      * Deletes the entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -607,11 +599,11 @@ class MobileNotificationController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model  = $this->getModel('notification');
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.notification.error.notfound',
@@ -671,7 +663,7 @@ class MobileNotificationController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model = $this->getModel('notification');
             $ids   = json_decode($this->request->query->get('ids', '{}'));
 
@@ -681,7 +673,7 @@ class MobileNotificationController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.notification.error.notfound',
@@ -736,7 +728,7 @@ class MobileNotificationController extends FormController
         $model        = $this->getModel('notification');
         $notification = $model->getEntity($objectId);
 
-        if ($notification != null
+        if (null != $notification
             && $this->get('mautic.security')->hasEntityAccess(
                 'notification:mobile_notifications:editown',
                 'notification:mobile_notifications:editother'

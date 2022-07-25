@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\ReportBundle\Adapter\ReportDataAdapter;
@@ -16,6 +7,7 @@ use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Event\ReportScheduleSendEvent;
 use Mautic\ReportBundle\Exception\FileIOException;
 use Mautic\ReportBundle\ReportEvents;
+use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -61,8 +53,6 @@ class ReportExporter
     }
 
     /**
-     * @param ExportOption $exportOption
-     *
      * @throws FileIOException
      */
     public function processExport(ExportOption $exportOption)
@@ -74,35 +64,59 @@ class ReportExporter
     }
 
     /**
-     * @param Scheduler $scheduler
-     *
      * @throws FileIOException
      */
     private function processReport(Scheduler $scheduler)
     {
         $report = $scheduler->getReport();
-        $this->reportExportOptions->beginExport();
-        while (true) {
-            $data = $this->reportDataAdapter->getReportData($report, $this->reportExportOptions);
 
-            $this->reportFileWriter->writeReportData($scheduler, $data, $this->reportExportOptions);
+        if (!is_null($scheduler->getScheduleDate())) {
+            $dateTo = clone $scheduler->getScheduleDate();
+            $dateTo->setTime(0, 0, 0);
 
-            $totalResults = $data->getTotalResults();
-            unset($data);
-
-            if ($this->reportExportOptions->getNumberOfProcessedResults() >= $totalResults) {
-                break;
+            $dateFrom = clone $dateTo;
+            switch ($report->getScheduleUnit()) {
+                case SchedulerEnum::UNIT_NOW:
+                    $dateFrom->sub(new \DateInterval('P10Y'));
+                    $this->schedulerModel->turnOffScheduler($report);
+                    break;
+                case SchedulerEnum::UNIT_DAILY:
+                    $dateFrom->sub(new \DateInterval('P1D'));
+                    break;
+                case SchedulerEnum::UNIT_WEEKLY:
+                    $dateFrom->sub(new \DateInterval('P7D'));
+                    break;
+                case SchedulerEnum::UNIT_MONTHLY:
+                    $dateFrom->sub(new \DateInterval('P1M'));
+                    break;
             }
 
-            $this->reportExportOptions->nextBatch();
+            $this->reportExportOptions->setDateFrom($dateFrom);
+            $this->reportExportOptions->setDateTo($dateTo->sub(new \DateInterval('PT1S')));
         }
 
-        $file = $this->reportFileWriter->getFilePath($scheduler);
+        // just published reports, but schedule continue
+        if ($report->isPublished()) {
+            $this->reportExportOptions->beginExport();
+            while (true) {
+                $data = $this->reportDataAdapter->getReportData($report, $this->reportExportOptions);
 
-        $event = new ReportScheduleSendEvent($scheduler, $file);
-        $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
+                $this->reportFileWriter->writeReportData($scheduler, $data, $this->reportExportOptions);
 
-        $this->reportFileWriter->clear($scheduler);
+                $totalResults = $data->getTotalResults();
+                unset($data);
+
+                if ($this->reportExportOptions->getNumberOfProcessedResults() >= $totalResults) {
+                    break;
+                }
+
+                $this->reportExportOptions->nextBatch();
+            }
+
+            $file  = $this->reportFileWriter->getFilePath($scheduler);
+            $event = new ReportScheduleSendEvent($scheduler, $file);
+            $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
+        }
 
         $this->schedulerModel->reportWasScheduled($report);
     }

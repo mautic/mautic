@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\PreferenceBuilder;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -36,11 +27,6 @@ class PreferenceBuilder
 
     /**
      * PreferenceBuilder constructor.
-     *
-     * @param ArrayCollection $logs
-     * @param Event           $event
-     * @param array           $channels
-     * @param LoggerInterface $logger
      */
     public function __construct(ArrayCollection $logs, Event $event, array $channels, LoggerInterface $logger)
     {
@@ -58,9 +44,6 @@ class PreferenceBuilder
         return $this->channels;
     }
 
-    /**
-     * @param LeadEventLog $log
-     */
     public function removeLogFromAllChannels(LeadEventLog $log)
     {
         foreach ($this->channels as $channelPreferences) {
@@ -69,16 +52,14 @@ class PreferenceBuilder
     }
 
     /**
-     * @param string       $channel
-     * @param array        $rule
-     * @param LeadEventLog $log
-     * @param int          $priority
+     * @param string $channel
+     * @param int    $priority
      */
     private function addChannelRule($channel, array $rule, LeadEventLog $log, $priority)
     {
         $channelPreferences = $this->getChannelPreferenceObject($channel, $priority);
 
-        if ($rule['dnc'] !== DoNotContact::IS_CONTACTABLE) {
+        if (DoNotContact::IS_CONTACTABLE !== $rule['dnc']) {
             $log->appendToMetadata(
                 [
                     $channel => [
@@ -104,7 +85,7 @@ class PreferenceBuilder
     private function getChannelPreferenceObject($channel, $priority)
     {
         if (!isset($this->channels[$channel])) {
-            $this->channels[$channel] = new ChannelPreferences($channel, $this->event, $this->logger);
+            $this->channels[$channel] = new ChannelPreferences($this->event);
         }
 
         $this->channels[$channel]->addPriority($priority);
@@ -112,10 +93,6 @@ class PreferenceBuilder
         return $this->channels[$channel];
     }
 
-    /**
-     * @param ArrayCollection $logs
-     * @param array           $channels
-     */
     private function buildRules(ArrayCollection $logs, array $channels)
     {
         /** @var LeadEventLog $log */

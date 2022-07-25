@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Helper;
 
 use Mautic\ChannelBundle\ChannelEvents;
@@ -17,9 +8,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class ChannelListHelper.
- */
 class ChannelListHelper extends Helper
 {
     /**
@@ -42,12 +30,6 @@ class ChannelListHelper extends Helper
      */
     protected $dispatcher;
 
-    /**
-     * ChannelListHelper constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param TranslatorInterface      $translator
-     */
     public function __construct(EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -103,7 +85,7 @@ class ChannelListHelper extends Helper
             $channels[$feature] = $returnChannels;
         }
 
-        if (count($features) === 1) {
+        if (1 === count($features)) {
             $channels = $channels[$features[0]];
         }
 
@@ -160,13 +142,5 @@ class ChannelListHelper extends Helper
         $this->channels        = $event->getChannelConfigs();
         $this->featureChannels = $event->getFeatureChannels();
         unset($event);
-
-        // @deprecated 2.4 to be removed 3.0; BC support
-        if ($this->dispatcher->hasListeners(\Mautic\LeadBundle\LeadEvents::ADD_CHANNEL)) {
-            $event                 = $this->dispatcher->dispatch(\Mautic\LeadBundle\LeadEvents::ADD_CHANNEL, new \Mautic\LeadBundle\Event\ChannelEvent());
-            $this->channels        = array_merge($this->channels, $event->getChannelConfigs());
-            $this->featureChannels = array_merge($this->featureChannels, $event->getFeatureChannels());
-            unset($event);
-        }
     }
 }

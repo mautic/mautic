@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -57,12 +48,6 @@ class ActionDispatcher
 
     /**
      * EventDispatcher constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
-     * @param EventScheduler           $scheduler
-     * @param NotificationHelper       $notificationHelper
-     * @param LegacyEventDispatcher    $legacyDispatcher
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
@@ -79,16 +64,10 @@ class ActionDispatcher
     }
 
     /**
-     * @param ActionAccessor    $config
-     * @param Event             $event
-     * @param ArrayCollection   $logs
-     * @param PendingEvent|null $pendingEvent
-     *
      * @return PendingEvent
      *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
-     * @throws \ReflectionException
      */
     public function dispatchEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, PendingEvent $pendingEvent = null)
     {
@@ -124,11 +103,6 @@ class ActionDispatcher
         return $pendingEvent;
     }
 
-    /**
-     * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $logs
-     */
     private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
     {
         if (!$logs->count()) {
@@ -148,10 +122,6 @@ class ActionDispatcher
         );
     }
 
-    /**
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $logs
-     */
     private function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs)
     {
         if (!$logs->count()) {
@@ -176,10 +146,6 @@ class ActionDispatcher
     }
 
     /**
-     * @param ArrayCollection $pending
-     * @param ArrayCollection $success
-     * @param ArrayCollection $failed
-     *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      */

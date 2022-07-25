@@ -1,7 +1,83 @@
-//DashboardBundle
+// DashboardBundle
+// Use absolute path to keep dashboard working when app is in subdir
+Mautic.widgetUrl = mauticBasePath + (typeof mauticEnv !== 'undefined' && mauticEnv === 'dev' ? '/index_dev.php' : '') + '/s/dashboard/widget/';
+
+/**
+ * @type jQuery DOM element to be replaced with spinner
+ */
+Mautic.dashboardSubmitButton = false; // Button text, to be get and shown instead of spinner
+
+/**
+ * Init dashboard events
+ * @param container
+ */
 Mautic.dashboardOnLoad = function (container) {
-    Mautic.initWidgetSorting();
-    Mautic.initWidgetRemoveButtons(mQuery('#dashboard-widgets'));
+    Mautic.loadWidgets();
+};
+
+/**
+ * Load all widgets on initial page render
+ */
+Mautic.loadWidgets = function () {
+    Mautic.dashboardFilterPreventSubmit();
+
+    jQuery('.widget').each(function() {
+        let widgetId = jQuery(this).attr('data-widget-id');
+        let container = jQuery('.widget[data-widget-id="'+widgetId+'"]');
+        jQuery.ajax({
+            url: Mautic.widgetUrl+widgetId+'?ignoreAjax=true',
+        }).done(function(response) {
+            Mautic.widgetOnLoad(container, response);
+        });
+    });
+
+    jQuery(document).ajaxComplete(function(){
+        Mautic.initDashboardFilter();
+    });
+};
+
+/**
+ * Init dashboard filter events after widget load
+ */
+Mautic.initDashboardFilter = function () {
+    let form = jQuery('form[name="daterange"]');
+    form.find('button')
+        .replaceWith(Mautic.dashboardSubmitButton);
+    form
+        .unbind('submit')
+        .on('submit', function(e){
+            e.preventDefault();
+            Mautic.dashboardFilterPreventSubmit();
+            jQuery('.widget').each(function() {
+                let widgetId = jQuery(this).attr('data-widget-id');
+                let element = jQuery('.widget[data-widget-id="' + widgetId + '"]');
+                jQuery.ajax({
+                    type: 'POST',
+                    url: Mautic.widgetUrl + widgetId + '?ignoreAjax=true',
+                    data: form.serializeArray(),
+                    success: function (response) {
+                        Mautic.widgetOnLoad(element, response);
+                    }
+                });
+            });
+        });
+};
+
+/**
+ * Prevent filter from submit, show spinner instead of send button
+ */
+Mautic.dashboardFilterPreventSubmit = function() {
+    let form = jQuery('form[name="daterange"]');
+    let button = form.find('button:first');
+    Mautic.dashboardSubmitButton = button.clone();
+    button.width(button.width()+'px'); // Keep button width
+    button.html('<i class="fa fa-spin fa-spinner"></i>');
+    jQuery('.widget').html('<div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>');
+    form
+        .unbind('submit')
+        .on('submit', function(e){
+            e.preventDefault();
+        });
 };
 
 Mautic.dashboardOnUnload = function(id) {
@@ -33,9 +109,24 @@ Mautic.widgetOnLoad = function(container, response) {
         .css('height', response.widgetHeight + '%');
     Mautic.renderCharts(widgetHtml);
     Mautic.renderMaps(widgetHtml);
-    Mautic.initWidgetRemoveButtons(widgetHtml);
-    Mautic.saveWidgetSorting();
-}
+    Mautic.initWidgetRemoveEvents();
+    Mautic.initWidgetSorting();
+    Mautic.initDashboardFilter();
+};
+
+Mautic.initWidgetRemoveEvents = function () {
+    jQuery('.remove-widget')
+        .unbind('click')
+        .on('click', function(e) {
+            e.preventDefault();
+            element = jQuery(this);
+            let url = element.attr('href');
+            element.closest('.widget').remove();
+            jQuery.ajax({
+                url: url,
+            });
+        });
+};
 
 Mautic.initWidgetSorting = function () {
     var widgetsWrapper = mQuery('#dashboard-widgets');
@@ -175,22 +266,6 @@ Mautic.updateWidgetForm = function (element) {
         }
         Mautic.removeLabelLoadingIndicator();
     });
-};
-
-Mautic.initWidgetRemoveButtons = function (scope) {
-    scope.find('.remove-widget').on('click', function(e) {
-        e.preventDefault();
-        var button = mQuery(this);
-        var wrapper = button.closest('.widget');
-        var widgetId = wrapper.attr('data-widget-id');
-        wrapper.hide('slow');
-        Mautic.ajaxActionRequest('dashboard:delete', {widget: widgetId}, function(response) {
-            if (!response.success) {
-                wrapper.show('slow');
-            }
-        });
-    });
-
 };
 
 Mautic.exportDashboardLayout = function(text, baseUrl) {

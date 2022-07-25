@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -18,18 +9,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class WebhookRepository extends CommonRepository
 {
-    /**
-     * Get a list of entities.
-     *
-     * @param array $args
-     *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
-     */
-    public function getEntities(array $args = [])
-    {
-        return parent::getEntities($args);
-    }
-
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      * @param                                                              $filter

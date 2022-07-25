@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Event;
 
 use Mautic\ReportBundle\Entity\Report;
@@ -36,10 +27,7 @@ class ReportDataEvent extends AbstractReportEvent
     /**
      * ReportDataEvent constructor.
      *
-     * @param Report $report
-     * @param array  $data
-     * @param        $totalResults
-     * @param array  $options
+     * @param $totalResults
      */
     public function __construct(Report $report, array $data, $totalResults, array $options)
     {

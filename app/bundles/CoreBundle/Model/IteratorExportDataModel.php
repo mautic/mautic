@@ -1,21 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Helper\DataExporterHelper;
 
-/**
- * Class IteratorExportDataModel.
- */
 class IteratorExportDataModel implements \Iterator
 {
     private $position;
@@ -24,12 +12,8 @@ class IteratorExportDataModel implements \Iterator
     private $callback;
     private $total;
     private $data;
-    private $page;
     private $totalResult;
 
-    /**
-     * IteratorExportDataModel constructor.
-     */
     public function __construct(AbstractCommonModel $model, $args, callable $callback)
     {
         $this->model       = $model;
@@ -37,7 +21,6 @@ class IteratorExportDataModel implements \Iterator
         $this->callback    = $callback;
         $this->position    = 0;
         $this->total       = 0;
-        $this->page        = 1;
         $this->totalResult = 0;
         $this->data        = 0;
     }
@@ -68,10 +51,9 @@ class IteratorExportDataModel implements \Iterator
         if ($this->position === $this->totalResult) {
             $data              = new DataExporterHelper();
             $this->data        = $data->getDataForExport($this->total, $this->model, $this->args, $this->callback);
-            $this->total       = $this->total + count($this->data);
-            $this->totalResult = count($this->data);
+            $this->totalResult = $this->data ? count($this->data) : 0;
+            $this->total       = $this->total + $this->totalResult;
             $this->position    = 0;
-            ++$this->page;
         }
     }
 
@@ -118,8 +100,8 @@ class IteratorExportDataModel implements \Iterator
     {
         $data              = new DataExporterHelper();
         $this->data        = $data->getDataForExport($this->total, $this->model, $this->args, $this->callback);
-        $this->total       = $this->total + count($this->data);
-        $this->totalResult = count($this->data);
+        $this->totalResult = $this->data ? count($this->data) : 0;
+        $this->total       = $this->total + $this->totalResult;
         $this->position    = 0;
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
@@ -17,13 +8,14 @@ use SendGrid\Email;
 use SendGrid\Mail;
 use SendGrid\Personalization;
 
-class SendGridMailPersonalizationTest extends \PHPUnit_Framework_TestCase
+class SendGridMailPersonalizationTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotMauticMessage()
     {
         $sendGridMailPersonalization = new SendGridMailPersonalization();
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $message->expects($this->never())

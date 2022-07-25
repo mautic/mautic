@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\EventCollector\Builder;
 
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
@@ -16,7 +7,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\Builder\EventBuilder;
 
-class EventBuilderTest extends \PHPUnit_Framework_TestCase
+class EventBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testActionsAreConvertedToAccessor()
     {

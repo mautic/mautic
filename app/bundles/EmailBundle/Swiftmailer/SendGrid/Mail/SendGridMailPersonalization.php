@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
@@ -18,11 +9,7 @@ use SendGrid\Personalization;
 
 class SendGridMailPersonalization
 {
-    /**
-     * @param Mail                $mail
-     * @param \Swift_Mime_Message $message
-     */
-    public function addPersonalizedDataToMail(Mail $mail, \Swift_Mime_Message $message)
+    public function addPersonalizedDataToMail(Mail $mail, \Swift_Mime_SimpleMessage $message)
     {
         if (!$message instanceof MauticMessage) { //Used for "Send test email" in settings
             foreach ($message->getTo() as $recipientEmail => $recipientName) {

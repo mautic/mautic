@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -20,8 +11,7 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 class CampaignEventHelper
 {
     /**
-     * @param      $event
-     * @param Lead $lead
+     * @param $event
      *
      * @return bool
      */
@@ -41,8 +31,7 @@ class CampaignEventHelper
     }
 
     /**
-     * @param ListChangeEvent $eventDetails
-     * @param                 $event
+     * @param $event
      *
      * @return bool
      */

@@ -21,10 +21,10 @@
                             <div class="panel-body">
                                 <span class="img-wrapper img-rounded" style="width:100%">
                                     <?php $preferred = $item['preferred_profile_image']; ?>
-                                    <?php if ($preferred == 'gravatar' || empty($preferred)) : ?>
+                                    <?php if ('gravatar' == $preferred || empty($preferred)) : ?>
                                         <?php $img = $view['gravatar']->getImage($item['email'], '250'); ?>
                                     <?php else : ?>
-                                        <?php $socialData = unserialize($item['social_cache']); ?>
+                                        <?php $socialData = \Mautic\CoreBundle\Helper\Serializer::decode($item['social_cache']); ?>
                                         <?php $img        = (!empty($socialData[$preferred]['profile']['profileImage'])) ? $socialData[$preferred]['profile']['profileImage'] : $view['gravatar']->getImage($item['email'], '250'); ?>
                                     <?php endif; ?>
                                     <img class="img img-responsive" src="<?php echo $img; ?>" />

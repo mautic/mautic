@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Event;
 
 use Mautic\EmailBundle\Entity\Email;
@@ -30,9 +21,6 @@ class EmailReplyEvent extends Event
      */
     private $stat;
 
-    /**
-     * @param Stat $stat
-     */
     public function __construct(Stat $stat)
     {
         $this->stat  = $stat;

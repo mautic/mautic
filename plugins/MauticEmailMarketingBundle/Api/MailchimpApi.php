@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -31,7 +22,7 @@ class MailchimpApi extends EmailMarketingApi
         if (isset($this->keys['password'])) {
             // Extract the dc from the key
             $parts = explode('-', $this->keys['password']);
-            if (count($parts) !== 2) {
+            if (2 !== count($parts)) {
                 throw new ApiErrorException('Invalid key');
             }
 
@@ -46,7 +37,7 @@ class MailchimpApi extends EmailMarketingApi
 
         $response = $this->integration->makeRequest($url, $parameters, $method, ['encode_parameters' => 'json']);
 
-        if (is_array($response) && !empty($response['status']) && $response['status'] == 'error') {
+        if (is_array($response) && !empty($response['status']) && 'error' == $response['status']) {
             throw new ApiErrorException($response['error']);
         } elseif (is_array($response) && !empty($response['errors'])) {
             $errors = [];

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
@@ -32,9 +23,6 @@ class DeduplicateCommand extends ModeratedCommand
 
     /**
      * DeduplicateCommand constructor.
-     *
-     * @param ContactDeduper      $contactDeduper
-     * @param TranslatorInterface $translator
      */
     public function __construct(ContactDeduper $contactDeduper, TranslatorInterface $translator)
     {
@@ -65,10 +53,6 @@ EOT
             );
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $newerIntoOlder = (bool) $input->getOption('newer-into-older');

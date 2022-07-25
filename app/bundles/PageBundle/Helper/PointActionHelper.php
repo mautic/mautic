@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -75,7 +66,7 @@ class PointActionHelper
         $lead          = $eventDetails->getLead();
         $urlWithSqlWC  = str_replace('*', '%', $limitToUrl);
 
-        if (isset($action['properties']['first_time']) && $action['properties']['first_time'] === true) {
+        if (isset($action['properties']['first_time']) && true === $action['properties']['first_time']) {
             $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             if (isset($hitStats['count']) && $hitStats['count']) {
                 $changePoints['first_time'] = false;

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Membership;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -26,8 +17,6 @@ class EventDispatcher
 
     /**
      * EventDispatcher constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
@@ -35,9 +24,7 @@ class EventDispatcher
     }
 
     /**
-     * @param Lead     $contact
-     * @param Campaign $campaign
-     * @param string   $action
+     * @param string $action
      */
     public function dispatchMembershipChange(Lead $contact, Campaign $campaign, $action)
     {
@@ -48,9 +35,7 @@ class EventDispatcher
     }
 
     /**
-     * @param array    $contacts
-     * @param Campaign $campaign
-     * @param          $action
+     * @param $action
      */
     public function dispatchBatchMembershipChange(array $contacts, Campaign $campaign, $action)
     {

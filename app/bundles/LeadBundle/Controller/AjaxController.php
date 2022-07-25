@@ -1,38 +1,39 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
+use Exception;
+use Mautic\CampaignBundle\Membership\MembershipManager;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
+use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
+use Mautic\LeadBundle\Services\SegmentDependencyTreeFactory;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function userListAction(Request $request)
@@ -52,8 +53,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getLeadIdsByFieldValueAction(Request $request)
@@ -95,51 +94,129 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     protected function fieldListAction(Request $request)
     {
-        $dataArray = ['success' => 0];
-        $filter    = InputHelper::clean($request->query->get('filter'));
-        $leadField = InputHelper::alphanum($request->query->get('field'), false, false, ['_']);
-        if (!empty($leadField)) {
-            if (strpos($leadField, 'company') === 0) {
-                $results = $this->getModel('lead.company')->getLookupResults('companyfield', [$leadField, $filter]);
-                foreach ($results as $r) {
-                    $dataArray[] = ['value' => $r['label']];
-                }
-            } else {
-                if ($leadField == 'owner_id') {
-                    $results = $this->getModel('lead.lead')->getLookupResults('user', $filter);
-                    foreach ($results as $r) {
-                        $name        = $r['firstName'].' '.$r['lastName'];
-                        $dataArray[] = [
-                            'value' => $name,
-                            'id'    => $r['id'],
-                        ];
-                    }
-                } elseif (in_array($leadField, ['hit_url', 'referer', 'url_title', 'source', 'source_id'])) {
-                    $dataArray[] = [
-                        'value' => '',
-                    ];
-                } else {
-                    $results = $this->getModel('lead.field')->getLookupResults($leadField, $filter);
-                    foreach ($results as $r) {
-                        $dataArray[] = ['value' => $r[$leadField]];
-                    }
-                }
+        $dataArray  = ['success' => 1];
+        $filter     = InputHelper::clean($request->query->get('filter'));
+        $fieldAlias = InputHelper::alphanum($request->query->get('field'), false, false, ['_']);
+
+        /** @var FieldModel $fieldModel */
+        $fieldModel = $this->getModel('lead.field');
+
+        /** @var LeadModel $contactModel */
+        $contactModel = $this->getModel('lead.lead');
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = $this->getModel('lead.company');
+
+        if (empty($fieldAlias)) {
+            $dataArray['error']   = 'Alias cannot be empty';
+            $dataArray['success'] = 0;
+
+            return $this->sendJsonResponse($dataArray);
+        }
+
+        if ('owner_id' === $fieldAlias) {
+            $results = $contactModel->getLookupResults('user', $filter);
+            foreach ($results as $r) {
+                $name        = $r['firstName'].' '.$r['lastName'];
+                $dataArray[] = [
+                    'value' => $name,
+                    'id'    => $r['id'],
+                ];
+            }
+
+            return $this->sendJsonResponse($dataArray);
+        }
+
+        $field      = $fieldModel->getEntityByAlias($fieldAlias);
+        $isBehavior = empty($field);
+
+        if ($isBehavior) {
+            return $this->sendJsonResponse($dataArray);
+        }
+
+        // Selet field types that make sense to provide typeahead for.
+        $isLookup     = in_array($field->getType(), ['lookup']);
+        $shouldLookup = in_array($field->getAlias(), ['city', 'company', 'title']);
+
+        if (!$isLookup && !$shouldLookup) {
+            return $this->sendJsonResponse($dataArray);
+        }
+
+        if ($isLookup && !empty($field->getProperties()['list'])) {
+            foreach ($field->getProperties()['list'] as $predefinedValue) {
+                $dataArray[] = ['value' => $predefinedValue];
+            }
+        }
+
+        if ('company' === $field->getObject()) {
+            $results = $companyModel->getLookupResults('companyfield', [$fieldAlias, $filter]);
+            foreach ($results as $r) {
+                $dataArray[] = ['value' => $r['label']];
+            }
+        } elseif ('lead' === $field->getObject()) {
+            $results = $fieldModel->getLookupResults($fieldAlias, $filter);
+            foreach ($results as $r) {
+                $dataArray[] = ['value' => $r[$fieldAlias]];
             }
         }
 
         return $this->sendJsonResponse($dataArray);
     }
 
+    protected function loadSegmentFilterFormAction(Request $request): JsonResponse
+    {
+        $fieldAlias  = InputHelper::clean($request->request->get('fieldAlias'));
+        $fieldObject = InputHelper::clean($request->request->get('fieldObject'));
+        $operator    = InputHelper::clean($request->request->get('operator'));
+        $search      = InputHelper::clean($request->request->get('search'));
+        $filterNum   = (int) $request->request->get('filterNum');
+
+        /** @var FormFactoryInterface $formFactory */
+        $formFactory = $this->get('form.factory');
+
+        /** @var FormAdjustmentsProviderInterface $formAdjustmentsProvider */
+        $formAdjustmentsProvider = $this->get('mautic.lead.provider.formAdjustments');
+
+        /** @var ListModel $listModel */
+        $listModel = $this->get('mautic.lead.model.list');
+
+        $form = $formFactory->createNamed('RENAME', FilterPropertiesType::class);
+
+        if ($fieldAlias && $operator) {
+            $formAdjustmentsProvider->adjustForm(
+                $form,
+                $fieldAlias,
+                $fieldObject,
+                $operator,
+                $listModel->getChoiceFields($search)[$fieldObject][$fieldAlias]
+            );
+        }
+
+        $formHtml = $this->renderView(
+            'MauticLeadBundle:List:filterpropform.html.php',
+            [
+                'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:filterpropform.html.php', []),
+            ]
+        );
+
+        $formHtml = str_replace('id="RENAME', "id=\"leadlist_filters_{$filterNum}_properties", $formHtml);
+        $formHtml = str_replace('name="RENAME', "name=\"leadlist[filters][{$filterNum}][properties]", $formHtml);
+
+        return $this->sendJsonResponse(
+            [
+                'viewParameters' => [
+                    'form' => $formHtml,
+                ],
+            ]
+        );
+    }
+
     /**
      * Updates the cache and gets returns updated HTML.
-     *
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -154,7 +231,7 @@ class AjaxController extends CommonAjaxController
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
-            if ($lead !== null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
+            if (null !== $lead && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $leadFields = $lead->getFields();
                 /** @var IntegrationHelper $integrationHelper */
                 $integrationHelper = $this->factory->getHelper('integration');
@@ -201,8 +278,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Clears the cache for a network.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function clearSocialProfileAction(Request $request)
@@ -216,7 +291,7 @@ class AjaxController extends CommonAjaxController
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
-            if ($lead !== null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
+            if (null !== $lead && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $dataArray['success'] = 1;
                 /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
                 $helper         = $this->factory->getHelper('integration');
@@ -244,8 +319,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Updates the timeline events and gets returns updated HTML.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateTimelineAction(Request $request)
@@ -261,7 +334,7 @@ class AjaxController extends CommonAjaxController
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
-            if ($lead !== null) {
+            if (null !== $lead) {
                 $session = $this->get('session');
 
                 $filter = [
@@ -300,8 +373,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function toggleLeadListAction(Request $request)
@@ -318,8 +389,8 @@ class AjaxController extends CommonAjaxController
             $lead = $leadModel->getEntity($leadId);
             $list = $listModel->getEntity($listId);
 
-            if ($lead !== null && $list !== null) {
-                $class = $action == 'add' ? 'addToLists' : 'removeFromLists';
+            if (null !== $lead && null !== $list) {
+                $class = 'add' == $action ? 'addToLists' : 'removeFromLists';
                 $leadModel->$class($lead, $list);
                 $dataArray['success'] = 1;
             }
@@ -329,8 +400,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function togglePreferredLeadChannelAction(Request $request)
@@ -342,14 +411,16 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($leadId) && !empty($channel) && in_array($action, ['remove', 'add'])) {
             $leadModel = $this->getModel('lead');
+            /** @var DoNotContactModel $doNotContact */
+            $doNotContact = $this->getModel('lead.dnc');
 
             $lead = $leadModel->getEntity($leadId);
 
-            if ($lead !== null && $channel !== null) {
-                if ($action === 'remove') {
-                    $leadModel->addDncForLead($lead, $channel, 'user', DoNotContact::MANUAL);
-                } elseif ($action === 'add') {
-                    $leadModel->removeDncForLead($lead, $channel);
+            if (null !== $lead && null !== $channel) {
+                if ('remove' === $action) {
+                    $doNotContact->addDncForContact($leadId, $channel, DoNotContact::MANUAL, 'user');
+                } elseif ('add' === $action) {
+                    $doNotContact->removeDncForContact($leadId, $channel);
                 }
                 $dataArray['success'] = 1;
             }
@@ -359,8 +430,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function toggleLeadCampaignAction(Request $request)
@@ -370,26 +439,40 @@ class AjaxController extends CommonAjaxController
         $campaignId = (int) $request->request->get('campaignId');
         $action     = InputHelper::clean($request->request->get('campaignAction'));
 
-        if (!empty($leadId) && !empty($campaignId) && in_array($action, ['remove', 'add'])) {
-            $leadModel     = $this->getModel('lead');
-            $campaignModel = $this->getModel('campaign');
-
-            $lead     = $leadModel->getEntity($leadId);
-            $campaign = $campaignModel->getEntity($campaignId);
-
-            if ($lead !== null && $campaign !== null) {
-                $class = "{$action}Lead";
-                $campaignModel->$class($campaign, $lead, true);
-                $dataArray['success'] = 1;
-            }
+        if (empty($leadId) || empty($campaignId) || !in_array($action, ['remove', 'add'])) {
+            return $this->sendJsonResponse($dataArray);
         }
+
+        /** @var LeadModel $leadModel */
+        $leadModel = $this->getModel('lead');
+
+        /** @var CampaignModel $campaignModel */
+        $campaignModel = $this->getModel('campaign');
+
+        $lead     = $leadModel->getEntity($leadId);
+        $campaign = $campaignModel->getEntity($campaignId);
+
+        if (null === $lead || null === $campaign) {
+            return $this->sendJsonResponse($dataArray);
+        }
+
+        /** @var MembershipManager $membershipManager */
+        $membershipManager = $this->get('mautic.campaign.membership.manager');
+
+        if ('add' === $action) {
+            $membershipManager->addContact($lead, $campaign);
+        }
+
+        if ('remove' === $action) {
+            $membershipManager->removeContact($lead, $campaign);
+        }
+
+        $dataArray['success'] = 1;
 
         return $this->sendJsonResponse($dataArray);
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function toggleCompanyLeadAction(Request $request)
@@ -406,8 +489,8 @@ class AjaxController extends CommonAjaxController
             $lead    = $leadModel->getEntity($leadId);
             $company = $companyModel->getEntity($companyId);
 
-            if ($lead !== null && $company !== null) {
-                $class = $action == 'add' ? 'addLeadToCompany' : 'removeLeadFromCompany';
+            if (null !== $lead && null !== $company) {
+                $class = 'add' == $action ? 'addLeadToCompany' : 'removeLeadFromCompany';
                 $companyModel->$class($company, $lead);
                 $dataArray['success'] = 1;
             }
@@ -417,8 +500,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getImportProgressAction(Request $request)
@@ -435,8 +516,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function removeBounceStatusAction(Request $request)
@@ -446,8 +525,11 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($dncId)) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-            $model = $this->getModel('lead');
-            /** @var \Mautic\LeadBundle\Entity\DoNotContact $dnc */
+
+            /** @var DoNotContactModel $doNotContact */
+            $doNotContact = $this->getModel('lead.dnc');
+
+            /** @var DoNotContactModel $dnc */
             $dnc = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->findOneBy(
                 [
                     'id' => $dncId,
@@ -457,7 +539,7 @@ class AjaxController extends CommonAjaxController
             $lead = $dnc->getLead();
             if ($lead) {
                 // Use lead model to trigger listeners
-                $model->removeDncForLead($lead, 'email');
+                $doNotContact->removeDncForContact($lead->getId(), 'email');
             } else {
                 $this->getModel('email')->getRepository()->deleteDoNotEmailEntry($dncId);
             }
@@ -470,8 +552,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Get the rows for new leads.
-     *
-     * @param Request $request
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -514,7 +594,7 @@ class AjaxController extends CommonAjaxController
             $session->set('mautic.lead.indexmode', $indexMode);
 
             // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||
-            if ($indexMode != 'list') {
+            if ('list' != $indexMode) {
                 //remove anonymous leads unless requested to prevent clutter
                 $filter['force'][] = "!$anonymous";
             }
@@ -545,7 +625,7 @@ class AjaxController extends CommonAjaxController
                 /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
                 $emailRepo          = $this->getModel('email')->getRepository();
                 $indexMode          = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
-                $template           = ($indexMode == 'list') ? 'list_rows' : 'grid_cards';
+                $template           = ('list' == $indexMode) ? 'list_rows' : 'grid_cards';
                 $dataArray['leads'] = $this->factory->getTemplating()->render(
                     "MauticLeadBundle:Lead:{$template}.html.php",
                     [
@@ -566,8 +646,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getEmailTemplateAction(Request $request)
@@ -581,7 +659,7 @@ class AjaxController extends CommonAjaxController
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($emailId);
 
-        if ($email !== null
+        if (null !== $email
             && $this->get('mautic.security')->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
@@ -599,8 +677,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateLeadTagsAction(Request $request)
@@ -612,7 +688,7 @@ class AjaxController extends CommonAjaxController
         $updatedTags = (!empty($post['tags']) && is_array($post['tags'])) ? $post['tags'] : [];
         $data        = ['success' => 0];
 
-        if ($lead !== null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+        if (null !== $lead && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
             $leadModel->setTags($lead, $updatedTags, true);
 
             /** @var \Doctrine\ORM\PersistentCollection $leadTags */
@@ -636,8 +712,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function addLeadTagsAction(Request $request)
@@ -680,8 +754,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function addLeadUtmTagsAction(Request $request)
@@ -727,8 +799,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function reorderAction(Request $request)
@@ -751,8 +821,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateLeadFieldValuesAction(Request $request)
@@ -771,7 +839,7 @@ class AjaxController extends CommonAjaxController
             if (!empty($properties['list'])) {
                 // Lookup/Select options
                 $options = FormFieldHelper::parseList($properties['list']);
-            } elseif (!empty($properties) && $leadFieldType == 'boolean') {
+            } elseif (!empty($properties) && 'boolean' == $leadFieldType) {
                 // Boolean options
                 $options = [
                     0 => $properties['no'],
@@ -848,8 +916,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function setAsPrimaryCompanyAction(Request $request)
@@ -864,5 +930,78 @@ class AjaxController extends CommonAjaxController
         $dataArray = array_merge($dataArray, $primaryCompany);
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    protected function getCampaignShareStatsAction(Request $request)
+    {
+        $ids      = $request->get('ids');
+        $entityid = $request->get('entityId');
+        /** @var SegmentCampaignShare $segmentCampaignShareService */
+        $segmentCampaignShareService = $this->get('mautic.lead.segment.stat.campaign.share');
+
+        $data = $segmentCampaignShareService->getCampaignsSegmentShare($entityid, $ids);
+
+        $data = [
+            'success' => 1,
+            'stats'   => $data,
+        ];
+
+        return new JsonResponse($data);
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function getLeadCountAction(Request $request): JsonResponse
+    {
+        $id = (int) InputHelper::clean($request->request->get('id'));
+
+        /** @var ListModel $model */
+        $model          = $this->getModel('lead.list');
+        $leadListExists = $model->leadListExists($id);
+
+        if (!$leadListExists) {
+            return new JsonResponse($this->prepareJsonResponse(0), Response::HTTP_NOT_FOUND);
+        }
+
+        $leadCounts = $model->getSegmentContactCount([$id]);
+        $leadCount  = $leadCounts[$id];
+
+        return new JsonResponse($this->prepareJsonResponse($leadCount));
+    }
+
+    protected function getSegmentDependencyTreeAction(Request $request): JsonResponse
+    {
+        /** @var ListModel $model */
+        $model   = $this->getModel('lead.list');
+        $id      = (int) $request->get('id');
+        $segment = $model->getEntity($id);
+
+        if (!$segment) {
+            return new JsonResponse(['message' => "Segment {$id} could not be found."], Response::HTTP_NOT_FOUND);
+        }
+
+        /** @var SegmentDependencyTreeFactory $segmentDependencyTreeFactory */
+        $segmentDependencyTreeFactory = $this->get('mautic.lead.service.segment_dependency_tree_factory');
+
+        $parentNode = $segmentDependencyTreeFactory->buildTree($segment);
+        $formatter  = new JsPlumbFormatter();
+
+        return new JsonResponse($formatter->format($parentNode));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function prepareJsonResponse(int $leadCount): array
+    {
+        return [
+            'html' => $this->translator->transChoice(
+                'mautic.lead.list.viewleads_count',
+                $leadCount,
+                ['%count%' => $leadCount]
+            ),
+            'leadCount' => $leadCount,
+        ];
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Knp\Menu\ItemInterface;
@@ -28,8 +19,6 @@ class MenuHelper extends Helper
 
     /**
      * MenuHelper constructor.
-     *
-     * @param KnpHelper $helper
      */
     public function __construct(KnpHelper $helper)
     {
@@ -77,9 +66,7 @@ class MenuHelper extends Helper
     /**
      * Concats the appropriate classes for menu links.
      *
-     * @param ItemInterface    $item
-     * @param MatcherInterface $matcher
-     * @param array            $options
+     * @param array $options
      */
     public function buildClasses(ItemInterface &$item, MatcherInterface &$matcher, $options)
     {
@@ -97,8 +84,7 @@ class MenuHelper extends Helper
     }
 
     /**
-     * @param ItemInterface    $menu
-     * @param MatcherInterface $matcher
+     * @param ItemInterface $menu
      *
      * @return bool
      */
@@ -118,8 +104,6 @@ class MenuHelper extends Helper
      * Retrieves an item following a path in the tree.
      *
      * @param \Knp\Menu\ItemInterface|string $menu
-     * @param array                          $path
-     * @param array                          $options
      *
      * @return \Knp\Menu\ItemInterface
      */
@@ -132,7 +116,6 @@ class MenuHelper extends Helper
      * Renders a menu with the specified renderer.
      *
      * @param \Knp\Menu\ItemInterface|string|array $menu
-     * @param array                                $options
      * @param string                               $renderer
      *
      * @return string

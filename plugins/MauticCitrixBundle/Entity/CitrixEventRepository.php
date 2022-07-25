@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -54,9 +45,8 @@ class CitrixEventRepository extends CommonRepository
     }
 
     /**
-     * @param       $product
-     * @param null  $leadId
-     * @param array $options
+     * @param      $product
+     * @param null $leadId
      *
      * @return array
      */
@@ -115,8 +105,6 @@ class CitrixEventRepository extends CommonRepository
 
     /**
      * Get a list of entities.
-     *
-     * @param array $args
      *
      * @return Paginator
      */

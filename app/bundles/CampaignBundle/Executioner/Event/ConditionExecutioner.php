@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -32,8 +23,6 @@ class ConditionExecutioner implements EventInterface
 
     /**
      * ConditionExecutioner constructor.
-     *
-     * @param ConditionDispatcher $dispatcher
      */
     public function __construct(ConditionDispatcher $dispatcher)
     {
@@ -41,9 +30,6 @@ class ConditionExecutioner implements EventInterface
     }
 
     /**
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $logs
-     *
      * @return EvaluatedContacts
      *
      * @throws CannotProcessEventException
@@ -71,9 +57,6 @@ class ConditionExecutioner implements EventInterface
     }
 
     /**
-     * @param ConditionAccessor $config
-     * @param LeadEventLog      $log
-     *
      * @throws CannotProcessEventException
      * @throws ConditionFailedException
      */

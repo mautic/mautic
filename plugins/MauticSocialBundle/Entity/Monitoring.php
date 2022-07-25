@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -77,9 +68,6 @@ class Monitoring extends FormEntity
      */
     private $publishUp;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -108,8 +96,6 @@ class Monitoring extends FormEntity
 
     /**
      * Constraints for required fields.
-     *
-     * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
@@ -388,7 +374,7 @@ class Monitoring extends FormEntity
         }
 
         // clean up property array for the twitter handle
-        if ($this->getNetworkType() == 'twitter_handle') {
+        if ('twitter_handle' == $this->getNetworkType()) {
             $this->setProperties(
                 [
                     'handle'     => $property['handle'],
@@ -398,7 +384,7 @@ class Monitoring extends FormEntity
         }
 
         // clean up property array for the hashtag
-        if ($this->getNetworkType() == 'twitter_hashtag') {
+        if ('twitter_hashtag' == $this->getNetworkType()) {
             $this->setProperties(
                 [
                     'hashtag'    => $property['hashtag'],
@@ -408,7 +394,7 @@ class Monitoring extends FormEntity
         }
 
         // clean up clean up property array for the custom action
-        if ($this->getNetworkType() == 'twitter_custom') {
+        if ('twitter_custom' == $this->getNetworkType()) {
             $this->setProperties(
                 [
                     'custom' => $property['custom'],

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Deduplicate;
 
 use Mautic\LeadBundle\Deduplicate\ContactDeduper;
@@ -17,24 +8,24 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 
-class ContactDeduperTest extends \PHPUnit_Framework_TestCase
+class ContactDeduperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FieldModel
+     * @var \PHPUnit\Framework\MockObject\MockObject|FieldModel
      */
     private $fieldModel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContactMerger
+     * @var \PHPUnit\Framework\MockObject\MockObject|ContactMerger
      */
     private $contactMerger;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LeadRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
      */
     private $leadRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
@@ -124,10 +115,10 @@ class ContactDeduperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param   $id
-     * @param   $email
+     * @param $id
+     * @param $email
      *
-     * @return Lead|\PHPUnit_Framework_MockObject_MockObject
+     * @return Lead|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getLead($id, $email)
     {

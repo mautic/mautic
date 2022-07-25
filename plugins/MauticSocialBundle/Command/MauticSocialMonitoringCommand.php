@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -21,23 +12,20 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
 {
     protected $batchSize;
 
-    /**
-     * @var \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
-     */
     protected $monitorRepo;
 
     /**
-     * @var
+     * @var int|null
      */
     protected $maxPerIterations;
 
     /**
-     * @var
+     * @var OutputInterface
      */
     protected $output;
 
     /**
-     * @var
+     * @var InputInterface
      */
     protected $input;
 
@@ -58,10 +46,6 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
             ->addOption('query-count', null, InputOption::VALUE_OPTIONAL, 'The number of records to search for per iteration. Default is 100.', 100);
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input  = $input;
@@ -115,7 +99,7 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
             'limit' => 100,
         ];
 
-        if ($id !== null) {
+        if (null !== $id) {
             $filter['filter'] = [
                 'force' => [
                     [
@@ -127,9 +111,7 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
             ];
         }
 
-        $monitorList = $this->monitorRepo->getPublishedEntities($filter);
-
-        return $monitorList;
+        return $this->monitorRepo->getPublishedEntities($filter);
     }
 
     /**
@@ -147,16 +129,16 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
         $commandName = '';
 
         // hashtag command
-        if ($networkType == 'twitter_hashtag') {
+        if ('twitter_hashtag' == $networkType) {
             $commandName = 'social:monitor:twitter:hashtags';
         }
 
         // mention command
-        if ($networkType == 'twitter_handle') {
+        if ('twitter_handle' == $networkType) {
             $commandName = 'social:monitor:twitter:mentions';
         }
 
-        if ($commandName == '') {
+        if ('' == $commandName) {
             $this->output->writeln('Matching command not found.');
 
             return 1;

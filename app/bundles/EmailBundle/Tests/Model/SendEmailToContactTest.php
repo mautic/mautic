@@ -1,15 +1,6 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-namespace Mautic\EmailBundle\Tests;
+namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -32,7 +23,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Router;
 
-class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
+class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 {
     protected $contacts = [
         [
@@ -257,7 +248,7 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
-            ->setMethods(['createEmailStat'])
+            ->onlyMethods(['createEmailStat'])
             ->getMock();
 
         $mailHelper->method('createEmailStat')
@@ -416,7 +407,7 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
-            ->setMethods(null)
+            ->onlyMethods([])
             ->getMock();
 
         // Enable queueing
@@ -519,7 +510,7 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
-            ->setMethods(['createEmailStat'])
+            ->onlyMethods(['createEmailStat'])
             ->getMock();
 
         $mailHelper->expects($this->exactly(21))
@@ -656,7 +647,7 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
-            ->setMethods(['createEmailStat'])
+            ->onlyMethods(['createEmailStat'])
             ->getMock();
 
         $mailHelper->method('createEmailStat')
@@ -724,5 +715,78 @@ class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
         // One error message from the transport
         $errorMessages = $model->getErrors();
         $this->assertCount(1, $errorMessages);
+    }
+
+    /**
+     * @testdox Test that sending an email with invalid Bcc address is handled
+     *
+     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::setContact()
+     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::send()
+     * @covers \Mautic\EmailBundle\Model\SendEmailToContact::failContact()
+     */
+    public function testThatInvalidBccFailureIsHandled()
+    {
+        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+
+        $mockFactory = $this->getMockBuilder(MauticFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mockFactory->method('getParameter')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mailer_return_path', false, null],
+                        ['mailer_spool_type', false, 'memory'],
+                    ]
+                )
+            );
+        $mockFactory->method('getLogger')
+            ->willReturn(
+                new NullLogger()
+            );
+
+        $swiftMailer = new \Swift_Mailer(new BatchTransport());
+
+        $mailHelper = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+
+        $statRepository = $this->getMockBuilder(StatRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $dncModel = $this->getMockBuilder(DoNotContact::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $statHelper = new StatHelper($statRepository);
+
+        $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
+
+        $emailMock = $this->getMockBuilder(Email::class)
+            ->getMock();
+        $emailMock
+            ->expects($this->any())
+            ->method('getId')
+            ->will($this->returnValue(1));
+
+        // Set invalid BCC (should use comma as separator)
+        $emailMock
+            ->expects($this->any())
+            ->method('getBccAddress')
+            ->willReturn('test@mautic.com; test@mautic.com');
+
+        $model->setEmail($emailMock);
+
+        $stat = new Stat();
+        $stat->setEmail($emailMock);
+
+        $this->expectException(FailedToSendToContactException::class);
+        $this->expectExceptionMessage('Address in mailbox given [test@mautic.com; test@mautic.com] does not comply with RFC 2822, 3.6.2.');
+
+        // Send should trigger the FailedToSendToContactException
+        $model->setContact($this->contacts[0])->send();
     }
 }

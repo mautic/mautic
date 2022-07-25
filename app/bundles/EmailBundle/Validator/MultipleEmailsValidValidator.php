@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-*/
-
 namespace Mautic\EmailBundle\Validator;
 
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
@@ -30,8 +21,7 @@ class MultipleEmailsValidValidator extends ConstraintValidator
     }
 
     /**
-     * @param string     $emailsInString
-     * @param Constraint $constraint
+     * @param string $emailsInString
      */
     public function validate($emailsInString, Constraint $constraint)
     {

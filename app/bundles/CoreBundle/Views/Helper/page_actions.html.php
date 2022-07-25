@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 
 if (!isset($item)) {
@@ -27,10 +18,6 @@ foreach ($templateButtons as $action => $enabled) {
         continue;
     }
 
-    if (!$enabled) {
-        continue;
-    }
-
     $path     = false;
     $primary  = false;
     $priority = 0;
@@ -42,7 +29,7 @@ foreach ($templateButtons as $action => $enabled) {
                 'objectId' => ('abtest' == $action && method_exists($item, 'getVariantParent') && $item->getVariantParent())
                     ? $item->getVariantParent()->getId() : $item->getId(),
             ];
-            $icon = ($action == 'clone') ? 'copy' : 'sitemap';
+            $icon = ('clone' == $action) ? 'copy' : 'sitemap';
             $path = $view['router']->path($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
             break;
         case 'close':
@@ -53,7 +40,7 @@ foreach ($templateButtons as $action => $enabled) {
             $priority        = 200;
             break;
         case 'new':
-        case'edit':
+        case 'edit':
             $actionQuery = ('edit' == $action) ? ['objectId' => $item->getId()] : [];
             $icon        = ('edit' == $action) ? 'pencil-square-o' : 'plus';
             $path        = $view['router']->path($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
@@ -102,15 +89,13 @@ foreach ($templateButtons as $action => $enabled) {
     }
 }
 
-if ($view['buttons']->getButtonCount() > 0) {
-    echo '<div class="std-toolbar btn-group">';
+echo '<div class="std-toolbar btn-group">';
 
-    $dropdownOpenHtml = '<button type="button" class="btn btn-default btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>'
-        ."\n";
-    $dropdownOpenHtml .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">'."\n";
-    echo $view['buttons']->renderButtons($dropdownOpenHtml, '</ul>');
+$dropdownOpenHtml = '<button type="button" class="btn btn-default btn-nospin dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>'
+    ."\n";
+$dropdownOpenHtml .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">'."\n";
+echo $view['buttons']->renderButtons($dropdownOpenHtml, '</ul>');
 
-    echo '</div>';
-}
+echo '</div>';
 
 echo $extraHtml;

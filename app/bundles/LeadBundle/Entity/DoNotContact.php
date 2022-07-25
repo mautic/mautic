@@ -1,19 +1,11 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
  * Class DoNotContact.
@@ -72,9 +64,6 @@ class DoNotContact
 
     private $channelId;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -145,8 +134,6 @@ class DoNotContact
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return DoNotContact
      */
     public function setLead(Lead $lead)
@@ -165,8 +152,6 @@ class DoNotContact
     }
 
     /**
-     * @param \DateTime $dateAdded
-     *
      * @return DoNotContact
      */
     public function setDateAdded(\DateTime $dateAdded)
@@ -211,7 +196,7 @@ class DoNotContact
      */
     public function setComments($comments)
     {
-        $this->comments = $comments;
+        $this->comments = InputHelper::string($comments);
 
         return $this;
     }

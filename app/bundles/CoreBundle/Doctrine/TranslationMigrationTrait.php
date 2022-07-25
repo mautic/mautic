@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -20,8 +11,6 @@ trait TranslationMigrationTrait
 {
     /**
      * Add translation parent/child relationship columns.
-     *
-     * @param Schema $schema
      */
     protected function addTranslationSchema(Schema $schema, $tableName, $languageColumnName = 'lang')
     {
@@ -53,7 +42,7 @@ trait TranslationMigrationTrait
         }
 
         if ($languageColumnName && !$table->hasColumn($languageColumnName)) {
-            $this->addSql("ALTER TABLE $tableName ADD COLUMN `lang` varchar(255) NULL");
+            $this->addSql("ALTER TABLE $tableName ADD COLUMN `lang` varchar(191) NULL");
         }
     }
 }

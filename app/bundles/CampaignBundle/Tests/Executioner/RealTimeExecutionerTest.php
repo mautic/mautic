@@ -1,19 +1,11 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner;
@@ -25,44 +17,49 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\NullLogger;
 
-class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
+class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LeadModel
+     * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
      */
     private $leadModel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventRepository
      */
     private $eventRepository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventExecutioner
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventExecutioner
      */
     private $executioner;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|DecisionExecutioner
+     * @var \PHPUnit\Framework\MockObject\MockObject|DecisionExecutioner
      */
     private $decisionExecutioner;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventCollector
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventCollector
      */
     private $eventCollector;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventScheduler
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
      */
     private $eventScheduler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContactTracker
+     * @var \PHPUnit\Framework\MockObject\MockObject|ContactTracker
      */
     private $contactTracker;
 
-    protected function setUp()
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
+     */
+    private $leadRepository;
+
+    protected function setUp(): void
     {
         $this->leadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
@@ -89,6 +86,10 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->contactTracker = $this->getMockBuilder(ContactTracker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->leadRepository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -161,6 +162,61 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
         $responses = $this->getExecutioner()->execute('something', null, 'page');
 
         $this->assertEquals(0, $responses->containsResponses());
+    }
+
+    public function testChannelFuzzyMatchResultsInNonEmptyResponses()
+    {
+        $lead = $this->getMockBuilder(Lead::class)
+            ->getMock();
+        $lead->expects($this->exactly(5))
+            ->method('getId')
+            ->willReturn(10);
+
+        $this->contactTracker->expects($this->once())
+            ->method('getContact')
+            ->willReturn($lead);
+
+        $event = $this->getMockBuilder(Event::class)
+            ->getMock();
+        $event->expects($this->exactly(2))
+            ->method('getChannel')
+            ->willReturn('page');
+        $event->method('getEventType')
+            ->willReturn(Event::TYPE_DECISION);
+
+        $action1 = $this->getMockBuilder(Event::class)
+            ->getMock();
+        $action2 = $this->getMockBuilder(Event::class)
+            ->getMock();
+
+        $event->expects($this->once())
+            ->method('getPositiveChildren')
+            ->willReturn(new ArrayCollection([$action1, $action2]));
+
+        $this->eventRepository->expects($this->once())
+            ->method('getContactPendingEvents')
+            ->willReturn([$event]);
+
+        $this->eventCollector->expects($this->once())
+            ->method('getEventConfig')
+            ->willReturn(new DecisionAccessor([]));
+
+        $this->eventScheduler->expects($this->exactly(2))
+            ->method('getExecutionDateTime')
+            ->willReturn(new \DateTime());
+
+        $this->eventScheduler->expects($this->exactly(2))
+            ->method('shouldSchedule')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $this->eventScheduler->expects($this->once())
+            ->method('scheduleForContact');
+
+        // This is how we know if the test failed/passed
+        $this->executioner->expects($this->once())
+            ->method('executeEventsForContact');
+
+        $this->getExecutioner()->execute('something', null, 'page.redirect');
     }
 
     public function testChannelIdMisMatchResultsInEmptyResponses()
@@ -292,16 +348,12 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
             ->method('getExecutionDateTime')
             ->willReturn(new \DateTime());
 
-        $this->eventScheduler->expects($this->at(1))
+        $this->eventScheduler->expects($this->exactly(2))
             ->method('shouldSchedule')
-            ->willReturn(true);
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $this->eventScheduler->expects($this->once())
             ->method('scheduleForContact');
-
-        $this->eventScheduler->expects($this->at(3))
-            ->method('shouldSchedule')
-            ->willReturn(false);
 
         $this->executioner->expects($this->once())
             ->method('executeEventsForContact');
@@ -356,7 +408,8 @@ class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
             $this->decisionExecutioner,
             $this->eventCollector,
             $this->eventScheduler,
-            $this->contactTracker
+            $this->contactTracker,
+            $this->leadRepository
         );
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -48,8 +39,6 @@ class TagRepository extends CommonRepository
     /**
      * Get tag entities by name.
      *
-     * @param array $tags
-     *
      * @return array
      */
     public function getTagsByName(array $tags)
@@ -75,21 +64,18 @@ class TagRepository extends CommonRepository
      * Goes through each element in the array expecting it to be a tag label and removes the '-' character infront of it.
      * The minus character is used to identify that the tag should be removed.
      *
-     * @param array $tags
-     *
      * @return array
      */
     public function removeMinusFromTags(array $tags)
     {
         return array_map(function ($val) {
-            return (strpos($val, '-') === 0) ? substr($val, 1) : $val;
+            return (0 === strpos($val, '-')) ? substr($val, 1) : $val;
         }, $tags);
     }
 
     /**
      * Check Lead tags by Ids.
      *
-     * @param Lead $lead
      * @param $tags
      *
      * @return bool
@@ -124,16 +110,15 @@ class TagRepository extends CommonRepository
      */
     public function getTagByNameOrCreateNewOne($name)
     {
-        $tag = $this->findOneBy(
+        $tag = new Tag($name, true);
+
+        /** @var Tag|null $existingTag */
+        $existingTag = $this->findOneBy(
             [
-                'tag' => $name,
+                'tag' => $tag->getTag(),
             ]
         );
 
-        if (!$tag) {
-            $tag = new Tag($name);
-        }
-
-        return $tag;
+        return $existingTag ?? $tag;
     }
 }

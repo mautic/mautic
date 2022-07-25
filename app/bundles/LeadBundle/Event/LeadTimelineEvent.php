@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -16,9 +7,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class LeadTimelineEvent.
- */
 class LeadTimelineEvent extends Event
 {
     /**
@@ -48,7 +36,7 @@ class LeadTimelineEvent extends Event
     /**
      * @var array|null
      */
-    protected $orderBy = null;
+    protected $orderBy;
 
     /**
      * Lead entity for the lead the timeline is being generated for.
@@ -109,9 +97,6 @@ class LeadTimelineEvent extends Event
      */
     protected $forTimeline = true;
 
-    /**
-     * @var
-     */
     protected $siteDomain;
 
     /**
@@ -127,11 +112,6 @@ class LeadTimelineEvent extends Event
     ];
 
     /**
-     * LeadTimelineEvent constructor.
-     *
-     * @param Lead|null   $lead
-     * @param array       $filters
-     * @param array|null  $orderBy
      * @param int         $page
      * @param int         $limit       Limit per type
      * @param bool        $forTimeline
@@ -229,7 +209,7 @@ class LeadTimelineEvent extends Event
                 // Ensure a full URL
                 if ($this->siteDomain && isset($data['eventLabel']) && is_array($data['eventLabel']) && isset($data['eventLabel']['href'])) {
                     // If this does not have a http, then assume a Mautic URL
-                    if (strpos($data['eventLabel']['href'], '://') === false) {
+                    if (false === strpos($data['eventLabel']['href'], '://')) {
                         $data['eventLabel']['href'] = $this->siteDomain.$data['eventLabel']['href'];
                     }
                 }
@@ -255,7 +235,7 @@ class LeadTimelineEvent extends Event
             return [];
         }
 
-        $events = call_user_func_array('array_merge', $this->events);
+        $events = call_user_func_array('array_merge', array_values($this->events));
 
         foreach ($events as &$e) {
             if (!$e['timestamp'] instanceof \DateTime) {
@@ -296,7 +276,7 @@ class LeadTimelineEvent extends Event
                 }
             );
 
-            if ($this->orderBy[1] == 'DESC') {
+            if ('DESC' == $this->orderBy[1]) {
                 $events = array_reverse($events);
             }
         }
@@ -546,10 +526,7 @@ class LeadTimelineEvent extends Event
     /**
      * Calculate engagement counts only.
      *
-     * @param \DateTime       $dateFrom
-     * @param \DateTime       $dateTo
-     * @param null            $groupUnit
-     * @param ChartQuery|null $chartQuery
+     * @param null $groupUnit
      */
     public function setCountOnly(\DateTime $dateFrom, \DateTime $dateTo, $groupUnit = null, ChartQuery $chartQuery = null)
     {
@@ -616,8 +593,6 @@ class LeadTimelineEvent extends Event
     /**
      * Convert all snake case keys o camel case for API congruency.
      *
-     * @param array $details
-     *
      * @return array
      */
     private function prepareDetailsForAPI(array $details)
@@ -645,8 +620,6 @@ class LeadTimelineEvent extends Event
 
     /**
      * Generate something consistent for this event to identify this log entry.
-     *
-     * @param array $data
      */
     private function generateEventId(array $data)
     {

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Metadata;
 
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -48,8 +39,6 @@ class MetadataProcessor
 
     /**
      * MetadataProcessor constructor.
-     *
-     * @param \Swift_Message $message
      */
     public function __construct(\Swift_Message $message)
     {
@@ -106,7 +95,7 @@ class MetadataProcessor
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getCampaignId()
     {
@@ -133,9 +122,6 @@ class MetadataProcessor
         $this->extractCampaignId($metadataSample);
     }
 
-    /**
-     * @param array $metadataSample
-     */
     private function extractCampaignId(array $metadataSample)
     {
         // Extract and build a campaign ID from the metadata sample

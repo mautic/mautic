@@ -13,7 +13,7 @@ $attr = $form->vars['attr'];
 
 <div class="row">
     <div class="form-group col-xs-12">
-        <?php echo $view['form']->label($form, $label) ?>
+        <?php echo $view['form']->label($form, $label); ?>
         <div class="choice-wrapper">
             <?php foreach ($form->children as $child): ?>
                 <div class="checkbox">

@@ -1,21 +1,9 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class ParseEmailEvent.
- */
 class ParseEmailEvent extends Event
 {
     /**
@@ -24,7 +12,7 @@ class ParseEmailEvent extends Event
     private $messages;
 
     /**
-     * @var
+     * @var array
      */
     private $keys;
 
@@ -38,10 +26,6 @@ class ParseEmailEvent extends Event
      */
     private $markAsSeen = [];
 
-    /**
-     * @param array $messages
-     * @param array $applicableKeys
-     */
     public function __construct(array $messages = [], array $applicableKeys = [])
     {
         $this->messages = $messages;
@@ -71,7 +55,7 @@ class ParseEmailEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getKeys()
     {
@@ -79,7 +63,7 @@ class ParseEmailEvent extends Event
     }
 
     /**
-     * @param mixed $keys
+     * @param array $keys
      *
      * @return $this
      */

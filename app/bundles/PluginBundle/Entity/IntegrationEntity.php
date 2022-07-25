@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -74,15 +65,12 @@ class IntegrationEntity extends CommonEntity
         $this->internal = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('integration_entity')
-            ->setCustomRepositoryClass('Mautic\PluginBundle\Entity\IntegrationEntityRepository')
+            ->setCustomRepositoryClass(IntegrationEntityRepository::class)
             ->addIndex(['integration', 'integration_entity', 'integration_entity_id'], 'integration_external_entity')
             ->addIndex(['integration', 'internal_entity', 'internal_entity_id'], 'integration_internal_entity')
             ->addIndex(['integration', 'internal_entity', 'integration_entity'], 'integration_entity_match')

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
@@ -23,8 +14,6 @@ class Parser
 
     /**
      * Parser constructor.
-     *
-     * @param Message $message
      */
     public function __construct(Message $message)
     {
@@ -32,7 +21,7 @@ class Parser
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getFailedRecipients()
     {
@@ -50,7 +39,7 @@ class Parser
         foreach ($this->message->to as $to => $name) {
             // Some ISPs strip the + email so will still process the content for a bounce
             // even if a +bounce address was not found
-            if (strpos($to, '+bounce') !== false) {
+            if (false !== strpos($to, '+bounce')) {
                 $bouncerAddress = $to;
 
                 break;

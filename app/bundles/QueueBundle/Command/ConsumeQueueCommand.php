@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\QueueBundle\Command;
 
+use Mautic\QueueBundle\Queue\QueueService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -42,7 +34,15 @@ class ConsumeQueueCommand extends ContainerAwareCommand
                 InputOption::VALUE_OPTIONAL,
                 'Number of messages from the queue to process. Default is infinite',
                 null
+            )
+            ->addOption(
+                '--timeout',
+                '-t',
+                InputOption::VALUE_REQUIRED,
+                'Set a graceful execution time at this many seconds in the future.',
+                null
             );
+
         parent::configure();
     }
 
@@ -52,6 +52,7 @@ class ConsumeQueueCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container    = $this->getContainer();
+        /** @var QueueService $queueService */
         $queueService = $container->get('mautic.queue.service');
 
         if (!$queueService->isQueueEnabled()) {
@@ -74,7 +75,14 @@ class ConsumeQueueCommand extends ContainerAwareCommand
             return 0;
         }
 
-        $queueService->consumeFromQueue($queueName, $messages);
+        $timeout = $input->getOption('timeout');
+        if (0 > $timeout) {
+            $output->writeLn('You did not provide a valid number of seconds. It should be null or greater than 0');
+
+            return 0;
+        }
+
+        $queueService->consumeFromQueue($queueName, $messages, $timeout);
 
         return 0;
     }

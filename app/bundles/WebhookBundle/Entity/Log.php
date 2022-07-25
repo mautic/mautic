@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
@@ -50,9 +41,6 @@ class Log
      */
     private $note;
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadMetadata(ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -92,8 +80,6 @@ class Log
     }
 
     /**
-     * @param Webhook $webhook
-     *
      * @return Log
      */
     public function setWebhook(Webhook $webhook)
@@ -132,8 +118,6 @@ class Log
     }
 
     /**
-     * @param DateTime $dateAdded
-     *
      * @return Log
      */
     public function setDateAdded(\DateTime $dateAdded)
@@ -152,7 +136,7 @@ class Log
     }
 
     /**
-     * Strips tags and keeps first 254 characters so it would fit in the varchar 255 limit.
+     * Strips tags and keeps first 191 characters so it would fit in the varchar 191 limit.
      *
      * @param string $note
      *
@@ -160,7 +144,7 @@ class Log
      */
     public function setNote($note)
     {
-        $this->note = substr(strip_tags($note), 0, 254);
+        $this->note = substr(strip_tags(iconv('UTF-8', 'UTF-8//IGNORE', $note)), 0, 190);
 
         return $this;
     }

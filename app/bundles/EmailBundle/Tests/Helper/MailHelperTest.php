@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -16,15 +7,42 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
+use Mautic\EmailBundle\Swiftmailer\Spool\DelegatingSpool;
+use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\BcInterfaceTokenTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
+use Swift_Mailer;
 
-class MailHelperTest extends \PHPUnit_Framework_TestCase
+class MailHelperTest extends TestCase
 {
+    /**
+     * @var MauticFactory|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $mockFactory;
+
+    /**
+     * @var SpoolTransport
+     */
+    private $spoolTransport;
+
+    /**
+     * @var \Swift_Events_EventDispatcher
+     */
+    private $swiftEventsDispatcher;
+
+    /**
+     * @var DelegatingSpool
+     */
+    private $delegatingSpool;
+
+    /**
+     * @var array
+     */
     protected $contacts = [
         [
             'id'        => 1,
@@ -56,16 +74,21 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         ],
     ];
 
-    public function setUp()
+    protected function setUp(): void
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+
+        $this->mockFactory           = $this->createMock(MauticFactory::class);
+        $this->swiftEventsDispatcher = $this->createMock(\Swift_Events_EventDispatcher::class);
+        $this->delegatingSpool       = $this->createMock(DelegatingSpool::class);
+
+        $this->spoolTransport = new SpoolTransport($this->swiftEventsDispatcher, $this->delegatingSpool);
     }
 
-    /**
-     * @expectedException \Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException
-     */
     public function testQueueModeThrowsExceptionWhenBatchLimitHit()
     {
+        $this->expectException(BatchQueueMaxException::class);
+
         $mockFactory = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -79,7 +102,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $swiftMailer = new \Swift_Mailer(new BatchTransport());
+        $swiftMailer = new Swift_Mailer(new BatchTransport());
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
 
@@ -107,7 +130,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $swiftMailer = new \Swift_Mailer(new BatchTransport());
+        $swiftMailer = new Swift_Mailer(new BatchTransport());
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
 
@@ -128,7 +151,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mockFactory = $this->getMockFactory(false);
 
         $transport   = new BatchTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
+        $swiftMailer = new Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->enableQueue();
@@ -136,6 +159,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $email = new Email();
         $email->setFromAddress('override@nowhere.com');
         $email->setFromName('Test');
+        $email->setUseOwnerAsMailer(false);
 
         $mailer->setEmail($email);
 
@@ -149,7 +173,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $from = $mailer->message->getFrom();
 
         $this->assertTrue(array_key_exists('override@nowhere.com', $from));
-        $this->assertTrue(count($from) === 1);
+        $this->assertTrue(1 === count($from));
 
         $mailer->reset();
         foreach ($this->contacts as $contact) {
@@ -161,7 +185,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $from = $mailer->message->getFrom();
 
         $this->assertTrue(array_key_exists('nobody@nowhere.com', $from));
-        $this->assertTrue(count($from) === 1);
+        $this->assertTrue(1 === count($from));
     }
 
     public function testBatchMode()
@@ -169,7 +193,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mockFactory = $this->getMockFactory(false);
 
         $transport   = new BatchTransport(true);
-        $swiftMailer = new \Swift_Mailer($transport);
+        $swiftMailer = new Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->enableQueue();
@@ -200,9 +224,14 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mockFactory = $this->getMockFactory();
 
         $transport   = new BatchTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
+        $swiftMailer = new Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+
+        $email = new Email();
+        $email->setUseOwnerAsMailer(true);
+        $mailer->setEmail($email);
+
         $mailer->enableQueue();
 
         $mailer->setSubject('Hello');
@@ -261,6 +290,11 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $swiftMailer = new \Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body&#39;s Business']);
+        $email  = new Email();
+        $email->setUseOwnerAsMailer(true);
+
+        $mailer->setEmail($email);
+        $mailer->enableQueue();
         $mailer->enableQueue();
 
         $mailer->setSubject('Hello');
@@ -290,9 +324,14 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mockFactory = $this->getMockFactory();
 
         $transport   = new BcInterfaceTokenTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
+        $swiftMailer = new Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+
+        $email = new Email();
+        $email->setUseOwnerAsMailer(true);
+
+        $mailer->setEmail($email);
         $mailer->enableQueue();
 
         $mailer->setSubject('Hello');
@@ -319,7 +358,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mockFactory = $this->getMockFactory();
 
         $transport   = new BatchTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
+        $swiftMailer = new Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->enableQueue();
@@ -342,14 +381,95 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['override@owner.com'], array_unique($fromAddresses));
     }
 
+    public function testStandardEmailFrom()
+    {
+        $mockFactory = $this->getMockFactory(true);
+        $transport   = new BatchTransport();
+        $swiftMailer = new Swift_Mailer($transport);
+        $mailer      = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $email       = new Email();
+
+        $email->setUseOwnerAsMailer(false);
+        $email->setFromAddress('override@nowhere.com');
+        $email->setFromName('Test');
+        $mailer->setEmail($email);
+
+        foreach ($this->contacts as $key => $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->setBody('{signature}');
+            $mailer->send();
+            $from = key($mailer->message->getFrom());
+            $this->assertEquals('override@nowhere.com', $from);
+        }
+    }
+
+    public function testStandardEmailReplyTo()
+    {
+        $mockFactory = $this->getMockFactory(true);
+        $transport   = new BatchTransport();
+        $swiftMailer = new Swift_Mailer($transport);
+        $mailer      = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $email       = new Email();
+
+        $mailer->setEmail($email);
+        $replyTo = key((array) $mailer->message->getReplyTo());
+        $this->assertEquals('nobody@nowhere.com', $replyTo);
+
+        $email->setReplyToAddress('replytooverride@nowhere.com');
+        $mailer->setEmail($email);
+        $replyTo = key((array) $mailer->message->getReplyTo());
+        $this->assertEquals('replytooverride@nowhere.com', $replyTo);
+    }
+
+    public function testEmailReplyToWithFromEmail(): void
+    {
+        $mockFactory = $this->getMockFactory(true);
+        $transport   = new BatchTransport();
+        $swiftMailer = new Swift_Mailer($transport);
+        $mailer      = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $email       = new Email();
+
+        // From address is set
+        $email->setFromAddress('from@nowhere.com');
+        $mailer->setEmail($email);
+        $replyTo = key((array) $mailer->message->getReplyTo());
+        // Expect from address in reply to
+        $this->assertEquals('from@nowhere.com', $replyTo);
+    }
+
+    public function testEmailReplyToWithFromAndGlobalEmail(): void
+    {
+        $parameterMap = [
+            ['mailer_reply_to_email', false, 'admin@mautic.com'],
+        ];
+        $factoryMock = $this->getMockFactory(true, $parameterMap);
+        $transport   = new BatchTransport();
+        $swiftMailer = new Swift_Mailer($transport);
+        $mailer      = new MailHelper($factoryMock, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $email       = new Email();
+
+        // From address is set
+        $email->setFromAddress('from@nowhere.com');
+        $mailer->setEmail($email);
+        $replyTo = key($mailer->message->getReplyTo());
+        // Expect from address in reply to
+        $this->assertEquals('admin@mautic.com', $replyTo);
+    }
+
     public function testStandardOwnerAsMailer()
     {
         $mockFactory = $this->getMockFactory();
 
         $transport   = new SmtpTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
+        $swiftMailer = new Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+
+        $email = new Email();
+        $mailer->setEmail($email);
+        $email->setUseOwnerAsMailer(true);
+
         $mailer->setBody('{signature}');
 
         foreach ($this->contacts as $key => $contact) {
@@ -383,7 +503,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
         foreach ($addresses as $address) {
             // will throw Swift_RfcComplianceException if it will find the address invalid
-            $helper::validateEmail($address);
+            $this->assertNull($helper::validateEmail($address));
         }
     }
 
@@ -507,7 +627,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
         $transport   = new SmtpTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
+        $swiftMailer = new Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->setBody('{signature}');
@@ -519,7 +639,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
         $headers = $mailer->message->getHeaders()->getAll();
         foreach ($headers as $header) {
-            if (strpos($header->getFieldName(), 'X-Mautic-Test') !== false) {
+            if (false !== strpos($header->getFieldName(), 'X-Mautic-Test')) {
                 $customHeadersFounds[] = $header->getFieldName();
 
                 $this->assertEquals('test', $header->getValue());
@@ -537,7 +657,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
         $transport   = new SmtpTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
+        $swiftMailer = new Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->addTo($this->contacts[0]['email']);
@@ -551,9 +671,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
         $headers = $mailer->message->getHeaders()->getAll();
         foreach ($headers as $header) {
-            if (strpos($header->getFieldName(), 'X-Mautic-Test') !== false) {
-                $this->fail('System headers were not supposed to be set');
-            }
+            $this->assertFalse(strpos($header->getFieldName(), 'X-Mautic-Test'), 'System headers were not supposed to be set');
         }
     }
 
@@ -565,7 +683,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
         $transport   = new SmtpTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
+        $swiftMailer = new Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->addTo($this->contacts[0]['email']);
@@ -582,7 +700,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
         $headers = $mailer->message->getHeaders()->getAll();
         foreach ($headers as $header) {
-            if (strpos($header->getFieldName(), 'X-Mautic-Test') !== false) {
+            if (false !== strpos($header->getFieldName(), 'X-Mautic-Test')) {
                 $customHeadersFounds[] = $header->getFieldName();
 
                 $this->assertEquals('test2', $header->getValue());
@@ -596,7 +714,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
     {
         $mockFactory = $this->getMockFactory();
         $transport   = ($useSmtp) ? new SmtpTransport() : new BatchTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
+        $swiftMailer = new Swift_Mailer($transport);
 
         return new MailHelper($mockFactory, $swiftMailer);
     }
@@ -673,5 +791,57 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
             );
 
         return $mockFactory;
+    }
+
+    public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair()
+    {
+        $mockFactory = $this->getMockBuilder(MauticFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mockFactory->method('getParameter')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mailer_return_path', false, null],
+                        ['mailer_spool_type', false, 'memory'],
+                    ]
+                )
+            );
+
+        $swiftMailer = new Swift_Mailer(new SmtpTransport());
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+
+        $mailer->setTo(['sombody@somewhere.com', 'sombodyelse@somewhere.com'], 'test');
+
+        $this->assertEquals(
+            [
+                'sombody@somewhere.com'     => 'test',
+                'sombodyelse@somewhere.com' => 'test',
+            ],
+            $mailer->message->getTo()
+        );
+    }
+
+    public function testThatTokenizationIsEnabledIfTransportSupportsTokenization()
+    {
+        $swiftMailer = new Swift_Mailer($this->spoolTransport);
+        $this->delegatingSpool->expects($this->once())
+            ->method('isTokenizationEnabled')
+            ->willReturn(true);
+
+        $mailer = new MailHelper($this->mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $this->assertTrue($mailer->inTokenizationMode());
+    }
+
+    public function testThatTokenizationIsDisabledIfTransportDoesnotSupportTokenization()
+    {
+        $swiftMailer = new Swift_Mailer($this->spoolTransport);
+        $this->delegatingSpool->expects($this->once())
+            ->method('isTokenizationEnabled')
+            ->willReturn(false);
+
+        $mailer = new MailHelper($this->mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $this->assertFalse($mailer->inTokenizationMode());
     }
 }

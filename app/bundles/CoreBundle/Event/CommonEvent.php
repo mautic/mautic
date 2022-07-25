@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -40,6 +31,11 @@ class CommonEvent extends Event
     protected $changes;
 
     /**
+     * @var string
+     */
+    protected $failed;
+
+    /**
      * Sets the entity manager for the event to use.
      *
      * @param \Doctrine\ORM\EntityManager $em
@@ -57,6 +53,11 @@ class CommonEvent extends Event
     public function isNew()
     {
         return $this->isNew;
+    }
+
+    public function setFailed(string $reason): void
+    {
+        $this->failed = $reason;
     }
 
     /**

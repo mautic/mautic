@@ -1,20 +1,12 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\Form\Type;
 
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -35,9 +27,6 @@ class CitrixCampaignEventType extends AbstractType
 
     /**
      * CitrixCampaignEventType constructor.
-     *
-     * @param CitrixModel         $model
-     * @param TranslatorInterface $translator
      */
     public function __construct(CitrixModel $model, TranslatorInterface $translator)
     {
@@ -75,11 +64,11 @@ class CitrixCampaignEventType extends AbstractType
 
         $builder->add(
             'event-criteria-'.$product,
-            'choice',
+            ChoiceType::class,
             [
-                'label'   => $this->translator->trans('plugin.citrix.decision.criteria'),
-                'choices' => $choices,
-            ]
+                'label'             => $this->translator->trans('plugin.citrix.decision.criteria'),
+                'choices'           => array_flip($choices),
+                ]
         );
 
         $choices = array_replace(
@@ -89,11 +78,11 @@ class CitrixCampaignEventType extends AbstractType
 
         $builder->add(
             $product.'-list',
-            'choice',
+            ChoiceType::class,
             [
-                'label'    => $this->translator->trans('plugin.citrix.decision.'.$product.'.list'),
-                'choices'  => $choices,
-                'multiple' => true,
+                'label'             => $this->translator->trans('plugin.citrix.decision.'.$product.'.list'),
+                'choices'           => array_flip($choices),
+                'multiple'          => true,
             ]
         );
     }
@@ -101,7 +90,7 @@ class CitrixCampaignEventType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'citrix_campaign_event';
     }

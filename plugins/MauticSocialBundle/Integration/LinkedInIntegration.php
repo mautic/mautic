@@ -1,15 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Integration;
+
+use MauticPlugin\MauticSocialBundle\Form\Type\LinkedInType;
 
 /**
  * Class LinkedInIntegration.
@@ -199,5 +192,13 @@ class LinkedInIntegration extends SocialIntegration
             'publicProfileUrl' => ['type' => 'string', 'fieldName' => 'public-profile-url'],
             'emailAddress'     => ['type' => 'string', 'fieldName' => 'email-address'],
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormType()
+    {
+        return LinkedInType::class;
     }
 }

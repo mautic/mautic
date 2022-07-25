@@ -53,6 +53,8 @@ $view['slots']->set(
     $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $list])
 );
 
+$hasSegmentMembershipFilter = $list->hasFilterTypeOf('leadlist');
+
 ?>
 
 <!-- start: box layout -->
@@ -78,6 +80,10 @@ $view['slots']->set(
                                 'MauticCoreBundle:Helper:details.html.php',
                                 ['entity' => $list]
                             ); ?>
+                            <tr>
+                                <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans('mautic.lead.leads'); ?></span></td>
+                                <td><?php echo $segmentCount; ?></td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -153,14 +159,72 @@ $view['slots']->set(
                         <?php echo $view['translator']->trans('mautic.lead.leads'); ?>
                     </a>
                 </li>
+                <?php if ($hasSegmentMembershipFilter) : ?>
+                <li>
+                    <a id="segment-dependencies" href="#segment-dependencies-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.lead.segment.dependencies'); ?>
+                    </a>
+                </li>
+                <?php endif; ?>
+                <li>
+                    <a id="campaign-share-tab" href="#campaign-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.lead.campaign.share'); ?>
+                    </a>
+                </li>
             </ul>
             <!--/ tabs controls -->
         </div>
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
-            <div class="tab-pane active bdr-w-0 page-list" id="contacts-container">
-                <?php echo $contacts; ?>
+            <div class="tab-pane active bdr-w-0 page-list" id="contacts-container" data-target-url="<?php
+            echo $view['router']->url(
+                'mautic_segment_contacts',
+                ['objectId' => $list->getId(), 'page' => $app->getSession()->get('mautic.segment.contact.page', 1)]
+            );
+            ?>">
+
+            <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+            </div>
+
+            <?php if ($hasSegmentMembershipFilter) : ?>
+            <div class="tab-pane bdr-w-0 page-list" id="segment-dependencies-container">
+            </div>
+            <?php endif; ?>
+
+            <div class="tab-pane bdr-w-0 page-list" id="campaign-container">
+                <div id="campaign-share-container" style="position: relative">
+                    <table id="campaign-share-table" class="table table-bordered table-striped mb-0">
+                        <thead>
+                        <tr>
+                            <th>
+                                <?php echo $view['translator']->trans('mautic.campaign.campaign'); ?>
+                            </th>
+                            <th>
+                                <?php echo $view['translator']->trans('mautic.lead.share'); ?>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($campaignStats as $stat) : ?>
+                            <tr>
+                                <td>
+                                    <a href="<?php echo $view['router']->path(
+                                        'mautic_campaign_action',
+                                        ['objectAction' => 'view', 'objectId' => $stat['id']]
+                                    ); ?>" data-toggle="ajax">
+                                        <?php echo $stat['name']; ?>
+                                    </a>
+                                </td>
+                                <td width="20%">
+                                    <span class="campaign-share-stat" data-value="<?php echo $stat['id']; ?>"
+                                          id="campaign-share-stat-<?php echo $stat['id']; ?>"><?php echo $stat['share']; ?></span> %
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <!-- end: tab-content -->
@@ -169,6 +233,13 @@ $view['slots']->set(
 
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
+        <?php
+        echo $view->render('MauticCoreBundle:Helper:usage.html.php', [
+            'title' => $view['translator']->trans('mautic.lead.segments.usages'),
+            'stats' => $usageStats,
+            ]);
+        ?>
+
         <!-- activity feed -->
         <?php // echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]);?>
     </div>

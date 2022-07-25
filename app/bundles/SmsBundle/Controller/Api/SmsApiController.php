@@ -1,17 +1,7 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\SmsBundle\Model\SmsModel;
@@ -45,24 +35,6 @@ class SmsApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of emails.
-     *
-     * @return Response
-     */
-    public function receiveAction()
-    {
-        $body = $this->request->get('Body');
-        $from = $this->request->get('From');
-
-        if ($body === 'STOP' && $this->factory->getHelper('sms')->unsubscribe($from)) {
-            return new Response('<Response><Sms>You have been unsubscribed.</Sms></Response>', 200, ['Content-Type' => 'text/xml; charset=utf-8']);
-        }
-
-        // Return an empty response
-        return new Response();
-    }
-
-    /**
      * @param $id
      * @param $contactId
      *
@@ -71,7 +43,7 @@ class SmsApiController extends CommonApiController
     public function sendAction($id, $contactId)
     {
         if (!$this->get('mautic.sms.transport_chain')->getEnabledTransports()) {
-            return new JsonResponse(json_encode(['error' => ['message' => 'SMS transport is disabled.', 'code' => Codes::HTTP_EXPECTATION_FAILED]]));
+            return new JsonResponse(json_encode(['error' => ['message' => 'SMS transport is disabled.', 'code' => Response::HTTP_EXPECTATION_FAILED]]));
         }
 
         $message = $this->model->getEntity((int) $id);
@@ -94,7 +66,7 @@ class SmsApiController extends CommonApiController
         } catch (\Exception $e) {
             $this->get('monolog.logger.mautic')->addError($e->getMessage(), ['error' => (array) $e]);
 
-            return new Response('Interval server error', Codes::HTTP_INTERNAL_SERVER_ERROR);
+            return new Response('Interval server error', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $success = !empty($response['sent']);
@@ -110,7 +82,7 @@ class SmsApiController extends CommonApiController
                 'result'  => $response,
                 'errors'  => $success ? [] : [['message' => $response['status']]],
             ],
-            Codes::HTTP_OK  //  200 - is legacy, we cannot change it yet
+            Response::HTTP_OK  //  200 - is legacy, we cannot change it yet
         );
 
         return $this->handleView($view);

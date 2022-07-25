@@ -52,12 +52,12 @@
                     if (k.match(/assetlink=/i) && v.match(/a:/)){
                         delete tokens[k];
                         var nv = v.replace('a:', '');
-                        k = '<a title=\'Asset Link\' href=\'' + k + '\'>' + nv + '</a>';
+                        k = '<a title="Asset Link" href="' + k + '">' + nv + '</a>';
                         tokens[k] = nv;
                     } else if (k.match(/pagelink=/i) && v.match(/a:/)){
                         delete tokens[k];
                         nv = v.replace('a:', '');
-                        k = '<a title=\'Page Link\' href=\'' + k + '\'>' + nv + '</a>';
+                        k = '<a title="Page Link" href="' + k + '">' + nv + '</a>';
                         tokens[k] = nv;
                     } else if (k.match(/dwc=/i)){
                         var tn = k.substr(5, k.length - 6);
@@ -91,7 +91,9 @@
                                                                 str.replace(/_BADGE_/,'dwc') : '';
                     var title = tokens[val];
                     if (title.length>24) title = title.substr(0, 24) + '...';
-                    var newOption = '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="token" data-param1="' + val + '" title="' + title + '">' + title + badge + '</a></li>';
+                    var normalizedValue = val.replace(new RegExp('"', 'g'), "'");
+                    var newOption = '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option"' +
+                        ' data-cmd="token" data-param1="' + normalizedValue + '" title="' + title + '">' + title + badge + '</a></li>';
                     options.push(newOption);
                 }
 

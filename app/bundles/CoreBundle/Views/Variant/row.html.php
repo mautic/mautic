@@ -94,7 +94,7 @@ $isCurrent = ($variant->getId() === $activeEntity->getId());
                         </div>
                     <?php endif; ?>
                     <h5 class="fw-sb text-primary">
-                        <a href="<?php echo $actionUrl ?>" data-toggle="ajax">
+                        <a href="<?php echo $actionUrl; ?>" data-toggle="ajax">
                             <?php echo $variant->$nameGetter(); ?>
                         </a>
                         <?php if ($isCurrent) : ?>

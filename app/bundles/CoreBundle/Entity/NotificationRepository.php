@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 /**
@@ -103,7 +94,7 @@ class NotificationRepository extends CommonRepository
         /** @var Notification $result */
         $result = $qb->getQuery()->getOneOrNullResult();
 
-        return $result === null ? null : $result->getDateAdded();
+        return null === $result ? null : $result->getDateAdded();
     }
 
     /**
@@ -145,7 +136,7 @@ class NotificationRepository extends CommonRepository
         }
 
         $qb->where($expr)
-            ->orderBy('n.id');
+            ->orderBy('n.dateAdded', 'DESC');
 
         if ($limit) {
             $qb->setMaxResults($limit);

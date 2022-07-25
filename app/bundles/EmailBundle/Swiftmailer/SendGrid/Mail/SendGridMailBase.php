@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
@@ -29,11 +20,9 @@ class SendGridMailBase
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     *
      * @return Mail
      */
-    public function getSendGridMail(\Swift_Mime_Message $message)
+    public function getSendGridMail(\Swift_Mime_SimpleMessage $message)
     {
         $froms       = $message->getFrom();
         $from        = new Email(current($froms), key($froms));
@@ -43,7 +32,7 @@ class SendGridMailBase
         $contentSecond = null;
 
         // Plain text message must be first if present
-        if ($contentMain->getType() !== 'text/plain') {
+        if ('text/plain' !== $contentMain->getType()) {
             $plainText = $this->plainTextMessageHelper->getPlainTextFromMessageNotStatic($message);
             if ($plainText) {
                 $contentSecond = $contentMain;
@@ -65,12 +54,10 @@ class SendGridMailBase
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     *
      * @return string
      */
-    private function getContentType(\Swift_Mime_Message $message)
+    private function getContentType(\Swift_Mime_SimpleMessage $message)
     {
-        return $message->getContentType() === 'text/plain' ? $message->getContentType() : 'text/html';
+        return 'text/plain' === $message->getContentType() ? $message->getContentType() : 'text/html';
     }
 }

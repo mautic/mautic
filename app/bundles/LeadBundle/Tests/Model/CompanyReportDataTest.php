@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -18,14 +9,14 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
+class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var TranslatorInterface
      */
     private $translator;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
@@ -73,6 +64,7 @@ class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
 
         $expected = [
             'comp.id' => [
+                'alias' => 'comp_id',
                 'label' => 'mautic.lead.report.company.company_id',
                 'type'  => 'int',
                 'link'  => 'mautic_company_action',
@@ -80,6 +72,10 @@ class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
             'companies_lead.is_primary' => [
                 'label' => 'mautic.lead.report.company.is_primary',
                 'type'  => 'bool',
+            ],
+            'companies_lead.date_added' => [
+                'label' => 'mautic.lead.report.company.date_added',
+                'type'  => 'datetime',
             ],
             'comp.boolField' => [
                 'label' => 'mautic.report.field.company.label',

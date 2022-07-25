@@ -1,24 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class EmailSendEvent.
- */
 class EmailSendEvent extends CommonEvent
 {
     /**
@@ -27,7 +16,7 @@ class EmailSendEvent extends CommonEvent
     private $helper;
 
     /**
-     * @var Mail
+     * @var Email|null
      */
     private $email;
 
@@ -47,12 +36,12 @@ class EmailSendEvent extends CommonEvent
     private $subject = '';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $idHash;
 
     /**
-     * @var Lead
+     * @var Lead|mixed[]|null
      */
     private $lead;
 
@@ -82,60 +71,30 @@ class EmailSendEvent extends CommonEvent
     private $isDynamicContentParsing;
 
     /**
-     * EmailSendEvent constructor.
-     *
-     * @param MailHelper|null $helper
-     * @param array           $args
-     * @param bool            $isDynamicContentParsing
+     * @param array $args
+     * @param bool  $isDynamicContentParsing
      */
     public function __construct(MailHelper $helper = null, $args = [], $isDynamicContentParsing = false)
     {
-        $this->helper = $helper;
+        $this->helper      = $helper;
+        $this->content     = $args['content'] ?? '';
+        $this->plainText   = $args['plainText'] ?? '';
+        $this->subject     = $args['subject'] ?? '';
+        $this->email       = $args['email'] ?? null;
+        $this->idHash      = $args['idHash'] ?? null;
+        $this->lead        = $args['lead'] ?? null;
+        $this->source      = $args['source'] ?? [];
+        $this->tokens      = $args['tokens'] ?? [];
+        $this->textHeaders = $args['textHeaders'] ?? [];
 
-        if (isset($args['content'])) {
-            $this->content = $args['content'];
-        }
-
-        if (isset($args['plainText'])) {
-            $this->plainText = $args['plainText'];
-        }
-
-        if (isset($args['subject'])) {
-            $this->subject = $args['subject'];
-        }
-
-        if (isset($args['email'])) {
-            $this->email = $args['email'];
-        }
-
-        if (!$this->subject && isset($args['email']) && $args['email'] instanceof Email) {
+        if (!$this->subject && $this->email instanceof Email) {
             $this->subject = $args['email']->getSubject();
-        }
-
-        if (isset($args['idHash'])) {
-            $this->idHash = $args['idHash'];
-        }
-
-        if (isset($args['lead'])) {
-            $this->lead = $args['lead'];
-        }
-
-        if (isset($args['source'])) {
-            $this->source = $args['source'];
-        }
-
-        if (isset($args['tokens'])) {
-            $this->tokens = $args['tokens'];
         }
 
         if (isset($args['internalSend'])) {
             $this->internalSend = $args['internalSend'];
-        } elseif ($helper !== null) {
+        } elseif (null !== $helper) {
             $this->internalSend = $helper->isInternalSend();
-        }
-
-        if (isset($args['textHeaders'])) {
-            $this->textHeaders = $args['textHeaders'];
         }
 
         $this->isDynamicContentParsing = $isDynamicContentParsing;
@@ -158,7 +117,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function inTokenizationMode()
     {
-        return ($this->helper !== null) ? $this->helper->inTokenizationMode() : false;
+        return (null !== $this->helper) ? $this->helper->inTokenizationMode() : false;
     }
 
     /**
@@ -168,7 +127,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getEmail()
     {
-        return ($this->helper !== null) ? $this->helper->getEmail() : $this->email;
+        return (null !== $this->helper) ? $this->helper->getEmail() : $this->email;
     }
 
     /**
@@ -176,11 +135,11 @@ class EmailSendEvent extends CommonEvent
      *
      * @param $replaceTokens
      *
-     * @return array
+     * @return string
      */
     public function getContent($replaceTokens = false)
     {
-        if ($this->helper !== null) {
+        if (null !== $this->helper) {
             $content = $this->helper->getBody();
         } else {
             $content = $this->content;
@@ -196,11 +155,12 @@ class EmailSendEvent extends CommonEvent
      */
     public function setContent($content)
     {
-        if ($this->helper !== null) {
-            $this->helper->setBody($content, 'text/html', null, true, true);
+        if (null !== $this->helper) {
+            $this->helper->setBody($content, 'text/html', null, true);
         } else {
             $this->content = $content;
         }
+        $this->setGeneratedPlainText();
     }
 
     /**
@@ -210,7 +170,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getPlainText()
     {
-        if ($this->helper !== null) {
+        if (null !== $this->helper) {
             return $this->helper->getPlainText();
         } else {
             return $this->plainText;
@@ -222,10 +182,26 @@ class EmailSendEvent extends CommonEvent
      */
     public function setPlainText($content)
     {
-        if ($this->helper !== null) {
+        if (null !== $this->helper) {
             $this->helper->setPlainText($content);
         } else {
             $this->plainText = $content;
+        }
+        $this->setGeneratedPlainText();
+    }
+
+    /**
+     * Check if plain text is empty. If yes, generate it.
+     */
+    private function setGeneratedPlainText()
+    {
+        $htmlContent = $this->getContent();
+        if ('' === $this->getPlainText() && '' !== $htmlContent) {
+            $parser             = new PlainTextHelper();
+            $generatedPlainText = $parser->setHtml($htmlContent)->getText();
+            if ('' !== $generatedPlainText) {
+                $this->setPlainText($generatedPlainText);
+            }
         }
     }
 
@@ -234,7 +210,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getSubject()
     {
-        if ($this->helper !== null) {
+        if (null !== $this->helper) {
             return $this->helper->getSubject();
         } else {
             return $this->subject;
@@ -248,7 +224,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function setSubject($subject)
     {
-        if ($this->helper !== null) {
+        if (null !== $this->helper) {
             $this->helper->setSubject($subject);
         } else {
             $this->subject = $subject;
@@ -270,7 +246,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getLead()
     {
-        return ($this->helper !== null) ? $this->helper->getLead() : $this->lead;
+        return (null !== $this->helper) ? $this->helper->getLead() : $this->lead;
     }
 
     /**
@@ -278,7 +254,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getIdHash()
     {
-        return ($this->helper !== null) ? $this->helper->getIdHash() : $this->idHash;
+        return (null !== $this->helper) ? $this->helper->getIdHash() : $this->idHash;
     }
 
     /**
@@ -286,12 +262,9 @@ class EmailSendEvent extends CommonEvent
      */
     public function getSource()
     {
-        return ($this->helper !== null) ? $this->helper->getSource() : $this->source;
+        return (null !== $this->helper) ? $this->helper->getSource() : $this->source;
     }
 
-    /**
-     * @param array $tokens
-     */
     public function addTokens(array $tokens)
     {
         $this->tokens = array_merge($this->tokens, $tokens);
@@ -328,7 +301,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function addTextHeader($name, $value)
     {
-        if ($this->helper !== null) {
+        if (null !== $this->helper) {
             $this->helper->addCustomHeader($name, $value);
         } else {
             $this->textHeaders[$name] = $value;
@@ -340,7 +313,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getTextHeaders()
     {
-        return ($this->helper !== null) ? $this->helper->getCustomHeaders() : $this->textHeaders;
+        return (null !== $this->helper) ? $this->helper->getCustomHeaders() : $this->textHeaders;
     }
 
     /**
@@ -366,11 +339,11 @@ class EmailSendEvent extends CommonEvent
             //what entity is sending the email?
             'source' => $source,
             //the email being sent to be logged in page hit if applicable
-            'email' => ($email != null) ? $email->getId() : null,
+            'email' => (null != $email) ? $email->getId() : null,
             'stat'  => $this->getIdHash(),
         ];
         $lead = $this->getLead();
-        if ($lead !== null) {
+        if (null !== $lead) {
             $clickthrough['lead'] = $lead['id'];
         }
 

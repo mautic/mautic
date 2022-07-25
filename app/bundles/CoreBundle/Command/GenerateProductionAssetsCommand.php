@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -65,7 +56,7 @@ EOT
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $container->get('translator');
-        $translator->setLocale($container->get('mautic.helper.core_parameters')->getParameter('locale'));
+        $translator->setLocale($container->get('mautic.helper.core_parameters')->get('locale'));
 
         // Update successful
         $output->writeln('<info>'.$translator->trans('mautic.core.command.asset_generate_success').'</info>');

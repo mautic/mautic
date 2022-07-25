@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\RecipientDTO;
 
 /**
@@ -29,7 +20,7 @@ final class AddressDTO implements \JsonSerializable
     /**
      * @var string|null
      */
-    private $headerTo = null;
+    private $headerTo;
 
     /**
      * AddressDTO constructor.
@@ -42,7 +33,7 @@ final class AddressDTO implements \JsonSerializable
     {
         $this->email = $email;
         $this->name  = $name;
-        if ($bcc === false) {
+        if (false === $bcc) {
             $this->headerTo = $email;
         }
     }
@@ -56,7 +47,7 @@ final class AddressDTO implements \JsonSerializable
             'email' => $this->email,
             'name'  => $this->name,
         ];
-        if ($this->headerTo !== null) {
+        if (null !== $this->headerTo) {
             $json['header_to'] = $this->headerTo;
         }
 

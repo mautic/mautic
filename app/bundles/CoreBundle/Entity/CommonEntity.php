@@ -1,17 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class CommonEntity
 {
@@ -25,6 +18,13 @@ class CommonEntity
      */
     protected $pastChanges = [];
 
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setMappedSuperClass();
+    }
+
     /**
      * Wrapper function for isProperty methods.
      *
@@ -35,9 +35,9 @@ class CommonEntity
      */
     public function __call($name, $arguments)
     {
-        if (strpos($name, 'is') === 0 && method_exists($this, 'get'.ucfirst($name))) {
+        if (0 === strpos($name, 'is') && method_exists($this, 'get'.ucfirst($name))) {
             return $this->{'get'.ucfirst($name)}();
-        } elseif ($name == 'getName' && method_exists($this, 'getTitle')) {
+        } elseif ('getName' == $name && method_exists($this, 'getTitle')) {
             return $this->getTitle();
         }
 
@@ -65,7 +65,7 @@ class CommonEntity
     {
         $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'category') {
+        if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -142,9 +142,6 @@ class CommonEntity
         $this->changes     = [];
     }
 
-    /**
-     * @param array $changes
-     */
     public function setChanges(array $changes)
     {
         $this->changes = $changes;

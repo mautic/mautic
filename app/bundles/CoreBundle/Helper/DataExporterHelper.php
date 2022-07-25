@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: Sam
- * Date: 05/04/2017
- * Time: 16:58.
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;
@@ -18,10 +11,7 @@ class DataExporterHelper
      *
      * Overwrite in your controller if required.
      *
-     * @param AbstractCommonModel $model
-     * @param array               $args
-     * @param callable|null       $resultsCallback
-     * @param int|null            $start
+     * @param int|null $start
      *
      * @return array
      */
@@ -32,7 +22,7 @@ class DataExporterHelper
 
         $results = $model->getEntities($args);
         $items   = $results['results'];
-        if (count($items) === 0) {
+        if (0 === count($items)) {
             return null;
         }
         unset($results);
@@ -61,8 +51,6 @@ class DataExporterHelper
     }
 
     /**
-     * @param array $row
-     *
      * @return array
      */
     private function secureAgainstCsvInjection(array $row)

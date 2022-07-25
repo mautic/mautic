@@ -1,30 +1,20 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFullContactBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class LookupType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'objectId',
-            'hidden',
+            HiddenType::class,
             [
                 'attr' => [
                     'value' => $options['data']['objectId'],
@@ -34,7 +24,7 @@ class LookupType extends AbstractType
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'apply_text'     => false,
                 'save_text'      => 'mautic.core.form.submit',
@@ -47,7 +37,7 @@ class LookupType extends AbstractType
 
         $builder->add(
             'notify',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.plugin.fullcontact.notify',
                 'label_attr' => ['class' => 'control-label'],
@@ -67,7 +57,7 @@ class LookupType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'fullcontact_lookup';
     }

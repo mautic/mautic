@@ -1,41 +1,134 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Transport;
 
-use Mautic\CoreBundle\Translation\Translator;
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Stream;
+use Http\Mock\Client;
+use Http\Promise\Promise;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Model\TransportCallback;
+use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
+use SparkPost\SparkPost;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
+class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
 {
-    public function testWebhookPayloadIsProcessed()
+    /**
+     * @var MockObject|TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var MockObject|TransportCallback
+     */
+    private $transportCallback;
+
+    /**
+     * @var MockObject|Client
+     */
+    private $httpClient;
+
+    /**
+     * @var MockObject|Promise
+     */
+    private $promise;
+
+    /**
+     * @var MockObject|Response
+     */
+    private $response;
+
+    /**
+     * @var MockObject|Stream
+     */
+    private $stream;
+
+    /**
+     * @var MockObject|MauticMessage
+     */
+    private $message;
+
+    /**
+     * @var MockObject|\Swift_Mime_SimpleHeaderSet
+     */
+    private $headers;
+
+    /**
+     * @var MockObject|SparkpostFactoryInterface
+     */
+    private $sparkpostFactory;
+
+    /**
+     * @var SparkPost
+     */
+    private $sparkpostClient;
+
+    /**
+     * @var SparkpostTransport
+     */
+    private $sparkpostTransport;
+
+    /**
+     * @var MockObject|LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    protected function setUp(): void
     {
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $translator->method('trans')
-            ->willReturnCallback(
-                function ($key) {
-                    return $key;
-                }
-            );
+        parent::setUp();
 
-        $transportCallback = $this->getMockBuilder(TransportCallback::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->transportCallback    = $this->createMock(TransportCallback::class);
+        $this->httpClient           = $this->createMock(Client::class);
+        $this->promise              = $this->createMock(Promise::class);
+        $this->response             = $this->createMock(Response::class);
+        $this->stream               = $this->createMock(Stream::class);
+        $this->message              = $this->createMock(MauticMessage::class);
+        $this->headers              = $this->createMock(\Swift_Mime_SimpleHeaderSet::class);
+        $this->sparkpostFactory     = $this->createMock(SparkpostFactoryInterface::class);
+        $this->logger               = $this->createMock(LoggerInterface::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->sparkpostClient      = new SparkPost($this->httpClient, ['key' => '1234']);
+        $this->sparkpostTransport   = new SparkpostTransport(
+            '1234',
+            $this->translator,
+            $this->transportCallback,
+            $this->sparkpostFactory,
+            $this->logger,
+            $this->coreParametersHelper
+        );
 
-        $transportCallback->expects($this->exactly(6))
+        $this->translator->method('trans')
+            ->willReturnCallback(function ($key) {
+                return $key;
+            });
+
+        $this->httpClient->method('sendAsyncRequest')->willReturn($this->promise);
+        $this->promise->method('wait')->willReturn($this->response);
+        $this->message->method('getChildren')->willReturn([]);
+        $this->message->method('getHeaders')->willReturn($this->headers);
+        $this->headers->method('getAll')->willReturn([]);
+        $this->response->method('getBody')->willReturn($this->stream);
+        $this->sparkpostFactory->method('create')->willReturn($this->sparkpostClient);
+    }
+
+    public function testWebhookPayloadIsProcessed(): void
+    {
+        $this->transportCallback->expects($this->exactly(6))
             ->method('addFailureByHashId')
             ->withConsecutive(
                 [$this->equalTo('1'), 'MAIL REFUSED - IP (17.99.99.99) is in black list', DoNotContact::BOUNCED],
@@ -45,9 +138,9 @@ class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
                 [$this->equalTo('5'), 'unsubscribed', DoNotContact::UNSUBSCRIBED],
                 [$this->equalTo('6'), 'unsubscribed', DoNotContact::UNSUBSCRIBED]
                 // cc recipient type is ignored so addFailureByHashId should not be called
-        );
+            );
 
-        $transportCallback->expects($this->once())
+        $this->transportCallback->expects($this->once())
             ->method('addFailureByAddress')
             ->with(
                 'bounce@example.com',
@@ -55,12 +148,175 @@ class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
                 DoNotContact::BOUNCED
             );
 
-        $sparkpost = new SparkpostTransport('1234', $translator, $transportCallback);
-
-        $sparkpost->processCallbackRequest($this->getRequestWithPayload());
+        $this->sparkpostTransport->processCallbackRequest($this->getRequestWithPayload());
     }
 
-    private function getRequestWithPayload()
+    /**
+     * @see https://www.sparkpost.com/blog/error-handling-transmissions-api/
+     */
+    public function testSendWithOldErrorResponse(): void
+    {
+        $templateCheckPayload = '{
+            "results": {
+                "subject": "Summer deals for Natalie",
+                "html": "<b>Check out these deals Natalie!</b>"
+            }
+        }';
+        $transmissionPayload = '{  
+            "errors":[{
+                "description":"Unconfigured or unverified sending domain.",
+                "code":"1902",
+                "message":"Invalid domain"
+            }]
+        }';
+
+        $this->message->method('getMetadata')->willReturn(['jane@doe.email' => ['leadId' => 21]]);
+        $this->message->method('getSubject')->willReturn('Top secret');
+        $this->message->method('getFrom')->willReturn(['john@doe.email' => 'John']);
+        $this->message->method('getTo')->willReturn(['jane@doe.email' => 'Jane']);
+        $this->response->method('getStatusCode')->willReturn(200);
+
+        $this->stream->expects($this->exactly(2))
+            ->method('__toString')
+            ->willReturnOnConsecutiveCalls($templateCheckPayload, $transmissionPayload);
+
+        $this->transportCallback
+            ->expects($this->once())
+            ->method('addFailureByContactId')
+            ->with(21, 'Unconfigured or unverified sending domain.', DoNotContact::BOUNCED, null);
+
+        $this->expectExceptionMessage('Unconfigured or unverified sending domain.');
+        $this->sparkpostTransport->send($this->message);
+    }
+
+    /**
+     * @see https://www.sparkpost.com/blog/error-handling-transmissions-api/
+     */
+    public function testSendWithNewErrorResponse(): void
+    {
+        $templateCheckPayload = '{
+            "results": {
+                "subject": "Summer deals for Natalie",
+                "html": "<b>Check out these deals Natalie!</b>"
+            }
+        }';
+        $transmissionPayload = '{  
+            "errors":[  
+              {
+                "code":"1902",
+                "message":"Invalid domain"
+              }
+            ]
+        }';
+
+        $this->message->method('getMetadata')->willReturn(['jane@doe.email' => ['leadId' => 21]]);
+        $this->message->method('getSubject')->willReturn('Top secret');
+        $this->message->method('getFrom')->willReturn(['john@doe.email' => 'John']);
+        $this->message->method('getTo')->willReturn(['jane@doe.email' => 'Jane']);
+        $this->response->method('getStatusCode')->willReturn(200);
+
+        $this->stream->expects($this->exactly(2))
+            ->method('__toString')
+            ->willReturnOnConsecutiveCalls($templateCheckPayload, $transmissionPayload);
+
+        $this->transportCallback
+            ->expects($this->once())
+            ->method('addFailureByContactId')
+            ->with(21, 'Invalid domain', DoNotContact::BOUNCED, null);
+
+        $this->expectExceptionMessage('Invalid domain');
+        $this->sparkpostTransport->send($this->message);
+    }
+
+    public function testCampaignIdFromUtmTagInPayload(): void
+    {
+        $metadata = [
+            'name'        => 'Joe Smith',
+            'leadId'      => '1',
+            'emailId'     => 20,
+            'emailName'   => 'Campaign Test Email',
+            'hashId'      => '5c92a91788e39848445285',
+            'hashIdState' => true,
+            'source'      => [
+                    'email',
+                    20,
+                ],
+            'tokens'      => [
+                    '{dynamiccontent="Dynamic Content 1"}' => 'Default Dynamic Content',
+                    '{unsubscribe_text}'                   => '<a href="http://website/email/unsubscribe/5c92a91788e39848445285">Unsubscribe</a> to no longer receive emails from us.',
+                    '{unsubscribe_url}'                    => 'http://website/email/unsubscribe/5c92a91788e39848445285',
+                    '{webview_text}'                       => '<a href="http://website/email/view/5c92a91788e39848445285">Having trouble reading this email? Click here.</a>',
+                    '{webview_url}'                        => 'http://website/email/view/5c92a91788e39848445285',
+                    '{signature}'                          => 'Best regards, Company',
+                    '{subject}'                            => 'Campaign Test',
+                    '{tracking_pixel}'                     => 'http://website/email/5c92a91788e39848445285.gif',
+                ],
+            'utmTags'     => [
+                    'utmSource'   => null,
+                    'utmMedium'   => null,
+                    'utmCampaign' => 'Campaign Test',
+                    'utmContent'  => null,
+                ],
+        ];
+
+        $message = new MauticMessage();
+        $message->addMetadata('test@test.com', $metadata);
+        $message->addTo('test@test.com');
+        $message->setFrom('someone@somewhere.com');
+        $message->setSubject('Test Email');
+        $message->setBody('Hello');
+
+        $sparkpost = new SparkpostTransport('abc123', $this->translator, $this->transportCallback, $this->sparkpostFactory, $this->logger, $this->coreParametersHelper);
+        $message   = $sparkpost->getSparkPostMessage($message);
+
+        $this->assertEquals($message['campaign_id'], 'Campaign Test');
+    }
+
+    public function testCampaignIdFromEmailNameInPayload(): void
+    {
+        $metadata = [
+            'name'        => 'Joe Smith',
+            'leadId'      => '1',
+            'emailId'     => 20,
+            'emailName'   => 'Campaign Test Email',
+            'hashId'      => '5c92a91788e39848445285',
+            'hashIdState' => true,
+            'source'      => [
+                    'email',
+                    20,
+                ],
+            'tokens'      => [
+                    '{dynamiccontent="Dynamic Content 1"}' => 'Default Dynamic Content',
+                    '{unsubscribe_text}'                   => '<a href="http://website/email/unsubscribe/5c92a91788e39848445285">Unsubscribe</a> to no longer receive emails from us.',
+                    '{unsubscribe_url}'                    => 'http://website/email/unsubscribe/5c92a91788e39848445285',
+                    '{webview_text}'                       => '<a href="http://website/email/view/5c92a91788e39848445285">Having trouble reading this email? Click here.</a>',
+                    '{webview_url}'                        => 'http://website/email/view/5c92a91788e39848445285',
+                    '{signature}'                          => 'Best regards, Company',
+                    '{subject}'                            => 'Campaign Test',
+                    '{tracking_pixel}'                     => 'http://website/email/5c92a91788e39848445285.gif',
+                ],
+            'utmTags'     => [
+                    'utmSource'   => null,
+                    'utmMedium'   => null,
+                    'utmCampaign' => null,
+                    'utmContent'  => null,
+                ],
+        ];
+
+        $message = new MauticMessage();
+        $message->addMetadata('test@test.com', $metadata);
+        $message->addTo('test@test.com');
+        $message->setFrom('someone@somewhere.com');
+        $message->setSubject('Test Email');
+        $message->setBody('Hello');
+
+        $sparkpost = new SparkpostTransport('abc123', $this->translator, $this->transportCallback, $this->sparkpostFactory, $this->logger, $this->coreParametersHelper);
+        $message   = $sparkpost->getSparkPostMessage($message);
+
+        $this->assertEquals($message['campaign_id'], '20:Campaign Test Email');
+    }
+
+    private function getRequestWithPayload(): Request
     {
         $json = <<<JSON
 [

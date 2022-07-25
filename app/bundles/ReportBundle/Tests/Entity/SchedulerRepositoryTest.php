@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Entity;
 
 use Doctrine\ORM\AbstractQuery;
@@ -18,7 +9,7 @@ use Doctrine\ORM\QueryBuilder;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 
-class SchedulerRepositoryTest extends \PHPUnit_Framework_TestCase
+class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetScheduledReportsForExportNoID()
     {
@@ -47,7 +38,7 @@ class SchedulerRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return QueryBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getQueryBuilderMock()
     {

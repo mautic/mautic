@@ -1,58 +1,53 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class FilterType.
- */
 class FilterType extends AbstractType
 {
     use FilterTrait;
 
-    private $translator;
-    private $currentListId;
+    /**
+     * @var FormAdjustmentsProviderInterface
+     */
+    private $formAdjustmentsProvider;
 
     /**
-     * @param MauticFactory $factory
+     * @var ListModel
      */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->translator    = $factory->getTranslator();
-        $this->currentListId = $factory->getRequest()->attributes->get('objectId', false);
+    private $listModel;
+
+    public function __construct(
+        FormAdjustmentsProviderInterface $formAdjustmentsProvider,
+        ListModel $listModel
+    ) {
+        $this->formAdjustmentsProvider = $formAdjustmentsProvider;
+        $this->listModel               = $listModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $fieldChoices = $this->listModel->getChoiceFields();
+
         $builder->add(
             'glue',
-            'choice',
+            ChoiceType::class,
             [
                 'label'   => false,
                 'choices' => [
-                    'and' => 'mautic.lead.list.form.glue.and',
-                    'or'  => 'mautic.lead.list.form.glue.or',
+                    'mautic.lead.list.form.glue.and' => 'and',
+                    'mautic.lead.list.form.glue.or'  => 'or',
                 ],
                 'attr' => [
                     'class'    => 'form-control not-chosen glue-select',
@@ -61,52 +56,71 @@ class FilterType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $event, $eventName) {
-            $this->buildFiltersForm($eventName, $event, $this->translator, $this->currentListId);
+        $formModifier = function (FormEvent $event) use ($fieldChoices) {
+            $data        = (array) $event->getData();
+            $form        = $event->getForm();
+            $fieldAlias  = $data['field'] ?? null;
+            $fieldObject = $data['object'] ?? 'behaviors';
+            // Looking for behaviors for BC reasons as some filters were moved from 'lead' to 'behaviors'.
+            $field       = $fieldChoices[$fieldObject][$fieldAlias] ?? $fieldChoices['behaviors'][$fieldAlias] ?? null;
+            $operators   = $field['operators'] ?? [];
+            $operator    = $data['operator'] ?? null;
+
+            if ($operators && !$operator) {
+                $operator = array_key_first($operators);
+            }
+
+            $form->add(
+                'operator',
+                ChoiceType::class,
+                [
+                    'label'   => false,
+                    'choices' => $operators,
+                    'attr'    => [
+                        'class'    => 'form-control not-chosen',
+                        'onchange' => 'Mautic.convertLeadFilterInput(this)',
+                    ],
+                ]
+            );
+
+            $form->add(
+                'properties',
+                FilterPropertiesType::class,
+                [
+                    'label' => false,
+                ]
+            );
+
+            if (null === $field) {
+                // The field was probably deleted since the segment was created.
+                // Do not show up the filter based on a deleted field.
+                return;
+            }
+
+            $filterPropertiesType = $form->get('properties');
+
+            $this->setPropertiesFormData($filterPropertiesType, $data);
+
+            if ($fieldAlias && $operator) {
+                $this->formAdjustmentsProvider->adjustForm(
+                    $filterPropertiesType,
+                    $fieldAlias,
+                    $fieldObject,
+                    $operator,
+                    $field
+                );
+            }
         };
 
-        $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
-                $formModifier($event, FormEvents::PRE_SET_DATA);
-            }
-        );
-
-        $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
-                $formModifier($event, FormEvents::PRE_SUBMIT);
-            }
-        );
-
-        $builder->add('field', 'hidden');
-        $builder->add('object', 'hidden');
-        $builder->add('type', 'hidden');
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, $formModifier);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, $formModifier);
+        $builder->add('field', HiddenType::class);
+        $builder->add('object', HiddenType::class);
+        $builder->add('type', HiddenType::class);
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(
-            [
-                'timezones',
-                'countries',
-                'regions',
-                'fields',
-                'lists',
-                'emails',
-                'deviceTypes',
-                'deviceBrands',
-                'deviceOs',
-                'tags',
-                'stage',
-                'locales',
-                'globalcategory',
-            ]
-        );
-
         $resolver->setDefaults(
             [
                 'label'          => false,
@@ -115,19 +129,37 @@ class FilterType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['fields'] = $options['fields'];
+        $view->vars['fields'] = $this->listModel->getChoiceFields();
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadlist_filter';
+    }
+
+    /**
+     * We have to ensure that the old data[filter] and data[display] will get to the properties form
+     * to keep BC for segments created before the properties form was added and the fitler and display
+     * fields were moved there.
+     *
+     * @param FormInterface<FormInterface> $filterPropertiesType
+     * @param mixed[]                      $data
+     */
+    private function setPropertiesFormData(FormInterface $filterPropertiesType, array $data): void
+    {
+        if (empty($data['properties'])) {
+            $propertiesData = [
+                'filter'  => $data['filter'] ?? null,
+                'display' => $data['display'] ?? null,
+            ];
+            $filterPropertiesType->setData($propertiesData);
+        } else {
+            $filterPropertiesType->setData($data['properties'] ?? []);
+        }
     }
 }

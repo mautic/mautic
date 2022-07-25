@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Model;
 
-use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
@@ -19,31 +10,25 @@ use Mautic\ReportBundle\Model\CsvExporter;
 use Mautic\ReportBundle\Tests\Fixtures;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CsvExporterTest extends \PHPUnit_Framework_TestCase
+class CsvExporterTest extends \PHPUnit\Framework\TestCase
 {
     public function testExport()
     {
-        $appVersion = $this->getMockBuilder(AppVersion::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $dateHelperMock = $this->getMockBuilder(DateHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dateHelperMock = $this->createMock(DateHelper::class);
 
         $dateHelperMock->expects($this->any())
-            ->method('toFull')
+            ->method('toFullConcat')
             ->willReturn('2017-10-01');
 
-        $translator = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
 
-        $formatterHelperMock = new FormatterHelper($appVersion, $dateHelperMock, $translator);
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+
+        $formatterHelperMock = new FormatterHelper($dateHelperMock, $translator);
 
         $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
 
-        $csvExporter = new CsvExporter($formatterHelperMock);
+        $csvExporter = new CsvExporter($formatterHelperMock, $coreParametersHelperMock);
 
         $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_csv_export_test_');
         $file    = fopen($tmpFile, 'w');

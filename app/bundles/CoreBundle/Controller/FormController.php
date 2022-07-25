@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 /**
@@ -51,7 +42,7 @@ class FormController extends AbstractStandardFormController
     ) {
         $this->deprecatedModelName      = $modelName;
         $this->deprecatedPermissionBase = $permissionBase;
-        if (strpos($sessionBase, 'mautic.') !== 0) {
+        if (0 !== strpos($sessionBase, 'mautic.')) {
             $sessionBase = 'mautic.'.$sessionBase;
         }
         $this->deprecatedSessionBase     = $sessionBase;
@@ -63,8 +54,7 @@ class FormController extends AbstractStandardFormController
     }
 
     /**
-     * @param array $args
-     * @param       $action
+     * @param $action
      *
      * @return array
      */
@@ -117,7 +107,7 @@ class FormController extends AbstractStandardFormController
      */
     protected function getSessionBase($objectId = null)
     {
-        return $this->deprecatedSessionBase;
+        return null !== $this->deprecatedSessionBase ? $this->deprecatedSessionBase : parent::getSessionBase($objectId);
     }
 
     /**

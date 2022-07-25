@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Stat;
 
 use Mautic\EmailBundle\Entity\Stat;
@@ -26,15 +17,10 @@ class Reference
     private $leadId = 0;
 
     /**
-     * @var
+     * @var int|null
      */
     private $statId;
 
-    /**
-     * Reference constructor.
-     *
-     * @param Stat $stat
-     */
     public function __construct(Stat $stat)
     {
         $this->statId  = $stat->getId();

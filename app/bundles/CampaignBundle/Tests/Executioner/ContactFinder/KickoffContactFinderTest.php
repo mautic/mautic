@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -20,19 +11,19 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\NullLogger;
 
-class KickoffContactFinderTest extends \PHPUnit_Framework_TestCase
+class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LeadRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
      */
     private $leadRepository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CampaignRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|CampaignRepository
      */
     private $campaignRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->leadRepository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()

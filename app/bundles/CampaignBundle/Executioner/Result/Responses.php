@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Result;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -29,8 +20,6 @@ class Responses
 
     /**
      * DecisionResponses constructor.
-     *
-     * @param ArrayCollection $logs
      */
     public function setFromLogs(ArrayCollection $logs)
     {
@@ -39,7 +28,7 @@ class Responses
             $metadata = $log->getMetadata();
             $response = $metadata;
 
-            if (isset($metadata['timeline']) && count($metadata) === 1) {
+            if (isset($metadata['timeline']) && 1 === count($metadata)) {
                 // Legacy listeners set a string in CampaignExecutionEvent::setResult that Lead::appendToMetadata put into
                 // under a timeline key for BC support. To keep BC for decisions, we have to extract that back out for the bubble
                 // up responses
@@ -52,7 +41,6 @@ class Responses
     }
 
     /**
-     * @param Event $event
      * @param mixed $response
      */
     public function setResponse(Event $event, $response)
@@ -107,18 +95,5 @@ class Responses
     public function containsResponses()
     {
         return count($this->actionResponses) + count($this->conditionResponses);
-    }
-
-    /**
-     * @deprecated 2.13.0 to be removed in 3.0; used for BC EventModel::triggerEvent()
-     *
-     * @return array
-     */
-    public function getResponseArray()
-    {
-        return [
-            Event::TYPE_ACTION    => $this->actionResponses,
-            Event::TYPE_CONDITION => $this->conditionResponses,
-        ];
     }
 }

@@ -1,28 +1,11 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 
-/**
- * Class ComponentValidationTrait.
- */
 trait ComponentValidationTrait
 {
-    /**
-     * @param array $keys
-     * @param array $component
-     * @param array $methods
-     */
     private function verifyComponent(array $keys, array $component, array $callbacks = [])
     {
         foreach ($keys as $k) {

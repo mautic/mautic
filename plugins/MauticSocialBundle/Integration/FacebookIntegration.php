@@ -1,15 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Integration;
+
+use MauticPlugin\MauticSocialBundle\Form\Type\FacebookType;
 
 /**
  * Class FacebookIntegration.
@@ -178,5 +171,13 @@ class FacebookIntegration extends SocialIntegration
             'timezone'    => ['type' => 'string'],
             'website'     => ['type' => 'string'],
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormType()
+    {
+        return FacebookType::class;
     }
 }

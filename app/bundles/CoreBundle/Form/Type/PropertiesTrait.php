@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\Form;
@@ -18,8 +9,6 @@ trait PropertiesTrait
 {
     /**
      * @param FormBuilderInterface|Form $builder
-     * @param array                     $options
-     * @param array                     $masks
      */
     protected function addPropertiesType($builder, array $options, array &$masks)
     {

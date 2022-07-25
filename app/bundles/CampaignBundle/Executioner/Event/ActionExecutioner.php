@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -36,9 +27,6 @@ class ActionExecutioner implements EventInterface
 
     /**
      * ActionExecutioner constructor.
-     *
-     * @param ActionDispatcher $dispatcher
-     * @param EventLogger      $eventLogger
      */
     public function __construct(ActionDispatcher $dispatcher, EventLogger $eventLogger)
     {
@@ -47,9 +35,6 @@ class ActionExecutioner implements EventInterface
     }
 
     /**
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $logs
-     *
      * @return EvaluatedContacts
      *
      * @throws CannotProcessEventException

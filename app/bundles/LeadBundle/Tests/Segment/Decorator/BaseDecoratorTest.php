@@ -1,23 +1,14 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 
-class BaseDecoratorTest extends \PHPUnit_Framework_TestCase
+class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
@@ -420,6 +411,19 @@ class BaseDecoratorTest extends \PHPUnit_Framework_TestCase
             'type'     => 'multiselect',
             'filter'   => [2, 4],
             'operator' => '!in',
+        ]);
+
+        $this->assertSame($expected, $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+
+        $expected = [
+            '(([|]|^)Value \(1\)([|]|$))',
+            '(([|]|^)Value 2([|]|$))',
+        ];
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'     => 'multiselect',
+            'filter'   => ['Value (1)', 'Value 2'],
+            'operator' => 'in',
         ]);
 
         $this->assertSame($expected, $baseDecorator->getParameterValue($contactSegmentFilterCrate));

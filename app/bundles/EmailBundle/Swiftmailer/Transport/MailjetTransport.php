@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\EmailBundle\Model\TransportCallback;
@@ -50,14 +41,13 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     * @param null                $failedRecipients
+     * @param null $failedRecipients
      *
      * @return int|void
      *
      * @throws \Exception
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         // add leadIdHash to track this email
         if (isset($message->leadIdHash)) {
@@ -73,7 +63,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
             $message->setTo($this->getSandboxMail());
         }
 
-        parent::send($message, $failedRecipients);
+        return parent::send($message, $failedRecipients);
     }
 
     /**
@@ -88,8 +78,6 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
 
     /**
      * Handle response.
-     *
-     * @param Request $request
      *
      * @return mixed
      */
@@ -115,21 +103,23 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
                 continue;
             }
 
-            if ($event['event'] === 'bounce' || $event['event'] === 'blocked') {
+            if ('bounce' === $event['event'] || 'blocked' === $event['event']) {
                 $reason = $event['error_related_to'].': '.$event['error'];
                 $type   = DoNotContact::BOUNCED;
-            } elseif ($event['event'] === 'spam') {
+            } elseif ('spam' === $event['event']) {
                 $reason = 'User reported email as spam, source: '.$event['source'];
                 $type   = DoNotContact::UNSUBSCRIBED;
-            } elseif ($event['event'] === 'unsub') {
+            } elseif ('unsub' === $event['event']) {
                 $reason = 'User unsubscribed';
                 $type   = DoNotContact::UNSUBSCRIBED;
             } else {
                 continue;
             }
 
-            if (isset($event['CustomID']) && $event['CustomID'] !== '' && strpos($event['CustomID'], '-', 0) !== false) {
-                list($leadIdHash, $leadEmail) = explode('-', $event['CustomID']);
+            if (isset($event['CustomID']) && '' !== $event['CustomID'] && false !== strpos($event['CustomID'], '-', 0)) {
+                $fistDashPos = strpos($event['CustomID'], '-', 0);
+                $leadIdHash  = substr($event['CustomID'], 0, $fistDashPos);
+                $leadEmail   = substr($event['CustomID'], $fistDashPos + 1, strlen($event['CustomID']));
                 if ($event['email'] == $leadEmail) {
                     $this->transportCallback->addFailureByHashId($leadIdHash, $reason, $type);
                 }

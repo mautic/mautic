@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle;
 
 /**
@@ -119,4 +110,40 @@ final class PageEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.page.on_campaign_trigger_action';
+
+    /**
+     * The mautic.page.on_redirect_generate event is fired when generating a redirect.
+     *
+     * The event listener receives a
+     * Mautic\PageBundle\Event\RedirectGenerationEvent
+     */
+    const ON_REDIRECT_GENERATE = 'mautic.page.on_redirect_generate';
+
+    /**
+     * The mautic.page.on_bounce_rate_winner event is fired when there is a need to determine bounce rate winner.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\DetermineWinnerEvent
+     *
+     * @var string
+     */
+    const ON_DETERMINE_BOUNCE_RATE_WINNER = 'mautic.page.on_bounce_rate_winner';
+
+    /**
+     * The mautic.page.on_dwell_time_winner event is fired when there is a need to determine a winner based on dwell time.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundles\Event\DetermineWinnerEvent
+     *
+     * @var string
+     */
+    const ON_DETERMINE_DWELL_TIME_WINNER = 'mautic.page.on_dwell_time_winner';
+
+    /**
+     * The mautic.page.on_contact_tracked event is dispatched when a contact is tracked via the mt() tracking event.
+     *
+     * The event listener receives a
+     * Mautic\PageBundle\Event\TrackingEvent
+     */
+    const ON_CONTACT_TRACKED = 'mautic.page.on_contact_tracked';
 }

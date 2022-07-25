@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
@@ -37,10 +28,9 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     * @param null                $failedRecipients
+     * @param null $failedRecipients
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $this->message         = $message;
         $this->fromAddresses[] = key($message->getFrom());
@@ -58,15 +48,15 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
     }
 
     /**
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded
-     * @param string         $type
+     * @param int    $toBeAdded
+     * @param string $type
      *
      * @return int
      */
     public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
     {
-        $toCount = count($message->getTo());
+        $to      = $message->getTo();
+        $toCount = (is_array($to) || $to instanceof \Countable) ? count($to) : 0;
 
         return ('to' === $type) ? $toCount + $toBeAdded : $toCount;
     }
@@ -105,9 +95,6 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
         // ignore
     }
 
-    /**
-     * @param Swift_Events_EventListener $plugin
-     */
     public function registerPlugin(Swift_Events_EventListener $plugin)
     {
         // ignore
@@ -116,5 +103,13 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
     public function start()
     {
         // ignore
+    }
+
+    /**
+     * @return bool
+     */
+    public function ping()
+    {
+        return true;
     }
 }

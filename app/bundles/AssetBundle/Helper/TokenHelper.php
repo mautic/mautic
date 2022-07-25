@@ -1,33 +1,16 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Helper;
 
 use Mautic\AssetBundle\Model\AssetModel;
 
-/**
- * Class TokenHelper.
- */
 class TokenHelper
 {
     /**
-     * @var
+     * @var AssetModel
      */
     protected $model;
 
-    /**
-     * TokenHelper constructor.
-     *
-     * @param AssetModel $model
-     */
     public function __construct(AssetModel $model)
     {
         $this->model = $model;
@@ -53,7 +36,7 @@ class TokenHelper
                 }
 
                 $asset          = $this->model->getEntity($assetId);
-                $tokens[$token] = ($asset !== null) ? $this->model->generateUrl($asset, true, $clickthrough) : '';
+                $tokens[$token] = (null !== $asset) ? $this->model->generateUrl($asset, true, $clickthrough) : '';
             }
         }
 

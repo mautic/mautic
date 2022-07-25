@@ -1,23 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Helper\BundleHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class ConfigEvent.
- */
 class ConfigBuilderEvent extends Event
 {
     /**
@@ -33,11 +20,6 @@ class ConfigBuilderEvent extends Event
     ];
 
     /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
-
-    /**
      * @var BundleHelper
      */
     private $bundleHelper;
@@ -47,22 +29,13 @@ class ConfigBuilderEvent extends Event
      */
     protected $encodedFields = [];
 
-    /**
-     * ConfigBuilderEvent constructor.
-     *
-     * @param PathsHelper  $pathsHelper
-     * @param BundleHelper $bundleHelper
-     */
-    public function __construct(PathsHelper $pathsHelper, BundleHelper $bundleHelper)
+    public function __construct(BundleHelper $bundleHelper)
     {
-        $this->pathsHelper  = $pathsHelper;
         $this->bundleHelper = $bundleHelper;
     }
 
     /**
      * Set new form to the forms array.
-     *
-     * @param array $form
      *
      * @return $this
      */
@@ -116,6 +89,8 @@ class ConfigBuilderEvent extends Event
     }
 
     /**
+     * Get default parameters from config defined in bundles.
+     *
      * @param $bundle
      *
      * @return array

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Bounce;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
@@ -18,7 +9,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
 
-class BodyParserTest extends \PHPUnit_Framework_TestCase
+class BodyParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that a BouncedEmail is returned from a bounce detected in the body

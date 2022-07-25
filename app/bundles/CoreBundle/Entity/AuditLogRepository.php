@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -23,7 +14,6 @@ class AuditLogRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * @param Lead  $lead
      * @param array $filters
      *
      * @return int
@@ -55,11 +45,9 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * @param Lead       $lead
-     * @param array      $filters
-     * @param array|null $orderBy
-     * @param int        $page
-     * @param int        $limit
+     * @param array $filters
+     * @param int   $page
+     * @param int   $limit
      *
      * @return array
      */
@@ -209,9 +197,6 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * @param Lead|null $lead
-     * @param array     $options
-     *
      * @return array
      */
     public function getLeadIpLogs(Lead $lead = null, array $options = [])
@@ -232,13 +217,15 @@ class AuditLogRepository extends CommonRepository
             ->groupBy('l.ip_address');
 
         if ($lead instanceof Lead) {
+            $dateTimeFormat = 'Y-m-d H:i:s';
+
             // Just a check to ensure reused IDs (happens with innodb) doesn't infect data
-            $dt = new DateTimeHelper($lead->getDateAdded(), 'Y-m-d H:i:s', 'local');
+            $dateTimeHelper = new DateTimeHelper($lead->getDateAdded(), $dateTimeFormat, 'local');
 
             $sqb->andWhere(
                 $sqb->expr()->andX(
                     $sqb->expr()->eq('l.object_id', $lead->getId()),
-                    $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dt->getUtcTimestamp()))
+                    $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dateTimeHelper->toUtcString($dateTimeFormat)))
                 )
             );
         }

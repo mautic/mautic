@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -80,9 +71,8 @@ class TrackableRepository extends CommonRepository
     /**
      * Get an array of Trackable entities by Redirect URLs.
      *
-     * @param array $urls
-     * @param       $channel
-     * @param       $channelId
+     * @param $channel
+     * @param $channelId
      *
      * @return array
      */
@@ -139,17 +129,18 @@ class TrackableRepository extends CommonRepository
     /**
      * Get hit count.
      *
-     * @param                 $channel
-     * @param                 $channelIds
-     * @param                 $listId
-     * @param ChartQuery|null $chartQuery
+     * @param $channel
+     * @param $channelIds
+     * @param $listId
+     * @param bool   $combined
+     * @param string $countColumn
      *
      * @return array|int
      */
-    public function getCount($channel, $channelIds, $listId, ChartQuery $chartQuery = null, $combined = false)
+    public function getCount($channel, $channelIds, $listId, ChartQuery $chartQuery = null, $combined = false, $countColumn = 'ph.id')
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('count(ph.id) as click_count')
+            ->select('count('.$countColumn.') as click_count')
             ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut')
             ->innerJoin('cut', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.redirect_id = cut.redirect_id AND ph.source = cut.channel AND ph.source_id = cut.channel_id');
 

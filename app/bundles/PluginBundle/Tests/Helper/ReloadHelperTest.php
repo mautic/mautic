@@ -1,23 +1,19 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Tests\Helper;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Event\PluginInstallEvent;
+use Mautic\PluginBundle\Event\PluginUpdateEvent;
 use Mautic\PluginBundle\Helper\ReloadHelper;
+use Mautic\PluginBundle\PluginEvents;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReloadHelperTest extends \PHPUnit_Framework_TestCase
+class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 {
     private $factoryMock;
 
@@ -34,28 +30,38 @@ class ReloadHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    private $sampleMetadata = [];
+    private $sampleMetaData = [];
 
     /**
      * @var array
      */
     private $sampleSchemas = [];
 
-    protected function setUp()
+    /**
+     * @var MockObject&EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->factoryMock = $this->createMock(MauticFactory::class);
-        $this->helper      = new ReloadHelper($this->factoryMock);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->factoryMock     = $this->createMock(MauticFactory::class);
+        $this->helper          = new ReloadHelper($this->eventDispatcher, $this->factoryMock);
 
         $this->sampleMetaData = [
             'MauticPlugin\MauticZapierBundle' => [$this->createMock(ClassMetadata::class)],
             'MauticPlugin\MauticCitrixBundle' => [$this->createMock(ClassMetadata::class)],
         ];
 
+        $sampleSchema = $this->createMock(Schema::class);
+        $sampleSchema->method('getTables')
+                ->willReturn([]);
+
         $this->sampleSchemas = [
-            'MauticPlugin\MauticZapierBundle' => $this->createMock(Schema::class),
-            'MauticPlugin\MauticCitrixBundle' => $this->createMock(Schema::class),
+            'MauticPlugin\MauticZapierBundle' => $sampleSchema,
+            'MauticPlugin\MauticCitrixBundle' => $sampleSchema,
         ];
 
         $this->sampleAllPlugins = [
@@ -143,7 +149,11 @@ class ReloadHelperTest extends \PHPUnit_Framework_TestCase
             'MauticCitrixBundle'  => $this->createSampleCitrixPlugin(),
             'MauticHappierBundle' => $this->createSampleHappierPlugin(),
         ];
-
+        $plugin = $this->createSampleZapierPlugin();
+        $plugin->setVersion('1.0.1');
+        $plugin->setDescription('Updated description');
+        $event = new PluginUpdateEvent($plugin, '1.0');
+        $this->eventDispatcher->expects($this->once())->method('dispatch')->with($event, PluginEvents::ON_PLUGIN_UPDATE);
         $updatedPlugins = $this->helper->updatePlugins($this->sampleAllPlugins, $sampleInstalledPlugins, $this->sampleMetaData, $this->sampleSchemas);
 
         $this->assertEquals(1, count($updatedPlugins));
@@ -158,6 +168,8 @@ class ReloadHelperTest extends \PHPUnit_Framework_TestCase
             'MauticCitrixBundle'  => $this->createSampleCitrixPlugin(),
             'MauticHappierBundle' => $this->createSampleHappierPlugin(),
         ];
+        $event = new PluginInstallEvent($this->createSampleZapierPlugin());
+        $this->eventDispatcher->expects($this->once())->method('dispatch')->with($event, PluginEvents::ON_PLUGIN_INSTALL);
 
         $installedPlugins = $this->helper->installPlugins($this->sampleAllPlugins, $sampleInstalledPlugins, $this->sampleMetaData, $this->sampleSchemas);
 

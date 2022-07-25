@@ -26,7 +26,7 @@
                     $rowCount = 0;
                 endif;
                 echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', ['graph' => $details['data'], 'options' => $details['options'], 'report' => $report]);
-                $rowCount += ($details['type'] == 'line') ? 12 : 4;
+                $rowCount += ('line' == $details['type']) ? 12 : 4;
             endforeach;
             ?>
         </div>

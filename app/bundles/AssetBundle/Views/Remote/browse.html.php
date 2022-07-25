@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') :
+if ('index' == $tmpl) :
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'asset');
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.asset.remote.file.browse'));
@@ -27,7 +27,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.asset.remo
                             <?php $step = 1; ?>
                             <?php /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integration */ ?>
                             <?php foreach ($integrations as $integration): ?>
-                                <li class="list-group-item<?php if ($step === 1) {
+                                <li class="list-group-item<?php if (1 === $step) {
     echo ' active';
 } ?>" id="tab<?php echo $integration->getName(); ?>">
                                     <a href="#" class="steps" onclick="Mautic.updateRemoteBrowser('<?php echo $integration->getName(); ?>');">
@@ -53,7 +53,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.asset.remo
             </div>
             <!--/ end: box layout -->
         <?php endif; ?>
-<?php if ($tmpl == 'index') : ?>
+<?php if ('index' == $tmpl) : ?>
     </div>
 </div>
 <?php endif; ?>

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\EventCollector\Accessor;
 
 use Mautic\CampaignBundle\Entity\Event;
@@ -16,8 +7,11 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor;
+use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
+use Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType;
+use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
 
-class EventAccessorTest extends \PHPUnit_Framework_TestCase
+class EventAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array
@@ -27,7 +21,7 @@ class EventAccessorTest extends \PHPUnit_Framework_TestCase
             'lead.scorecontactscompanies' => [
                 'label'          => 'Add to company\'s score',
                 'description'    => 'This action will add the specified value to the company\'s existing score',
-                'formType'       => 'scorecontactscompanies_action',
+                'formType'       => CompanyChangeScoreActionType::class,
                 'batchEventName' => 'mautic.lead.on_campaign_trigger_action',
             ],
         ],
@@ -35,7 +29,7 @@ class EventAccessorTest extends \PHPUnit_Framework_TestCase
             'lead.campaigns' => [
                 'label'       => 'Contact campaigns',
                 'description' => 'Condition based on a contact campaigns.',
-                'formType'    => 'campaignevent_lead_campaigns',
+                'formType'    => CampaignEventLeadCampaignsType::class,
                 'formTheme'   => 'MauticLeadBundle:FormTheme\\ContactCampaignsCondition',
                 'eventName'   => 'mautic.lead.on_campaign_trigger_condition',
             ],
@@ -45,7 +39,7 @@ class EventAccessorTest extends \PHPUnit_Framework_TestCase
                 'label'                  => 'Clicks email',
                 'description'            => 'Trigger actions when an email is clicked. Connect a &quot;Send Email&quot; action to the top of this decision.',
                 'eventName'              => 'mautic.email.on_campaign_trigger_decision',
-                'formType'               => 'email_click_decision',
+                'formType'               => EmailClickDecisionType::class,
                 'connectionRestrictions' => [
                     'source' => [
                         'action' => [

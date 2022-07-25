@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Authenticator;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -21,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -31,7 +22,7 @@ use Symfony\Component\Security\Http\Authentication\SimpleFormAuthenticatorInterf
 class FormAuthenticator implements SimpleFormAuthenticatorInterface
 {
     /**
-     * @var UserPasswordEncoderInterface
+     * @var UserPasswordEncoder
      */
     protected $encoder;
 
@@ -46,19 +37,13 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
     protected $integrationHelper;
 
     /**
-     * @var null|RequestStack
+     * @var RequestStack|null
      */
     protected $requestStack;
 
-    /**
-     * @param IntegrationHelper            $integrationHelper
-     * @param UserPasswordEncoderInterface $encoder
-     * @param EventDispatcherInterface     $dispatcher
-     * @param RequestStack                 $requestStack
-     */
     public function __construct(
         IntegrationHelper $integrationHelper,
-        UserPasswordEncoderInterface $encoder,
+        UserPasswordEncoder $encoder,
         EventDispatcherInterface $dispatcher,
         RequestStack $requestStack
     ) {
@@ -69,9 +54,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
     }
 
     /**
-     * @param TokenInterface        $token
-     * @param UserProviderInterface $userProvider
-     * @param                       $providerKey
+     * @param $providerKey
      *
      * @return PluginToken
      *
@@ -149,8 +132,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
     }
 
     /**
-     * @param TokenInterface $token
-     * @param                $providerKey
+     * @param $providerKey
      *
      * @return bool
      */
@@ -160,10 +142,9 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
     }
 
     /**
-     * @param Request $request
-     * @param         $username
-     * @param         $password
-     * @param         $providerKey
+     * @param $username
+     * @param $password
+     * @param $providerKey
      *
      * @return UsernamePasswordToken
      */

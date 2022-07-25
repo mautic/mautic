@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -82,7 +73,7 @@ class TweetController extends FormController
      */
     protected function getPermissionBase()
     {
-        return 'plugin:mauticSocial:tweets';
+        return 'mauticSocial:tweets';
     }
 
     /**
@@ -105,7 +96,7 @@ class TweetController extends FormController
      */
     public function getUpdateSelect()
     {
-        return ($this->request->getMethod() == 'POST')
+        return ('POST' == $this->request->getMethod())
             ? $this->request->request->get('twitter_tweet[updateSelect]', false, true)
             : $this->request->get('updateSelect', false);
     }
@@ -113,7 +104,6 @@ class TweetController extends FormController
     /**
      * Set custom form themes, etc.
      *
-     * @param Form   $form
      * @param string $action
      *
      * @return \Symfony\Component\Form\FormView
@@ -152,7 +142,7 @@ class TweetController extends FormController
      */
     protected function getTemplateName($file)
     {
-        if ($file === 'form.html.php' && $this->request->get('modal') == 1) {
+        if ('form.html.php' === $file && 1 == $this->request->get('modal')) {
             return parent::getTemplateName('form.modal.html.php');
         }
 

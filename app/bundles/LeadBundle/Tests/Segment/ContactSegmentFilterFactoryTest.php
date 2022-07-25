@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
@@ -20,7 +11,7 @@ use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
 use Symfony\Component\DependencyInjection\Container;
 
-class ContactSegmentFilterFactoryTest extends \PHPUnit_Framework_TestCase
+class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterFactory

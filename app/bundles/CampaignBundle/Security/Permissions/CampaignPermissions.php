@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
@@ -25,8 +16,7 @@ class CampaignPermissions extends AbstractPermissions
     public function __construct($params)
     {
         parent::__construct($params);
-
-        $this->addStandardPermissions('campaigns');
+        $this->addExtendedPermissions('campaigns');
         $this->addStandardPermissions('categories');
     }
 
@@ -44,6 +34,6 @@ class CampaignPermissions extends AbstractPermissions
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
         $this->addStandardFormFields('campaign', 'categories', $builder, $data);
-        $this->addStandardFormFields('campaign', 'campaigns', $builder, $data);
+        $this->addExtendedFormFields('campaign', 'campaigns', $builder, $data);
     }
 }

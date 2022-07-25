@@ -3,7 +3,7 @@
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @see        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -18,25 +18,28 @@ chdir($baseDir.'/packaging');
 
 system('rm -f app/phpunit.*');
 system('rm -f app/tests.bootstrap*');
-system('rm -rf app/bundles/*/Tests');
+system('find app/bundles/*/Tests/* ! -path "*/Tests/DataFixtures*" -prune -exec rm -rf {} \\;');
 system('rm -rf app/bundles/CoreBundle/Test');
 system('rm -rf app/cache/*');
+system('rm -rf app/logs/*');
+system('rm -rf var/cache/*');
+system('rm -rf var/logs/*');
+system('rm -rf var/spool/*');
+system('rm -rf var/tmp/*');
 system('rm -rf media/files/*');
+// Delete ElFinder's (filemanager) assets
+system('rm -rf media/assets/');
 system('rm -f app/config/config_dev.php');
 system('rm -f app/config/config_test.php');
 system('rm -f app/config/local*.php');
 system('rm -f app/config/routing_dev.php');
 system('rm -f app/config/security_test.php');
-system('rm -rf app/logs/*');
 
 // babdev/transifex
 system('rm -f vendor/babdev/transifex/.scrutinizer.yml');
 
 // doctrine/common
 system('rm -f vendor/doctrine/common/UPGRADE_TO*');
-
-// doctrine/doctrine-cache-bundle
-system('rm -f vendor/doctrine/doctrine-cache-bundle/Doctrine/Bundle/DoctrineCacheBundle/ruleset.xml');
 
 // doctrine/migrations
 system('rm -f vendor/doctrine/migrations/build.properties.dev');
@@ -127,9 +130,6 @@ system('rm -f vendor/twig/twig/README.rst');
 // webfactory/exceptions-bundle
 system('rm -rf vendor/webfactory/exceptions-bundle/Resources/doc');
 
-// willdurand/oauth-server-bundle
-system('rm -rf vendor/willdurand/oauth-server-bundle/Resources/doc');
-
 // Delete random files
 system('find . -type f -name phpunit.xml -exec rm -f {} \\;');
 system('find . -type f -name phpunit.xml.dist -exec rm -f {} \\;');
@@ -157,7 +157,7 @@ system('find . -name ".git*" -prune -exec rm -rf {} \\;');
 system('find . -name .DS_Store -exec rm -rf {} \\;');
 
 // Delete test directories
-system('find . -type d -name Test ! -path "./vendor/twig/twig/lib/Twig/Node/Expression/Test" ! -path "./vendor/twig/twig/lib/Twig/Test" -prune -exec rm -rf {} \\;');
-system('find . -type d -name test ! -path "./vendor/twig/twig/lib/Twig/Node/Expression/Test" ! -path "./vendor/twig/twig/lib/Twig/Test" -prune -exec rm -rf {} \\;');
-system('find . -type d -name Tests -prune -exec rm -rf {} \\;');
+system('find . -type d -name Test ! -path "./vendor/twig/twig/lib/Twig/Node/Expression/Test" ! -path "./vendor/twig/twig/lib/Twig/Test" ! -path "./vendor/twig/twig/src/Node/Expression/Test" ! -path "./vendor/twig/twig/src/Test" -prune -exec rm -rf {} \\;');
+system('find . -type d -name test ! -path "./vendor/twig/twig/lib/Twig/Node/Expression/Test" ! -path "./vendor/twig/twig/lib/Twig/Test" ! -path "./vendor/twig/twig/src/Node/Expression/Test" ! -path "./vendor/twig/twig/src/Test" -prune -exec rm -rf {} \\;');
+system('find . -path "*/Tests/*" ! -path "./app/bundles/*/Tests*" ! -path "./plugins/*/Tests/DataFixtures*" -prune -exec rm -rf {} \\;');
 system('find . -type d -name tests -prune -exec rm -rf {} \\;');

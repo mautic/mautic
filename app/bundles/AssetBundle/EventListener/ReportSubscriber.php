@@ -1,29 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\EventListener;
 
-use Mautic\AssetBundle\Entity\Download;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ReportSubscriber.
- */
-class ReportSubscriber extends CommonSubscriber
+class ReportSubscriber implements EventSubscriberInterface
 {
     const CONTEXT_ASSET          = 'assets';
     const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
@@ -33,9 +21,15 @@ class ReportSubscriber extends CommonSubscriber
      */
     private $companyReportData;
 
-    public function __construct(CompanyReportData $companyReportData)
+    /**
+     * @var DownloadRepository
+     */
+    private $downloadRepository;
+
+    public function __construct(CompanyReportData $companyReportData, DownloadRepository $downloadRepository)
     {
-        $this->companyReportData = $companyReportData;
+        $this->companyReportData  = $companyReportData;
+        $this->downloadRepository = $downloadRepository;
     }
 
     /**
@@ -52,8 +46,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -65,10 +57,12 @@ class ReportSubscriber extends CommonSubscriber
         $prefix  = 'a.';
         $columns = [
             $prefix.'download_count' => [
+                'alias' => 'download_count',
                 'label' => 'mautic.asset.report.download_count',
                 'type'  => 'int',
             ],
             $prefix.'unique_download_count' => [
+                'alias' => 'unique_download_count',
                 'label' => 'mautic.asset.report.unique_download_count',
                 'type'  => 'int',
             ],
@@ -101,6 +95,10 @@ class ReportSubscriber extends CommonSubscriber
         );
 
         if ($event->checkContext([self::CONTEXT_ASSET_DOWNLOAD])) {
+            // asset downloads calculate this columns
+            $columns[$prefix.'download_count']['formula']        = 'COUNT(ad.id)';
+            $columns[$prefix.'unique_download_count']['formula'] = 'COUNT(DISTINCT ad.lead_id)';
+
             // Downloads
             $downloadPrefix  = 'ad.';
             $downloadColumns = [
@@ -156,8 +154,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -183,6 +179,10 @@ class ReportSubscriber extends CommonSubscriber
             if ($this->companyReportData->eventHasCompanyColumns($event)) {
                 $event->addCompanyLeftJoin($queryBuilder);
             }
+
+            if (!$event->hasGroupBy()) {
+                $queryBuilder->groupBy('ad.id');
+            }
         }
 
         $event->setQueryBuilder($queryBuilder);
@@ -190,8 +190,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGraphEvent $event
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
@@ -200,9 +198,8 @@ class ReportSubscriber extends CommonSubscriber
             return;
         }
 
-        $graphs       = $event->getRequestedGraphs();
-        $qb           = $event->getQueryBuilder();
-        $downloadRepo = $this->em->getRepository(Download::class);
+        $graphs = $event->getRequestedGraphs();
+        $qb     = $event->getQueryBuilder();
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
@@ -224,7 +221,7 @@ class ReportSubscriber extends CommonSubscriber
                 case 'mautic.asset.table.most.downloaded':
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $downloadRepo->getMostDownloaded($queryBuilder, $limit, $offset);
+                    $items                  = $this->downloadRepository->getMostDownloaded($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -235,7 +232,7 @@ class ReportSubscriber extends CommonSubscriber
                 case 'mautic.asset.table.top.referrers':
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $downloadRepo->getTopReferrers($queryBuilder, $limit, $offset);
+                    $items                  = $this->downloadRepository->getTopReferrers($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -244,7 +241,7 @@ class ReportSubscriber extends CommonSubscriber
                     $event->setGraph($g, $graphData);
                     break;
                 case 'mautic.asset.graph.pie.statuses':
-                    $items                  = $downloadRepo->getHttpStatuses($queryBuilder);
+                    $items                  = $this->downloadRepository->getHttpStatuses($queryBuilder);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;

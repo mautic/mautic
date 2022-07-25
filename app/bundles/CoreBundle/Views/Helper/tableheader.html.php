@@ -37,21 +37,20 @@ if (!empty($checkall)):
     endswitch;
 ?>
 <th class="col-actions" <?php if (!empty($tooltip)): ?> data-toggle="tooltip" title="" data-placement="top" data-original-title="<?php echo $view['translator']->trans($tooltip); ?>"<?php endif; ?>>
-    <?php if ($view['buttons']->getButtonCount()): ?>
     <div class="input-group input-group-sm">
-    <span class="input-group-addon">
-        <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="<?php echo $target; ?>">
-    </span>
+        <span class="input-group-addon">
+            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="<?php echo $target; ?>">
+        </span>
 
-    <div class="input-group-btn">
-        <button type="button" disabled class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
-            <i class="fa fa-angle-down "></i>
-        </button>
-        <ul class="pull-<?php echo $pull; ?> page-list-actions dropdown-menu" role="menu">
-            <?php echo $view['buttons']->renderButtons(); ?>
-        </ul>
+        <div class="input-group-btn">
+            <button type="button" disabled class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
+                <i class="fa fa-angle-down "></i>
+            </button>
+            <ul class="pull-<?php echo $pull; ?> page-list-actions dropdown-menu" role="menu">
+                <?php echo $view['buttons']->renderButtons(); ?>
+            </ul>
+        </div>
     </div>
-    <?php endif; ?>
 </th>
 <?php elseif (empty($sessionVar)) : ?>
 <th<?php echo (!empty($class)) ? ' class="'.$class.'"' : ''; ?>>

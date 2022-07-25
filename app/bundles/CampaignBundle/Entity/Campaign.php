@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -17,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\PublishStatusIconAttributesInterface;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -26,7 +18,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * Class Campaign.
  */
-class Campaign extends FormEntity
+class Campaign extends FormEntity implements PublishStatusIconAttributesInterface
 {
     /**
      * @var int
@@ -44,12 +36,12 @@ class Campaign extends FormEntity
     private $description;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $publishUp;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $publishDown;
 
@@ -110,9 +102,6 @@ class Campaign extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -162,9 +151,6 @@ class Campaign extends FormEntity
         $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
@@ -235,7 +221,7 @@ class Campaign extends FormEntity
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'category') {
+        if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -309,8 +295,6 @@ class Campaign extends FormEntity
     /**
      * Calls $this->addEvent on every item in the collection.
      *
-     * @param array $events
-     *
      * @return Campaign
      */
     public function addEvents(array $events)
@@ -342,10 +326,8 @@ class Campaign extends FormEntity
 
     /**
      * Remove events.
-     *
-     * @param \Mautic\CampaignBundle\Entity\Event $event
      */
-    public function removeEvent(\Mautic\CampaignBundle\Entity\Event $event)
+    public function removeEvent(Event $event)
     {
         $this->changes['events']['removed'][$event->getId()] = $event->getName();
 
@@ -495,8 +477,7 @@ class Campaign extends FormEntity
     /**
      * Add lead.
      *
-     * @param      $key
-     * @param Lead $lead
+     * @param $key
      *
      * @return Campaign
      */
@@ -513,8 +494,6 @@ class Campaign extends FormEntity
 
     /**
      * Remove lead.
-     *
-     * @param Lead $lead
      */
     public function removeLead(Lead $lead)
     {
@@ -544,8 +523,6 @@ class Campaign extends FormEntity
     /**
      * Add list.
      *
-     * @param LeadList $list
-     *
      * @return Campaign
      */
     public function addList(LeadList $list)
@@ -559,8 +536,6 @@ class Campaign extends FormEntity
 
     /**
      * Remove list.
-     *
-     * @param LeadList $list
      */
     public function removeList(LeadList $list)
     {
@@ -579,13 +554,11 @@ class Campaign extends FormEntity
     /**
      * Add form.
      *
-     * @param Form $form
-     *
      * @return Campaign
      */
     public function addForm(Form $form)
     {
-        $this->forms[] = $form;
+        $this->forms[$form->getId()] = $form;
 
         $this->changes['forms']['added'][$form->getId()] = $form->getName();
 
@@ -594,8 +567,6 @@ class Campaign extends FormEntity
 
     /**
      * Remove form.
-     *
-     * @param Form $form
      */
     public function removeForm(Form $form)
     {
@@ -611,9 +582,6 @@ class Campaign extends FormEntity
         return $this->canvasSettings;
     }
 
-    /**
-     * @param array $canvasSettings
-     */
     public function setCanvasSettings(array $canvasSettings)
     {
         $this->canvasSettings = $canvasSettings;
@@ -642,6 +610,8 @@ class Campaign extends FormEntity
      */
     public function setAllowRestart($allowRestart)
     {
+        $this->isChanged('allowRestart', $allowRestart);
+
         $this->allowRestart = $allowRestart;
 
         return $this;
@@ -649,8 +619,6 @@ class Campaign extends FormEntity
 
     /**
      * Get contact membership.
-     *
-     * @param Contact $contact
      *
      * @return \Doctrine\Common\Collections\Collection
      */
@@ -663,5 +631,28 @@ class Campaign extends FormEntity
                     )
                     ->orderBy(['dateAdded' => Criteria::DESC])
         );
+    }
+
+    public function getOnclickMethod(): string
+    {
+        return 'Mautic.confirmationCampaignPublishStatus(mQuery(this));';
+    }
+
+    public function getDataAttributes(): array
+    {
+        return [
+            'data-toggle'           => 'confirmation',
+            'data-confirm-callback' => 'confirmCallbackCampaignPublishStatus',
+            'data-cancel-callback'  => 'dismissConfirmation',
+        ];
+    }
+
+    public function getTranslationKeysDataAttributes(): array
+    {
+        return [
+            'data-message'      => 'mautic.campaign.form.confirmation.message',
+            'data-confirm-text' => 'mautic.campaign.form.confirmation.confirm_text',
+            'data-cancel-text'  => 'mautic.campaign.form.confirmation.cancel_text',
+        ];
     }
 }

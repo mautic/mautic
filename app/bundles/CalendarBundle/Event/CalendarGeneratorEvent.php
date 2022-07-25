@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CalendarBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
@@ -28,9 +19,6 @@ class CalendarGeneratorEvent extends Event
      */
     private $events = [];
 
-    /**
-     * @param array $dates
-     */
     public function __construct(array $dates)
     {
         $this->dates = $dates;
@@ -38,8 +26,6 @@ class CalendarGeneratorEvent extends Event
 
     /**
      * Adds an array of events to the container.
-     *
-     * @param array $events
      */
     public function addEvents(array $events)
     {

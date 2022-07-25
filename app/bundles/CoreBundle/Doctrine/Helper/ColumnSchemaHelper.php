@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -17,9 +8,7 @@ use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Exception\SchemaException;
 
 /**
- * Class ColumnSchemaHelper.
- *
- * Used to manipulate the schema of an existing table
+ * Used to manipulate the schema of an existing table.
  */
 class ColumnSchemaHelper
 {
@@ -53,9 +42,10 @@ class ColumnSchemaHelper
      */
     protected $toTable;
 
+    private $columns;
+
     /**
-     * @param Connection $db
-     * @param string     $prefix
+     * @param string $prefix
      */
     public function __construct(Connection $db, $prefix)
     {
@@ -124,8 +114,6 @@ class ColumnSchemaHelper
 
     /**
      * Add an array of columns to the table.
-     *
-     * @param array $columns
      *
      * @throws SchemaException
      */

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -31,9 +22,6 @@ class ScheduledContactFinder
 
     /**
      * ScheduledContactFinder constructor.
-     *
-     * @param LeadRepository  $leadRepository
-     * @param LoggerInterface $logger
      */
     public function __construct(LeadRepository $leadRepository, LoggerInterface $logger)
     {
@@ -43,8 +31,6 @@ class ScheduledContactFinder
 
     /**
      * Hydrate contacts with custom field value, companies, etc.
-     *
-     * @param ArrayCollection $logs
      */
     public function hydrateContacts(ArrayCollection $logs)
     {
@@ -63,9 +49,14 @@ class ScheduledContactFinder
 
         $contacts = $this->leadRepository->getContactCollection($contactIds);
 
-        foreach ($logs as $log) {
+        foreach ($logs as $key => $log) {
             $contactId = $log->getLead()->getId();
-            $contact   = $contacts->get($contactId);
+            if (!$contact = $contacts->get($contactId)) {
+                // the contact must have been deleted mid execution so remove this log from memory
+                $logs->remove($key);
+
+                continue;
+            }
 
             $log->setLead($contact);
         }

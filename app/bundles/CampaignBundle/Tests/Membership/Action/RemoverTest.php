@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Membership\Action;
 
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
@@ -19,19 +10,19 @@ use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaign
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class RemoverTest extends \PHPUnit_Framework_TestCase
+class RemoverTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $leadRepository;
 
     /**
-     * @var LeadEventLogRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadEventLogRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $leadEventLogRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->leadRepository         = $this->createMock(LeadRepository::class);
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);

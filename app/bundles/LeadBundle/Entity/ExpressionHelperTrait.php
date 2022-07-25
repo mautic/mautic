@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
@@ -28,7 +19,7 @@ trait ExpressionHelperTrait
     public function generateFilterExpression($q, $column, $operator, $parameter, $includeIsNull, CompositeExpression $appendTo = null)
     {
         // in/notIn for dbal will use a raw array
-        if (!is_array($parameter) && strpos($parameter, ':') !== 0) {
+        if (!is_array($parameter) && 0 !== strpos($parameter, ':')) {
             $parameter = ":$parameter";
         }
 

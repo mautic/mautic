@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
@@ -20,9 +11,6 @@ use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class TokenSubscriber.
- */
 class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
@@ -37,12 +25,6 @@ class TokenSubscriber implements EventSubscriberInterface
      */
     private $primaryCompanyHelper;
 
-    /**
-     * TokenSubscriber constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param PrimaryCompanyHelper     $primaryCompanyHelper
-     */
     public function __construct(EventDispatcherInterface $dispatcher, PrimaryCompanyHelper $primaryCompanyHelper)
     {
         $this->dispatcher           = $dispatcher;
@@ -61,9 +43,6 @@ class TokenSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function decodeTokens(EmailSendEvent $event)
     {
         if ($event->isDynamicContentParsing()) {
@@ -101,9 +80,6 @@ class TokenSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param TokenReplacementEvent $event
-     */
     public function onTokenReplacement(TokenReplacementEvent $event)
     {
         $clickthrough = $event->getClickthrough();

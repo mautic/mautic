@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Exception\FilePathException;
@@ -30,7 +21,7 @@ class ExportHandler
 
     public function __construct(CoreParametersHelper $coreParametersHelper, FilePathResolver $filePathResolver)
     {
-        $this->dir              = $coreParametersHelper->getParameter('report_temp_dir');
+        $this->dir              = $coreParametersHelper->get('report_temp_dir');
         $this->filePathResolver = $filePathResolver;
     }
 
@@ -45,7 +36,7 @@ class ExportHandler
     {
         $path = $this->getPath($fileName);
 
-        if (($handler = @fopen($path, 'a')) === false) {
+        if (false === ($handler = @fopen($path, 'a'))) {
             throw new FileIOException('Could not open file '.$path);
         }
 

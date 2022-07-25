@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 /**
@@ -30,8 +21,8 @@ class CsvHelper
 
         $header = null;
         $data   = [];
-        if (($handle = fopen($filename, 'r')) !== false) {
-            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
+        if (false !== ($handle = fopen($filename, 'r'))) {
+            while (false !== ($row = fgetcsv($handle, 1000, $delimiter))) {
                 if (!$header) {
                     $header = $row;
                 } else {
@@ -45,8 +36,6 @@ class CsvHelper
     }
 
     /**
-     * @param array $headers
-     *
      * @return array
      */
     public static function sanitizeHeaders(array $headers)
@@ -55,8 +44,6 @@ class CsvHelper
     }
 
     /**
-     * @param array $headers
-     *
      * @return array
      */
     public static function convertHeadersIntoFields(array $headers)

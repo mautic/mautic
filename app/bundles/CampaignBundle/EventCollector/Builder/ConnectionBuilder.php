@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventCollector\Builder;
 
 use Mautic\CampaignBundle\Entity\Event;
@@ -27,8 +18,6 @@ class ConnectionBuilder
 
     /**
      * Used by JS/JsPlumb to restrict how events can be associated to each other in the UI.
-     *
-     * @param array $events
      *
      * @return array
      */
@@ -51,7 +40,6 @@ class ConnectionBuilder
     /**
      * @param string $eventType
      * @param string $key
-     * @param array  $event
      */
     private static function addTypeConnection($eventType, $key, array $event)
     {
@@ -62,8 +50,8 @@ class ConnectionBuilder
             ];
         }
 
-        if (!isset($connectionRestrictions[$key])) {
-            $connectionRestrictions['anchor'][$key] = [];
+        if (!isset(self::$connectionRestrictions[$key])) {
+            self::$connectionRestrictions['anchor'][$key] = [];
         }
 
         if (isset($event['connectionRestrictions'])) {
@@ -78,7 +66,6 @@ class ConnectionBuilder
     /**
      * @param string $key
      * @param string $restrictionType
-     * @param array  $restrictions
      */
     private static function addRestriction($key, $restrictionType, array $restrictions)
     {
@@ -104,7 +91,6 @@ class ConnectionBuilder
      *
      * @param string $eventType
      * @param string $key
-     * @param array  $event
      */
     private static function addDeprecatedAnchorRestrictions($eventType, $key, array $event)
     {

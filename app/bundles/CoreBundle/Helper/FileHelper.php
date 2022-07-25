@@ -1,14 +1,5 @@
 <?php
 
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @see         http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 class FileHelper
@@ -41,11 +32,19 @@ class FileHelper
         return self::convertBytesToMegabytes($maxUploadSizeInBytes);
     }
 
+    /**
+     * @param string $sSize
+     *
+     * @return int
+     */
     public static function convertPHPSizeToBytes($sSize)
     {
+        $sSize = trim($sSize);
+
         if (is_numeric($sSize)) {
-            return $sSize;
+            return (int) $sSize;
         }
+
         $sSuffix = substr($sSize, -1);
         $iValue  = substr($sSize, 0, -1);
 
@@ -53,12 +52,16 @@ class FileHelper
         switch (strtoupper($sSuffix)) {
             case 'P':
                 $iValue *= 1024;
+                // no break
             case 'T':
                 $iValue *= 1024;
+                // no break
             case 'G':
                 $iValue *= 1024;
+                // no break
             case 'M':
                 $iValue *= 1024;
+                // no break
             case 'K':
                 $iValue *= 1024;
                 break;

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
@@ -59,7 +50,7 @@ class DynamicContentApiController extends CommonController
         $lead          = $model->getContactFromRequest($pageModel->getHitQuery($this->request));
         $content       = $helper->getDynamicContentForLead($objectAlias, $lead);
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
-        $deviceId      = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
+        $deviceId      = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
         return empty($content)
             ? new Response('', Response::HTTP_NO_CONTENT)

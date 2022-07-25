@@ -1,24 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
+use Mautic\FormBundle\FormEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class EmailSubscriber.
- */
-class EmailSubscriber extends CommonSubscriber
+class EmailSubscriber implements EventSubscriberInterface
 {
     /**
      * {@inheritdoc}
@@ -30,9 +19,6 @@ class EmailSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param EmailBuilderEvent $event
-     */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         if ($event->abTestWinnerCriteriaRequested()) {
@@ -40,7 +26,7 @@ class EmailSubscriber extends CommonSubscriber
             $formSubmissions = [
                 'group'    => 'mautic.form.abtest.criteria',
                 'label'    => 'mautic.form.abtest.criteria.submissions',
-                'callback' => '\Mautic\FormBundle\Helper\AbTestHelper::determineSubmissionWinner',
+                'event'    => FormEvents::ON_DETERMINE_SUBMISSION_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('form.submissions', $formSubmissions);
         }

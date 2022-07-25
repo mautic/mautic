@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Helper;
 
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Model\FormModel;
 
 /**
@@ -19,23 +11,26 @@ use Mautic\FormBundle\Model\FormModel;
 class TokenHelper
 {
     /**
-     * @var
+     * @var FormModel
      */
     protected $formModel;
 
     /**
-     * TokenHelper constructor.
-     *
-     * @param FormModel $model
+     * @var CorePermissions
      */
-    public function __construct(FormModel $formModel)
+    protected $security;
+
+    /**
+     * TokenHelper constructor.
+     */
+    public function __construct(FormModel $formModel, CorePermissions $security)
     {
         $this->formModel = $formModel;
+        $this->security  = $security;
     }
 
     /**
      * @param $content
-     * @param $clickthrough
      *
      * @return array
      */
@@ -53,7 +48,7 @@ class TokenHelper
                     continue;
                 }
                 $form = $this->formModel->getEntity($id);
-                if ($form !== null &&
+                if (null !== $form &&
                     (
                         $form->isPublished(false) ||
                         $this->security->hasEntityAccess(

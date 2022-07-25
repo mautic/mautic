@@ -1,62 +1,49 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class BatchType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'add',
-            'choice',
+            ChoiceType::class,
             [
-                'label'      => 'mautic.lead.batch.add_to',
-                'multiple'   => true,
-                'choices'    => $options['items'],
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'label'             => 'mautic.lead.batch.add_to',
+                'multiple'          => true,
+                'choices'           => $options['items'],
+                'required'          => false,
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control'],
             ]
         );
 
         $builder->add(
             'remove',
-            'choice',
+            ChoiceType::class,
             [
-                'label'      => 'mautic.lead.batch.remove_from',
-                'multiple'   => true,
-                'choices'    => $options['items'],
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'label'             => 'mautic.lead.batch.remove_from',
+                'multiple'          => true,
+                'choices'           => $options['items'],
+                'required'          => false,
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control'],
             ]
         );
 
-        $builder->add(
-            'ids',
-            'hidden'
-        );
+        $builder->add('ids', HiddenType::class);
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'apply_text'     => false,
                 'save_text'      => 'mautic.core.form.save',
@@ -72,10 +59,7 @@ class BatchType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(
             [
@@ -87,7 +71,7 @@ class BatchType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_batch';
     }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\CampaignMember;
 
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -18,7 +9,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\CampaignMember;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Contact;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
-class FetcherTest extends \PHPUnit_Framework_TestCase
+class FetcherTest extends \PHPUnit\Framework\TestCase
 {
     public function testEntitiesAreFetchedFromOrganizerResults()
     {

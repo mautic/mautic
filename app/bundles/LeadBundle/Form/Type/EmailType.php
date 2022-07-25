@@ -1,26 +1,19 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\EmailBundle\Form\Type\EmailListType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class EmailType.
- */
 class EmailType extends AbstractType
 {
     /**
@@ -28,25 +21,18 @@ class EmailType extends AbstractType
      */
     private $userHelper;
 
-    /**
-     * @param UserHelper $userHelper
-     */
     public function __construct(UserHelper $userHelper)
     {
         $this->userHelper = $userHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['body' => 'html']));
 
         $builder->add(
             'subject',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.subject',
                 'label_attr' => ['class' => 'control-label'],
@@ -60,7 +46,7 @@ class EmailType extends AbstractType
         $default = (empty($options['data']['fromname'])) ? $user->getFirstName().' '.$user->getLastName() : $options['data']['fromname'];
         $builder->add(
             'fromname',
-            'text',
+            TextType::class,
              [
                 'label'      => 'mautic.lead.email.from_name',
                 'label_attr' => ['class' => 'control-label'],
@@ -73,7 +59,7 @@ class EmailType extends AbstractType
         $default = (empty($options['data']['from'])) ? $user->getEmail() : $options['data']['from'];
         $builder->add(
             'from',
-            'text',
+            TextType::class,
             [
                 'label'       => 'mautic.lead.email.from_email',
                 'label_attr'  => ['class' => 'control-label'],
@@ -93,7 +79,7 @@ class EmailType extends AbstractType
 
         $builder->add(
             'body',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.email.form.body',
                 'label_attr' => ['class' => 'control-label'],
@@ -105,11 +91,11 @@ class EmailType extends AbstractType
             ]
         );
 
-        $builder->add('list', 'hidden');
+        $builder->add('list', HiddenType::class);
 
         $builder->add(
             'templates',
-            'email_list',
+            EmailListType::class,
             [
                 'label'      => 'mautic.lead.email.template',
                 'label_attr' => ['class' => 'control-label'],
@@ -122,7 +108,7 @@ class EmailType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', 'form_buttons', [
+        $builder->add('buttons', FormButtonsType::class, [
             'apply_text'  => false,
             'save_text'   => 'mautic.email.send',
             'save_class'  => 'btn btn-primary',
@@ -138,7 +124,7 @@ class EmailType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_quickemail';
     }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Adapter;
 
 use Mautic\ReportBundle\Crate\ReportDataResult;
@@ -35,6 +26,8 @@ class ReportDataAdapter
         $options['limit']           = $reportExportOptions->getBatchSize();
         $options['ignoreGraphData'] = true;
         $options['page']            = $reportExportOptions->getPage();
+        $options['dateTo']          = $reportExportOptions->getDateTo();
+        $options['dateFrom']        = $reportExportOptions->getDateFrom();
 
         $data = $this->reportModel->getReportData($report, null, $options);
 

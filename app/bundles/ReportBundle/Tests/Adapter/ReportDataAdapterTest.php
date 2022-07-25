@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Adapter;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,7 +9,7 @@ use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Tests\Fixtures;
 
-class ReportDataAdapterTest extends \PHPUnit_Framework_TestCase
+class ReportDataAdapterTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoEmailsProvided()
     {
@@ -31,7 +22,7 @@ class ReportDataAdapterTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $coreParametersHelperMock->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_batch_size')
             ->willReturn(11);
 
@@ -45,6 +36,8 @@ class ReportDataAdapterTest extends \PHPUnit_Framework_TestCase
             'limit'           => 11,
             'ignoreGraphData' => true,
             'page'            => 1,
+            'dateTo'          => null,
+            'dateFrom'        => null,
         ];
 
         $reportModelMock->expects($this->once())

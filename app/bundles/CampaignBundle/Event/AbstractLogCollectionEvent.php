@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -47,10 +38,6 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
 
     /**
      * PendingEvent constructor.
-     *
-     * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $logs
      */
     public function __construct(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
     {

@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
+use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -56,14 +48,14 @@ class UserPermissions extends AbstractPermissions
 
         $builder->add(
             'user:profile',
-            'permissionlist',
+            PermissionListType::class,
             [
-                'choices' => [
-                    'editname'     => 'mautic.user.account.permissions.editname',
-                    'editusername' => 'mautic.user.account.permissions.editusername',
-                    'editemail'    => 'mautic.user.account.permissions.editemail',
-                    'editposition' => 'mautic.user.account.permissions.editposition',
-                    'full'         => 'mautic.user.account.permissions.editall',
+                'choices'           => [
+                    'mautic.user.account.permissions.editname'     => 'editname',
+                    'mautic.user.account.permissions.editusername' => 'editusername',
+                    'mautic.user.account.permissions.editemail'    => 'editemail',
+                    'mautic.user.account.permissions.editposition' => 'editposition',
+                    'mautic.user.account.permissions.editall'      => 'full',
                 ],
                 'label'  => 'mautic.user.permissions.profile',
                 'data'   => (!empty($data['profile']) ? $data['profile'] : []),

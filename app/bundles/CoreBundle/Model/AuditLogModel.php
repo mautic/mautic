@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\AuditLog;
@@ -70,11 +61,11 @@ class AuditLogModel extends AbstractCommonModel
     /**
      * Get the audit log for specific object.
      *
-     * @param      $object
-     * @param      $id
-     * @param null $afterDate
-     * @param int  $limit
-     * @param null $bundle
+     * @param string                  $object
+     * @param string|int              $id
+     * @param \DateTimeInterface|null $afterDate
+     * @param int                     $limit
+     * @param string|null             $bundle
      *
      * @return mixed
      */

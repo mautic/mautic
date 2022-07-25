@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Doctrine\ORM\EntityManager;
@@ -42,10 +33,9 @@ class IdToEntityModelTransformer implements DataTransformerInterface
     private $isArray;
 
     /**
-     * @param EntityManager $em
-     * @param string        $repo
-     * @param string        $identifier
-     * @param bool          $isArray
+     * @param string $repo
+     * @param string $identifier
+     * @param bool   $isArray
      */
     public function __construct(EntityManager $em, $repo = '', $identifier = 'id', $isArray = false)
     {
@@ -99,11 +89,8 @@ class IdToEntityModelTransformer implements DataTransformerInterface
                 ->findOneBy([$this->id => $id])
             ;
 
-            if ($entity === null) {
-                throw new TransformationFailedException(sprintf(
-                    'An entity with a/an '.$this->id.' of "%s" does not exist!',
-                    $id
-                ));
+            if (null === $entity) {
+                throw new TransformationFailedException(sprintf('An entity with a/an '.$this->id.' of "%s" does not exist!', $id));
             }
 
             return $entity;
@@ -130,10 +117,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
         ]);
 
         if (!count($entities)) {
-            throw new TransformationFailedException(sprintf(
-                'Entities with a/an '.$this->id.' of "%s" does not exist!',
-                $id
-            ));
+            throw new TransformationFailedException(sprintf('Entities with a/an '.$this->id.' of "%s" does not exist!', $id));
         }
 
         return $entities;

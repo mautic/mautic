@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Decorator;
 
 use Mautic\LeadBundle\Entity\RegexTrait;
@@ -31,8 +22,6 @@ class BaseDecorator implements FilterDecoratorInterface
 
     /**
      * BaseDecorator constructor.
-     *
-     * @param ContactSegmentFilterOperator $contactSegmentFilterOperator
      */
     public function __construct(
         ContactSegmentFilterOperator $contactSegmentFilterOperator
@@ -41,9 +30,7 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return null|string
+     * @return string|null
      */
     public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
@@ -51,8 +38,6 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -65,8 +50,6 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -78,15 +61,12 @@ class BaseDecorator implements FilterDecoratorInterface
             case 'endsWith':
             case 'contains':
                 return 'like';
-                break;
         }
 
         return $operator;
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -95,8 +75,7 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     * @param array|string              $argument
+     * @param array|string $argument
      *
      * @return array|string
      */
@@ -115,9 +94,7 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return array|bool|float|null|string
+     * @return array|bool|float|string|null
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
@@ -128,9 +105,12 @@ class BaseDecorator implements FilterDecoratorInterface
         }
 
         switch ($contactSegmentFilterCrate->getOperator()) {
+            case 'in':
+            case '!in':
+                return !is_array($filter) ? explode('|', $filter) : $filter;
             case 'like':
             case '!like':
-                return strpos($filter, '%') === false ? '%'.$filter.'%' : $filter;
+                return false === strpos($filter, '%') ? '%'.$filter.'%' : $filter;
             case 'contains':
                 return '%'.$filter.'%';
             case 'startsWith':
@@ -145,7 +125,7 @@ class BaseDecorator implements FilterDecoratorInterface
                 $filter = (array) $filter;
 
                 foreach ($filter as $key => $value) {
-                    $filter[$key] = sprintf('(([|]|^)%s([|]|$))', $value);
+                    $filter[$key] = sprintf('(([|]|^)%s([|]|$))', preg_quote($value, '/'));
                 }
 
                 return $filter;
@@ -155,8 +135,6 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return bool
      */
     public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -165,9 +143,7 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return null|CompositeExpression|string
+     * @return CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

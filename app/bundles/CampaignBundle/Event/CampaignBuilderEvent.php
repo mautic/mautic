@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Event\Exception\KeyAlreadyRegisteredException;
@@ -16,9 +7,6 @@ use Mautic\CoreBundle\Event\ComponentValidationTrait;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CampaignBuilderEvent.
- */
 class CampaignBuilderEvent extends Event
 {
     use ComponentValidationTrait;
@@ -52,8 +40,6 @@ class CampaignBuilderEvent extends Event
 
     /**
      * CampaignBuilderEvent constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {
@@ -100,34 +86,11 @@ class CampaignBuilderEvent extends Event
     }
 
     /**
-     * Get decisions.
-     *
      * @return mixed
      */
     public function getDecisions()
     {
         return $this->sort('decisions');
-    }
-
-    /**
-     * @deprecated - use addDecision instead
-     *
-     * @param       $key
-     * @param array $decision
-     */
-    public function addLeadDecision($key, array $decision)
-    {
-        $this->addDecision($key, $decision);
-    }
-
-    /**
-     * @deprecated - use getDecisions instead
-     *
-     * @return array
-     */
-    public function getLeadDecisions()
-    {
-        return $this->getDecisions();
     }
 
     /**
@@ -177,27 +140,6 @@ class CampaignBuilderEvent extends Event
     public function getConditions()
     {
         return $this->sort('conditions');
-    }
-
-    /**
-     * @deprecated use addCondition instead
-     *
-     * @param       $key
-     * @param array $event
-     */
-    public function addLeadCondition($key, array $event)
-    {
-        $this->addCondition($key, $event);
-    }
-
-    /**
-     * @deprecated use getConditions() instead
-     *
-     * @return array
-     */
-    public function getLeadConditions()
-    {
-        return $this->getConditions();
     }
 
     /**

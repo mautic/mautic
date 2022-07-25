@@ -1,18 +1,8 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -26,11 +16,6 @@ class InactiveContactFinder
      * @var LeadRepository
      */
     private $leadRepository;
-
-    /**
-     * @var CampaignRepository
-     */
-    private $campaignRepository;
 
     /**
      * @var CampaignLeadRepository
@@ -47,30 +32,18 @@ class InactiveContactFinder
      */
     private $campaignMemberDatesAdded;
 
-    /**
-     * InactiveContactFinder constructor.
-     *
-     * @param LeadRepository         $leadRepository
-     * @param CampaignRepository     $campaignRepository
-     * @param CampaignLeadRepository $campaignLeadRepository
-     * @param LoggerInterface        $logger
-     */
     public function __construct(
         LeadRepository $leadRepository,
-        CampaignRepository $campaignRepository,
         CampaignLeadRepository $campaignLeadRepository,
         LoggerInterface $logger
     ) {
         $this->leadRepository         = $leadRepository;
-        $this->campaignRepository     = $campaignRepository;
         $this->campaignLeadRepository = $campaignLeadRepository;
         $this->logger                 = $logger;
     }
 
     /**
-     * @param int            $campaignId
-     * @param Event          $decisionEvent
-     * @param ContactLimiter $limiter
+     * @param int $campaignId
      *
      * @return ArrayCollection
      *
@@ -78,6 +51,11 @@ class InactiveContactFinder
      */
     public function getContacts($campaignId, Event $decisionEvent, ContactLimiter $limiter)
     {
+        if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
+            // Limit was reached but do not trigger the NoContactsFoundException
+            return new ArrayCollection();
+        }
+
         // Get list of all campaign leads
         $decisionParentEvent            = $decisionEvent->getParent();
         $this->campaignMemberDatesAdded = $this->campaignLeadRepository->getInactiveContacts(
@@ -117,9 +95,7 @@ class InactiveContactFinder
     }
 
     /**
-     * @param int            $campaignId
-     * @param array          $decisionEvents
-     * @param ContactLimiter $limiter
+     * @param int $campaignId
      *
      * @return int
      */

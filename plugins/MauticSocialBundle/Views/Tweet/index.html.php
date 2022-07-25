@@ -20,7 +20,7 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
             'templateButtons' => [
-                'new' => $view['security']->isGranted('plugin:mauticSocial:tweet:create'),
+                'new' => $view['security']->isGranted('mauticSocial:tweet:create'),
             ],
             'routeBase' => 'mautic_tweet',
             'langVar'   => 'tweet',

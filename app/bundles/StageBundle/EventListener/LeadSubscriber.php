@@ -1,28 +1,50 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\StageBundle\Entity\LeadStageLogRepository;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var StagesChangeLogRepository
+     */
+    private $stagesChangeLogRepository;
+
+    /**
+     * @var LeadStageLogRepository
+     */
+    private $leadStageLogRepository;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    public function __construct(
+        StagesChangeLogRepository $stagesChangeLogRepository,
+        LeadStageLogRepository $leadStageLogRepository,
+        TranslatorInterface $translator,
+        RouterInterface $router
+    ) {
+        $this->stagesChangeLogRepository = $stagesChangeLogRepository;
+        $this->leadStageLogRepository    = $leadStageLogRepository;
+        $this->translator                = $translator;
+        $this->router                    = $router;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -36,8 +58,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -51,9 +71,7 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var StagesChangeLogRepository $logRepository */
-        $logRepository = $this->em->getRepository('MauticLeadBundle:StagesChangeLog');
-        $logs          = $logRepository->getLeadTimelineEvents($event->getLeadId(), $event->getQueryOptions());
+        $logs = $this->stagesChangeLogRepository->getLeadTimelineEvents($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $logs);
@@ -61,7 +79,7 @@ class LeadSubscriber extends CommonSubscriber
         if (!$event->isEngagementCount()) {
             // Add the logs to the event array
             foreach ($logs['results'] as $log) {
-                if (isset($log['reference']) && $log['reference'] != null) {
+                if (isset($log['reference']) && null != $log['reference']) {
                     $eventLabel = [
                         'label'      => $log['eventName'],
                         'href'       => $this->router->generate('mautic_stage_action', ['objectAction' => 'edit', 'objectId' => $log['reference']]),
@@ -89,13 +107,9 @@ class LeadSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $em = $this->em;
-        $em->getRepository('MauticStageBundle:LeadStageLog')->updateLead(
+        $this->leadStageLogRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );

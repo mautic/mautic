@@ -1,34 +1,39 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class DynamicContentFilterType.
- */
 class DynamicContentFilterType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
+    private BuilderIntegrationsHelper $builderIntegrationsHelper;
+
+    public function __construct(BuilderIntegrationsHelper $builderIntegrationsHelper)
+    {
+        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $extraClasses = '';
+
+        try {
+            $mauticBuilder = $this->builderIntegrationsHelper->getBuilder('email');
+            $mauticBuilder->getName();
+        } catch (IntegrationNotFoundException $exception) {
+            // Assume legacy builder
+            $extraClasses = ' legacy-builder';
+        }
+
         $builder->add(
             'tokenName',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.core.dynamicContent.token_name',
                 'attr'  => [
@@ -39,11 +44,11 @@ class DynamicContentFilterType extends AbstractType
 
         $builder->add(
             'content',
-            'textarea',
+            TextareaType::class,
             [
                 'label' => 'mautic.core.dynamicContent.default_content',
                 'attr'  => [
-                    'class' => 'form-control editor editor-dynamic-content',
+                    'class' => 'form-control editor editor-dynamic-content'.$extraClasses,
                 ],
             ]
         );
@@ -51,25 +56,23 @@ class DynamicContentFilterType extends AbstractType
         $builder->add(
             $builder->create(
                 'filters',
-                'collection',
+                DynamicListType::class,
                 [
-                    'type'    => 'dynamic_content_filter_entry',
-                    'options' => [
+                    'entry_type'     => DynamicContentFilterEntryType::class,
+                    'entry_options'  => [
                         'label' => false,
                         'attr'  => [
                             'class' => 'form-control',
                         ],
                     ],
-                    'allow_add'    => true,
-                    'allow_delete' => true,
+                    'option_required' => false,
+                    'allow_add'       => true,
+                    'allow_delete'    => true,
                 ]
             )
         );
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -83,7 +86,7 @@ class DynamicContentFilterType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'dynamic_content_filter';
     }

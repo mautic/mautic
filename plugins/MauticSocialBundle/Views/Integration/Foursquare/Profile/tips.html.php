@@ -17,7 +17,7 @@
      <?php foreach ($activity as $item): ?>
         <?php
         $border = 'bdr-b bdr-l-wdh-0 bdr-r-wdh-0';
-        if ($i == 0 || $i == ($total - 1)):
+        if (0 == $i || $i == ($total - 1)):
             $border = 'bdr-w-0';
         endif;
         ?>
@@ -30,7 +30,7 @@
                 <?php endforeach; ?>
             </p>
             <p class="text-muted"><i class="fa fa-clock-o"></i> <?php echo $view['date']->toFull($item['createdAt'], 'UTC', 'U'); ?></p>
-            <?php echo $i == 0 ? '' : '<hr />'; ?>
+            <?php echo 0 == $i ? '' : '<hr />'; ?>
         </li>
         <?php ++$i; ?>
     <?php endforeach; ?>

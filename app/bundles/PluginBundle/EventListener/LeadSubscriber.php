@@ -1,37 +1,20 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Model\PluginModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var PluginModel
      */
-    protected $pluginModel;
+    private $pluginModel;
 
-    /**
-     * LeadSubscriber constructor.
-     *
-     * @param PluginModel $pluginModel
-     */
     public function __construct(PluginModel $pluginModel)
     {
         $this->pluginModel = $pluginModel;
@@ -58,9 +41,8 @@ class LeadSubscriber extends CommonSubscriber
         $lead                  = $event->getLead();
         $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
         $integrationEntityRepo->findLeadsToDelete('lead%', $lead->getId());
-        $success = false;
 
-        return $success;
+        return false;
     }
 
     /*
@@ -72,9 +54,8 @@ class LeadSubscriber extends CommonSubscriber
         $company               = $event->getCompany();
         $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
         $integrationEntityRepo->findLeadsToDelete('company%', $company->getId());
-        $success = false;
 
-        return $success;
+        return false;
     }
 
     /*

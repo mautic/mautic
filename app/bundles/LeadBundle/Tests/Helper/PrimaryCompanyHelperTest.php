@@ -1,28 +1,20 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
+use PHPUnit\Framework\Exception;
 
-class PrimaryCompanyHelperTest extends \PHPUnit_Framework_TestCase
+class PrimaryCompanyHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var CompanyLeadRepository|\PHPUnit_Framework_Exception
+     * @var CompanyLeadRepository|Exception
      */
     private $leadRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->leadRepository = $this->createMock(CompanyLeadRepository::class);
 

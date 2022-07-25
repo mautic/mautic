@@ -16,7 +16,7 @@ $js     = <<<js
 js;
 
 $counter     = (!empty($settings['counter'])) ? $settings['counter'] : 'none';
-$dataCounter = ($counter != 'none') ? ' data-counter="'.$settings['counter'].'"' : '';
+$dataCounter = ('none' != $counter) ? ' data-counter="'.$settings['counter'].'"' : '';
 ?>
 <div class="share-button linkedin-share-button layout-<?php echo $counter; ?>">
 <script type="IN/Share"<?php echo $dataCounter; ?>></script>

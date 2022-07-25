@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CalendarBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -22,8 +13,6 @@ class AjaxController extends CommonAjaxController
 {
     /**
      * Generates the calendar data.
-     *
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -51,8 +40,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Updates an event on dragging the event around the calendar.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function updateEventAction(Request $request)
@@ -71,7 +58,7 @@ class AjaxController extends CommonAjaxController
         $entity = $event->getEntity();
 
         //not found
-        if ($entity === null) {
+        if (null === $entity) {
             $this->addFlash('mautic.core.error.notfound', 'error');
         } elseif (!$event->hasAccess()) {
             $this->addFlash('mautic.core.error.accessdenied', 'error');
@@ -90,7 +77,7 @@ class AjaxController extends CommonAjaxController
                     ),
                 ]
             );
-        } elseif ($this->request->getMethod() == 'POST') {
+        } elseif ('POST' == $this->request->getMethod()) {
             $entity->$setter($dateValue);
             $model->saveEntity($entity);
             $response['success'] = true;
@@ -128,7 +115,7 @@ class AjaxController extends CommonAjaxController
         foreach ($events as $key => $event) {
             //make sure the user has view access to the entities
             foreach ($event as $eventKey => $eventValue) {
-                if (substr($eventKey, -3) === '_id') {
+                if ('_id' === substr($eventKey, -3)) {
                     $modelName = substr($eventKey, 0, -3);
                     if ($modelFactory->hasModel($modelName)) {
                         $model = $modelFactory->getModel($modelName);

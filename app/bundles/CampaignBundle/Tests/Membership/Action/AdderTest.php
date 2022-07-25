@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Membership\Action;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -19,19 +10,19 @@ use Mautic\CampaignBundle\Membership\Action\Adder;
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
 use Mautic\LeadBundle\Entity\Lead;
 
-class AdderTest extends \PHPUnit_Framework_TestCase
+class AdderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $leadRepository;
 
     /**
-     * @var LeadEventLogRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadEventLogRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $leadEventLogRepository;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->leadRepository         = $this->createMock(LeadRepository::class);
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);

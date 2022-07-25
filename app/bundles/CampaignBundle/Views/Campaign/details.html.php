@@ -20,10 +20,22 @@ $view['slots']->set(
         [
             'item'            => $campaign,
             'templateButtons' => [
-                'edit'   => $permissions['campaign:campaigns:edit'],
-                'clone'  => $permissions['campaign:campaigns:create'],
-                'delete' => $permissions['campaign:campaigns:delete'],
-                'close'  => $permissions['campaign:campaigns:view'],
+                'edit'   => $view['security']->hasEntityAccess(
+                    $permissions['campaign:campaigns:editown'],
+                    $permissions['campaign:campaigns:editother'],
+                    $campaign->getCreatedBy()
+                ),
+                'clone'    => $permissions['campaign:campaigns:create'],
+                'delete'   => $view['security']->hasEntityAccess(
+                    $permissions['campaign:campaigns:deleteown'],
+                    $permissions['campaign:campaigns:deleteother'],
+                    $campaign->getCreatedBy()
+                ),
+                'close'   => $view['security']->hasEntityAccess(
+                    $permissions['campaign:campaigns:viewown'],
+                    $permissions['campaign:campaigns:viewother'],
+                    $campaign->getCreatedBy()
+                ),
             ],
             'routeBase' => 'campaign',
         ]
@@ -93,7 +105,7 @@ switch (true) {
                             <?php foreach ($sources as $sourceType => $typeNames): ?>
                             <?php if (!empty($typeNames)): ?>
                             <tr>
-                                <td width="20%"><span class="fw-b">
+                                <td width="20%"><span class="fw-b textTitle">
                                     <?php echo $view['translator']->trans('mautic.campaign.leadsource.'.$sourceType); ?>
                                 </td>
                                 <td>
@@ -219,8 +231,13 @@ switch (true) {
                 </div>
             <?php endif; ?>
             <!--/ #events-container -->
-            <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container">
-                <?php echo $campaignLeads; ?>
+            <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container" data-target-url="<?php
+                    echo $view['router']->url(
+                        'mautic_campaign_contacts',
+                        ['objectId' => $campaign->getId(), 'page' => $app->getSession()->get('mautic.campaign.contact.page', 1)]
+                    );
+                ?>">
+                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                 <div class="clearfix"></div>
             </div>
             <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>

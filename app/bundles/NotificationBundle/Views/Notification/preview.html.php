@@ -42,8 +42,8 @@ $actionButtonText2 = $notification->getActionButtonText2();
                 ?>
 
             </div>
-            <div class="col-xs-8 text height-auto bg-white">
-                <h3>
+            <div class="text height-auto bg-white">
+                <h4>
                     <?php 
                     if ($notification->getHeading()) {
                         echo $notification->getHeading();
@@ -53,7 +53,7 @@ $actionButtonText2 = $notification->getActionButtonText2();
                     ?>  
                 </h3>
                 <p>
-                    <?php 
+                    <?php
                     if ($notification->getMessage()) {
                         echo $notification->getMessage();
                     } else {

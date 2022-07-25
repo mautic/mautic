@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Exception\FilePathException;
@@ -17,7 +8,7 @@ use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\ReportBundle\Exception\FileIOException;
 use Mautic\ReportBundle\Model\ExportHandler;
 
-class ExportHandlerTest extends \PHPUnit_Framework_TestCase
+class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 {
     public function testHandler()
     {
@@ -28,7 +19,7 @@ class ExportHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $coreParametersHelperMock->expects($this->any())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_temp_dir')
             ->willReturn($tmpDir);
 
@@ -63,7 +54,7 @@ class ExportHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $coreParametersHelperMock->expects($this->any())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_temp_dir')
             ->willReturn($tmpDir);
 
@@ -92,7 +83,7 @@ class ExportHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $coreParametersHelperMock->expects($this->any())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_temp_dir')
             ->willReturn($tmpDir);
 

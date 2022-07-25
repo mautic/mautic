@@ -1,29 +1,30 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\UpgradeEvent;
+use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
+use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckError;
+use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * Class AjaxController.
@@ -43,11 +44,11 @@ class AjaxController extends CommonController
     {
         $response = new JsonResponse();
 
-        if ($this->container->getParameter('kernel.environment') == 'dev' && $addIgnoreWdt) {
+        if ('dev' == $this->container->getParameter('kernel.environment') && $addIgnoreWdt) {
             $dataArray['ignore_wdt'] = 1;
         }
 
-        if ($statusCode !== null) {
+        if (null !== $statusCode) {
             $response->setStatusCode($statusCode);
         }
 
@@ -73,27 +74,28 @@ class AjaxController extends CommonController
         }
 
         if ($authenticationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            if (strpos($action, ':') !== false) {
+            if (false !== strpos($action, ':')) {
                 //call the specified bundle's ajax action
                 $parts     = explode(':', $action);
                 $namespace = 'Mautic';
                 $isPlugin  = false;
 
-                if (count($parts) == 3 && $parts['0'] == 'plugin') {
+                if (3 == count($parts) && 'plugin' == $parts['0']) {
                     $namespace = 'MauticPlugin';
                     array_shift($parts);
                     $isPlugin = true;
                 }
 
-                if (count($parts) == 2) {
+                if (2 == count($parts)) {
                     $bundleName = $parts[0];
                     $bundle     = ucfirst($bundleName);
                     $action     = $parts[1];
+
                     if (!$classExists = class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController')) {
                         // Check if a plugin is prefixed with Mautic
                         $bundle      = 'Mautic'.$bundle;
                         $classExists = class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController');
-                    } elseif (!$isPlugin) {
+                    } elseif (!$isPlugin && 'Marketplace' !== $bundle) {
                         $bundle = 'Mautic'.$bundle;
                     }
 
@@ -118,9 +120,8 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param         $action
-     * @param Request $request
-     * @param null    $bundle
+     * @param      $action
+     * @param null $bundle
      *
      * @return JsonResponse
      */
@@ -134,8 +135,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function globalSearchAction(Request $request)
@@ -156,8 +155,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function commandListAction(Request $request)
@@ -170,13 +167,13 @@ class AjaxController extends CommonController
             if (is_array($c)) {
                 foreach ($c as $subc) {
                     $command = $translator->trans($k);
-                    $command = (strpos($command, ':') === false) ? $command.':' : $command;
+                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
 
                     $dataArray[$command.$translator->trans($subc)] = ['value' => $command.$translator->trans($subc)];
                 }
             } else {
                 $command = $translator->trans($c);
-                $command = (strpos($command, ':') === false) ? $command.':' : $command;
+                $command = (false === strpos($command, ':')) ? $command.':' : $command;
 
                 $dataArray[$command] = ['value' => $command];
             }
@@ -187,8 +184,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function globalCommandListAction(Request $request)
@@ -200,14 +195,14 @@ class AjaxController extends CommonController
         $translator  = $this->get('translator');
         $dataArray   = [];
         $dupChecker  = [];
-        foreach ($allCommands as $header => $commands) {
+        foreach ($allCommands as $commands) {
             //@todo if/when figure out a way for typeahead dynamic headers
             //$header = $translator->trans($header);
             //$dataArray[$header] = array();
             foreach ($commands as $k => $c) {
                 if (is_array($c)) {
                     $command = $translator->trans($k);
-                    $command = (strpos($command, ':') === false) ? $command.':' : $command;
+                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
 
                     foreach ($c as $subc) {
                         $subcommand = $command.$translator->trans($subc);
@@ -218,7 +213,7 @@ class AjaxController extends CommonController
                     }
                 } else {
                     $command = $translator->trans($k);
-                    $command = (strpos($command, ':') === false) ? $command.':' : $command;
+                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
 
                     if (!in_array($command, $dupChecker)) {
                         $dataArray[]  = ['value' => $command];
@@ -235,16 +230,16 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function togglePublishStatusAction(Request $request)
     {
-        $dataArray = ['success' => 0];
-        $name      = InputHelper::clean($request->request->get('model'));
-        $id        = InputHelper::int($request->request->get('id'));
-        $model     = $this->getModel($name);
+        $dataArray      = ['success' => 0];
+        $name           = InputHelper::clean($request->request->get('model'));
+        $id             = InputHelper::clean($request->request->get('id'));
+        $customToggle   = InputHelper::clean($request->request->get('customToggle'));
+        $model          = $this->getModel($name);
+        $status         = Response::HTTP_OK;
 
         $post = $request->request->all();
         unset($post['model'], $post['id'], $post['action']);
@@ -255,10 +250,12 @@ class AjaxController extends CommonController
         }
 
         $entity = $model->getEntity($id);
-        if ($entity !== null) {
+        if (null !== $entity) {
             $permissionBase = $model->getPermissionBase();
-            $security       = $this->get('mautic.security');
-            $createdBy      = (method_exists($entity, 'getCreatedBy')) ? $entity->getCreatedBy() : null;
+
+            /** @var CorePermissions $security */
+            $security  = $this->get('mautic.security');
+            $createdBy = (method_exists($entity, 'getCreatedBy')) ? $entity->getCreatedBy() : null;
 
             if ($security->checkPermissionExists($permissionBase.':publishown')) {
                 $hasPermission = $security->hasEntityAccess($permissionBase.':publishown', $permissionBase.':publishother', $createdBy);
@@ -277,35 +274,55 @@ class AjaxController extends CommonController
             }
 
             if ($hasPermission) {
-                $dataArray['success'] = 1;
-                //toggle permission state
-                $refresh = $model->togglePublishStatus($entity);
+                try {
+                    $dataArray['success'] = 1;
+                    //toggle permission state
+                    if ($customToggle) {
+                        $accessor = PropertyAccess::createPropertyAccessor();
+                        $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
+                        $model->getRepository()->saveEntity($entity);
+                    } else {
+                        $refresh = $model->togglePublishStatus($entity);
+                    }
+                    if (!empty($refresh)) {
+                        $dataArray['reload'] = 1;
+                    } else {
+                        $onclickMethod  = (method_exists($entity, 'getOnclickMethod')) ? $entity->getOnclickMethod() : '';
+                        $dataAttr       = (method_exists($entity, 'getDataAttributes')) ? $entity->getDataAttributes() : [];
+                        $attrTransKeys  = (method_exists($entity, 'getTranslationKeysDataAttributes')) ? $entity->getTranslationKeysDataAttributes() : [];
 
-                if ($refresh) {
-                    $dataArray['reload'] = 1;
-                } else {
-                    //get updated icon HTML
-                    $html = $this->renderView(
-                        'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                        [
-                            'item'  => $entity,
-                            'model' => $name,
-                            'query' => $extra,
-                            'size'  => (isset($post['size'])) ? $post['size'] : '',
-                        ]
-                    );
-                    $dataArray['statusHtml'] = $html;
+                        //get updated icon HTML
+                        $html = $this->renderView(
+                            'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                            [
+                                'item'          => $entity,
+                                'model'         => $name,
+                                'query'         => $extra,
+                                'size'          => (isset($post['size'])) ? $post['size'] : '',
+                                'onclick'       => $onclickMethod,
+                                'attributes'    => $dataAttr,
+                                'transKeys'     => $attrTransKeys,
+                            ]
+                        );
+                        $dataArray['statusHtml'] = $html;
+                    }
+                } catch (RecordCanNotUnpublishException $e) {
+                    $this->addFlash($e->getMessage());
+                    $status = Response::HTTP_UNPROCESSABLE_ENTITY;
                 }
+            } else {
+                $this->addFlash('mautic.core.error.access.denied');
+                $status = Response::HTTP_FORBIDDEN;
             }
         }
 
-        return $this->sendJsonResponse($dataArray);
+        $dataArray['flashes'] = $this->getFlashContent();
+
+        return $this->sendJsonResponse($dataArray, $status);
     }
 
     /**
      * Unlock an entity locked by the current user.
-     *
-     * @param Request $request
      *
      * @return JsonResponse
      */
@@ -313,7 +330,7 @@ class AjaxController extends CommonController
     {
         $dataArray   = ['success' => 0];
         $name        = InputHelper::clean($request->request->get('model'));
-        $id          = InputHelper::int($request->request->get('id'));
+        $id          = (int) $request->request->get('id');
         $extra       = InputHelper::clean($request->request->get('parameter'));
         $model       = $this->getModel($name);
         $entity      = $model->getEntity($id);
@@ -321,7 +338,7 @@ class AjaxController extends CommonController
 
         if (method_exists($entity, 'getCheckedOutBy')) {
             $checkedOut = $entity->getCheckedOutBy();
-            if ($entity !== null && !empty($checkedOut) && $checkedOut === $currentUser->getId()) {
+            if (null !== $entity && !empty($checkedOut) && $checkedOut === $currentUser->getId()) {
                 //entity exists, is checked out, and is checked out by the current user so go ahead and unlock
                 $model->unlockEntity($entity, $extra);
                 $dataArray['success'] = 1;
@@ -333,8 +350,6 @@ class AjaxController extends CommonController
 
     /**
      * Sets the page layout to the update layout.
-     *
-     * @param Request $request
      *
      * @return JsonResponse
      */
@@ -348,16 +363,64 @@ class AjaxController extends CommonController
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
         /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-        $cookieHelper = $this->factory->getHelper('cookie');
+        $cookieHelper = $this->container->get('mautic.helper.cookie');
         $cookieHelper->setCookie('mautic_update', 'setupUpdate', 300);
 
         return $this->sendJsonResponse($dataArray);
     }
 
     /**
+     * Run pre-update checks, like if the user has the correct PHP version, database version, etc.
+     */
+    protected function updateRunChecksAction(): JsonResponse
+    {
+        $dataArray  = [];
+        $translator = $this->translator;
+        /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+        $cookieHelper = $this->container->get('mautic.helper.cookie');
+        /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
+        $updateHelper = $this->container->get('mautic.helper.update');
+        /** @var CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = $this->container->get('mautic.helper.core_parameters');
+        $errors               = [];
+
+        if (true === $coreParametersHelper->get('composer_updates', false)) {
+            $errors = [$translator->trans('mautic.core.update.composer')];
+        } else {
+            $results = $updateHelper->runPreUpdateChecks();
+
+            foreach ($results as $result) {
+                if (!$result->success) {
+                    $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error) => $translator->trans($error->key, $error->parameters), $result->errors));
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            $dataArray['success']    = 0;
+            $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
+            $dataArray['message']    = $translator->trans('mautic.core.update.check.error');
+            $dataArray['errors']     = $errors;
+
+            // A way to keep the upgrade from failing if the session is lost after
+            // the cache is cleared by upgrade.php
+            $cookieHelper->deleteCookie('mautic_update');
+        } else {
+            $dataArray['success']        = 1;
+            $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
+            $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.downloading.package');
+            $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
+
+            // A way to keep the upgrade from failing if the session is lost after
+            // the cache is cleared by upgrade.php
+            $cookieHelper->setCookie('mautic_update', 'runChecks', 300);
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
      * Downloads the update package.
-     *
-     * @param Request $request
      *
      * @return JsonResponse
      */
@@ -367,11 +430,14 @@ class AjaxController extends CommonController
         $translator = $this->translator;
 
         /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
-        $updateHelper = $this->factory->getHelper('update');
+        $updateHelper = $this->container->get('mautic.helper.update');
 
         // Fetch the update package
         $update  = $updateHelper->fetchData();
         $package = $updateHelper->fetchPackage($update['package']);
+
+        /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+        $cookieHelper = $this->container->get('mautic.helper.cookie');
 
         if ($package['error']) {
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
@@ -379,8 +445,6 @@ class AjaxController extends CommonController
 
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-            $cookieHelper = $this->factory->getHelper('cookie');
             $cookieHelper->deleteCookie('mautic_update');
         } else {
             $dataArray['success']        = 1;
@@ -390,8 +454,6 @@ class AjaxController extends CommonController
 
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-            $cookieHelper = $this->factory->getHelper('cookie');
             $cookieHelper->setCookie('mautic_update', 'downloadPackage', 300);
         }
 
@@ -401,8 +463,6 @@ class AjaxController extends CommonController
     /**
      * Extracts the update package.
      *
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function updateExtractPackageAction(Request $request)
@@ -410,17 +470,23 @@ class AjaxController extends CommonController
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
 
-        /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
-        $updateHelper = $this->factory->getHelper('update');
+        /** @var UpdateHelper $updateHelper */
+        $updateHelper = $this->container->get('mautic.helper.update');
+
+        /** @var CookieHelper $cookieHelper */
+        $cookieHelper = $this->container->get('mautic.helper.cookie');
+
+        /** @var PathsHelper $pathsHelper */
+        $pathsHelper = $this->container->get('mautic.helper.paths');
 
         // Fetch the package data
         $update  = $updateHelper->fetchData();
-        $zipFile = $this->factory->getSystemPath('cache').'/'.basename($update['package']);
+        $zipFile = $pathsHelper->getSystemPath('cache').'/'.basename($update['package']);
 
         $zipper  = new \ZipArchive();
         $archive = $zipper->open($zipFile);
 
-        if ($archive !== true) {
+        if (true !== $archive) {
             // Get the exact error
             switch ($archive) {
                 case \ZipArchive::ER_EXISTS:
@@ -450,8 +516,6 @@ class AjaxController extends CommonController
 
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-            $cookieHelper = $this->factory->getHelper('cookie');
             $cookieHelper->deleteCookie('mautic_update');
         } else {
             // Extract the archive file now
@@ -471,8 +535,6 @@ class AjaxController extends CommonController
 
                 // A way to keep the upgrade from failing if the session is lost after
                 // the cache is cleared by upgrade.php
-                /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-                $cookieHelper = $this->factory->getHelper('cookie');
                 $cookieHelper->setCookie('mautic_update', 'extractPackage', 300);
             }
         }
@@ -482,8 +544,6 @@ class AjaxController extends CommonController
 
     /**
      * Migrate the database to the latest version.
-     *
-     * @param Request $request
      *
      * @return JsonResponse
      */
@@ -511,25 +571,24 @@ class AjaxController extends CommonController
             @rmdir(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade');
         }
 
-        $cacheDir = $this->factory->getSystemPath('cache');
+        $cacheDir = $this->container->get('mautic.helper.paths')->getSystemPath('cache');
 
         // Cleanup the update cache data now too
         if (file_exists($cacheDir.'/lastUpdateCheck.txt')) {
             @unlink($cacheDir.'/lastUpdateCheck.txt');
         }
 
-        if (file_exists($cacheDir.'/'.$this->factory->getVersion().'.zip')) {
-            @unlink($cacheDir.'/'.$this->factory->getVersion().'.zip');
+        if (file_exists($cacheDir.'/'.MAUTIC_VERSION.'.zip')) {
+            @unlink($cacheDir.'/'.MAUTIC_VERSION.'.zip');
         }
 
         // Update languages
-        $supportedLanguages = $this->coreParametersHelper->getParameter('supported_languages');
+        /** @var LanguageHelper $languageHelper */
+        $languageHelper     = $this->container->get('mautic.helper.language');
+        $supportedLanguages = $languageHelper->getSupportedLanguages();
 
         // If there is only one language, assume it is 'en_US' and skip this
         if (count($supportedLanguages) > 1) {
-            /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
-            $languageHelper = $this->factory->getHelper('language');
-
             // First, update the cached language data
             $result = $languageHelper->fetchLanguages(true);
 
@@ -537,7 +596,7 @@ class AjaxController extends CommonController
             if (!isset($result['error'])) {
                 foreach ($supportedLanguages as $locale => $name) {
                     // We don't need to update en_US, that comes with the main package
-                    if ($locale == 'en_US') {
+                    if ('en_US' == $locale) {
                         continue;
                     }
 
@@ -554,25 +613,34 @@ class AjaxController extends CommonController
         $iterator = new \FilesystemIterator($this->container->getParameter('kernel.root_dir').'/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
-            $env  = $this->factory->getEnvironment();
-            $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.$env];
+            $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.MAUTIC_ENV];
 
-            if ($env == 'prod') {
+            if ('prod' === MAUTIC_ENV) {
                 $args[] = '--no-debug';
             }
 
             $input       = new ArgvInput($args);
-            $application = new Application($this->get('kernel'));
+            $application = new Application($this->container->get('kernel'));
             $application->setAutoExit(false);
             $output = new BufferedOutput();
+
+            $minExecutionTime = 300;
+            $maxExecutionTime = (int) ini_get('max_execution_time');
+            if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
+                ini_set('max_execution_time', $minExecutionTime);
+            }
+
             $result = $application->run($input, $output);
         }
 
-        if ($result !== 0) {
+        /** @var CookieHelper $cookieHelper */
+        $cookieHelper = $this->container->get('mautic.helper.cookie');
+
+        if (0 !== $result) {
             // Log the output
             $outputBuffer = trim(preg_replace('/\n\s*\n/s', ' \\ ', $output->fetch()));
             $outputBuffer = preg_replace('/\s\s+/', ' ', trim($outputBuffer));
-            $this->factory->getLogger()->log('error', '[UPGRADE ERROR] Exit code '.$result.'; '.$outputBuffer);
+            $this->container->get('monolog.logger.mautic')->log('error', '[UPGRADE ERROR] Exit code '.$result.'; '.$outputBuffer);
 
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
             $dataArray['message']    = $translator->trans(
@@ -583,14 +651,11 @@ class AjaxController extends CommonController
 
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-            $cookieHelper = $this->factory->getHelper('cookie');
             $cookieHelper->deleteCookie('mautic_update');
         } else {
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-            $cookieHelper = $this->factory->getHelper('cookie');
+            /* @var CookieHelper $cookieHelper */
             $cookieHelper->setCookie('mautic_update', 'schemaMigration', 300);
 
             if ($request->get('finalize', false)) {
@@ -612,8 +677,6 @@ class AjaxController extends CommonController
     /**
      * Finalize update.
      *
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     public function updateFinalizationAction(Request $request)
@@ -628,14 +691,8 @@ class AjaxController extends CommonController
         // Check for a post install message
         if ($postMessage = $this->container->get('session')->get('post_upgrade_message', false)) {
             $this->container->get('session')->remove('post_upgrade_message');
-            $postMessage = sprintf('<h4 class="mt-lg">%s</h4><p>%s</p>', $this->container->get('translator')->trans('mautic.core.update.post_message'), $postMessage);
-            if ('1.2.3' == $this->container->get('kernel')->getVersion()) {
-                // @TODO - remove in 2.0
-                $dataArray['message'] .= $postMessage;
-                $dataArray['postmessage'] = false;
-            } else {
-                $dataArray['postmessage'] = $postMessage;
-            }
+            $postMessage              = sprintf('<h4 class="mt-lg">%s</h4><p>%s</p>', $this->container->get('translator')->trans('mautic.core.update.post_message'), $postMessage);
+            $dataArray['postmessage'] = $postMessage;
         }
 
         // Execute the mautic.post_upgrade event
@@ -643,48 +700,22 @@ class AjaxController extends CommonController
 
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
-        /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-        $cookieHelper = $this->factory->getHelper('cookie');
+        /** @var CookieHelper $cookieHelper */
+        $cookieHelper = $this->container->get('mautic.helper.cookie');
         $cookieHelper->deleteCookie('mautic_update');
 
         // Set a redirect to force a page reload to get new menu items, assets, etc
-        $dataArray['redirect'] = $this->get('router')->generate('mautic_core_update');
+        $dataArray['redirect'] = $this->container->get('router')->generate('mautic_core_update');
 
         return $this->sendJsonResponse($dataArray);
     }
 
     /**
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    protected function updateUserStatusAction(Request $request)
-    {
-        $status = InputHelper::clean($request->request->get('status'));
-
-        /** @var \Mautic\UserBundle\Model\UserModel $model */
-        $model = $this->getModel('user');
-
-        $currentStatus = $this->user->getOnlineStatus();
-        if (!in_array($currentStatus, ['manualaway', 'dnd'])) {
-            if ($status == 'back') {
-                $status = 'online';
-            }
-
-            $model->setOnlineStatus($status);
-        }
-
-        return $this->sendJsonResponse(['success' => 1]);
-    }
-
-    /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function clearNotificationAction(Request $request)
     {
-        $id = InputHelper::int($request->get('id', 0));
+        $id = (int) $request->get('id', 0);
 
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
         $model = $this->getModel('core.notification');
@@ -694,8 +725,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function getBuilderTokensAction(Request $request)
@@ -712,8 +741,6 @@ class AjaxController extends CommonController
 
     /**
      * Fetch remote data store.
-     *
-     * @param Request $request
      *
      * @return JsonResponse
      */
@@ -759,8 +786,6 @@ class AjaxController extends CommonController
 
     /**
      * Fetch IP Lookup form.
-     *
-     * @param Request $request
      *
      * @return JsonResponse
      */

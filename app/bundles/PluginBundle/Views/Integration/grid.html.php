@@ -8,13 +8,13 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticPluginBundle:Integration:index.html.php');
 }
 ?>
 <?php if (count($items)): ?>
 <div class="pa-md bg-auto">
-    <div class="row shuffle-integrations">
+    <div class="row shuffle-integrations native-integrations">
             <?php foreach ($items as $item):
                 if (array_key_exists($item['plugin'], $plugins)) {
                     $pluginTitle = $plugins[$item['plugin']]['name'].' - '.$item['display'];

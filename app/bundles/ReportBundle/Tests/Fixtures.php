@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests;
 
 class Fixtures
@@ -187,5 +178,61 @@ class Fixtures
     public static function getEmailType()
     {
         return 'email';
+    }
+
+    public static function getReportBuilderEventData()
+    {
+        return [
+            'all' => [
+                'tables' => [
+                    'assets' => [
+                        'display_name' => 'mautic.asset.assets',
+                        'columns'      => [
+                            'a.alias' => [
+                                'label' => 'Alias',
+                                'type'  => 'string',
+                                'alias' => 'alias',
+                            ],
+                            'a.description' => [
+                                'label' => 'Description',
+                                'type'  => 'string',
+                                'alias' => 'a_description',
+                            ],
+                        ],
+                        'group' => 'assets',
+                    ],
+                ],
+                'graphs' => [
+                    'all'                 => [],
+                    'mautic.asset.assets' => [
+                        'tables' => [],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    public static function getGoodColumnList()
+    {
+        $list          = new \stdClass();
+        $list->choices = [
+            'a.alias'       => 'Alias',
+            'a.description' => 'Description',
+        ];
+        $list->choiceHtml  = '<option value="a.alias">Alias</option>\n<option value="a.description">Description</option>\n';
+        $list->definitions = [
+            'a.alias' => [
+                'label' => 'Alias',
+                'type'  => 'string',
+                'alias' => 'alias',
+            ],
+            'a.description' => [
+                'label' => 'Description',
+                'type'  => 'string',
+                'alias' => 'a_description',
+            ],
+        ];
+
+        return $list;
     }
 }

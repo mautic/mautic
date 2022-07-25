@@ -17,7 +17,7 @@
     <div class="col-xs-2">
         <?php if ('emailform_dynamicContent_0_content' !== $id) : ?>
             <a class="remove-item btn btn-default text-danger"><i class="fa fa-trash-o"></i></a>
-        <?php endif ?>
+        <?php endif; ?>
     </div>
 </div>
 <div class="row form-group">

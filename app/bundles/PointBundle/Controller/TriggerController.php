@@ -1,25 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Trigger;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class TriggerController.
- */
 class TriggerController extends FormController
 {
     /**
@@ -42,38 +31,35 @@ class TriggerController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
-        //set limits
-        $limit = $this->get('session')->get('mautic.point.trigger.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make('mautic.point.trigger', $page);
 
-        $search = $this->request->get('search', $this->get('session')->get('mautic.point.trigger.filter', ''));
-        $this->get('session')->set('mautic.point.trigger.filter', $search);
-
+        $limit      = $pageHelper->getLimit();
+        $start      = $pageHelper->getStart();
+        $search     = $this->request->get('search', $this->get('session')->get('mautic.point.trigger.filter', ''));
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $this->get('session')->get('mautic.point.trigger.orderby', 't.name');
         $orderByDir = $this->get('session')->get('mautic.point.trigger.orderbydir', 'ASC');
-
-        $triggers = $this->getModel('point.trigger')->getEntities(
+        $triggers   = $this->getModel('point.trigger')->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir,
-            ]);
+            ]
+        );
+
+        $this->get('session')->set('mautic.point.trigger.filter', $search);
 
         $count = count($triggers);
         if ($count && $count < ($start + 1)) {
-            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.point.trigger.page', $lastPage);
+            $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_pointtrigger_index', ['page' => $lastPage]);
+            $pageHelper->rememberPage($lastPage);
 
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
@@ -86,10 +72,7 @@ class TriggerController extends FormController
             ]);
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.point.trigger.page', $page);
-
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $pageHelper->rememberPage($page);
 
         return $this->delegateView([
             'viewParameters' => [
@@ -98,7 +81,7 @@ class TriggerController extends FormController
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
-                'tmpl'        => $tmpl,
+                'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
             ],
             'contentTemplate' => 'MauticPointBundle:Trigger:list.html.php',
             'passthroughVars' => [
@@ -131,7 +114,7 @@ class TriggerController extends FormController
             'point:triggers:publish',
         ], 'RETURN_ARRAY');
 
-        if ($entity === null) {
+        if (null === $entity) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_pointtrigger_index', ['page' => $page]);
 
@@ -190,8 +173,9 @@ class TriggerController extends FormController
             $entity = $model->getEntity();
         }
 
-        $session   = $this->get('session');
-        $sessionId = $this->request->request->get('pointtrigger[sessionId]', 'mautic_'.sha1(uniqid(mt_rand(), true)), true);
+        $session      = $this->get('session');
+        $pointTrigger = $this->request->request->get('pointtrigger', []);
+        $sessionId    = $pointTrigger['sessionId'] ?? 'mautic_'.sha1(uniqid(random_int(1, PHP_INT_MAX), true));
 
         if (!$this->get('mautic.security')->isGranted('point:triggers:create')) {
             return $this->accessDenied();
@@ -209,7 +193,7 @@ class TriggerController extends FormController
         $form->get('sessionId')->setData($sessionId);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -324,7 +308,7 @@ class TriggerController extends FormController
         ];
 
         //form not found
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -348,7 +332,7 @@ class TriggerController extends FormController
         $form->get('sessionId')->setData($objectId);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //set added/updated events
@@ -372,7 +356,7 @@ class TriggerController extends FormController
 
                         //delete entities
                         if (count($deletedEvents)) {
-                            $this->getModel('point.triggerEvent')->deleteEntities($deletedEvents);
+                            $this->getModel('point.triggerevent')->deleteEntities($deletedEvents);
                         }
 
                         $this->addFlash('mautic.core.notice.updated', [
@@ -467,7 +451,7 @@ class TriggerController extends FormController
         $model  = $this->getModel('point.trigger');
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if (null != $entity) {
             if (!$this->get('mautic.security')->isGranted('point:triggers:create')) {
                 return $this->accessDenied();
             }
@@ -502,11 +486,11 @@ class TriggerController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model  = $this->getModel('point.trigger');
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.point.trigger.error.notfound',
@@ -559,7 +543,7 @@ class TriggerController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model     = $this->getModel('point.trigger');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
@@ -568,7 +552,7 @@ class TriggerController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.point.trigger.error.notfound',

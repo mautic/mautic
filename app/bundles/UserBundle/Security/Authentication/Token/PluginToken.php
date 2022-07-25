@@ -1,26 +1,14 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Authentication\Token;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
-/**
- * Class PluginToken.
- */
 class PluginToken extends AbstractToken
 {
     /**
-     * @var
+     * @var array|\Symfony\Component\Security\Core\Role\RoleInterface[]
      */
     protected $providerKey;
 
@@ -29,9 +17,6 @@ class PluginToken extends AbstractToken
      */
     protected $credentials;
 
-    /**
-     * @var
-     */
     protected $authenticatingService;
 
     /**
@@ -44,7 +29,6 @@ class PluginToken extends AbstractToken
      * @param null                                                        $authenticatingService
      * @param string                                                      $user
      * @param string                                                      $credentials
-     * @param array                                                       $roles
      * @param Response                                                    $response
      */
     public function __construct(

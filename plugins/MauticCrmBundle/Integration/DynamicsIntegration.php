@@ -1,26 +1,18 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Joomla\Http\Response;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 class DynamicsIntegration extends CrmAbstractIntegration
@@ -77,34 +69,34 @@ class DynamicsIntegration extends CrmAbstractIntegration
     {
         $builder->add(
             'updateBlanks',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
-                    'updateBlanks' => 'mautic.integrations.blanks',
+                    'mautic.integrations.blanks' => 'updateBlanks',
                 ],
-                'expanded'    => true,
-                'multiple'    => true,
-                'label'       => 'mautic.integrations.form.blanks',
-                'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
-                'required'    => false,
+                'expanded'          => true,
+                'multiple'          => true,
+                'label'             => 'mautic.integrations.form.blanks',
+                'label_attr'        => ['class' => 'control-label'],
+                'placeholder'       => false,
+                'required'          => false,
             ]
         );
-        if ($formArea === 'features') {
+        if ('features' === $formArea) {
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'contacts' => 'mautic.dynamics.object.contact',
-                        'company'  => 'mautic.dynamics.object.company',
+                        'mautic.dynamics.object.contact'  => 'contacts',
+                        'mautic.dynamics.object.company'  => 'company',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.dynamics.form.objects_to_pull_from',
-                    'label_attr'  => ['class' => ''],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.dynamics.form.objects_to_pull_from',
+                    'label_attr'        => ['class' => ''],
+                    'placeholder'       => false,
+                    'required'          => false,
                 ]
             );
         }
@@ -172,9 +164,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
     public function getAuthLoginUrl()
     {
         $url = parent::getAuthLoginUrl();
-        $url .= '&resource='.urlencode($this->keys['resource']);
 
-        return $url;
+        return $url.('&resource='.urlencode($this->keys['resource']));
     }
 
     /**
@@ -256,7 +247,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function getFormLeadFields($settings = [])
     {
-        return  $this->getFormFieldsByObject('contacts', $settings);
+        return $this->getFormFieldsByObject('contacts', $settings);
     }
 
     /**
@@ -279,7 +270,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 if (!empty($dynamicsObjects) && is_array($dynamicsObjects)) {
-                    foreach ($dynamicsObjects as $key => $dynamicsObject) {
+                    foreach ($dynamicsObjects as $dynamicsObject) {
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$dynamicsObject;
                         if ($fields = parent::getAvailableLeadFields($settings)) {
@@ -372,10 +363,10 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
                     return $integrationEntityId;
                 }
-                /** @var Response $response */
+                /** @var ResponseInterface $response */
                 $response = $this->getApiHelper()->createLead($mappedData, $lead);
                 // OData-EntityId: https://clientname.crm.dynamics.com/api/data/v8.2/contacts(9844333b-c955-e711-80f1-c4346bad526c)
-                $header = $response->headers['OData-EntityId'];
+                $header = $response->getHeader('OData-EntityId');
                 if (preg_match('/contacts\((.+)\)/', $header, $out)) {
                     $id = $out[1];
                     if (empty($integrationId)) {
@@ -407,7 +398,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * @param array      $params
-     * @param null|array $query
+     * @param array|null $query
      *
      * @return int|null
      */
@@ -842,7 +833,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         // update contacts
         $leadData = [];
         $rowNum   = 0;
-        foreach ($leadsToUpdateInD as $email => $lead) {
+        foreach ($leadsToUpdateInD as $lead) {
             $mappedData = [];
             if (defined('IN_MAUTIC_CONSOLE') && $progress) {
                 $progress->advance();
@@ -879,7 +870,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         // create  contacts
         $leadData = [];
         $rowNum   = 0;
-        foreach ($leadsToCreateInD as $email => $lead) {
+        foreach ($leadsToCreateInD as $lead) {
             $mappedData = [];
             if (defined('IN_MAUTIC_CONSOLE') && $progress) {
                 $progress->advance();

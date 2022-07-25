@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Provider;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -19,7 +10,7 @@ use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -53,23 +44,16 @@ class UserProvider implements UserProviderInterface
     protected $dispatcher;
 
     /**
-     * @var EncoderFactory
+     * @var UserPasswordEncoder
      */
     protected $encoder;
 
-    /**
-     * @param UserRepository           $userRepository
-     * @param PermissionRepository     $permissionRepository
-     * @param Session                  $session
-     * @param EventDispatcherInterface $dispatcher
-     * @param EncoderFactory           $encoder
-     */
     public function __construct(
         UserRepository $userRepository,
         PermissionRepository $permissionRepository,
         Session $session,
         EventDispatcherInterface $dispatcher,
-        EncoderFactory $encoder
+        UserPasswordEncoder $encoder
     ) {
         $this->userRepository       = $userRepository;
         $this->permissionRepository = $permissionRepository;
@@ -122,12 +106,7 @@ class UserProvider implements UserProviderInterface
     {
         $class = get_class($user);
         if (!$this->supportsClass($class)) {
-            throw new UnsupportedUserException(
-                sprintf(
-                    'Instances of "%s" are not supported.',
-                    $class
-                )
-            );
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $class));
         }
 
         return $this->loadUserByUsername($user->getUsername());
@@ -145,7 +124,6 @@ class UserProvider implements UserProviderInterface
     /**
      * Create/update user from authentication plugins.
      *
-     * @param User      $user
      * @param bool|true $createIfNotExists
      *
      * @return User
@@ -185,12 +163,12 @@ class UserProvider implements UserProviderInterface
         if ($plainPassword) {
             // Encode plain text
             $user->setPassword(
-                $this->encoder->getEncoder($user)->encodePassword($plainPassword, $user->getSalt())
+                $this->encoder->encodePassword($user, $plainPassword)
             );
         } elseif (!$password = $user->getPassword()) {
             // Generate and encode a random password
             $user->setPassword(
-                $this->encoder->getEncoder($user)->encodePassword(EncryptionHelper::generateKey(), $user->getSalt())
+                $this->encoder->encodePassword($user, EncryptionHelper::generateKey())
             );
         }
 
@@ -210,8 +188,6 @@ class UserProvider implements UserProviderInterface
     }
 
     /**
-     * @param User $user
-     *
      * @return User
      */
     public function findUser(User $user)
@@ -224,9 +200,7 @@ class UserProvider implements UserProviderInterface
         } catch (UsernameNotFoundException $exception) {
             // Try by email
             try {
-                $user = $this->loadUserByUsername($user->getEmail());
-
-                return $user;
+                return $this->loadUserByUsername($user->getEmail());
             } catch (UsernameNotFoundException $exception) {
             }
         }

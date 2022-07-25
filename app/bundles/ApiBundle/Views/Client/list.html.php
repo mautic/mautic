@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 //Check to see if the entire page should be displayed or just main content
-if ($tmpl == 'index'):
+if ('index' == $tmpl):
     $view->extend('MauticApiBundle:Client:index.html.php');
 endif;
 ?>

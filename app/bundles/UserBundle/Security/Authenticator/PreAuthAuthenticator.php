@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Authenticator;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -32,9 +23,6 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
      */
     protected $dispatcher;
 
-    /**
-     * @var
-     */
     protected $providerKey;
 
     /**
@@ -48,16 +36,12 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
     protected $integrationHelper;
 
     /**
-     * @var null|requestStack
+     * @var requestStack|null
      */
     protected $requestStack;
 
     /**
-     * @param IntegrationHelper        $integrationHelper
-     * @param EventDispatcherInterface $dispatcher
-     * @param RequestStack             $requestStack
-     * @param UserProviderInterface    $userProvider
-     * @param                          $providerKey
+     * @param $providerKey
      */
     public function __construct(
         IntegrationHelper $integrationHelper,
@@ -74,8 +58,6 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
     }
 
     /**
-     * @param TokenInterface $token
-     *
      * @return Response|PluginToken
      */
     public function authenticate(TokenInterface $token)
@@ -144,8 +126,6 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
     }
 
     /**
-     * @param TokenInterface $token
-     *
      * @return mixed
      */
     public function supports(TokenInterface $token)

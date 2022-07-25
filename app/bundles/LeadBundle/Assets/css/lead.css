@@ -72,13 +72,9 @@
 .col-leadpoints-date {
     width: 175px;
 }
+
 .col-leadpoints-delta {
     width: 75px;
-}
-
-.panel-googleplus .panel-heading {
-    background: #dd4b39;
-    color: #FFFFFF;
 }
 
 .panel-foursquare .panel-heading {
@@ -100,6 +96,7 @@
     background: #00aced;
     color: #FFFFFF;
 }
+
 .panel-instagram .panel-heading {
     background: #517fa4;
     color: #FFFFFF;
@@ -156,13 +153,16 @@ ul.tag-cloud li {
 .contact-cards .img {
     max-height: 115px;
 }
+
 #lead_merge_lead_to_merge_chosen .chosen-search {
     display:none;
 }
+
 .history-search{
     overflow: visible!important;
-    height: 53px;
+    min-height: 53px;
 }
+
 .timeline-icon {
     width: 50px;
     text-align: center;
@@ -201,19 +201,15 @@ ul.tag-cloud li {
 #contact-timeline tr.timeline-details img {
     max-height: 200px;
 }
-.frequency{
-    width: 45px!important;
 
+.frequency{
+    width: 65px!important;
 }
-.fa-user:before, .fa-building:before{
-    margin-right: 6px;
-}
-.inline-spacer {
-    text-transform: capitalize;
-}
+
 .contact{
     display: inline !important;
 }
+
 .frequency-table, .frequency-table td{
     border-bottom: none!important;
     border-top: none!important;
@@ -224,28 +220,67 @@ ul.tag-cloud li {
     padding-top: 27px;
     padding-bottom: 15px;
 }
+
 .frequency-select {
-    width:145px !important;
+    width:125px !important;
     float: right;
     padding-right: 5px;
 }
+
 .frequency-label {
     padding: 8px;
  }
+
 .frequency-date {
     width: 100px;
     float:left;
 }
+
 .panel-companies .primary {
     color: #fdb933;
 }
+
 .building::before {
     content: "\f1ad";
     font-family: "FontAwesome";
     padding-right: 3px;
 }
+
 .user::before {
     content: "\f007";
     font-family: "FontAwesome";
     padding-right: 3px;
+}
+
+#leads-container .spinner {
+    text-align: center;
+    line-height: 250px;
+    font-size: 24px;
+}
+
+.segment-node {
+    border: grey solid 1px;
+    border-radius: 6px;
+    text-align: center;
+    margin: 20px;
+    flex: 1 200px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 200px;
+    flex-flow: column wrap;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+}
+
+.segment-node.has-message {
+    border: red solid 4px;
+}
+
+.segment-level {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
 }

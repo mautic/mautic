@@ -1,19 +1,9 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
-use Symfony\Component\EventDispatcher\Event;
 
 class DecisionEvent extends CampaignExecutionEvent
 {
@@ -44,9 +34,7 @@ class DecisionEvent extends CampaignExecutionEvent
     /**
      * DecisionEvent constructor.
      *
-     * @param AbstractEventAccessor $config
-     * @param LeadEventLog          $log
-     * @param mixed                 $passthrough
+     * @param mixed $passthrough
      */
     public function __construct(AbstractEventAccessor $config, LeadEventLog $log, $passthrough = null)
     {
@@ -111,7 +99,7 @@ class DecisionEvent extends CampaignExecutionEvent
 
     /**
      * @param string   $channel
-     * @param null|int $channelId
+     * @param int|null $channelId
      */
     public function setChannel($channel, $channelId = null)
     {

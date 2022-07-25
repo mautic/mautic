@@ -1,18 +1,10 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\Serializer;
 
 /**
  * DynamicContentRepository.
@@ -21,8 +13,6 @@ class DynamicContentRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
-     *
-     * @param array $args
      *
      * @return Paginator
      */
@@ -177,10 +167,10 @@ class DynamicContentRepository extends CommonRepository
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        if ($topLevel == 'translation') {
+        if ('translation' == $topLevel) {
             //only get top level pages
             $q->andWhere($q->expr()->isNull('e.translationParent'));
-        } elseif ($topLevel == 'variant') {
+        } elseif ('variant' == $topLevel) {
             $q->andWhere($q->expr()->isNull('e.variantParent'));
         }
 
@@ -206,7 +196,7 @@ class DynamicContentRepository extends CommonRepository
     /**
      * @param $slot
      *
-     * @return bool|null|object
+     * @return bool|object|null
      */
     public function getDynamicContentForSlotFromCampaign($slot)
     {
@@ -223,7 +213,7 @@ class DynamicContentRepository extends CommonRepository
         $result = $qb->execute()->fetchAll();
 
         foreach ($result as $item) {
-            $properties = unserialize($item['properties']);
+            $properties = Serializer::decode($item['properties']);
 
             if (isset($properties['dynamicContent'])) {
                 $dwc = $this->getEntity($properties['dynamicContent']);

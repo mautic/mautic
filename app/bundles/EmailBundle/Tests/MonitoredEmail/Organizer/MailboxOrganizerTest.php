@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Organizer;
 
 use Mautic\EmailBundle\Event\ParseEmailEvent;
@@ -17,7 +8,7 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 
-class MailboxOrganizerTest extends \PHPUnit_Framework_TestCase
+class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
 {
     protected $mailboxes = [
        'EmailBundle_bounces' => [

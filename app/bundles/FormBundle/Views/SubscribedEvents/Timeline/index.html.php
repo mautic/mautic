@@ -34,9 +34,9 @@ $results    = $submission->getResults();
 	<dd><?php echo $view['assets']->makeLinks($submission->getReferer()); ?></dd>
 <?php if (is_array($results)) : ?>
 	<?php foreach ($form->getFields() as $field) : ?>
-		<?php if (array_key_exists($field->getAlias(), $results) && $results[$field->getAlias()] != ''
-&& $results[$field->getAlias()] != null
-&& $results[$field->getAlias()] != []
+		<?php if (array_key_exists($field->getAlias(), $results) && '' != $results[$field->getAlias()]
+&& null != $results[$field->getAlias()]
+&& [] != $results[$field->getAlias()]
 ) : ?>
 			<dt><?php echo $field->getLabel(); ?></dt>
 			<dd>

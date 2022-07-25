@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Callback;
 
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Exception\ResponseItemException;
@@ -36,8 +27,6 @@ class ResponseItem
     private $statHash;
 
     /**
-     * @param array $item
-     *
      * @throws ResponseItemException
      */
     public function __construct(array $item)
@@ -60,7 +49,7 @@ class ResponseItem
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getReason()
     {
@@ -76,7 +65,7 @@ class ResponseItem
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getStatHash()
     {

@@ -1,17 +1,7 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-// Defaults
 $appendAttribute = function (&$attributes, $attributeName, $append) {
-    if (stripos($attributes, "{$attributeName}=") === false) {
+    if (false === stripos($attributes, "{$attributeName}=")) {
         $attributes .= ' '.$attributeName.'="'.$append.'"';
     } else {
         $attributes = str_ireplace($attributeName.'="', $attributeName.'="'.$append.' ', $attributes);
@@ -87,11 +77,24 @@ if (!empty($inForm)) {
 
 // Container
 $containerAttr = 'id="mauticform'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
+
 if (!isset($containerClass)) {
     $containerClass = $containerType;
 }
 $order                 = (isset($field['order'])) ? $field['order'] : 0;
 $defaultContainerClass = 'mauticform-row mauticform-'.$containerClass.' mauticform-field-'.$order;
+
+if ($field['parent'] && isset($fields[$field['parent']])) {
+    $values = implode('|', $field['conditions']['values']);
+
+    if (!empty($field['conditions']['any']) && 'notIn' != $field['conditions']['expr']) {
+        $values = '*';
+    }
+
+    $containerAttr .= " data-mautic-form-show-on=\"{$fields[$field['parent']]->getAlias()}:".$values.'" data-mautic-form-expr="'.$field['conditions']['expr'].'"';
+
+    $defaultContainerClass .= '  mauticform-field-hidden';
+}
 
 // Field is required
 $validationMessage = '';
@@ -117,8 +120,8 @@ $appendAttribute($containerAttr, 'class', $defaultContainerClass);
 
 // Setup list parsing
 if (isset($list) || isset($properties['syncList']) || isset($properties['list']) || isset($properties['optionlist'])) {
-    $parseList           = [];
-    $ignoreNumericalKeys = false;
+    $parseList     = [];
+    $isBooleanList = false;
 
     if (!isset($contactFields)) {
         $contactFields = [];
@@ -134,11 +137,11 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
                 $parseList = $formFields[$field['leadField']]['properties']['list'];
                 break;
             case 'boolean' == $leadFieldType:
-                $parseList = [
+                $parseList     = [
                     0 => $formFields[$field['leadField']]['properties']['no'],
                     1 => $formFields[$field['leadField']]['properties']['yes'],
                 ];
-                $ignoreNumericalKeys = true;
+                $isBooleanList = true;
                 break;
             case 'country' == $leadFieldType:
                 $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getCountryChoices();
@@ -158,10 +161,10 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
     if (empty($parseList)) {
         if (isset($list)) {
             $parseList = $list;
-        } elseif (!empty($properties['list'])) {
-            $parseList = $properties['list'];
         } elseif (!empty($properties['optionlist'])) {
             $parseList = $properties['optionlist'];
+        } elseif (!empty($properties['list'])) {
+            $parseList = $properties['list'];
         }
 
         if (isset($parseList['list'])) {
@@ -169,14 +172,24 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
         }
     }
 
-    if ($field['leadField'] && !empty($formFields[$field['leadField']]['type']) && in_array($formFields[$field['leadField']]['type'], ['datetime', 'date'])) {
+    if ($field['leadField'] && !empty($formFields[$field['leadField']]['type'])
+        && in_array(
+            $formFields[$field['leadField']]['type'],
+            ['datetime', 'date']
+        )) {
         $tempLeadFieldType = $formFields[$field['leadField']]['type'];
         foreach ($parseList as $key => $aTemp) {
-            if ($date = ($tempLeadFieldType == 'datetime' ? $view['date']->toFull($aTemp['label']) : $view['date']->toDate($aTemp['label']))) {
+            if ($date = ('datetime' == $tempLeadFieldType ? $view['date']->toFull($aTemp['label']) : $view['date']->toDate($aTemp['label']))) {
                 $parseList[$key]['label'] = $date;
             }
         }
     }
-    $list           = \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList, false, $ignoreNumericalKeys);
+
+    $list = $isBooleanList
+        ?
+        \Mautic\FormBundle\Helper\FormFieldHelper::parseBooleanList($parseList)
+        :
+        \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList);
+
     $firstListValue = reset($list);
 }

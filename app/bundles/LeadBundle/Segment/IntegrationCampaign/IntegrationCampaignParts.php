@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\IntegrationCampaign;
 
 class IntegrationCampaignParts
@@ -28,7 +19,7 @@ class IntegrationCampaignParts
      */
     public function __construct($field)
     {
-        if (strpos($field, '::') !== false) {
+        if (false !== strpos($field, '::')) {
             list($integrationName, $campaignId) = explode('::', $field);
         } else {
             // Assuming this is a Salesforce integration for BC with pre 2.11.0

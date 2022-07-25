@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -56,6 +47,7 @@ class ConnectwiseApi extends CrmApi
                         break;
                     case 'errors':
                         $errors[] = $response['message'];
+                        // no break
                     case 'code':
                         $errors[] = $response['message'];
                         break;
@@ -70,8 +62,7 @@ class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @param array $params
-     * @param int   $page
+     * @param int $page
      *
      * @return mixed|string
      *
@@ -97,8 +88,7 @@ class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @param array $params
-     * @param int   $page
+     * @param int $page
      *
      * @return mixed|string
      *
@@ -127,8 +117,6 @@ class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @param array $params
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -139,8 +127,7 @@ class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @param array $params
-     * @param       $id
+     * @param $id
      *
      * @return mixed|string
      *

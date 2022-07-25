@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -33,9 +24,6 @@ class CampaignActionDeleteContactSubscriber implements EventSubscriberInterface
 
     /**
      * CampaignActionDeleteContactSubscriber constructor.
-     *
-     * @param LeadModel             $leadModel
-     * @param RemovedContactTracker $removedContactTracker
      */
     public function __construct(LeadModel $leadModel, RemovedContactTracker $removedContactTracker)
     {
@@ -54,9 +42,6 @@ class CampaignActionDeleteContactSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function configureAction(CampaignBuilderEvent $event)
     {
         $event->addAction(
@@ -78,9 +63,6 @@ class CampaignActionDeleteContactSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param PendingEvent $event
-     */
     public function deleteContacts(PendingEvent $event)
     {
         $contactIds = $event->getContactIds();

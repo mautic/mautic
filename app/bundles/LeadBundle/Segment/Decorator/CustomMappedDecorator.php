@@ -1,23 +1,12 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Decorator;
 
+use Mautic\LeadBundle\Exception\FilterNotFoundException;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 
-/**
- * Class CustomMappedDecorator.
- */
 class CustomMappedDecorator extends BaseDecorator
 {
     /**
@@ -27,9 +16,6 @@ class CustomMappedDecorator extends BaseDecorator
 
     /**
      * CustomMappedDecorator constructor.
-     *
-     * @param ContactSegmentFilterOperator   $contactSegmentFilterOperator
-     * @param ContactSegmentFilterDictionary $contactSegmentFilterDictionary
      */
     public function __construct(
         ContactSegmentFilterOperator $contactSegmentFilterOperator,
@@ -40,79 +26,72 @@ class CustomMappedDecorator extends BaseDecorator
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return null|string
+     * @return string|null
      */
     public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         $originalField = $contactSegmentFilterCrate->getField();
 
-        if (empty($this->dictionary[$originalField]['field'])) {
+        try {
+            return $this->dictionary->getFilterProperty($originalField, 'field');
+        } catch (FilterNotFoundException $e) {
             return parent::getField($contactSegmentFilterCrate);
         }
-
-        return $this->dictionary[$originalField]['field'];
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         $originalField = $contactSegmentFilterCrate->getField();
 
-        if (empty($this->dictionary[$originalField]['foreign_table'])) {
+        try {
+            return MAUTIC_TABLE_PREFIX.$this->dictionary->getFilterProperty($originalField, 'foreign_table');
+        } catch (FilterNotFoundException $e) {
             return parent::getTable($contactSegmentFilterCrate);
         }
-
-        return MAUTIC_TABLE_PREFIX.$this->dictionary[$originalField]['foreign_table'];
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         $originalField = $contactSegmentFilterCrate->getField();
 
-        if (!isset($this->dictionary[$originalField]['type'])) {
+        try {
+            return $this->dictionary->getFilterProperty($originalField, 'type');
+        } catch (FilterNotFoundException $e) {
             return parent::getQueryType($contactSegmentFilterCrate);
         }
-
-        return $this->dictionary[$originalField]['type'];
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string|bool if no func needed
      */
     public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         $originalField = $contactSegmentFilterCrate->getField();
 
-        return isset($this->dictionary[$originalField]['func']) ?
-            $this->dictionary[$originalField]['func'] : false;
+        try {
+            return $this->dictionary->getFilterProperty($originalField, 'func');
+        } catch (FilterNotFoundException $e) {
+            return false;
+        }
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|null|string
+     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         $originalField = $contactSegmentFilterCrate->getField();
 
-        if (!isset($this->dictionary[$originalField]['where'])) {
+        try {
+            return $this->dictionary->getFilterProperty($originalField, 'where');
+        } catch (FilterNotFoundException $e) {
             return parent::getWhere($contactSegmentFilterCrate);
         }
-
-        return $this->dictionary[$originalField]['where'];
     }
 }

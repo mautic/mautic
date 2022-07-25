@@ -83,7 +83,8 @@ Mautic.launchBuilder = function (formName, actionName) {
             'categorylist',
             'preferredchannel',
             'channelfrequency',
-            'saveprefsbutton'
+            'saveprefsbutton',
+            'successmessage'
         ];
         mQuery.each(slots, function(i, s){
             if (isPrefCenterEnabled) {
@@ -106,23 +107,35 @@ Mautic.launchBuilder = function (formName, actionName) {
 
     applyBtn.off('click').on('click', function(e) {
         Mautic.activateButtonLoadingIndicator(applyBtn);
-        Mautic.sendBuilderContentToTextarea(function() {
-            // Trigger slot:destroy event
-            document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
-            // Clear the customize forms
-            mQuery('#slot-form-container, #section-form-container').html('');
-            Mautic.inBuilderSubmissionOn(form);
-            var bgApplyBtn = mQuery('.btn-apply');
-            if (0 === bgApplyBtn.length && ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder)) {
-                var frm = mQuery('.btn-save').closest('form');
-                Mautic.inBuilderSubmissionOn(frm);
-                frm.submit();
+        try {
+            Mautic.sendBuilderContentToTextarea(function () {
+                // Trigger slot:destroy event
+                if (typeof document.getElementById('builder-template-content').contentWindow.Mautic !== 'undefined') {
+                    document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
+                }
+                // Clear the customize forms
+                mQuery('#slot-form-container, #section-form-container').html('');
+                Mautic.inBuilderSubmissionOn(form);
+                var bgApplyBtn = mQuery('.btn-apply');
+                if (0 === bgApplyBtn.length && ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder)) {
+                    var frm = mQuery('.btn-save').closest('form');
+                    Mautic.inBuilderSubmissionOn(frm);
+                    frm.submit();
+                    Mautic.inBuilderSubmissionOff();
+                } else {
+                    bgApplyBtn.trigger('click');
+                }
                 Mautic.inBuilderSubmissionOff();
-            } else {
-                bgApplyBtn.trigger('click');
+            }, true);
+        } catch (error) {
+            Mautic.removeButtonLoadingIndicator(applyBtn);
+            if (/SYNTAX ERROR/.test(error.message.toUpperCase())) {
+                var errorMessage = 'Syntax error. Please check your HTML code.';
+                alert(errorMessage);
+                console.error(errorMessage);
             }
-            Mautic.inBuilderSubmissionOff();
-        }, true);
+            console.error(error.message);
+        }
     });
 
     // Blur and focus the focussed inputs to fix the browser autocomplete bug on scroll
@@ -206,7 +219,7 @@ Mautic.formatCode = function() {
  */
 Mautic.openMediaManager = function() {
     Mautic.openServerBrowser(
-        mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=Images',
+        mauticBasePath + (typeof mauticEnv !== 'undefined' &&  mauticEnv === 'dev' ? '/index_dev.php' : '') + '/elfinder',
         screen.width * 0.7,
         screen.height * 0.7
     );
@@ -258,11 +271,60 @@ Mautic.keepPreviewAlive = function(iframeId, slot) {
     window.setInterval(function() {
         if (codeChanged) {
             var value = (Mautic.builderCodeMirror)?Mautic.builderCodeMirror.getValue():'';
+            if (!Mautic.codeMode) {
+                Mautic.setCodeModeSlotContent(slot, value);
+            }
             Mautic.livePreviewInterval = Mautic.updateIframeContent(iframeId, value, slot);
             codeChanged = false;
         }
     }, 2000);
 };
+
+Mautic.isValidHtml = function (html) {
+    var doc = document.createElement('div');
+    doc.innerHTML = html;
+    return (doc.innerHTML === html);
+}
+
+Mautic.setCodeModeSlotContent = function (slot, content) {
+    if (Mautic.isValidHtml(content)) {
+        slot.removeAttr('data-encode');
+    } else {
+        slot.attr('data-encode', btoa(content));
+    }
+}
+
+Mautic.geCodeModetSlotContent = function (slot) {
+    var html = slot.html();
+    if (slot.attr('data-encode')) {
+        html = atob(slot.attr('data-encode'));
+    }
+    return html;
+}
+
+Mautic.prepareCodeModeBlocksBeforeSave = function(themeHtml) {
+    var parser = new DOMParser();
+    var el = parser.parseFromString(themeHtml, "text/html");
+    var $b = mQuery(el);
+    var codeBlocks = {};
+
+    $b.find('#codemodeHtmlContainer,.codemodeHtmlContainer').each(function (index) {
+        var html = mQuery(this).html();
+        if (mQuery(this).attr('data-encode')) {
+            html = atob(mQuery(this).attr('data-encode'));
+            var token = '{CODEMODEBLOCK'+index+'}';
+            codeBlocks[token] = html;
+            mQuery(this).html(token);
+        }
+    })
+
+    themeHtml = Mautic.domToString($b);
+    for (codeBlock in codeBlocks) {
+        themeHtml = themeHtml.replace(codeBlock, codeBlocks[codeBlock]);
+    }
+
+    return themeHtml;
+}
 
 Mautic.killLivePreview = function() {
     window.clearInterval(Mautic.livePreviewInterval);
@@ -411,6 +473,7 @@ Mautic.updateIframeContent = function(iframeId, content, slot) {
         }
     } else if (slot) {
         slot.html(content);
+        Mautic.setEmptySlotPlaceholder(slot.parent());
     }
 };
 
@@ -457,7 +520,9 @@ Mautic.closeBuilder = function(model) {
                 delete Mautic.codeMode;
             } else {
                 // Trigger slot:destroy event
-                document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
+                if(typeof document.getElementById('builder-template-content').contentWindow.Mautic !== 'undefined') {
+                    document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
+                }
 
                 // Clear the customize forms
                 mQuery('#slot-form-container, #section-form-container').html('');
@@ -476,8 +541,17 @@ Mautic.closeBuilder = function(model) {
         }, false);
 
     } catch (error) {
+        overlay.addClass('hide');
+        closeBtn.prop('disabled', false);
+
+        if (/SYNTAX ERROR/.test(error.message.toUpperCase())) {
+            var errorMessage = 'Syntax error. Please check your HTML code.';
+            alert(errorMessage);
+            console.error(errorMessage);
+        }
+
         // prevent from being able to close builder
-        console.error(error);
+        console.error(error.message);
     }
 };
 
@@ -489,35 +563,30 @@ Mautic.closeBuilder = function(model) {
  */
 Mautic.sendBuilderContentToTextarea = function(callback, keepBuilderContent) {
     var customHtml;
-    try {
-        if (Mautic.codeMode) {
-            customHtml = Mautic.builderCodeMirror.getValue();
+    if (Mautic.codeMode) {
+        customHtml = Mautic.builderCodeMirror.getValue();
 
-            // Convert dynamic slot definitions into tokens
-            customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
+        // Convert dynamic slot definitions into tokens
+        customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
 
-            // Store the HTML content to the HTML textarea
-            mQuery('.builder-html').val(customHtml);
-            callback();
-        } else {
-            var builderHtml = mQuery('iframe#builder-template-content').contents();
+        // Store the HTML content to the HTML textarea
+        mQuery('.builder-html').val(customHtml);
+        callback();
+    } else {
+        var builderHtml = mQuery('iframe#builder-template-content').contents();
 
-            if (keepBuilderContent) {
-                // The content has to be cloned so the sanitization won't affect the HTML in the builder
-                Mautic.cloneHtmlContent(builderHtml, function(themeHtml) {
-                    Mautic.sanitizeHtmlAndStoreToTextarea(themeHtml);
-                    callback();
-                });
-            } else {
-                Mautic.sanitizeHtmlAndStoreToTextarea(builderHtml);
+        if (keepBuilderContent) {
+            // The content has to be cloned so the sanitization won't affect the HTML in the builder
+            Mautic.cloneHtmlContent(builderHtml, function(themeHtml) {
+                Mautic.sanitizeHtmlAndStoreToTextarea(themeHtml);
                 callback();
-            }
+            });
+        } else {
+            Mautic.sanitizeHtmlAndStoreToTextarea(builderHtml);
+            callback();
         }
-    } catch (error) {
-        // prevent from being able to close builder
-        console.error(error);
     }
-}
+};
 
 Mautic.sanitizeHtmlAndStoreToTextarea = function(html) {
     var cleanHtml = Mautic.sanitizeHtmlBeforeSave(html);
@@ -554,15 +623,17 @@ Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
     // Remove the slot focus highlight
     htmlContent.find('[data-slot-focus], [data-section-focus]').remove();
 
-    var customHtml = Mautic.domToString(htmlContent);
+    // Replace all url("${URL}") with url('${URL}')
+    var customHtml = Mautic.domToString(htmlContent).replace(/url\(&quot;(.+)&quot;\)/g, 'url(\'$1\')');
 
     // Convert dynamic slot definitions into tokens
-    return Mautic.convertDynamicContentSlotsToTokens(customHtml);
+    customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
+
+    return Mautic.prepareCodeModeBlocksBeforeSave(customHtml);
 };
 
 /**
- * Clones full HTML document by creating a virtual iframe, putting the HTML into it and
- * reading it back. This is async process.
+ * Clones full HTML document by creating a virtual iframe, putting the HTML into it and reading it back. This is async process.
  *
  * @param  object   content
  * @param  Function callback(clonedContent)
@@ -738,9 +809,49 @@ Mautic.initSectionListeners = function() {
                 sectionForm.find('#builder_section_content-background-color').val(Mautic.rgb2hex(section.css('backgroundColor')));
             }
 
+            // Prefill The Content Background Image
+            if (bgImage = section.css('background-image')) {
+                sectionForm.find('#builder_section_content-background-image').val(bgImage.replace(/url\((?:'|")(.+)(?:'|")\)/g, '$1'));
+            }
+
+            // Prefill The Content Background Size
+            if (bgSize = section.css('background-size')) {
+                sectionForm.find('#builder_section_content-background-size').val(bgSize || 'auto auto');
+            }
+
+            // Prefill The Content Background Repeat
+            if (bgRepeat = section.css('background-repeat')) {
+                sectionForm.find('#builder_section_content-background-repeat').val(bgRepeat);
+            }
+
+            // Prefill The Content Background Position
+            if (bgPosition = section.css('background-position')) {
+                sectionForm.find('#builder_section_content-background-position').val(bgPosition);
+            }
+
             // Prefill the sectionform with section wrapper color
             if (sectionWrapper.css('background-color') !== 'rgba(0, 0, 0, 0)') {
                 sectionForm.find('#builder_section_wrapper-background-color').val(Mautic.rgb2hex(sectionWrapper.css('backgroundColor')));
+            }
+
+            // Prefill The Wrapper Background Image
+            if (bgImage = sectionWrapper.css('background-image')) {
+                sectionForm.find('#builder_section_wrapper-background-image').val(bgImage.replace(/url\((?:'|")(.+)(?:'|")\)/g, '$1'));
+            }
+
+            // Prefill The Wrapper Background Size
+            if (bgSize = sectionWrapper.css('background-size')) {
+                sectionForm.find('#builder_section_wrapper-background-size').val(bgSize || 'auto auto');
+            }
+
+            // Prefill The Wrapper Background Repeat
+            if (bgRepeat = sectionWrapper.css('background-repeat')) {
+                sectionForm.find('#builder_section_wrapper-background-repeat').val(bgRepeat);
+            }
+
+            // Prefill The Wrapper Background Position
+            if (bgPosition = sectionWrapper.css('background-position')) {
+                sectionForm.find('#builder_section_wrapper-background-position').val(bgPosition);
             }
 
             // Initialize the color picker
@@ -751,10 +862,37 @@ Mautic.initSectionListeners = function() {
             // Handle color change events
             sectionForm.on('keyup paste change touchmove', function(e) {
                 var field = mQuery(e.target);
-                if (section.length && field.attr('id') === 'builder_section_content-background-color') {
-                    Mautic.sectionBackgroundChanged(section, field.val());
-                } else if (field.attr('id') === 'builder_section_wrapper-background-color') {
-                    Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
+                switch (field.attr('id')) {
+                    case 'builder_section_content-background-color':
+                        Mautic.sectionBackgroundChanged(section, field.val());
+                        break;
+                    case 'builder_section_content-background-image':
+                        Mautic.sectionBackgroundImageChanged(section, field.val());
+                        break;
+                    case 'builder_section_content-background-repeat':
+                        section.css('background-repeat', field.val());
+                        break;
+                    case 'builder_section_content-background-size':
+                        Mautic.sectionBackgroundSize(section, field.val());
+                        break;
+                    case 'builder_section_content-background-position':
+                        section.css('background-position', field.val());
+                        break;
+                    case 'builder_section_wrapper-background-color':
+                        Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
+                        break;
+                    case 'builder_section_wrapper-background-image':
+                        Mautic.sectionBackgroundImageChanged(sectionWrapper, field.val());
+                        break;
+                    case 'builder_section_wrapper-background-repeat':
+                        sectionWrapper.css('background-repeat', field.val());
+                        break;
+                    case 'builder_section_wrapper-background-size':
+                        Mautic.sectionBackgroundSize(sectionWrapper, field.val());
+                        break;
+                    case 'builder_section_wrapper-background-position':
+                        sectionWrapper.css('background-position', field.val());
+                        break;
                 }
             });
 
@@ -770,7 +908,7 @@ Mautic.initSectionListeners = function() {
             });
         });
     });
-}
+};
 
 Mautic.initSections = function() {
     Mautic.initSectionListeners();
@@ -827,7 +965,7 @@ Mautic.initSections = function() {
         iframeFix: true,
         connectToSortable: 'body',
         revert: 'invalid',
-        iframeOffset: iframe.offset(),
+        iframeOffset: iframe.jQuery2Offset(),
         helper: function(e, ui) {
             // Fix body overflow that messes sortable up
             bodyOverflow.overflowX = mQuery('body', parent.document).css('overflow-x');
@@ -872,6 +1010,7 @@ Mautic.sectionBackgroundChanged = function(element, color) {
     }
     element.css('background-color', color).attr('bgcolor', color);
 
+    Mautic.updateOutlookTag(element);
 
     // Change the color of the editor for selected slots
     mQuery(element).find('[data-slot-focus]').each(function() {
@@ -882,12 +1021,110 @@ Mautic.sectionBackgroundChanged = function(element, color) {
     });
 };
 
+Mautic.sectionBackgroundImageChanged = function (element, imageUrl) {
+    var regWrappedInUrl = /url\(.+\)/g;
+    var match = regWrappedInUrl.exec(imageUrl);
+
+    if (!imageUrl || imageUrl === 'none') {
+        element.css('background-image', imageUrl);
+    } else if (match) {
+        element.css('background-image', imageUrl);
+    } else {
+        element.css('background-image', "url(" + imageUrl + ")");
+    }
+
+    Mautic.updateOutlookTag(element);
+};
+
+Mautic.sectionBackgroundSize = function (element, size) {
+    if (!size) {
+        size = 'auto auto';
+    }
+
+    element.css('background-size', size);
+    Mautic.updateOutlookTag(element);
+};
+
 Mautic.rgb2hex = function(orig) {
     var rgb = orig.replace(/\s/g,'').match(/^rgba?\((\d+),(\d+),(\d+)/i);
     return (rgb && rgb.length === 4) ? "#" +
-    ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
-    ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-    ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : orig;
+        ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+        ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+        ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : orig;
+};
+
+Mautic.updateOutlookTag = function (element) {
+    if (parent.mQuery('.builder').hasClass('email-builder')) {
+
+        // section-wrapper is TABLE element, no outlook hack need
+        if (element.get(0).tagName == 'TABLE') {
+            return;
+        }
+
+        var sectionForm = parent.mQuery('#section-form-container');
+
+        if (element[0].hasAttribute('data-section-wrapper')) {
+            var color = sectionForm.find('#builder_section_wrapper-background-color').val() ? '#'+sectionForm.find('#builder_section_wrapper-background-color').val() : '';
+            var image = sectionForm.find('#builder_section_wrapper-background-image').val();
+            var size  = sectionForm.find('#builder_section_wrapper-background-size').val();
+        } else {
+            var color = sectionForm.find('#builder_section_content-background-color').val() ? '#'+sectionForm.find('#builder_section_content-background-color').val() : '';
+            var image = sectionForm.find('#builder_section_content-background-image').val();
+            var size  = sectionForm.find('#builder_section_content-background-size').val();
+        }
+
+        var comments = element.contents().filter(function(){return this.nodeType == 8;});
+
+        if (comments.length === 0) {
+            element.prepend(
+                '<!--[if gte mso 9]>\n' +
+                '<v:rect style="" xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false">\n' +
+                '<v:fill type="tile" src="" color=""/>\n' +
+                '<v:textbox style="" inset="0,0,0,0">\n' +
+                '<![endif]-->'
+            );
+
+            element.append(
+                '<!--[if gte mso 9]>\n' +
+                '</v:textbox>\n' +
+                '</v:rect>\n' +
+                '<![endif]-->'
+            );
+        }
+
+        comments.each(function(i, e) {
+                if (i == 0) {
+                    mQuery(this)[0].data = e.data.replace(/src\s*=\s*".*?"/mg, 'src="' + image + '"');
+                    mQuery(this)[0].data = e.data.replace(/color\s*=\s*".*?"/mg, 'color="' + color + '"');
+
+                    if (!size) {
+                        mQuery(this)[0].data = e.data.replace(/rect\s*style=\s*".*?"/mg, 'rect style="mso-width-percent:1000;"');
+                        mQuery(this)[0].data = e.data.replace(/textbox\s*style=\s*".*?"/mg, 'textbox style="mso-fit-shape-to-text:true"');
+                    } else {
+                        var newSize     = "";
+                        var splitedSize = size.split(" ");
+
+                        if (splitedSize[0] && splitedSize[0].match(/[0-9]*?px/gm)) {
+                            newSize = "width:"+splitedSize[0]+";";
+                        } else {
+                            newSize = "mso-width-percent:1000;";
+                        }
+
+                        if (splitedSize[1] && splitedSize[1].match(/[0-9]*?px/gm)) {
+                            newSize += "height:"+splitedSize[1]+";";
+                            mQuery(this)[0].data = e.data.replace(/textbox\s*style=\s*".*?"/mg, 'textbox style=""');
+                        } else {
+                            mQuery(this)[0].data = e.data.replace(/textbox\s*style=\s*".*?"/mg, 'textbox style="mso-fit-shape-to-text:true"');
+                        }
+
+                        mQuery(this)[0].data = e.data.replace(/rect\s*style=\s*".*?"/mg, 'rect style="'+newSize+'"');
+                    }
+
+                    return false;
+                }
+            }
+        );
+    }
 };
 
 Mautic.initSlots = function(slotContainers) {
@@ -963,7 +1200,7 @@ Mautic.initSlots = function(slotContainers) {
         iframeFix: true,
         connectToSortable: '[data-slot-container]',
         revert: 'invalid',
-        iframeOffset: iframe.offset(),
+        iframeOffset: iframe.jQuery2Offset(),
         helper: function(e, ui) {
             // fix for Uncaught TypeError: Cannot read property 'document' of null
             // Fix body overflow that messes sortable up
@@ -1114,6 +1351,30 @@ Mautic.isSlotInitiated = function(slot) {
     }) !== 'undefined';
 };
 
+Mautic.isCodeMode = function() {
+    return mQuery('a[data-theme=mautic_code_mode]').first().hasClass('hide');
+};
+
+window.document.fileManagerInsertImageCallback = function(selector, url) {
+    if (Mautic.isCodeMode()) {
+        Mautic.insertTextAtCMCursor(url);
+    } else {
+        if (typeof FroalaEditorForFileManager !== 'underfined') {
+            if (typeof FroalaEditorForFileManagerCurrentImage !== 'undefined') {
+                FroalaEditorForFileManager.image.insert(url, false, {}, FroalaEditorForFileManagerCurrentImage);
+            } else {
+                FroalaEditorForFileManager.image.insert(url);
+            }
+        } else {
+            if (typeof FroalaEditorForFileManagerCurrentImage !== 'undefined') {
+                mQuery(selector).froalaEditor('image.insert', url, false, {}, FroalaEditorForFileManagerCurrentImage);
+            } else {
+                mQuery(selector).froalaEditor('image.insert', url);
+            }
+        }
+    }
+};
+
 Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
@@ -1151,6 +1412,12 @@ Mautic.initSlotListeners = function() {
                 return;
             }
 
+            if(slot.html() == '') {
+                slot.addClass('empty');
+            }else{
+                slot.removeClass('empty');
+            }
+
             slot.append(focus);
             deleteLink.click(function(e) {
                 // if slot is DEC, delete it from the outside form
@@ -1171,8 +1438,16 @@ Mautic.initSlotListeners = function() {
                 slot.remove();
                 focus.remove();
             });
-            cloneLink.click(function(e) {   
-                slot.clone().insertAfter(slot);
+            cloneLink.click(function(e) {
+                if (type == 'dynamicContent') {
+                    var maxId = Mautic.getDynamicContentMaxId();
+
+                    slot.clone().attr('data-param-dec-id', maxId + 1).insertAfter(slot);
+                    Mautic.createNewDynamicContentItem(parent.mQuery);
+                } else {
+                    slot.clone().insertAfter(slot);
+                }
+
                 Mautic.initSlots(slot.closest('[data-slot-container="1"]'));
             });
 
@@ -1184,6 +1459,7 @@ Mautic.initSlotListeners = function() {
             }
 
             slot.append(slotToolbar);
+            Mautic.setEmptySlotPlaceholder(slot);
         }, function() {
             if (Mautic.sortActive) {
                 // don't activate while sorting
@@ -1324,8 +1600,10 @@ Mautic.initSlotListeners = function() {
                             extraKeys: {"Ctrl-Space": "autocomplete"},
                             lineWrapping: true,
                         });
-                        Mautic.builderCodeMirror.getDoc().setValue(slot.find('#codemodeHtmlContainer,.codemodeHtmlContainer').html());
-                        Mautic.keepPreviewAlive(null, slot.find('#codemodeHtmlContainer,.codemodeHtmlContainer'));
+                        var elem = slot.find('#codemodeHtmlContainer,.codemodeHtmlContainer');
+                        html = Mautic.geCodeModetSlotContent(elem);
+                        Mautic.builderCodeMirror.getDoc().setValue(html);
+                        Mautic.keepPreviewAlive(null, elem);
                     }
                     break;
                 }
@@ -1341,12 +1619,6 @@ Mautic.initSlotListeners = function() {
 
                 var builderEl = parent.mQuery('.builder');
 
-                if (builderEl.length && builderEl.hasClass('email-builder')) {
-                    buttons = parent.mQuery.grep(buttons, function (value) {
-                        return value != 'insertGatedVideo';
-                    });
-                }
-
                 var froalaOptions = {
                     toolbarButtons: buttons,
                     toolbarButtonsMD: buttons,
@@ -1356,6 +1628,13 @@ Mautic.initSlotListeners = function() {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
                     imageEditButtons: ['imageReplace', 'imageAlign', 'imageRemove', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
                 };
+
+                if (builderEl.length && builderEl.hasClass('email-builder')) {
+                    buttons = parent.mQuery.grep(buttons, function (value) {
+                        return value != 'insertGatedVideo';
+                    });
+                    froalaOptions.imageOutputSize = true;
+                }
 
                 // prevent overriding variant content in editor
                 if (focusType !== 'dynamicContent') {
@@ -1371,6 +1650,7 @@ Mautic.initSlotListeners = function() {
                     // replace DEC with content from the first editor
                     if (!(focusType == 'dynamicContent' && mQuery(this).attr('id').match(/filters/))) {
                         clickedSlot.html(slotHtml.html());
+                        Mautic.setEmptySlotPlaceholder(clickedSlot);
                     }
                 });
 
@@ -1398,7 +1678,8 @@ Mautic.initSlotListeners = function() {
             var froalaOptions = mQuery.extend({}, Mautic.basicFroalaOptions, {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
                     imageEditButtons: ['imageReplace', 'imageAlign', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove'],
-                    useClasses: false
+                    useClasses: false,
+                    imageOutputSize: true
                 }
             );
             image.froalaEditor(froalaOptions);
@@ -1408,10 +1689,8 @@ Mautic.initSlotListeners = function() {
             });
         } else if (type === 'dynamicContent') {
             if (slot.html().match(/__dynamicContent__/)) {
-                var decs = mQuery('[data-slot="dynamicContent"]');
-                var ids = mQuery.map(decs, function(e){return mQuery(e).attr('data-param-dec-id');})
-                var maxId = Math.max.apply(Math, ids);
-                if (isNaN(maxId) || Number.NEGATIVE_INFINITY == maxId) maxId = 0;
+                var maxId = Mautic.getDynamicContentMaxId();
+
                 slot.attr('data-param-dec-id', maxId + 1);
                 slot.html('Dynamic Content');
                 Mautic.createNewDynamicContentItem(parent.mQuery);
@@ -1466,7 +1745,7 @@ Mautic.initSlotListeners = function() {
             params.slot.find('label.label3').text(params.field.val());
         } else if ('label-text4' === fieldParam) {
             params.slot.find('label.label4').text(params.field.val());
-        } else if ('glink' === fieldParam || 'flink' === fieldParam || 'tlink' === fieldParam) {
+        } else if ('flink' === fieldParam || 'tlink' === fieldParam) {
             params.slot.find('#'+fieldParam).attr('href', params.field.val());
         } else if (fieldParam === 'href') {
             params.slot.find('a').eq(0).attr('href', params.field.val());
@@ -1776,7 +2055,8 @@ Mautic.prepareBuilderIframe = function(themeHtml, btnCloseBuilder, applyBtn) {
             'categorylist',
             'preferredchannel',
             'channelfrequency',
-            'saveprefsbutton'
+            'saveprefsbutton',
+            'successmessage'
         ];
         mQuery.each(slots, function (i, s) {
             // delete existing tokens
@@ -1846,7 +2126,7 @@ Mautic.getDynamicContentDataForToken = function(token) {
     if (dynConContainer.html()) {
         var dynConContent = dynConContainer.find(dynConTarget+'_content');
 
-        if (dynConContent.hasClass('editor')) {
+        if (dynConContent.hasClass('editor') && Mautic.getActiveBuilderName() === 'legacy') {
             dynConContent = dynConContent.froalaEditor('html.get');
         } else {
             dynConContent = dynConContent.html();
@@ -1917,6 +2197,27 @@ Mautic.getPredefinedLinks = function(callback) {
         }
         return callback(linkList);
     });
+};
+
+Mautic.getDynamicContentMaxId = function() {
+    var decs = mQuery('[data-slot="dynamicContent"]');
+    var ids = mQuery.map(decs, function(e){return mQuery(e).attr('data-param-dec-id');});
+    var maxId = Math.max.apply(Math, ids);
+    if (isNaN(maxId) || Number.NEGATIVE_INFINITY === maxId) maxId = 0;
+
+    return maxId;
+};
+
+Mautic.setEmptySlotPlaceholder = function (slot) {
+    var clonedSlot = slot.clone();
+    clonedSlot.find('div[data-slot-focus="true"]').remove()
+    clonedSlot.find('div[data-slot-toolbar="true"]').remove()
+
+    if ((clonedSlot.text()).trim() == '' && !clonedSlot.find('img').length) {
+        slot.addClass('empty');
+    } else {
+        slot.removeClass('empty');
+    }
 };
 
 // Init inside the builder's iframe

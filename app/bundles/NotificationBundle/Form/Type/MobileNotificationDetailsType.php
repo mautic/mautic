@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
@@ -30,18 +21,12 @@ class MobileNotificationDetailsType extends AbstractType
 
     /**
      * MobileNotificationDetailsType constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
      */
     public function __construct(IntegrationHelper $integrationHelper)
     {
         $this->integrationHelper = $integrationHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
@@ -89,10 +74,10 @@ class MobileNotificationDetailsType extends AbstractType
                 ButtonGroupType::class,
                 [
                     'choices' => [
-                        'SetTo'    => 'mautic.notification.form.mobile.ios_badges.set',
-                        'Increase' => 'mautic.notification.form.mobile.ios_badges.increment',
+                        'mautic.notification.form.mobile.ios_badges.set'       => 'SetTo',
+                        'mautic.notification.form.mobile.ios_badges.increment' => 'Increase',
                     ],
-                    'attr' => [
+                    'attr'              => [
                         'tooltip' => 'mautic.notification.form.mobile.ios_badges.tooltip',
                     ],
                     'label'       => 'mautic.notification.form.mobile.ios_badges',
@@ -254,10 +239,10 @@ class MobileNotificationDetailsType extends AbstractType
                 ButtonGroupType::class,
                 [
                     'choices' => [
-                        '0'  => 'mautic.notification.form.mobile.android_lockscreen_visibility.private',
-                        '-1' => 'mautic.notification.form.mobile.android_lockscreen_visibility.secret',
+                        'mautic.notification.form.mobile.android_lockscreen_visibility.private' => '0',
+                        'mautic.notification.form.mobile.android_lockscreen_visibility.secret'  => '-1',
                     ],
-                    'attr' => [
+                    'attr'              => [
                         'tooltip' => 'mautic.notification.form.mobile.android_lockscreen_visibility.tooltip',
                     ],
                     'label'       => 'mautic.notification.form.mobile.android_lockscreen_visibility',
@@ -274,7 +259,7 @@ class MobileNotificationDetailsType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'mobile_notification_details';
     }

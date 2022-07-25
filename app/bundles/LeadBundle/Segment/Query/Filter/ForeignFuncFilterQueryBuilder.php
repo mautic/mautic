@@ -1,39 +1,29 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryException;
 
-/**
- * Class ForeignFuncFilterQueryBuilder.
- */
 class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function getServiceId()
     {
         return 'mautic.lead.query.builder.foreign.func';
     }
 
     /**
-     * {@inheritdoc}
+     * @throws FieldNotFoundException
+     * @throws QueryException
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
-        $filterOperator = $filter->getOperator();
-        $filterGlue     = $filter->getGlue();
-        $filterAggr     = $filter->getAggregateFunction();
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
+        $filterOperator  = $filter->getOperator();
+        $filterGlue      = $filter->getGlue();
+        $filterAggr      = $filter->getAggregateFunction();
 
         $filterParameters = $filter->getParameterValue();
 
@@ -65,13 +55,13 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
             if ($filterAggr) {
                 // No join needed, it is placed in exist/not exists
             } else {
-                if ($filter->getTable() == 'companies') {
+                if ('companies' == $filter->getTable()) {
                     $relTable = $this->generateRandomParameterName();
-                    $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', $relTable, $relTable.'.lead_id = l.id');
+                    $queryBuilder->leftJoin($leadsTableAlias, MAUTIC_TABLE_PREFIX.'companies_leads', $relTable, $relTable.'.lead_id = '.$leadsTableAlias.'.id');
                     $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.company_id');
                 } else { // This should never happen
                     $queryBuilder->leftJoin(
-                        $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
+                        $leadsTableAlias,
                         $filter->getTable(),
                         $tableAlias,
                         sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
@@ -98,7 +88,7 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
             default:
                 if ($filterAggr) {
                     if (!is_null($filter)) {
-                        if ($filterAggr === 'sum') {
+                        if ('sum' === $filterAggr) {
                             $expressionArg = $queryBuilder->expr()->func('COALESCE',
                                 $queryBuilder->expr()->func('SUM', $tableAlias.'.'.$filter->getField()),
                                 0
@@ -131,13 +121,13 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 
         if ($queryBuilder->isJoinTable($filter->getTable()) && !$filterAggr) { // This should never happen
             $queryBuilder->addJoinCondition($tableAlias, ' ('.$expression.')');
-            $queryBuilder->addGroupBy('l.id');
+            $queryBuilder->addGroupBy($leadsTableAlias.'.id');
         } else {
             if ($filterAggr) {
                 $expression = $queryBuilder->expr()->exists('SELECT '.$expressionArg.' FROM '.$filter->getTable().' '.
-                    $tableAlias.' WHERE l.id='.$tableAlias.'.lead_id HAVING '.$expression);
+                    $tableAlias.' WHERE '.$leadsTableAlias.'.id='.$tableAlias.'.lead_id HAVING '.$expression);
             } else { // This should never happen
-                $queryBuilder->addGroupBy('l.id');
+                $queryBuilder->addGroupBy($leadsTableAlias.'.id');
             }
 
             $queryBuilder->addLogic($expression, $filter->getGlue());

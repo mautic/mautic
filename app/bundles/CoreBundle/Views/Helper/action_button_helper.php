@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 if (isset($customButtons)) {
     $view['buttons']->addButtons($customButtons);
 }
@@ -92,14 +83,4 @@ if (isset($groupType)) {
     $view['buttons']->setGroupType($groupType);
 }
 
-// @deprecated 2.3; to be removed in 3.0; use $view['button']->addButton/addButtons instead
-//Build pre template custom buttons
-if (!isset($preCustomButtons)) {
-    $preCustomButtons = [];
-}
-if (!isset($postCustomButtons)) {
-    $postCustomButtons = [];
-}
-
-$view['buttons']->setCustomButtons($preCustomButtons, $postCustomButtons);
 $buttonCount = $view['buttons']->getButtonCount();

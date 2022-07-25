@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
@@ -41,9 +32,6 @@ class Progress
      */
     protected $bar;
 
-    /**
-     * @param OutputInterface|null $output
-     */
     public function __construct(OutputInterface $output = null)
     {
         $this->output = $output;
@@ -91,8 +79,6 @@ class Progress
     /**
      * Set total value.
      *
-     * @param int $total
-     *
      * @return Progress
      */
     public function setDone($done)
@@ -135,8 +121,6 @@ class Progress
 
     /**
      * Bind Progress from simple array.
-     *
-     * @param array $progress
      *
      * @return Progress
      */

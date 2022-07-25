@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
@@ -21,7 +12,7 @@ trait DataGeneratorTrait
     protected $page = 1;
 
     /**
-     * @var
+     * @var int
      */
     protected $id = 0;
 

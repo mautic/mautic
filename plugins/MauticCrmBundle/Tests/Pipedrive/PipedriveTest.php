@@ -2,12 +2,14 @@
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Pipedrive;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
@@ -18,26 +20,41 @@ abstract class PipedriveTest extends MauticMysqlTestCase
     const WEBHOOK_USER     = 'user';
     const WEBHOOK_PASSWORD = 'pa$$word';
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $GLOBALS['requests'] = [];
+        // Simulate request.
+        $GLOBALS['requests']        = [];
+        $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
+        $_SERVER['SERVER_PORT']     = 80;
+        $_SERVER['SERVER_NAME']     = 'www.example.com';
+        $_SERVER['REQUEST_URI']     = '/index.php';
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
-        unset($GLOBALS['requests']);
+        unset($GLOBALS['requests'], $_SERVER['SERVER_PROTOCOL'], $_SERVER['SERVER_PORT'], $_SERVER['SERVER_NAME']);
 
         parent::tearDown();
     }
 
+    /**
+     * @param $type
+     *
+     * @return string
+     */
     public static function getData($type)
     {
-        return file_get_contents(dirname(__FILE__).sprintf('/Data/%s.json', $type));
+        $filename = dirname(__FILE__).sprintf('/Data/%s.json', $type);
+        if (file_exists($filename)) {
+            return file_get_contents($filename);
+        }
+
+        return null;
     }
 
-    protected function makeRequest($method, $json, $addCredential = true)
+    protected function makeRequest(string $method, string $json, bool $addCredential = true)
     {
         $headers = !$addCredential ? [] : [
             'PHP_AUTH_USER' => self::WEBHOOK_USER,
@@ -47,7 +64,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $this->client->request($method, '/plugin/pipedrive/webhook', [], [], $headers, $json);
     }
 
-    protected function installPipedriveIntegration($published = false, array $settings = [], array $apiKeys = [], array $features = ['push_lead'], $addCredential = true)
+    protected function installPipedriveIntegration($published = false, array $settings = [], array $apiKeys = ['url' => '', 'token' => ''], array $features = ['push_lead'], $addCredential = true)
     {
         $plugin = new Plugin();
         $plugin->setName('CRM');
@@ -61,10 +78,17 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $integration = new Integration();
         $integration->setName('Pipedrive');
         $integration->setIsPublished($published);
+        $settings = array_merge(
+            [
+                'import' => [
+                    'enabled',
+                ],
+            ],
+            $settings
+        );
         $integration->setFeatureSettings($settings);
         $integration->setSupportedFeatures($features);
         $integration->setPlugin($plugin);
-
         $this->em->persist($integration);
         $this->em->flush();
 
@@ -73,8 +97,8 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         if ($addCredential) {
             [
             $apiKeys = array_merge($apiKeys, [
-                'user'     => self::WEBHOOK_USER,
-                'password' => self::WEBHOOK_PASSWORD,
+                'user'      => self::WEBHOOK_USER,
+                'password'  => self::WEBHOOK_PASSWORD,
             ]),
         ];
         }
@@ -84,13 +108,16 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $this->em->flush();
     }
 
-    protected function createLead($companies = [], User $owner = null)
+    protected function createLead($companies = [], User $owner = null, $data = [])
     {
         $lead = new Lead();
         $lead->setFirstname('Firstname');
         $lead->setLastname('Lastname');
         $lead->setEmail('test@test.com');
         $lead->setPhone('555-666-777');
+        foreach ($data as $alias => $value) {
+            $lead->addUpdatedField($alias, $value);
+        }
 
         if ($owner) {
             $lead->setOwner($owner);
@@ -99,7 +126,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $companyModel = $this->container->get('mautic.lead.model.company');
+        $companyModel = self::$container->get('mautic.lead.model.company');
 
         if ($companies instanceof Company) {
             $companies = [$companies];
@@ -109,6 +136,10 @@ abstract class PipedriveTest extends MauticMysqlTestCase
             $companyModel->addLeadToCompany($company, $lead);
             $lead->setCompany($company->getName());
         }
+        // need modified date due import data to Pipedrive
+        $lead->setDateModified(new \DateTime('2099-01-01T15:03:01.012345Z'));
+        $this->em->persist($lead);
+        $this->em->flush();
 
         return $lead;
     }
@@ -150,7 +181,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     protected function createLeadIntegrationEntity($integrationEntityId, $internalEntityId)
     {
-        $date = new \DateTime();
+        $date = (new DateTimeHelper('2017-05-15 00:00:00'))->getDateTime();
 
         $integrationEntity = new IntegrationEntity();
 
@@ -170,7 +201,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     protected function createCompanyIntegrationEntity($integrationEntityId, $internalEntityId)
     {
-        $date = new \DateTime();
+        $date = (new DateTimeHelper('2017-05-15 00:00:00'))->getDateTime();
 
         $integrationEntity = new IntegrationEntity();
 
@@ -190,9 +221,13 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     protected function getIntegrationObject()
     {
-        $integrationHelper = $this->container->get('mautic.helper.integration');
+        /** @var IntegrationHelper $integrationHelper */
+        $integrationHelper = self::$container->get('mautic.helper.integration');
 
-        return $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
+        /** @var Integration $integration */
+        $integration = $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
+
+        return $integration;
     }
 
     protected function addPipedriveOwner($pipedriveOwnerId, $email)

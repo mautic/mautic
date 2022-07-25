@@ -10,15 +10,15 @@
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
-$object = $app->getRequest()->get('object', 'contacts');
+$object     = $app->getRequest()->get('object', 'contacts');
+$objectName = $view['translator']->trans($objectName);
 
 $view['slots']->set('mauticContent', 'leadImport');
-$view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.import.leads', ['%object%' => $object]));
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.import.leads', ['%object%' => $objectName]));
 
 $percent    = $progress->toPercent();
 $id         = ($complete) ? 'leadImportProgressComplete' : 'leadImportProgress';
 $header     = ($complete) ? 'mautic.lead.import.success' : 'mautic.lead.import.donotleave';
-$indexRoute = $object === 'contacts' ? 'mautic_contact_index' : 'mautic_company_index';
 ?>
 
 <div class="row ma-lg" id="<?php echo $id; ?>">
@@ -69,22 +69,22 @@ $indexRoute = $object === 'contacts' ? 'mautic_contact_index' : 'mautic_company_
                 <?php if (!$complete): ?>
                     <div>
                         <a class="btn btn-danger" href="<?php echo $view['router']->path(
-                            'mautic_contact_import_action',
-                            ['objectAction' => 'cancel']
+                            'mautic_import_action',
+                            ['objectAction' => 'cancel', 'object' => $object]
                         ); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans('mautic.core.form.cancel'); ?>
                         </a>
                         <a class="btn btn-primary" href="<?php echo $view['router']->path(
-                            'mautic_contact_import_action',
-                            ['objectAction' => 'queue']
+                            'mautic_import_action',
+                            ['objectAction' => 'queue', 'object' => $object]
                         ); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans('mautic.lead.import.queue.btn'); ?>
                         </a>
                     </div>
                 <?php else: ?>
                     <div>
-                        <a class="btn btn-success" href="<?php echo $view['router']->path($indexRoute); ?>" data-toggle="ajax">
-                            <?php echo $view['translator']->trans('mautic.lead.list.view_'.$object); ?>
+                        <a class="btn btn-success" href="<?php echo $view['router']->path($indexRoute, $indexRouteParams); ?>" data-toggle="ajax">
+                            <?php echo $view['translator']->trans('mautic.lead.list.view', ['%objects%' => $objectName]); ?>
                         </a>
                         <a class="btn btn-success" href="<?php echo $view['router']->path('mautic_import_index', ['object' => $object]); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans('mautic.lead.view.imports'); ?>

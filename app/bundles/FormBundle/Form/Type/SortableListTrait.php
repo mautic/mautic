@@ -1,16 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\SortableListType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -20,8 +13,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 trait SortableListTrait
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param                      $options
+     * @param $options
      */
     public function addSortableList(FormBuilderInterface $builder, $options, $listName = 'list', $listData = null, $formName = 'formfield')
     {
@@ -45,10 +37,10 @@ trait SortableListTrait
             $listOptions['data'] = $listData;
         }
 
-        $builder->add($listName, 'sortablelist', $listOptions);
+        $builder->add($listName, SortableListType::class, $listOptions);
         $builder->add(
             'syncList',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'attr' => [
                     'data-show-on' => '{"'.$formName.'_leadField:data-list-type": "1"}',

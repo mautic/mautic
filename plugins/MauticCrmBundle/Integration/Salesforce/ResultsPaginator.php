@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -37,12 +28,12 @@ class ResultsPaginator
     private $recordCount = 0;
 
     /**
-     * @var
+     * @var int
      */
     private $retryCount = 0;
 
     /**
-     * @var
+     * @var string|null
      */
     private $nextRecordsUrl;
 
@@ -52,10 +43,7 @@ class ResultsPaginator
     private $salesforceBaseUrl;
 
     /**
-     * ResultsPaginator constructor.
-     *
-     * @param LoggerInterface $logger
-     * @param string          $salesforceBaseUrl
+     * @param string $salesforceBaseUrl
      */
     public function __construct(LoggerInterface $logger, $salesforceBaseUrl)
     {
@@ -64,8 +52,6 @@ class ResultsPaginator
     }
 
     /**
-     * @param array $results
-     *
      * @return $this
      *
      * @throws ApiErrorException
@@ -94,7 +80,7 @@ class ResultsPaginator
             $this->retryCount     = 0;
             $this->nextRecordsUrl = $this->results['nextRecordsUrl'];
 
-            if (strpos($this->nextRecordsUrl, $this->salesforceBaseUrl) === false) {
+            if (false === strpos($this->nextRecordsUrl, $this->salesforceBaseUrl)) {
                 $this->nextRecordsUrl = $this->salesforceBaseUrl.$this->nextRecordsUrl;
             }
 

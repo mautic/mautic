@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventCollector\Builder;
 
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
@@ -18,8 +9,6 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 class EventBuilder
 {
     /**
-     * @param array $actions
-     *
      * @return array
      */
     public static function buildActions(array $actions)
@@ -33,8 +22,6 @@ class EventBuilder
     }
 
     /**
-     * @param array $conditions
-     *
      * @return array
      */
     public static function buildConditions(array $conditions)
@@ -48,8 +35,6 @@ class EventBuilder
     }
 
     /**
-     * @param array $decisions
-     *
      * @return array
      */
     public static function buildDecisions(array $decisions)

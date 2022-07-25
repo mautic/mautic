@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -44,10 +35,6 @@ class ValidateEventCommand extends Command
 
     /**
      * ValidateEventCommand constructor.
-     *
-     * @param InactiveExecutioner $inactiveExecutioner
-     * @param TranslatorInterface $translator
-     * @param FormatterHelper     $formatterHelper
      */
     public function __construct(InactiveExecutioner $inactiveExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
     {
@@ -89,9 +76,6 @@ class ValidateEventCommand extends Command
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return int|null
      *
      * @throws \Exception
@@ -107,7 +91,7 @@ class ValidateEventCommand extends Command
         if (!$contactIds && !$contactId) {
             $output->writeln(
                 "\n".
-                '<comment>'.$this->translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => 0])
+                '<comment>'.$this->translator->trans('mautic.campaign.trigger.events_executed', ['%count%' => 0])
                 .'</comment>'
             );
 

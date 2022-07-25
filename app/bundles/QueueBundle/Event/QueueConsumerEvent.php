@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\QueueBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -57,5 +48,17 @@ class QueueConsumerEvent extends CommonEvent
     public function setResult($result)
     {
         $this->result = $result;
+    }
+
+    /**
+     * Checks if the event is for specific transport.
+     *
+     * @param string $transport
+     *
+     * @return bool
+     */
+    public function checkTransport($transport)
+    {
+        return isset($this->payload['transport']) && $this->payload['transport'] === $transport;
     }
 }

@@ -1,21 +1,11 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Helper;
 
 class UrlMatcher
 {
     /**
-     * @param array $urlsToCheckAgainst
-     * @param       $urlToFind
+     * @param $urlToFind
      *
      * @return bool
      */
@@ -51,7 +41,7 @@ class UrlMatcher
         $url = str_replace(['http://', 'https://'], '', $url);
 
         // Remove preceding //
-        if (strpos($url, '//') === 0) {
+        if (0 === strpos($url, '//')) {
             $url = str_replace('//', '', $url);
         }
 

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -30,8 +21,6 @@ trait PushToIntegrationTrait
 
     /**
      * Used by methodCalls to event subscribers.
-     *
-     * @param IntegrationHelper $integrationHelper
      */
     public function setIntegrationHelper(IntegrationHelper $integrationHelper)
     {
@@ -40,8 +29,6 @@ trait PushToIntegrationTrait
 
     /**
      * Used by callback methods such as point triggers.
-     *
-     * @param IntegrationHelper $integrationHelper
      */
     public static function setStaticIntegrationHelper(IntegrationHelper $integrationHelper)
     {
@@ -49,8 +36,7 @@ trait PushToIntegrationTrait
     }
 
     /**
-     * @param array $config
-     * @param       $lead
+     * @param $lead
      */
     protected function pushToIntegration(array $config, Lead $lead, array &$errors = [])
     {
@@ -60,10 +46,9 @@ trait PushToIntegrationTrait
     /**
      * Used because the the Point trigger actions have not be converted to Events yet and thus must leverage a callback.
      *
-     * @param IntegrationHelper $helper
-     * @param                   $config
-     * @param                   $lead
-     * @param                   $errors
+     * @param $config
+     * @param $lead
+     * @param $errors
      *
      * @return bool
      */
@@ -80,7 +65,7 @@ trait PushToIntegrationTrait
          * @var string
          * @var AbstractIntegration $s
          */
-        foreach ($services as $name => $s) {
+        foreach ($services as $s) {
             $settings = $s->getIntegrationSettings();
             if (!$settings->isPublished()) {
                 continue;

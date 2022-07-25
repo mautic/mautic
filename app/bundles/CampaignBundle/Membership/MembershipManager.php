@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Membership;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -60,12 +51,6 @@ class MembershipManager
 
     /**
      * MembershipManager constructor.
-     *
-     * @param Adder           $adder
-     * @param Remover         $remover
-     * @param EventDispatcher $eventDispatcher
-     * @param LeadRepository  $leadRepository
-     * @param LoggerInterface $logger
      */
     public function __construct(
         Adder $adder,
@@ -82,9 +67,7 @@ class MembershipManager
     }
 
     /**
-     * @param Lead     $contact
-     * @param Campaign $campaign
-     * @param bool     $isManualAction
+     * @param bool $isManualAction
      */
     public function addContact(Lead $contact, Campaign $campaign, $isManualAction = true)
     {
@@ -135,9 +118,7 @@ class MembershipManager
     }
 
     /**
-     * @param ArrayCollection $contacts
-     * @param Campaign        $campaign
-     * @param bool            $isManualAction
+     * @param bool $isManualAction
      */
     public function addContacts(ArrayCollection $contacts, Campaign $campaign, $isManualAction = true)
     {
@@ -165,17 +146,8 @@ class MembershipManager
                 continue;
             }
 
-            try {
-                // Existing membership does not exist so create a new one
-                $this->adder->createNewMembership($contact, $campaign, $isManualAction);
-            } catch (ContactCannotBeAddedToCampaignException $exception) {
-                $this->logger->debug(
-                    "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}."
-                );
-
-                $contacts->remove($contact->getId());
-                continue;
-            }
+            // Existing membership does not exist so create a new one
+            $this->adder->createNewMembership($contact, $campaign, $isManualAction);
 
             $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was added to campaign ID {$campaign->getId()} as a new member.");
         }
@@ -190,9 +162,7 @@ class MembershipManager
     }
 
     /**
-     * @param Lead     $contact
-     * @param Campaign $campaign
-     * @param bool     $isExit
+     * @param bool $isExit
      */
     public function removeContact(Lead $contact, Campaign $campaign, $isExit = false)
     {
@@ -226,10 +196,8 @@ class MembershipManager
     }
 
     /**
-     * @param ArrayCollection $contacts
-     * @param Campaign        $campaign
-     * @param bool            $isExit   If true, the contact can be added by a segment/source. If false, the contact can only be added back
-     *                                  by a manual process.
+     * @param bool $isExit If true, the contact can be added by a segment/source. If false, the contact can only be added back
+     *                     by a manual process.
      */
     public function removeContacts(ArrayCollection $contacts, Campaign $campaign, $isExit = false)
     {
@@ -270,9 +238,6 @@ class MembershipManager
         $this->leadRepository->clear();
     }
 
-    /**
-     * @param ProgressBar|null $progressBar
-     */
     public function setProgressBar(ProgressBar $progressBar = null)
     {
         $this->progressBar = $progressBar;

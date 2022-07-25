@@ -1,19 +1,13 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
+use MauticPlugin\MauticFocusBundle\Event\FocusViewEvent;
+use MauticPlugin\MauticFocusBundle\FocusEvents;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -41,9 +35,8 @@ class PublicController extends CommonController
             }
 
             $content  = $model->generateJavascript($focus, false, (MAUTIC_ENV == 'dev'));
-            $response = new Response($content, 200, ['Content-Type' => 'application/javascript']);
 
-            return $response;
+            return new Response($content, 200, ['Content-Type' => 'application/javascript']);
         } else {
             return new Response('', 200, ['Content-Type' => 'application/javascript']);
         }
@@ -59,15 +52,21 @@ class PublicController extends CommonController
             /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
             $model = $this->getModel('focus');
             $focus = $model->getEntity($id);
-            $lead  = $this->getModel('lead')->getCurrentLead();
+
+            /** @var ContactTracker $contactTracker */
+            $contactTracker = $this->get('mautic.tracker.contact');
+            $lead           = $contactTracker->getContact();
 
             if ($focus && $focus->isPublished() && $lead) {
-                $model->addStat($focus, Stat::TYPE_NOTIFICATION, $this->request, $lead);
+                $stat = $model->addStat($focus, Stat::TYPE_NOTIFICATION, $this->request, $lead);
+                if ($stat && $this->dispatcher->hasListeners(FocusEvents::FOCUS_ON_VIEW)) {
+                    $event = new FocusViewEvent($stat);
+                    $this->dispatcher->dispatch(FocusEvents::FOCUS_ON_VIEW, $event);
+                    unset($event);
+                }
             }
         }
 
-        $response = TrackingPixelHelper::getResponse($this->request);
-
-        return $response;
+        return TrackingPixelHelper::getResponse($this->request);
     }
 }

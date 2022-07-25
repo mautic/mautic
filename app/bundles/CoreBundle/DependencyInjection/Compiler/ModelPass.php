@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -65,11 +56,6 @@ class ModelPass implements CompilerPassInterface
 
             if ($reflected->hasMethod('setSession')) {
                 $definition->addMethodCall('setSession', [new Reference('session')]);
-            }
-
-            // Temporary, for development purposes
-            if ($reflected->hasProperty('factory')) {
-                $definition->addMethodCall('setFactory', [new Reference('mautic.factory')]);
             }
         }
     }

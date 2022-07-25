@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticPointBundle:Point:index.html.php');
 }
 ?>
@@ -102,12 +102,16 @@ if ($tmpl == 'index') {
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 ['item' => $item, 'model' => 'point']
                             ); ?>
-                            <a href="<?php echo $view['router']->path(
-                                'mautic_point_action',
-                                ['objectAction' => 'edit', 'objectId' => $item->getId()]
-                            ); ?>" data-toggle="ajax">
+                            <?php if ($permissions['point:points:edit']): ?>
+                                <a href="<?php echo $view['router']->path(
+                                    'mautic_point_action',
+                                    ['objectAction' => 'edit', 'objectId' => $item->getId()]
+                                ); ?>" data-toggle="ajax">
+                                    <?php echo $item->getName(); ?>
+                                </a>
+                            <?php else: ?>
                                 <?php echo $item->getName(); ?>
-                            </a>
+                            <?php endif; ?>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>
                             <div class="text-muted mt-4">

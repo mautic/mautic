@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Organizer;
 
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer;
 
-class MailboxContainerTest extends \PHPUnit_Framework_TestCase
+class MailboxContainerTest extends \PHPUnit\Framework\TestCase
 {
     protected $config = [
         'imap_path' => 'path',

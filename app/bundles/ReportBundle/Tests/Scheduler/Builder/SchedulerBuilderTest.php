@@ -10,7 +10,7 @@ use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 use Recurr\Recurrence;
 use Recurr\RecurrenceCollection;
 
-class SchedulerBuilderTest extends \PHPUnit_Framework_TestCase
+class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetNextEvent()
     {

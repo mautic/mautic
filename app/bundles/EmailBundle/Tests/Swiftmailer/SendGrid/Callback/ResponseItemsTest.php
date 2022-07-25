@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Callback;
 
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\ResponseItem;
@@ -16,7 +7,7 @@ use Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\ResponseItems;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
-class ResponseItemsTest extends \PHPUnit_Framework_TestCase
+class ResponseItemsTest extends \PHPUnit\Framework\TestCase
 {
     public function testResponseItems()
     {

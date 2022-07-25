@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
@@ -23,6 +14,14 @@ return [
             'mautic_message_action' => [
                 'path'       => '/messages/{objectAction}/{objectId}',
                 'controller' => 'MauticChannelBundle:Message:execute',
+            ],
+            'mautic_channel_batch_contact_set' => [
+                'path'       => '/channels/batch/contact/set',
+                'controller' => 'MauticChannelBundle:BatchContact:set',
+            ],
+            'mautic_channel_batch_contact_view' => [
+                'path'       => '/channels/batch/contact/view',
+                'controller' => 'MauticChannelBundle:BatchContact:index',
             ],
         ],
         'api' => [
@@ -55,7 +54,7 @@ return [
     ],
 
     'categories' => [
-        'messages',
+        'messages' => null,
     ],
 
     'services' => [
@@ -71,18 +70,31 @@ return [
                 ],
             ],
             'mautic.channel.channelbundle.subscriber' => [
-                'class'     => 'Mautic\ChannelBundle\EventListener\MessageSubscriber',
+                'class'     => \Mautic\ChannelBundle\EventListener\MessageSubscriber::class,
                 'arguments' => [
                     'mautic.core.model.auditlog',
                 ],
             ],
             'mautic.channel.channelbundle.lead.subscriber' => [
-                'class' => Mautic\ChannelBundle\EventListener\LeadSubscriber::class,
+                'class'     => Mautic\ChannelBundle\EventListener\LeadSubscriber::class,
+                'arguments' => [
+                    'translator',
+                    'router',
+                    'mautic.channel.repository.message_queue',
+                ],
             ],
             'mautic.channel.reportbundle.subscriber' => [
                 'class'     => Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.company_report_data',
+                    'router',
+                ],
+            ],
+            'mautic.channel.button.subscriber' => [
+                'class'     => \Mautic\ChannelBundle\EventListener\ButtonSubscriber::class,
+                'arguments' => [
+                    'router',
+                    'translator',
                 ],
             ],
         ],
@@ -97,13 +109,11 @@ return [
                 ],
             ],
             'mautic.form.type.message_list' => [
-                'class' => 'Mautic\ChannelBundle\Form\Type\MessageListType',
-                'alias' => 'message_list',
+                'class' => \Mautic\ChannelBundle\Form\Type\MessageListType::class,
             ],
             'mautic.form.type.message_send' => [
-                'class'     => 'Mautic\ChannelBundle\Form\Type\MessageSendType',
+                'class'     => \Mautic\ChannelBundle\Form\Type\MessageSendType::class,
                 'arguments' => ['router', 'mautic.channel.model.message'],
-                'alias'     => 'message_send',
             ],
         ],
         'helpers' => [
@@ -131,6 +141,28 @@ return [
                     'mautic.lead.model.company',
                     'mautic.helper.core_parameters',
                 ],
+            ],
+            'mautic.channel.model.channel.action' => [
+                'class'     => \Mautic\ChannelBundle\Model\ChannelActionModel::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.dnc',
+                    'translator',
+                ],
+            ],
+            'mautic.channel.model.frequency.action' => [
+                'class'     => \Mautic\ChannelBundle\Model\FrequencyActionModel::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.repository.frequency_rule',
+                ],
+            ],
+        ],
+        'repositories' => [
+            'mautic.channel.repository.message_queue' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => \Mautic\ChannelBundle\Entity\MessageQueue::class,
             ],
         ],
     ],

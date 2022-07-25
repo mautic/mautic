@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Crate;
 
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Tests\Fixtures;
 
-class ReportDataResultTest extends \PHPUnit_Framework_TestCase
+class ReportDataResultTest extends \PHPUnit\Framework\TestCase
 {
     public function testValidData()
     {

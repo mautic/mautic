@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -92,13 +83,6 @@ class InactiveExecutioner implements ExecutionerInterface
 
     /**
      * InactiveExecutioner constructor.
-     *
-     * @param InactiveContactFinder $inactiveContactFinder
-     * @param LoggerInterface       $logger
-     * @param TranslatorInterface   $translator
-     * @param EventScheduler        $scheduler
-     * @param InactiveHelper        $helper
-     * @param EventExecutioner      $executioner
      */
     public function __construct(
         InactiveContactFinder $inactiveContactFinder,
@@ -117,10 +101,6 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param Campaign             $campaign
-     * @param ContactLimiter       $limiter
-     * @param OutputInterface|null $output
-     *
      * @return Counter
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
@@ -147,7 +127,6 @@ class InactiveExecutioner implements ExecutionerInterface
         } finally {
             if ($this->progressBar) {
                 $this->progressBar->finish();
-                $this->output->writeln("\n");
             }
         }
 
@@ -155,9 +134,7 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param int                  $decisionId
-     * @param ContactLimiter       $limiter
-     * @param OutputInterface|null $output
+     * @param int $decisionId
      *
      * @return Counter
      *
@@ -185,7 +162,6 @@ class InactiveExecutioner implements ExecutionerInterface
         } finally {
             if ($this->progressBar) {
                 $this->progressBar->finish();
-                $this->output->writeln("\n");
             }
         }
 
@@ -221,22 +197,24 @@ class InactiveExecutioner implements ExecutionerInterface
         if (!$totalDecisions) {
             throw new NoEventsFoundException();
         }
+        $totalContacts = 0;
+        if (!($this->output instanceof NullOutput)) {
+            $totalContacts = $this->inactiveContactFinder->getContactCount($this->campaign->getId(), $this->decisions->getKeys(), $this->limiter);
 
-        $totalContacts = $this->inactiveContactFinder->getContactCount($this->campaign->getId(), $this->decisions->getKeys(), $this->limiter);
+            $this->output->writeln(
+                $this->translator->trans(
+                    'mautic.campaign.trigger.decision_count_analyzed',
+                    [
+                        '%decisions%' => $totalDecisions,
+                        '%leads%'     => $totalContacts,
+                        '%batch%'     => $this->limiter->getBatchLimit(),
+                    ]
+                )
+            );
 
-        $this->output->writeln(
-            $this->translator->trans(
-                'mautic.campaign.trigger.decision_count_analyzed',
-                [
-                    '%decisions%' => $totalDecisions,
-                    '%leads%'     => $totalContacts,
-                    '%batch%'     => $this->limiter->getBatchLimit(),
-                ]
-            )
-        );
-
-        if (!$totalContacts) {
-            throw new NoContactsFoundException();
+            if (!$totalContacts) {
+                throw new NoContactsFoundException();
+            }
         }
 
         // Approximate total count because the query to fetch contacts will filter out those that have not arrived to this point in the campaign yet
@@ -248,7 +226,6 @@ class InactiveExecutioner implements ExecutionerInterface
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws NoContactsFoundException
      * @throws Scheduler\Exception\NotSchedulableException
      */
     private function executeEvents()
@@ -267,7 +244,7 @@ class InactiveExecutioner implements ExecutionerInterface
                 $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->limiter);
 
                 // Loop over all contacts till we've processed all those applicable for this decision
-                while ($contacts->count()) {
+                while ($contacts && $contacts->count()) {
                     // Get the max contact ID before any are removed
                     $batchMinContactId = max($contacts->getKeys()) + 1;
 
@@ -316,11 +293,6 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param ArrayCollection $children
-     * @param ArrayCollection $contacts
-     * @param Counter         $childrenCounter
-     * @param \DateTime       $earliestLastActiveDateTime
-     *
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
@@ -353,10 +325,10 @@ class InactiveExecutioner implements ExecutionerInterface
 
             $this->logger->debug(
                 'CAMPAIGN: Event ID# '.$event->getId().
-                ' to be executed on '.$eventExecutionDate->format('Y-m-d H:i:s')
+                ' to be executed on '.$eventExecutionDate->format('Y-m-d H:i:s e')
             );
 
-            if ($this->scheduler->shouldSchedule($eventExecutionDate, $executionDate)) {
+            if ($this->scheduler->shouldScheduleEvent($event, $eventExecutionDate, $executionDate)) {
                 $childrenCounter->advanceTotalScheduled($contacts->count());
                 $this->scheduler->schedule($event, $eventExecutionDate, $contacts, true);
 

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember;
 
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -79,9 +70,7 @@ class Fetcher
     /**
      * Fetcher constructor.
      *
-     * @param IntegrationEntityRepository $repo
-     * @param Organizer                   $organizer
-     * @param string                      $campaignId
+     * @param string $campaignId
      */
     public function __construct(IntegrationEntityRepository $repo, Organizer $organizer, $campaignId)
     {
@@ -96,8 +85,7 @@ class Fetcher
     /**
      * Return SF query to fetch the object information for a CampaignMember.
      *
-     * @param array $fields
-     * @param       $object
+     * @param $object
      *
      * @return string
      *

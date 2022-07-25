@@ -1,22 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class CampaignTriggerEvent.
- */
 class CampaignTriggerEvent extends Event
 {
     /**
@@ -25,13 +13,10 @@ class CampaignTriggerEvent extends Event
     protected $campaign;
 
     /**
-     * @var
+     * @var bool
      */
     protected $triggerCampaign = true;
 
-    /**
-     * @param Campaign $campaign
-     */
     public function __construct(Campaign $campaign)
     {
         $this->campaign = $campaign;

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle;
 
 /**
@@ -72,4 +63,14 @@ final class FocusEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.focus.on_campaign_trigger_action';
+
+    /**
+     * The mautic.focus.on_open event is dispatched when an focus is opened.
+     *
+     * The event listener receives a
+     * MauticPlugin\MauticFocusBundle\Event\FocusOpenEvent instance.
+     *
+     * @var string
+     */
+    const FOCUS_ON_VIEW = 'mautic.focus.on_view';
 }

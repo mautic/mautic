@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle;
 
 /**
@@ -35,4 +26,13 @@ final class ConfigEvents
      * @var string
      */
     const CONFIG_PRE_SAVE = 'mautic.config_pre_save';
+
+    /**
+     * The mautic.config_post_save event is thrown right after config data are saved.
+     *
+     * The event listener receives a Mautic\ConfigBundle\Event\ConfigEvent instance.
+     *
+     * @var string
+     */
+    const CONFIG_POST_SAVE = 'mautic.config_post_save';
 }

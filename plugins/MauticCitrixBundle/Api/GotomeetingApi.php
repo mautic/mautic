@@ -8,7 +8,6 @@ class GotomeetingApi extends CitrixApi
 {
     /**
      * @param string $operation
-     * @param array  $parameters
      * @param string $method
      *
      * @return mixed|string
@@ -22,15 +21,6 @@ class GotomeetingApi extends CitrixApi
             'method'     => $method,
             'parameters' => $parameters,
         ];
-
-        if (preg_match('/start$/', $operation)) {
-            $settings['requestSettings'] = [
-                'auth_type' => 'none',
-                'headers'   => [
-                    'Authorization' => 'OAuth oauth_token='.$this->integration->getApiKey(),
-                ],
-            ];
-        }
 
         return parent::_request($operation, $settings);
     }

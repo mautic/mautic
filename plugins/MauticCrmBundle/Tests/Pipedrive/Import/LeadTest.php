@@ -19,100 +19,25 @@ class LeadTest extends PipedriveTest
         ],
     ];
 
-    public function testCreateLead()
+    private $updateData = ['email' => 'test@test.pl', 'firstname'=> 'Test', 'lastname'=>'Person', 'phone'=>'678465345'];
+
+    protected function beforeBeginTransaction(): void
     {
-        $this->installPipedriveIntegration(true, $this->features);
-        $data = $this->getData('person.added');
-
-        $this->makeRequest('POST', $data);
-
-        $response     = $this->client->getResponse();
-        $responseData = json_decode($response->getContent(), true);
-        $lead         = $this->em->getRepository(Lead::class)->find(1);
-
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertEquals($responseData['status'], 'ok');
-        $this->assertEquals($lead->getName(), 'Test Person');
-        $this->assertEquals($lead->getEmail(), 'test@test.pl');
-        $this->assertEquals($lead->getPhone(), '678465345');
-        $this->assertNotNull($lead->getDateAdded());
-        $this->assertEquals($lead->getPreferredProfileImage(), 'gravatar');
-        $this->assertEquals(count($this->em->getRepository(Lead::class)->findAll()), 1);
-    }
-
-    public function testCreateLeadWithOwner()
-    {
-        $this->installPipedriveIntegration(true, $this->features);
-        $json = $this->getData('person.added');
-        $data = json_decode($json, true);
-
-        //add user
-        $owner = $this->createUser(true, 'admin@admin.pl');
-        $this->addPipedriveOwner($data['current']['owner_id'], $owner->getEmail());
-
-        $this->makeRequest('POST', $json);
-
-        $response     = $this->client->getResponse();
-        $responseData = json_decode($response->getContent(), true);
-        $lead         = $this->em->getRepository(Lead::class)->find(1);
-
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertEquals($responseData['status'], 'ok');
-        $this->assertEquals($lead->getName(), 'Test Person');
-        $this->assertEquals($lead->getEmail(), 'test@test.pl');
-        $this->assertEquals($lead->getPhone(), '678465345');
-        $this->assertEquals($lead->getOwner()->getEmail(), $owner->getEmail());
-        $this->assertNotNull($lead->getDateAdded());
-        $this->assertEquals($lead->getPreferredProfileImage(), 'gravatar');
-        $this->assertEquals(count($this->em->getRepository(Lead::class)->findAll()), 1);
-    }
-
-    public function testCreateLeadWithCompany()
-    {
-        $newCompanyId   = 88;
-        $newCompanyName = 'New Company Name';
-
-        $this->installPipedriveIntegration(true, $this->features);
-        $data = json_decode($json = $this->getData('person.added'), true);
-
-        $newCompany = $this->createCompany($newCompanyName);
-
-        $this->createCompanyIntegrationEntity($newCompanyId, $newCompany->getId());
-
-        $data['current']['org_id'] = $newCompanyId;
-
-        $this->makeRequest('POST', json_encode($data));
-
-        $response     = $this->client->getResponse();
-        $responseData = json_decode($response->getContent(), true);
-        $lead         = $this->em->getRepository(Lead::class)->find(1);
-
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertEquals($responseData['status'], 'ok');
-        $this->assertEquals($lead->getName(), 'Test Person');
-        $this->assertEquals($lead->getEmail(), 'test@test.pl');
-        $this->assertEquals($lead->getPhone(), '678465345');
-        $this->assertEquals($lead->getCompany(), $newCompanyName);
-        $this->assertNotNull($lead->getDateAdded());
-        $this->assertEquals($lead->getPreferredProfileImage(), 'gravatar');
-        $this->assertEquals(count($this->em->getRepository(Lead::class)->findAll()), 1);
-    }
-
-    public function testCreateSameLeadMultipleTimes()
-    {
-        $this->installPipedriveIntegration(true, $this->features);
-
-        $data = $this->getData('person.added');
-        $this->makeRequest('POST', $data);
-        $this->makeRequest('POST', $data);
-        $this->makeRequest('POST', $data);
-
-        $this->assertEquals(count($this->em->getRepository(Lead::class)->findAll()), 1);
+        $this->resetAutoincrement([
+            'leads',
+        ]);
     }
 
     public function testCreateLeadViaUpdate()
     {
-        $this->installPipedriveIntegration(true, $this->features);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => '',
+                'token' => 'token',
+            ]
+        );
         $data = $this->getData('person.updated');
 
         $this->makeRequest('POST', $data);
@@ -122,20 +47,27 @@ class LeadTest extends PipedriveTest
         $lead         = $this->em->getRepository(Lead::class)->find(1);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertEquals($responseData['status'], 'ok');
-        $this->assertEquals($lead->getName(), 'Test Person');
-        $this->assertEquals($lead->getEmail(), 'test@test.pl');
-        $this->assertEquals($lead->getPhone(), '678465345');
+        $this->assertEquals('ok', $responseData['status']);
+        $this->assertEquals('Test Person', $lead->getName());
+        $this->assertEquals('test@test.pl', $lead->getEmail());
+        $this->assertEquals('678465345', $lead->getPhone());
         $this->assertNotNull($lead->getDateAdded());
-        $this->assertEquals($lead->getPreferredProfileImage(), 'gravatar');
+        $this->assertEquals('gravatar', $lead->getPreferredProfileImage());
     }
 
     public function testUpdateLead()
     {
-        $this->installPipedriveIntegration(true, $this->features);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => '',
+                'token' => 'token',
+            ]
+        );
         $data = json_decode($this->getData('person.updated'), true);
 
-        $lead = $this->createLead();
+        $lead = $this->createLead([], null, $this->updateData);
         $this->createLeadIntegrationEntity($data['current']['id'], $lead->getId());
 
         $this->makeRequest('POST', json_encode($data));
@@ -145,10 +77,10 @@ class LeadTest extends PipedriveTest
         $lead         = $this->em->getRepository(Lead::class)->find(1);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertEquals($responseData['status'], 'ok');
-        $this->assertEquals($lead->getName(), 'Test Person');
-        $this->assertEquals($lead->getEmail(), 'test@test.pl');
-        $this->assertEquals($lead->getPhone(), '678465345');
+        $this->assertEquals('ok', $responseData['status']);
+        $this->assertEquals('Test Person', $lead->getName());
+        $this->assertEquals('test@test.pl', $lead->getEmail());
+        $this->assertEquals('678465345', $lead->getPhone());
         $this->assertNull($lead->getOwner());
         $this->assertNull($lead->getCompany());
         $this->assertNotNull($lead->getDateModified());
@@ -159,16 +91,22 @@ class LeadTest extends PipedriveTest
         $newOwnerId    = 88;
         $newOwnerEmail = 'new@admin.com';
 
-        $this->installPipedriveIntegration(true, $this->features);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => '',
+                'token' => 'token',
+            ]
+        );
 
         $data = json_decode($this->getData('person.updated'), true);
 
         $oldUser = $this->createUser(true);
-        $lead    = $this->createLead([], $oldUser);
+        $this->createLead([], $oldUser);
         $newUser = $this->createUser(true, $newOwnerEmail, 'admin2');
 
         $this->addPipedriveOwner($newOwnerId, $newUser->getEmail());
-        $this->createLeadIntegrationEntity($data['current']['id'], $lead->getId());
 
         $data['current']['owner_id'] = $newOwnerId;
 
@@ -176,22 +114,28 @@ class LeadTest extends PipedriveTest
 
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
-        $lead         = $this->em->getRepository(Lead::class)->find(1);
+        $lead         = $this->em->getRepository(Lead::class)->find(2);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertEquals($responseData['status'], 'ok');
+        $this->assertEquals('ok', $responseData['status']);
         $this->assertNotNull($lead->getOwner());
-        $this->assertEquals($lead->getOwner()->getEmail(), $newOwnerEmail);
-        $this->assertNotNull($lead->getDateModified());
+        $this->assertEquals($newOwnerEmail, $lead->getOwner()->getEmail());
     }
 
     public function testUpdateLeadCompany()
     {
         $newCompanyId      = 88;
         $newCompanyName    = 'New Company Name';
-        $newCompanyAddress = 'Madrit, Spain';
+        $newCompanyAddress = 'Madrid, Spain';
 
-        $this->installPipedriveIntegration(true, $this->features);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => '',
+                'token' => 'token',
+            ]
+        );
 
         $data = json_decode($this->getData('person.updated'), true);
 
@@ -204,7 +148,6 @@ class LeadTest extends PipedriveTest
         $this->createCompanyIntegrationEntity($newCompanyId, $newCompany->getId());
 
         $data['current']['org_id'] = $newCompanyId;
-
         $this->makeRequest('POST', json_encode($data));
 
         $response     = $this->client->getResponse();
@@ -212,29 +155,32 @@ class LeadTest extends PipedriveTest
         $lead         = $this->em->getRepository(Lead::class)->find(1);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertEquals($responseData['status'], 'ok');
+        $this->assertEquals('ok', $responseData['status']);
         $this->assertNotNull($lead->getCompany());
-        $this->assertEquals($lead->getCompany(), $newCompanyName);
+        $this->assertEquals($newCompanyName, $lead->getCompany());
         $this->assertNotNull($lead->getDateModified());
     }
 
     public function testRemoveLeadCompany()
     {
-        $companyModel = $this->container->get('mautic.lead.model.company');
+        $companyModel = self::$container->get('mautic.lead.model.company');
 
-        $this->installPipedriveIntegration(true, $this->features);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => '',
+                'token' => 'token',
+            ]
+        );
         $data = json_decode($this->getData('person.updated'), true);
 
-        $oldCompany = $this->createCompany();
-        $lead       = $this->createLead($oldCompany, null);
-
+        $oldCompany    = $this->createCompany();
+        $lead          = $this->createLead($oldCompany, null, $this->updateData);
         $leadCompanies = $companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
-
         $this->assertEquals(count($leadCompanies), 1);
 
         $this->createLeadIntegrationEntity($data['current']['id'], $lead->getId());
-
-        $data['current']['org_id'] = null;
 
         $this->makeRequest('POST', json_encode($data));
 
@@ -252,7 +198,14 @@ class LeadTest extends PipedriveTest
 
     public function testRemoveLeadOwner()
     {
-        $this->installPipedriveIntegration(true, $this->features);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => '',
+                'token' => 'token',
+            ]
+        );
         $data = json_decode($this->getData('person.updated'), true);
 
         $owner = $this->createUser(true);
@@ -288,7 +241,14 @@ class LeadTest extends PipedriveTest
             ],
         ];
 
-        $this->installPipedriveIntegration(true, $features);
+        $this->installPipedriveIntegration(
+            true,
+            $this->features,
+            [
+                'url'   => '',
+                'token' => 'token',
+            ]
+        );
         $lead = $this->createLead();
         $json = $this->getData('person.deleted');
         $data = json_decode($json, true);

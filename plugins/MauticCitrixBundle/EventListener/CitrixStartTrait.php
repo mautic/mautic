@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
 use Mautic\EmailBundle\Model\EmailModel;
@@ -24,9 +15,6 @@ trait CitrixStartTrait
      */
     protected $emailModel;
 
-    /**
-     * @param EmailModel $emailModel
-     */
     public function setEmailModel(EmailModel $emailModel)
     {
         $this->emailModel = $emailModel;
@@ -35,7 +23,6 @@ trait CitrixStartTrait
     /**
      * @param string $product
      * @param Lead   $lead
-     * @param array  $productsToStart
      * @param  $emailId
      * @param  $actionId
      *

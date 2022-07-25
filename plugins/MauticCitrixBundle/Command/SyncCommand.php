@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
@@ -21,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command : Synchronizes registrant information from Citrix products.
  *
- * php app/console mautic:citrix:sync [--product=webinar|meeting|assist|training [--id=%productId%]]
+ * php bin/console mautic:citrix:sync [--product=webinar|meeting|assist|training [--id=%productId%]]
  */
 class SyncCommand extends ModeratedCommand
 {
@@ -112,7 +103,7 @@ class SyncCommand extends ModeratedCommand
                     $output->writeln('<error>Error syncing '.$product.': '.$productId.'.</error>');
                     $output->writeln('<error>'.$ex->getMessage().'</error>');
                     if ('dev' === MAUTIC_ENV) {
-                        $output->writeln('<info>'.(string) $ex.'</info>');
+                        $output->writeln('<info>'.$ex.'</info>');
                     }
                 }
             }

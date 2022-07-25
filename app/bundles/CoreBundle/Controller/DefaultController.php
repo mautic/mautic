@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -23,13 +14,11 @@ use Symfony\Component\HttpFoundation\Request;
 class DefaultController extends CommonController
 {
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Request $request)
     {
-        $root = $this->coreParametersHelper->getParameter('webroot');
+        $root = $this->coreParametersHelper->get('webroot');
 
         if (empty($root)) {
             return $this->redirect($this->generateUrl('mautic_dashboard_index'));
@@ -66,7 +55,7 @@ class DefaultController extends CommonController
             $results = [];
         }
 
-        return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.php',
+        return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.twig',
             [
                 'results'      => $results,
                 'searchString' => $searchStr,
@@ -86,7 +75,7 @@ class DefaultController extends CommonController
 
         return $this->delegateView(
             [
-                'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.php',
+                'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.twig',
                 'viewParameters'  => [
                     'showNewIndicator' => $showNewIndicator,
                     'notifications'    => $notifications,

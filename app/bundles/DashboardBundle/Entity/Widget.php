@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
@@ -96,9 +87,6 @@ class Widget extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -113,9 +101,6 @@ class Widget extends FormEntity
         $builder->addNullableField('params', Type::TARRAY);
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('type', new NotBlank([
@@ -296,8 +281,6 @@ class Widget extends FormEntity
     /**
      * Set params.
      *
-     * @param array $params
-     *
      * @return Widget
      */
     public function setParams(array $params)
@@ -345,8 +328,6 @@ class Widget extends FormEntity
 
     /**
      * Set template data.
-     *
-     * @param array $templateData
      *
      * @return Widget
      */

@@ -1,23 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class TriggerBuilderEvent.
- */
 class TriggerBuilderEvent extends Event
 {
     /**
@@ -30,9 +18,6 @@ class TriggerBuilderEvent extends Event
      */
     private $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -84,8 +69,6 @@ class TriggerBuilderEvent extends Event
     }
 
     /**
-     * Get events.
-     *
      * @return array
      */
     public function getEvents()
@@ -99,10 +82,6 @@ class TriggerBuilderEvent extends Event
     }
 
     /**
-     * @param array $keys
-     * @param array $methods
-     * @param array $component
-     *
      * @throws InvalidArgumentException
      */
     private function verifyComponent(array $keys, array $methods, array $component)

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-*/
-
 namespace Mautic\ReportBundle\Scheduler\Validator;
 
 use Mautic\ReportBundle\Entity\Report;
@@ -21,7 +12,9 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class ScheduleIsValidValidator extends ConstraintValidator
 {
-    /** @var SchedulerBuilder */
+    /**
+     * @var SchedulerBuilder
+     */
     private $schedulerBuilder;
 
     public function __construct(SchedulerBuilder $schedulerBuilder)
@@ -30,8 +23,7 @@ class ScheduleIsValidValidator extends ConstraintValidator
     }
 
     /**
-     * @param Report     $report
-     * @param Constraint $constraint
+     * @param Report $report
      */
     public function validate($report, Constraint $constraint)
     {
@@ -60,7 +52,7 @@ class ScheduleIsValidValidator extends ConstraintValidator
 
                 return;
             } catch (ScheduleNotValidException $e) {
-                $this->addViolation();
+                $this->addReportScheduleNotValidViolation();
             }
         }
         if ($report->isScheduledMonthly()) {
@@ -70,12 +62,12 @@ class ScheduleIsValidValidator extends ConstraintValidator
 
                 return;
             } catch (ScheduleNotValidException $e) {
-                $this->addViolation();
+                $this->addReportScheduleNotValidViolation();
             }
         }
     }
 
-    private function addViolation()
+    private function addReportScheduleNotValidViolation()
     {
         $this->context->buildViolation('mautic.report.schedule.notValid')
             ->atPath('isScheduled')

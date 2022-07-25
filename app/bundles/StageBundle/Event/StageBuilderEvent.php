@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
@@ -52,7 +43,6 @@ class StageBuilderEvent extends Event
      *                       'callback'        => (optional) callback function that will be passed when the action is triggered; return true to
      *                       change the configured stages or false to ignore the action
      *                       The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *                       Mautic\CoreBundle\Factory\MauticFactory $factory
      *                       Mautic\LeadBundle\Entity\Lead $lead
      *                       $eventDetails - variable sent from firing function to call back function
      *                       array $action = array(
@@ -127,10 +117,6 @@ class StageBuilderEvent extends Event
     }
 
     /**
-     * @param array $keys
-     * @param array $methods
-     * @param array $component
-     *
      * @throws InvalidArgumentException
      */
     private function verifyComponent(array $keys, array $methods, array $component)

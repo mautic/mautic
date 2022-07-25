@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -147,8 +138,7 @@ class StatRepository extends CommonRepository
     /**
      * Get a contact's notifications stat.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int $leadId
      *
      * @return array
      *
@@ -228,9 +218,7 @@ class StatRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
@@ -249,7 +237,7 @@ class StatRepository extends CommonRepository
                 $q->expr()->in('s.notification_id', $notificationIds)
             );
 
-        if ($fromDate !== null) {
+        if (null !== $fromDate) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(

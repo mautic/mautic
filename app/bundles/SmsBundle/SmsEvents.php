@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle;
 
 /**
@@ -86,4 +77,22 @@ final class SmsEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.sms.on_campaign_trigger_action';
+
+    /**
+     * The mautic.sms.on_reply event is dispatched when a SMS service receives a reply.
+     *
+     * The event listener receives a Mautic\SmsBundle\Event\ReplyEvent
+     *
+     * @var string
+     */
+    const ON_REPLY = 'mautic.sms.on_reply';
+
+    /**
+     * The mautic.sms.on_campaign_reply event is dispatched when a SMS reply campaign decision is processed.
+     *
+     * The event listener receives a Mautic\SmsBundle\Event\ReplyEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_REPLY = 'mautic.sms.on_campaign_reply';
 }

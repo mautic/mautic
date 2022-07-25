@@ -1,20 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\Form\Type;
 
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -27,8 +19,6 @@ class CategoryBundlesType extends AbstractType
 
     /**
      * CategoryBundlesType constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
@@ -49,24 +39,24 @@ class CategoryBundlesType extends AbstractType
                     $types = [];
                 }
 
-                return $types;
+                return array_flip($types);
             },
-            'expanded' => false,
-            'multiple' => false,
-            'required' => false,
+            'expanded'          => false,
+            'multiple'          => false,
+            'required'          => false,
         ]);
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'category_bundles_form';
     }
 
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Year;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -30,7 +21,7 @@ abstract class DateYearAbstract extends DateOptionAbstract
      */
     protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
     {
-        return $dateTimeHelper->toUtcString('Y-%');
+        return $dateTimeHelper->toLocalString('Y-%');
     }
 
     /**
@@ -38,6 +29,6 @@ abstract class DateYearAbstract extends DateOptionAbstract
      */
     protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        return $leadSegmentFilterCrate->getOperator() === '!=' ? 'notLike' : 'like';
+        return '!=' === $leadSegmentFilterCrate->getOperator() ? 'notLike' : 'like';
     }
 }

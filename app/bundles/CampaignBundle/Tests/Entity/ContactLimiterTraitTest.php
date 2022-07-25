@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
@@ -21,21 +12,21 @@ use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CampaignBundle\Entity\ContactLimiterTrait;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 
-class ContactLimiterTraitTest extends \PHPUnit_Framework_TestCase
+class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
 {
     use ContactLimiterTrait;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Connection
+     * @var \PHPUnit\Framework\MockObject\MockObject|Connection
      */
     private $connection;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EntityManagerInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface
      */
     private $entityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
 

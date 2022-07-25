@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\EmailBundle\EmailEvents;
@@ -17,9 +8,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class ConfigMonitoredEmailType.
- */
 class ConfigMonitoredEmailType extends AbstractType
 {
     /**
@@ -27,25 +15,15 @@ class ConfigMonitoredEmailType extends AbstractType
      */
     private $dispatcher;
 
-    /**
-     * ConfigMonitoredEmailType constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (function_exists('imap_open')) {
-            $data = $options['data'];
-
+            $data  = $options['data'];
             $event = new MonitoredEmailEvent($builder, $data);
 
             // Default email bundles
@@ -58,7 +36,7 @@ class ConfigMonitoredEmailType extends AbstractType
                 $folderData = (array_key_exists($key, $data)) ? $data[$key] : [];
                 $builder->add(
                     $key,
-                    'monitored_mailboxes',
+                    ConfigMonitoredMailboxesType::class,
                     [
                         'label'            => $settings['label'],
                         'mailbox'          => $key,
@@ -75,7 +53,7 @@ class ConfigMonitoredEmailType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'monitored_email';
     }

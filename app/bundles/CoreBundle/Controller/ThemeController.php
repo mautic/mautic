@@ -1,17 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Form\Type\ThemeUploadType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,12 +32,16 @@ class ThemeController extends FormController
             return $this->accessDenied();
         }
 
+        /** @var ThemeHelperInterface $themeHelper */
         $themeHelper = $this->container->get('mautic.helper.theme');
+        /** @var BuilderIntegrationsHelper $builderIntegrationsHelper */
+        $builderIntegrationsHelper    = $this->container->get('mautic.integrations.helper.builder_integrations');
+
         $dir         = $this->factory->getSystemPath('themes', true);
         $action      = $this->generateUrl('mautic_themes_index');
-        $form        = $this->get('form.factory')->create('theme_upload', [], ['action' => $action]);
+        $form        = $this->get('form.factory')->create(ThemeUploadType::class, [], ['action' => $action]);
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     $fileData = $form['file']->getData();
@@ -61,7 +59,7 @@ class ThemeController extends FormController
                         if (!empty($fileData)) {
                             $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
-                            if ($extension === 'zip') {
+                            if ('zip' === $extension) {
                                 try {
                                     $fileData->move($dir, $fileName);
                                     $themeHelper->install($dir.'/'.$fileName);
@@ -95,6 +93,7 @@ class ThemeController extends FormController
         return $this->delegateView([
             'viewParameters' => [
                 'items'         => $themeHelper->getInstalledThemes('all', true, true),
+                'builders'      => $builderIntegrationsHelper->getBuilderNames(),
                 'defaultThemes' => $themeHelper->getDefaultThemes(),
                 'form'          => $form->createView(),
                 'permissions'   => $permissions,
@@ -118,11 +117,12 @@ class ThemeController extends FormController
      */
     public function downloadAction($themeName)
     {
+        /** @var ThemeHelperInterface $themeHelper */
         $themeHelper = $this->container->get('mautic.helper.theme');
         $flashes     = [];
         $error       = false;
 
-        if (!$this->get('mautic.security')->isGranted('core:themes:edit')) {
+        if (!$this->get('mautic.security')->isGranted('core:themes:view')) {
             return $this->accessDenied();
         }
 
@@ -187,7 +187,7 @@ class ThemeController extends FormController
     {
         $flashes = [];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $flashes = $this->deleteTheme($themeName);
         }
 
@@ -207,7 +207,7 @@ class ThemeController extends FormController
     {
         $flashes = [];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $themeNames = json_decode($this->request->query->get('ids', '{}'));
 
             foreach ($themeNames as $themeName) {

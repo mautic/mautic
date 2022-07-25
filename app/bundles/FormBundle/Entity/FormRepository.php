@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Query\Expr\Join;
@@ -95,17 +86,19 @@ class FormRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter)
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        list($expr, $standardSearchParameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
-            return [$expr, $parameters];
+            return [$expr, $standardSearchParameters];
         }
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
+        $parameters      = [];
         $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
+            case $this->translator->trans('mautic.form.form.searchcommand.isexpired', [], null, 'en_US'):
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('f.isPublished', ":$unique"),
                     $q->expr()->isNotNull('f.publishDown'),
@@ -115,6 +108,7 @@ class FormRepository extends CommonRepository
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.ispending'):
+            case $this->translator->trans('mautic.form.form.searchcommand.ispending', [], null, 'en_US'):
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('f.isPublished', ":$unique"),
                     $q->expr()->isNotNull('f.publishUp'),
@@ -124,6 +118,7 @@ class FormRepository extends CommonRepository
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.hasresults'):
+            case $this->translator->trans('mautic.form.form.searchcommand.hasresults', [], null, 'en_US'):
                 $sq       = $this->getEntityManager()->createQueryBuilder();
                 $subquery = $sq->select('count(s.id)')
                     ->from('MauticFormBundle:Submission', 's')
@@ -138,7 +133,8 @@ class FormRepository extends CommonRepository
                 $expr = $q->expr()->gt(sprintf('(%s)', $subquery), 1);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $q->expr()->like('f.name', ':'.$unique);
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
+                $expr            = $q->expr()->like('f.name', ':'.$unique);
                 $returnParameter = true;
                 break;
         }
@@ -162,9 +158,6 @@ class FormRepository extends CommonRepository
 
     /**
      * Fetch the form results.
-     *
-     * @param Form  $form
-     * @param array $options
      *
      * @return array
      *

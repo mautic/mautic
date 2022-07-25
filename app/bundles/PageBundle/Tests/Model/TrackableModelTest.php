@@ -1,24 +1,15 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-namespace Mautic\CoreBundle\Test;
+namespace Mautic\PageBundle\Tests\Model;
 
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
 
-class TrackableModelTest extends WebTestCase
+class TrackableModelTest extends TestCase
 {
     /**
      * @testdox Test that content is detected as HTML
@@ -36,7 +27,7 @@ class TrackableModelTest extends WebTestCase
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
-            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
+            ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
             ->getMock();
 
         $mockModel->expects($this->once())
@@ -84,7 +75,7 @@ class TrackableModelTest extends WebTestCase
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
-            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
+            ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
             ->getMock();
 
         $mockModel->expects($this->once())
@@ -434,7 +425,7 @@ class TrackableModelTest extends WebTestCase
             1
         );
 
-        $this->assertTrue((strpos($content, $url) !== false), $content);
+        $this->assertTrue((false !== strpos($content, $url)), $content);
     }
 
     /**
@@ -464,7 +455,7 @@ class TrackableModelTest extends WebTestCase
         reset($trackables);
         $token = key($trackables);
         $this->assertNotEmpty($trackables, $content);
-        $this->assertContains($token, $content);
+        $this->assertStringContainsString($token, $content);
     }
 
     /**
@@ -597,7 +588,7 @@ TEXT;
      * @param array $doNotTrack
      * @param array $urlFieldsForPlaintext
      *
-     * @return TrackableModel|\PHPUnit_Framework_MockObject_MockObject
+     * @return TrackableModel|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getModel($doNotTrack = [], $urlFieldsForPlaintext = [])
     {
@@ -616,7 +607,7 @@ TEXT;
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
-            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
+            ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
             ->getMock();
 
         $mockModel->expects($this->once())
@@ -679,7 +670,7 @@ TEXT;
         }
 
         foreach ($urls as $url) {
-            if ($type == 'html') {
+            if ('html' == $type) {
                 $dnc = ($doNotTrack) ? ' mautic:disable-tracking' : '';
 
                 $content .= <<<CONTENT

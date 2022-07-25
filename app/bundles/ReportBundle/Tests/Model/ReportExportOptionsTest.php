@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\ReportBundle\Model\ReportExportOptions;
 
-class ReportExportOptionsTest extends \PHPUnit_Framework_TestCase
+class ReportExportOptionsTest extends \PHPUnit\Framework\TestCase
 {
     public function testBatch()
     {
@@ -23,7 +14,7 @@ class ReportExportOptionsTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_batch_size')
             ->willReturn(3);
 

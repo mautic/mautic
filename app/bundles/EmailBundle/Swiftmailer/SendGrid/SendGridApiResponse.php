@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid;
 
 use Mautic\EmailBundle\Swiftmailer\Exception\SendGridBadLoginException;
@@ -29,8 +20,6 @@ class SendGridApiResponse
     }
 
     /**
-     * @param Response $response
-     *
      * @throws SendGridBadLoginException
      * @throws SendGridBadRequestException
      */
@@ -50,11 +39,11 @@ class SendGridApiResponse
 
         $body    = @json_decode($response->body(), true);
         $message = '';
-        if ($body !== false && isset($body['errors'][0]['message'])) {
+        if (false !== $body && isset($body['errors'][0]['message'])) {
             $message = $body['errors'][0]['message'];
         }
 
-        if ($statusCode === 401) {
+        if (401 === $statusCode) {
             throw new SendGridBadLoginException($message);
         }
 

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\Helper;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -20,7 +11,7 @@ use MauticPlugin\MauticCitrixBundle\Api\GotowebinarApi;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class CitrixHelper
@@ -33,16 +24,18 @@ class CitrixHelper
     /**
      * @var IntegrationHelper
      */
-    private static $integratonHelper;
+    private static $integrationHelper;
 
     /**
-     * @param IntegrationHelper $helper
-     * @param LoggerInterface   $logger
+     * @var RouterInterface
      */
-    public static function init(IntegrationHelper $helper, LoggerInterface $logger)
+    private static $router;
+
+    public static function init(IntegrationHelper $helper, LoggerInterface $logger, RouterInterface $router)
     {
-        self::$logger           = $logger;
-        self::$integratonHelper = $helper;
+        self::$logger            = $logger;
+        self::$integrationHelper = $helper;
+        self::$router            = $router;
     }
 
     /**
@@ -248,7 +241,7 @@ class CitrixHelper
     private static function getIntegration($integration)
     {
         try {
-            return self::$integratonHelper->getIntegrationObject($integration);
+            return self::$integrationHelper->getIntegrationObject($integration);
         } catch (\Exception $e) {
             // do nothing
         }
@@ -311,7 +304,7 @@ class CitrixHelper
      * @param $firstname
      * @param $lastname
      *
-     * @return bool
+     * @return string
      *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      */
@@ -319,7 +312,7 @@ class CitrixHelper
     {
         try {
             $response = [];
-            if ($product === CitrixProducts::GOTOWEBINAR) {
+            if (CitrixProducts::GOTOWEBINAR === $product) {
                 $params = [
                     'email'     => $email,
                     'firstName' => $firstname,
@@ -332,7 +325,7 @@ class CitrixHelper
                     'POST'
                 );
             } else {
-                if ($product === CitrixProducts::GOTOTRAINING) {
+                if (CitrixProducts::GOTOTRAINING === $product) {
                     $params = [
                         'email'     => $email,
                         'givenName' => $firstname,
@@ -347,7 +340,11 @@ class CitrixHelper
                 }
             }
 
-            return is_array($response) && array_key_exists('joinUrl', $response);
+            if (!is_array($response) || !array_key_exists('joinUrl', $response)) {          //response has key and registration url
+                throw new BadRequestHttpException('Unable to register!');
+            }
+
+            return $response['joinUrl'];
         } catch (\Exception $ex) {
             self::log('registerToProduct: '.$ex->getMessage());
             throw new BadRequestHttpException($ex->getMessage());
@@ -368,24 +365,23 @@ class CitrixHelper
     public static function startToProduct($product, $productId, $email, $firstname, $lastname)
     {
         try {
-            if ($product === CitrixProducts::GOTOMEETING) {
+            if (CitrixProducts::GOTOMEETING === $product) {
                 $response = self::getG2mApi()->request(
                     'meetings/'.$productId.'/start'
                 );
 
                 return (is_array($response) && array_key_exists('hostURL', $response)) ? $response['hostURL'] : '';
             } else {
-                if ($product === CitrixProducts::GOTOTRAINING) {
+                if (CitrixProducts::GOTOTRAINING === $product) {
                     $response = self::getG2tApi()->request(
                         'trainings/'.$productId.'/start'
                     );
 
                     return (is_array($response) && array_key_exists('hostURL', $response)) ? $response['hostURL'] : '';
                 } else {
-                    if ($product === CitrixProducts::GOTOASSIST) {
+                    if (CitrixProducts::GOTOASSIST === $product) {
                         // TODO: use the sessioncallback to update attendance status
-                        /** @var Router $router */
-                        $router = self::getContainer()->get('router');
+                        $router = self::$router;
                         $params = [
                             'sessionStatusCallbackUrl' => $router
                                 ->generate(
@@ -504,7 +500,7 @@ class CitrixHelper
 
             case CitrixProducts::GOTOTRAINING:
                 $reports  = self::getG2tApi()->request($product.'s/'.$productId, [], 'GET', 'rest/reports');
-                $sessions = array_map(create_function('$o', 'return $o["sessionKey"];'), $reports);
+                $sessions = array_column($reports, 'sessionKey');
                 foreach ($sessions as $session) {
                     $result = self::getG2tApi()->request(
                         'sessions/'.$session.'/attendees',
@@ -512,7 +508,7 @@ class CitrixHelper
                         'GET',
                         'rest/reports'
                     );
-                    $arr    = array_map(create_function('$o', 'return $o["email"];'), $result);
+                    $arr    = array_column($result, 'email');
                     $result = array_merge($result, $arr);
                 }
 

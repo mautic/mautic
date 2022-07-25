@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Search;
 
 use Mautic\EmailBundle\Entity\Stat;
@@ -36,10 +27,6 @@ class ContactFinder
 
     /**
      * ContactFinder constructor.
-     *
-     * @param StatRepository  $statRepository
-     * @param LeadRepository  $leadRepository
-     * @param LoggerInterface $logger
      */
     public function __construct(StatRepository $statRepository, LeadRepository $leadRepository, LoggerInterface $logger)
     {

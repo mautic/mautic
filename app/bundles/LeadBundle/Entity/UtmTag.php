@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -47,9 +39,6 @@ class UtmTag
      */
     private $remoteHost;
 
-    /**
-     * @var
-     */
     private $url;
 
     /**
@@ -82,41 +71,25 @@ class UtmTag
      */
     private $utmTerm;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('lead_utmtags')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\UtmTagRepository');
-
+        $builder->setTable('lead_utmtags');
+        $builder->setCustomRepositoryClass(UtmTagRepository::class);
         $builder->addId();
-
         $builder->addDateAdded();
-
         $builder->addLead(false, 'CASCADE', false, 'utmtags');
-
-        $builder->addNullableField('query', 'array');
-
-        $builder->addNullableField('referer', 'text');
-
-        $builder->addNullableField('remoteHost', 'string', 'remote_host');
-
-        $builder->addNullableField('url', 'string');
-
-        $builder->addNullableField('userAgent', 'text', 'user_agent');
-
-        $builder->addNullableField('utmCampaign', 'string', 'utm_campaign');
-
-        $builder->addNullableField('utmContent', 'string', 'utm_content');
-
-        $builder->addNullableField('utmMedium', 'string', 'utm_medium');
-
-        $builder->addNullableField('utmSource', 'string', 'utm_source');
-
-        $builder->addNullableField('utmTerm', 'string', 'utm_term');
+        $builder->addNullableField('query', Type::TARRAY);
+        $builder->addNullableField('referer', Type::TEXT);
+        $builder->addNullableField('remoteHost', Type::STRING, 'remote_host');
+        $builder->addNullableField('url', Type::TEXT);
+        $builder->addNullableField('userAgent', Type::TEXT, 'user_agent');
+        $builder->addNullableField('utmCampaign', Type::STRING, 'utm_campaign');
+        $builder->addNullableField('utmContent', Type::STRING, 'utm_content');
+        $builder->addNullableField('utmMedium', Type::STRING, 'utm_medium');
+        $builder->addNullableField('utmSource', Type::STRING, 'utm_source');
+        $builder->addNullableField('utmTerm', Type::STRING, 'utm_term');
     }
 
     /**
@@ -159,8 +132,6 @@ class UtmTag
     /**
      * Set date added.
      *
-     * @param \DateTime $dateHit
-     *
      * @return UtmTag
      */
     public function setDateAdded(\DateTime $date)
@@ -189,8 +160,6 @@ class UtmTag
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return UtmTag
      */
     public function setLead(Lead $lead)
@@ -351,6 +320,7 @@ class UtmTag
      */
     public function setUtmContent($utmContent)
     {
+        $utmContent       = mb_strlen($utmContent) <= ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH ? $utmContent : mb_substr($utmContent, 0, ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH);
         $this->utmContent = $utmContent;
 
         return $this;

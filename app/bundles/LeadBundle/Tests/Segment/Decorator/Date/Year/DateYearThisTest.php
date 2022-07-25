@@ -1,36 +1,29 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Year;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
+use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearThis;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
-class DateYearThisTest extends \PHPUnit_Framework_TestCase
+class DateYearThisTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearThis::getOperator
      */
     public function testGetOperatorBetween()
     {
-        $dateDecorator = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $filter        = [
             'operator' => '=',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
-        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
         $filterDecorator = new DateYearThis($dateDecorator, $dateOptionParameters);
 
@@ -42,7 +35,8 @@ class DateYearThisTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOperatorLessOrEqual()
     {
-        $dateDecorator = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $dateDecorator->method('getOperator')
             ->with()
@@ -52,7 +46,7 @@ class DateYearThisTest extends \PHPUnit_Framework_TestCase
             'operator' => 'lte',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
-        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
         $filterDecorator = new DateYearThis($dateDecorator, $dateOptionParameters);
 
@@ -64,11 +58,12 @@ class DateYearThisTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetParameterValueBetween()
     {
-        $dateDecorator = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('', null, 'local');
 
-        $dateDecorator->method('getDefaultDate')
+        $timezoneResolver->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 
@@ -76,7 +71,7 @@ class DateYearThisTest extends \PHPUnit_Framework_TestCase
             'operator' => '!=',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
-        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
         $filterDecorator = new DateYearThis($dateDecorator, $dateOptionParameters);
 
@@ -90,11 +85,12 @@ class DateYearThisTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetParameterValueSingle()
     {
-        $dateDecorator = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('', null, 'local');
 
-        $dateDecorator->method('getDefaultDate')
+        $timezoneResolver->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 
@@ -102,7 +98,7 @@ class DateYearThisTest extends \PHPUnit_Framework_TestCase
             'operator' => 'lt',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
-        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
         $filterDecorator = new DateYearThis($dateDecorator, $dateOptionParameters);
 

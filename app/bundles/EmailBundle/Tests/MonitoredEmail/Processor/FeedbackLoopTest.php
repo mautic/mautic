@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -19,10 +10,10 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Monolog\Logger;
 
-class FeedbackLoopTest extends \PHPUnit_Framework_TestCase
+class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that the message is processed appropriately
@@ -62,12 +53,6 @@ class FeedbackLoopTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $leadModel->expects($this->once())
-            ->method('addDncForLead');
-
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -76,7 +61,11 @@ class FeedbackLoopTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $processor = new FeedbackLoop($contactFinder, $leadModel, $translator, $logger);
+        $doNotContact = $this->getMockBuilder(DoNotContact::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $processor = new FeedbackLoop($contactFinder, $translator, $logger, $doNotContact);
 
         $message            = new Message();
         $message->fblReport = <<<'BODY'

@@ -1,37 +1,24 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class CookieHelper.
- */
 class CookieHelper
 {
-    private $path     = null;
-    private $domain   = null;
-    private $secure   = false;
-    private $httponly = false;
-    private $request  = null;
+    const SAME_SITE       = '; SameSite=';
+    const SAME_SITE_VALUE = 'None';
+    private $path;
+    private $domain;
+    private $secure       = true;
+    private $httponly     = false;
+    private $request;
 
     /**
-     * CookieHelper constructor.
-     *
-     * @param              $cookiePath
-     * @param              $cookieDomain
-     * @param              $cookieSecure
-     * @param              $cookieHttp
-     * @param RequestStack $requestStack
+     * @param $cookiePath
+     * @param $cookieDomain
+     * @param $cookieSecure
+     * @param $cookieHttp
      */
     public function __construct($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, RequestStack $requestStack)
     {
@@ -42,7 +29,7 @@ class CookieHelper
 
         $this->request = $requestStack->getCurrentRequest();
         if (('' === $this->secure || null === $this->secure) && $this->request) {
-            $this->secure = filter_var($requestStack->getCurrentRequest()->server->get('HTTPS', false), FILTER_VALIDATE_BOOLEAN);
+            $this->secure = $requestStack->getCurrentRequest()->isSecure();
         }
     }
 
@@ -54,7 +41,7 @@ class CookieHelper
      */
     public function getCookie($key, $default = null)
     {
-        if ($this->request === null) {
+        if (null === $this->request) {
             return $default;
         }
 
@@ -72,19 +59,42 @@ class CookieHelper
      */
     public function setCookie($name, $value, $expire = 1800, $path = null, $domain = null, $secure = null, $httponly = null)
     {
-        if ($this->request == null || (defined('MAUTIC_TEST_ENV') && MAUTIC_TEST_ENV)) {
+        if (null == $this->request || (defined('MAUTIC_TEST_ENV') && MAUTIC_TEST_ENV)) {
             return true;
         }
 
-        setcookie(
-            $name,
-            $value,
-            ($expire) ? time() + $expire : null,
-            ($path == null) ? $this->path : $path,
-            ($domain == null) ? $this->domain : $domain,
-            ($secure == null) ? $this->secure : $secure,
-            ($httponly == null) ? $this->httponly : $httponly
-        );
+        // If https, SameSite equals None
+        $sameSiteNoneText             = '';
+        $sameSiteNoneTextGreaterPhp73 = null;
+        if (true === $secure or (null === $secure and true === $this->secure)) {
+            $sameSiteNoneText             = self::SAME_SITE.self::SAME_SITE_VALUE;
+            $sameSiteNoneTextGreaterPhp73 = self::SAME_SITE_VALUE;
+        }
+
+        if (version_compare(phpversion(), '7.3', '>=')) {
+            setcookie(
+                $name,
+                $value,
+                [
+                    'expires'  => ($expire) ? (int) (time() + $expire) : null,
+                    'path'     => ((null == $path) ? $this->path : $path),
+                    'domain'   => (null == $domain) ? $this->domain : $domain,
+                    'secure'   => (null == $secure) ? $this->secure : $secure,
+                    'httponly' => (null == $httponly) ? $this->httponly : $httponly,
+                    'samesite' => $sameSiteNoneTextGreaterPhp73,
+                ]
+            );
+        } else {
+            setcookie(
+                $name,
+                $value,
+                ($expire) ? (int) (time() + $expire) : null,
+                ((null == $path) ? $this->path : $path).$sameSiteNoneText,
+                (null == $domain) ? $this->domain : $domain,
+                (null == $secure) ? $this->secure : $secure,
+                (null == $httponly) ? $this->httponly : $httponly
+            );
+        }
     }
 
     /**
@@ -98,6 +108,6 @@ class CookieHelper
      */
     public function deleteCookie($name, $path = null, $domain = null, $secure = null, $httponly = null)
     {
-        $this->setCookie($name, '', time() - 3600, $path, $domain, $secure, $httponly);
+        $this->setCookie($name, '', -86400, $path, $domain, $secure, $httponly);
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -34,9 +25,6 @@ class DecisionDispatcher
 
     /**
      * DecisionDispatcher constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param LegacyEventDispatcher    $legacyDispatcher
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
@@ -47,9 +35,7 @@ class DecisionDispatcher
     }
 
     /**
-     * @param DecisionAccessor $config
-     * @param LeadEventLog     $log
-     * @param mixed            $passthrough
+     * @param mixed $passthrough
      *
      * @return DecisionEvent
      */
@@ -62,9 +48,6 @@ class DecisionDispatcher
     }
 
     /**
-     * @param DecisionAccessor $config
-     * @param LeadEventLog     $log
-     *
      * @return DecisionEvent
      */
     public function dispatchEvaluationEvent(DecisionAccessor $config, LeadEventLog $log)
@@ -77,11 +60,6 @@ class DecisionDispatcher
         return $event;
     }
 
-    /**
-     * @param DecisionAccessor  $config
-     * @param ArrayCollection   $logs
-     * @param EvaluatedContacts $evaluatedContacts
-     */
     public function dispatchDecisionResultsEvent(DecisionAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
     {
         if (!$logs->count()) {

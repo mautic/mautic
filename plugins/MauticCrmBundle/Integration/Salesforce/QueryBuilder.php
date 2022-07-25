@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce;
 
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Exception\NoObjectsToFetchException;
@@ -16,9 +7,6 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Exception\NoObjectsToFet
 class QueryBuilder
 {
     /**
-     * @param array $fields
-     * @param array $ids
-     *
      * @return string
      *
      * @throws NoObjectsToFetchException
@@ -36,9 +24,6 @@ class QueryBuilder
     }
 
     /**
-     * @param array $fields
-     * @param array $ids
-     *
      * @return string
      *
      * @throws NoObjectsToFetchException
@@ -56,8 +41,6 @@ class QueryBuilder
     }
 
     /**
-     * @param array $fields
-     *
      * @return string
      */
     private static function getFieldString(array $fields)

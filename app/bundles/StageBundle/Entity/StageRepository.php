@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -199,5 +190,30 @@ class StageRepository extends CommonRepository
         }
 
         return null;
+    }
+
+    /**
+     * @param string|int $value
+     *
+     * @return array
+     */
+    public function findByIdOrName($value)
+    {
+        $qb = $this->_em->createQueryBuilder()
+            ->select('s')
+            ->from(Stage::class, 's');
+
+        if (is_numeric($value)) {
+            // This is numeric value so check id and name
+            $qb->where('s.id = :value');
+        } else {
+            // This is string, no need to check IDs
+            $qb->where('s.name = :value');
+        }
+
+        return $qb
+            ->setParameter('value', $value)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

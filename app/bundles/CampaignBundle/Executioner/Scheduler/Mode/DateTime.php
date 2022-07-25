@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Scheduler\Mode;
 
 use Mautic\CampaignBundle\Entity\Event;
@@ -23,8 +14,6 @@ class DateTime implements ScheduleModeInterface
 
     /**
      * DateTime constructor.
-     *
-     * @param LoggerInterface $logger
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -32,10 +21,6 @@ class DateTime implements ScheduleModeInterface
     }
 
     /**
-     * @param Event     $event
-     * @param \DateTime $compareFromDateTime
-     * @param \DateTime $comparedToDateTime
-     *
      * @return \DateTime
      */
     public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime)

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
@@ -16,34 +7,26 @@ use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Entity\PluginRepository;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class ConfigFormTest extends KernelTestCase
 {
-    protected $container;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         self::bootKernel();
-        $this->container = self::$kernel->getContainer();
     }
 
     public function testConfigForm()
     {
-        $plugins        = $this->getIntegrationObject()->getIntegrationObjects();
-        $mockTranslator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $plugins = $this->getIntegrationObject()->getIntegrationObjects();
 
         foreach ($plugins as $name => $s) {
-            $s->setTranslator($mockTranslator);
-
             $featureSettings = $s->getFormSettings();
 
             $this->assertArrayHasKey('requires_callback', $featureSettings);
@@ -56,27 +39,42 @@ class ConfigFormTest extends KernelTestCase
 
     public function testOauth()
     {
-        $plugins = $this->getIntegrationObject()->getIntegrationObjects();
-
+        $plugins    = $this->getIntegrationObject()->getIntegrationObjects();
         $url        = 'https://test.com';
         $parameters = ['a' => 'testa', 'b' => 'testb'];
         $method     = 'GET';
         $authType   = 'oauth2';
-        foreach ($plugins as $s) {
-            $s->prepareRequest($url, $parameters, $method, [], $authType);
+        $expected   = [
+            [
+              'a' => 'testa',
+              'b' => 'testb',
+              ''  => '',
+            ], [
+              'oauth-token: ',
+              'Authorization: OAuth ',
+            ],
+        ];
+
+        /** @var AbstractIntegration $integration */
+        foreach ($plugins as $integration) {
+            $this->assertSame($expected, $integration->prepareRequest($url, $parameters, $method, [], $authType));
         }
     }
 
     public function testAmendLeadDataBeforeMauticPopulate()
     {
         $plugins = $this->getIntegrationObject()->getIntegrationObjects();
+        $object  = 'company';
+        $data    = ['company_name' => 'company_name', 'email' => 'company_email'];
 
-        $object = 'company';
-        $data   = ['company_name' => 'company_name', 'email' => 'company_email'];
-        foreach ($plugins as $name => $s) {
-            if (method_exists($s, 'amendLeadDataBeforeMauticPopulate')) {
-                $count = $s->amendLeadDataBeforeMauticPopulate($data, $object);
+        /** @var AbstractIntegration $integration */
+        foreach ($plugins as $integration) {
+            $methodExists = method_exists($integration, 'amendLeadDataBeforeMauticPopulate');
+            if ($methodExists) {
+                $count = $integration->amendLeadDataBeforeMauticPopulate($data, $object);
                 $this->assertGreaterThanOrEqual(0, $count);
+            } else {
+                $this->assertFalse($methodExists, 'To make this test avoid the risky waring...');
             }
         }
     }
@@ -87,7 +85,7 @@ class ConfigFormTest extends KernelTestCase
         $pathsHelper          = $this->getMockBuilder(PathsHelper::class)->disableOriginalConstructor()->getMock();
         $bundleHelper         = $this->getMockBuilder(BundleHelper::class)->disableOriginalConstructor()->getMock();
         $pluginModel          = $this->getMockBuilder(PluginModel::class)->disableOriginalConstructor()->getMock();
-        $coreParametersHelper = new CoreParametersHelper(self::$kernel);
+        $coreParametersHelper = new CoreParametersHelper(self::$kernel->getContainer());
         $templatingHelper     = $this->getMockBuilder(TemplatingHelper::class)->disableOriginalConstructor()->getMock();
         $entityManager        = $this
             ->getMockBuilder(EntityManager::class)
@@ -99,8 +97,8 @@ class ConfigFormTest extends KernelTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $registeredPluginBundles = $this->container->getParameter('mautic.plugin.bundles');
-        $mauticPlugins           = $this->container->getParameter('mautic.bundles');
+        $registeredPluginBundles = self::$container->getParameter('mautic.plugin.bundles');
+        $mauticPlugins           = self::$container->getParameter('mautic.bundles');
         $bundleHelper->expects($this->any())->method('getPluginBundles')->willReturn([$registeredPluginBundles]);
 
         $bundleHelper->expects($this->any())->method('getMauticBundles')->willReturn(array_merge($mauticPlugins, $registeredPluginBundles));
@@ -128,7 +126,7 @@ class ConfigFormTest extends KernelTestCase
                 );
 
         $integrationHelper = new IntegrationHelper(
-            self::$kernel,
+            self::$kernel->getContainer(),
             $entityManager,
             $pathsHelper,
             $bundleHelper,
@@ -143,7 +141,7 @@ class ConfigFormTest extends KernelTestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
     }

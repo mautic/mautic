@@ -47,9 +47,9 @@ mQuery.ajaxSetup({
 
 mQuery( document ).ajaxComplete(function(event, xhr, settings) {
     Mautic.stopPageLoadingBar();
-    xhr.always(function(response) {
-        if (response.flashes) Mautic.setFlashes(response.flashes);
-    });
+    if (xhr.responseJSON && xhr.responseJSON.flashes) {
+        Mautic.setFlashes(xhr.responseJSON.flashes);
+    }
 });
 
 // Force stop the page loading bar when no more requests are being in progress
@@ -63,14 +63,6 @@ mQuery( document ).ready(function() {
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
-        });
-    }
-
-    if (typeof IdleTimer != 'undefined') {
-        IdleTimer.init({
-            idleTimeout: 60000, //1 min
-            awayTimeout: 900000, //15 min
-            statusChangeUrl: mauticAjaxUrl + '?action=updateUserStatus'
         });
     }
 
@@ -343,8 +335,13 @@ var Mautic = {
         if (options.windowUrl) {
             Mautic.startModalLoadingBar();
 
+            var popupName = 'mauticpopup';
+            if (options.popupName) {
+                popupName = options.popupName;
+            }
+
             setTimeout(function () {
-                var opener = window.open(options.windowUrl, 'mauticpopup', 'height=600,width=1100');
+                var opener = window.open(options.windowUrl, popupName, 'height=600,width=1100');
 
                 if (!opener || opener.closed || typeof opener.closed == 'undefined') {
                     alert(mauticLang.popupBlockerMessage);
@@ -592,7 +589,7 @@ var Mautic = {
 
         if (typeof request.responseJSON !== 'undefined') {
             response = request.responseJSON;
-        } else {
+        } else if (typeof(request.responseText) !== 'undefined') {
             //Symfony may have added some excess buffer if an exception was hit during a sub rendering and because
             //it uses ob_start, PHP dumps the buffer upon hitting the exception.  So let's filter that out.
             var errorStart = request.responseText.indexOf('{"newContent');
@@ -600,7 +597,7 @@ var Mautic = {
 
             if (jsonString) {
                 try {
-                    var response = mQuery.parseJSON(jsonString);
+                    var response = JSON.parse(jsonString);
                     if (inDevMode) {
                         console.log(response);
                     }
@@ -771,7 +768,7 @@ var Mautic = {
      * Marks notifications as read and clears unread indicators
      */
     showNotifications: function () {
-        mQuery("#notificationsDropdown").unbind('hide.bs.dropdown');
+        mQuery("#notificationsDropdown").off('hide.bs.dropdown');
         mQuery('#notificationsDropdown').on('hidden.bs.dropdown', function () {
             if (!mQuery('#newNotificationIndicator').hasClass('hide')) {
                 mQuery('#notifications .is-unread').remove();

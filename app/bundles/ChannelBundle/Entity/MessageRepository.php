@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -16,8 +7,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class MessageRepository extends CommonRepository
 {
     /**
-     * @param array $args
-     *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function getEntities(array $args = [])
@@ -66,9 +55,7 @@ class MessageRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $results = $q->getQuery()->getArrayResult();
-
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
@@ -110,8 +97,6 @@ class MessageRepository extends CommonRepository
             ->setParameter('channelId', $channelId)
             ->andWhere($q->expr()->eq('is_enabled', true, 'boolean'));
 
-        $result = $q->execute()->fetch();
-
-        return $result;
+        return $q->execute()->fetch();
     }
 }

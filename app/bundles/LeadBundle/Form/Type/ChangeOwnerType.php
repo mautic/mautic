@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -19,7 +10,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ChangeOwnerType extends AbstractType
 {
-    /** @var UserModel */
+    /**
+     * @var UserModel
+     */
     private $userModel;
 
     public function __construct(UserModel $userModel)
@@ -33,12 +26,12 @@ class ChangeOwnerType extends AbstractType
             'owner',
             ChoiceType::class,
             [
-                'label'      => 'mautic.lead.batch.add_to',
-                'multiple'   => false,
-                'choices'    => $this->userModel->getOwnerListChoices(),
-                'required'   => true,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'label'             => 'mautic.lead.batch.add_to',
+                'multiple'          => false,
+                'choices'           => $this->userModel->getOwnerListChoices(),
+                'required'          => true,
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control'],
             ]
         );
 

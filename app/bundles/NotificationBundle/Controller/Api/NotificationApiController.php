@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -21,10 +13,16 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 class NotificationApiController extends CommonApiController
 {
     /**
+     * @var ContactTracker
+     */
+    protected $contactTracker;
+
+    /**
      * {@inheritdoc}
      */
     public function initialize(FilterControllerEvent $event)
     {
+        $this->contactTracker  = $this->container->get('mautic.tracker.contact');
         $this->model           = $this->getModel('notification');
         $this->entityClass     = 'Mautic\NotificationBundle\Entity\Notification';
         $this->entityNameOne   = 'notification';
@@ -45,7 +43,7 @@ class NotificationApiController extends CommonApiController
             /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
             $leadModel = $this->getModel('lead');
 
-            if ($currentLead = $leadModel->getCurrentLead()) {
+            if ($currentLead = $this->contactTracker->getContact()) {
                 $currentLead->addPushIDEntry($osid);
                 $leadModel->saveEntity($currentLead);
             }

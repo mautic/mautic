@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\Event;
@@ -29,8 +20,6 @@ trait EventArrayTrait
 
     /**
      * Used to convert entities to the old array format; tried to minimize the need for this except where needed.
-     *
-     * @param Event $event
      *
      * @return array
      */
@@ -75,8 +64,6 @@ trait EventArrayTrait
     }
 
     /**
-     * @param LeadEventLog $log
-     *
      * @return array
      */
     protected function getLegacyEventsArray(LeadEventLog $log)
@@ -91,9 +78,6 @@ trait EventArrayTrait
     }
 
     /**
-     * @param Event                 $event
-     * @param AbstractEventAccessor $config
-     *
      * @return array
      */
     protected function getLegacyEventsConfigArray(Event $event, AbstractEventAccessor $config)

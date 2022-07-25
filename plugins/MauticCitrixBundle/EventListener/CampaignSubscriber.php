@@ -1,30 +1,22 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use MauticPlugin\MauticCitrixBundle\CitrixEvents;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
+use MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignActionType;
+use MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignEventType;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     use CitrixRegistrationTrait;
     use CitrixStartTrait;
@@ -32,16 +24,30 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * @var CitrixModel
      */
-    protected $citrixModel;
+    private $citrixModel;
 
     /**
-     * CampaignSubscriber constructor.
+     * ヽ(ಠ_ಠ)ノ Used in the CitrixStartTrait.
      *
-     * @param CitrixModel $citrixModel
+     * @var TranslatorInterface
      */
-    public function __construct(CitrixModel $citrixModel)
-    {
+    private $translator;
+
+    /**
+     * ヽ(ಠ_ಠ)ノ Used in the CitrixStartTrait.
+     *
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    public function __construct(
+        CitrixModel $citrixModel,
+        TranslatorInterface $translator,
+        TemplatingHelper $templating
+    ) {
         $this->citrixModel = $citrixModel;
+        $this->translator  = $translator;
+        $this->templating  = $templating;
     }
 
     /**
@@ -64,41 +70,28 @@ class CampaignSubscriber extends CommonSubscriber
 
     /* Actions */
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onWebinarAction(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixAction(CitrixProducts::GOTOWEBINAR, $event));
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onMeetingAction(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixAction(CitrixProducts::GOTOMEETING, $event));
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onTrainingAction(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixAction(CitrixProducts::GOTOTRAINING, $event));
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onAssistAction(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixAction(CitrixProducts::GOTOASSIST, $event));
     }
 
     /**
-     * @param string                 $product
-     * @param CampaignExecutionEvent $event
+     * @param string $product
      *
      * @return bool
      */
@@ -146,41 +139,28 @@ class CampaignSubscriber extends CommonSubscriber
 
     /* Events */
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onWebinarEvent(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOWEBINAR, $event));
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onMeetingEvent(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOMEETING, $event));
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onTrainingEvent(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOTRAINING, $event));
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onAssistEvent(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOASSIST, $event));
     }
 
     /**
-     * @param string                 $product
-     * @param CampaignExecutionEvent $event
+     * @param string $product
      *
      * @return bool
      *
@@ -222,9 +202,6 @@ class CampaignSubscriber extends CommonSubscriber
         return $counter > 0;
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $activeProducts = [];
@@ -256,7 +233,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'citrix.event.'.$product,
                 [
                     'label'           => 'plugin.citrix.campaign.event.'.$product.'.label',
-                    'formType'        => 'citrix_campaign_event',
+                    'formType'        => CitrixCampaignEventType::class,
                     'formTypeOptions' => [
                         'attr' => [
                             'data-product' => $product,
@@ -272,7 +249,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'citrix.action.'.$product,
                 [
                     'label'           => 'plugin.citrix.campaign.action.'.$product.'.label',
-                    'formType'        => 'citrix_campaign_action',
+                    'formType'        => CitrixCampaignActionType::class,
                     'formTypeOptions' => [
                         'attr' => [
                             'data-product' => $product,

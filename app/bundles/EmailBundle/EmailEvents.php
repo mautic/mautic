@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle;
 
 /**
@@ -26,6 +17,16 @@ final class EmailEvents
      * @var string
      */
     const TOKEN_REPLACEMENT = 'mautic.email_token_replacement';
+
+    /**
+     * The mautic.email_address_token_replacement event is thrown right before a email address token needs replacement.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\TokenReplacementEvent instance.
+     *
+     * @var string
+     */
+    const ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT = 'mautic.email_address_token_replacement';
 
     /**
      * The mautic.email_on_open event is dispatched when an email is opened.
@@ -224,4 +225,34 @@ final class EmailEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.email.on_campaign_trigger_action';
+
+    /**
+     * The mautic.email.on_transport_webhook event is fired when an email transport service sends Mautic a webhook request.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\TransportWebhookEvent
+     *
+     * @var string
+     */
+    const ON_TRANSPORT_WEBHOOK = 'mautic.email.on_transport_webhook';
+
+    /**
+     * The mautic.email.on_open_rate_winner event is fired when there is a need to determine open rate winner.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\DetermineWinnerEvent
+     *
+     * @var string
+     */
+    const ON_DETERMINE_OPEN_RATE_WINNER = 'mautic.email.on_open_rate_winner';
+
+    /**
+     * The mautic.email.on_open_rate_winner event is fired when there is a need to determine clickthrough rate winner.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundles\Event\DetermineWinnerEvent
+     *
+     * @var string
+     */
+    const ON_DETERMINE_CLICKTHROUGH_RATE_WINNER = 'mautic.email.on_clickthrough_rate_winner';
 }

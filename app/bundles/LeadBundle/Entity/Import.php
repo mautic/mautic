@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
@@ -164,9 +155,6 @@ class Import extends FormEntity
         $this->priority = self::LOW;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -191,9 +179,6 @@ class Import extends FormEntity
             ->addNullableField('properties', Type::JSON_ARRAY);
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('dir', new Assert\NotBlank(
@@ -247,7 +232,7 @@ class Import extends FormEntity
             return false;
         }
 
-        if (file_exists($this->getFilePath()) === false || is_readable($this->getFilePath()) === false) {
+        if (false === file_exists($this->getFilePath()) || false === is_readable($this->getFilePath())) {
             $this->setStatus(self::FAILED);
             $this->setStatusInfo($this->getFile().' not found');
 
@@ -275,7 +260,7 @@ class Import extends FormEntity
      */
     public function isBackgroundProcess()
     {
-        return !($this->getStatus() === self::MANUAL);
+        return !(self::MANUAL === $this->getStatus());
     }
 
     /**
@@ -623,8 +608,11 @@ class Import extends FormEntity
      */
     public function start()
     {
-        $this->setDateStarted(new \DateTime())
-            ->setStatus(self::IN_PROGRESS);
+        if (empty($this->getDateStarted())) {
+            $this->setDateStarted(new \DateTime());
+        }
+
+        $this->setStatus(self::IN_PROGRESS);
 
         return $this;
     }
@@ -638,7 +626,7 @@ class Import extends FormEntity
     {
         $this->setDateEnded(new \DateTime());
 
-        if ($this->getStatus() === self::IN_PROGRESS) {
+        if (self::IN_PROGRESS === $this->getStatus()) {
             $this->setStatus(self::IMPORTED);
 
             if ($removeFile) {
@@ -680,7 +668,7 @@ class Import extends FormEntity
         $startTime = $this->getDateStarted();
         $endTime   = $this->getDateEnded();
 
-        if (!$endTime && $this->getStatus() === self::IN_PROGRESS) {
+        if (!$endTime && self::IN_PROGRESS === $this->getStatus()) {
             $endTime = $this->getDateModified();
         }
 
@@ -701,7 +689,7 @@ class Import extends FormEntity
         $startTime = $this->getDateStarted();
         $endTime   = $this->getDateEnded();
 
-        if (!$endTime && $this->getStatus() === self::IN_PROGRESS) {
+        if (!$endTime && self::IN_PROGRESS === $this->getStatus()) {
             $endTime = $this->getDateModified();
         }
 
@@ -751,8 +739,6 @@ class Import extends FormEntity
     }
 
     /**
-     * @param array $fields
-     *
      * @return Import
      */
     public function setMatchedFields(array $fields)
@@ -830,7 +816,7 @@ class Import extends FormEntity
      * Set a default value to the defaults array.
      *
      * @param string $key
-     * @param string $value
+     * @param mixed  $value
      *
      * @return Import
      */
@@ -854,8 +840,6 @@ class Import extends FormEntity
     /**
      * Set headers array to the properties.
      *
-     * @param array $headers
-     *
      * @return Import
      */
     public function setHeaders(array $headers)
@@ -876,8 +860,6 @@ class Import extends FormEntity
 
     /**
      * Set parser config array to the properties.
-     *
-     * @param array $parser
      *
      * @return Import
      */
@@ -935,11 +917,11 @@ class Import extends FormEntity
      */
     public function setIsPublished($isPublished)
     {
-        if ($isPublished && $this->getStatus() === self::STOPPED) {
+        if ($isPublished && self::STOPPED === $this->getStatus()) {
             $this->setStatus(self::QUEUED);
         }
 
-        if (!$isPublished && ($this->getStatus() === self::IN_PROGRESS || $this->getStatus() === self::QUEUED)) {
+        if (!$isPublished && (self::IN_PROGRESS === $this->getStatus() || self::QUEUED === $this->getStatus())) {
             $this->setStatus(self::STOPPED);
         }
 
@@ -948,8 +930,6 @@ class Import extends FormEntity
 
     /**
      * Get pie graph data for row status counts.
-     *
-     * @param TranslatorHelper $translator
      *
      * @return array
      */

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tracker;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -52,11 +43,6 @@ class DeviceTracker
 
     /**
      * DeviceTracker constructor.
-     *
-     * @param DeviceCreatorServiceInterface  $deviceCreatorService
-     * @param DeviceDetectorFactoryInterface $deviceDetectorFactory
-     * @param DeviceTrackingServiceInterface $deviceTrackingService
-     * @param Logger                         $logger
      */
     public function __construct(
         DeviceCreatorServiceInterface $deviceCreatorService,
@@ -71,8 +57,7 @@ class DeviceTracker
     }
 
     /**
-     * @param Lead $trackedContact
-     * @param      $userAgent
+     * @param $userAgent
      *
      * @return \Mautic\LeadBundle\Entity\LeadDevice|null
      */
@@ -116,7 +101,7 @@ class DeviceTracker
     {
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
 
-        if ($trackedDevice !== null) {
+        if (null !== $trackedDevice) {
             $this->logger->addDebug("LEAD: Tracking ID for this device is {$trackedDevice->getTrackingId()}");
         }
 

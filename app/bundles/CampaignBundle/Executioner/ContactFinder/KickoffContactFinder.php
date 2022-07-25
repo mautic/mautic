@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -37,10 +28,6 @@ class KickoffContactFinder
 
     /**
      * KickoffContactFinder constructor.
-     *
-     * @param LeadRepository     $leadRepository
-     * @param CampaignRepository $campaignRepository
-     * @param LoggerInterface    $logger
      */
     public function __construct(LeadRepository $leadRepository, CampaignRepository $campaignRepository, LoggerInterface $logger)
     {
@@ -50,8 +37,7 @@ class KickoffContactFinder
     }
 
     /**
-     * @param int            $campaignId
-     * @param ContactLimiter $limiter
+     * @param int $campaignId
      *
      * @return ArrayCollection
      *
@@ -84,9 +70,7 @@ class KickoffContactFinder
     }
 
     /**
-     * @param int            $campaignId
-     * @param array          $eventIds
-     * @param ContactLimiter $limiter
+     * @param int $campaignId
      *
      * @return int
      */

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle;
 
 /**
@@ -71,7 +62,19 @@ final class StageEvents
      * @var string
      */
     const STAGE_ON_ACTION = 'mautic.stage_on_action';
+
     /**
+     * The mautic.stage.on_campaign_batch_action event is dispatched when the campaign action triggers.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_BATCH_ACTION = 'mautic.stage.on_campaign_batch_action';
+
+    /**
+     * @deprecated; use ON_CAMPAIGN_BATCH_ACTION instead
+     *
      * The mautic.stage.on_campaign_trigger_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
