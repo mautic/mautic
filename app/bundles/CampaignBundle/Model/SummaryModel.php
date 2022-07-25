@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Model;
 
 use DateInterval;
@@ -42,6 +33,12 @@ class SummaryModel extends AbstractCommonModel
 
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
+            if (!$log->getDateTriggered()) {
+                // This shouldn't normally happen but it's possible to have a log without a date triggered
+                // as it is a nullable field and it can be created without date triggered for example via API.
+                continue;
+            }
+
             $timestamp = $log->getDateTriggered()->getTimestamp();
             $timestamp -= ($timestamp % 3600);
             $dateFrom = ($now)->setTimestamp($timestamp);

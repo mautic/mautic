@@ -188,14 +188,12 @@ foreach ($responsiveViewports as $viewport):
             </ul>
             <div class="clearfix"></div>
             <small class="text-muted">
-                <?php echo $view['translator']->transChoice(
+                <?php echo $view['translator']->trans(
                     'mautic.core.pagination.items',
-                    $totalItems,
                     ['%count%' => $totalItems]
                 ); ?>,
-                <?php echo $view['translator']->transChoice(
+                <?php echo $view['translator']->trans(
                     'mautic.core.pagination.pages',
-                    $totalPages,
                     ['%count%' => $totalPages]
                 ); ?>
                 <?php echo $view['translator']->trans(

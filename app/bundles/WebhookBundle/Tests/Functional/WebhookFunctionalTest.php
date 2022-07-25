@@ -22,6 +22,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->setUpSymfony(
+            $this->configParams +
             [
                 'queue_mode' => WebhookModel::COMMAND_PROCESS,
             ]
@@ -42,8 +43,8 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
 
     public function testWebhookWorkflowWithCommandProcess()
     {
-        $httpClient                    = new class() extends Client {
-            public $sendRequestCounter = 0;
+        $httpClient                        = new class() extends Client {
+            public int $sendRequestCounter = 0;
 
             public function sendRequest(RequestInterface $request): ResponseInterface
             {

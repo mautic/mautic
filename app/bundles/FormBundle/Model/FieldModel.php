@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -87,10 +78,12 @@ class FieldModel extends CommonFormModel
         $choices = [];
 
         foreach ($fields as $alias => $field) {
+            if (empty($field['isPublished'])) {
+                continue;
+            }
             if (!isset($choices[$field['group_label']])) {
                 $choices[$field['group_label']] = [];
             }
-
             $choices[$field['group_label']][$field['label']] = $alias;
         }
 

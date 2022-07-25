@@ -29,8 +29,8 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td><?php echo $view['translator']->trans('mautic.core.update.step.downloading.package'); ?></td>
-                    <td id="update-step-downloading-status"><span class="hidden-xs"><?php echo $view['translator']->trans('mautic.core.update.step.in.progress'); ?></span><i class="pull-right fa fa-spinner fa-spin"></i></td>
+                    <td><?php echo $view['translator']->trans('mautic.core.update.step.running.checks'); ?></td>
+                    <td id="update-step-running-checks-status"><span class="hidden-xs"><?php echo $view['translator']->trans('mautic.core.update.step.in.progress'); ?></span><i class="pull-right fa fa-spinner fa-spin"></i></td>
                 </tr>
                 </tbody>
             </table>

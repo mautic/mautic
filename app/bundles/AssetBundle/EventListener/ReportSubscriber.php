@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Entity\DownloadRepository;
@@ -190,7 +181,7 @@ class ReportSubscriber implements EventSubscriberInterface
             }
 
             if (!$event->hasGroupBy()) {
-                $queryBuilder->groupBy('ad.asset_id');
+                $queryBuilder->groupBy('ad.id');
             }
         }
 
