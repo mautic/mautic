@@ -789,8 +789,8 @@
                 for (const entry of entries) {
                     const inputs = document.getElementsByName(`mauticform[${entry[0]}]`);
                     inputs.forEach(function (input) {
-                        if (input.type !== 'hidden') {
-                            input.value = entry[1];
+                        if (input.type !== 'hidden' && input.value === '') {
+                            input.value = entry[1].replace(/<[^>]*>?/gm, '');
                         }
                     });
                 }
