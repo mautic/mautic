@@ -629,6 +629,46 @@ class ConfigType extends AbstractType
                 ]
             )->addViewTransformer($arrayLinebreakTransformer)
         );
+
+        $builder->add(
+            'headers_sts',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.response.headers.sts',
+                'data'  => (array_key_exists('headers_sts', $options['data']) && !empty($options['data']['headers_sts'])),
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.response.headers.sts.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'headers_sts_expire_time',
+            NumberType::class,
+            [
+                'label' => 'mautic.core.config.response.headers.sts.expire_time',
+                'data'  => $options['data']['headers_sts_expire_time'] ?? 0,
+                'attr'  => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'headers_sts_subdomains',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.response.headers.sts.subdomains',
+                'data'  => (array_key_exists('headers_sts_subdomains', $options['data']) && !empty($options['data']['headers_sts_subdomains'])),
+                'attr'  => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.core.config.response.headers.sts.subdomains.tooltip',
+                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                ],
+            ]
+        );
     }
 
     /**
