@@ -388,6 +388,9 @@ class LeadRepository extends CommonRepository
      * and the campaign setting if a contact is allowed to restart
      * a campaign.
      *
+     * @param int  $campaignId
+     * @param bool $campaignCanBeRestarted
+     *
      * @return array<int|string, string>
      */
     public function getCampaignContactsBySegments($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false)

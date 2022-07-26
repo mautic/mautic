@@ -93,7 +93,7 @@ class MembershipManager
                 // Do nothing
                 $this->logger->debug(
                     "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}.",
-                    $this->getExceptionAsArray($exception)
+                    $exception->toArray()
                 );
             }
 
@@ -107,7 +107,7 @@ class MembershipManager
             // Do nothing
             $this->logger->debug(
                 "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}.",
-                $this->getExceptionAsArray($exception)
+                $exception->toArray()
             );
 
             return;
@@ -133,7 +133,7 @@ class MembershipManager
 
             $this->logger->debug(
                 'CAMPAIGN: Contacts: '.count($contacts),
-                array_map($contact => $contact->getId(), $contacts->toArray())
+                array_map(fn ($item) => $item->getId(), $contacts->toArray())
             );
 
             // is the contact an existing campaign member? update and continue
@@ -148,7 +148,7 @@ class MembershipManager
 
                     $this->logger->debug(
                         "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}.",
-                        $this->getExceptionAsArray($exception)
+                        $exception->toArray()
                     );
                 }
 
@@ -202,7 +202,7 @@ class MembershipManager
 
             $this->logger->debug(
                 "CAMPAIGN: Contact ID {$contact->getId()} was already removed from campaign ID {$campaign->getId()}.",
-                $this->getExceptionAsArray($exception)
+                $exception->toArray()
             );
         }
     }
@@ -239,7 +239,7 @@ class MembershipManager
 
                 $this->logger->debug(
                     "CAMPAIGN: Contact ID {$contact->getId()} was already removed from campaign ID {$campaign->getId()}.",
-                    $this->getExceptionAsArray($exception)
+                    $exception->toArray()
                 );
             }
         }
@@ -263,18 +263,5 @@ class MembershipManager
         if ($this->progressBar) {
             $this->progressBar->advance();
         }
-    }
-
-    /**
-     * Transform an Exception to an array to pass to the logger.
-     */
-    private function getExceptionAsArray(\Exception $exception): array
-    {
-        return [
-            'message' => $exception->getMessage(),
-            'file'    => $exception->getFile(),
-            'line'    => $exception->getLine(),
-            'trace'   => $exception->getTraceAsString(),
-        ];
     }
 }
