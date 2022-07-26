@@ -133,7 +133,7 @@ class MembershipManager
 
             $this->logger->debug(
                 'CAMPAIGN: Contacts: '.count($contacts),
-                $contacts->toArray()
+                array_map($contact => $contact->getId(), $contacts->toArray())
             );
 
             // is the contact an existing campaign member? update and continue
