@@ -44,26 +44,29 @@ export default class MjmlService {
   /**
    * Transform MJML to HTML
    * @todo show validation errors in the UI
-   * @returns ?string
+   * @returns string
    */
   static mjmlToHtml(mjml, endpoint = '') {
-    if (typeof mjml !== 'string' || !mjml.includes('<mjml>')) {
-      throw new Error('No valid MJML provided');
-    }
-
-    if (endpoint !== '') {
-      return MjmlService.mjmlToHtmlViaEndpoint(mjml, endpoint);
-    }
+    let html = '';
 
     try {
-      // html needs to be beautified for the click tracking to work.
-      // strict mode not working with e.g. id="" and data-type parameters that
-      // are e.g. used for Dynamic Content
-      return mjml2html(mjml, { beautify: true });
+      if (typeof mjml !== 'string' || !mjml.includes('<mjml>')) {
+        throw new Error('No valid MJML provided');
+      }
+
+      if (endpoint !== '') {
+        html = MjmlService.mjmlToHtmlViaEndpoint(mjml, endpoint);
+      } else {
+        // html needs to be beautified for the click tracking to work.
+        // strict mode not working with e.g. id="" and data-type parameters that
+        // are e.g. used for Dynamic Content
+        html = mjml2html(mjml, { beautify: true });
+      }
     } catch (error) {
       console.warn(error);
-      return null;
     }
+
+    return html;
   }
 
   /**
@@ -71,7 +74,6 @@ export default class MjmlService {
    * @returns string|null
    */
   static mjmlToHtmlViaEndpoint(mjml, endpoint) {
-    console.log(endpoint);
     const xmlHttpRequest = new XMLHttpRequest();
     xmlHttpRequest.open('POST', endpoint, false);
     xmlHttpRequest.setRequestHeader('Content-type', 'application/json');
