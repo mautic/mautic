@@ -46,15 +46,16 @@ export default class MjmlService {
    * @todo show validation erros in the UI
    * @returns string
    */
-  static mjmlToHtml(mjml, endpoint = null) {
-    if (endpoint !== null) {
+  static mjmlToHtml(mjml, endpoint = '') {
+    if (typeof mjml !== 'string' || !mjml.includes('<mjml>')) {
+      throw new Error('No valid MJML provided');
+    }
+
+    if (endpoint !== '') {
       return MjmlService.mjmlToHtmlViaEndpoint(mjml, endpoint);
     }
 
     try {
-      if (typeof mjml !== 'string' || !mjml.includes('<mjml>')) {
-        throw new Error('No valid MJML provided');
-      }
       // html needs to be beautified for the click tracking to work.
       // strict mode not working with e.g. id="" and data-type parameters that
       // are e.g. used for Dynamic Content
