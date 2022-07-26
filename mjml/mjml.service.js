@@ -43,8 +43,8 @@ export default class MjmlService {
 
   /**
    * Transform MJML to HTML
-   * @todo show validation erros in the UI
-   * @returns string
+   * @todo show validation errors in the UI
+   * @returns ?string
    */
   static mjmlToHtml(mjml, endpoint = '') {
     if (typeof mjml !== 'string' || !mjml.includes('<mjml>')) {
@@ -71,6 +71,7 @@ export default class MjmlService {
    * @returns string|null
    */
   static mjmlToHtmlViaEndpoint(mjml, endpoint) {
+    console.log(endpoint);
     const xmlHttpRequest = new XMLHttpRequest();
     xmlHttpRequest.open('POST', endpoint, false);
     xmlHttpRequest.setRequestHeader('Content-type', 'application/json');
