@@ -443,7 +443,12 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         // Published only
-        $this->publishedOnly($reflection, $q, $prefix);
+        if ($reflection->hasMethod('getIsPublished')) {
+            $q->andWhere(
+                $q->expr()->eq($prefix.'is_published', ':true')
+            )
+                ->setParameter('true', true, 'boolean');
+        }
 
         return $q->executeQuery()->fetchAllAssociative();
     }
@@ -535,46 +540,20 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * @param array<string> $parameters
-     *
-     * @return mixed[]
+     * @return array<string[]>
      */
-    public function getFieldLookupData(CompositeExpression $expr = null, array $parameters = []): array
+    public function getCompanyLookupData(string $filterVal): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $tableName = $this->_em->getClassMetadata($this->getEntityName())->getTableName();
+        $q->select('id, companyname, companycity, companystate')
+            ->from(MAUTIC_TABLE_PREFIX.Company::TABLE_NAME)
+            ->where($q->expr()->eq('is_published', true))
+            ->andWhere($q->expr()->like('companyname', ':filterVar'))
+            ->setParameter('filterVar', '%'.$filterVal.'%')
+            ->orderBy('companyname')
+            ->setMaxResults(50);
 
-        $class      = '\\'.$this->getClassName();
-        $reflection = new \ReflectionClass(new $class());
-
-        $q->select('id, companyname as value, companycity, companystate')
-            ->from($tableName)
-            ->orderBy('companyname');
-
-        if (null !== $expr && $expr->count()) {
-            $q->where($expr);
-        }
-
-        if (!empty($parameters)) {
-            $q->setParameters($parameters);
-        }
-
-        // Published only
-        $this->publishedOnly($reflection, $q);
-
-        $q->setMaxResults(5);
-
-        return $q->execute()->fetchAll();
-    }
-
-    private function publishedOnly(\ReflectionClass $reflection, \Doctrine\DBAL\Query\QueryBuilder $q, string $prefix = ''): void
-    {
-        if ($reflection->hasMethod('getIsPublished')) {
-            $q->andWhere(
-                $q->expr()->eq($prefix.'is_published', ':status')
-            )
-                ->setParameter('status', true, 'boolean');
-        }
+        return $q->execute()->fetchAllAssociative();
     }
 }

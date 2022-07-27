@@ -967,24 +967,4 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->getCompanyLeadRepository()->detachEntity($companyLead);
         }
     }
-
-    /**
-     * Get list of entities for auto populating fields.
-     *
-     * @return array<string> $results
-     */
-    public function getCompanyNameFieldLookupResults(string $filterVal): array
-    {
-        $columns    = ['companyname', 'companystate', 'companycity'];
-
-        $expr      = new ExpressionBuilder($this->em->getConnection());
-        $composite = $expr->orX();
-        foreach ($columns as $column) {
-            $composite->add(
-                $expr->like("$column", ':filterVar'),
-            );
-        }
-
-        return $this->getRepository()->getFieldLookupData($composite, ['filterVar' => '%'.$filterVal.'%']);
-    }
 }

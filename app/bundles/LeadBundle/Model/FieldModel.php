@@ -56,9 +56,9 @@ class FieldModel extends FormModel
                     'Miss',
                 ],
             ],
-            'fixed'      => true,
-            'listable'   => true,
-            'object'     => 'lead',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'firstname' => [
             'fixed'    => true,
@@ -464,9 +464,9 @@ class FieldModel extends FormModel
                     ],
                 ],
             ],
-            'fixed'      => true,
-            'listable'   => true,
-            'object'     => 'company',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'company',
         ],
         'companydescription' => [
             'fixed'    => true,
@@ -578,8 +578,8 @@ class FieldModel extends FormModel
      */
     public function getLeadFieldCustomFieldSchemaDetails(): array
     {
-        $fields     = $this->getLeadFieldCustomFields();
-        $columns    = $this->columnSchemaHelper->setName('leads')->getColumns();
+        $fields  = $this->getLeadFieldCustomFields();
+        $columns = $this->columnSchemaHelper->setName('leads')->getColumns();
 
         $schemaDetails = [];
         foreach ($fields as $value) {
@@ -944,6 +944,8 @@ class FieldModel extends FormModel
      */
     public function getFieldsProperties(array $filters = []): array
     {
+        $forceFilters = [];
+
         foreach ($filters as $col => $val) {
             $forceFilters[] = [
                 'column' => "f.{$col}",

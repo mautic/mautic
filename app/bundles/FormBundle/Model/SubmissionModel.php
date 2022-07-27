@@ -261,10 +261,9 @@ class SubmissionModel extends CommonFormModel
             }
 
             if ('companyLookup' === $f->getType() && !empty($value)) {
-                /** @var Company $company */
-                $company       = $this->companyModel->getEntity($value);
+                $company = $this->companyModel->getEntity($value);
                 if ($company instanceof Company) {
-                    $value         = $company->getName();
+                    $value = $company->getName();
                 }
             }
 
@@ -917,7 +916,7 @@ class SubmissionModel extends CommonFormModel
         $getCompanyData = function ($currentFields) use ($companyFields): array {
             $companyData = [];
             // force add company contact field to company fields check
-            $companyFields = array_merge($companyFields, ['company'=> 'company']);
+            $companyFields = array_merge($companyFields, ['company' => 'company']);
             foreach ($companyFields as $alias => $properties) {
                 if (isset($currentFields[$alias])) {
                     $value               = $currentFields[$alias];
@@ -975,8 +974,8 @@ class SubmissionModel extends CommonFormModel
             $foundLeadFields = $foundLead->getProfileFields();
 
             // Get unique identifier fields for the found lead then compare with the lead currently tracked
-            $uniqueFieldsFound             = $getData($foundLeadFields, true);
-            [$hasConflict, $conflicts]     = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
+            $uniqueFieldsFound         = $getData($foundLeadFields, true);
+            [$hasConflict, $conflicts] = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
 
             if ($inKioskMode || $hasConflict || !$lead->getId()) {
                 // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge

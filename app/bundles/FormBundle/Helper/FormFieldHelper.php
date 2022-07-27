@@ -40,11 +40,11 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 Email::class => ['message' => 'mautic.form.submission.email.invalid'],
             ],
         ],
-        'freetext'        => [],
-        'freehtml'        => [],
-        'hidden'          => [],
-        'companyLookup'   => [],
-        'number'          => [
+        'freetext'      => [],
+        'freehtml'      => [],
+        'hidden'        => [],
+        'companyLookup' => [],
+        'number'        => [
             'filter' => 'float',
         ],
         'pagebreak' => [],
