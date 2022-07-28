@@ -778,6 +778,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "omert37",
+      "name": "Omer Toledano",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33084245?v=4",
+      "profile": "http://www.omertoledano.com",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
