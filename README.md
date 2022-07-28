@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-81-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-82-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -179,6 +179,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://benjamin.leveque.me"><img src="https://avatars.githubusercontent.com/u/166890?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Benjamin Lévêque</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=benji07" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/OnyXxL"><img src="https://avatars.githubusercontent.com/u/19322954?v=4?s=100" width="100px;" alt=""/><br /><sub><b>OnyXxL</b></sub></a><br /><a href="#userTesting-OnyXxL" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/dlackovic2"><img src="https://avatars.githubusercontent.com/u/68977388?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dominik Lacković</b></sub></a><br /><a href="#userTesting-dlackovic2" title="User Testing">📓</a></td>
+    <td align="center"><a href="http://www.omertoledano.com"><img src="https://avatars.githubusercontent.com/u/33084245?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Omer Toledano</b></sub></a><br /><a href="#userTesting-omert37" title="User Testing">📓</a></td>
   </tr>
 </table>
 
