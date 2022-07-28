@@ -16,6 +16,10 @@ import './grapesjs-custom.css';
  * @param actionName
  */
 function launchBuilderGrapesjs(formName) {
+  if (useBuilderForCodeMode() === false) {
+    return;
+  }
+
   const assets = AssetService.getAssets();
 
   const builder = new BuilderService(assets);
@@ -31,6 +35,22 @@ function launchBuilderGrapesjs(formName) {
 
   // Initialize GrapesJS
   builder.initGrapesJS(formName);
+}
+
+/**
+ * The user acknowledges the risk before editing an email or landing page created in Code Mode in the Builder
+ */
+function useBuilderForCodeMode() {
+  const theme = mQuery('.theme-selected').find('[data-theme]').attr('data-theme');
+  const isCodeMode = theme === 'mautic_code_mode';
+
+  if (isCodeMode) {
+    if (confirm(Mautic.translate('grapesjsbuilder.builder.warning.code_mode')) === false) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**
@@ -71,34 +91,6 @@ function setThemeHtml(theme) {
 }
 
 /**
- * The builder button to launch GrapesJS will be disabled when the code mode theme is selected
- *
- * @param theme
- */
-function switchBuilderButton(theme) {
-  const builderButton  = mQuery('.btn-builder');
-  const mEmailBuilderButton = mQuery('#emailform_buttons_builder_toolbar_mobile');
-  const mPageBuilderButton = mQuery('#page_buttons_builder_toolbar_mobile');
-  const isCodeMode = theme === 'mautic_code_mode';
-
-  builderButton.attr('disabled', isCodeMode);
-
-  if (isCodeMode) {
-    mPageBuilderButton.addClass('link-is-disabled');
-    mEmailBuilderButton.addClass('link-is-disabled');
-
-    mPageBuilderButton.parent().addClass('is-not-allowed');
-    mEmailBuilderButton.parent().addClass('is-not-allowed');
-  } else {
-    mPageBuilderButton.removeClass('link-is-disabled');
-    mEmailBuilderButton.removeClass('link-is-disabled');
-
-    mPageBuilderButton.parent().removeClass('is-not-allowed');
-    mEmailBuilderButton.parent().removeClass('is-not-allowed');
-  }
-}
-
-/**
  * The textarea with the HTML source will be displayed if the code mode theme is selected
  *
  * @param theme
@@ -126,7 +118,6 @@ function initSelectThemeGrapesjs(parentInitSelectTheme) {
     const builderUrl = mQuery('#builder_url');
     let url;
 
-    switchBuilderButton(themeField.val());
     switchCustomHtml(themeField.val());
 
     // Replace Mautic URL by plugin URL
@@ -146,7 +137,6 @@ function initSelectThemeGrapesjs(parentInitSelectTheme) {
     mQuery('[data-theme]').click((event) => {
       const theme = mQuery(event.target).attr('data-theme');
 
-      switchBuilderButton(theme);
       switchCustomHtml(theme);
     });
   }
