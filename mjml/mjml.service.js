@@ -71,7 +71,7 @@ export default class MjmlService {
 
   /**
    * Transform MJML to HTML via endpoint
-   * @returns string|null
+   * @returns string
    */
   static mjmlToHtmlViaEndpoint(mjml, endpoint) {
     const xmlHttpRequest = new XMLHttpRequest();
@@ -79,6 +79,6 @@ export default class MjmlService {
     xmlHttpRequest.setRequestHeader('Content-type', 'application/json');
     xmlHttpRequest.send(JSON.stringify({ mjml }));
 
-    return xmlHttpRequest.responseText ? JSON.parse(xmlHttpRequest.responseText) : null;
+    return xmlHttpRequest.responseText ? JSON.parse(xmlHttpRequest.responseText) : '';
   }
 }
