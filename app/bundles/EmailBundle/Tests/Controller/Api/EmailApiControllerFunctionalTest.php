@@ -247,6 +247,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setFirstName('John');
         $user->setLastName('Doe');
         $user->setEmail('john@api.test');
+        $user->setSignature('Best regards, |FROM_NAME|');
         $user->setRole($role);
         $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
         $user->setPassword($encoder->encodePassword('password', null));
@@ -289,7 +290,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
             $email->setSubject('Email created via API test');
             $email->setEmailType('list');
             $email->addList($segment);
-            $email->setCustomHtml('<h1>Email content created by an API test</h1>');
+            $email->setCustomHtml('<h1>Email content created by an API test</h1><br>{signature}');
             $email->setIsPublished(true);
             $email->setFromAddress('from@api.test');
             $email->setFromName('API Test');
@@ -315,7 +316,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmail = function (): void {
             $message = $this->transport->sentMessage;
             $this->assertSame($message->getSubject(), 'Email created via API test');
-            $bodyRegExp = '#<h1>Email content created by an API test</h1><img height="1" width="1" src="[^"]+" alt="" />#';
+            $bodyRegExp = '#<h1>Email content created by an API test</h1><br><img height="1" width="1" src="[^"]+" alt="" />#';
             $this->assertMatchesRegularExpression($bodyRegExp, $message->getBody());
             $this->assertSame($message->getTo(), ['jane@api.test' => 'Jane Doe']);
             $this->assertSame($message->getFrom(), ['from@api.test' => 'API Test']);
@@ -353,7 +354,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmailOwnerAsMailer = function (): void {
             $message = $this->transport->sentMessage;
             $this->assertSame($message->getSubject(), 'Email created via API test');
-            $bodyRegExp = '#<h1>Email content created by an API test</h1><img height="1" width="1" src="[^"]+" alt="" />#';
+            $bodyRegExp = '#<h1>Email content created by an API test</h1><br>Best regards, John Doe<img height="1" width="1" src="[^"]+" alt="" />#';
             $this->assertMatchesRegularExpression($bodyRegExp, $message->getBody());
             $this->assertSame($message->getTo(), ['jane@api.test' => 'Jane Doe']);
             $this->assertSame($message->getFrom(), ['john@api.test' => 'John Doe']);
