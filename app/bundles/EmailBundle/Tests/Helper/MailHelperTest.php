@@ -15,6 +15,7 @@ use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Swift_Mailer;
 
@@ -843,5 +844,34 @@ class MailHelperTest extends TestCase
 
         $mailer = new MailHelper($this->mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $this->assertFalse($mailer->inTokenizationMode());
+    }
+
+    public function testImagesEmbeddedOnSend(): void
+    {
+        $parameterMap = [
+            ['mailer_convert_embed_images', false, true],
+        ];
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $transport   = new SmtpTransport();
+        $swiftMailer = new Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $initialHtml = 'Text <img src="/tmp/fake.jpg">';
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml($initialHtml);
+        $mailer->setEmail($email);
+
+        Assert::assertNull($mailer->message->getBody());
+        Assert::assertSame($initialHtml, $mailer->getBody());
+
+        $mailer->send();
+
+        Assert::assertStringStartsWith('Text <img src="cid:', $mailer->message->getBody());
+        Assert::assertSame($initialHtml, $mailer->getBody());
     }
 }
