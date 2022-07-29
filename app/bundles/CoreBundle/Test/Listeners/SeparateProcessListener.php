@@ -55,6 +55,7 @@ class SeparateProcessListener implements TestListener
 
         // remove non-problematic ones
         $constants = array_diff($constants, [
+            'MAUTIC_AJAX_VIEW',
             'MAUTIC_API_REQUEST',
             'MAUTIC_CAMPAIGN_NOT_SYSTEM_TRIGGERED',
             'MAUTIC_DB_SERVER_VERSION',
