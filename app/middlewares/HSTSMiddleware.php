@@ -14,7 +14,7 @@ class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
 
     const PRIORITY = 900;
 
-    protected bool $addHSTS           = false;
+    protected bool $enableHSTS        = false;
     protected bool $includeDubDomains = false;
     protected int $expireTime         = 0;
     protected HttpKernelInterface $app;
@@ -23,7 +23,7 @@ class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     {
         $this->app               = $app;
         $this->config            = $this->getConfig();
-        $this->addHSTS           = array_key_exists('headers_sts', $this->config) && (bool) $this->config['headers_sts'];
+        $this->enableHSTS        = array_key_exists('headers_sts', $this->config) && (bool) $this->config['headers_sts'];
         $this->includeDubDomains = array_key_exists('headers_sts_subdomains', $this->config) && (bool) $this->config['headers_sts_subdomains'];
         $this->expireTime        = $this->config['headers_sts_expire_time'] ?? 0;
     }
@@ -32,7 +32,12 @@ class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     {
         $response = $this->app->handle($request, $type, $catch);
 
-        if ($this->addHSTS && $this->expireTime && self::MASTER_REQUEST === $type) {
+        //Do not include the header in the sub-request response
+        if (self::MASTER_REQUEST !== $type) {
+            return $response;
+        }
+
+        if ($this->enableHSTS && $this->expireTime) {
             $value = 'max-age='.$this->expireTime.($this->includeDubDomains ? '; includeSubDomains' : '');
             $response->headers->set('Strict-Transport-Security', $value);
         }
