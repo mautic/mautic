@@ -4,7 +4,7 @@ import ContentService from 'grapesjs-preset-mautic/dist/content.service';
 import Logger from 'grapesjs-preset-mautic/dist/logger';
 
 class CodeEditor {
-  editor;
+  #editor;
 
   logger;
 
@@ -15,17 +15,28 @@ class CodeEditor {
   codePopup;
 
   constructor(editor, opts = {}) {
-    this.editor = editor;
+    this.setEditor(editor);
     this.opts = opts;
 
-    this.logger = new Logger(editor);
+    this.logger = new Logger(this.getEditor());
     this.codeEditor = this.buildCodeEditor();
     this.codePopup = this.buildCodePopup();
   }
 
+  getEditor(){
+    return this.#editor;
+  }
+  setEditor(editor){
+    if (!editor) {
+      throw new Error('no editor');
+    }
+    console.warn('setting the editor for code editor',{ editor });
+    this.#editor = editor;
+  }
+
   // Build codeEditor (CodeMirror instance)
   buildCodeEditor() {
-    const codeEditor = this.editor.CodeManager.getViewer('CodeMirror').clone();
+    const codeEditor = this.getEditor().CodeManager.getViewer('CodeMirror').clone();
 
     codeEditor.set({
       codeName: 'htmlmixed',
@@ -45,7 +56,7 @@ class CodeEditor {
 
   // Build popup content, codeEditor area and buttons
   buildCodePopup() {
-    const cfg = this.editor.getConfig();
+    const cfg = this.getEditor().getConfig();
 
     const codePopup = document.createElement('div');
     const btnEdit = document.createElement('button');
@@ -93,15 +104,15 @@ class CodeEditor {
   updateCode() {
     const code = this.codeEditor.editor.getValue();
     // validate MJML code
-    if (ContentService.isMjmlMode(this.editor)) {
+    if (ContentService.isMjmlMode(this.getEditor())) {
       MjmlService.mjmlToHtml(code);
     }
 
     try {
       // delete canvas and set new content
-      this.editor.DomComponents.getWrapper().set('content', '');
-      this.editor.setComponents(code.trim());
-      this.editor.Modal.close();
+      this.getEditor().DomComponents.getWrapper().set('content', '');
+      this.getEditor().setComponents(code.trim());
+      this.getEditor().Modal.close();
     } catch (e) {
       window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')} \n${e.message}`);
     }
@@ -109,7 +120,7 @@ class CodeEditor {
 
   // Close popup
   cancelCode() {
-    this.editor.Modal.close();
+    this.getEditor().Modal.close();
   }
 
   /**
@@ -119,12 +130,12 @@ class CodeEditor {
 
     // Check if MJML plugin is on
     let content;
-    if (ContentService.isMjmlMode(this.editor)) {
+    if (ContentService.isMjmlMode(this.getEditor())) {
       this.logger.debug('updateEditorContents mjml');
-      content = MjmlService.getEditorMjmlContent(this.editor);
+      content = MjmlService.getEditorMjmlContent(this.getEditor());
     } else {
       this.logger.debug('updateEditorContents html');
-      content = ContentService.getEditorHtmlContent(this.editor);
+      content = ContentService.getEditorHtmlContent(this.getEditor());
     }
     this.codeEditor.setContent(content);
   }

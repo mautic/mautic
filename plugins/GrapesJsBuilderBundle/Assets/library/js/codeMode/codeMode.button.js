@@ -1,7 +1,7 @@
 import CodeModeCommand from './codeMode.command';
 
 export default class CodeModeButton {
-  editor;
+  #editor;
 
   /**
    * Add close button with save for Mautic
@@ -10,11 +10,22 @@ export default class CodeModeButton {
     if (!editor) {
       throw new Error('no editor');
     }
-    this.editor = editor;
+    this.setEditor(editor);
+  }
+
+  getEditor(){
+    return this.#editor;
+  }
+  setEditor(editor){
+    if (!editor) {
+      throw new Error('no editor');
+    }
+    console.warn('setting the editor for code editor',{ editor });
+    this.#editor = editor;
   }
 
   addButton() {
-    this.editor.Panels.addButton('options', [
+    this.getEditor().Panels.addButton('options', [
       {
         id: 'code-edit',
         className: 'fa fa-edit',
@@ -27,7 +38,7 @@ export default class CodeModeButton {
   }
 
   addCommand() {
-    this.editor.Commands.add(CodeModeCommand.name, {
+    this.getEditor().Commands.add(CodeModeCommand.name, {
       run: CodeModeCommand.launchCodeEditorModal,
       stop: CodeModeCommand.stopCodeEditorModal,
     });
