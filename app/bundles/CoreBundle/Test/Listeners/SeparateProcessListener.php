@@ -4,18 +4,30 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Test\Listeners;
 
+use InvalidArgumentException;
 use LogicException;
 use PHPUnit\Framework\Test;
+use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestListener;
 use PHPUnit\Framework\TestListenerDefaultImplementation;
+use PHPUnit\Framework\TestSuite;
 use ReflectionMethod;
 
 /**
- * Throws an exception if the test should be run in a separate process.
+ * Lists tests that should be run in a separate process and throws an exception making the test suite fail.
  */
 class SeparateProcessListener implements TestListener
 {
     use TestListenerDefaultImplementation;
+
+    private const PROBLEMATIC_CONSTANTS = [
+        'MAUTIC_INTEGRATION_SYNC_IN_PROGRESS',
+    ];
+
+    /**
+     * @var array<string,string[]>
+     */
+    private array $problematicTests = [];
 
     public function endTest(Test $test, float $time): void
     {
@@ -23,11 +35,26 @@ class SeparateProcessListener implements TestListener
             return;
         }
 
-        $constants = $this->getMauticConstants();
+        $problematicConstants = $this->getDefinedProblematicConstants();
 
-        if ($constants) {
-            throw new LogicException(sprintf('Test "%s::%s" must be run in a separate process as there were defined the following constants during the test execution: "%s".', get_class($test), $test->getName(), implode(', ', $constants)));
+        if (!$problematicConstants) {
+            return;
         }
+
+        $this->trackProblematicTest($test, $problematicConstants);
+    }
+
+    public function endTestSuite(TestSuite $suite): void
+    {
+        if (!$this->problematicTests) {
+            return;
+        }
+
+        foreach ($this->problematicTests as $testName => $problematicConstants) {
+            fwrite(STDOUT, sprintf('Test "%s" must be run in a separate process as there were defined the following constants during the test execution: "%s".%s', $testName, implode(', ', $problematicConstants), PHP_EOL));
+        }
+
+        throw new LogicException('There are tests that must be run in a separate process!');
     }
 
     private function isTestRunInSeparateProcess(Test $test): bool
@@ -41,31 +68,24 @@ class SeparateProcessListener implements TestListener
     /**
      * @return string[]
      */
-    private function getMauticConstants(): array
+    private function getDefinedProblematicConstants(): array
     {
-        // get all user defined constants
-        $constants = get_defined_constants(true)['user'] ?? [];
+        $defined = get_defined_constants(true)['user'] ?? [];
 
-        if (!$constants) {
-            return [];
+        return array_intersect(array_keys($defined), self::PROBLEMATIC_CONSTANTS);
+    }
+
+    /**
+     * @param string[] $problematicConstants
+     */
+    private function trackProblematicTest(Test $test, array $problematicConstants): void
+    {
+        if (!$test instanceof TestCase) {
+            throw new InvalidArgumentException(sprintf('$test must be an instance of "%s".', TestCase::class));
         }
 
-        // filter out only those that begins with MAUTIC_
-        $constants = array_filter(array_keys($constants), fn (string $constant) => 0 === strpos($constant, 'MAUTIC_'));
+        $testName = sprintf('%s::%s', get_class($test), $test->getName());
 
-        // remove non-problematic ones
-        $constants = array_diff($constants, [
-            'MAUTIC_AJAX_VIEW',
-            'MAUTIC_API_REQUEST',
-            'MAUTIC_CAMPAIGN_NOT_SYSTEM_TRIGGERED',
-            'MAUTIC_DB_SERVER_VERSION',
-            'MAUTIC_DELEGATE_VIEW',
-            'MAUTIC_ENV',
-            'MAUTIC_RENDERING_TEMPLATE',
-            'MAUTIC_TABLE_PREFIX',
-            'MAUTIC_VERSION',
-        ]);
-
-        return $constants;
+        $this->problematicTests[$testName] = $problematicConstants;
     }
 }
