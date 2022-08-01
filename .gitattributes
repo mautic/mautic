@@ -1,0 +1,5 @@
+/.gitattributes export-ignore
+/.github export-ignore
+/.gitignore export-ignore
+/phpstan.neon export-ignore
+/tests export-ignore
