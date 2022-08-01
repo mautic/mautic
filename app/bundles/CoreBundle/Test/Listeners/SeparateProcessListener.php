@@ -44,6 +44,9 @@ class SeparateProcessListener implements TestListener
         $this->trackProblematicTest($test, $problematicConstants);
     }
 
+    /**
+     * @param TestSuite|Test[] $suite
+     */
     public function endTestSuite(TestSuite $suite): void
     {
         if (!$this->problematicTests) {
