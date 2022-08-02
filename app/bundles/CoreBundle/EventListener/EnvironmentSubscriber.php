@@ -5,14 +5,12 @@ namespace Mautic\CoreBundle\EventListener;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class EnvironmentSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private CoreParametersHelper $coreParametersHelper;
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
@@ -29,8 +27,8 @@ class EnvironmentSubscriber implements EventSubscriberInterface
                 // Cannot be called earlier than priority 128 or the session is not populated leading to Doctrine's UTCDateTimeType leaving
                 // entity DateTime values in UTC
                 ['onKernelRequestSetTimezone', 128],
-                // Must be 15 to load after Symfony's default Locale listener
-                ['onKernelRequestSetLocale', 15],
+                // Must be 101 to load after Symfony's default Locale listener
+                ['onKernelRequestSetLocale', 101],
             ],
         ];
     }
@@ -52,19 +50,21 @@ class EnvironmentSubscriber implements EventSubscriberInterface
     /**
      * Set default locale.
      */
-    public function onKernelRequestSetLocale(GetResponseEvent $event)
+    public function onKernelRequestSetLocale(RequestEvent $event): void
     {
-        // Set the user's default locale
         $request = $event->getRequest();
+
         if (!$request->hasPreviousSession()) {
             return;
         }
 
-        // Set locale
-        if ($locale = $request->attributes->get('_locale')) {
-            $request->getSession()->set('_locale', $locale);
-        } else {
-            $request->setLocale($request->getSession()->get('_locale', $this->coreParametersHelper->get('locale')));
+        $locale = $request->getSession()->get('_locale');
+
+        if (!$locale) {
+            $locale = $this->coreParametersHelper->get('locale');
         }
+
+        $request->setLocale($locale);
+        $request->getSession()->set('_locale', $locale);
     }
 }

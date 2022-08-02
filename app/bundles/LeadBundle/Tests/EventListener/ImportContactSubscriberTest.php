@@ -61,6 +61,42 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame(['name' => 'Bud'], $event->getMatchedFields());
     }
 
+    /**
+     * @see https://github.com/mautic/mautic/issues/11080
+     */
+    public function testHandleFieldWithIntValues(): void
+    {
+        $formMock = $this->createMock(Form::class);
+        $formMock->method('getData')
+            ->willReturn(
+                [
+                    'name'           => 'Bud',
+                    'skip_if_exists' => 1,
+                ]
+            );
+
+        $event      = new ImportValidateEvent('contacts', $formMock);
+        $subscriber = new ImportContactSubscriber(
+            new class() extends FieldList {
+                public function __construct()
+                {
+                }
+
+                public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array
+                {
+                    return [];
+                }
+            },
+            $this->getCorePermissionsFake(),
+            $this->getLeadModelFake(),
+            $this->getTranslatorFake()
+        );
+
+        $subscriber->onValidateImport($event);
+
+        Assert::assertSame(['name' => 'Bud', 'skip_if_exists' => 1], $event->getMatchedFields());
+    }
+
     public function testOnImportInitForUknownObject(): void
     {
         $subscriber = new ImportContactSubscriber(
