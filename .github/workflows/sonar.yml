@@ -1,23 +1,56 @@
-name: Sonar
-on:
+name: Sonarcloud scan
+
+on: 
   workflow_run:
     workflows: [Mautic tests and validations]
-    types:
-      - completed
+    types: [completed]
+
 jobs:
-  sonar:
-    name: Sonar
+
+  QA:
     runs-on: ubuntu-latest
     if: github.event.workflow_run.conclusion == 'success'
     steps:
-      - uses: actions/checkout@v2
-        with:
+    - name: echo event
+      run: cat $GITHUB_EVENT_PATH
+    - name: Download PR number artifact
+      if: github.event.workflow_run.event == 'pull_request'
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: Mautic tests and validations
+        run_id: ${{ github.event.workflow_run.id }}
+        name: PR_NUMBER
+    - name: Read PR_NUMBER.txt
+      if: github.event.workflow_run.event == 'pull_request'
+      id: pr_number
+      uses: juliangruber/read-file-action@v1
+      with:
+        path: ./PR_NUMBER.txt
+    - name: Request GitHub API for PR data
+      if: github.event.workflow_run.event == 'pull_request'
+      uses: octokit/request-action@v2.x
+      id: get_pr_data
+      with:
+        route: GET /repos/${{ github.event.repository.full_name }}/pulls/${{ steps.pr_number.outputs.content }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/checkout@v3
+      with:
           repository: ${{ github.event.workflow_run.head_repository.full_name }}
           ref: ${{ github.event.workflow_run.head_branch }}
           fetch-depth: 0
-      - name: 'Download code coverage'
-        uses: actions/github-script@v5
-        with:
+    - name: Checkout base branch
+      if: github.event.workflow_run.event == 'pull_request'
+      run: |
+        git remote add upstream ${{ github.event.repository.clone_url }}
+        git fetch upstream
+        git checkout -B ${{ fromJson(steps.get_pr_data.outputs.data).base.ref }} upstream/${{ fromJson(steps.get_pr_data.outputs.data).base.ref }}
+        git checkout ${{ github.event.workflow_run.head_branch }}
+        git clean -ffdx && git reset --hard HEAD
+    - name: 'Download code coverage'
+      if: github.event.workflow_run.event == 'pull_request'
+      uses: actions/github-script@v5
+      with:
           script: |
             let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
                owner: context.repo.owner,
@@ -25,7 +58,7 @@ jobs:
                run_id: context.payload.workflow_run.id,
             });
             let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
-              return artifact.name == "clover.xml"
+              return artifact.name == "code-coverage-report"
             })[0];
             let download = await github.rest.actions.downloadArtifact({
                owner: context.repo.owner,
@@ -34,19 +67,35 @@ jobs:
                archive_format: 'zip',
             });
             let fs = require('fs');
-            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/clover.zip`, Buffer.from(download.data));
-      - name: 'Unzip code coverage'
-        run: unzip clover.zip -d coverage
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          projectBaseDir: '.'
-          args: >
-            -Dsonar.scm.revision=${{ github.event.workflow_run.head_sha }}
-            -Dsonar.pullrequest.key=${{ github.event.workflow_run.pull_requests[0].number }}
-            -Dsonar.pullrequest.branch=${{ github.event.workflow_run.pull_requests[0].head.ref }}
-            -Dsonar.pullrequest.base=${{ github.event.workflow_run.pull_requests[0].base.ref }}
-            -Dproject.settings=sonar-project.properties
+            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/artifact.zip`, Buffer.from(download.data));
+            
+    - name: 'Unzip code coverage'
+      if: github.event.workflow_run.event == 'pull_request'
+      run: unzip artifact.zip
+      
+    - name: 'Fix code coverage paths'
+      if: github.event.workflow_run.event == 'pull_request'
+      working-directory: ./
+      run: |
+          sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' clover.xml
+        
+    - name: SonarCloud Scan on PR
+      if: github.event.workflow_run.event == 'pull_request'
+      uses: sonarsource/sonarcloud-github-action@master
+      with:
+        projectBaseDir: '.'
+        args: >
+          -Dsonar.scm.revision=${{ github.event.workflow_run.head_sha }} -Dsonar.pullrequest.key=${{ fromJson(steps.get_pr_data.outputs.data).number }} -Dsonar.pullrequest.branch=${{ fromJson(steps.get_pr_data.outputs.data).head.ref }} -Dsonar.pullrequest.base=${{ fromJson(steps.get_pr_data.outputs.data).base.ref }} -Dproject.settings=sonar-project.properties
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: SonarCloud Scan on push
+      if: github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == ${{ github.event.workflow_run.head_repository.full_name }}
+      uses: sonarsource/sonarcloud-github-action@master
+      with:
+        projectBaseDir: '.'
+        args: >
+          -Dsonar.scm.revision=${{ github.event.workflow_run.head_sha }} -Dsonar.branch.name=${{ github.event.workflow_run.head_branch }} -Dproject.settings=sonar-project.properties
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
