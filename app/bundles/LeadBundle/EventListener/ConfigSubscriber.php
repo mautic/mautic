@@ -26,22 +26,24 @@ class ConfigSubscriber implements EventSubscriberInterface
 
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
-        $parameters = $event->getParametersFromConfig('MauticLeadBundle');
-        unset($parameters['company_unique_identifiers_operator']);
+        $leadParameters = $event->getParametersFromConfig('MauticLeadBundle');
+        unset($leadParameters['company_unique_identifiers_operator']);
         $event->addForm([
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'leadconfig',
             'formType'   => ConfigType::class,
             'formTheme'  => 'MauticLeadBundle:FormTheme\Config',
-            'parameters' => $parameters,
+            'parameters' => $leadParameters,
         ]);
 
+        $segmentParameters = $event->getParametersFromConfig('MauticLeadBundle');
+        unset($segmentParameters['contact_unique_identifiers_operator'], $segmentParameters['contact_columns'], $segmentParameters['background_import_if_more_rows_than']);
         $event->addForm([
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'segment_config',
             'formType'   => SegmentConfigType::class,
             'formTheme'  => 'MauticLeadBundle:FormTheme\Config',
-            'parameters' => $event->getParametersFromConfig('MauticLeadBundle'),
+            'parameters' => $segmentParameters,
         ]);
     }
 
