@@ -604,7 +604,8 @@
       "profile": "https://github.com/biozshock",
       "contributions": [
         "userTesting",
-        "review"
+        "review",
+        "code"
       ]
     },
     {
@@ -738,6 +739,51 @@
       "name": "automatyzuj",
       "avatar_url": "https://avatars.githubusercontent.com/u/104569506?v=4",
       "profile": "https://github.com/automatyzuj",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "KN4CK3R",
+      "name": "KN4CK3R",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1666336?v=4",
+      "profile": "https://www.oldschoolhack.me",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "benji07",
+      "name": "Benjamin Lévêque",
+      "avatar_url": "https://avatars.githubusercontent.com/u/166890?v=4",
+      "profile": "http://benjamin.leveque.me",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "OnyXxL",
+      "name": "OnyXxL",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19322954?v=4",
+      "profile": "https://github.com/OnyXxL",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "dlackovic2",
+      "name": "Dominik Lacković",
+      "avatar_url": "https://avatars.githubusercontent.com/u/68977388?v=4",
+      "profile": "https://github.com/dlackovic2",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "omert37",
+      "name": "Omer Toledano",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33084245?v=4",
+      "profile": "http://www.omertoledano.com",
       "contributions": [
         "userTesting"
       ]

@@ -337,10 +337,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                 $selectText = sprintf('%s(%s)', $aggregator['function'], $columnSelect);
 
-                if ('AVG' === $aggregator['function']) {
-                    $selectText = sprintf('ROUND(%s)', $selectText);
-                }
-
                 $aggregatorSelect[] = sprintf("%s AS '%s %s'", $selectText, $aggregator['function'], $aggregator['column']);
             }
 
