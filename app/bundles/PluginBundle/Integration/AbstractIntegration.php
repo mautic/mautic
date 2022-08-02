@@ -826,9 +826,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 case 'PUT':
                 case 'PATCH':
                     $result = $client->request($method, $url, [
-                        \GuzzleHttp\RequestOptions::BODY    => $parameters,
-                        \GuzzleHttp\RequestOptions::HEADERS => $headers,
-                        \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                        \GuzzleHttp\RequestOptions::FORM_PARAMS => $parameters,
+                        \GuzzleHttp\RequestOptions::HEADERS     => $headers,
+                        \GuzzleHttp\RequestOptions::TIMEOUT     => $timeout,
                     ]);
                     break;
                 case 'DELETE':
@@ -2287,7 +2287,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param                 $leadsToSync
      * @param bool|\Exception $error
      *
      * @return int Number ignored due to being duplicates

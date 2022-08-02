@@ -189,7 +189,7 @@ class FormatterHelper extends Helper
             return $this->_($stringIsDate, 'datetime');
         }
 
-        return $this->_($string);
+        return $string;
     }
 
     /**

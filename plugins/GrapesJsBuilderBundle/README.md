@@ -39,7 +39,7 @@ Ready to go. Now the GrapesJs Builder is loaded for Emails and Landing pages.
 
 GrapesJS plugin introduce also support for [MJML](https://mjml.io/) language. Just [create template](https://developer.mautic.org/#themes) as usual and add to template `email.mjml.tpl` file with properly formatted MJML syntax.  
 
-You can use the Blank MJML template provided by Webmecanik Blank MJML as a starting point - this ships with Mautic.
+You can use the Blank template as a starting point - this ships with Mautic.
 
 ## Existing Templates
 
@@ -89,15 +89,22 @@ npm install
 #### Configure babel, eslint, prettier
 use the template files provided. E.g. .eslintrc.temp
 
-### How to test standalone
+### How to develop and test Grapesjs standalone
 ```bash
+# for the bare grapesjs editor
 npm run start-helloWorld
-or
+
+# or for the light mautic experience (no dynamic content)
 npm run start-mautic
+
+# or for the full mautic experience
+npm run start-mautic-full
 ```
 
-In order for start-mautic to work a running ddev container has to be present. 
-If you are on some other development environment you need to update some paths in Demo/mautic/index.html
+#### Hints
+- In order for start-mautic* to work a running ddev container has to be present. 
+- If you are on some other development environment you need to update some paths in the html files. E.g. Demo/mautic/index.html
+- Tell Chrome to ignore cors issues: ?open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args --user-data-dir="/tmp/chrome_dev_test" --disable-web-security?
 
 ### How to build for production
 ```bash

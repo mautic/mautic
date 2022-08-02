@@ -112,7 +112,7 @@ class StatRepository extends CommonRepository
         $companyJoinOnExpr = $q->expr()->andX(
             $q->expr()->eq('s.lead_id', 'cl.lead_id')
         );
-        if (null === $companyId) {
+        if (!empty($companyId)) {
             // Must force a one to one relationship
             $companyJoinOnExpr->add(
                 $q->expr()->eq('cl.is_primary', 1)
@@ -124,7 +124,7 @@ class StatRepository extends CommonRepository
             ->addSelect('c.id AS company_id')
             ->addSelect('c.companyname AS company_name');
 
-        if (null !== $companyId) {
+        if (!empty($companyId)) {
             $q->andWhere('cl.company_id = :companyId')
                 ->setParameter('companyId', $companyId);
         }

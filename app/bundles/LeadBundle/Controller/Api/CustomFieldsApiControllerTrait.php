@@ -60,7 +60,6 @@ trait CustomFieldsApiControllerTrait
     /**
      * Flatten fields into an 'all' key for dev convenience.
      *
-     * @param        $entity
      * @param string $action
      */
     protected function preSerializeEntity(&$entity, $action = 'view')

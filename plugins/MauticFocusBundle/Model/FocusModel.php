@@ -247,7 +247,7 @@ class FocusModel extends FormModel
      */
     public function getContent(array $focus, $isPreview = false, $url = '#')
     {
-        $form = (!empty($focus['form'])) ? $this->formModel->getEntity($focus['form']) : null;
+        $form = (!empty($focus['form']) && 'form' === $focus['type']) ? $this->formModel->getEntity($focus['form']) : null;
 
         if (isset($focus['html_mode'])) {
             $htmlMode = $focus['html_mode'];

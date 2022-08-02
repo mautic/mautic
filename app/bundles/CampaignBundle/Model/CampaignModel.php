@@ -769,7 +769,6 @@ class CampaignModel extends CommonFormModel
 
     /**
      * @param          $hierarchy
-     * @param          $events
      * @param Campaign $entity
      * @param string   $root
      * @param int      $order

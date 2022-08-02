@@ -603,11 +603,11 @@ class SalesforceApi extends CrmApi
         // Remember that PHP uses \ as an escape. Therefore, to replace a single backslash with 2, must use 2 and 4
         $value = str_replace('\\', '\\\\', $value);
 
-        // Escape single quotes
-        $value = str_replace("'", "\'", $value);
-
         // Apply general formatting/cleanup
         $value = $this->integration->cleanPushData($value);
+
+        // Escape single quotes
+        $value = str_replace("'", "\'", $value);
 
         return $value;
     }

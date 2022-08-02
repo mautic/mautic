@@ -117,6 +117,7 @@ $dbalSettings = [
         'bit'   => 'string',
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
+    'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
 ];
 
 $container->loadFromExtension('doctrine', [

@@ -11,8 +11,6 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use Debril\RssAtomBundle\Protocol\FeedReader;
-use Debril\RssAtomBundle\Protocol\Parser\FeedContent;
 use Debril\RssAtomBundle\Protocol\Parser\Item;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;

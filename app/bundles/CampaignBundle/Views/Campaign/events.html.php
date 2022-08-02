@@ -29,7 +29,7 @@
                         <?php echo $event['noPercent'].'%'; ?>
                     </span>
                     <?php endif; ?>
-                <span class="mt-xs label label-warning" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.completed.actions'); ?>"><?= $event['logCount']; ?></span> <span class="mt-xs label label-default"  data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.pending.actions'); ?>"><?= $event['leadCount'] - $event['logCountForPending']; ?></span>
+                <span class="mt-xs label label-warning" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.completed.actions'); ?>"><?php echo $event['logCount']; ?></span> <span class="mt-xs label label-default"  data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.pending.actions'); ?>"><?php echo $event['leadCount'] - $event['logCountForPending']; ?></span>
                 </div>
                     <div class="col-md-5 va-m">
                     <h5 class="fw-sb text-primary mb-xs">

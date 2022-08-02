@@ -88,7 +88,7 @@ class EmailValidator
      */
     public function hasValidCharacters($address)
     {
-        $invalidChar = strpbrk($address, '\'^&*%');
+        $invalidChar = strpbrk($address, '^&*%');
 
         return $invalidChar ? substr($invalidChar, 0, 1) : $invalidChar;
     }

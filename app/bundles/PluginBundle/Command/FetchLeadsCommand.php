@@ -276,7 +276,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 .'</comment>'."\n"
             );
 
-            if (method_exists($integrationObject, 'pushCompanies')) {
+            if (in_array('push_companies', $supportedFeatures) && method_exists($integrationObject, 'pushCompanies')) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.companies', ['%integration%' => $integration]).'</info>');
                 $result  = $integrationObject->pushCompanies($params);
                 $ignored = 0;

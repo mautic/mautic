@@ -206,7 +206,6 @@ class ImportController extends FormController
 
         switch ($step) {
             case self::STEP_UPLOAD_CSV:
-
                 if ($forceStop) {
                     $this->resetImport($object, $fullPath);
                 }
@@ -214,7 +213,6 @@ class ImportController extends FormController
                 $form = $this->get('form.factory')->create(LeadImportType::class, [], ['action' => $action]);
                 break;
             case self::STEP_MATCH_FIELDS:
-
                 $mappingEvent = $dispatcher->dispatch(
                     LeadEvents::IMPORT_ON_FIELD_MAPPING,
                     new ImportMappingEvent($this->request->get('object'))

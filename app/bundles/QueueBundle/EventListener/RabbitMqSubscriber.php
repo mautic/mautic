@@ -15,9 +15,6 @@ use Mautic\QueueBundle\Event as Events;
 use Mautic\QueueBundle\Queue\QueueProtocol;
 use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class RabbitMqSubscriber extends AbstractQueueSubscriber
 {

@@ -306,6 +306,10 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.form.type.timeformat' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\TimeFormatType::class,
+                'arguments' => ['translator'],
+            ],
             'mautic.form.type.slot.saveprefsbutton' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
                 'arguments' => [
@@ -316,6 +320,12 @@ return [
                 'class'     => Mautic\CoreBundle\Form\Type\SlotSuccessMessageType::class,
                 'arguments' => [
                     'translator',
+                ],
+            ],
+            'mautic.form.type.slot.gatedvideo' => [
+                'class'     => Mautic\CoreBundle\Form\Type\GatedVideoType::class,
+                'arguments' => [
+                    'mautic.form.repository.form',
                 ],
             ],
             'mautic.form.type.slot.segmentlist' => [
@@ -347,6 +357,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.list',
                     'mautic.stage.model.stage',
+                    'mautic.integrations.helper.builder_integrations',
                 ],
             ],
             'mautic.form.type.dynamic_content_filter_entry_filters' => [
@@ -367,6 +378,12 @@ return [
                     'translator',
                     'database_connection',
                     'router',
+                ],
+            ],
+            'mautic.form.type.dynamic_content_filter' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,
+                'arguments' => [
+                    'mautic.integrations.helper.builder_integrations',
                 ],
             ],
         ],

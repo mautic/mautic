@@ -119,16 +119,15 @@ class TagRepository extends CommonRepository
      */
     public function getTagByNameOrCreateNewOne($name)
     {
-        $tag = $this->findOneBy(
+        $tag = new Tag($name);
+
+        /** @var Tag|null $existingTag */
+        $existingTag = $this->findOneBy(
             [
-                'tag' => $name,
+                'tag' => $tag->getTag(),
             ]
         );
 
-        if (!$tag) {
-            $tag = new Tag($name);
-        }
-
-        return $tag;
+        return $existingTag ?? $tag;
     }
 }

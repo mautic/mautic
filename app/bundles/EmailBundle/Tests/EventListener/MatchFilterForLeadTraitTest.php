@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
-use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\TestCase;
 
 class MatchFilterForLeadTraitTest extends TestCase

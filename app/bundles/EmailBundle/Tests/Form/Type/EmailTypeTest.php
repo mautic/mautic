@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailType;

@@ -156,4 +156,49 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $reflectedProp->setAccessible(true);
         $reflectedProp->setValue($object, $value);
     }
+
+    public function testExtractCompanyDataFromImport()
+    {
+        /** @var CompanyModel $companyModel */
+        $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['fetchCompanyFields'])
+            ->getMock();
+
+        $companyModel->method('fetchCompanyFields')
+            ->will($this->returnValue([
+                ['alias' => 'companyname'],
+                ['alias' => 'companyemail'],
+                ['alias' => 'companyindustry'],
+            ]));
+
+        $fields = [
+            'email'           => 'i_contact_email',
+            'companyemail'    => 'i_company_email',
+            'company'         => 'i_company_name',
+            'companyindustry' => 'i_company_industry',
+        ];
+        $data= [
+            'i_contact_email'    => 'PennyKMoore@dayrep.com',
+            'i_company_email'    => 'turbochicken@dayrep.com',
+            'i_company_name'     => 'Turbo chicken',
+            'i_company_industry' => 'Biotechnology',
+        ];
+
+        [$companyFields, $companyData] = $companyModel->extractCompanyDataFromImport($fields, $data);
+
+        $expectedCompanyFields = [
+            'companyemail'    => 'i_company_email',
+            'companyindustry' => 'i_company_industry',
+            'companyname'     => 'i_company_name',
+        ];
+        $expectedCompanyData = [
+            'i_company_email'    => 'turbochicken@dayrep.com',
+            'i_company_industry' => 'Biotechnology',
+            'i_company_name'     => 'Turbo chicken',
+        ];
+
+        $this->assertSame($expectedCompanyFields, $companyFields);
+        $this->assertSame($expectedCompanyData, $companyData);
+    }
 }

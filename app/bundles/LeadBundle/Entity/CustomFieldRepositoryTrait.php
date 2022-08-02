@@ -282,7 +282,6 @@ trait CustomFieldRepositoryTrait
     /**
      * Function to remove non custom field columns from an arrayed lead row.
      *
-     * @param       $r
      * @param array $fixedFields
      */
     protected function removeNonFieldColumns(&$r, $fixedFields = [])

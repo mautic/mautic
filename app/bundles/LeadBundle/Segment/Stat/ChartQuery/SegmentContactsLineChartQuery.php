@@ -149,7 +149,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
             $q->andWhere($q->expr()->lt('t.date_added', $q->expr()->literal($this->firstEventLog)));
         }
 
-        return  $this->loadAndBuildTimeData($q);
+        return $this->loadAndBuildTimeData($q);
     }
 
     /**

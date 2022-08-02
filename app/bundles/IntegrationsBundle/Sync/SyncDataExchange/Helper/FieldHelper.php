@@ -113,6 +113,10 @@ class FieldHelper
                 return NormalizedValueDAO::DATETIME_TYPE;
             case 'number':
                 return NormalizedValueDAO::FLOAT_TYPE;
+            case 'select':
+                return NormalizedValueDAO::SELECT_TYPE;
+            case 'multiselect':
+                return NormalizedValueDAO::MULTISELECT_TYPE;
             default:
                 return NormalizedValueDAO::STRING_TYPE;
         }

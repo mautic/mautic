@@ -22,7 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Override Doctrine's builder classes to add support to orphanRemoval until the fix is incorporated into Doctrine release
- * See @link https://github.com/doctrine/doctrine2/pull/1326/.
+ * See @see https://github.com/doctrine/doctrine2/pull/1326/.
  */
 class ClassMetadataBuilder extends OrmClassMetadataBuilder
 {

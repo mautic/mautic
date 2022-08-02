@@ -379,17 +379,24 @@ class PublicController extends CommonFormController
      */
     public function trackingAction(Request $request)
     {
+        $notSuccessResponse = new JsonResponse(
+            [
+                'success' => 0,
+            ]
+        );
         if (!$this->get('mautic.security')->isAnonymous()) {
-            return new JsonResponse(
-                [
-                    'success' => 0,
-                ]
-            );
+            return $notSuccessResponse;
         }
 
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
-        $model->hitPage(null, $this->request);
+
+        try {
+            $model->hitPage(null, $this->request);
+        } catch (InvalidDecodedStringException $invalidDecodedStringException) {
+            // do not track invalid ct
+            return $notSuccessResponse;
+        }
 
         /** @var ContactTracker $contactTracker */
         $contactTracker = $this->get(ContactTracker::class);
@@ -492,6 +499,10 @@ class PublicController extends CommonFormController
             $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
 
             $url = TokenHelper::findLeadTokens($url, $leadArray, true);
+        }
+
+        if (false !== strpos($url, $this->generateUrl('mautic_asset_download'))) {
+            $url .= '?ct='.$ct;
         }
 
         $url = UrlHelper::sanitizeAbsoluteUrl($url);

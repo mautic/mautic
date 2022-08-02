@@ -47,6 +47,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     ];
 
     /**
+     * @var bool
+     */
+    private $failureFetchingLeads = false;
+
+    /**
      * {@inheritdoc}
      *
      * @return string
@@ -947,6 +952,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
+
+            $this->failureFetchingLeads = $e->getMessage();
         }
 
         $this->logger->debug('SALESFORCE: '.$this->getApiHelper()->getRequestCounter().' API requests made for getLeads: '.$object);
@@ -1366,6 +1373,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getCampaignMembers($campaignId)
     {
+        $this->failureFetchingLeads = false;
+
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $mixedFields           = $this->getIntegrationSettings()->getFeatureSettings();
@@ -1399,6 +1408,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     try {
                         $query = $fetcher->getQueryForUnknownObjects($fields, $object);
                         $this->getLeads([], $query, $executed, [], $object);
+
+                        if ($this->failureFetchingLeads) {
+                            // Something failed while fetching the leads (i.e API error limit) so we have to fail here to prevent the campaign
+                            // from caching the timestamp that will cause contacts to not be pulled/added to the segment
+                            throw new ApiErrorException($this->failureFetchingLeads);
+                        }
                     } catch (NoObjectsToFetchException $exception) {
                         // No more IDs to fetch so break and continue on
                         continue;
@@ -1682,13 +1697,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param      $checkEmailsInSF
      * @param      $fieldMapping
      * @param      $mauticLeadFieldString
      * @param      $limit
      * @param      $fromDate
      * @param      $toDate
-     * @param      $totalCount
      * @param null $progress
      *
      * @return array
@@ -1770,7 +1783,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param      $mauticData
      * @param      $objectFields
      * @param      $object
      * @param null $objectId
@@ -2167,11 +2179,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param      $mauticData
-     * @param      $checkEmailsInSF
-     * @param      $processedLeads
-     * @param      $trackedContacts
-     * @param      $leadsToSync
      * @param      $objectFields
      * @param      $mauticLeadFieldString
      * @param      $sfEntityRecords
@@ -2716,7 +2723,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $lead = $this->leadModel->getEntity($leadId);
 
         if (true == $newDncValue) {
-            $this->doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, 'Set by Salesforce', true, false, true);
+            $this->doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, 'Set by Salesforce', true, true, true);
         } elseif (false == $newDncValue) {
             $this->doNotContact->removeDncForContact($lead->getId(), 'email', true);
         }
@@ -2920,7 +2927,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param      $mauticData
      * @param      $objectFields
      * @param      $sfEntityRecords
      * @param null $progress
@@ -3097,12 +3103,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param      $checkIdsInSF
      * @param      $mauticCompanyFieldString
      * @param      $limit
      * @param      $fromDate
      * @param      $toDate
-     * @param      $totalCount
      * @param null $progress
      */
     protected function getMauticEntitesToCreate(
