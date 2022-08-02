@@ -7,6 +7,7 @@ namespace Mautic\MarketplaceBundle\Controller\Package;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;

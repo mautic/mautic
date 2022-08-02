@@ -583,7 +583,7 @@ Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptio
 
     mQuery('#' + displayId).attr('data-lookup-callback', 'updateLookupListFilter');
 
-    Mautic.activateFieldTypeahead(displayId, filterId, [], 'lead:fieldList')
+    Mautic.activateFieldTypeahead(displayId, filterId, [], mQuery('#' + displayId).data('action') || 'lead:fieldList');
 
     mQuery = mQueryBackup;
 };
@@ -1573,7 +1573,7 @@ Mautic.listOnLoad = function(container, response) {
 
 Mautic.listOnUnload = function() {
     Mautic.cleanSegmentDependencies();
-}
+};
 
 /**
  *  JsPlumb has a problem with z-index when using tabs or change content by ajax so we need to re-initialize it.
@@ -1581,7 +1581,7 @@ Mautic.listOnUnload = function() {
 Mautic.cleanSegmentDependencies = function() {
     mQuery('.jtk-connector').remove();
     mQuery('#segment-dependencies-container').empty();
-}
+};
 
 Mautic.renderSegmentTree = function(containerId, data) {
     Mautic.cleanSegmentDependencies(); // Make sure there is no tree rendered already
@@ -1617,7 +1617,7 @@ Mautic.renderSegmentTree = function(containerId, data) {
     }
 
     return plumbInstance;
-}
+};
 
 Mautic.buildSegmentDependencyNode = function(nodeData) {
     let message = '';
@@ -1633,7 +1633,7 @@ Mautic.buildSegmentDependencyNode = function(nodeData) {
     const node = mQuery('<div class="segment-node'+hasMessageClass+'" id="segment-node'+nodeData['id']+'">'+link+message+'</div>');
 
     return node;
-}
+};
 
 Mautic.lazyLoadContactListOnSegmentDetail = function() {
     const containerId = '#contacts-container';

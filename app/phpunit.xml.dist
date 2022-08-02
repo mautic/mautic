@@ -63,5 +63,6 @@
   </listeners>
   <extensions>
     <extension class="\Mautic\CoreBundle\Test\Hooks\ExecuteTestAfterExtension" />
+    <extension class="\Mautic\CoreBundle\Test\Hooks\MauticExtension" />
   </extensions>
 </phpunit>

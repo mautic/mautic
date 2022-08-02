@@ -51,9 +51,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param        $log
-         * @param string $context
-         * @param bool   $backtrace
+         * @param mixed               $log
+         * @param string|array<mixed> $context
+         * @param bool                $backtrace
          */
         public static function logDebugEntry($log, $context = 'null', $backtrace = false)
         {
@@ -351,7 +351,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
                 // Hide errors by default so we can format them
                 self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); //ini_get('display_errors'));
-                ini_set('display_errors', 0);
+                ini_set('display_errors', '0');
             }
 
             return self::$handler;
