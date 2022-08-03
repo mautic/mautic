@@ -275,9 +275,6 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
                     'mautic.lead.list.year_this'   => 'this year',
                     'mautic.lead.list.birthday'    => 'birthday',
                     'mautic.lead.list.anniversary' => 'anniversary',
-                    'mautic.lead.list.ago'         => 'ago',
-                    'mautic.lead.list.first_day_of'=> 'first day of',
-                    'mautic.lead.list.last_day_of' => 'last day of',
                 ]
             );
 

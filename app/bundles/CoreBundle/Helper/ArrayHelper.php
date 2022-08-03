@@ -107,12 +107,12 @@ class ArrayHelper
     /**
      *  Find a sub string in an array.
      *
-     * @param array<int|string, mixed> $array
+     * @param array<int|string, string> $array
      */
     public static function substrInArray(string $string, array $array): bool
     {
         foreach ($array as $item) {
-            if (false !== strpos($string, $item)) {
+            if (false !== stripos($string, (string) $item)) {
                 return true;
             }
         }
