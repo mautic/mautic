@@ -54,26 +54,11 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->transformer = new FieldFilterTransformer($translator);
-
-        $this->data = [
-            'test 1' => [
-                'input'    => '2020-03-17 17:22:34',
-                'expected' => '2020-03-17 17:22',
-            ],
-            'test 2' => [
-                'input'    => '2 days ago',
-                'expected' => '2 days ago',
-            ],
-            'test 3' => [
-                'input'    => 'first day of August 2022',
-                'expected' => 'first day of August 2022',
-            ],
-        ];
     }
 
     public function testTransform(): void
     {
-        foreach ($this->data as $item) {
+        foreach ($this->getTestData() as $item) {
             $filters = $this->transformer->transform([
                 [
                     'type'       => 'datetime',
@@ -122,7 +107,7 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testReverseTransform(): void
     {
-        foreach ($this->data as $item) {
+        foreach ($this->getTestData() as $item) {
             $filters = $this->transformer->reverseTransform([
                 [
                     'type'       => 'datetime',
@@ -167,5 +152,26 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
             ],
             $filters
         );
+    }
+
+    /**
+     * @return array<string, array<string, string>>
+     */
+    private function getTestData(): array
+    {
+        return [
+            'test 1' => [
+                'input'    => '2020-03-17 17:22:34',
+                'expected' => '2020-03-17 17:22',
+            ],
+            'test 2' => [
+                'input'    => '2 days ago',
+                'expected' => '2 days ago',
+            ],
+            'test 3' => [
+                'input'    => 'first day of August 2022',
+                'expected' => 'first day of August 2022',
+            ],
+        ];
     }
 }
