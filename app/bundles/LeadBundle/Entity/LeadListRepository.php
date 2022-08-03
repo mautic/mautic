@@ -520,6 +520,9 @@ class LeadListRepository extends CommonRepository
             'mautic.lead.list.year_next',
             'mautic.lead.list.year_this',
             'mautic.lead.list.anniversary',
+            'mautic.lead.list.ago',
+            'mautic.lead.list.first_day_of',
+            'mautic.lead.list.last_day_of',
         ];
     }
 
