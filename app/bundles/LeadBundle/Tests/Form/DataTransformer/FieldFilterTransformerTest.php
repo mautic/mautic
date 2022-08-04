@@ -158,7 +158,7 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return Generator<array<string, string>>
+     * @return Generator<array<int, string>>
      */
     public function dateProvider(): Generator
     {
