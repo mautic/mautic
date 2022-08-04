@@ -50,7 +50,7 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $lead->setFields([
             'core' => [
                 'First Name' => [
-                    'value' => 'John',
+                    'value' => 'Joe',
                 ],
                 'Last Name' => [
                     'value' => 'Doe',
@@ -84,6 +84,8 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
             )
             ->execute()
             ->fetchAll(FetchMode::COLUMN);
+
+        $expectedLabels = array_merge(['Created on', 'ID'], $expectedLabels);
 
         $crawler = $this->client->request('GET', sprintf('/s/contacts/view/%d', $lead->getId()));
 
