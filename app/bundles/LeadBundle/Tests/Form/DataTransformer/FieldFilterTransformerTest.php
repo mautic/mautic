@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Form\DataTransformer;
 
+use Generator;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -56,30 +57,31 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer = new FieldFilterTransformer($translator);
     }
 
-    public function testTransform(): void
+    /**
+     * @dataProvider dateProvider
+     */
+    public function testTransform(string $value, string $expected): void
     {
-        foreach ($this->getTestData() as $item) {
-            $filters = $this->transformer->transform([
+        $filters = $this->transformer->transform([
+            [
+                'type'       => 'datetime',
+                'properties' => [
+                    'filter' => $value,
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            [
                 [
                     'type'       => 'datetime',
                     'properties' => [
-                        'filter' => $item['input'],
+                        'filter' => $expected,
                     ],
                 ],
-            ]);
-
-            $this->assertSame(
-                [
-                    [
-                        'type'       => 'datetime',
-                        'properties' => [
-                            'filter' => $item['expected'],
-                        ],
-                    ],
-                ],
-                $filters
-            );
-        }
+            ],
+            $filters
+        );
     }
 
     public function testTransformWithBcFilter(): void
@@ -105,30 +107,31 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testReverseTransform(): void
+    /**
+     * @dataProvider dateProvider
+     */
+    public function testReverseTransform(string $value, string $expected): void
     {
-        foreach ($this->getTestData() as $item) {
-            $filters = $this->transformer->reverseTransform([
+        $filters = $this->transformer->reverseTransform([
+            [
+                'type'       => 'datetime',
+                'properties' => [
+                    'filter' => $value,
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            [
                 [
                     'type'       => 'datetime',
                     'properties' => [
-                        'filter' => $item['input'],
+                        'filter' => $expected,
                     ],
                 ],
-            ]);
-
-            $this->assertSame(
-                [
-                    [
-                        'type'       => 'datetime',
-                        'properties' => [
-                            'filter' => $item['expected'],
-                        ],
-                    ],
-                ],
-                $filters
-            );
-        }
+            ],
+            $filters
+        );
     }
 
     public function testReverseTransformWithBcFilter(): void
@@ -155,23 +158,12 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<string, array<string, string>>
+     * @return Generator<array<string, string>>
      */
-    private function getTestData(): array
+    public function dateProvider(): Generator
     {
-        return [
-            'test 1' => [
-                'input'    => '2020-03-17 17:22:34',
-                'expected' => '2020-03-17 17:22',
-            ],
-            'test 2' => [
-                'input'    => '2 days ago',
-                'expected' => '2 days ago',
-            ],
-            'test 3' => [
-                'input'    => 'first day of August 2022',
-                'expected' => 'first day of August 2022',
-            ],
-        ];
+        yield ['2020-03-17 17:22:34', '2020-03-17 17:22'];
+        yield ['2 days ago', '2 days ago'];
+        yield ['first day of August 2022', 'first day of August 2022'];
     }
 }
