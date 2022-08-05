@@ -1,0 +1,51 @@
+{% extends tmpl == 'index' ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+
+{% block headerTitle %}{% trans %}mautic.webhook.webhooks{% endtrans %}{% endblock %}
+{% block mauticContent %}mauticWebhook{% endblock %}
+
+{% block actions %}
+    {{- include(
+        'MauticCoreBundle:Helper:page_actions.html.twig', {
+            templateButtons: {
+                'new': permissions['webhook:webhooks:create']
+            },
+            routeBase: 'webhook'
+    }) -}}
+{% endblock %}
+
+{% block content %}
+{% if tmpl == 'index' %}
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    {#
+        Setting the template to 'list' below ensures that we send that value with the search AJAX call
+        instead of index, which would render the entire content instead of just search results.
+    #}
+    {{- include(
+        'MauticCoreBundle:Helper:list_toolbar.html.twig', {
+            searchValue: searchValue,
+            searchHelp: 'mautic.page.help.searchcommands',
+            action: currentRoute,
+            tmpl: 'list'
+    }) -}}
+    <div class="page-list">
+        {{ block('listResults') }}
+    </div>
+</div>
+{% else %}
+    {{ block('listResults') }}
+{% endif %}
+{% endblock %}
+
+{% block listResults %}
+{% if items is defined and items is not empty %}
+    <div class="table-responsive panel-collapse pull out webhook-list">
+        {# TODO #}
+    </div>
+
+    <div class="panel-footer">
+        {# TODO #}
+    </div>
+{% else %}
+    {{ include('MauticCoreBundle:Helper:noresults.html.twig') }}
+{% endif %}
+{% endblock %}

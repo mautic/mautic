@@ -2,6 +2,7 @@
 
 namespace Mautic\WebhookBundle\Controller;
 
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\FormController;
 
 /**
@@ -30,7 +31,7 @@ class WebhookController extends FormController
      */
     public function indexAction($page = 1)
     {
-        return parent::indexStandard($page);
+        return parent::indexStandard($page, AbstractStandardFormController::ENGINE_TWIG);
     }
 
     /**
