@@ -36,7 +36,7 @@
                     {% trans %}mautic.core.loading{% endtrans %}
                 </div>
                 <div class="modal-body-content">
-                    {{ body }}
+                    {{ body|raw }}
                 </div>
             </div>
             {% if footer is not empty or (footerButtons is defined and footerButtons is not empty) %}

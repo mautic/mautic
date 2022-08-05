@@ -1065,6 +1065,8 @@ return [
                 'arguments' => [
                     'mautic.helper.template.button',
                     'request_stack',
+                    'router',
+                    'translator',
                 ],
                 'tag' => 'twig.extension',
             ],
@@ -1106,6 +1108,10 @@ return [
                 'arguments' => [
                     'mautic.helper.template.config',
                 ],
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.storage' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\StorageExtension::class,
                 'tag'       => 'twig.extension',
             ],
             // Schema

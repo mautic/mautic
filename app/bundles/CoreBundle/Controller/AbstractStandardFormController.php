@@ -13,6 +13,12 @@ abstract class AbstractStandardFormController extends AbstractFormController
 {
     use FormErrorMessagesTrait;
 
+    public const ENGINE_TWIG = 'twig';
+    /**
+     * @deprecated The PHP templating engine is deprecated and will be removed in Mautic 5. Please use ENGINE_TWIG instead.
+     */
+    public const ENGINE_PHP  = 'php';
+
     /**
      * Get this controller's model name.
      */
@@ -342,7 +348,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @throws \Exception
      */
-    protected function editStandard($objectId, $ignorePost = false)
+    protected function editStandard($objectId, $ignorePost = false, $engine = self::ENGINE_PHP)
     {
         $isClone = false;
         $model   = $this->getModel($this->getModelName());
@@ -487,7 +493,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 'entity'          => $entity,
                 'form'            => $this->getFormView($form, 'edit'),
             ],
-            'contentTemplate' => $this->getTemplateName('form.html.php'),
+            'contentTemplate' => $this->getTemplateName('form.html.'.$engine),
             'passthroughVars' => [
                 'mauticContent' => $this->getJsLoadMethodPrefix(),
                 'route'         => $this->generateUrl(
@@ -833,7 +839,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function indexStandard($page = null)
+    protected function indexStandard($page = null, $engine = self::ENGINE_PHP)
     {
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
@@ -939,7 +945,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             $this->getViewArguments(
                 [
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => $this->getTemplateName('list.html.php'),
+                    'contentTemplate' => $this->getTemplateName('list.html.'.$engine),
                     'passthroughVars' => [
                         'mauticContent' => $this->getJsLoadMethodPrefix(),
                         'route'         => $this->generateUrl($this->getIndexRoute(), ['page' => $page]),
@@ -955,7 +961,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @throws \Exception
      */
-    protected function newStandard()
+    protected function newStandard($engine = self::ENGINE_PHP)
     {
         $entity = $this->getFormEntity('new');
 
@@ -1053,7 +1059,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 'entity'          => $entity,
                 'form'            => $this->getFormView($form, 'new'),
             ],
-            'contentTemplate' => $this->getTemplateName('form.html.php'),
+            'contentTemplate' => $this->getTemplateName('form.html.'.$engine),
             'passthroughVars' => [
                 'mauticContent' => $this->getJsLoadMethodPrefix(),
                 'route'         => $this->generateUrl(
@@ -1091,7 +1097,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function viewStandard($objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item')
+    protected function viewStandard($objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item', $engine = self::ENGINE_PHP)
     {
         $model    = $this->getModel($this->getModelName());
         $entity   = $model->getEntity($objectId);
@@ -1165,7 +1171,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     true
                 ),
             ],
-            'contentTemplate' => $this->getTemplateName('details.html.php'),
+            'contentTemplate' => $this->getTemplateName('details.html.'.$engine),
             'passthroughVars' => [
                 'mauticContent' => $this->getJsLoadMethodPrefix(),
                 'route'         => $route,
