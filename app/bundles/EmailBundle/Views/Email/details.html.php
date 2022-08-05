@@ -60,6 +60,7 @@ if (!$isEmbedded) {
         ];
 
         if ($isBackgroundSending) {
+            $sendButton['attr']['href']     = 'javascript:void(0);';
             $sendButton['attr']['disabled'] = true;
             $sendButton['tooltip']          = 'mautic.email.send.disabled';
         }
