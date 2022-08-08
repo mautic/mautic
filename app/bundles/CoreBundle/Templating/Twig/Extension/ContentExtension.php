@@ -40,6 +40,11 @@ class ContentExtension extends AbstractExtension
         return $this->contentHelper->getCustomContent($context, $vars, $viewName);
     }
 
+    /**
+     * @param array<mixed> $fonts
+     *
+     * @return array<mixed>
+     */
     public function sortEditorFonts(array $fonts): array
     {
         usort($fonts, static function ($fontA, $fontB): int {
