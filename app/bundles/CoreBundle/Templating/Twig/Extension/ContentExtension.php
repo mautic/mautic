@@ -24,6 +24,7 @@ class ContentExtension extends AbstractExtension
     {
         return [
             new TwigFunction('customContent', [$this, 'getCustomContent'], ['is_safe' => ['all']]),
+            new TwigFunction('getSortedEditorFonts', [$this, 'sortEditorFonts']),
         ];
     }
 
@@ -37,5 +38,17 @@ class ContentExtension extends AbstractExtension
     public function getCustomContent($context = null, array $vars = [], ?string $viewName = null): string
     {
         return $this->contentHelper->getCustomContent($context, $vars, $viewName);
+    }
+
+    public function sortEditorFonts(array $fonts): array
+    {
+        usort($fonts, static function ($fontA, $fontB): int {
+            $fontAName = $fontA['name'] ?? '';
+            $fontBName = $fontB['name'] ?? '';
+
+            return strcasecmp($fontAName, $fontBName);
+        });
+
+        return $fonts;
     }
 }
