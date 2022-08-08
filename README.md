@@ -176,7 +176,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="http://benjamin.leveque.me"><img src="https://avatars.githubusercontent.com/u/166890?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Benjamin Lévêque</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=benji07" title="Code">💻</a></td>
-    <td align="center"><a href="https://buzelac.com"><img src="https://avatars.githubusercontent.com/u/430255?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Benjamin</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=uzegonemad" title="Code">💻</a></td>
+    <td align="center"><a href="https://buzelac.com"><img src="https://avatars.githubusercontent.com/u/430255?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Benjamin</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=uzegonemad" title="Code">💻</a> <a href="https://github.com/mautic/mautic/issues?q=author%3Auzegonemad" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
