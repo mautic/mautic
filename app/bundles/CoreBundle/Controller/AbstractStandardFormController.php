@@ -348,7 +348,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @throws \Exception
      */
-    protected function editStandard($objectId, $ignorePost = false, $engine = self::ENGINE_PHP)
+    protected function editStandard($objectId, $ignorePost = false, string $engine = self::ENGINE_PHP)
     {
         $isClone = false;
         $model   = $this->getModel($this->getModelName());
@@ -839,7 +839,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function indexStandard($page = null, $engine = self::ENGINE_PHP)
+    protected function indexStandard($page = null, string $engine = self::ENGINE_PHP)
     {
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
@@ -961,7 +961,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @throws \Exception
      */
-    protected function newStandard($engine = self::ENGINE_PHP)
+    protected function newStandard(string $engine = self::ENGINE_PHP)
     {
         $entity = $this->getFormEntity('new');
 
@@ -1097,7 +1097,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function viewStandard($objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item', $engine = self::ENGINE_PHP)
+    protected function viewStandard($objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item', string $engine = self::ENGINE_PHP)
     {
         $model    = $this->getModel($this->getModelName());
         $entity   = $model->getEntity($objectId);

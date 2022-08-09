@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
-use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -49,6 +48,9 @@ class ButtonExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * @param null $item
+     */
     public function reset(string $location, string $groupType = ButtonHelper::TYPE_GROUP, $item = null): void
     {
         $this->buttonHelper->reset(
@@ -59,6 +61,9 @@ class ButtonExtension extends AbstractExtension
         );
     }
 
+    /**
+     * @param array<string,mixed> $button
+     */
     public function addButton(array $button): void
     {
         $this->buttonHelper->addButton($button);
@@ -84,6 +89,9 @@ class ButtonExtension extends AbstractExtension
         return $this->buttonHelper->getButtonCount();
     }
 
+    /**
+     * @param array<array<string,mixed>> $buttons
+     */
     public function addButtons(array $buttons): void
     {
         $this->buttonHelper->addButtons($buttons);
@@ -95,18 +103,23 @@ class ButtonExtension extends AbstractExtension
     }
 
     /**
-     * @param array<string,bool> $templateButtons
+     * @param array<string,bool>   $templateButtons
+     * @param array<string,string> $query
+     * @param array<string,string> $editAttr
+     * @param array<string,string> $routeVars
+     * @param mixed                $item
      */
     public function addButtonsFromTemplate(
         array $templateButtons,
-        array $query = [],
+        array $query,
         string $actionRoute,
         string $indexRoute,
         string $langVar,
         string $nameGetter,
         array $editAttr = [],
-        ?VariantEntityInterface $item = null,
-        $tooltip = null
+        array $routeVars = [],
+        $item = null,
+        ?string $tooltip = null
     ): void {
         foreach ($templateButtons as $action => $enabled) {
             if (!$enabled) {
@@ -121,6 +134,10 @@ class ButtonExtension extends AbstractExtension
                 case 'clone':
                 case 'abtest':
                     $actionQuery = [
+                        /**
+                         * If the item has the getVariantParent(), it probably implements VariantEntityInterface,
+                         * but that doesn't have a getId() method so we can't do $item instanceof VariantEntityInterface here.
+                         */
                         'objectId' => ('abtest' == $action && method_exists($item, 'getVariantParent') && $item->getVariantParent())
                             ? $item->getVariantParent()->getId() : $item->getId(),
                     ];

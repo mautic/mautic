@@ -36,7 +36,7 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function newStandard()
+    protected function newStandard(string $engine = self::ENGINE_PHP)
     {
         return $this->processModalAction('new');
     }
@@ -47,7 +47,7 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
      *
      * @return JsonResponse
      */
-    public function editStandard($objectId, $ignorePost = false)
+    public function editStandard($objectId, $ignorePost = false, string $engine = self::ENGINE_PHP)
     {
         return $this->processModalAction('edit', $objectId);
     }
