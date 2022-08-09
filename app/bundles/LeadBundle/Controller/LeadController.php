@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
@@ -1386,45 +1387,49 @@ class LeadController extends FormController
                         // To lead
                         $mailer->addTo($leadEmail, $leadName);
 
-                        // From user
-                        $user = $this->get('mautic.helper.user')->getUser();
-
                         $mailer->setFrom(
                             $email['from'],
                             empty($email['fromname']) ? null : $email['fromname']
                         );
 
                         // Attachments
+                        // From Assets
                         $assets = [];
-                        $assetsIds  = (!empty($email['assetAttachments'])) ? $email['assetAttachments'] : [];
+                        $assetsIds  = $email['assetAttachments'] ?? [];
+                        $assetModel = $this->getModel('asset.asset');
+                        $uploadDir = $this->get('mautic.helper.core_parameters')->get('upload_dir');
+
+
                         foreach($assetsIds as $assetId) {
-                            $model = $this->factory->getModel('asset');
-                            $asset = $model->getEntity($assetId);
+                            $asset = $assetModel->getEntity($assetId);
                             if ($asset->isPublished()) {
-                                $asset->setUploadDir($this->factory->getParameter('upload_dir'));
-                                $assets[$asset->getId()] = $asset;
+                                $asset->setUploadDir($uploadDir);
+                                $assets[] = $asset;
                             }
                         }
 
                         if (!empty($assets)) {
                             foreach ($assets as $asset) {
                                 if(is_file($asset->getFilePath())) {
-                                    $mailer->message->attach(\Swift_Attachment::fromPath(
+                                    /** @var MailHelper $mailer */
+                                    $mailer->message->addAttachment(
                                         $asset->getFilePath(),
+                                        $asset->getOriginalFileName(),
                                         $asset->getMime()
-                                    )->setFilename($asset->getOriginalFileName()));
+                                    );
                                 }
                             }
                         }
 
-
+                        // Attachments from form
                         if(isset($email['attachments']) && !empty($email['attachments'])) {
                             foreach($email['attachments'] as $attachment) {
-                                $identifier = time();
-                                $attachment->move($this->get('kernel')->getRootDir() . "/../media/attachments", $identifier . "-" . $attachment->getClientOriginalName());
-                                $mailer->message->attach(\Swift_Attachment::fromPath(
-                                    $this->get('kernel')->getRootDir() . "/../media/attachments/" . $identifier . "-" . $attachment->getClientOriginalName()
-                                )->setFilename($attachment->getClientOriginalName()));
+                                /** @var UploadedFile $attachment */
+                                $mailer->message->addAttachment(
+                                    $attachment->getRealPath(),
+                                    $attachment->getClientOriginalName(),
+                                    $attachment->getMimeType()
+                                );
                             }
                         }
 
