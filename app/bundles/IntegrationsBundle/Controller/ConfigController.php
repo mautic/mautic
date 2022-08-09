@@ -212,9 +212,17 @@ class ConfigController extends AbstractFormController
             $integrationObject->getRedirectUri()
             : false;
 
-        $formNotes = $integrationObject instanceof ConfigFormNotesInterface ?
-            $integrationObject->getFormNotes()
-            : [];
+        $authorizationNote = $integrationObject instanceof ConfigFormNotesInterface ?
+            $integrationObject->getAuthorizationNote()
+            : null;
+
+        $featuresNote = $integrationObject instanceof ConfigFormNotesInterface ?
+            $integrationObject->getFeaturesNote()
+            : null;
+
+        $fieldMappingNote = $integrationObject instanceof ConfigFormNotesInterface ?
+            $integrationObject->getFieldMappingNote()
+            : null;
 
         return $this->delegateView(
             [
@@ -229,7 +237,9 @@ class ConfigController extends AbstractFormController
                     'useFeatureSettings'  => $useFeatureSettings,
                     'useAuthorizationUrl' => $useAuthorizationUrl,
                     'callbackUrl'         => $callbackUrl,
-                    'formNotes'           => $formNotes,
+                    'authorizationNote'   => $authorizationNote,
+                    'featuresNote'        => $featuresNote,
+                    'fieldMappingNote'    => $fieldMappingNote,
                 ],
                 'contentTemplate' => $integrationObject->getConfigFormContentTemplate()
                     ?: 'IntegrationsBundle:Config:form.html.twig',

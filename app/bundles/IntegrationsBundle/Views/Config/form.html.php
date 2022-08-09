@@ -61,11 +61,12 @@ $activeTab = $activeTab ?: 'details-container';
 <div class="tab-content pa-md bg-white">
     <!-- Enabled\Auth -->
     <div class="tab-pane fade <?php if ('details-container' == $activeTab): echo 'in active'; endif; ?> bdr-w-0" id="details-container">
-        <?php if (isset($formNotes['authorization'])): ?>
-            <div class="alert alert-<?php echo $formNotes['authorization']['type']; ?>">
-                <?php echo $view['translator']->trans($formNotes['authorization']['note']); ?>
+        <?php if ($authorizationNote instanceof \Mautic\IntegrationsBundle\DTO\Note): ?>
+            <div class="alert alert-<?php echo $authorizationNote->getType(); ?>">
+                <?php echo $view['translator']->trans($authorizationNote->getNote()); ?>
             </div>
         <?php endif; ?>
+
         <?php echo $view['form']->row($form['isPublished']); ?>
         <?php if ($integrationObject instanceof \Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthInterface): ?>
         <hr />
@@ -101,9 +102,9 @@ $activeTab = $activeTab ?: 'details-container';
     <!-- Features -->
     <?php if ($showFeaturesTab): ?>
     <div class="tab-pane fade <?php if ('features-container' == $activeTab): echo 'in active'; endif; ?> bdr-w-0" id="features-container">
-        <?php if (isset($formNotes['features'])): ?>
-            <div class="alert alert-<?php echo $formNotes['features']['type']; ?>">
-                <?php echo $view['translator']->trans($formNotes['features']['note']); ?>
+        <?php if ($featuresNote instanceof \Mautic\IntegrationsBundle\DTO\Note): ?>
+            <div class="alert alert-<?php echo $featuresNote->getType(); ?>">
+                <?php echo $view['translator']->trans($featuresNote->getNote()); ?>
             </div>
         <?php endif; ?>
         <?php
@@ -142,9 +143,9 @@ $activeTab = $activeTab ?: 'details-container';
         <div class="has-error">
             <?php echo $view['form']->errors($objectFieldMapping); ?>
         </div>
-        <?php if (isset($formNotes['field_mapping'])): ?>
-            <div class="alert alert-<?php echo $formNotes['field_mapping']['type']; ?>">
-                <?php echo $view['translator']->trans($formNotes['field_mapping']['note']); ?>
+        <?php if ($fieldMappingNote instanceof \Mautic\IntegrationsBundle\DTO\Note): ?>
+            <div class="alert alert-<?php echo $fieldMappingNote->getType(); ?>">
+                <?php echo $view['translator']->trans($fieldMappingNote->getNote()); ?>
             </div>
         <?php endif; ?>
         <?php echo $view['form']->row($objectFieldMapping['filter-keyword']); ?>
