@@ -1114,6 +1114,14 @@ return [
                 'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\StorageExtension::class,
                 'tag'       => 'twig.extension',
             ],
+            'templating.twig.extension.publish_status' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\PublishStatusExtension::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.template.date',
+                ],
+                'tag'       => 'twig.extension',
+            ],
             // Schema
             'mautic.schema.helper.column' => [
                 'class'     => 'Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper',

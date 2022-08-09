@@ -3,6 +3,8 @@
 {% endif %}
 {# Function used to get identifier string for entity #}
 {% set nameGetter = nameGetter is defined and nameGetter is not empty ? nameGetter : 'getName' %}
+{# Dropdown direction #}
+{% set pull = pull is defined and pull is not empty ? pull : 'left' %}
 {# Custom query parameters for URLs #}
 {% set query = query is defined ? query : [] %}
 {% if tmpl is defined %}
