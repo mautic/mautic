@@ -998,11 +998,20 @@ class MailHelper
         $content = $this->message->getBody();
         $matches = [];
         $content = strtr($content, $this->embedImagesReplaces);
+        $tokens  = $this->getTokens();
         if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches) > 0) {
             foreach ($matches[1] as $match) {
-                if (false === strpos($match, 'cid:') && false === strpos($match, '{tracking_pixel}') && !array_key_exists($match, $this->embedImagesReplaces)) {
-                    $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                // skip items that already embedded, or have token {tracking_pixel}
+                if (false !== strpos($match, 'cid:') || false !== strpos($match, '{tracking_pixel}') || array_key_exists($match, $this->embedImagesReplaces)) {
+                    continue;
                 }
+
+                // skip images with tracking pixel that are already replaced.
+                if (isset($tokens['{tracking_pixel}']) && $match === $tokens['{tracking_pixel}']) {
+                    continue;
+                }
+
+                $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
             }
             $content = strtr($content, $this->embedImagesReplaces);
         }
