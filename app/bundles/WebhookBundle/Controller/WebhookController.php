@@ -2,7 +2,6 @@
 
 namespace Mautic\WebhookBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\FormController;
 
 /**
@@ -31,7 +30,7 @@ class WebhookController extends FormController
      */
     public function indexAction($page = 1)
     {
-        return parent::indexStandard($page, AbstractStandardFormController::ENGINE_TWIG);
+        return parent::indexStandard($page, self::ENGINE_TWIG);
     }
 
     /**
@@ -41,7 +40,7 @@ class WebhookController extends FormController
      */
     public function newAction()
     {
-        return parent::newStandard();
+        return parent::newStandard(self::ENGINE_TWIG);
     }
 
     /**
@@ -54,7 +53,7 @@ class WebhookController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        return parent::editStandard($objectId, $ignorePost);
+        return parent::editStandard($objectId, $ignorePost, self::ENGINE_TWIG);
     }
 
     /**
@@ -66,7 +65,7 @@ class WebhookController extends FormController
      */
     public function viewAction($objectId)
     {
-        return parent::viewStandard($objectId, 'webhook', 'webhook');
+        return parent::viewStandard($objectId, 'webhook', 'webhook', null, 'item', self::ENGINE_TWIG);
     }
 
     /**
