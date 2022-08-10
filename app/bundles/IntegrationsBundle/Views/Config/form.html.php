@@ -61,9 +61,9 @@ $activeTab = $activeTab ?: 'details-container';
 <div class="tab-content pa-md bg-white">
     <!-- Enabled\Auth -->
     <div class="tab-pane fade <?php if ('details-container' == $activeTab): echo 'in active'; endif; ?> bdr-w-0" id="details-container">
-        <?php if ($authorizationNote instanceof \Mautic\IntegrationsBundle\DTO\Note): ?>
-            <div class="alert alert-<?php echo $authorizationNote->getType(); ?>">
-                <?php echo $view['translator']->trans($authorizationNote->getNote()); ?>
+        <?php if ($useConfigFormNotes && $integrationObject->getAuthorizationNote() instanceof \Mautic\IntegrationsBundle\DTO\Note): ?>
+            <div class="alert alert-<?php echo $integrationObject->getAuthorizationNote()->getType(); ?>">
+                <?php echo $view['translator']->trans($integrationObject->getAuthorizationNote()->getNote()); ?>
             </div>
         <?php endif; ?>
 
@@ -102,9 +102,9 @@ $activeTab = $activeTab ?: 'details-container';
     <!-- Features -->
     <?php if ($showFeaturesTab): ?>
     <div class="tab-pane fade <?php if ('features-container' == $activeTab): echo 'in active'; endif; ?> bdr-w-0" id="features-container">
-        <?php if ($featuresNote instanceof \Mautic\IntegrationsBundle\DTO\Note): ?>
-            <div class="alert alert-<?php echo $featuresNote->getType(); ?>">
-                <?php echo $view['translator']->trans($featuresNote->getNote()); ?>
+        <?php if ($useConfigFormNotes && $integrationObject->getFeaturesNote() instanceof \Mautic\IntegrationsBundle\DTO\Note): ?>
+            <div class="alert alert-<?php echo $integrationObject->getFeaturesNote()->getType(); ?>">
+                <?php echo $view['translator']->trans($integrationObject->getFeaturesNote()->getNote()); ?>
             </div>
         <?php endif; ?>
         <?php
@@ -143,9 +143,9 @@ $activeTab = $activeTab ?: 'details-container';
         <div class="has-error">
             <?php echo $view['form']->errors($objectFieldMapping); ?>
         </div>
-        <?php if ($fieldMappingNote instanceof \Mautic\IntegrationsBundle\DTO\Note): ?>
-            <div class="alert alert-<?php echo $fieldMappingNote->getType(); ?>">
-                <?php echo $view['translator']->trans($fieldMappingNote->getNote()); ?>
+        <?php if ($useConfigFormNotes && $integrationObject->getFieldMappingNote() instanceof \Mautic\IntegrationsBundle\DTO\Note): ?>
+            <div class="alert alert-<?php echo $integrationObject->getFieldMappingNote()->getType(); ?>">
+                <?php echo $view['translator']->trans($integrationObject->getFieldMappingNote()->getNote()); ?>
             </div>
         <?php endif; ?>
         <?php echo $view['form']->row($objectFieldMapping['filter-keyword']); ?>
