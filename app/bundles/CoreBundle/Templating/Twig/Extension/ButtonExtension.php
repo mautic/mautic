@@ -42,7 +42,7 @@ class ButtonExtension extends AbstractExtension
             new TwigFunction('buttonSetWrappingTags', [$this, 'setWrappingTags'], ['is_safe' => ['all']]),
             new TwigFunction('buttonSetGroupType', [$this, 'setGroupType'], ['is_safe' => ['all']]),
             new TwigFunction('buttonGetCount', [$this, 'getButtonCount']),
-            new TwigFunction('buttonsRender', [$this, 'render']),
+            new TwigFunction('buttonsRender', [$this, 'render'], ['is_safe' => ['all']]),
             new TwigFunction('buttonsAdd', [$this, 'addButtons'], ['is_safe' => ['all']]),
             new TwigFunction('buttonsAddFromTemplate', [$this, 'addButtonsFromTemplate'], ['is_safe' => ['all']]),
         ];
