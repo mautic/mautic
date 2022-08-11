@@ -80,3 +80,4 @@ Becomes
 - If you extend `MauticCoreBundle:Default:content.html.twig`, everything HAS to be in blocks. Trying to put any HTML elements outside a block will fail with the following error:
 
     > A template that extends another one cannot include content outside Twig blocks.
+- You're probably used to writing `if !empty($variable) {}` in PHP. That checks if the variable is set and whether it is not empty. In Twig, you explicity have to write `if variable is defined and variable is not empty`. It's a lot more descriptive, and we might want to create a custom Twig function like `notEmpty(variable)`.

@@ -1,4 +1,8 @@
-{% extends tmpl == 'index' ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{# Override tmpl to "list" because otherwise AJAX calls render the whole content instead of just the raw output #}
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+
+{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
 
 {% block headerTitle %}{% trans %}mautic.webhook.webhooks{% endtrans %}{% endblock %}
 {% block mauticContent %}mauticWebhook{% endblock %}
@@ -14,18 +18,13 @@
 {% endblock %}
 
 {% block content %}
-{% if tmpl == 'index' %}
+{% if isIndex %}
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
-    {#
-        Setting the template to 'list' below ensures that we send that value with the search AJAX call
-        instead of index, which would render the entire content instead of just search results.
-    #}
     {{- include(
         'MauticCoreBundle:Helper:list_toolbar.html.twig', {
             searchValue: searchValue,
             searchHelp: 'mautic.page.help.searchcommands',
-            action: currentRoute,
-            tmpl: 'list'
+            action: currentRoute
     }) -}}
     <div class="page-list">
         {{ block('listResults') }}

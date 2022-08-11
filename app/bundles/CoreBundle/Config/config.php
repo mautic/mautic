@@ -1115,7 +1115,7 @@ return [
                 'tag'       => 'twig.extension',
             ],
             'templating.twig.extension.publish_status' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\PublishStatusExtension::class,
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\CoreHelpersExtension::class,
                 'arguments' => [
                     'translator',
                     'mautic.helper.template.date',
