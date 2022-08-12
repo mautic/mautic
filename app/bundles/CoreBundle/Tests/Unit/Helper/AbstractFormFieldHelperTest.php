@@ -266,6 +266,26 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
+     */
+    public function testBooleanForChoicesArrayList(): void
+    {
+        $array = [
+            0 => 'no',
+            1 => 'yes',
+        ];
+
+        $expected = [
+             'no' => 0,
+            'yes' => 1,
+        ];
+
+        $actual = AbstractFormFieldHelper::parseBooleanListForChoices($array);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
      * @covers  \Mautic\CoreBundle\Helper\ListParser\BarListParser::parse
      * @covers  \Mautic\CoreBundle\Helper\ListParser\ArrayListParser::parse
      */
