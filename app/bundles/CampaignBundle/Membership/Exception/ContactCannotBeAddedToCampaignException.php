@@ -2,6 +2,8 @@
 
 namespace Mautic\CampaignBundle\Membership\Exception;
 
-class ContactCannotBeAddedToCampaignException extends \Exception
+use Mautic\CoreBundle\Exception\FlattenableException;
+
+class ContactCannotBeAddedToCampaignException extends FlattenableException
 {
 }

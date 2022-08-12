@@ -53,6 +53,50 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
         yield ['neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
     }
 
+    /**
+     * @return array<mixed>
+     */
+    public function dataApplyQueryWithBatchLimiters(): iterable
+    {
+        yield [['minId' => 1, 'maxId' => 1], 'eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id BETWEEN 1 and 1))'];
+        yield [['minId' => 1, 'maxId' => 1], 'eq', '0', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id BETWEEN 1 and 1))'];
+        yield [['minId' => 1, 'maxId' => 1], 'neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id BETWEEN 1 and 1))'];
+        yield [['minId' => 1, 'maxId' => 1], 'neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id BETWEEN 1 and 1))'];
+
+        yield [['minId' => 1], 'eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id >= 1))'];
+        yield [['minId' => 1], 'eq', '0', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id >= 1))'];
+        yield [['minId' => 1], 'neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id >= 1))'];
+        yield [['minId' => 1], 'neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id >= 1))'];
+
+        yield [['maxId' => 1], 'eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id <= 1))'];
+        yield [['maxId' => 1], 'eq', '0', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id <= 1))'];
+        yield [['maxId' => 1], 'neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id <= 1))'];
+        yield [['maxId' => 1], 'neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id <= 1))'];
+
+        yield [['lead_id' => 1], 'eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id = 1))'];
+        yield [['lead_id' => 1], 'eq', '0', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id = 1))'];
+        yield [['lead_id' => 1], 'neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id = 1))'];
+        yield [['lead_id' => 1], 'neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\') AND (par0.lead_id = 1))'];
+    }
+
+    /**
+     * @dataProvider dataApplyQueryWithBatchLimiters
+     *
+     * @param array<string, mixed> $batchLimiters
+     */
+    public function testApplyQueryWithBatchLimiters(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
+    {
+        $queryBuilder = new QueryBuilder($this->createConnection());
+        $queryBuilder->select('1');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
+        $filter             = $this->createFilter($operator, $parameterValue, $batchLimiters);
+        $filterQueryBuilder = new DoNotContactFilterQueryBuilder(new RandomParameterName(), new EventDispatcher());
+
+        Assert::assertSame($queryBuilder, $filterQueryBuilder->applyQuery($queryBuilder, $filter));
+        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+    }
+
     private function createConnection(): Connection
     {
         return new class() extends Connection {
@@ -63,9 +107,14 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
         };
     }
 
-    private function createFilter(string $operator, string $parameterValue): ContactSegmentFilter
+    /**
+     * @dataProvider dataApplyQueryWithBatchLimitersMinMaxBoth
+     *
+     *  @param array<string, mixed> $batchLimiters
+     */
+    private function createFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter
     {
-        return new class($operator, $parameterValue) extends ContactSegmentFilter {
+        return new class($operator, $parameterValue, $batchLimiters) extends ContactSegmentFilter {
             /**
              * @var string
              */
@@ -76,11 +125,17 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
              */
             private $parameterValue;
 
+            /**
+             * @var array<string, mixed>
+             */
+            private $batchLimiters;
+
             /** @noinspection PhpMissingParentConstructorInspection */
-            public function __construct(string $operator, string $parameterValue)
+            public function __construct(string $operator, string $parameterValue, array $batchLimiters)
             {
                 $this->operator       = $operator;
                 $this->parameterValue = $parameterValue;
+                $this->batchLimiters  = $batchLimiters;
             }
 
             public function getDoNotContactParts()
@@ -101,6 +156,11 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
             public function getGlue()
             {
                 return 'and';
+            }
+
+            public function getBatchLimiters(): array
+            {
+                return $this->batchLimiters;
             }
         };
     }
