@@ -156,6 +156,26 @@ abstract class AbstractFormFieldHelper
     }
 
     /**
+     * @param mixed $list
+     *
+     * @return mixed[]
+     */
+    public static function parseBooleanListForChoices($list): array
+    {
+        return static::parseChoiceList(
+            self::parseListsWithParsers(
+                $list,
+                [
+                    new JsonListParser(),
+                    new BarListParser(),
+                    new ValueListParser(),
+                ]
+            ),
+            true
+        );
+    }
+
+    /**
      * @param $format
      * @param $choices
      *

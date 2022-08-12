@@ -44,7 +44,7 @@
                                     $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
                                     $choices   = ('boolean' === $params['properties']['type'])
                                         ?
-                                        \Mautic\LeadBundle\Helper\FormFieldHelper::parseBooleanList($list)
+                                        \Mautic\LeadBundle\Helper\FormFieldHelper::parseBooleanListForChoices($list)
                                         :
                                         \Mautic\LeadBundle\Helper\FormFieldHelper::parseListForChoices($list);
                                     $list      = json_encode($choices);
