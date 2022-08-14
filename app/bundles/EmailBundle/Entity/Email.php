@@ -1220,4 +1220,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         return $this->clonedId;
     }
+
+    public function isBackgroundSending(): bool
+    {
+        return $this->isPublished() && !empty($this->getPublishUp()) && ($this->getPublishUp() < new \DateTime());
+    }
 }

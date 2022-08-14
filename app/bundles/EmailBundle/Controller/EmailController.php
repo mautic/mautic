@@ -423,7 +423,6 @@ class EmailController extends FormController
                         ]
                     )->getContent(),
                     'dateRangeForm'         => $dateRangeForm->createView(),
-                    'isBackgroundSending'   => $email->isPublished() && !empty($email->getPublishUp()) && ($email->getPublishUp() < new \DateTime()),
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:details.html.php',
                 'passthroughVars' => [
