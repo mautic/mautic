@@ -157,7 +157,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
         $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
-        $this->assertStringContainsString('disabled', $html, $html);
+        $this->assertStringContainsString('Email is sending in the background', $html, $html);
 
         $email->setPublishUp(new \DateTime('now +1 hour'));
         $this->em->persist($email);
@@ -165,7 +165,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
         $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
-        $this->assertStringNotContainsString('disabled', $html, $html);
+        $this->assertStringNotContainsString('Email is sending in the background', $html, $html);
 
         $email->setPublishUp(null);
         $this->em->persist($email);
