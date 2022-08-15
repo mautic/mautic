@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
  */
 class Version20180212084814 extends AbstractMauticMigration
 {
-    private $keys = ['actionButtonIcon1', 'actionButtonIcon2', 'icon', 'image', 'actionButtonUrl1', 'actionButtonUrl2'];
+    private $keys = ['action_button_icon_1', 'action_button_icon_2', 'icon', 'image', 'action_button_url_1', 'action_button_url_2', 'action_button_text_2'];
 
     /**
      * @throws SkipMigrationException
@@ -37,8 +37,10 @@ class Version20180212084814 extends AbstractMauticMigration
         $columns = $schema->getTable($this->prefix.'push_notifications')->getColumns();
         foreach ($this->keys as $key) {
             if (!array_key_exists($key, $columns)) {
-                $this->addSql("ALTER TABLE {$this->prefix}push_notifications ADD {$key} VARCHAR(512) DEFAULT NULL;");
+                $this->addSql("ALTER TABLE {$this->prefix}push_notifications ADD {$key} VARCHAR(191) DEFAULT NULL;");
             }
         }
+        $this->addSql("ALTER TABLE {$this->prefix}push_notifications ADD ttl INT NOT NULL");
+        $this->addSql("ALTER TABLE {$this->prefix}push_notifications ADD priority INT NOT NULL");
     }
 }
