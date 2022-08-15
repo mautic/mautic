@@ -23,12 +23,11 @@ abstract class AbstractNotificationApi
     /**
      * AbstractNotificationApi constructor.
      */
-    public function __construct(Client $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper, NotificationUploader $notificationUpload
-er)
+    public function __construct(Client $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper, NotificationUploader $notificationUploader)
     {
-        $this->http              = $http;
-        $this->trackableModel    = $trackableModel;
-        $this->integrationHelper = $integrationHelper;
+        $this->http                 = $http;
+        $this->trackableModel       = $trackableModel;
+        $this->integrationHelper    = $integrationHelper;
         $this->notificationUploader = $notificationUploader;
     }
 
