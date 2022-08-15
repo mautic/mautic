@@ -4,6 +4,7 @@ namespace Mautic\NotificationBundle\Api;
 
 use GuzzleHttp\Client;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Helper\NotificationUploader;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Http\Message\ResponseInterface;
@@ -15,13 +16,20 @@ abstract class AbstractNotificationApi
     protected IntegrationHelper $integrationHelper;
 
     /**
+     * @var NotificationUploader
+     */
+    protected $notificationUploader;
+
+    /**
      * AbstractNotificationApi constructor.
      */
-    public function __construct(Client $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper)
+    public function __construct(Client $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper, NotificationUploader $notificationUpload
+er)
     {
         $this->http              = $http;
         $this->trackableModel    = $trackableModel;
         $this->integrationHelper = $integrationHelper;
+        $this->notificationUploader = $notificationUploader;
     }
 
     /**
@@ -35,7 +43,7 @@ abstract class AbstractNotificationApi
      *
      * @return mixed
      */
-    abstract public function sendNotification($id, Notification $notification);
+    abstract public function sendNotification($id, Notification $sendNotification, Notification $notification);
 
     /**
      * Convert a non-tracked url to a tracked url.

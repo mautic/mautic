@@ -280,7 +280,6 @@ class NotificationController extends AbstractFormController
 
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
-
         ///Check for a submitted form and process it
         if ('POST' === $method) {
             $valid = false;
@@ -288,6 +287,11 @@ class NotificationController extends AbstractFormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($entity);
+                    // update entity if files was updated
+                    $this->get('mautic.notification.helper.uploader')->uploadFiles($entity, $this->request, $form);
+                    if (!empty($entity->getChanges())) {
+                        $model->saveEntity($entity);
+                    }
 
                     $this->addFlash(
                         'mautic.core.notice.created',
@@ -442,7 +446,6 @@ class NotificationController extends AbstractFormController
             : $this->request->get('updateSelect', false);
 
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
-
         ///Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $method) {
             $valid = false;
@@ -450,6 +453,7 @@ class NotificationController extends AbstractFormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
+                    $this->get('mautic.notification.helper.uploader')->uploadFiles($entity, $this->request, $form);
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
                     $this->addFlash(
@@ -738,7 +742,8 @@ class NotificationController extends AbstractFormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'notification' => $notification,
+                    'notification'         => $notification,
+                    'notificationUploader' => $this->get('mautic.notification.helper.uploader'),
                 ],
                 'contentTemplate' => 'MauticNotificationBundle:Notification:preview.html.php',
             ]

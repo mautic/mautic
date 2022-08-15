@@ -67,7 +67,12 @@ return [
         ],
         'forms' => [
             'mautic.form.type.notification' => [
-                'class' => 'Mautic\NotificationBundle\Form\Type\NotificationType',
+                'class'    => 'Mautic\NotificationBundle\Form\Type\NotificationType',
+                'arguments'=> [
+                    'translator',
+                    'mautic.notification.helper.uploader',
+                    'mautic.notification.model.notification',
+                ],
             ],
             'mautic.form.type.mobile.notification' => [
                 'class' => \Mautic\NotificationBundle\Form\Type\MobileNotificationType::class,
@@ -121,8 +126,25 @@ return [
                     'mautic.http.client',
                     'mautic.page.model.trackable',
                     'mautic.helper.integration',
+                    'mautic.notification.helper.uploader',
                 ],
                 'alias' => 'notification_api',
+            ],
+            'mautic.notification.helper.uploader' => [
+                'class'     => \Mautic\NotificationBundle\Helper\NotificationUploader::class,
+                'arguments' => [
+                    'mautic.helper.file_uploader',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.paths',
+                ],
+            ],
+        ],
+        'validator' => [
+            'mautic.notification.validator.upload_field_validator' => [
+                'class'     => \Mautic\NotificationBundle\Validator\UploadNotificationValidator::class,
+                'arguments' => [
+                    'mautic.core.validator.file_upload',
+                ],
             ],
         ],
         'models' => [
@@ -286,5 +308,6 @@ return [
         'campaign_notification_email_addresses'       => null,
         'webhook_send_notification_to_author'         => true,
         'webhook_notification_email_addresses'        => null,
+        'notification_image_directory'                => 'notifications',
     ],
 ];
