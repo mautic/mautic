@@ -417,6 +417,10 @@ class AssetController extends FormController
         $model  = $this->getModel('asset');
         $entity = $model->getEntity($objectId);
 
+        if (!$this->get('mautic.security')->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy())) {
+            return $this->accessDenied();
+        }
+
         $entity->setMaxSize(FileHelper::convertMegabytesToBytes($this->coreParametersHelper->get('max_size')));
 
         $session    = $request->getSession();
