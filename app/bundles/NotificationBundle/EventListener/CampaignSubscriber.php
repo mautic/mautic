@@ -15,6 +15,7 @@ use Mautic\NotificationBundle\Form\Type\NotificationSendType;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -182,14 +183,14 @@ class CampaignSubscriber implements EventSubscriberInterface
         $sendNotification->setMessage($sendEvent->getMessage());
         $sendNotification->setHeading($sendEvent->getHeading());
 
+        /** @var ResponseInterface $response */
         $response = $this->notificationApi->sendNotification(
             $playerID,
             $sendNotification,
             $notification
         );
-
         // enable/disable push_id
-        $results    = \GuzzleHttp\json_decode($response->body, true);
+        $results    = \GuzzleHttp\json_decode($response->getBody(), true);
         $invalidIds = !empty($results['errors']['invalid_player_ids']) ? $results['errors']['invalid_player_ids'] : [];
         foreach ($pushIDs as $pushID) {
             if (in_array($pushID->getPushID(), $invalidIds)) {
@@ -203,7 +204,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->setChannel('notification', $notification->getId());
 
         // If for some reason the call failed, tell mautic to try again by return false
-        if (200 !== $response->code) {
+        if (200 !== $response->getStatusCode()) {
             return $event->setResult(false);
         }
 

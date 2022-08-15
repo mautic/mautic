@@ -68,7 +68,7 @@ class NotificationSendType extends AbstractType
                 ]
             );
 
-            $notification = $options['data']['notification'];
+            $notification = $options['data']['notification'] ?? null;
 
             // create button edit notification
             $windowUrlEdit = $this->router->generate('mautic_notification_action', [

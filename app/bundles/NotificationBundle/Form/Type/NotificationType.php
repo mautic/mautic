@@ -7,8 +7,13 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
+use Mautic\NotificationBundle\Helper\NotificationUploader;
+use Mautic\NotificationBundle\Model\NotificationModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -16,6 +21,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class NotificationType.
@@ -140,7 +148,7 @@ class NotificationType extends AbstractType
 
         $builder->add(
             'actionButtonUrl1',
-            'url',
+            UrlType::class,
             [
                 'label'      => 'mautic.notification.form.button.url',
                 'label_attr' => ['class' => 'control-label'],
@@ -154,7 +162,7 @@ class NotificationType extends AbstractType
 
         $builder->add(
             'actionButtonUrl2',
-            'url',
+            UrlType::class,
             [
                 'label'      => 'mautic.notification.form.button.url',
                 'label_attr' => ['class' => 'control-label'],
@@ -182,7 +190,7 @@ class NotificationType extends AbstractType
 
         $builder->add(
             'actionButtonText2',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.notification.form.button.text',
                 'label_attr' => ['class' => 'control-label'],
@@ -196,7 +204,7 @@ class NotificationType extends AbstractType
 
         $builder->add(
             'actionButtonIcon1',
-            'file',
+            FileType::class,
             [
                 'label'      => 'mautic.notification.form.button.icon',
                 'label_attr' => ['class' => 'control-label'],
@@ -340,7 +348,7 @@ class NotificationType extends AbstractType
                 'multiple'    => false,
                 'label'       => 'mautic.notification.form.priority',
                 'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
+                'placeholder' => false,
                 'required'    => false,
                 'attr'        => [
                     'class'   => 'form-control',
@@ -358,7 +366,7 @@ class NotificationType extends AbstractType
                 'multiple'    => false,
                 'label'       => 'mautic.notification.form.time.to.live',
                 'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
+                'placeholder' => false,
                 'required'    => false,
                 'attr'        => [
                     'class'   => 'form-control',
@@ -369,7 +377,7 @@ class NotificationType extends AbstractType
 
         $builder->add(
             'icon',
-            'file',
+            FileType::class,
             [
                 'label'      => 'mautic.notification.form.icon',
                 'label_attr' => ['class' => 'control-label'],
@@ -406,7 +414,7 @@ class NotificationType extends AbstractType
 
         $builder->add(
             'image',
-            'file',
+            FileType::class,
             [
                 'label'      => 'mautic.notification.form.image',
                 'label_attr' => ['class' => 'control-label'],
