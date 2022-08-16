@@ -89,7 +89,11 @@ return [
                 ],
             ],
             'mautic.api.configbundle.subscriber' => [
-                'class' => \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
+                'class'     => \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
+                'arguments' => [
+                    'mautic.filesystem',
+                    '%kernel.cache_dir%',
+                ],
             ],
             'mautic.api.search.subscriber' => [
                 'class'     => \Mautic\ApiBundle\EventListener\SearchSubscriber::class,
