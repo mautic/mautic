@@ -304,6 +304,13 @@ class TrackableModel extends AbstractCommonModel
         krsort($this->contentReplacements['second_pass']);
 
         if ('html' == $type) {
+            // First remove all EOL characters to avoid errors with replace regex later
+            $content = preg_replace(
+                '/[\r\n]/i',
+                '',
+                $content
+            );
+
             // For HTML, replace only the links; leaving the link text (if a URL) intact
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
                 $content = preg_replace(
