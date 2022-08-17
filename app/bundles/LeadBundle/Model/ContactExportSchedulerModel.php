@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Model;
 
+use DateTimeImmutable;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
@@ -220,7 +221,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         $csvFilePath = $this->exportHelper
             ->exportDataIntoFile($iterator, $fileType, strtolower($fileName.'.'.$fileType));
 
-        return $this->exportHelper->zipFile($csvFilePath);
+        return $this->exportHelper->zipFile($csvFilePath, 'contacts_export.csv');
     }
 
     private function getContactExportFileContentType(string $fileName): string

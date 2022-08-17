@@ -12,6 +12,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use ZipArchive;
 
 /**
  * Provides several functions for export-related tasks,
@@ -73,6 +74,22 @@ class ExportHelper
         throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.specific.export.type', ['%type%' => $type, '%expected_type%' => self::EXPORT_TYPE_EXCEL]));
     }
 
+    public function zipFile(string $filePath, string $fileName): string
+    {
+        $zipFilePath = str_replace('.csv', '.zip', $filePath);
+        $zipArchive  = new ZipArchive();
+
+        if (true === $zipArchive->open($zipFilePath, ZipArchive::OVERWRITE | ZipArchive::CREATE)) {
+            $zipArchive->addFile($filePath, $fileName);
+            $zipArchive->close();
+            $this->filePathResolver->delete($filePath);
+
+            return $zipFilePath;
+        }
+
+        throw new FilePathException("Could not create zip archive at $zipFilePath.");
+    }
+
     public function exportDataIntoFile(IteratorExportDataModel $data, string $type, string $fileName): string
     {
         if (!$data->valid()) {
@@ -84,22 +101,6 @@ class ExportHelper
         }
 
         throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.specific.export.type', ['%type%' => $type, '%expected_type%' => self::EXPORT_TYPE_CSV]));
-    }
-
-    public function zipFile(string $filePath): string
-    {
-        $zipFilePath = str_replace('.csv', '.zip', $filePath);
-        $zipArchive  = new \ZipArchive();
-
-        if (true === $zipArchive->open($zipFilePath, \ZipArchive::OVERWRITE | \ZipArchive::CREATE)) {
-            $zipArchive->addFile($filePath, 'contacts_export.csv');
-            $zipArchive->close();
-            $this->filePathResolver->delete($filePath);
-
-            return $zipFilePath;
-        }
-
-        throw new FilePathException("Could not create zip archive at $zipFilePath.");
     }
 
     private function exportAsExcel(\Iterator $data, string $filename): StreamedResponse
@@ -222,5 +223,24 @@ class ExportHelper
         $leadExport['stage'] = $stage ? $stage->getName() : null;
 
         return $leadExport;
+    }
+
+    public function getValidExportFileName(string $fileName, string $directory): string
+    {
+        $contactExportDir = $this->coreParametersHelper->get($directory);
+        $this->filePathResolver->createDirectory($contactExportDir);
+        $filePath     = $contactExportDir.'/'.$fileName;
+        $fileName     = (string) pathinfo($filePath, PATHINFO_FILENAME);
+        $extension    = (string) pathinfo($filePath, PATHINFO_EXTENSION);
+        $originalName = $fileName;
+        $i            = 1;
+
+        while (file_exists($filePath)) {
+            $fileName = $originalName.'_'.$i;
+            $filePath = $contactExportDir.'/'.$fileName.'.'.$extension;
+            ++$i;
+        }
+
+        return $filePath;
     }
 }
