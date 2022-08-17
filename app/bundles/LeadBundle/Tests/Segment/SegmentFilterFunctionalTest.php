@@ -82,7 +82,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
     {
         $filters = [];
         foreach ($segmentFilters as $segmentFilter) {
-            $filters[] =  [
+            $filters[] = [
                 'object'     => 'lead',
                 'glue'       => $segmentFilter['glue'],
                 'field'      => $segmentFilter['field'],
@@ -119,7 +119,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
     private function buildSegment(LeadList $segment, int $expectedCountInSegment): void
     {
         /** @var ContactSegmentService $contactSegmentService */
-        $contactSegmentService = $this->container->get('mautic.lead.model.lead_segment_service');
+        $contactSegmentService = self::$container->get('mautic.lead.model.lead_segment_service');
 
         $this->runCommand('mautic:segments:update', [
             '-i'    => $segment->getId(),
@@ -153,9 +153,9 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
     {
         yield [
             'contacts' => [
-                ['email'=>'lukas@mautic.com', 'in_segment'=>true, 'city'=>'Prague'],
-                ['email'=> 'lukas2@mautic.com', 'in_segment'=>true, 'city'=>'Prague 11'],
-                ['email'=> 'lukas3@mautic.com', 'in_segment'=>false, 'city'=>'Praha'],
+                ['email' => 'lukas@mautic.com', 'in_segment' => true, 'city' => 'Prague'],
+                ['email' => 'lukas2@mautic.com', 'in_segment' => true, 'city' => 'Prague 11'],
+                ['email' => 'lukas3@mautic.com', 'in_segment' => false, 'city' => 'Praha'],
             ],
             'segment' => [
                 ['field' => 'city', 'operator' => 'startsWith', 'value' => 'Prague', 'glue' => 'and', 'type' => 'text'],
@@ -163,9 +163,9 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         ];
         yield [
             'contacts' => [
-                ['email'=>'lukas@mautic.com', 'in_segment'=>true, 'points'=>20],
-                ['email'=> 'lukas2@mautic.com', 'in_segment'=>false, 'points'=>10],
-                ['email'=> 'lukas3@mautic.com', 'in_segment'=>true, 'points'=>25],
+                ['email' => 'lukas@mautic.com', 'in_segment' => true, 'points' => 20],
+                ['email' => 'lukas2@mautic.com', 'in_segment' => false, 'points' => 10],
+                ['email' => 'lukas3@mautic.com', 'in_segment' => true, 'points' => 25],
             ],
             'segment' => [
                 ['field' => 'points', 'operator' => 'gte', 'value' => 20, 'glue' => 'and', 'type' => 'text'],
