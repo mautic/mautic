@@ -600,6 +600,7 @@ class PageModel extends FormModel
                 $pageTitle = InputHelper::transliterate($pageTitle);
             }
 
+            $query['page_title'] = $pageTitle;
             $hit->setUrlTitle($pageTitle);
         }
 
