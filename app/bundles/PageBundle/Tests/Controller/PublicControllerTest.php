@@ -374,7 +374,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         $redirectId   = 'dummy_redirect_id';
         $clickThrough = 'dummy_click_through';
         $redirectUrl  = 'https://some.test.url/asset/1:examplefilejpg';
-        $targetUrl    = $redirectUrl.'?ct='.$clickThrough;
+        $targetUrl    = 'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through%3Fct%3Ddummy_click_through';
 
         $this->redirectModel->expects(self::once())
             ->method('getRedirectById')
