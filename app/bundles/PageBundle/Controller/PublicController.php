@@ -455,9 +455,7 @@ class PublicController extends CommonFormController
         // Get query string
         $query = $this->request->query->all();
 
-        // Unset the clickthrough from the URL query
         $ct = $query['ct'] ?? null;
-        unset($query['ct']);
 
         // Tak on anything left to the URL
         if (count($query)) {
@@ -468,7 +466,7 @@ class PublicController extends CommonFormController
         // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
         $ipAddress = $this->container->get('mautic.helper.ip_lookup')->getIpAddress();
 
-        if (isset($ct)) {
+        if ($ct) {
             if ($ipAddress->isTrackable()) {
                 // Search replace lead fields in the URL
                 /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
