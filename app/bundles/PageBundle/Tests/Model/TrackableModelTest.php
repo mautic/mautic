@@ -607,6 +607,38 @@ TEXT;
     }
 
     /**
+     * @testdox Tests that URLs in the plaintext does not contaminate HTML
+     */
+    public function testLineBreaksAnchorHTML(): void
+    {
+        $url   = 'https://domain.com';
+        $model = $this->getModel();
+
+        $html = <<<CONTENT
+Hi {contactfield=firstname},
+<br />
+<a 
+  href="{$url}" style=""
+    ></a>
+CONTENT;
+
+        list($content, $trackables) = $model->parseContentForTrackables(
+            $html,
+            [],
+            'email',
+            1
+        );
+
+        $this->assertCount(1, $trackables);
+
+        // Has a URL so has one trackable
+        reset($trackables);
+        $token = key($trackables);
+
+        $this->assertEquals($trackables[$token]->getRedirect()->getUrl(), $url);
+    }
+
+    /**
      * @testdox Tests that URL based contact fields are found in plain text
      */
     public function testPlainTextFindsUrlContactFields()

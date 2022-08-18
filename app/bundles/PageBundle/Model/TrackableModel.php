@@ -226,11 +226,11 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Extract URLs from content and return as trackables.
      *
-     * @param mixed      $content
-     * @param null       $channel
-     * @param null       $channelId
-     * @param bool|false $usingClickthrough Set to false if not using a clickthrough parameter. This is to ensure that URLs are built correctly with ?
-     *                                      or & for URLs tracked that include query parameters
+     * @param mixed       $content
+     * @param string|null $channel
+     * @param int|null    $channelId
+     * @param bool|false  $usingClickthrough Set to false if not using a clickthrough parameter. This is to ensure that URLs are built correctly with ?
+     *                                       or & for URLs tracked that include query parameters
      *
      * @return array[mixed $content, array $trackables]
      */
