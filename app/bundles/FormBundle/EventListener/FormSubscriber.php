@@ -137,7 +137,7 @@ class FormSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    public function onFormSubmitActionSendEmail(Events\SubmissionEvent $event)
+    public function onFormSubmitActionSendEmail(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.email')) {
             return;
@@ -148,12 +148,26 @@ class FormSubscriber implements EventSubscriberInterface
             foreach ($tokens as &$value) {
                 $value = nl2br(html_entity_decode($value, ENT_QUOTES));
             }
+            unset($value);
         }
 
         $config    = $event->getActionConfig();
         $lead      = $event->getSubmission()->getLead();
         $leadEmail = null !== $lead ? $lead->getEmail() : null;
         $emails    = $this->getEmailsFromString($config['to']);
+
+        // The SwiftMailer must have "to" due to https://github.com/swiftmailer/swiftmailer/issues/1209
+        // if "to" is empty try cc
+        if ([] === $emails && isset($config['cc']) && '' !== $config['cc']) {
+            $emails = $this->getEmailsFromString($config['cc']);
+            unset($config['cc']);
+        }
+
+        // if "to" and "cc" are empty try bcc
+        if ([] === $emails && isset($config['bcc']) && '' !== $config['bcc']) {
+            $emails = $this->getEmailsFromString($config['bcc']);
+            unset($config['bcc']);
+        }
 
         if (!empty($emails)) {
             $this->setMailer($config, $tokens, $emails, $lead);
