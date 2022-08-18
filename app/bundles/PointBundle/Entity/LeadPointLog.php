@@ -39,8 +39,7 @@ class LeadPointLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(LeadPointLogRepository::class)
-            ->addIndex(['internal_id'], 'internal_id');
+            ->setCustomRepositoryClass(LeadPointLogRepository::class);
 
         $builder->createManyToOne('point', 'Point')
             ->isPrimaryKey()
