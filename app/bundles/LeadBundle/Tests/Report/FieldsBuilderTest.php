@@ -250,8 +250,10 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
                     3 => 'C',
                 ],
                 'operators' => [
-                    'in'    => 'mautic.core.operator.in',
-                    'notIn' => 'mautic.core.operator.notin',
+                    'in'       => 'mautic.core.operator.in',
+                    'notIn'    => 'mautic.core.operator.notin',
+                    'empty'    => 'mautic.core.operator.isempty',
+                    'notEmpty' => 'mautic.core.operator.isnotempty',
                 ],
             ],
             'x.owner_id' => [
