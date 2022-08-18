@@ -369,17 +369,19 @@ class ReportGeneratorEvent extends AbstractReportEvent
     {
         $tagSubQuery = $this->queryBuilder->getConnection()->createQueryBuilder();
         $tagSubQuery->select('DISTINCT lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx')
-            ->where($tagSubQuery->expr()->in('ltx.tag_id', $filter['value']));
-        $tagSubQuerySql = $tagSubQuery->getSQL();
+            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx');
 
-        if ('in' === $filter['condition']) {
+        if (in_array($filter['condition'], ['in', 'notIn']) && !empty($filter['value'])) {
+            $tagSubQuery->where($tagSubQuery->expr()->in('ltx.tag_id', $filter['value']));
+        }
+
+        if (in_array($filter['condition'], ['in', 'notEmpty'])) {
             $groupExpr->add(
-                $tagSubQuery->expr()->in('l.id', $tagSubQuerySql)
+                $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL())
             );
-        } elseif ('notIn' === $filter['condition']) {
+        } elseif (in_array($filter['condition'], ['notIn', 'empty'])) {
             $groupExpr->add(
-                $tagSubQuery->expr()->notIn('l.id', $tagSubQuerySql)
+                $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL())
             );
         }
     }

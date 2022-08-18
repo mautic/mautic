@@ -352,9 +352,9 @@ Mautic.checkReportCondition = function (selector) {
 
     // Disable the value input if the condition is empty or notEmpty
     if (option == 'empty' || option == 'notEmpty') {
-        mQuery('#' + valueInput).prop('disabled', true);
+        mQuery('#' + valueInput).prop('disabled', true).trigger('chosen:updated');
     } else {
-        mQuery('#' + valueInput).prop('disabled', false);
+        mQuery('#' + valueInput).prop('disabled', false).trigger('chosen:updated');
     }
 };
 
