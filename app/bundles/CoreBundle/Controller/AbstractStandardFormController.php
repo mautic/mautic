@@ -734,7 +734,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         } elseif ($this->get('templating')->exists('MauticCoreBundle:Standard:'.$file)) {
             return 'MauticCoreBundle:Standard:'.$file;
         } elseif (self::ENGINE_TWIG === $engine) {
-            return $this->getTemplateName($file, self::ENGINE_PHP);
+            return $this->getTemplateName(str_replace('.twig', '.php', $file), self::ENGINE_PHP);
         }
 
         throw new \Exception("Template {$file} not found");
