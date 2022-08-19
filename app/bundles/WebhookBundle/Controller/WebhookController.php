@@ -30,7 +30,7 @@ class WebhookController extends FormController
      */
     public function indexAction($page = 1)
     {
-        return parent::indexStandard($page, self::ENGINE_TWIG);
+        return parent::indexStandard($page);
     }
 
     /**
@@ -40,7 +40,7 @@ class WebhookController extends FormController
      */
     public function newAction()
     {
-        return parent::newStandard(self::ENGINE_TWIG);
+        return parent::newStandard();
     }
 
     /**
@@ -53,7 +53,7 @@ class WebhookController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        return parent::editStandard($objectId, $ignorePost, self::ENGINE_TWIG);
+        return parent::editStandard($objectId, $ignorePost);
     }
 
     /**
@@ -65,7 +65,7 @@ class WebhookController extends FormController
      */
     public function viewAction($objectId)
     {
-        return parent::viewStandard($objectId, 'webhook', 'webhook', null, 'item', self::ENGINE_TWIG);
+        return parent::viewStandard($objectId, 'webhook', 'webhook', null, 'item');
     }
 
     /**
