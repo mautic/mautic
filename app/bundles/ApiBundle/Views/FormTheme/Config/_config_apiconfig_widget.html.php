@@ -15,6 +15,7 @@
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.apiconfig'); ?></h3>
     </div>
     <div class="panel-body">
+        <div class="alert alert-info"><?php echo $view['translator']->trans('mautic.api.config.form.api.cache_notice'); ?></div>
         <?php foreach ($form->children as $f): ?>
         <div class="row">
             <div class="col-md-6">
