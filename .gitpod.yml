@@ -8,7 +8,7 @@ tasks:
   - name: Startup 
   - command: |
       bash .ddev/gitpod-setup-ddev.sh 
-      gp await-port 8080 && gp preview $(gp url 8080)/index_dev.php 
+      gp ports await 8080 && gp preview $(gp url 8080)/index_dev.php 
 
 # VScode xdebug extension
 vscode:
