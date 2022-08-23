@@ -152,9 +152,24 @@ class FormSubscriberTest extends TestCase
         $this->mailer->expects(self::once())
             ->method('send');
 
-        $this->mailer->expects(self::once())
-            ->method('setTo')
-            ->with(array_fill_keys(array_map('trim', explode(',', $to ?? $cc ?? $bcc)), null));
+        if (null !== $to) {
+            $this->mailer->expects(self::once())
+                ->method('setTo')
+                ->with(array_fill_keys(array_map('trim', explode(',', $to)), null));
+        }
+
+        if (null !== $cc) {
+            $this->mailer->expects(self::once())
+                ->method('setCc')
+                ->with(array_fill_keys(array_map('trim', explode(',', $cc)), null));
+        }
+
+        if (null !== $bcc) {
+            $this->mailer->expects(self::once())
+                ->method('setBcc')
+                ->with(array_fill_keys(array_map('trim', explode(',', $bcc)), null));
+        }
+
         $this->mailer->expects(self::once())
             ->method('setSubject')
             ->with($subject);
@@ -219,11 +234,11 @@ class FormSubscriberTest extends TestCase
         $this->mailer->expects(self::once())
             ->method('send');
 
-        $this->mailer->expects(self::once())
-            ->method('setTo')
-            ->with(array_fill_keys(array_map('trim', explode(',', $cc)), null));
         $this->mailer->expects(self::never())
-            ->method('setCc');
+            ->method('setTo');
+        $this->mailer->expects(self::once())
+            ->method('setCc')
+            ->with(array_fill_keys(array_map('trim', explode(',', $cc)), null));
         $this->mailer->expects(self::once())
             ->method('setBcc')
             ->with(array_fill_keys(array_map('trim', explode(',', $bcc)), null));
@@ -285,7 +300,7 @@ class FormSubscriberTest extends TestCase
 
         $this->mailer->expects(self::once())
             ->method('setTo')
-            ->with($leadEmail);
+            ->with([$leadEmail => null]);
         $this->mailer->expects(self::once())
             ->method('setSubject')
             ->with($subject);
@@ -347,7 +362,7 @@ class FormSubscriberTest extends TestCase
 
         $this->mailer->expects(self::once())
             ->method('setTo')
-            ->with($ownerEmail);
+            ->with([$ownerEmail => null]);
         $this->mailer->expects(self::once())
             ->method('setSubject')
             ->with($subject);
@@ -416,8 +431,8 @@ class FormSubscriberTest extends TestCase
             ->method('setTo')
             ->withConsecutive(
                 [[$to => null]],
-                [$leadEmail],
-                [$ownerEmail]
+                [[$leadEmail => null]],
+                [[$ownerEmail => null]]
             );
         $this->mailer->expects(self::once())
             ->method('setCc')
