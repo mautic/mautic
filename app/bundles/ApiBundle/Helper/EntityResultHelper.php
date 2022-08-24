@@ -7,10 +7,10 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 class EntityResultHelper
 {
     /**
-     * @param mixed  $results
-     * @param string $callback
+     * @param array<mixed>|Paginator<mixed> $results
+     * @param callable|null                 $callback
      *
-     * @return array
+     * @return array<mixed>|\ArrayObject<int,mixed>
      */
     public function getArray($results, $callback = null)
     {
@@ -28,7 +28,7 @@ class EntityResultHelper
 
         // solving array/object discrepancy for empty values
         if ($this->isKeyedById($results) && empty($entities)) {
-            $entities = [];
+            $entities = new \ArrayObject();
         }
 
         return $entities;
@@ -81,16 +81,12 @@ class EntityResultHelper
     }
 
     /**
-     * @param mixed $results
+     * @param array<mixed>|Paginator<mixed> $results
      *
      * @return bool
      */
     private function isKeyedById($results)
     {
-        if ($results instanceof Paginator) {
-            return false;
-        }
-
-        return true;
+        return !$results instanceof Paginator;
     }
 }

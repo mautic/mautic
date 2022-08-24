@@ -86,7 +86,6 @@ class ClearbitController extends FormController
                     $this->addFlash(
                         'mautic.lead.batch_leads_affected',
                         [
-                            'pluralCount' => 1,
                             '%count%'     => 1,
                         ]
                     );
@@ -248,7 +247,6 @@ class ClearbitController extends FormController
                     $this->addFlash(
                             'mautic.lead.batch_leads_affected',
                             [
-                                'pluralCount' => $count,
                                 '%count%'     => $count,
                             ]
                         );
@@ -341,7 +339,6 @@ class ClearbitController extends FormController
                     $this->addFlash(
                         'mautic.company.batch_companies_affected',
                         [
-                            'pluralCount' => 1,
                             '%count%'     => 1,
                         ]
                     );
@@ -502,7 +499,6 @@ class ClearbitController extends FormController
                     $this->addFlash(
                         'mautic.company.batch_companies_affected',
                         [
-                            'pluralCount' => $count,
                             '%count%'     => $count,
                         ]
                     );

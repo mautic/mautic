@@ -1,0 +1,15 @@
+{% set dismissable = dismissable|default('') %}
+{% set alertType = alertType|default('growl') %}
+{% set alertClasses = alertType == 'growl' ? 
+    {notice: 'alert-growl', warning: 'alert-growl', error: 'alert-growl'} :
+    {notice: 'alert-success', warning: 'alert-warning', error: 'alert-danger'}
+%}
+{% set flashes = flashes|default(app.flashes) %}
+
+{% for type, messages in flashes %}
+{% set message = messages is iterable ? messages[0] : messages %}
+<div class="alert {{ attribute(alertClasses, type) ~ dismissable }} alert-new">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true"><i class="fa fa-times"></i></button>
+    <span>{{ message }}</span>
+</div>
+{% endfor %}

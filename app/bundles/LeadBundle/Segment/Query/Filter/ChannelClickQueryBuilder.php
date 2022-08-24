@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
@@ -17,41 +16,46 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
 
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
-        $filterOperator = $filter->getOperator();
-        $filterChannel  = $this->getChannel($filter->getField());
+        $leadsTableAlias  = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
+        $filterOperator   = $filter->getOperator();
+        $filterChannel    = $this->getChannel($filter->getField());
+        $filterParameters = $filter->getParameterValue();
 
-        $filterParameter = $filter->getParameterValue();
-        $parameter       = $this->generateRandomParameterName();
+        if (is_array($filterParameters)) {
+            $parameters = [];
+            foreach ($filterParameters as $filterParameter) {
+                $parameters[] = $this->generateRandomParameterName();
+            }
+        } else {
+            $parameters = $this->generateRandomParameterName();
+        }
 
         $tableAlias = $this->generateRandomParameterName();
 
-        $subQb = $queryBuilder->getConnection()->createQueryBuilder();
+        $subQb = $queryBuilder->createQueryBuilder($queryBuilder->getConnection());
         $expr  = $subQb->expr()->andX(
             $subQb->expr()->isNotNull($tableAlias.'.redirect_id'),
             $subQb->expr()->isNotNull($tableAlias.'.lead_id'),
             $subQb->expr()->eq($tableAlias.'.source', $subQb->expr()->literal($filterChannel))
         );
 
-        $inExpr = OperatorOptions::NOT_EQUAL_TO === $filterOperator ? 'notIn' : 'in';
         if ($this->isDateBased($filter->getField())) {
             $expr->add(
-                $subQb->expr()->$filterOperator($tableAlias.'.date_hit', $filter->getParameterHolder($parameter))
+                $subQb->expr()->$filterOperator($tableAlias.'.date_hit', $filter->getParameterHolder($parameters))
             );
-        } elseif (empty($filterParameter) && in_array($filterOperator, [OperatorOptions::NOT_EQUAL_TO, OperatorOptions::NOT_EMPTY])) {
-            // value != 0
-            $inExpr = 'in';
-        } elseif (empty($filterParameter) && in_array($filterOperator, [OperatorOptions::EQUAL_TO, OperatorOptions::EMPTY])) {
-            // value = 0
-            $inExpr = 'notIn';
         }
 
         $subQb->select($tableAlias.'.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', $tableAlias)
             ->where($expr);
 
-        $queryBuilder->addLogic($queryBuilder->expr()->$inExpr('l.id', $subQb->getSQL()), $filter->getGlue());
+        if ('empty' === $filterOperator && !$this->isDateBased($filter->getField())) {
+            $queryBuilder->addLogic($queryBuilder->expr()->notIn($leadsTableAlias.'.id', $subQb->getSQL()), $filter->getGlue());
+        } else {
+            $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQb->getSQL()), $filter->getGlue());
+        }
 
-        $queryBuilder->setParametersPairs($parameter, $filterParameter);
+        $queryBuilder->setParametersPairs($parameters, $filterParameters);
 
         return $queryBuilder;
     }

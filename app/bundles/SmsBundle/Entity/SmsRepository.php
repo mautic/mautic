@@ -63,7 +63,7 @@ class SmsRepository extends CommonRepository
     {
         // Main query
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->from('sms_message_list_xref', 'sml')
+        $q->from(MAUTIC_TABLE_PREFIX.'sms_message_list_xref', 'sml')
             ->join('sml', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = sml.leadlist_id and ll.is_published = 1')
             ->join('ll', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.leadlist_id = sml.leadlist_id and lll.manually_removed = 0')
             ->join('lll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'lll.lead_id = l.id')

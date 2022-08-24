@@ -56,7 +56,6 @@ class BatchContactController extends AbstractFormController
             $this->frequencyActionModel->update($ids, $params, $preferredChannel);
 
             $this->addFlash('mautic.lead.batch_leads_affected', [
-                'pluralCount' => count($ids),
                 '%count%'     => count($ids),
             ]);
         } else {

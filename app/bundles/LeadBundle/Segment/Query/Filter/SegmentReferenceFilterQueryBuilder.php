@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
@@ -11,6 +12,7 @@ use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -54,22 +56,22 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @return QueryBuilder
-     *
-     * @throws \Doctrine\DBAL\Query\QueryException
-     * @throws \Exception
+     * @throws SegmentNotFoundException
      * @throws SegmentQueryException
+     * @throws DBALException
+     * @throws QueryException
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
-        $segmentIds = $filter->getParameterValue();
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
+        $segmentIds      = $filter->getParameterValue();
 
         if (!is_array($segmentIds)) {
             $segmentIds = [intval($segmentIds)];
         }
 
-        $logic     = [];
-        $exclusion = false;
+        $orLogic = [];
+
         foreach ($segmentIds as $segmentId) {
             $exclusion = in_array($filter->getOperator(), ['notExists', 'notIn']);
 
@@ -81,14 +83,16 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 
             $filters = $this->leadSegmentFilterFactory->getSegmentFilters($contactSegment);
 
-            $segmentQueryBuilder = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($contactSegment->getId(), $filters);
+            $segmentQueryBuilder       = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($contactSegment->getId(), $filters, true);
+            $subSegmentLeadsTableAlias = $segmentQueryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
+            $segmentQueryBuilder->resetQueryParts(['select'])->select('null');
 
             //  If the segment contains no filters; it means its for manually subscribed only
             if (count($filters)) {
-                $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
+                $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubscribedQuery($segmentQueryBuilder, (int) $contactSegment->getId());
             }
 
-            $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
+            $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, (int) $contactSegment->getId());
 
             $parameters = $segmentQueryBuilder->getParameters();
             foreach ($parameters as $key => $value) {
@@ -97,23 +101,25 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 
             $this->leadSegmentQueryBuilder->queryBuilderGenerated($contactSegment, $segmentQueryBuilder);
 
-            $segmentAlias = $this->generateRandomParameterName();
-            if ($exclusion) {
-                $queryBuilder->leftJoin('l', '('.$segmentQueryBuilder->getSQL().') ', $segmentAlias, $segmentAlias.'.id = l.id');
-                $expression = $queryBuilder->expr()->isNull($segmentAlias.'.id');
-            } else {
-                $queryBuilder->leftJoin('l', '('.$segmentQueryBuilder->getSQL().') ', $segmentAlias, $segmentAlias.'.id = l.id');
-                $expression = $queryBuilder->expr()->isNotNull($segmentAlias.'.id');
-            }
-            $queryBuilder->addSelect($segmentAlias.'.id as '.$segmentAlias.'_id');
+            $segmentQueryWherePart = $segmentQueryBuilder->getQueryPart('where');
+            $segmentQueryBuilder->where("$leadsTableAlias.id = $subSegmentLeadsTableAlias.id");
+            $segmentQueryBuilder->andWhere($segmentQueryWherePart);
 
-            $logic[] = $expression;
+            if ($exclusion) {
+                $expression = $queryBuilder->expr()->notExists($segmentQueryBuilder->getSQL());
+            } else {
+                $expression = $queryBuilder->expr()->exists($segmentQueryBuilder->getSQL());
+            }
+
+            if (!$exclusion && count($segmentIds) > 1) {
+                $orLogic[] = $expression;
+            } else {
+                $queryBuilder->addLogic($expression, $filter->getGlue());
+            }
         }
 
-        if ($exclusion) {
-            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_AND, $logic), $filter->getGlue());
-        } else {
-            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_OR, $logic), $filter->getGlue());
+        if (count($orLogic)) {
+            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_OR, $orLogic), CompositeExpression::TYPE_AND);
         }
 
         return $queryBuilder;

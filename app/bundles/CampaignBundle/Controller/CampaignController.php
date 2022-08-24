@@ -342,7 +342,7 @@ class CampaignController extends AbstractStandardFormController
                 $this->afterFormProcessed($valid, $campaign, $form, 'new');
             } else {
                 $viewParameters = ['page' => $page];
-                $returnUrl      = $this->generateUrl('c', $viewParameters);
+                $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
                 $template       = 'MauticCampaignBundle:Campaign:index';
             }
 
@@ -1008,9 +1008,9 @@ class CampaignController extends AbstractStandardFormController
                         'mautic.campaign.connection.trigger.interval.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
                         [
                             '%number%' => $event['triggerInterval'],
-                            '%unit%'   => $translator->transChoice(
+                            '%unit%'   => $translator->trans(
                                 'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
-                                $event['triggerInterval']
+                                ['%count%' => $event['triggerInterval']]
                             ),
                         ]
                     );
