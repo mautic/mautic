@@ -173,7 +173,7 @@ class UserType extends AbstractType
                         'tooltip'  => 'mautic.user.user.form.automaticpassword.descr',
                         'onchange' => 'Mautic.togglePasswordInput()',
                     ],
-                    'data' => false,
+                    'data' => true,
                 ]
             );
         }
