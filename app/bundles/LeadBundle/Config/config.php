@@ -1159,6 +1159,7 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\RelativeDate::class,
                 'arguments' => [
                     'translator',
+                    'mautic.helper.core_parameters'
                 ],
             ],
             'mautic.lead.model.lead_segment_filter_operator' => [

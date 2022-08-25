@@ -11,16 +11,20 @@
 
 namespace Mautic\LeadBundle\Segment;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class RelativeDate
 {
+    private CoreParametersHelper $coreParametersHelper;
+
     /** @var TranslatorInterface */
     private $translator;
 
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
         $this->translator = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -28,13 +32,15 @@ class RelativeDate
      */
     public function getRelativeDateStrings(string $locale = null)
     {
+        if ($locale === null) {
+            $locale = $this->coreParametersHelper->get('locale');
+        }
         $keys = $this->getRelativeDateTranslationKeys();
 
         $strings = [];
         foreach ($keys as $key) {
             $strings[$key] = $this->translator->trans($key, [], null, $locale);
         }
-
         return $strings;
     }
 
