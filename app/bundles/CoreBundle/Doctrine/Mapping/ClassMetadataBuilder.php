@@ -477,7 +477,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      */
     public function isIndexedVarchar(string $name, string $type): bool
     {
-        return Types::STRING === $type || isset($this->getClassMetadata()->table['indexes'][$name]);
+        return Types::STRING === $type && isset($this->getClassMetadata()->table['indexes'][$name]);
     }
 
     /**
