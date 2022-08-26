@@ -601,6 +601,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function parseCallbackResponse($data, $postAuthorization = false)
     {
+        // remove control characters that will break json_decode from parsing
+        $data = preg_replace('/[[:cntrl:]]/', '', $data);
         if (!$parsed = json_decode($data, true)) {
             parse_str($data, $parsed);
         }
