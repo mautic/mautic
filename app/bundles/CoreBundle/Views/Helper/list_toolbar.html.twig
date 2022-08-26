@@ -14,12 +14,12 @@
         <div class="col-xs-6 col-lg-8 va-m form-inline">
             {% if searchValue is defined %}
             {{- include('MauticCoreBundle:Helper:search.html.twig', {
-                searchId: searchId is defined and searchId is not empty ? searchId : null,
+                searchId: searchId|default(null),
                 searchValue: searchValue,
-                action: action is defined ? action : '',
-                searchHelp: searchHelp is defined ? searchHelp : '',
-                target: target is defined and target is not empty ? target : null,
-                tmpl: tmpl is defined and tmpl is not empty ? tmpl : null,
+                action: action|default(''),
+                searchHelp: searchHelp|default(''),
+                target: target|default(null),
+                tmpl: tmpl|default(null),
                 overlayDisabled: overlayDisabled is defined ? overlayDisabled : null
             }) -}}
             {% endif %}
@@ -27,8 +27,8 @@
             {% if filters is defined and filters is not empty %}
             {{- include('MauticCoreBundle:Helper:list_filters.html.twig', {
                 filters: filters,
-                target: target is defined and target is not empty ? target : null,
-                tmpl: tmpl is defined and tmpl is not empty ? tmpl : null
+                target: target|default(null),
+                tmpl: tmpl|default(null)
             }) -}}
             {% endif %}
         </div>

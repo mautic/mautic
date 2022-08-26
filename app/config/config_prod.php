@@ -56,9 +56,10 @@ $container->loadFromExtension('monolog', [
 
 //Twig Configuration
 $container->loadFromExtension('twig', [
-    'cache'       => '%env(resolve:MAUTIC_TWIG_CACHE_DIR)%',
-    'auto_reload' => true,
-    'paths'       => [
+    'cache'            => '%env(resolve:MAUTIC_TWIG_CACHE_DIR)%',
+    'auto_reload'      => true,
+    'strict_variables' => true,
+    'paths'            => [
         '%kernel.root_dir%/bundles' => 'bundles',
     ],
     'form_themes' => [

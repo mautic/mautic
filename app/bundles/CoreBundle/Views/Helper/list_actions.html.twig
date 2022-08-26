@@ -8,8 +8,8 @@
 {# Workaround to get variables from action_button_helper here #}
 {{ restore('action_button_helper') }}
 
-{% set id = item.id is defined and item.id is not empty ? item.id : item.getId() %}
-{% set name = item.name is defined and item.name is not empty ? item.name : attribute(item, nameGetter) %}
+{% set id = item.id|default(item.getId()) %}
+{% set name = item.name|default(attribute(item, nameGetter)) %}
 
 <div class="input-group input-group-sm">
     <span class="input-group-addon">

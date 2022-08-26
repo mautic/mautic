@@ -1,5 +1,5 @@
-{% set target = target is defined and target is not empty ? target : '.page-list' %}
-{% set tmpl = tmpl is defined and tmpl is not empty ? tmpl : 'list' %}
+{% set target = target|default('.page-list') %}
+{% set tmpl = tmpl|default('list') %}
 
 {% if fixedPages is not defined or fixedPages is empty %}
     {% set limit = limit is not defined ? 30 : limit|int %}

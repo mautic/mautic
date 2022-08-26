@@ -2,7 +2,7 @@
 {% set icon = publishStatusIcon(
     query is defined ? query : '',
     item,
-    size is defined and size is not empty ? size : 'fa-lg',
+    size|default('fa-lg'),
     model,
     backdrop is defined ? 'true' : 'false',
     onclick is defined ? onclick : null,

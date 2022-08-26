@@ -4,8 +4,8 @@
         {% set attr = getFilterAttributes(
             filterName|trans,
             filter,
-            target is defined and target is not empty ? target : '.page-list',
-            tmpl is defined and tmpl is not empty ? tmpl : 'list'
+            target|default('.page-list'),
+            tmpl|default('list')
         ) %}
 
         <select {{ attr|join(' ') }}>
@@ -14,8 +14,8 @@
                 <optgroup label="{{ groupLabel|trans }}"{% if groupFilter.prefix is defined %} data-prefix="{{ groupFilter.prefix }}"{% endif %}>
                     {% for value, label in groupFilter.options if groupFilter.options is defined %}
                         {% if label is iterable %}
-                            {% set value = label.value is defined and label.value is not empty ? label.value : label.id %}
-                            {% set label = label.label is defined and label.label is not empty ? label.label : (label.title is defined and label.title is not empty ? label.title : label.name) %}
+                            {% set value = label.value|default(label.id) %}
+                            {% set label = label.label|default(label.title|default(label.name)) %}
                         {% endif %}
 
                         {% set selected = (groupFilter.values is defined and value in groupFilter.values) ? ' selected' : '' %}
@@ -30,8 +30,8 @@
         {% elseif filter.options is defined %}
             {% for value, label in filter.options %}
                 {% if label is iterable %}
-                    {% set value = label.value is defined and label.value is not empty ? label.value : label.id %}
-                    {% set label = label.label is defined and label.label is not empty ? label.label : (label.title is defined and label.title is not empty ? label.title : label.name) %}
+                    {% set value = label.value|default(label.id) %}
+                    {% set label = label.label|default(label.title|default(label.name)) %}
                 {% endif %}
 
                 {% set selected = (filter.values is defined and value in filter.values) ? ' selected' : '' %}

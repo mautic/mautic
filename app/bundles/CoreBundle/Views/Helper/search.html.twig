@@ -1,9 +1,9 @@
-{% set searchValue = searchValue is defined and searchValue is not empty ? searchValue : '' %}
-{% set target = target is defined and target is not empty ? target : '.page-list' %}
-{% set overlayTarget = overlayTarget is defined and overlayTarget is not empty ? overlayTarget : target %}
+{% set searchValue = searchValue|default('') %}
+{% set target = target|default('.page-list') %}
+{% set overlayTarget = overlayTarget|default(target) %}
 {% set overlayEnabled = overlayDisabled is defined and overlayDisabled is not empty ? 'false' : 'true' %}
-{% set id = searchId is defined and searchId is not empty ? searchId : 'list-search' %}
-{% set tmpl = tmpl is defined and tmpl is not empty ? tmpl : 'list' %}
+{% set id = searchId|default('list-search') %}
+{% set tmpl = tmpl|default('list') %}
 
 <div class="input-group">
     {% if searchHelp is defined and searchHelp is not empty %}

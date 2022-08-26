@@ -46,9 +46,9 @@
                     {% if footerButtons is iterable %}
                     {% for button in footerButtons %}
                         <button type="button"
-                                class="btn {{ button.class is defined and button.class is not empty ? button.class : 'btn-default' }}"
+                                class="btn {{ button.class|default('btn-default') }}"
                                 {{ button.attr is defined and button.attr is not empty ? ' ' ~ buton.attr : '' }}>
-                            {{ button.textIcon is defined and button.textIcon is not empty ? '<i class="{{ button.textIcon }}>"></i>' : '' }}
+                            {{ button.textIcon is defined and button.textIcon is not empty ? '<i class="{{ button.textIcon }}"></i>' : '' }}
                             {{ button.label }}
                         </button>
                     {% endfor %}
