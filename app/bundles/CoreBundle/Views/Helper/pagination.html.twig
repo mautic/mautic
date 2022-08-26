@@ -52,8 +52,7 @@
                     onchange="Mautic.limitTableData('{{ sessionVar }}',this.value,'{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %}, '{{ baseUrl ~ queryString }}'{% endif %});"
                 >
                     {% for value, label in limitOptions %}
-                        {% set selected = limit == value ? ' selected="selected' : '' %}
-                        <option{{ selected }} value="{{ value|escape('html_attr') }}">
+                        <option{% if limit == value %} selected="selected"{% endif %} value="{{ value|escape('html_attr') }}">
                             {{ ('mautic.core.pagination.' ~ label)|trans }}
                         </option>
                     {% endfor %}
