@@ -214,6 +214,12 @@ $view['slots']->set(
                                 <div class="panel shd-none mb-0">
                                     <table class="table table-bordered table-striped mb-0">
                                         <tbody>
+                                        <?php if ('core' == $group): ?>
+                                            <?php echo $view->render(
+                                                'MauticCoreBundle:Helper:details.html.php',
+                                                ['entity' => $lead]
+                                            ); ?>
+                                        <?php endif; ?>
                                         <?php foreach ($fields[$group] as $field): ?>
                                             <?php if (isset($field['value'])): ?>
                                                 <tr>

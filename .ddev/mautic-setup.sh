@@ -1,7 +1,7 @@
 #!/bin/bash
 
 setup_mautic() {
-    [ -z "${MAUTIC_URL}" ] && MAUTIC_URL="https://${DDEV_HOSTNAME}"
+    [ -z "${MAUTIC_URL}" ] && MAUTIC_URL="https://${DDEV_HOSTNAME}/index_dev.php"
     [ -z "${PHPMYADMIN_URL}" ] && PHPMYADMIN_URL="https://${DDEV_HOSTNAME}:8037"
     [ -z "${MAILHOG_URL}" ] && MAILHOG_URL="https://${DDEV_HOSTNAME}:8026"
 
