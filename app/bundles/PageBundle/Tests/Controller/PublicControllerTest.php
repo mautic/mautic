@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Exception;
@@ -20,7 +11,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -43,7 +34,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
 
-class PublicControllerTest extends AbstractMauticTestCase
+class PublicControllerTest extends MauticMysqlTestCase
 {
     /** @var PublicControllerTest */
     private $controller;

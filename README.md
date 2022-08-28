@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-73-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-82-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -169,6 +169,17 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/nick-vanpraet"><img src="https://avatars.githubusercontent.com/u/7923739?v=4?s=100" width="100px;" alt=""/><br /><sub><b>nick-vanpraet</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=nick-vanpraet" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/volha-pivavarchyk"><img src="https://avatars.githubusercontent.com/u/96085911?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Volha Pivavarchyk</b></sub></a><br /><a href="#userTesting-volha-pivavarchyk" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/J-Light"><img src="https://avatars.githubusercontent.com/u/2544660?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nish Joseph</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=J-Light" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Damzoneuh"><img src="https://avatars.githubusercontent.com/u/44919863?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Damzoneuh</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=Damzoneuh" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/alinmbb"><img src="https://avatars.githubusercontent.com/u/86683952?v=4?s=100" width="100px;" alt=""/><br /><sub><b>alinmbb</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=alinmbb" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/deborahsalves"><img src="https://avatars.githubusercontent.com/u/79517214?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Déborah Salves</b></sub></a><br /><a href="#userTesting-deborahsalves" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://github.com/automatyzuj"><img src="https://avatars.githubusercontent.com/u/104569506?v=4?s=100" width="100px;" alt=""/><br /><sub><b>automatyzuj</b></sub></a><br /><a href="#userTesting-automatyzuj" title="User Testing">📓</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="http://benjamin.leveque.me"><img src="https://avatars.githubusercontent.com/u/166890?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Benjamin Lévêque</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=benji07" title="Code">💻</a></td>
+    <td align="center"><a href="https://buzelac.com"><img src="https://avatars.githubusercontent.com/u/430255?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Benjamin</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=uzegonemad" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/IrisAmrein"><img src="https://avatars.githubusercontent.com/u/70972871?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Iris Amrein</b></sub></a><br /><a href="#userTesting-IrisAmrein" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://github.com/pety-dc"><img src="https://avatars.githubusercontent.com/u/25766885?v=4?s=100" width="100px;" alt=""/><br /><sub><b>peter.osvath</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=pety-dc" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/poweriguana"><img src="https://avatars.githubusercontent.com/u/86078621?v=4?s=100" width="100px;" alt=""/><br /><sub><b>poweriguana</b></sub></a><br /><a href="#userTesting-poweriguana" title="User Testing">📓</a> <a href="#projectManagement-poweriguana" title="Project Management">📆</a></td>
   </tr>
 </table>
 

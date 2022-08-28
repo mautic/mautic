@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
@@ -265,7 +256,7 @@ return [
                 ],
             ],
             'mautic.campaign.model.event_log' => [
-                'class'     => 'Mautic\CampaignBundle\Model\EventLogModel',
+                'class'     => \Mautic\CampaignBundle\Model\EventLogModel::class,
                 'arguments' => [
                     'mautic.campaign.model.event',
                     'mautic.campaign.model.campaign',
@@ -472,7 +463,7 @@ return [
                     'mautic.campaign.event_collector',
                     'mautic.campaign.scheduler',
                     'mautic.tracker.contact',
-                    'mautic.campaign.repository.lead',
+                    'mautic.campaign.helper.decision',
                 ],
             ],
             'mautic.campaign.executioner.inactive'     => [
@@ -486,6 +477,12 @@ return [
                     'mautic.campaign.event_executioner',
                 ],
             ],
+            'mautic.campaign.helper.decision' => [
+                'class'     => \Mautic\CampaignBundle\Executioner\Helper\DecisionHelper::class,
+                'arguments' => [
+                    'mautic.campaign.repository.lead',
+                ],
+            ],
             'mautic.campaign.helper.inactivity' => [
                 'class'     => \Mautic\CampaignBundle\Executioner\Helper\InactiveHelper::class,
                 'arguments' => [
@@ -494,6 +491,7 @@ return [
                     'mautic.campaign.repository.lead_event_log',
                     'mautic.campaign.repository.event',
                     'monolog.logger.mautic',
+                    'mautic.campaign.helper.decision',
                 ],
             ],
             'mautic.campaign.helper.removed_contact_tracker' => [
@@ -577,6 +575,8 @@ return [
                     'mautic.campaign.executioner.inactive',
                     'monolog.logger.mautic',
                     'mautic.helper.template.formatter',
+                    'mautic.lead.model.list',
+                    'mautic.helper.segment.count.cache',
                 ],
                 'tag' => 'console.command',
             ],

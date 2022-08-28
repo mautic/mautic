@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\Command;
 
 use Doctrine\DBAL\Exception;
@@ -117,7 +108,7 @@ class InstallCommand extends ContainerAwareCommand
                 '--db_backup_tables',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Backup database tables if they exist; otherwise drop them.',
+                'Backup database tables if they exist; otherwise drop them. (true|false)',
                 null
             )
             ->addOption(
@@ -276,6 +267,9 @@ class InstallCommand extends ContainerAwareCommand
         $output->writeln('Parsing options and arguments...');
         $options = $input->getOptions();
 
+        // Convert boolean options to actual booleans.
+        $options['db_backup_tables'] = (bool) filter_var($options['db_backup_tables'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
         /**
          * We need to have some default database parameters, as it could be the case that the
          * user didn't set them both in local.php and the command line options.
@@ -309,7 +303,7 @@ class InstallCommand extends ContainerAwareCommand
 
         // Initialize DB and admin params from cli options
         foreach ($options as $opt => $value) {
-            if (!empty($value)) {
+            if (isset($value)) {
                 if (0 === strpos($opt, 'db_')) {
                     $dbParams[substr($opt, 3)] = $value;
                     $allParams[$opt]           = $value;

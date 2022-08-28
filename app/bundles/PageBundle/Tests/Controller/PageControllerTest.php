@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageData;
@@ -12,6 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PageControllerTest extends MauticMysqlTestCase
 {
+    use ControllerTrait;
+
     /**
      * @var string
      */
@@ -43,6 +46,20 @@ class PageControllerTest extends MauticMysqlTestCase
         $model->saveEntity($page);
 
         $this->id = $page->getId();
+    }
+
+    /**
+     * Index should return status code 200.
+     */
+    public function testIndexAction(): void
+    {
+        $urlAlias   = 'pages';
+        $routeAlias = 'page';
+        $column     = 'dateModified';
+        $column2    = 'title';
+        $tableAlias = 'p.';
+
+        $this->getControllerColumnTests($urlAlias, $routeAlias, $column, $tableAlias, $column2);
     }
 
     public function testLandingPageTracking()

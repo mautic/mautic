@@ -8,6 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)): ?>
     <p>
         <?php if (!empty($item['isFailed'])) : ?>
@@ -35,9 +36,8 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)): ?>
             <?php echo $view['translator']->trans('mautic.email.timeline.event.viewed.in.browser'); ?>
         <?php endif; ?>
         <?php if (!empty($item['retryCount'])) : ?>
-            <?php echo $view['translator']->transChoice(
+            <?php echo $view['translator']->trans(
                 'mautic.email.timeline.event.retried',
-                $item['retryCount'],
                 ['%count%' => $item['retryCount']]
             ); ?>
         <?php endif; ?>
@@ -64,7 +64,7 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)): ?>
             endif;
             ?>
             <?php if ($counter > 1): ?><hr/><?php endif; ?>
-            <strong><?php echo $view['date']->toText($detail['datetime'], 'UTC'); ?></strong><br/><?php echo $detail['useragent']; ?>
+            <strong><?php echo $view['date']->toText($detail['datetime'], 'UTC'); ?></strong><br/><?php echo $view->escape($detail['useragent']); ?>
             <?php ++$counter; ?>
         <?php endforeach; ?>
         <?php

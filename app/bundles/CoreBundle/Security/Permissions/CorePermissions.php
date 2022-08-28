@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -240,11 +231,11 @@ class CorePermissions
     /**
      * Determines if the user has permission to access the given area.
      *
-     * @param array|string $requestedPermission
-     * @param string       $mode                MATCH_ALL|MATCH_ONE|RETURN_ARRAY
-     * @param User         $userEntity
-     * @param bool         $allowUnknown        If the permission is not recognized, false will be returned.  Otherwise an
-     *                                          exception will be thrown
+     * @param string[]|string $requestedPermission
+     * @param string          $mode                MATCH_ALL|MATCH_ONE|RETURN_ARRAY
+     * @param User            $userEntity
+     * @param bool            $allowUnknown        If the permission is not recognized, false will be returned.  Otherwise an
+     *                                             exception will be thrown
      *
      * @return mixed
      *

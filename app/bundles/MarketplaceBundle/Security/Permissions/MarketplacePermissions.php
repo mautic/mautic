@@ -15,6 +15,7 @@ class MarketplacePermissions extends AbstractPermissions
     public const PACKAGES             = 'packages';
     public const CAN_VIEW_PACKAGES    = self::BASE.':'.self::PACKAGES.':view';
     public const CAN_INSTALL_PACKAGES = self::BASE.':'.self::PACKAGES.':create';
+    public const CAN_REMOVE_PACKAGES  = self::BASE.':'.self::PACKAGES.':remove';
 
     private Config $config;
 

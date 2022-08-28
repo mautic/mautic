@@ -1,26 +1,23 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Command;
 
+use Exception;
 use Mautic\CampaignBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
 class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
+    private ?SegmentCountCacheHelper $segmentCountCacheHelper = null;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
+
+        $this->segmentCountCacheHelper = self::$container->get('mautic.helper.segment.count.cache');
     }
 
     public function tearDown(): void
@@ -28,10 +25,12 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         parent::tearDown();
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=0');
+
+        $this->segmentCountCacheHelper = null;
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testCampaignExecutionForAll()
     {
@@ -197,7 +196,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testCampaignExecutionForOne()
     {
@@ -542,6 +541,18 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
         Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
         Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testSegmentCacheCount(): void
+    {
+        // Execute the command again to trigger related events.
+        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1]);
+        // Segment cache count should be 50.
+        $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
+        self::assertEquals(50, $count);
     }
 
     /**

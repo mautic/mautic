@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Configurator;
@@ -256,6 +247,10 @@ class CheckStep implements StepInterface
             } catch (\Exception $exception) {
                 $messages[] = 'mautic.install.intl.config';
             }
+        }
+
+        if (-1 !== (int) ini_get('zend.assertions')) {
+            $messages[] = 'mautic.install.zend_assertions';
         }
 
         return $messages;

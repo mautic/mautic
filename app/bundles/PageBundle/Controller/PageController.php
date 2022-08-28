@@ -113,8 +113,8 @@ class PageController extends FormController
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
 
-        $orderBy    = $this->get('session')->get('mautic.page.orderby', 'p.title');
-        $orderByDir = $this->get('session')->get('mautic.page.orderbydir', 'DESC');
+        $orderBy    = $this->get('session')->get('mautic.page.orderby', 'p.dateModified');
+        $orderByDir = $this->get('session')->get('mautic.page.orderbydir', $this->getDefaultOrderDirection());
         $pages      = $model->getEntities(
             [
                 'start'      => $start,
@@ -377,6 +377,7 @@ class PageController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
+                    $entity->setDateModified(new \DateTime());
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
@@ -1213,5 +1214,15 @@ class PageController extends FormController
         $model = $this->getModel('form.submission');
 
         return $model->exportResultsForPage($format, $activePage, $args);
+    }
+
+    public function getModelName(): string
+    {
+        return 'page';
+    }
+
+    protected function getDefaultOrderDirection()
+    {
+        return 'DESC';
     }
 }

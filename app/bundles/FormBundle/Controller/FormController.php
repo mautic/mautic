@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
@@ -69,7 +60,7 @@ class FormController extends CommonFormController
         }
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
-        $orderByDir = $session->get('mautic.form.orderbydir', 'DESC');
+        $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());
         $forms      = $this->getModel('form.form')->getEntities(
             [
                 'start'      => $start,
@@ -762,7 +753,11 @@ class FormController extends CommonFormController
                 uasort(
                     $modifiedFields,
                     function ($a, $b) {
-                        return $a['order'] > $b['order'];
+                        if ($a['order'] == $b['order']) {
+                            return 0;
+                        }
+
+                        return $a['order'] < $b['order'] ? -1 : 1;
                     }
                 );
             }
@@ -796,7 +791,11 @@ class FormController extends CommonFormController
                 uasort(
                     $modifiedActions,
                     function ($a, $b) {
-                        return $a['order'] > $b['order'];
+                        if ($a['order'] == $b['order']) {
+                            return 0;
+                        }
+
+                        return $a['order'] < $b['order'] ? -1 : 1;
                     }
                 );
             }
@@ -1178,7 +1177,6 @@ class FormController extends CommonFormController
                 'type'    => 'notice',
                 'msg'     => 'mautic.form.notice.batch_html_generated',
                 'msgVars' => [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ],
             ];
@@ -1192,5 +1190,15 @@ class FormController extends CommonFormController
                 ]
             )
         );
+    }
+
+    public function getModelName(): string
+    {
+        return 'form';
+    }
+
+    protected function getDefaultOrderDirection(): string
+    {
+        return 'DESC';
     }
 }

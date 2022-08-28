@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -91,9 +82,15 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $event    = new Event();
         $event2   = new Event();
         $campaign = new class() extends Campaign {
-            public $rootEvents;
+            /**
+             * @var ArrayCollection<int,Event>
+             */
+            public ArrayCollection $rootEvents;
 
-            public function getRootEvents()
+            /**
+             * @return ArrayCollection<int,Event>
+             */
+            public function getRootEvents(): ArrayCollection
             {
                 return $this->rootEvents;
             }

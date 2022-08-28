@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -270,7 +261,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
         $groups = ['User', 'SecondPass'];
 
         //check if creating a new user or editing an existing user and the password has been updated
-        if (!$data->getId() || ($data->getId() && $data->getPlainPassword())) {
+        if ($data instanceof User && (!$data->getId() || ($data->getId() && $data->getPlainPassword()))) {
             $groups[] = 'CheckPassword';
         }
 

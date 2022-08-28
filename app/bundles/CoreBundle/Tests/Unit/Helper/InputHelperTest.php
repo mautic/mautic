@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -67,7 +58,7 @@ class InputHelperTest extends TestCase
     {
         $clean = InputHelper::email('john..doe@email.com');
 
-        $this->assertEquals('john.doe@email.com', $clean);
+        $this->assertEquals('john..doe@email.com', $clean);
     }
 
     /**
