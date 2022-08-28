@@ -104,6 +104,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $this->setIncludeExcludeOperatorsToTextFilters($event);
         $staticFields = [
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
@@ -148,7 +149,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
                 'properties' => [
                     'type' => 'leadlist',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist', $event->getSearch()),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
@@ -253,6 +254,15 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
             ],
+            'dnc_manual_sms' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_manual_sms'),
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_manual_sms'),
+                ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
+                'object'     => 'lead',
+            ],
             'stage' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.field.stage'),
                 'object'     => 'lead',
@@ -320,12 +330,13 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $this->setIncludeExcludeOperatorsToTextFilters($event);
         $choices = [
             'lead_asset_download' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_asset_download'),
                 'properties' => [
                     'type' => 'assets',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_asset_download'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_asset_download', $event->getSearch()),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
@@ -442,6 +453,44 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
+            ],
+            // Clicked any link from any email relative to time
+            'email_clicked_link_date' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.email_clicked_link_date'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
+                    OperatorOptions::EQUAL_TO,
+                    OperatorOptions::NOT_EQUAL_TO,
+                    OperatorOptions::GREATER_THAN,
+                    OperatorOptions::LESS_THAN,
+                    OperatorOptions::GREATER_THAN_OR_EQUAL,
+                    OperatorOptions::LESS_THAN_OR_EQUAL,
+                ]),
+                'object' => 'lead',
+            ],
+            // Clicked any link from any sms
+            'sms_clicked_link' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.sms_clicked_link'),
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'sms_clicked_link'),
+                ],
+                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
+                'object'    => 'lead',
+            ],
+            // Clicked any link from any sms relative to time
+            'sms_clicked_link_date' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.sms_clicked_link_date'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
+                    OperatorOptions::EQUAL_TO,
+                    OperatorOptions::NOT_EQUAL_TO,
+                    OperatorOptions::GREATER_THAN,
+                    OperatorOptions::LESS_THAN,
+                    OperatorOptions::GREATER_THAN_OR_EQUAL,
+                    OperatorOptions::LESS_THAN_OR_EQUAL,
+                ]),
+                'object' => 'lead',
             ],
             'sessions' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.session'),
@@ -565,5 +614,35 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
         // something else such as dynanmic content
         return false;
+    }
+
+    private function setIncludeExcludeOperatorsToTextFilters(LeadListFiltersChoicesEvent $event): void
+    {
+        $choices = $event->getChoices();
+
+        foreach ($choices as $group => $groups) {
+            foreach ($groups as $alias => $choice) {
+                $type = $choice['properties']['type'] ?? null;
+                if ('text' === $type) {
+                    $choices[$group][$alias]['operators'] = $this->typeOperatorProvider->getOperatorsIncluding([
+                        OperatorOptions::EQUAL_TO,
+                        OperatorOptions::NOT_EQUAL_TO,
+                        OperatorOptions::EMPTY,
+                        OperatorOptions::NOT_EMPTY,
+                        OperatorOptions::LIKE,
+                        OperatorOptions::NOT_LIKE,
+                        OperatorOptions::REGEXP,
+                        OperatorOptions::NOT_REGEXP,
+                        OperatorOptions::IN,
+                        OperatorOptions::NOT_IN,
+                        OperatorOptions::STARTS_WITH,
+                        OperatorOptions::ENDS_WITH,
+                        OperatorOptions::CONTAINS,
+                    ]);
+                }
+            }
+        }
+
+        $event->setChoices($choices);
     }
 }

@@ -13,5 +13,5 @@ interface FieldChoicesProviderInterface
      *
      * @return mixed[]
      */
-    public function getChoicesForField(string $fieldType, string $fieldAlias): array;
+    public function getChoicesForField(string $fieldType, string $fieldAlias, string $search = ''): array;
 }

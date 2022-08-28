@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\DBAL\Cache\CacheException;
@@ -351,7 +342,7 @@ class CampaignController extends AbstractStandardFormController
                 $this->afterFormProcessed($valid, $campaign, $form, 'new');
             } else {
                 $viewParameters = ['page' => $page];
-                $returnUrl      = $this->generateUrl('c', $viewParameters);
+                $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
                 $template       = 'MauticCampaignBundle:Campaign:index';
             }
 
@@ -1017,9 +1008,9 @@ class CampaignController extends AbstractStandardFormController
                         'mautic.campaign.connection.trigger.interval.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
                         [
                             '%number%' => $event['triggerInterval'],
-                            '%unit%'   => $translator->transChoice(
+                            '%unit%'   => $translator->trans(
                                 'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
-                                $event['triggerInterval']
+                                ['%count%' => $event['triggerInterval']]
                             ),
                         ]
                     );

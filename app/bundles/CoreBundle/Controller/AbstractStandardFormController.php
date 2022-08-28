@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -1084,7 +1075,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param null $name
+     * @param string|null $name
      */
     protected function setListFilters($name = null)
     {

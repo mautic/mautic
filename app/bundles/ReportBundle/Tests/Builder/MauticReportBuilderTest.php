@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Builder;
 
 use Doctrine\DBAL\Connection;
@@ -41,6 +32,11 @@ final class MauticReportBuilderTest extends TestCase
      */
     private $channelListHelper;
 
+    /**
+     * @var QueryBuilder
+     */
+    private $queryBuilder;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -48,16 +44,17 @@ final class MauticReportBuilderTest extends TestCase
         $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
         $this->connection        = $this->createMock(Connection::class);
         $this->channelListHelper = $this->createMock(ChannelListHelper::class);
+        $this->queryBuilder      = new QueryBuilder($this->connection);
 
-        $this->connection->method('createQueryBuilder')->willReturn(new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
         $this->connection->method('getExpressionBuilder')->willReturn(new ExpressionBuilder($this->connection));
-        $this->connection->method('quote')->willReturnMap([
-            ['', null, "''"],
-        ]);
+        $this->connection->method('quote')->willReturnMap([['', null, "''"]]);
     }
 
     public function testColumnSanitization(): void
     {
+        $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
+
         $report = new Report();
         $report->setColumns(['a.b', 'b.c']);
         $builder = $this->buildBuilder($report);
@@ -156,6 +153,34 @@ final class MauticReportBuilderTest extends TestCase
                 AND ((a.emptyString IS NULL) OR (a.emptyString = ''))
                 AND (a.notEmptyString IS NOT NULL) AND (a.notEmptyString <> '')
         ")), $query->getSql());
+    }
+
+    public function testFiltersWithEmptyAndNotEmptyDateTypes2(): void
+    {
+        $report = new Report();
+        $report->setColumns(['a.someField']);
+        $report->setFilters([
+            [
+                'column'    => 'a.notEqualString',
+                'glue'      => 'and',
+                'value'     => '',
+                'condition' => 'neq',
+            ],
+        ]);
+        $builder = $this->buildBuilder($report);
+        $query   = $builder->getQuery([
+            'columns' => ['a.someField' => []],
+            'filters' => [
+                'a.notEqualString' => [
+                    'label' => 'Not equal string',
+                    'type'  => 'string',
+                    'alias' => 'notEqualString',
+                ],
+            ],
+        ]);
+        Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+            SELECT `a`.`someField` WHERE (a.notEqualString IS NULL) OR (a.notEqualString <> :i0canotEqualString)
+        ')), $query->getSql());
     }
 
     private function buildBuilder(Report $report): MauticReportBuilder

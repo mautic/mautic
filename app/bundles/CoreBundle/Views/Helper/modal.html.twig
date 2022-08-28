@@ -1,0 +1,64 @@
+{% set containerClass = containerClass is defined ? ' ' ~ containerClass : '' %}
+{% set containerAttr = containerAttr is defined ? ' ' ~ containerAttr : '' %}
+{% set size = size is defined ? ' modal-' ~ size : '' %}
+{% set class = class is defined and class is not empty ? ' ' ~ class : '' %}
+{% set body = body is defined ? body : '' %}
+{% set footer = footer is defined ? footer : '' %}
+{% set hidePlaceholder = body is defined and body is not empty ? ' hide' : '' %}
+{% set header = header is defined ? header : '' %}
+{% set padding = padding is defined ? padding : '' %}
+{% set footerButtonClass = footerButtonClass is defined ? footerButtonClass : 'modal-form-buttons' %}
+{% set dismissable = dismissable is defined ? dismissable : true %}
+
+<div class="modal fade{{ containerClass }}" id="{{ id }}" data-backdrop="static" role="dialog" aria-labelledby="{{ id }}-label" aria-hidden="true"{{ containerAttr }}>
+    <div class="modal-dialog{{ size }}">
+        <div class="modal-content{{ class }}">
+            {% if header is not same as(false) %}
+            <div class="modal-header">
+                {% if dismissable %}
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span aria-hidden="true">&times;</span></button>
+                {% endif %}
+
+                <h4 class="modal-title" id="{{ id }}-label">
+                    {{ header }}
+                </h4>
+
+                <!-- start: loading bar -->
+                <div class="modal-loading-bar">
+                    {% trans %}mautic.core.loading{% endtrans %}
+                </div>
+                <!--/ end: loading bar -->
+
+            </div>
+            {% endif %}
+            <div class="modal-body {{ padding }}">
+                <div class="loading-placeholder{{ hidePlaceholder }}">
+                    {% trans %}mautic.core.loading{% endtrans %}
+                </div>
+                <div class="modal-body-content">
+                    {{ body }}
+                </div>
+            </div>
+            {% if footer is not empty or (footerButtons is defined and footerButtons is not empty) %}
+            <div class="modal-footer">
+                {% if footerButtons is defined and footerButtons is not empty %}
+                <div class="{{ footerButtonClass }}">
+                    {% if footerButtons is iterable %}
+                    {% for button in footerButtons %}
+                        <button type="button"
+                                class="btn {{ button.class is defined and button.class is not empty ? button.class : 'btn-default' }}"
+                                {{ button.attr is defined and button.attr is not empty ? ' ' ~ buton.attr : '' }}>
+                            {{ button.textIcon is defined and button.textIcon is not empty ? '<i class="{{ button.textIcon }}>"></i>' : '' }}
+                            {{ button.label }}
+                        </button>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% else %}
+                {{ footer }}
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

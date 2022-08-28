@@ -50,10 +50,13 @@ $isComposerEnabled = $isComposerEnabled;
                             </tbody>
                         </table>
                         <?php if ($isComposerEnabled): ?>
-                        <div class="text-center">
+                        <div class="alert alert-warning text-center">
                             <strong><?php echo $view['translator']->trans('mautic.core.update.composer'); ?></strong>
                         </div>
                         <?php else: ?>
+                        <div class="alert alert-warning text-center">
+                            <strong><?php echo $view['translator']->trans('mautic.core.update.ui.deprecated'); ?></strong>
+                        </div>
                         <div class="text-right">
                             <button class="btn btn-primary" onclick="Mautic.processUpdate('update-panel', 1, '<?php echo base64_encode(json_encode([])); ?>');"><?php echo $view['translator']->trans('mautic.core.update.now'); ?></button>
                         </div>

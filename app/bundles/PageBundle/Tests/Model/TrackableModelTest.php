@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Tests\Model;
 
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
@@ -355,7 +346,7 @@ class TrackableModelTest extends TestCase
         );
 
         $this->assertEmpty($trackables, $content);
-        $this->assertFalse(strpos($url, $content), 'https:// should have been stripped from the token URL');
+        $this->assertFalse(strpos($content, $url), 'https:// should have been stripped from the token URL');
     }
 
     /**

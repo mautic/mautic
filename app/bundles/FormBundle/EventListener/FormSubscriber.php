@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\EventListener;
 
 use GuzzleHttp\Client;
@@ -32,35 +23,17 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var MailHelper
-     */
-    private $mailer;
+    private MailHelper $mailer;
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private AuditLogModel $auditLogModel;
 
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
+    private IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private RouterInterface $router;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -252,8 +225,12 @@ class FormSubscriber implements EventSubscriberInterface
             // Use the cleaned value by default - but if set to not save result, get from post
             $value               = (isset($results[$field['alias']])) ? $results[$field['alias']] : $post[$field['alias']];
             $matchedFields[$key] = $field['alias'];
-            $payload[$key]       = $value;
+
+            // decode html chars and quotes before posting to next form
+            $payload[$key]       = htmlspecialchars_decode($value, ENT_QUOTES);
         }
+
+        $event->setPostSubmitPayload($payload);
 
         $headers = [
             'X-Forwarded-For' => $event->getSubmission()->getIpAddress()->getIpAddress(),

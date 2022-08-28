@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -461,7 +452,7 @@ class MailHelperTest extends TestCase
         // From address is set
         $email->setFromAddress('from@nowhere.com');
         $mailer->setEmail($email);
-        $replyTo = key($mailer->message->getReplyTo());
+        $replyTo = key((array) $mailer->message->getReplyTo());
         // Expect from address in reply to
         $this->assertEquals('admin@mautic.com', $replyTo);
     }

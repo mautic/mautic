@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\NonUniqueResultException;
@@ -66,12 +57,9 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Countries;
+use Tightenco\Collect\Support\Collection;
 
-/**
- * Class LeadModel
- * {@inheritdoc}
- */
 class LeadModel extends FormModel
 {
     use DefaultValueTrait;
@@ -1119,12 +1107,12 @@ class LeadModel extends FormModel
     /**
      * Set frequency rules for lead per channel.
      *
-     * @param null $data
-     * @param null $leadLists
+     * @param array<mixed>    $data
+     * @param array<LeadList> $leadLists
      *
      * @return bool Returns true
      */
-    public function setFrequencyRules(Lead $lead, $data = null, $leadLists = null, $persist = true)
+    public function setFrequencyRules(Lead $lead, $data, $leadLists, $persist = true)
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();
@@ -1818,25 +1806,34 @@ class LeadModel extends FormModel
     /**
      * Modify companies for lead.
      *
-     * @param $companies
+     * @param int[] $companies
      */
-    public function modifyCompanies(Lead $lead, $companies)
+    public function modifyCompanies(Lead $lead, array $companies)
     {
         // See which companies belong to the lead already
         $leadCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
 
-        foreach ($leadCompanies as $leadCompany) {
-            if (false === array_search($leadCompany['company_id'], $companies)) {
-                $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead);
-            }
+        $requestedCompanies = new Collection($companies);
+        $currentCompanies   = (new Collection($leadCompanies))->keyBy('company_id');
+
+        // Add companies that are not in the array of found companies
+        $addCompanies = $requestedCompanies->reject(
+            // Reject if the lead is already in the given company
+            fn ($companyId) => $currentCompanies->has($companyId)
+        );
+        if ($addCompanies->count()) {
+            $this->companyModel->addLeadToCompany($addCompanies->toArray(), $lead);
         }
 
-        if (count($companies)) {
-            $this->companyModel->addLeadToCompany($companies, $lead);
-        } else {
-            // update the lead's company name to nothing
-            $lead->addUpdatedField('company', '');
-            $this->getRepository()->saveEntity($lead);
+        // Remove companies that are not in the array of given companies
+        $removeCompanies = $currentCompanies->reject(
+            function (array $company) use ($requestedCompanies) {
+                // Reject if the found company is still in the list of companies given
+                return $requestedCompanies->contains($company['company_id']);
+            }
+        );
+        if ($removeCompanies->count()) {
+            $this->companyModel->removeLeadFromCompany($removeCompanies->keys()->toArray(), $lead);
         }
     }
 
@@ -1968,10 +1965,10 @@ class LeadModel extends FormModel
      * Get leads count per country name.
      * Can't use entity, because country is a custom field.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
-     * @param bool   $canViewOthers
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param mixed[]   $filters
+     * @param bool      $canViewOthers
      *
      * @return array
      */
@@ -1991,9 +1988,8 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
-
-        $countries = array_flip(Intl::getRegionBundle()->getCountryNames('en'));
+        $results   = $q->execute()->fetchAllAssociative();
+        $countries = array_flip(Countries::getNames('en'));
         $mapData   = [];
 
         // Convert country names to 2-char code

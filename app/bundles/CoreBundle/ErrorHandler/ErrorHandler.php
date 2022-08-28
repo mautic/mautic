@@ -1,24 +1,15 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\ErrorHandler {
     use Mautic\CoreBundle\Exception\DatabaseConnectionException;
     use Mautic\CoreBundle\Exception\ErrorHandlerException;
     use Psr\Log\LoggerInterface;
     use Psr\Log\LogLevel;
-    use Symfony\Component\Debug\Debug;
     use Symfony\Component\Debug\Exception\FatalErrorException;
     use Symfony\Component\Debug\Exception\FatalThrowableError;
     use Symfony\Component\Debug\Exception\FlattenException;
     use Symfony\Component\Debug\Exception\OutOfMemoryException;
+    use Symfony\Component\ErrorHandler\Debug;
 
     class ErrorHandler
     {
@@ -60,9 +51,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param        $log
-         * @param string $context
-         * @param bool   $backtrace
+         * @param mixed               $log
+         * @param string|array<mixed> $context
+         * @param bool                $backtrace
          */
         public static function logDebugEntry($log, $context = 'null', $backtrace = false)
         {
@@ -360,7 +351,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
                 // Hide errors by default so we can format them
                 self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); //ini_get('display_errors'));
-                ini_set('display_errors', 0);
+                ini_set('display_errors', '0');
             }
 
             return self::$handler;

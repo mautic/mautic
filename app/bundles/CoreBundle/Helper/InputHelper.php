@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Joomla\Filter\InputFilter;
@@ -380,7 +371,6 @@ class InputHelper
 
         $value = substr($value, 0, 254);
         $value = filter_var($value, FILTER_SANITIZE_EMAIL);
-        $value = str_replace('..', '.', $value);
 
         return trim($value);
     }

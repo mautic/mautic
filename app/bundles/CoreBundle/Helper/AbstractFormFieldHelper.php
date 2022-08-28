@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Helper\ListParser\ArrayListParser;
@@ -206,7 +197,7 @@ abstract class AbstractFormFieldHelper
     {
         $choices = [];
         foreach ($list as $value => $label) {
-            if (is_array($label) && isset($label['value'])) {
+            if (is_array($label) && array_key_exists('value', $label)) {
                 $value = $label['value'];
                 $label = $label['label'];
 

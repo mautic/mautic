@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -35,6 +26,7 @@ class PermissionListType extends AbstractType
                     'onchange'        => 'Mautic.onPermissionChange(this, \''.$options['bundle'].'\')',
                 ];
             },
+            'choices_as_values' => false,
         ]);
     }
 

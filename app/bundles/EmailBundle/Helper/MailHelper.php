@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Helper;
 
 use Doctrine\ORM\ORMException;
@@ -67,7 +58,7 @@ class MailHelper
     public $message;
 
     /**
-     * @var null
+     * @var string|array<string, string>
      */
     protected $from;
 
@@ -354,6 +345,7 @@ class MailHelper
                     if (!empty($owner)) {
                         $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
                         $ownerSignature = $this->getContactOwnerSignature($owner);
+                        $this->setReplyTo($owner['email']);
                     } else {
                         $this->setFrom($this->systemFrom, null);
                     }
@@ -1900,7 +1892,7 @@ class MailHelper
             $copyCreated = false;
             if (null === $copy) {
                 $contentToPersist = strtr($this->body['content'], array_flip($this->embedImagesReplaces));
-                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $contentToPersist)) {
+                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $contentToPersist, $this->plainText)) {
                     // Try one more time to find the ID in case there was overlap when creating
                     $copy = $emailModel->getCopyRepository()->findByHash($hash);
                 } else {

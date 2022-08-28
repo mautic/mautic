@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -744,7 +735,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $nullExpr = $operators['null'][$exprType];
         $inExpr   = $operators['in'][$exprType];
         $xExpr    = $operators['x'][$exprType];
-
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous', [], null, 'en_US'):
@@ -807,6 +797,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                             $q->expr()->$eqExpr('list_lead.manually_removed', 0)
                         )
                     )
+                );
+                $filter->strict  = true;
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.company_id', [], null, 'en_US'):
+                $this->applySearchQueryRelationship(
+                    $q,
+                    [
+                        [
+                            'from_alias' => 'l',
+                            'table'      => 'companies_leads',
+                            'alias'      => 'comp_lead',
+                            'condition'  => 'l.id = comp_lead.lead_id',
+                        ],
+                    ],
+                    $innerJoinTables,
+                    $this->generateFilterExpression($q, 'comp_lead.company_id', $eqExpr, $unique, null)
                 );
                 $filter->strict  = true;
                 $returnParameter = true;
@@ -973,6 +981,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.list',
             'mautic.core.searchcommand.name',
             'mautic.lead.lead.searchcommand.company',
+            'mautic.lead.lead.searchcommand.company_id',
             'mautic.core.searchcommand.email',
             'mautic.lead.lead.searchcommand.owner',
             'mautic.core.searchcommand.ip',
@@ -1016,9 +1025,17 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Updates lead's lastActive with now date/time.
      *
      * @param int $leadId
+     *
+     * @return void
      */
     public function updateLastActive($leadId)
     {
+        if (!$leadId) {
+            // Prevent unnecessary queries like:
+            // `UPDATE leads SET last_active = ... WHERE id IS NULL`
+            return;
+        }
+
         $dt     = new DateTimeHelper();
         $fields = ['last_active' => $dt->toUtcString()];
 
