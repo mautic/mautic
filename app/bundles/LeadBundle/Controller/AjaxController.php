@@ -948,7 +948,7 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @throws DBALException
+     * @throws Exception
      */
     protected function getLeadCountAction(Request $request): JsonResponse
     {
