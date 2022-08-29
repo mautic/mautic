@@ -95,7 +95,7 @@ class ButtonHelper extends Helper
     private $menuLink;
 
     /**
-     * @var array
+     * @var array<array<string,mixed>>
      */
     private $buttons = [];
 
@@ -140,6 +140,8 @@ class ButtonHelper extends Helper
     }
 
     /**
+     * @param array<string,mixed> $button
+     *
      * @return $this
      */
     public function addButton(array $button)
