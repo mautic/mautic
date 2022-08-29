@@ -37,18 +37,16 @@ class PublicController extends FormController
                 $data = $form->getData();
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
-                if (null == $user) {
-                    $form['identifier']->addError(new FormError($this->translator->trans('mautic.user.user.passwordreset.nouserfound', [], 'validators')));
-                } else {
-                    try {
+                try {
+                    if (null !== $user) {
                         $model->sendResetEmail($user);
-                        $this->addFlash('mautic.user.user.notice.passwordreset');
-                    } catch (\Exception $exception) {
-                        $this->addFlash('mautic.user.user.notice.passwordreset.error', [], 'error');
                     }
-
-                    return $this->redirect($this->generateUrl('login'));
+                    $this->addFlash('mautic.user.user.notice.passwordreset');
+                } catch (\Exception $exception) {
+                    $this->addFlash('mautic.user.user.notice.passwordreset.error', [], 'error');
                 }
+
+                return $this->redirect($this->generateUrl('login'));
             }
         }
 
@@ -86,7 +84,8 @@ class PublicController extends FormController
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
                 if (null == $user) {
-                    $form['identifier']->addError(new FormError($this->translator->trans('mautic.user.user.passwordreset.nouserfound', [], 'validators')));
+                    $this->addFlash('mautic.user.user.notice.passwordreset.success');
+                    return $this->redirect($this->generateUrl('login'));
                 } else {
                     if ($this->request->getSession()->has('resetToken')) {
                         $resetToken = $this->request->getSession()->get('resetToken');
