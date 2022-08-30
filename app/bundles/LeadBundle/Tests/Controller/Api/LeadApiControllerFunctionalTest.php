@@ -9,6 +9,25 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected function setUp(): void
+    {
+        // Disable API just for specific test.
+        $this->configParams['api_enabled'] = 'testDisabledApi' !== $this->getName();
+
+        parent::setUp();
+    }
+
+    public function testDisabledApi(): void
+    {
+        $this->client->request('POST', '/api/contacts/new', ['email' => 'apiemail1@email.com']);
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertEquals(
+            '{"errors":[{"message":"API disabled. You need to enable the API in the API settings of Mautic\u0027s Configuration.","code":403,"type":"api_disabled"}]}',
+            $clientResponse->getContent()
+        );
+    }
+
     public function testBatchNewEndpointDoesNotCreateDuplicates(): void
     {
         $payload = [
