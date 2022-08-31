@@ -18,8 +18,8 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
 {
     use ControllerTrait;
 
-    private const USER_EDITOR_USERNAME  = 'sales';
-    private const USER_CREATOR_USERNAME = 'admin';
+    private const SALES_USER = 'sales';
+    private const ADMIN_USER = 'admin';
 
     /**
      * Index action should return status code 200.
@@ -110,11 +110,11 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
      *
      * @dataProvider getValuesProvider
      */
-    public function testEditWithPermissions(array $permission, int $expectedStatusCode, string $userCreatorUN): void
+    public function testEditWithPermissions(string $route, array $permission, int $expectedStatusCode, string $userCreatorUN): void
     {
         $userCreator = $this->getUser($userCreatorUN);
-        $userEditor  = $this->getUser(self::USER_EDITOR_USERNAME);
-        $this->setPermission($userEditor, $permission);
+        $userEditor  = $this->getUser(self::SALES_USER);
+        $this->setPermission($userEditor, ['asset:assets' => $permission]);
 
         $asset = new Asset();
         $asset->setTitle('Asset A');
@@ -131,10 +131,10 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
         // Logout admin.
         $this->client->request(Request::METHOD_GET, '/s/logout');
 
-        $this->loginUser(self::USER_EDITOR_USERNAME);
+        $this->loginUser(self::SALES_USER);
 
-        $this->client->setServerParameter('PHP_AUTH_USER', self::USER_EDITOR_USERNAME);
-        $this->client->request(Request::METHOD_GET, sprintf('/s/assets/edit/%d', $asset->getId()));
+        $this->client->setServerParameter('PHP_AUTH_USER', self::SALES_USER);
+        $this->client->request(Request::METHOD_GET, "/s/assets/{$route}/{$asset->getId()}");
 
         Assert::assertSame($expectedStatusCode, $this->client->getResponse()->getStatusCode());
     }
@@ -144,44 +144,60 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
      */
     public function getValuesProvider(): \Generator
     {
-        yield 'The sales user edits its own asset' => [
-            'permission' => [
-                'asset:assets' => ['editown', 'editother'],
-            ],
+        yield 'The sales user with edit own permission can edits its own asset' => [
+            'route'              => 'edit',
+            'permission'         => ['editown'],
             'expectedStatusCode' => Response::HTTP_OK,
-            'userCreatorUN'      => self::USER_EDITOR_USERNAME,
+            'userCreatorUN'      => self::SALES_USER,
         ];
 
-        yield 'The sales user cannot edit asset created by admin' => [
-            'permission' => [
-                'asset:assets' => ['editown'],
-            ],
+        yield 'The sales user with edit own permission cannot edit asset created by admin' => [
+            'route'              => 'edit',
+            'permission'         => ['editown'],
             'expectedStatusCode' => Response::HTTP_FORBIDDEN,
-            'userCreatorUN'      => self::USER_CREATOR_USERNAME,
+            'userCreatorUN'      => self::ADMIN_USER,
         ];
 
-        yield 'The sales user can edit asset created by admin' => [
-            'permission' => [
-                'asset:assets' => ['editown', 'editother'],
-            ],
+        yield 'The sales user with edit other permission can edit asset created by admin' => [
+            'route'              => 'edit',
+            'permission'         => ['editown', 'editother'],
             'expectedStatusCode' => Response::HTTP_OK,
-            'userCreatorUN'      => self::USER_CREATOR_USERNAME,
+            'userCreatorUN'      => self::ADMIN_USER,
         ];
 
-        yield 'The sales user cannot edit or view asset created by admin' => [
-            'permission' => [
-                'asset:assets' => ['viewown'],
-            ],
+        yield 'The sales user with view own permission cannot edit or asset created by admin' => [
+            'route'              => 'edit',
+            'permission'         => ['viewown'],
             'expectedStatusCode' => Response::HTTP_FORBIDDEN,
-            'userCreatorUN'      => self::USER_CREATOR_USERNAME,
+            'userCreatorUN'      => self::ADMIN_USER,
         ];
 
-        yield 'The sales user can edit or view asset created by admin' => [
-            'permission' => [
-                'asset:assets' => ['viewown', 'viewother'],
-            ],
+        yield 'The sales user with view other permission cannot edit asset created by admin' => [
+            'route'              => 'edit',
+            'permission'         => ['viewown', 'viewother'],
+            'expectedStatusCode' => Response::HTTP_FORBIDDEN,
+            'userCreatorUN'      => self::ADMIN_USER,
+        ];
+
+        yield 'The sales user with view own permission cannot view asset created by admin' => [
+            'route'              => 'view',
+            'permission'         => ['viewown'],
+            'expectedStatusCode' => Response::HTTP_FORBIDDEN,
+            'userCreatorUN'      => self::ADMIN_USER,
+        ];
+
+        yield 'The sales user with view others permission can view asset created by admin' => [
+            'route'              => 'view',
+            'permission'         => ['viewown', 'viewother'],
             'expectedStatusCode' => Response::HTTP_OK,
-            'userCreatorUN'      => self::USER_CREATOR_USERNAME,
+            'userCreatorUN'      => self::ADMIN_USER,
+        ];
+
+        yield 'The sales user with view own permission can view its own asset' => [
+            'route'              => 'view',
+            'permission'         => ['viewown'],
+            'expectedStatusCode' => Response::HTTP_OK,
+            'userCreatorUN'      => self::SALES_USER,
         ];
     }
 
