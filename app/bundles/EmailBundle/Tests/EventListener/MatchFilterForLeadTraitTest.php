@@ -208,7 +208,7 @@ class MatchFilterForLeadTraitTest extends TestCase
         ];
     }
 
-    public function testMatchFilterForLeadTraitEmptyCompany()
+    public function testMatchFilterForLeadTraitEmptyCompany(): void
     {
         $lead = [
             'id'        => 1,
@@ -231,7 +231,7 @@ class MatchFilterForLeadTraitTest extends TestCase
         $this->assertEquals(true, $this->matchFilterForLeadTrait->match($filters, $lead));
     }
 
-    public function testMatchFilterForLeadTraitNonEmptyCompany()
+    public function testMatchFilterForLeadTraitNonEmptyCompany(): void
     {
         $lead = [
             'id'        => 1,
