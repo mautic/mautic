@@ -145,6 +145,37 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertCount(1, $dncQueries, 'DNC query not found. '.var_export(array_map(fn (array $query) => $query['sql'], $queries['default']), true));
     }
 
+    public function testEmailDetailPageForDisabledSendButton(): void
+    {
+        $segment = $this->createSegment();
+        $this->em->persist($segment);
+        $email   = $this->createEmail();
+        $email->setPublishUp(new \DateTime('now -1 hour'));
+        $email->addList($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
+        $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
+        $this->assertStringContainsString('Email is sending in the background', $html, $html);
+
+        $email->setPublishUp(new \DateTime('now +1 hour'));
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
+        $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
+        $this->assertStringNotContainsString('Email is sending in the background', $html, $html);
+
+        $email->setPublishUp(null);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
+        $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
+        $this->assertStringNotContainsString('disabled', $html, $html);
+    }
+
     /**
      * @throws ORMException
      * @throws OptimisticLockException
