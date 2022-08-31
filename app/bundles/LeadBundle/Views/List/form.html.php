@@ -79,7 +79,13 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                     <?php
                                     foreach ($fields as $object => $field):
                                         $header = $object;
-                                        $icon   = ('company' == $object) ? 'building' : 'user';
+                                        $icon   = '';
+                                        if ('company' == $object) {
+                                            $icon = 'building';
+                                        } elseif ('lead' == $object) {
+                                            $icon = 'user';
+                                        }
+
                                         $header = $view['translator']->hasId($translationId = 'mautic.lead.'.$header)
                                             ? $view['translator']->trans($translationId)
                                             : $view['translator']->trans($header);

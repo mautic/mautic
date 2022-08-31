@@ -655,7 +655,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
 
     if (fieldObject == 'company') {
         prototype.find(".object-icon").removeClass('fa-user').addClass('fa-building');
-    } else {
+    } else if (fieldObject == 'lead') {
         prototype.find(".object-icon").removeClass('fa-building').addClass('fa-user');
     }
     prototype.find(".inline-spacer").append(fieldObject);
