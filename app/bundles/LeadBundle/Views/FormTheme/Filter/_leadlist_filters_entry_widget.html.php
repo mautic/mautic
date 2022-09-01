@@ -16,7 +16,7 @@ $isBehavior  = isset($fields['behaviors'][$filterType]['label']);
 $class  = '';
 $object = $form->vars['data']['object'] ?? '';
 if ('company' == $object) {
-    $class = 'fa-building1';
+    $class = 'fa-building';
 } elseif ('lead' == $object) {
     $class = 'fa-user';
 }
