@@ -115,10 +115,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testFireWebhookWithPostJson(): void
     {
-        $config      = $this->provideSampleConfig('post');
-        $expectedUrl = 'https://mautic.org?test=tee&email=john%40doe.email&IP=127.0.0.1%2C127.0.0.2';
-
-        $config      = $this->provideSampleConfig('post', 'application/json');
+        $config = $this->provideSampleConfig('post', 'application/json');
         $this->client->expects($this->once())
             ->method('request')
             ->with('post', 'https://mautic.org', [
@@ -151,7 +148,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<string,mixed>
      */
-    private function provideSampleConfig(string $method = 'get', $type = 'application/x-www-form-urlencoded'): array
+    private function provideSampleConfig(string $method = 'get', string $type = 'application/x-www-form-urlencoded'): array
     {
         $sample = [
             'url'             => 'https://mautic.org',

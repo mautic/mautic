@@ -22,10 +22,7 @@ class ClientTest extends TestCase
      */
     private $httpClientMock;
 
-    /**
-     * @var Client
-     */
-    private $client;
+    private Client $client;
 
     protected function setUp(): void
     {
@@ -47,17 +44,14 @@ class ClientTest extends TestCase
             'X-Origin-Base-URL' => $siteUrl,
         ];
 
-        $response = new Response(); // here too
+        $response = new Response();
 
-        $parametersMock     = $this->createMock(CoreParametersHelper::class);
-        $httpClientMock     = $this->createMock(GuzzleClient::class);
-
-        $parametersMock->expects($this->once())
+        $this->parametersMock->expects($this->once())
             ->method('get')
             ->with('site_url')
             ->willReturn($siteUrl);
 
-        $httpClientMock->expects($this->once())
+        $this->httpClientMock->expects($this->once())
             ->method('sendRequest')
             ->with($this->callback(function (Request $request) use ($method, $url, $headers, $payload) {
                 $this->assertSame($method, $request->getMethod());
@@ -74,8 +68,7 @@ class ClientTest extends TestCase
             }))
             ->willReturn($response);
 
-        $client = new Client($parametersMock, $httpClientMock);
 
-        $this->assertEquals($response, $client->post($url, $payload));
+        $this->assertEquals($response, $this->client->post($url, $payload));
     }
 }
