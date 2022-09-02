@@ -22,12 +22,18 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject $contact;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Client
+     * @var MockObject|Client
      */
     private \PHPUnit\Framework\MockObject\MockObject $client;
 
+    /**
+     * @var MockObject|CompanyModel
+     */
     private \PHPUnit\Framework\MockObject\MockObject $companyModel;
 
+    /**
+     * @var MockObject|CompanyRepository
+     */
     private \PHPUnit\Framework\MockObject\MockObject $companyRepository;
 
     /**
@@ -38,7 +44,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
     private \Mautic\WebhookBundle\Helper\CampaignHelper $campaignHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
+     * @var MockObject|EventDispatcherInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
@@ -145,7 +151,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<string,mixed>
      */
-    private function provideSampleConfig(string $method = 'get'): array
+    private function provideSampleConfig(string $method = 'get', $type = 'application/x-www-form-urlencoded'): array
     {
         $sample = [
             'url'             => 'https://mautic.org',

@@ -2,19 +2,9 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Statement as DriverStatement;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
@@ -31,7 +21,7 @@ class WebhookQueueRepositoryTest extends TestCase
     private $entityManager;
 
     /**
-     * @var ClassMetadata|MockObject
+     * @var ClassMetadata<Webhook>|MockObject
      */
     private $classMetadata;
 
@@ -109,7 +99,7 @@ class WebhookQueueRepositoryTest extends TestCase
         self::assertSame(0, $this->repository->getQueueCountByWebhookId(0));
     }
 
-    public function testExistsExists()
+    public function testWebhookExists():void
     {
         $id = 1;
 
@@ -156,7 +146,7 @@ class WebhookQueueRepositoryTest extends TestCase
         self::assertTrue($this->repository->exists($id));
     }
 
-    public function testExistsNotExists()
+    public function testWebhookExistsNotExists(): void
     {
         $id = 1;
 
@@ -201,42 +191,5 @@ class WebhookQueueRepositoryTest extends TestCase
             ->willReturn($connection);
 
         self::assertFalse($this->repository->exists($id));
-    }
-
-    public function testGetConsecutiveIDsAsRanges()
-    {
-        $webhookId      = 1;
-        $expectedResult = [];
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
-        $statement = $this->createMock(DriverStatement::class);
-        $statement->expects(self::once())
-            ->method('execute')
-            ->with([
-                ':webhookId' => $webhookId,
-            ])
-            ->willReturn($statement);
-        $statement->expects(self::once())
-            ->method('fetchAll')
-            ->willReturn($expectedResult);
-
-        $connection = $this->createMock(Connection::class);
-        $connection->expects(self::once())
-            ->method('prepare')
-            ->willReturn($statement);
-
-        $this->entityManager->expects(self::once())
-            ->method('getConnection')
-            ->willReturn($connection);
-
-        $this->assertSame($expectedResult, $this->repository->getConsecutiveIDsAsRanges((string) $webhookId));
-    }
-
-    public function testGetConsecutiveIDsAsRangesInvalidArgumentException()
-    {
-        self::expectException(\InvalidArgumentException::class);
-
-        $this->repository->getConsecutiveIDsAsRanges(0);
     }
 }
