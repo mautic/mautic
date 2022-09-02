@@ -64,6 +64,16 @@ class WebhookModel extends FormModel
     protected $webhookLimit;
 
     /**
+     * Sets min webhook queue ID to get/process.
+     */
+    protected ?int $minQueueId = null;
+
+    /**
+     * Sets max webhook queue ID to get/process.
+     */
+    protected ?int $maxQueueId = null;
+
+    /**
      * How long the webhook processing can run in seconds.
      */
     private int $webhookTimeLimit;
@@ -623,6 +633,20 @@ class WebhookModel extends FormModel
     public function getPermissionBase(): string
     {
         return 'webhook:webhooks';
+    }
+
+    public function setMinQueueId(int $minQueueId): self
+    {
+        $this->minQueueId = $minQueueId;
+
+        return $this;
+    }
+
+    public function setMaxQueueId(int $maxQueueId): self
+    {
+        $this->maxQueueId = $maxQueueId;
+
+        return $this;
     }
 
     private function isProcessingExpired(): bool
