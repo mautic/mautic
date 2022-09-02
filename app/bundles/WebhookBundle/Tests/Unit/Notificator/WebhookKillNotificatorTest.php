@@ -269,27 +269,22 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $this->webhookKillNotificator->send($this->webhook, $this->reason);
     }
 
-    private function mockCommonMethods(int $sentToAuther): void
+    private function mockCommonMethods(int $sentToAuther, string $emailToSend = null): void
     {
         $this->coreParamHelperMock
-            ->expects($this->at(0))
             ->method('get')
-            ->with('webhook_send_notification_to_author')
-            ->willReturn($sentToAuther);
+            ->withConsecutive(['webhook_send_notification_to_author'], ['webhook_notification_email_addresses'])
+            ->willReturnOnConsecutiveCalls($sentToAuther, $emailToSend);
 
         $this->webhookKillNotificator = new WebhookKillNotificator($this->translatorMock, $this->routerMock, $this->notificationModelMock, $this->entityManagerMock, $this->mailHelperMock, $this->coreParamHelperMock);
 
         $this->owner          = $this->createMock(User::class);
+
+        $htmlUrl = '<a href="'.$this->generatedRoute.'" data-toggle="ajax">'.$this->webhookName.'</a>';
         $this->translatorMock
-            ->expects($this->at(0))
             ->method('trans')
-            ->with('mautic.webhook.stopped')
-            ->willReturn($this->subject);
-        $this->translatorMock
-            ->expects($this->at(1))
-            ->method('trans')
-            ->with($this->reason)
-            ->willReturn($this->reason);
+            ->withConsecutive(['mautic.webhook.stopped'], [$this->reason], ['mautic.webhook.stopped.details', ['%reason%'  => $this->reason, '%webhook%' => $htmlUrl]])
+            ->willReturnOnConsecutiveCalls($this->subject, $this->reason, $this->details);
 
         $this->webhook->expects($this->once())
             ->method('getId')
@@ -307,17 +302,6 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
                 UrlGeneratorInterface::ABSOLUTE_URL
             )
             ->willReturn($this->generatedRoute);
-
-        $htmlUrl = '<a href="'.$this->generatedRoute.'" data-toggle="ajax">'.$this->webhookName.'</a>';
-
-        $this->translatorMock
-            ->expects($this->at(2))
-            ->method('trans')
-            ->with(
-                'mautic.webhook.stopped.details',
-                ['%reason%'  => $this->reason, '%webhook%' => $htmlUrl]
-            )
-            ->willReturn($this->details);
 
         if ($sentToAuther) {
             $this->owner

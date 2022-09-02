@@ -10,6 +10,8 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\WebhookBundle\Entity\Event;
+use Mautic\WebhookBundle\Entity\Log;
+use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
@@ -205,7 +207,12 @@ class WebhookModelTest extends TestCase
 
     public function testProcessWebhook(): void
     {
-        $webhook = new Webhook();
+        $webhook = new class() extends Webhook {
+            public function getId(): ?int
+            {
+                return 1;
+            }
+        };
         $webhook->setWebhookUrl('test-webhook.com');
 
         $event = new Event();
@@ -222,11 +229,15 @@ class WebhookModelTest extends TestCase
         $queue->setDateAdded(new \DateTime('2021-04-01T16:00:00+00:00'));
 
         $webhookQueueRepoMock = $this->createMock(WebhookQueueRepository::class);
+        $webhookLogRepoMock = $this->createMock(LogRepository::class);
+        $webhookRepoMock = $this->createMock(WebhookRepository::class);
 
-        $this->entityManagerMock
-            ->method('getRepository')
-            ->with(WebhookQueue::class)
-            ->willReturn($webhookQueueRepoMock);
+        $this->entityManagerMock->method('getRepository')
+            ->willReturnMap([
+                [WebhookQueue::class, $webhookQueueRepoMock],
+                [Log::class, $webhookLogRepoMock],
+                [Webhook::class, $webhookRepoMock],
+            ]);
 
         $webhookQueueRepoMock
             ->method('deleteQueuesById')
