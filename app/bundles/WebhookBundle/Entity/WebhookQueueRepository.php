@@ -34,7 +34,7 @@ class WebhookQueueRepository extends CommonRepository
      *
      * @param $id int (for Webhooks)
      *
-     * @deprecated
+     * @deprecated Use exists() instead
      */
     public function getQueueCountByWebhookId($id): int
     {
