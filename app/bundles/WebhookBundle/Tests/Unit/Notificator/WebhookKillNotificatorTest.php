@@ -135,7 +135,7 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $this->entityManagerMock
             ->expects($this->once())
             ->method('getReference')
-            ->with(\Mautic\UserBundle\Entity\User::class, $this->createdBy)
+            ->with(User::class, $this->createdBy)
             ->willReturn($this->owner);
 
         $this->notificationModelMock
