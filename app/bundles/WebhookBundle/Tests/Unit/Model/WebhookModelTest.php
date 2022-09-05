@@ -48,6 +48,11 @@ class WebhookModelTest extends TestCase
     private \PHPUnit\Framework\MockObject\MockObject $webhookRepository;
 
     /**
+     * @var MockObject|WebhookQueueRepository
+     */
+    private $webhookQueueRepository;
+
+    /**
      * @var MockObject|UserHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $userHelper;
@@ -66,14 +71,15 @@ class WebhookModelTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->parametersHelperMock  = $this->createMock(CoreParametersHelper::class);
-        $this->serializerMock        = $this->createMock(SerializerInterface::class);
-        $this->entityManagerMock     = $this->createMock(EntityManager::class);
-        $this->userHelper            = $this->createMock(UserHelper::class);
-        $this->webhookRepository     = $this->createMock(WebhookRepository::class);
-        $this->httpClientMock        = $this->createMock(Client::class);
-        $this->eventDispatcherMock   = $this->createMock(EventDispatcher::class);
-        $this->model                 = $this->initModel();
+        $this->parametersHelperMock   = $this->createMock(CoreParametersHelper::class);
+        $this->serializerMock         = $this->createMock(SerializerInterface::class);
+        $this->entityManagerMock      = $this->createMock(EntityManager::class);
+        $this->userHelper             = $this->createMock(UserHelper::class);
+        $this->webhookRepository      = $this->createMock(WebhookRepository::class);
+        $this->webhookQueueRepository = $this->createMock(WebhookQueueRepository::class);
+        $this->httpClientMock         = $this->createMock(Client::class);
+        $this->eventDispatcherMock    = $this->createMock(EventDispatcher::class);
+        $this->model                  = $this->initModel();
     }
 
     public function testSaveEntity(): void
@@ -257,6 +263,100 @@ class WebhookModelTest extends TestCase
             ->willReturn(new Response(200, [], 'Success'));
 
         self::assertTrue($this->model->processWebhook($webhook, $queue));
+    }
+
+    public function testMinAndMaxQueueIdWhenNoneIsSet(): void
+    {
+        $webhook = new class() extends Webhook {
+            public function getId(): ?int
+            {
+                return 1;
+            }
+        };
+
+        $webhook->setEventsOrderbyDir('ASC');
+
+        $this->entityManagerMock->expects($this->once())
+            ->method('getRepository')
+            ->with(WebhookQueue::class)
+            ->willReturn($this->webhookQueueRepository);
+
+        $this->webhookQueueRepository->method('getTableAlias')->willReturn('w');
+
+        $this->webhookQueueRepository->expects($this->once())
+            ->method('getEntities')
+            ->with(
+                [
+                    'filter' => [
+                        'force' => [
+                            [
+                                'column' => 'IDENTITY(w.webhook)',
+                                'expr'   => 'eq',
+                                'value'  => 1,
+                            ],
+                        ],
+                    ],
+                    'limit'         => 0,
+                    'iterator_mode' => true,
+                    'start'         => 0,
+                    'orderBy'       => 'w.id',
+                    'orderByDir'    => 'ASC',
+                ]
+            );
+        $this->initModel()->getWebhookQueues($webhook);
+    }
+
+    public function testMinAndMaxQueueIdWhenBothSet(): void
+    {
+        $webhook = new class() extends Webhook {
+            public function getId(): ?int
+            {
+                return 1;
+            }
+        };
+
+        $webhook->setEventsOrderbyDir('ASC');
+
+        $this->entityManagerMock->expects($this->once())
+            ->method('getRepository')
+            ->with(WebhookQueue::class)
+            ->willReturn($this->webhookQueueRepository);
+
+        $this->webhookQueueRepository->method('getTableAlias')->willReturn('w');
+
+        $this->webhookQueueRepository->expects($this->once())
+            ->method('getEntities')
+            ->with(
+                [
+                    'filter' => [
+                        'force' => [
+                            [
+                                'column' => 'IDENTITY(w.webhook)',
+                                'expr'   => 'eq',
+                                'value'  => 1,
+                            ],
+                            [
+                                'column' => 'w.id',
+                                'expr'   => 'gte',
+                                'value'  => 20,
+                            ],
+                            [
+                                'column' => 'w.id',
+                                'expr'   => 'lte',
+                                'value'  => 30,
+                            ],
+                        ],
+                    ],
+                    'iterator_mode' => true,
+                    'orderBy'       => 'w.id',
+                    'orderByDir'    => 'ASC',
+                ]
+            );
+
+        $model = $this->initModel();
+        $model->setMinQueueId(20);
+        $model->setMaxQueueId(30);
+        $model->getWebhookQueues($webhook);
     }
 
     private function initModel(): WebhookModel
