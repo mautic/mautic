@@ -26,6 +26,11 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class CategoryModel extends FormModel
 {
+    /**
+     * @var mixed[]
+     */
+    private array $categoriesByBundleCache = [];
+
     public function __construct(
         protected RequestStack $requestStack,
         EntityManager $em,
@@ -42,7 +47,10 @@ class CategoryModel extends FormModel
 
     public function getRepository(): CategoryRepository
     {
-        return $this->em->getRepository(Category::class);
+        /** @var CategoryRepository $repository */
+        $repository = $this->em->getRepository(Category::class);
+
+        return $repository;
     }
 
     public function getNameGetter(): string
@@ -163,16 +171,21 @@ class CategoryModel extends FormModel
 
     /**
      * Get list of entities for autopopulate fields.
+     *
+     * @param string $bundle
+     * @param string $filter
+     * @param string $limit
+     *
+     * @return mixed[]
      */
     public function getLookupResults($bundle, $filter = '', $limit = 10): array
     {
-        static $results = [];
-
         $key = $bundle.$filter.$limit;
-        if (!isset($results[$key])) {
-            $results[$key] = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
+
+        if (!empty($this->categoriesByBundleCache[$key])) {
+            return $this->categoriesByBundleCache[$key];
         }
 
-        return $results[$key];
+        return $this->categoriesByBundleCache[$key] = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
     }
 }

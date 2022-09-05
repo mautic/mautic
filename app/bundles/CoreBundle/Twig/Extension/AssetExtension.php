@@ -37,6 +37,7 @@ class AssetExtension extends AbstractExtension
             new TwigFunction('assetGetCountryFlag', [$this, 'getCountryFlag']),
             new TwigFunction('assetGetBaseUrl', [$this, 'getBaseUrl'], ['is_safe' => ['html']]),
             new TwigFunction('assetMakeLinks', [$this, 'makeLinks'], ['is_safe' => ['html']]),
+            new TwigFunction('assetaddScriptDeclaration', [$this, 'addCustomDeclaration'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -166,5 +167,10 @@ class AssetExtension extends AbstractExtension
     public function makeLinks(string $text, array $protocols = ['http', 'mail'], array $attributes = []): string
     {
         return $this->assetsHelper->makeLinks($text, $protocols, $attributes);
+    }
+
+    public function addCustomDeclaration(string $declaration, string $location): void
+    {
+        $this->assetsHelper->addCustomDeclaration($declaration, $location);
     }
 }
