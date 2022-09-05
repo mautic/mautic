@@ -7,8 +7,8 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\WebhookBundle\Http\Client;
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 class ClientTest extends TestCase
 {
@@ -67,7 +67,6 @@ class ClientTest extends TestCase
                 return true;
             }))
             ->willReturn($response);
-
 
         $this->assertEquals($response, $this->client->post($url, $payload));
     }

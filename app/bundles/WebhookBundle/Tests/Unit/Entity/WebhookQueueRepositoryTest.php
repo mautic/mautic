@@ -100,7 +100,7 @@ class WebhookQueueRepositoryTest extends TestCase
         self::assertSame(0, $this->repository->getQueueCountByWebhookId(0));
     }
 
-    public function testWebhookExists():void
+    public function testWebhookExists(): void
     {
         $id = 1;
 

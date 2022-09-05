@@ -229,8 +229,8 @@ class WebhookModelTest extends TestCase
         $queue->setDateAdded(new \DateTime('2021-04-01T16:00:00+00:00'));
 
         $webhookQueueRepoMock = $this->createMock(WebhookQueueRepository::class);
-        $webhookLogRepoMock = $this->createMock(LogRepository::class);
-        $webhookRepoMock = $this->createMock(WebhookRepository::class);
+        $webhookLogRepoMock   = $this->createMock(LogRepository::class);
+        $webhookRepoMock      = $this->createMock(WebhookRepository::class);
 
         $this->entityManagerMock->method('getRepository')
             ->willReturnMap([
