@@ -211,54 +211,6 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $this->webhookKillNotificator->send($this->webhook, $this->reason);
     }
 
-    public function testSendTomailAddresses(): void
-    {
-        $emailToSend = 'a@test.com, b@test.com';
-        $this->mockCommonMethods(0);
-
-        $this->coreParamHelperMock
-            ->expects($this->at(1))
-            ->method('get')
-            ->with('webhook_notification_email_addresses')
-            ->willReturn($emailToSend);
-
-        $this->webhook
-            ->expects($this->once())
-            ->method('getCreatedBy')
-            ->willReturn($this->createdBy);
-
-        $this->webhook
-            ->expects($this->once())
-            ->method('getModifiedBy')
-            ->willReturn($this->modifiedBy);
-
-        $this->entityManagerMock
-            ->expects($this->once())
-            ->method('getReference')
-            ->with('MauticUserBundle:User', $this->createdBy)
-            ->willReturn($this->owner);
-
-        $this->notificationModelMock
-            ->expects($this->once())
-            ->method('addNotification')
-            ->with(
-                $this->details,
-                'error',
-                false,
-                $this->subject,
-                null,
-                false,
-                $this->owner
-            );
-
-        $this->mailHelperMock
-            ->expects($this->once())
-            ->method('setTo')
-            ->with(array_map('trim', explode(',', $emailToSend)));
-
-        $this->webhookKillNotificator->send($this->webhook, $this->reason);
-    }
-
     private function mockCommonMethods(int $sentToAuther, string $emailToSend = null): void
     {
         $this->coreParamHelperMock
