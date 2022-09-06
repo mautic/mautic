@@ -38,9 +38,13 @@ class LeadControllerTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
+        $leadCompany = new CompanyLead();
+        $leadCompany->setLead($contactA);
+        $leadCompany->setCompany($company);
+        $leadCompany->setDateAdded(new \DateTime());
+        $this->em->persist($leadCompany);
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+        return $leadCompany;
     }
 
     protected function beforeBeginTransaction(): void
@@ -410,6 +414,22 @@ class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertStringContainsString('firstname: This field is required.', $clientResponse->getContent());
+    }
+
+    public function testAddContactsErrorMessageForEmailWithTwoDots(): void
+    {
+        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues(
+            [
+                'lead[email]' => 'john..doe@email.com',
+            ]
+        );
+
+        $this->client->submit($form);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertStringContainsString('email: john..doe@email.com is invalid.', $clientResponse->getContent());
     }
 
     public function testCompanyIdSearchCommand(): void
