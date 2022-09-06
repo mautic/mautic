@@ -100,6 +100,8 @@ class UpdateLeadListsCommand extends ModeratedCommand
                         }
                     } catch (QueryException $e) {
                         $this->logger->error('Query Builder Exception: '.$e->getMessage());
+
+                        return 1;
                     }
 
                     $output->writeln(
@@ -108,6 +110,8 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 }
             } else {
                 $output->writeln('<error>'.$this->translator->trans('mautic.lead.list.rebuild.not_found', ['%id%' => $id]).'</error>');
+
+                return 2;
             }
         } else {
             $leadLists = $this->listModel->getEntities(
@@ -139,10 +143,8 @@ class UpdateLeadListsCommand extends ModeratedCommand
                         $output->writeln('<fg=cyan>'.$this->translator->trans('mautic.lead.list.rebuild.contacts.time', ['%time%' => $totalTime]).'</>'."\n");
                     }
                 }
-
                 unset($leadList);
             }
-
             unset($leadLists);
         }
 
