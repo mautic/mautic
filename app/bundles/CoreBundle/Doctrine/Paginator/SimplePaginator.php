@@ -9,7 +9,6 @@ use Countable;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
 use IteratorAggregate;
-use MauticPlugin\VarsityBundle\Entity\AccountSpendSummary;
 
 /**
  * This is a fast paginator (unlike \Doctrine\ORM\Tools\Pagination\Paginator) that can handle simple queries using no joins or ManyToOne joins.
@@ -26,7 +25,7 @@ class SimplePaginator implements IteratorAggregate, Countable
     }
 
     /**
-     * @return iterable<AccountSpendSummary>
+     * @return iterable<mixed>
      */
     public function getIterator(): iterable
     {
