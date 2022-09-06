@@ -45,14 +45,6 @@ class ConfigSubscriber implements EventSubscriberInterface
             'formTheme'  => 'MauticLeadBundle:FormTheme\Config',
             'parameters' => $segmentParameters,
         ]);
-
-        $event->addForm([
-            'bundle'     => 'LeadBundle',
-            'formAlias'  => 'segment_config',
-            'formType'   => SegmentConfigType::class,
-            'formTheme'  => 'MauticLeadBundle:FormTheme\Config',
-            'parameters' => $event->getParametersFromConfig('MauticLeadBundle'),
-        ]);
     }
 
     public function onConfigCompanyGenerate(ConfigBuilderEvent $event)

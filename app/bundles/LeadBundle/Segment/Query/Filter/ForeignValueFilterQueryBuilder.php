@@ -43,20 +43,15 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         switch ($filterOperator) {
             case 'empty':
-                $subQueryBuilder->select($tableAlias.'.lead_id')
-                    ->from($filter->getTable(), $tableAlias)
-                    ->andWhere($subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()));
-
-                $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
+                $subQueryBuilder->select($tableAlias.'.lead_id')->from($filter->getTable(), $tableAlias);
+                $queryBuilder->addLogic($queryBuilder->expr()->notIn($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'notEmpty':
-                $subQueryBuilder->select($tableAlias.'.lead_id')
-                    ->from($filter->getTable(), $tableAlias)
-                    ->andWhere($subQueryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()));
-
-                $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
-
-                $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
+                $subQueryBuilder->select($tableAlias.'.lead_id')->from($filter->getTable(), $tableAlias);
+                $queryBuilder->addLogic(
+                    $queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()),
+                    $filter->getGlue()
+                );
                 break;
             case 'notIn':
                 $subQueryBuilder
