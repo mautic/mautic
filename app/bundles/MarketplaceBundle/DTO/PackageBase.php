@@ -21,11 +21,6 @@ final class PackageBase
      */
     public ?string $type;
 
-    /**
-     * E.g. mautic-plugin.
-     */
-    public ?string $type;
-
     public function __construct(string $name, string $url, string $repository, string $description, int $downloads, int $favers, ?string $type, ?string $displayName = null)
     {
         $this->name        = $name;

@@ -14,11 +14,6 @@ class FieldFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    /**
-     * @var string
-     */
-    private $alias;
-
     public function testNewFieldVarcharFieldWith191Length(): void
     {
         $fieldModel = self::$container->get('mautic.lead.model.field');

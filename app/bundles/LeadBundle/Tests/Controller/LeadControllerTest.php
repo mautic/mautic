@@ -36,17 +36,6 @@ class LeadControllerTest extends MauticMysqlTestCase
         return $leadCompany;
     }
 
-    protected function setUp(): void
-    {
-        $leadCompany = new CompanyLead();
-        $leadCompany->setLead($contactA);
-        $leadCompany->setCompany($company);
-        $leadCompany->setDateAdded(new \DateTime());
-        $this->em->persist($leadCompany);
-
-        return $leadCompany;
-    }
-
     protected function beforeBeginTransaction(): void
     {
         $this->resetAutoincrement([
