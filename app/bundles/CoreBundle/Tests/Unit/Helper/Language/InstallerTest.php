@@ -40,10 +40,10 @@ class InstallerTest extends \PHPUnit\Framework\TestCase
         $this->assertFileExists($languagePath.'/CampaignBundle');
 
         // did it copy the INI files?
-        $this->assertFileExists($languagePath.'/CoreBundle/messages.ini');
-        $this->assertFileExists($languagePath.'/CoreBundle/flashes.ini');
-        $this->assertFileExists($languagePath.'/CampaignBundle/messages.ini');
-        $this->assertFileExists($languagePath.'/CampaignBundle/flashes.ini');
+        $this->assertFileExists($languagePath.'/CoreBundle/messages.es.ini');
+        $this->assertFileExists($languagePath.'/CoreBundle/flashes.es.ini');
+        $this->assertFileExists($languagePath.'/CampaignBundle/messages.es.ini');
+        $this->assertFileExists($languagePath.'/CampaignBundle/flashes.es.ini');
 
         // did it ignore the bundle's extra files?
         $this->assertFileDoesNotExist($languagePath.'/CoreBundle/random.txt');
