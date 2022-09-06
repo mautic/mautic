@@ -67,10 +67,9 @@ $firewalls = [
             'check_path'      => '%env(MAUTIC_SAML_LOGIN_CHECK_PATH)%', // '/s/saml/login_check',
         ],
         'form_login' => [
-            // 'authenticator'        => 'mautic.user.form_authenticator',
-            // 'csrf_token_generator' => 'security.csrf.token_manager',
-            // 'success_handler'      => 'mautic.security.authentication_handler',
-            // 'failure_handler'      => 'mautic.security.authentication_handler',
+            'csrf_token_generator' => 'security.csrf.token_manager',
+            'success_handler'      => 'mautic.security.authentication_handler',
+            'failure_handler'      => 'mautic.security.authentication_handler',
             'login_path'           => '/s/login',
             'check_path'           => '/s/login_check',
         ],
@@ -86,6 +85,11 @@ $firewalls = [
             'lifetime' => '%mautic.rememberme_lifetime%',
             'path'     => '%mautic.rememberme_path%',
             'domain'   => '%mautic.rememberme_domain%',
+        ],
+        'guard' => [
+            'authenticators' => [
+                'mautic.user.form_guard_authenticator',
+            ],
         ],
         'fos_oauth'     => true,
         'context'       => 'mautic',
