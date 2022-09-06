@@ -137,6 +137,7 @@ class Message extends FormEntity
      */
     public function setName($name)
     {
+        $this->isChanged('name', $name);
         $this->name = $name;
 
         return $this;
@@ -157,6 +158,7 @@ class Message extends FormEntity
      */
     public function setDescription($description)
     {
+        $this->isChanged('description', $description);
         $this->description = $description;
 
         return $this;
@@ -177,6 +179,7 @@ class Message extends FormEntity
      */
     public function setPublishUp($publishUp)
     {
+        $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
 
         return $this;
@@ -197,6 +200,7 @@ class Message extends FormEntity
      */
     public function setPublishDown($publishDown)
     {
+        $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
 
         return $this;
@@ -217,6 +221,7 @@ class Message extends FormEntity
      */
     public function setCategory($category)
     {
+        $this->isChanged('category', $category);
         $this->category = $category;
 
         return $this;
@@ -237,6 +242,7 @@ class Message extends FormEntity
      */
     public function setChannels($channels)
     {
+        $this->isChanged('channels', $channels);
         $this->channels = $channels;
 
         return $this;
