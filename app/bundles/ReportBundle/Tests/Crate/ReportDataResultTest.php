@@ -19,6 +19,17 @@ class ReportDataResultTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(Fixtures::getEmailType(), $reportDataResult->getType('email'));
     }
 
+    public function testValidDataWithAggregatedColumns()
+    {
+        $reportDataResult = new ReportDataResult(Fixtures::getValidReportResultWithAggregatedColumns());
+
+        $this->assertSame(Fixtures::getValidReportDataAggregatedColumns(), $reportDataResult->getData());
+        $this->assertSame(Fixtures::getValidReportWithAggregatedColumnsHeaders(), $reportDataResult->getHeaders());
+        $this->assertSame(Fixtures::getValidReportWithAggregatedColumnsTotalResult(), $reportDataResult->getTotalResults());
+        $this->assertSame(Fixtures::getIntegerType(), $reportDataResult->getType('SUM es.is_read'));
+        $this->assertSame(Fixtures::getFloatType(), $reportDataResult->getType('AVG es.is_read'));
+    }
+
     public function testNoDataProvided()
     {
         $this->expectException(\InvalidArgumentException::class);

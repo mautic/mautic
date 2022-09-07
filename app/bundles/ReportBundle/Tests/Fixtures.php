@@ -174,6 +174,11 @@ class Fixtures
         return 'bool';
     }
 
+    public static function getFloatType(): string
+    {
+        return 'float';
+    }
+
     /**
      * @return string
      */
@@ -258,6 +263,7 @@ class Fixtures
                 'e_id'           => 'e.id',
                 'e_name'         => 'e.name',
                 'SUM es.is_read' => 'es.is_read',
+                'AVG es.is_read' => 'es.is_read',
                 'COUNT l.id'     => 'l.id',
             ],
             'columns' => [
@@ -286,6 +292,7 @@ class Fixtures
             ],
             'aggregatorColumns' => [
                 'SUM es.is_read' => 'es.is_read',
+                'AVG es.is_read' => 'es.is_read',
                 'COUNT l.id'     => 'l.id',
             ],
             'limit' => 0,
@@ -302,14 +309,35 @@ class Fixtures
                 'e_id'           => '1',
                 'e_name'         => 'Email 1',
                 'SUM es.is_read' => '50',
+                'AVG es.is_read' => '0.5000',
                 'COUNT l.id'     => '100',
             ],
             [
                 'e_id'           => '2',
                 'e_name'         => 'Email 2',
                 'SUM es.is_read' => '10',
+                'AVG es.is_read' => '0.1666',
                 'COUNT l.id'     => '60',
             ],
         ];
+    }
+
+    public static function getValidReportWithAggregatedColumnsHeaders()
+    {
+        return [
+            'ID',
+            'Name',
+            'SUM Read',
+            'AVG Read',
+            'COUNT Contact ID',
+        ];
+    }
+
+    /**
+     * @return int
+     */
+    public static function getValidReportWithAggregatedColumnsTotalResult()
+    {
+        return 2;
     }
 }
