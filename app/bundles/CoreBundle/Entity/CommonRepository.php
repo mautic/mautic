@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Entity;
 
-use Countable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\DBAL\Connection;
