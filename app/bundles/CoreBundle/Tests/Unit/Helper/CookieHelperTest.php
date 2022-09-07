@@ -3,34 +3,29 @@
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CookieHelperTest extends \PHPUnit\Framework\TestCase
+class CookieHelperTest extends TestCase
 {
     /**
-     * @var RequestStack|\PHPUnit\Framework\MockObject\MockObject
+     * @var RequestStack|MockObject
      */
     private $requestStackMock;
 
-    /**
-     * @var Request|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $requestMock;
-
     protected function setUp(): void
     {
-        if (!function_exists('xdebug_get_headers')) {
-            $this->markTestSkipped('This test needs xdebug.');
-        }
         $this->requestStackMock = $this->createMock(RequestStack::class);
-        $this->requestMock      = $this->createMock(Request::class);
-        $this->requestStackMock->method('getCurrentRequest')
-            ->willReturn($this->requestMock);
+        $requestMock            = $this->createMock(Request::class);
+        $this->requestStackMock->method('getMasterRequest')
+            ->willReturn($requestMock);
     }
 
     /**
-     * @testdox The helper is instantiated correctly when secure and contains SameSite = None
+     * @testdox The helper is instantiated correctly when secure and contains samesite=lax
      *
      * @runInSeparateProcess
      * @preserveGlobalState disabled
@@ -38,7 +33,7 @@ class CookieHelperTest extends \PHPUnit\Framework\TestCase
      * @covers \Mautic\CoreBundle\Helper\CookieHelper::__construct
      * @covers \Mautic\CoreBundle\Helper\CookieHelper::setCookie
      */
-    public function testSetCookieWhenSecure()
+    public function testSetCookieWhenSecure(): void
     {
         $cookiePath   = '/';
         $cookieDomain = 'https://test.test';
@@ -47,15 +42,18 @@ class CookieHelperTest extends \PHPUnit\Framework\TestCase
         $requestStack = $this->requestStackMock;
         $cookieHelper = new CookieHelper($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, $requestStack);
         $cookieName   = 'secureTest';
-        $cookieHelper->setCookie($cookieName, 'test');
+        $cookie       = $cookieHelper->setCookie($cookieName, 'test');
 
-        $cookie = $this->getCookie($cookieName);
-        $this->assertStringContainsString('SameSite=None', $cookie);
-        $this->assertStringContainsString('secure', $cookie);
+        if (function_exists('xdebug_get_headers')) {
+            $cookie = $this->getCookie($cookieName);
+        }
+
+        Assert::assertStringContainsString('samesite=lax', $cookie);
+        Assert::assertStringContainsString('secure', $cookie);
     }
 
     /**
-     * @testdox The helper is instantiated correctly when not secure and does not contain SameSite = None
+     * @testdox The helper is instantiated correctly when not secure and does not contain samesite=lax
      *
      * @runInSeparateProcess
      * @preserveGlobalState disabled
@@ -63,7 +61,7 @@ class CookieHelperTest extends \PHPUnit\Framework\TestCase
      * @covers \Mautic\CoreBundle\Helper\CookieHelper::__construct
      * @covers \Mautic\CoreBundle\Helper\CookieHelper::setCookie
      */
-    public function testSetCookieWhenNotSecure()
+    public function testSetCookieWhenNotSecure(): void
     {
         $cookiePath   = '/';
         $cookieDomain = 'https://test.test';
@@ -72,21 +70,20 @@ class CookieHelperTest extends \PHPUnit\Framework\TestCase
         $requestStack = $this->requestStackMock;
         $cookieHelper = new CookieHelper($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, $requestStack);
         $cookieName   = 'notSecureTest';
-        $cookieHelper->setCookie($cookieName, 'test');
+        $cookie       = $cookieHelper->setCookie($cookieName, 'test');
 
-        $cookie = $this->getCookie($cookieName);
-        $this->assertNotContains('SameSite=None', $cookie);
-        $this->assertNotContains('secure', $cookie);
+        if (function_exists('xdebug_get_headers')) {
+            $cookie = $this->getCookie($cookieName);
+        }
+
+        Assert::assertStringNotContainsString('SameSite=None', $cookie);
+        Assert::assertStringNotContainsString('secure', $cookie);
     }
 
     /**
      * Helper function to get cookie from header list.
-     *
-     * @param string $name
-     *
-     * @return string
      */
-    private function getCookie($name)
+    private function getCookie(string $name): string
     {
         $cookies = [];
         $headers = xdebug_get_headers();
