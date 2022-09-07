@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\EventListener;
 
 use Generator;
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class SearchSubscriberFunctionalTest extends MauticMysqlTestCase
@@ -29,6 +29,9 @@ class SearchSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString($expected, $responseContent['newContent'], 'The page was not found');
     }
 
+    /**
+     * @param array<string, string|bool> $params
+     */
     private function createTestPage(array $params = []): Page
     {
         $page = new Page();
@@ -54,7 +57,7 @@ class SearchSubscriberFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return Generator<array<int,array<string, string|bool>|string>
+     * @return Generator<array<int, array<string, string|bool>|string>>
      */
     public function dataProvider(): Generator
     {
@@ -64,7 +67,7 @@ class SearchSubscriberFunctionalTest extends MauticMysqlTestCase
                 'alias'       => 'page-1',
                 'description' => 'The first landing page',
             ],
-            'Page 1'
+            'Page 1',
         ];
         yield [
             [
@@ -72,7 +75,7 @@ class SearchSubscriberFunctionalTest extends MauticMysqlTestCase
                 'alias'       => 'page-2',
                 'description' => 'The second landing page',
             ],
-            'Page 2'
+            'Page 2',
         ];
     }
 }
