@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormSubscriberTest extends TestCase
 {

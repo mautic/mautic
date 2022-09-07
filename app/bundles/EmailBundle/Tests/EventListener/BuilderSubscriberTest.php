@@ -12,7 +12,7 @@ use Mautic\EmailBundle\EventListener\BuilderSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
 {
