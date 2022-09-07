@@ -20,7 +20,7 @@ use Mautic\PointBundle\Model\TriggerModel;
 use Mautic\PointBundle\PointEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TriggerModelTest extends \PHPUnit\Framework\TestCase
 {

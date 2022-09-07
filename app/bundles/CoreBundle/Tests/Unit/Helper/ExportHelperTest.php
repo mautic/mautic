@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportHelperTest extends \PHPUnit\Framework\TestCase
 {
