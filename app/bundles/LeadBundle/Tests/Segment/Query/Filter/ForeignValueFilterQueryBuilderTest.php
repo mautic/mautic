@@ -74,8 +74,8 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
         yield ['notRegexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE EXISTS(SELECT NULL FROM __PREFIX__page_hits par1 WHERE par1.url NOT REGEXP '.com$')"];
         yield ['eq', 'https://acquia.com', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.url = 'https://acquia.com')"];
         yield ['neq', 'https://acquia.com', "SELECT 1 FROM __PREFIX__leads l WHERE NOT EXISTS(SELECT NULL FROM __PREFIX__page_hits par1 WHERE (par1.lead_id = l.id) AND ((par1.url = 'https://acquia.com') OR (par1.url IS NULL)))"];
-        yield ['empty', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.url IS NULL)'];
-        yield ['notEmpty', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.url IS NOT NULL)'];
+        yield ['empty', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id NOT IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1)'];
+        yield ['notEmpty', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1)'];
         yield ['like', '%.com', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.url LIKE '%.com')"];
         yield ['notLike', '%.com', "SELECT 1 FROM __PREFIX__leads l WHERE NOT EXISTS(SELECT NULL FROM __PREFIX__page_hits par1 WHERE (par1.lead_id = l.id) AND ((par1.url IS NULL) OR (par1.url LIKE '%.com')))"];
         yield ['contains', '.com', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.url LIKE '%.com%')"];
@@ -168,10 +168,10 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
         yield [['maxId' => 2], 'eq', 'https://acquia.com', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id <= 2) AND (par1.url = 'https://acquia.com'))"];
         yield [['lead_id' => 1], 'eq', 'https://acquia.com', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id = 1) AND (par1.url = 'https://acquia.com'))"]; //        yield ['empty', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.url IS NULL)'];
 
-        yield [['minId' => 1, 'maxId' => 2], 'notEmpty', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.url IS NOT NULL) AND (par1.lead_id BETWEEN 1 and 2))'];
-        yield [['minId' => 1], 'notEmpty', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.url IS NOT NULL) AND (par1.lead_id >= 1))'];
-        yield [['maxId' => 2], 'notEmpty', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.url IS NOT NULL) AND (par1.lead_id <= 2))'];
-        yield [['lead_id' => 1], 'notEmpty', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.url IS NOT NULL) AND (par1.lead_id = 1))'];
+        yield [['minId' => 1, 'maxId' => 2], 'notEmpty', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.lead_id BETWEEN 1 and 2)'];
+        yield [['minId' => 1], 'notEmpty', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.lead_id >= 1)'];
+        yield [['maxId' => 2], 'notEmpty', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.lead_id <= 2)'];
+        yield [['lead_id' => 1], 'notEmpty', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.lead_id = 1)'];
 
         yield [['minId' => 1, 'maxId' => 2], 'like', '%.com', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url LIKE '%.com'))"];
         yield [['minId' => 1], 'like', '%.com', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id >= 1) AND (par1.url LIKE '%.com'))"];
