@@ -19,6 +19,19 @@ class SimplePaginatorTest extends MauticMysqlTestCase
      * @var array<string,mixed>
      */
     protected array $clientOptions = ['debug' => true];
+    private DebugStack $logger;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $logger = self::$container->get('doctrine.dbal.logger.profiling.default');
+        assert($logger instanceof DebugStack);
+        $logger->queries      = [];
+        $logger->currentQuery = 0;
+
+        $this->logger = $logger;
+    }
 
     public function testPaginator(): void
     {
@@ -50,11 +63,9 @@ class SimplePaginatorTest extends MauticMysqlTestCase
         ], iterator_to_array($paginator), 'Only 2 last records should be returned.');
 
         $prefix = self::$container->getParameter('mautic.db_table_prefix');
-        $logger = self::$container->get('doctrine.dbal.logger.profiling.default');
-        assert($logger instanceof DebugStack);
 
-        $this->assertCount(6, $logger->queries, 'There should be exactly 6 queries executed.');
-        $this->assertMatchesRegularExpression("/^SELECT count\((.{2}_)\.id\) AS sclr_0 FROM {$prefix}ip_addresses \\1$/", $logger->queries[5]['sql'], 'Simple paginator should not use either a DISTINCT keyword or sub-queries.');
-        $this->assertMatchesRegularExpression("/^SELECT (.{2}_)\.id AS id_0, \\1\.ip_address AS ip_address_1, \\1\.ip_details AS ip_details_2 FROM {$prefix}ip_addresses \\1 ORDER BY \\1\.id ASC LIMIT 5 OFFSET 1$/", $logger->queries[6]['sql'], 'Ordering and limit/offset have to be reflected.');
+        $this->assertCount(5, $this->logger->queries, 'There should be exactly 5 queries executed.');
+        $this->assertMatchesRegularExpression("/^SELECT count\((.{2}_)\.id\) AS sclr_0 FROM {$prefix}ip_addresses \\1$/", $this->logger->queries[4]['sql'], 'Simple paginator should not use either a DISTINCT keyword or sub-queries.');
+        $this->assertMatchesRegularExpression("/^SELECT (.{2}_)\.id AS id_0, \\1\.ip_address AS ip_address_1, \\1\.ip_details AS ip_details_2 FROM {$prefix}ip_addresses \\1 ORDER BY \\1\.id ASC LIMIT 5 OFFSET 1$/", $this->logger->queries[5]['sql'], 'Ordering and limit/offset have to be reflected.');
     }
 }
