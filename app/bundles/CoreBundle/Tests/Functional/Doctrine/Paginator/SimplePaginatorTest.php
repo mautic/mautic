@@ -49,11 +49,12 @@ class SimplePaginatorTest extends MauticMysqlTestCase
             $ipAddress3->getId() => $ipAddress3,
         ], iterator_to_array($paginator), 'Only 2 last records should be returned.');
 
+        $prefix = self::$container->getParameter('mautic.db_table_prefix');
         $logger = self::$container->get('doctrine.dbal.logger.profiling.default');
         assert($logger instanceof DebugStack);
 
         $this->assertCount(6, $logger->queries, 'There should be exactly 6 queries executed.');
-        $this->assertSame('SELECT count(m0_.id) AS sclr_0 FROM mautic_ip_addresses m0_', $logger->queries[5]['sql'], 'Simple paginator should not use either a DISTINCT keyword or sub-queries.');
-        $this->assertSame('SELECT m0_.id AS id_0, m0_.ip_address AS ip_address_1, m0_.ip_details AS ip_details_2 FROM mautic_ip_addresses m0_ ORDER BY m0_.id ASC LIMIT 5 OFFSET 1', $logger->queries[6]['sql'], 'Ordering and limit/offset have to be reflected.');
+        $this->assertSame("SELECT count(m0_.id) AS sclr_0 FROM {$prefix}ip_addresses m0_", $logger->queries[5]['sql'], 'Simple paginator should not use either a DISTINCT keyword or sub-queries.');
+        $this->assertSame("SELECT m0_.id AS id_0, m0_.ip_address AS ip_address_1, m0_.ip_details AS ip_details_2 FROM {$prefix}ip_addresses m0_ ORDER BY m0_.id ASC LIMIT 5 OFFSET 1", $logger->queries[6]['sql'], 'Ordering and limit/offset have to be reflected.');
     }
 }
