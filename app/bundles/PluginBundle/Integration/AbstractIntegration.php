@@ -81,8 +81,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Used for notifications.
+     *
+     * @var \Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\UserBundle\Entity\User>
      */
-    protected ?array $adminUsers;
+    protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
     protected array $notifications = [];
     protected ?string $lastIntegrationError;
@@ -599,6 +601,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function parseCallbackResponse($data, $postAuthorization = false)
     {
+        // remove control characters that will break json_decode from parsing
+        $data = preg_replace('/[[:cntrl:]]/', '', $data);
         if (!$parsed = json_decode($data, true)) {
             parse_str($data, $parsed);
         }
