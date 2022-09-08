@@ -48,10 +48,10 @@ class TranslatorHelper extends BaseHelper
      */
     public function getJsLang()
     {
-        $defaultMessages = $this->translator->getCatalogue('en_US')->all('javascript') ?? [];
+        $defaultMessages = $this->translator->getCatalogue('en_US')->all('javascript');
 
         $fallbackLocales = $this->translator->getFallbackLocales();
-        foreach($fallbackLocales as $fallbackLocale) {
+        foreach ($fallbackLocales as $fallbackLocale) {
             $defaultMessages = array_merge($defaultMessages, $this->translator->getCatalogue($fallbackLocale)->all('javascript'));
         }
 
