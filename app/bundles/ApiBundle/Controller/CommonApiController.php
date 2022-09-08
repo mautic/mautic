@@ -1097,7 +1097,7 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
 
         $form->submit($submitParams, 'PATCH' !== $method);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $this->setCategory($entity, $categoryId);
             $preSaveError = $this->preSaveEntity($entity, $form, $submitParams, $action);
 
