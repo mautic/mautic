@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
@@ -537,7 +538,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
                 $stageRepositoryMock
             );
 
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createMock(Translator::class);
         $translator->expects($this->once())
             ->method('trans')
             ->with('mautic.stage.event.changed');
@@ -575,7 +576,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
                 $stageRepositoryMock
             );
 
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createMock(Translator::class);
         $translator->expects($this->once())
             ->method('trans')
             ->with('mautic.lead.import.stage.not.exists', ['id' => $data['stage']])
