@@ -45,3 +45,6 @@ parameters:
 		# Following 2 ignores are there due to https://symfony.com/blog/new-in-symfony-4-3-simpler-event-dispatching
 		- '#Method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) invoked with 2 parameters, 1 required\.#'
 		- '#Parameter \#1 \$event of method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) expects object, string given\.#'
+		# Following can be removed once we get rid of PHP 7.4.
+		- '#Method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\.php:13::getParameter\(\) has invalid return type UnitEnum\.#'
+		- '#Parameter \$value of method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\.php:13::setParameter\(\) has invalid type UnitEnum\.#'

@@ -97,12 +97,16 @@ EOT
     /**
      * Returns Mautic translation files.
      *
-     * @return array
+     * @return array<string,string[]>
      */
-    private function getLanguageFiles()
+    private function getLanguageFiles(): array
     {
-        $files         = [];
+        $files = [];
+
+        /** @var array<array<string,string>> $mauticBundles */
         $mauticBundles = $this->getContainer()->getParameter('mautic.bundles');
+
+        /** @var array<array<string,string>> $pluginBundles */
         $pluginBundles = $this->getContainer()->getParameter('mautic.plugin.bundles');
 
         foreach ($mauticBundles as $bundle) {
