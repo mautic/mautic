@@ -168,6 +168,8 @@ Mautic.leadOnLoad = function (container, response) {
             });
         }
     });
+
+    Mautic.lazyLoadContactStatsOnLeadLoad();
 };
 
 Mautic.leadTimelineOnLoad = function (container, response) {
@@ -1646,6 +1648,22 @@ Mautic.lazyLoadContactListOnSegmentDetail = function() {
 
     const segmentContactUrl = container.data('target-url');
     mQuery.get(segmentContactUrl, function(response) {
+        response.target = containerId;
+        Mautic.processPageContent(response);
+    });
+};
+
+Mautic.lazyLoadContactStatsOnLeadLoad = function() {
+    const containerId = '#lead-stats';
+    const container = mQuery(containerId);
+
+    // Load the contact stats only if the container exists.
+    if (!container.length) {
+        return;
+    }
+
+    const contactStatsUrl = container.data('target-url');
+    mQuery.get(contactStatsUrl, function(response) {
         response.target = containerId;
         Mautic.processPageContent(response);
     });
