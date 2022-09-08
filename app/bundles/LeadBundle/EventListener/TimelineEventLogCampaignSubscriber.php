@@ -6,6 +6,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
@@ -26,7 +27,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
     /**
      * TimelineEventLogCampaignSubscriber constructor.
      */
-    public function __construct(LeadEventLogRepository $eventLogRepository, UserHelper $userHelper, TranslatorInterface $translator)
+    public function __construct(LeadEventLogRepository $eventLogRepository, UserHelper $userHelper, Translator $translator)
     {
         $this->eventLogRepository = $eventLogRepository;
         $this->userHelper         = $userHelper;

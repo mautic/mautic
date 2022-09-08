@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -20,6 +21,7 @@ use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 class PublicController extends CommonFormController
 {
@@ -330,7 +332,7 @@ class PublicController extends CommonFormController
                 $this->get('mautic.tracker.contact')->setTrackedContact($lead);
 
                 // Set lead lang
-                if ($lead->getPreferredLocale()) {
+                if ($lead->getPreferredLocale() && $this->translator instanceof LocaleAwareInterface) {
                     $this->translator->setLocale($lead->getPreferredLocale());
                 }
             }

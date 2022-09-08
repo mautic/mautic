@@ -146,7 +146,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @return \Mautic\CoreBundle\Translation\Translator
+     * @return TranslatorInterface
      */
     public function getTranslator()
     {

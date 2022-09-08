@@ -2,7 +2,9 @@
 
 namespace Mautic\FormBundle\Helper;
 
+use Mautic\CoreBundle\Exception\UnexpectedTypeException;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Email;
@@ -77,6 +79,10 @@ class FormFieldHelper extends AbstractFormFieldHelper
      */
     public function __construct(TranslatorInterface $translator, ValidatorInterface $validator = null)
     {
+        if (!$translator instanceof Translator) {
+            throw new UnexpectedTypeException($translator, Translator::class);
+        }
+
         $this->translator = $translator;
 
         if (null === $validator) {

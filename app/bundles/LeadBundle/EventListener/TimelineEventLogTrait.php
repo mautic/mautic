@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -9,7 +10,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 trait TimelineEventLogTrait
 {
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 

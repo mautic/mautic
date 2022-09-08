@@ -4,6 +4,7 @@ namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\ApiBundle\Helper\RequestHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -20,13 +21,13 @@ class ApiSubscriber implements EventSubscriberInterface
     private $coreParametersHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator
+        Translator $translator
     ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;

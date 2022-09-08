@@ -21,7 +21,7 @@ class OAuthEventListener
     private $mauticSecurity;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     private $translator;
 

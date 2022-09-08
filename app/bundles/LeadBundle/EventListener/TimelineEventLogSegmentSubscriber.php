@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
@@ -34,7 +35,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
     public function __construct(
         LeadEventLogRepository $eventLogRepository,
         UserHelper $userHelper,
-        TranslatorInterface $translator,
+        Translator $translator,
         EntityManagerInterface $em
     ) {
         $this->eventLogRepository = $eventLogRepository;

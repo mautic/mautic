@@ -2,12 +2,14 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Exception\UnexpectedTypeException;
 use Mautic\CoreBundle\Helper\ListParser\ArrayListParser;
 use Mautic\CoreBundle\Helper\ListParser\BarListParser;
 use Mautic\CoreBundle\Helper\ListParser\Exception\FormatNotSupportedException;
 use Mautic\CoreBundle\Helper\ListParser\JsonListParser;
 use Mautic\CoreBundle\Helper\ListParser\ListParserInterface;
 use Mautic\CoreBundle\Helper\ListParser\ValueListParser;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractFormFieldHelper
@@ -38,7 +40,7 @@ abstract class AbstractFormFieldHelper
     protected $translationKeyPrefix;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     protected $translator;
 
@@ -59,6 +61,10 @@ abstract class AbstractFormFieldHelper
 
     public function setTranslator(TranslatorInterface $translator)
     {
+        if (!$translator instanceof Translator) {
+            throw new UnexpectedTypeException($translator, Translator::class);
+        }
+
         $this->translator = $translator;
     }
 

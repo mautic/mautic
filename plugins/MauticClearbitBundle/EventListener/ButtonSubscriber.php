@@ -19,12 +19,12 @@ class ButtonSubscriber implements EventSubscriberInterface
     private $helper;
 
     /**
-     * @var RouterInterface
+     * @var TranslatorInterface
      */
     private $translator;
 
     /**
-     * @var TranslatorInterface
+     * @var RouterInterface
      */
     private $router;
 
