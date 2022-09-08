@@ -11,14 +11,13 @@ use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class GeneratedColumnSubscriber implements EventSubscriberInterface
 {
     private ListModel $segmentModel;
-    private TranslatorInterface $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    public function __construct(ListModel $segmentModel, TranslatorInterface $translator)
+    public function __construct(ListModel $segmentModel, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->segmentModel = $segmentModel;
         $this->translator   = $translator;

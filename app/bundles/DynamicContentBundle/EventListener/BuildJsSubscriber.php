@@ -9,7 +9,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {
@@ -19,7 +18,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
     private $assetsHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -35,7 +34,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
 
     public function __construct(
         AssetsHelper $assetsHelper,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         RequestStack $requestStack,
         RouterInterface $router
     ) {

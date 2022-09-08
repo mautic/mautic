@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CompanyReportData
 {
@@ -14,14 +13,14 @@ class CompanyReportData
     private $fieldModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
     /**
      * CompanyReportData constructor.
      */
-    public function __construct(FieldModel $fieldModel, TranslatorInterface $translator)
+    public function __construct(FieldModel $fieldModel, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->fieldModel = $fieldModel;
         $this->translator = $translator;

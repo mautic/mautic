@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\AbstractCustomRequestEvent;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
 {
@@ -25,7 +24,7 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
     protected $operators;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
@@ -35,7 +34,7 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
      * @param mixed[] $choices
      * @param mixed[] $operators
      */
-    public function __construct($choices, $operators, TranslatorInterface $translator, Request $request = null, string $search = '')
+    public function __construct($choices, $operators, \Symfony\Contracts\Translation\TranslatorInterface $translator, Request $request = null, string $search = '')
     {
         parent::__construct($request);
 
@@ -62,7 +61,7 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @return TranslatorInterface
+     * @return \Symfony\Contracts\Translation\TranslatorInterface
      */
     public function getTranslator()
     {

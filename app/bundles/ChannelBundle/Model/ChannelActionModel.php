@@ -6,7 +6,6 @@ use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ChannelActionModel
 {
@@ -21,14 +20,14 @@ class ChannelActionModel
     private $doNotContact;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
     public function __construct(
         LeadModel $contactModel,
         DoNotContact $doNotContact,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->contactModel = $contactModel;
         $this->doNotContact = $doNotContact;

@@ -15,7 +15,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CampaignType.
@@ -28,11 +27,11 @@ class CampaignType extends AbstractType
     private $security;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(CorePermissions $security, TranslatorInterface $translator)
+    public function __construct(CorePermissions $security, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->security   = $security;
         $this->translator = $translator;

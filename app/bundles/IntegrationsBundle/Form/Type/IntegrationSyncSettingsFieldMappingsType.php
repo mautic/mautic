@@ -14,7 +14,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class IntegrationSyncSettingsFieldMappingsType extends AbstractType
 {
@@ -24,11 +23,11 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
     private $logger;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(LoggerInterface $logger, TranslatorInterface $translator)
+    public function __construct(LoggerInterface $logger, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->logger     = $logger;
         $this->translator = $translator;

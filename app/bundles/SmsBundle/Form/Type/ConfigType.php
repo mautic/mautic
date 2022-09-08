@@ -6,7 +6,6 @@ use Mautic\SmsBundle\Sms\TransportChain;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class ConfigType.
@@ -19,14 +18,14 @@ class ConfigType extends AbstractType
     private $transportChain;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
     /**
      * ConfigType constructor.
      */
-    public function __construct(TransportChain $transportChain, TranslatorInterface $translator)
+    public function __construct(TransportChain $transportChain, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->transportChain = $transportChain;
         $this->translator     = $translator;

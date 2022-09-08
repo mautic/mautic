@@ -8,7 +8,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ApiSubscriber implements EventSubscriberInterface
 {
@@ -18,13 +17,13 @@ class ApiSubscriber implements EventSubscriberInterface
     private $coreParametersHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;

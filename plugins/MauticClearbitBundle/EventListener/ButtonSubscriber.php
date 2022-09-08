@@ -9,7 +9,6 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ButtonSubscriber implements EventSubscriberInterface
 {
@@ -24,11 +23,11 @@ class ButtonSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $router;
 
-    public function __construct(IntegrationHelper $helper, TranslatorInterface $translator, RouterInterface $router)
+    public function __construct(IntegrationHelper $helper, \Symfony\Contracts\Translation\TranslatorInterface $translator, RouterInterface $router)
     {
         $this->helper     = $helper;
         $this->translator = $translator;

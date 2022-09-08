@@ -22,7 +22,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class PipedriveIntegration extends CrmAbstractIntegration
 {
@@ -59,7 +58,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
         Session $session,
         RequestStack $requestStack,
         Router $router,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         Logger $logger,
         EncryptionHelper $encryptionHelper,
         LeadModel $leadModel,

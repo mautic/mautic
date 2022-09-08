@@ -14,7 +14,6 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -29,7 +28,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * ヽ(ಠ_ಠ)ノ Used in the CitrixStartTrait.
      *
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -42,7 +41,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     public function __construct(
         CitrixModel $citrixModel,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         TemplatingHelper $templating
     ) {
         $this->citrixModel = $citrixModel;

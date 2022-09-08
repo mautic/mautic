@@ -6,7 +6,6 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
@@ -16,11 +15,11 @@ class MaintenanceSubscriber implements EventSubscriberInterface
     private $db;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(Connection $db, TranslatorInterface $translator)
+    public function __construct(Connection $db, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->db         = $db;
         $this->translator = $translator;

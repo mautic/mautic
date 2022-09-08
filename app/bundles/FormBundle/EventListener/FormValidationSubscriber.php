@@ -11,12 +11,11 @@ use Mautic\FormBundle\Form\Type\FormFieldEmailType;
 use Mautic\FormBundle\Form\Type\FormFieldTelType;
 use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class FormValidationSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -25,7 +24,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
      */
     private $coreParametersHelper;
 
-    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
         $this->translator           = $translator;
         $this->coreParametersHelper = $coreParametersHelper;

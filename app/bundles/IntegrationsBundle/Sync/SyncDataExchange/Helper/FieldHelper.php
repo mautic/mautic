@@ -19,7 +19,6 @@ use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInte
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class FieldHelper
 {
@@ -39,7 +38,7 @@ class FieldHelper
     private $channelListHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -72,7 +71,7 @@ class FieldHelper
         FieldModel $fieldModel,
         VariableExpresserHelperInterface $variableExpresserHelper,
         ChannelListHelper $channelListHelper,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         EventDispatcherInterface $eventDispatcher,
         ObjectProvider $objectProvider
     ) {

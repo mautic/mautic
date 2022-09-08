@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ButtonSubscriber implements EventSubscriberInterface
 {
@@ -17,11 +16,11 @@ class ButtonSubscriber implements EventSubscriberInterface
     private $router;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(RouterInterface $router, TranslatorInterface $translator)
+    public function __construct(RouterInterface $router, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->router     = $router;
         $this->translator = $translator;

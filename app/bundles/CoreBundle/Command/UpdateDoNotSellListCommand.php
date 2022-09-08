@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class UpdateDoNotSellListCommand extends Command
 {
@@ -16,11 +15,11 @@ class UpdateDoNotSellListCommand extends Command
     private $maxMindDoNotSellDownloadHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper, TranslatorInterface $translator)
+    public function __construct(MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         parent::__construct();
         $this->maxMindDoNotSellDownloadHelper = $maxMindDoNotSellDownloadHelper;

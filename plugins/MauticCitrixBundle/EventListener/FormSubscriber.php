@@ -27,7 +27,6 @@ use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
@@ -50,7 +49,7 @@ class FormSubscriber implements EventSubscriberInterface
     private $citrixModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -70,7 +69,7 @@ class FormSubscriber implements EventSubscriberInterface
         CitrixModel $citrixModel,
         FormModel $formModel,
         SubmissionModel $submissionModel,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         EntityManager $entityManager,
         TemplatingHelper $templating
     ) {

@@ -14,12 +14,11 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -28,7 +27,7 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
      */
     private $fieldHelper;
 
-    public function __construct(TranslatorInterface $translator, FieldHelper $fieldHelper)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, FieldHelper $fieldHelper)
     {
         $this->translator  = $translator;
         $this->fieldHelper = $fieldHelper;

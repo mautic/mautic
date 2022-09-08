@@ -11,13 +11,12 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CampaignEventLeadFieldValueType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
@@ -31,7 +30,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
      */
     protected $fieldModel;
 
-    public function __construct(TranslatorInterface $translator, LeadModel $leadModel, FieldModel $fieldModel)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, LeadModel $leadModel, FieldModel $fieldModel)
     {
         $this->translator = $translator;
         $this->leadModel  = $leadModel;

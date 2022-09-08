@@ -22,7 +22,6 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TriggerCampaignCommand extends ModeratedCommand
 {
@@ -39,7 +38,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     private $dispatcher;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -111,7 +110,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     public function __construct(
         CampaignRepository $campaignRepository,
         EventDispatcherInterface $dispatcher,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         KickoffExecutioner $kickoffExecutioner,
         ScheduledExecutioner $scheduledExecutioner,
         InactiveExecutioner $inactiveExecutioner,

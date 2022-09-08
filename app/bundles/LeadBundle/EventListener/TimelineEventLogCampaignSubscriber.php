@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
 {
@@ -26,7 +25,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
     /**
      * TimelineEventLogCampaignSubscriber constructor.
      */
-    public function __construct(LeadEventLogRepository $eventLogRepository, UserHelper $userHelper, TranslatorInterface $translator)
+    public function __construct(LeadEventLogRepository $eventLogRepository, UserHelper $userHelper, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->eventLogRepository = $eventLogRepository;
         $this->userHelper         = $userHelper;

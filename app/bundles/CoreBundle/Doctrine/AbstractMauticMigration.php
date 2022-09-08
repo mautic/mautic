@@ -42,6 +42,13 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      * @var EntityManagerInterface
      */
     protected $entityManager;
+    private \Doctrine\Bundle\DoctrineBundle\Registry $registry;
+
+    public function __construct(\Doctrine\Migrations\Version\Version $version, \Doctrine\Bundle\DoctrineBundle\Registry $registry)
+    {
+        $this->registry = $registry;
+        parent::__construct($version);
+    }
 
     /**
      * @throws DBALException
@@ -79,7 +86,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         $this->container     = $container;
         $this->prefix        = $container->getParameter('mautic.db_table_prefix');
         $this->platform      = $this->connection->getDatabasePlatform()->getName();
-        $this->entityManager = $this->container->get('doctrine')->getManager();
+        $this->entityManager = $this->registry->getManager();
     }
 
     /**

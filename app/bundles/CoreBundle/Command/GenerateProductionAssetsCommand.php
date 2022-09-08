@@ -2,15 +2,28 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * CLI Command to generate production assets.
  */
-class GenerateProductionAssetsCommand extends ContainerAwareCommand
+class GenerateProductionAssetsCommand extends \Symfony\Component\Console\Command\Command
 {
+    private \Mautic\CoreBundle\Helper\AssetGenerationHelper $assetGenerationHelper;
+    private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
+    private \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
+
+    public function __construct(\Mautic\CoreBundle\Helper\AssetGenerationHelper $assetGenerationHelper, \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper, \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator, \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper)
+    {
+        $this->assetGenerationHelper = $assetGenerationHelper;
+        parent::__construct();
+        $this->pathsHelper             = $pathsHelper;
+        $this->dataCollectorTranslator = $dataCollectorTranslator;
+        $this->coreParametersHelper    = $coreParametersHelper;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -33,9 +46,9 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $container   = $this->getContainer();
-        $assetHelper = $container->get('mautic.helper.assetgeneration');
+        $assetHelper = $this->assetGenerationHelper;
 
-        $pathsHelper = $container->get('mautic.helper.paths');
+        $pathsHelper = $this->pathsHelper;
 
         // Combine and minify bundle assets
         $assetHelper->getAssets(true);
@@ -55,8 +68,8 @@ EOT
         unlink($pathsHelper->getSystemPath('assets', true).'/js/mautic-form-tmp.js');
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
-        $translator = $container->get('translator');
-        $translator->setLocale($container->get('mautic.helper.core_parameters')->get('locale'));
+        $translator = $this->dataCollectorTranslator;
+        $translator->setLocale($this->coreParametersHelper->get('locale'));
 
         // Update successful
         $output->writeln('<info>'.$translator->trans('mautic.core.command.asset_generate_success').'</info>');

@@ -17,7 +17,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class KickoffExecutioner implements ExecutionerInterface
 {
@@ -47,7 +46,7 @@ class KickoffExecutioner implements ExecutionerInterface
     private $kickoffContactFinder;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -79,7 +78,7 @@ class KickoffExecutioner implements ExecutionerInterface
     public function __construct(
         LoggerInterface $logger,
         KickoffContactFinder $kickoffContactFinder,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         EventExecutioner $executioner,
         EventScheduler $scheduler
     ) {

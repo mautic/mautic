@@ -31,7 +31,6 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class DynamicContentType.
@@ -59,7 +58,7 @@ class DynamicContentType extends AbstractType
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(EntityManager $entityManager, ListModel $listModel, TranslatorInterface $translator, LeadModel $leadModel)
+    public function __construct(EntityManager $entityManager, ListModel $listModel, \Symfony\Contracts\Translation\TranslatorInterface $translator, LeadModel $leadModel)
     {
         $this->em              = $entityManager;
         $this->translator      = $translator;

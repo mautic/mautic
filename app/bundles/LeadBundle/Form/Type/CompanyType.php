@@ -15,7 +15,6 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CompanyType extends AbstractType
 {
@@ -32,11 +31,11 @@ class CompanyType extends AbstractType
     protected $router;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
-    public function __construct(EntityManager $entityManager, RouterInterface $router, TranslatorInterface $translator)
+    public function __construct(EntityManager $entityManager, RouterInterface $router, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->em         = $entityManager;
         $this->router     = $router;

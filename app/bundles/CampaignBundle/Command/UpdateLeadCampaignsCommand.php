@@ -13,7 +13,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
@@ -23,7 +22,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     private $campaignRepository;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -62,7 +61,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
      */
     public function __construct(
         CampaignRepository $campaignRepository,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         MembershipBuilder $membershipBuilder,
         LoggerInterface $logger,
         FormatterHelper $formatterHelper

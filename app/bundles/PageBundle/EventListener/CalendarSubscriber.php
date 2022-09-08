@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CalendarSubscriber implements EventSubscriberInterface
 {
@@ -31,7 +30,7 @@ class CalendarSubscriber implements EventSubscriberInterface
     private $security;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -44,7 +43,7 @@ class CalendarSubscriber implements EventSubscriberInterface
         PageModel $pageModel,
         Connection $connection,
         CorePermissions $security,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         RouterInterface $router
     ) {
         $this->pageModel  = $pageModel;

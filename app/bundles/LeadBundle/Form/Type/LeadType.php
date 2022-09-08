@@ -18,7 +18,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\File;
 
 class LeadType extends AbstractType
@@ -26,7 +25,7 @@ class LeadType extends AbstractType
     use EntityFieldsBuildFormTrait;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -40,7 +39,7 @@ class LeadType extends AbstractType
      */
     private $entityManager;
 
-    public function __construct(TranslatorInterface $translator, CompanyModel $companyModel, EntityManager $entityManager)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, CompanyModel $companyModel, EntityManager $entityManager)
     {
         $this->translator    = $translator;
         $this->companyModel  = $companyModel;

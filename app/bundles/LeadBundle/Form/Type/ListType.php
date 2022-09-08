@@ -19,7 +19,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ListType extends AbstractType
 {
@@ -30,7 +29,7 @@ class ListType extends AbstractType
      */
     private $listModel;
 
-    public function __construct(TranslatorInterface $translator, ListModel $listModel)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, ListModel $listModel)
     {
         $this->translator = $translator;
         $this->listModel  = $listModel;

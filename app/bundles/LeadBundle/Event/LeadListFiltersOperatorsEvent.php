@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadListFiltersOperatorsEvent extends CommonEvent
 {
@@ -17,17 +16,17 @@ class LeadListFiltersOperatorsEvent extends CommonEvent
     /**
      * @deprecated to be removed in Mautic 3
      *
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
     /**
      * @deprecated to be removed in Mautic 3
      *
-     * @param array               $operators  @deprecated to be removed in Mautic 3. Subscribe operators instead.
-     * @param TranslatorInterface $translator @deprecated to be removed in Mautic 3
+     * @param array                                              $operators  @deprecated to be removed in Mautic 3. Subscribe operators instead.
+     * @param \Symfony\Contracts\Translation\TranslatorInterface $translator @deprecated to be removed in Mautic 3
      */
-    public function __construct($operators, TranslatorInterface $translator)
+    public function __construct($operators, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->operators  = $operators;
         $this->translator = $translator;
@@ -44,7 +43,7 @@ class LeadListFiltersOperatorsEvent extends CommonEvent
     /**
      * @deprecated to be removed in Mautic 3. Use DI instead.
      *
-     * @return TranslatorInterface
+     * @return \Symfony\Contracts\Translation\TranslatorInterface
      */
     public function getTranslator()
     {

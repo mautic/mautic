@@ -16,7 +16,6 @@ use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * This class subscribes to events related to building and providing
@@ -27,7 +26,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class EmailSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
@@ -52,7 +51,7 @@ class EmailSubscriber implements EventSubscriberInterface
     protected $integrationHelper;
 
     public function __construct(
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         EventDispatcherInterface $eventDispatcher,
         TokenParser $tokenParser,
         ObjectMappingRepository $objectMappingRepository,

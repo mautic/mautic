@@ -12,7 +12,6 @@ use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class SendEmailToContact
 {
@@ -32,7 +31,7 @@ class SendEmailToContact
     private $dncModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -89,7 +88,7 @@ class SendEmailToContact
     /**
      * SendEmailToContact constructor.
      */
-    public function __construct(MailHelper $mailer, StatHelper $statHelper, DoNotContact $dncModel, TranslatorInterface $translator)
+    public function __construct(MailHelper $mailer, StatHelper $statHelper, DoNotContact $dncModel, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->mailer     = $mailer;
         $this->statHelper = $statHelper;

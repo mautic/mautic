@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Helper\CacheHelper;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 final class DeleteCacheStep implements StepInterface
 {
@@ -16,11 +15,11 @@ final class DeleteCacheStep implements StepInterface
     private $cacheHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(CacheHelper $cacheHelper, TranslatorInterface $translator)
+    public function __construct(CacheHelper $cacheHelper, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->cacheHelper = $cacheHelper;
         $this->translator  = $translator;

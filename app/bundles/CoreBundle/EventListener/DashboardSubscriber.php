@@ -11,7 +11,6 @@ use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class DashboardSubscriber extends MainDashboardSubscriber
 {
@@ -37,7 +36,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $auditLogModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
@@ -67,7 +66,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     public function __construct(
         AuditLogModel $auditLogModel,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         RouterInterface $router,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,

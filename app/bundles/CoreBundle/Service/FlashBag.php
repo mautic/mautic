@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Service;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Provides translated flash messages.
@@ -22,7 +21,7 @@ class FlashBag
     private $session;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -38,7 +37,7 @@ class FlashBag
 
     public function __construct(
         Session $session,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         RequestStack $requestStack,
         NotificationModel $notificationModel
     ) {

@@ -8,7 +8,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CampaignListType.
@@ -21,7 +20,7 @@ class CampaignListType extends AbstractType
     private $model;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
@@ -30,7 +29,7 @@ class CampaignListType extends AbstractType
      */
     private $canViewOther = false;
 
-    public function __construct(CampaignModel $campaignModel, TranslatorInterface $translator, CorePermissions $security)
+    public function __construct(CampaignModel $campaignModel, \Symfony\Contracts\Translation\TranslatorInterface $translator, CorePermissions $security)
     {
         $this->model        = $campaignModel;
         $this->translator   = $translator;

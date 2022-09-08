@@ -4,7 +4,6 @@ namespace Mautic\StageBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class StageBuilderEvent.
@@ -24,7 +23,7 @@ class StageBuilderEvent extends \Symfony\Contracts\EventDispatcher\Event
     /**
      * @param Translator $translator
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }

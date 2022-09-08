@@ -11,7 +11,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 
 /**
@@ -27,11 +26,11 @@ class FormFieldFileType extends AbstractType
     private $coreParametersHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
+    public function __construct(CoreParametersHelper $coreParametersHelper, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;

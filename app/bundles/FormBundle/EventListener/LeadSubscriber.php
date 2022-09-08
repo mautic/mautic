@@ -10,7 +10,6 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
@@ -30,7 +29,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private $submissionRepository;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -43,7 +42,7 @@ class LeadSubscriber implements EventSubscriberInterface
         FormModel $formModel,
         PageModel $pageModel,
         SubmissionRepository $submissionRepository,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         RouterInterface $router
     ) {
         $this->formModel            = $formModel;

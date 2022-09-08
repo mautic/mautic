@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 use FOS\OAuthServerBundle\Event\OAuthEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class OAuthEventListener
 {
@@ -28,7 +27,7 @@ class OAuthEventListener
     /**
      * OAuthEventListener constructor.
      */
-    public function __construct(EntityManager $entityManager, CorePermissions $corePermissions, TranslatorInterface $translator)
+    public function __construct(EntityManager $entityManager, CorePermissions $corePermissions, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->em             = $entityManager;
         $this->mauticSecurity = $corePermissions;

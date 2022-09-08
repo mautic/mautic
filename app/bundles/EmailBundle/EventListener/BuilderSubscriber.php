@@ -23,7 +23,6 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
@@ -48,7 +47,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     private $pageRedirectModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -62,7 +61,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         EmailModel $emailModel,
         TrackableModel $trackableModel,
         RedirectModel $redirectModel,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         EntityManager $entityManager
     ) {
         $this->coreParametersHelper = $coreParametersHelper;

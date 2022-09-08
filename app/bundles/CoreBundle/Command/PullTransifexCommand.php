@@ -7,17 +7,15 @@ use Mautic\CoreBundle\Factory\TransifexFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\Transifex\Connector\Statistics;
 use Mautic\Transifex\Connector\Translations;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * CLI Command to pull language resources from Transifex.
  */
-class PullTransifexCommand extends ContainerAwareCommand
+class PullTransifexCommand extends \Symfony\Component\Console\Command\Command
 {
     private $transifexFactory;
     private $translator;
@@ -25,7 +23,7 @@ class PullTransifexCommand extends ContainerAwareCommand
 
     public function __construct(
         TransifexFactory $transifexFactory,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         CoreParametersHelper $coreParametersHelper
     ) {
         $this->transifexFactory     = $transifexFactory;

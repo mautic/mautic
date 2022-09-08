@@ -7,12 +7,11 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 final class RemoveDeletedFilesStep implements StepInterface
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -26,7 +25,7 @@ final class RemoveDeletedFilesStep implements StepInterface
      */
     private $appRoot;
 
-    public function __construct(TranslatorInterface $translator, PathsHelper $pathsHelper, LoggerInterface $logger)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, PathsHelper $pathsHelper, LoggerInterface $logger)
     {
         $this->translator = $translator;
         $this->appRoot    = $pathsHelper->getRootPath();

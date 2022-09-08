@@ -22,7 +22,6 @@ use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
@@ -54,7 +53,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private $entityManager;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -76,7 +75,7 @@ class LeadSubscriber implements EventSubscriberInterface
         LeadChangeEventDispatcher $eventDispatcher,
         DncReasonHelper $dncReasonHelper,
         EntityManager $entityManager,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         RouterInterface $router,
         $isTest = false
     ) {

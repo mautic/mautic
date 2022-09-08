@@ -6,7 +6,6 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class BroadcastExecutioner
 {
@@ -31,14 +30,14 @@ class BroadcastExecutioner
     private $result;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
     /**
      * BroadcastExecutioner constructor.
      */
-    public function __construct(SmsModel $smsModel, BroadcastQuery $broadcastQuery, TranslatorInterface $translator)
+    public function __construct(SmsModel $smsModel, BroadcastQuery $broadcastQuery, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->smsModel       = $smsModel;
         $this->broadcastQuery = $broadcastQuery;

@@ -11,7 +11,6 @@ use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
@@ -31,7 +30,7 @@ class EmailSubscriber implements EventSubscriberInterface
     private $emailModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -44,7 +43,7 @@ class EmailSubscriber implements EventSubscriberInterface
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
         EmailModel $emailModel,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         EntityManager $entityManager
     ) {
         $this->ipLookupHelper = $ipLookupHelper;

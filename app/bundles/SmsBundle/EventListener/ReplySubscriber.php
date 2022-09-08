@@ -11,7 +11,6 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ReplySubscriber implements EventSubscriberInterface
 {
@@ -20,7 +19,7 @@ class ReplySubscriber implements EventSubscriberInterface
     /**
      * ReplySubscriber constructor.
      */
-    public function __construct(TranslatorInterface $translator, LeadEventLogRepository $eventLogRepository)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, LeadEventLogRepository $eventLogRepository)
     {
         $this->translator         = $translator;
         $this->eventLogRepository = $eventLogRepository;

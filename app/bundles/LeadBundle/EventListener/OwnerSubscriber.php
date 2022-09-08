@@ -8,7 +8,6 @@ use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class OwnerSubscriber implements EventSubscriberInterface
 {
@@ -18,7 +17,7 @@ class OwnerSubscriber implements EventSubscriberInterface
     private $ownerFieldSprintf = '{ownerfield=%s}';
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -35,7 +34,7 @@ class OwnerSubscriber implements EventSubscriberInterface
     /**
      * OwnerSubscriber constructor.
      */
-    public function __construct(LeadModel $leadModel, TranslatorInterface $translator)
+    public function __construct(LeadModel $leadModel, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->translator = $translator;
         $this->leadModel  = $leadModel;

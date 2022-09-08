@@ -34,14 +34,13 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailType extends AbstractType
 {
     use DynamicContentTrait;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -63,7 +62,7 @@ class EmailType extends AbstractType
     private $themeHelper;
 
     public function __construct(
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         EntityManager $entityManager,
         StageModel $stageModel,
         CoreParametersHelper $coreParametersHelper,

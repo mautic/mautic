@@ -15,7 +15,6 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class AbstractCommonModel
 {
@@ -40,7 +39,7 @@ abstract class AbstractCommonModel
     protected $router;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
@@ -79,7 +78,7 @@ abstract class AbstractCommonModel
         $this->router = $router;
     }
 
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(\Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }

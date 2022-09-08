@@ -10,7 +10,6 @@ use MauticPlugin\MauticSocialBundle\Form\Type\TweetSendType;
 use MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -25,14 +24,14 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $integrationHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
     public function __construct(
         CampaignEventHelper $campaignEventHelper,
         IntegrationHelper $integrationHelper,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->campaignEventHelper = $campaignEventHelper;
         $this->integrationHelper   = $integrationHelper;

@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Exception\NoUserException;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldNotification
 {
@@ -24,14 +23,14 @@ class CustomFieldNotification
     private $userModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
     public function __construct(
         NotificationModel $notificationModel,
         UserModel $userModel,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->notificationModel = $notificationModel;
         $this->userModel         = $userModel;

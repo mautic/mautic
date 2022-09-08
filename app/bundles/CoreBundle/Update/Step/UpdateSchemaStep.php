@@ -11,12 +11,11 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 final class UpdateSchemaStep implements StepInterface
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -25,7 +24,7 @@ final class UpdateSchemaStep implements StepInterface
      */
     private $kernel;
 
-    public function __construct(TranslatorInterface $translator, ContainerInterface $container)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, ContainerInterface $container)
     {
         $this->translator = $translator;
         $this->kernel     = $container->get('kernel');

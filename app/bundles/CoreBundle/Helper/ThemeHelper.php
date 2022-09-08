@@ -11,7 +11,6 @@ use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\TemplateReference;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ThemeHelper implements ThemeHelperInterface
 {
@@ -26,7 +25,7 @@ class ThemeHelper implements ThemeHelperInterface
     private $templatingHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -113,7 +112,7 @@ class ThemeHelper implements ThemeHelperInterface
     public function __construct(
         PathsHelper $pathsHelper,
         TemplatingHelper $templatingHelper,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         CoreParametersHelper $coreParametersHelper,
         Filesystem $filesystem,
         Finder $finder,

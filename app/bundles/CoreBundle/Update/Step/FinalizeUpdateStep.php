@@ -8,12 +8,11 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
 
 final class FinalizeUpdateStep implements StepInterface
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -32,7 +31,7 @@ final class FinalizeUpdateStep implements StepInterface
      */
     private $appVersion;
 
-    public function __construct(TranslatorInterface $translator, PathsHelper $pathsHelper, Session $session, AppVersion $appVersion)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, PathsHelper $pathsHelper, Session $session, AppVersion $appVersion)
     {
         $this->translator  = $translator;
         $this->pathsHelper = $pathsHelper;

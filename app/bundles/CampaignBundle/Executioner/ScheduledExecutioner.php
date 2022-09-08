@@ -19,7 +19,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ScheduledExecutioner implements ExecutionerInterface
 {
@@ -34,7 +33,7 @@ class ScheduledExecutioner implements ExecutionerInterface
     private $logger;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -94,7 +93,7 @@ class ScheduledExecutioner implements ExecutionerInterface
     public function __construct(
         LeadEventLogRepository $repository,
         LoggerInterface $logger,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         EventExecutioner $executioner,
         EventScheduler $scheduler,
         ScheduledContactFinder $scheduledContactFinder

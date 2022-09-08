@@ -15,6 +15,18 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class SendChannelBroadcastCommand extends ModeratedCommand
 {
+    private \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
+    private \Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher $traceableEventDispatcher;
+
+    public function __construct(\Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator, \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper, \Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher $traceableEventDispatcher)
+    {
+        $this->dataCollectorTranslator = $dataCollectorTranslator;
+        parent::__construct();
+        $this->coreParametersHelper     = $coreParametersHelper;
+        $this->traceableEventDispatcher = $traceableEventDispatcher;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -75,10 +87,10 @@ EOT
             return 0;
         }
 
-        $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->get('mautic.helper.core_parameters')->get('locale'));
+        $translator = $this->dataCollectorTranslator;
+        $translator->setLocale($this->coreParametersHelper->get('locale'));
 
-        $dispatcher = $this->getContainer()->get('event_dispatcher');
+        $dispatcher = $this->traceableEventDispatcher;
 
         $event = new ChannelBroadcastEvent($channel, $channelId, $output);
         $event->setLimit($limit);
@@ -86,7 +98,7 @@ EOT
         $event->setMinContactIdFilter($minContactId);
         $event->setMaxContactIdFilter($maxContactId);
 
-        $dispatcher->dispatch(ChannelEvents::CHANNEL_BROADCAST, $event);
+        $dispatcher->dispatch($event, ChannelEvents::CHANNEL_BROADCAST);
 
         $results = $event->getResults();
 

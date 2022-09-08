@@ -6,7 +6,6 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailValidationEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class EmailValidator.
@@ -14,7 +13,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class EmailValidator
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
@@ -26,7 +25,7 @@ class EmailValidator
     /**
      * EmailValidator constructor.
      */
-    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
         $this->translator = $translator;
         $this->dispatcher = $dispatcher;

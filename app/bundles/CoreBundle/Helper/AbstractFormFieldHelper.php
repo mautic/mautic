@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Helper\ListParser\Exception\FormatNotSupportedException;
 use Mautic\CoreBundle\Helper\ListParser\JsonListParser;
 use Mautic\CoreBundle\Helper\ListParser\ListParserInterface;
 use Mautic\CoreBundle\Helper\ListParser\ValueListParser;
-use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class AbstractFormFieldHelper
 {
@@ -38,7 +37,7 @@ abstract class AbstractFormFieldHelper
     protected $translationKeyPrefix;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
@@ -57,7 +56,7 @@ abstract class AbstractFormFieldHelper
         $this->setTranslationKeyPrefix();
     }
 
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(\Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }

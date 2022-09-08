@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Form\Type;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class SlotButtonType.
@@ -13,14 +12,14 @@ use Symfony\Component\Translation\TranslatorInterface;
 class SlotSavePrefsButtonType extends SlotType
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
     /**
      * ConfigType constructor.
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }

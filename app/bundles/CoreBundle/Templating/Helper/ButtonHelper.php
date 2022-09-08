@@ -8,7 +8,6 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ButtonHelper extends Helper
 {
@@ -121,7 +120,7 @@ class ButtonHelper extends Helper
      */
     private $listMarker = 3;
 
-    public function __construct(EngineInterface $templating, TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
+    public function __construct(EngineInterface $templating, \Symfony\Contracts\Translation\TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
         $this->templating = $templating;
         $this->translator = $translator;

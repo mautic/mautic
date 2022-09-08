@@ -5,29 +5,30 @@ namespace Mautic\CoreBundle\Command;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Factory\TransifexFactory;
 use Mautic\Transifex\Connector\Resources;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * CLI Command to push language resources to Transifex.
  */
-class PushTransifexCommand extends ContainerAwareCommand
+class PushTransifexCommand extends \Symfony\Component\Console\Command\Command
 {
     private $transifexFactory;
     private $translator;
+    private \Mautic\CoreBundle\Factory\MauticFactory $mauticFactory;
 
     public function __construct(
         TransifexFactory $transifexFactory,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
+        \Mautic\CoreBundle\Factory\MauticFactory $mauticFactory
     ) {
         $this->transifexFactory = $transifexFactory;
         $this->translator       = $translator;
 
         parent::__construct();
+        $this->mauticFactory = $mauticFactory;
     }
 
     protected function configure()
@@ -54,7 +55,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
+        $this->translator->setLocale($this->mauticFactory->getParameter('locale'));
 
         $options = $input->getOptions();
         $create  = $options['create'];

@@ -8,7 +8,6 @@ use Mautic\CalendarBundle\Event\CalendarGeneratorEvent;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CalendarSubscriber implements EventSubscriberInterface
 {
@@ -18,7 +17,7 @@ class CalendarSubscriber implements EventSubscriberInterface
     private $connection;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -27,7 +26,7 @@ class CalendarSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    public function __construct(Connection $connection, TranslatorInterface $translator, RouterInterface $router)
+    public function __construct(Connection $connection, \Symfony\Contracts\Translation\TranslatorInterface $translator, RouterInterface $router)
     {
         $this->connection = $connection;
         $this->translator = $translator;

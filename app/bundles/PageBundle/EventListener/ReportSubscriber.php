@@ -12,7 +12,6 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
@@ -31,14 +30,14 @@ class ReportSubscriber implements EventSubscriberInterface
     private $hitRepository;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
     public function __construct(
         CompanyReportData $companyReportData,
         HitRepository $hitRepository,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->companyReportData = $companyReportData;
         $this->hitRepository     = $hitRepository;

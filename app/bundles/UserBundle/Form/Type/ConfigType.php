@@ -10,7 +10,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\File;
 
 class ConfigType extends AbstractType
@@ -21,11 +20,11 @@ class ConfigType extends AbstractType
     protected $parameters;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
-    public function __construct(CoreParametersHelper $parametersHelper, TranslatorInterface $translator)
+    public function __construct(CoreParametersHelper $parametersHelper, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->parameters = $parametersHelper;
         $this->translator = $translator;

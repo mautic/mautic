@@ -9,12 +9,11 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor;
 use Mautic\CampaignBundle\EventCollector\Builder\ConnectionBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class EventCollector
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -36,7 +35,7 @@ class EventCollector
     /**
      * EventCollector constructor.
      */
-    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
         $this->translator = $translator;
         $this->dispatcher = $dispatcher;

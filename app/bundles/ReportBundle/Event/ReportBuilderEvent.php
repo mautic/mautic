@@ -6,7 +6,6 @@ use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\Model\ReportModel;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class ReportBuilderEvent.
@@ -38,7 +37,7 @@ class ReportBuilderEvent extends AbstractReportEvent
     private $channelListHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -63,7 +62,7 @@ class ReportBuilderEvent extends AbstractReportEvent
      *
      * @param string $context
      */
-    public function __construct(TranslatorInterface $translator, ChannelListHelper $channelListHelper, $context, $leadFields, ReportHelper $reportHelper)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, ChannelListHelper $channelListHelper, $context, $leadFields, ReportHelper $reportHelper)
     {
         $this->context           = $context;
         $this->translator        = $translator;

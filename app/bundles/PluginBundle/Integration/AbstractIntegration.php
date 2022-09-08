@@ -44,7 +44,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * @method pushLead(Lead $lead, array $config = [])
@@ -72,7 +71,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected ?Request $request;
     protected Router $router;
     protected LoggerInterface $logger;
-    protected TranslatorInterface $translator;
+    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
     protected EncryptionHelper $encryptionHelper;
     protected LeadModel $leadModel;
     protected CompanyModel $companyModel;
@@ -104,7 +103,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         Session $session,
         RequestStack $requestStack,
         Router $router,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         Logger $logger,
         EncryptionHelper $encryptionHelper,
         LeadModel $leadModel,

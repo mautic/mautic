@@ -7,7 +7,6 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaignException;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class Remover
 {
@@ -34,7 +33,7 @@ class Remover
     public function __construct(
         LeadRepository $leadRepository,
         LeadEventLogRepository $leadEventLogRepository,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         DateHelper $dateHelper
     ) {
         $this->leadRepository         = $leadRepository;

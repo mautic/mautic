@@ -24,7 +24,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 final class TypeOperatorSubscriber implements EventSubscriberInterface
@@ -45,7 +44,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
     private AssetModel $assetModel;
 
-    private TranslatorInterface $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(
         LeadModel $leadModel,
@@ -55,7 +54,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         StageModel $stageModel,
         CategoryModel $categoryModel,
         AssetModel $assetModel,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->leadModel     = $leadModel;
         $this->listModel     = $listModel;

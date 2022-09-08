@@ -6,7 +6,6 @@ use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class ElasticEmailTransport.
@@ -14,7 +13,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ElasticemailTransport extends \Swift_SmtpTransport implements CallbackTransportInterface
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -31,7 +30,7 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements CallbackTran
     /**
      * ElasticemailTransport constructor.
      */
-    public function __construct(TranslatorInterface $translator, LoggerInterface $logger, TransportCallback $transportCallback)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, LoggerInterface $logger, TransportCallback $transportCallback)
     {
         $this->translator        = $translator;
         $this->logger            = $logger;

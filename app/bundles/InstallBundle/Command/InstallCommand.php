@@ -10,7 +10,6 @@ use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;
 use Mautic\InstallBundle\Install\InstallService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,9 +20,18 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  * CLI Command to install Mautic.
  * Class InstallCommand.
  */
-class InstallCommand extends ContainerAwareCommand
+class InstallCommand extends \Symfony\Component\Console\Command\Command
 {
     public const COMMAND = 'mautic:install';
+    private \Mautic\InstallBundle\Install\InstallService $installService;
+    private \Doctrine\Bundle\DoctrineBundle\Registry $registry;
+
+    public function __construct(InstallService $installService, \Doctrine\Bundle\DoctrineBundle\Registry $registry)
+    {
+        $this->installService = $installService;
+        parent::__construct();
+        $this->registry = $registry;
+    }
 
     /**
      * Note: in every option (addOption()), please leave the default value empty to prevent problems with values from local.php being overwritten.
@@ -243,7 +251,7 @@ class InstallCommand extends ContainerAwareCommand
     {
         $container = $this->getContainer();
         /** @var \Mautic\InstallBundle\Install\InstallService $installer */
-        $installer = $container->get('mautic.install.service');
+        $installer = $this->installService;
 
         // Check Mautic is not already installed
         if ($installer->checkIfInstalled()) {
@@ -372,7 +380,7 @@ class InstallCommand extends ContainerAwareCommand
                  *
                  * @var ConnectionWrapper $connectionWrapper
                  */
-                $connectionWrapper = $container->get('doctrine')->getConnection();
+                $connectionWrapper = $this->registry->getConnection();
                 $connectionWrapper->initConnection($dbParams);
 
                 $messages = $this->stepAction($installer, $dbParams, $step);

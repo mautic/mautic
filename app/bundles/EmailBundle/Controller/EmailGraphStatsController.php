@@ -3,11 +3,10 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class EmailGraphStatsController extends Controller
+class EmailGraphStatsController extends \Symfony\Bundle\FrameworkBundle\Controller\AbstractController
 {
     /**
      * Loads a specific form into the detailed panel.

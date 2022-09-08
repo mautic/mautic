@@ -8,7 +8,6 @@ use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CitrixCampaignEventType.
@@ -21,14 +20,14 @@ class CitrixCampaignEventType extends AbstractType
     protected $model;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
     /**
      * CitrixCampaignEventType constructor.
      */
-    public function __construct(CitrixModel $model, TranslatorInterface $translator)
+    public function __construct(CitrixModel $model, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->model      = $model;
         $this->translator = $translator;

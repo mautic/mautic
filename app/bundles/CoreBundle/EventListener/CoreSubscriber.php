@@ -28,7 +28,6 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CoreSubscriber implements EventSubscriberInterface
 {
@@ -73,7 +72,7 @@ class CoreSubscriber implements EventSubscriberInterface
     private $dispatcher;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -106,7 +105,7 @@ class CoreSubscriber implements EventSubscriberInterface
         AuthorizationChecker $securityContext,
         UserModel $userModel,
         EventDispatcherInterface $dispatcher,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         RequestStack $requestStack,
         FormRepository $formRepository,
         MauticFactory $factory,

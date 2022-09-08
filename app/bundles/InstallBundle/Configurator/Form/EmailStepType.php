@@ -12,14 +12,13 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EmailStepType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -28,7 +27,7 @@ class EmailStepType extends AbstractType
      */
     private $transportType;
 
-    public function __construct(TranslatorInterface $translator, TransportType $transportType)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, TransportType $transportType)
     {
         $this->translator    = $translator;
         $this->transportType = $transportType;

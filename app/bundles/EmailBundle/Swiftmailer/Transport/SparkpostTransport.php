@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Psr\Log\LoggerInterface;
 use SparkPost\SparkPost;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
 {
@@ -24,7 +23,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $host;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -53,7 +52,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      */
     public function __construct(
         $apiKey,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         TransportCallback $transportCallback,
         SparkpostFactoryInterface $sparkpostFactory,
         LoggerInterface $logger,

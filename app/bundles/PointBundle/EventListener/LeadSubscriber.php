@@ -12,7 +12,6 @@ use Mautic\PointBundle\Entity\LeadPointLogRepository;
 use Mautic\PointBundle\Entity\LeadTriggerLogRepository;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
@@ -22,7 +21,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private $triggerModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -43,7 +42,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
     public function __construct(
         TriggerModel $triggerModel,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         PointsChangeLogRepository $pointsChangeLogRepository,
         LeadPointLogRepository $leadPointLogRepository,
         LeadTriggerLogRepository $leadTriggerLogRepository

@@ -8,13 +8,12 @@ use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Api\PipedriveApi;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class FetchPipedriveDataCommand extends ContainerAwareCommand
+class FetchPipedriveDataCommand extends \Symfony\Component\Console\Command\Command
 {
     private SymfonyStyle $io;
     private IntegrationHelper $integrationHelper;
@@ -101,7 +100,7 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
     private function getData($type, $endPoint, $integrationObject)
     {
         $container  = $this->getContainer();
-        $translator = $container->get('templating.helper.translator');
+        $translator = $this->translatorHelper;
 
         $this->io->title('Pulling '.$type);
         $start = 0;

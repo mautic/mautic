@@ -26,7 +26,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * @method HubspotApi getApiHelper
@@ -45,7 +44,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         Session $session,
         RequestStack $requestStack,
         Router $router,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         Logger $logger,
         EncryptionHelper $encryptionHelper,
         LeadModel $leadModel,

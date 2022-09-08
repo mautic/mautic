@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,8 +9,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command to convert PHP theme config to JSON.
  */
-class ConvertConfigCommand extends ContainerAwareCommand
+class ConvertConfigCommand extends \Symfony\Component\Console\Command\Command
 {
+    private \Mautic\CoreBundle\Factory\MauticFactory $mauticFactory;
+
+    public function __construct(\Mautic\CoreBundle\Factory\MauticFactory $mauticFactory)
+    {
+        $this->mauticFactory = $mauticFactory;
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -54,7 +61,7 @@ EOT
         $theme         = $options['theme'];
         $savePhpConfig = $options['save-php-config'];
 
-        $themePath = realpath($this->getContainer()->get('mautic.factory')->getSystemPath('themes').'/'.$theme);
+        $themePath = realpath($this->mauticFactory->getSystemPath('themes').'/'.$theme);
 
         if (empty($themePath)) {
             $output->writeln("\n\n<error>The specified theme ($theme) does not exist.</error>");

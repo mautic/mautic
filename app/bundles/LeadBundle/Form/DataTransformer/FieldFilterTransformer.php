@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Form\DataTransformer;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class FieldFilterTransformer implements DataTransformerInterface
 {
@@ -21,7 +20,7 @@ class FieldFilterTransformer implements DataTransformerInterface
      */
     private $default;
 
-    public function __construct(TranslatorInterface $translator, array $default = [])
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, array $default = [])
     {
         $this->relativeDateStrings = LeadListRepository::getRelativeDateTranslationKeys();
         foreach ($this->relativeDateStrings as &$string) {

@@ -2,13 +2,12 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MauticSocialMonitoringCommand extends ContainerAwareCommand
+class MauticSocialMonitoringCommand extends \Symfony\Component\Console\Command\Command
 {
     protected $batchSize;
 
@@ -28,6 +27,15 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
      * @var InputInterface
      */
     protected $input;
+    private \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $monitoringModel;
+    private \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator;
+
+    public function __construct(\MauticPlugin\MauticSocialBundle\Model\MonitoringModel $monitoringModel, \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator)
+    {
+        $this->monitoringModel = $monitoringModel;
+        parent::__construct();
+        $this->dataCollectorTranslator = $dataCollectorTranslator;
+    }
 
     /**
      * Configure the command.
@@ -52,13 +60,12 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
         $this->output = $output;
 
         /** @var \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $model */
-        $model = $this->getContainer()
-            ->get('mautic.social.model.monitoring');
+        $model = $this->monitoringModel;
 
         // set the repository
         $this->monitorRepo = $model->getRepository();
 
-        $translator = $this->getContainer()->get('translator');
+        $translator = $this->dataCollectorTranslator;
         $translator->setLocale($this->getContainer()->getParameter('mautic.locale'));
 
         // get the mid from the cli

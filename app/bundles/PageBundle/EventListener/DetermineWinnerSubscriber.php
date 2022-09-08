@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
@@ -16,11 +15,11 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     private $hitRepository;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(HitRepository $hitRepository, TranslatorInterface $translator)
+    public function __construct(HitRepository $hitRepository, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->hitRepository = $hitRepository;
         $this->translator    = $translator;

@@ -7,7 +7,6 @@ use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class Fetcher
 {
@@ -22,7 +21,7 @@ class Fetcher
     private $dispatcher;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -44,7 +43,7 @@ class Fetcher
     /**
      * Fetcher constructor.
      */
-    public function __construct(Mailbox $imapHelper, EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
+    public function __construct(Mailbox $imapHelper, EventDispatcherInterface $dispatcher, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->imapHelper = $imapHelper;
         $this->dispatcher = $dispatcher;

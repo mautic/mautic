@@ -12,7 +12,6 @@ use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
 {
@@ -32,7 +31,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $password;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -148,7 +147,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     public function __construct(
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         AmazonCallback $amazonCallback,
         LoggerInterface $logger
     ) {

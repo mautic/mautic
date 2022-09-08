@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\Command;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,9 +12,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command to import data.
  */
-class ImportCommand extends ContainerAwareCommand
+class ImportCommand extends \Symfony\Component\Console\Command\Command
 {
     public const COMMAND_NAME = 'mautic:import';
+    private \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator;
+    private \Mautic\LeadBundle\Model\ImportModel $importModel;
+
+    public function __construct(\Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator, \Mautic\LeadBundle\Model\ImportModel $importModel)
+    {
+        $this->dataCollectorTranslator = $dataCollectorTranslator;
+        parent::__construct();
+        $this->importModel = $importModel;
+    }
 
     protected function configure()
     {
@@ -37,10 +45,10 @@ EOT
         $start = microtime(true);
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
-        $translator = $this->getContainer()->get('translator');
+        $translator = $this->dataCollectorTranslator;
 
         /** @var \Mautic\LeadBundle\Model\ImportModel $model */
-        $model = $this->getContainer()->get('mautic.lead.model.import');
+        $model = $this->importModel;
 
         $progress = new Progress($output);
         $id       = (int) $input->getOption('id');

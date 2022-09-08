@@ -18,7 +18,6 @@ use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\ChannelBundle\PreferenceBuilder\PreferenceBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -43,7 +42,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $logger;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -75,7 +74,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ActionDispatcher $actionDispatcher,
         EventCollector $collector,
         LoggerInterface $logger,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->messageModel     = $messageModel;
         $this->actionDispatcher = $actionDispatcher;

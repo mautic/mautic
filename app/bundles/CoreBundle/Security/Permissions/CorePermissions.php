@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Security\Exception\PermissionNotFoundException;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CorePermissions
 {
@@ -70,7 +69,7 @@ class CorePermissions
 
     public function __construct(
         UserHelper $userHelper,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         CoreParametersHelper $coreParametersHelper,
         array $bundles,
         array $pluginBundles

@@ -4,7 +4,6 @@ namespace Mautic\PluginBundle\Command;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,8 +11,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class PushLeadActivityCommand.
  */
-class PushLeadActivityCommand extends ContainerAwareCommand
+class PushLeadActivityCommand extends \Symfony\Component\Console\Command\Command
 {
+    private \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
+
+    public function __construct(\Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator, IntegrationHelper $integrationHelper)
+    {
+        $this->dataCollectorTranslator = $dataCollectorTranslator;
+        parent::__construct();
+        $this->integrationHelper = $integrationHelper;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -59,7 +68,7 @@ class PushLeadActivityCommand extends ContainerAwareCommand
     {
         $container = $this->getContainer();
 
-        $translator  = $container->get('translator');
+        $translator  = $this->dataCollectorTranslator;
         $integration = $input->getOption('integration');
         $startDate   = $input->getOption('start-date');
         $endDate     = $input->getOption('end-date');
@@ -78,7 +87,7 @@ class PushLeadActivityCommand extends ContainerAwareCommand
 
         if ($integration && $startDate && $endDate) {
             /** @var IntegrationHelper $integrationHelper */
-            $integrationHelper = $container->get('mautic.helper.integration');
+            $integrationHelper = $this->integrationHelper;
 
             /** @var AbstractIntegration $integrationObject */
             $integrationObject = $integrationHelper->getIntegrationObject($integration);

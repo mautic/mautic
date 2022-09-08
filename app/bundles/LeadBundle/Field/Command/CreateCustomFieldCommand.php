@@ -13,13 +13,11 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\ColumnAlreadyCreatedException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
-class CreateCustomFieldCommand extends ContainerAwareCommand
+class CreateCustomFieldCommand extends \Symfony\Component\Console\Command\Command
 {
     /**
      * @var BackgroundService
@@ -27,7 +25,7 @@ class CreateCustomFieldCommand extends ContainerAwareCommand
     private $backgroundService;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -38,7 +36,7 @@ class CreateCustomFieldCommand extends ContainerAwareCommand
 
     public function __construct(
         BackgroundService $backgroundService,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         LeadFieldRepository $leadFieldRepository
     ) {
         parent::__construct();

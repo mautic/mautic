@@ -2,7 +2,6 @@
 
 namespace Mautic\WebhookBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,9 +9,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command to process queued webhook payloads.
  */
-class ProcessWebhookQueuesCommand extends ContainerAwareCommand
+class ProcessWebhookQueuesCommand extends \Symfony\Component\Console\Command\Command
 {
     public const COMMAND_NAME = 'mautic:webhooks:process';
+    private \Mautic\WebhookBundle\Model\WebhookModel $webhookModel;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
+
+    public function __construct(\Mautic\WebhookBundle\Model\WebhookModel $webhookModel, \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper)
+    {
+        $this->webhookModel = $webhookModel;
+        parent::__construct();
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
 
     protected function configure()
     {
@@ -30,8 +38,8 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
-        $model  = $this->getContainer()->get('mautic.webhook.model.webhook');
-        $params = $this->getContainer()->get('mautic.helper.core_parameters');
+        $model  = $this->webhookModel;
+        $params = $this->coreParametersHelper;
 
         // check to make sure we are in queue mode
         if ($params->getParameter('queue_mode') != $model::COMMAND_PROCESS) {

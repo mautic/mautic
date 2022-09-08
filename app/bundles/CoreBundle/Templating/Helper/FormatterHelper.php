@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Templating\Helper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class FormatterHelper extends Helper
 {
@@ -14,11 +13,11 @@ class FormatterHelper extends Helper
      */
     private $dateHelper;
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
+    public function __construct(DateHelper $dateHelper, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->dateHelper = $dateHelper;
         $this->translator = $translator;

@@ -12,6 +12,16 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 {
+    private \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator;
+    private \Mautic\ChannelBundle\Model\MessageQueueModel $messageQueueModel;
+
+    public function __construct(\Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator, \Mautic\ChannelBundle\Model\MessageQueueModel $messageQueueModel)
+    {
+        $this->dataCollectorTranslator = $dataCollectorTranslator;
+        parent::__construct();
+        $this->messageQueueModel = $messageQueueModel;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -46,7 +56,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
     {
         $processed  = 0;
         $container  = $this->getContainer();
-        $translator = $container->get('translator');
+        $translator = $this->dataCollectorTranslator;
         $channel    = $input->getOption('channel');
         $channelId  = $input->getOption('channel-id');
         $messageId  = $input->getOption('message-id');
@@ -57,7 +67,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
         }
 
         /** @var \Mautic\ChannelBundle\Model\MessageQueueModel $model */
-        $model = $container->get('mautic.channel.model.queue');
+        $model = $this->messageQueueModel;
 
         $output->writeln('<info>'.$translator->trans('mautic.campaign.command.process.messages').'</info>');
 

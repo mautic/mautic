@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,7 +9,7 @@ use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 
-abstract class ModeratedCommand extends ContainerAwareCommand
+abstract class ModeratedCommand extends \Symfony\Component\Console\Command\Command
 {
     const MODE_PID   = 'pid';
     const MODE_FLOCK = 'flock';

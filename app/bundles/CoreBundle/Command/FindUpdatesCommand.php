@@ -2,15 +2,26 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * CLI Command to fetch application updates.
  */
-class FindUpdatesCommand extends ContainerAwareCommand
+class FindUpdatesCommand extends \Symfony\Component\Console\Command\Command
 {
+    private \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator;
+    private \Mautic\CoreBundle\Factory\MauticFactory $mauticFactory;
+    private \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper;
+
+    public function __construct(\Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator, \Mautic\CoreBundle\Factory\MauticFactory $mauticFactory, \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper)
+    {
+        $this->dataCollectorTranslator = $dataCollectorTranslator;
+        parent::__construct();
+        $this->mauticFactory = $mauticFactory;
+        $this->updateHelper  = $updateHelper;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -32,10 +43,10 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
-        $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
+        $translator = $this->dataCollectorTranslator;
+        $translator->setLocale($this->mauticFactory->getParameter('locale'));
 
-        $updateHelper = $this->getContainer()->get('mautic.helper.update');
+        $updateHelper = $this->updateHelper;
         $updateData   = $updateHelper->fetchData(true);
 
         if ($updateData['error']) {

@@ -8,7 +8,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class TriggerCampaignCommand.
@@ -23,7 +22,7 @@ class ExecuteEventCommand extends Command
     private $scheduledExecutioner;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -35,7 +34,7 @@ class ExecuteEventCommand extends Command
     /**
      * ExecuteEventCommand constructor.
      */
-    public function __construct(ScheduledExecutioner $scheduledExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
+    public function __construct(ScheduledExecutioner $scheduledExecutioner, \Symfony\Contracts\Translation\TranslatorInterface $translator, FormatterHelper $formatterHelper)
     {
         parent::__construct();
 

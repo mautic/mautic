@@ -9,7 +9,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class TriggerCampaignCommand.
@@ -24,7 +23,7 @@ class ValidateEventCommand extends Command
     private $inactiveExecution;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -36,7 +35,7 @@ class ValidateEventCommand extends Command
     /**
      * ValidateEventCommand constructor.
      */
-    public function __construct(InactiveExecutioner $inactiveExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
+    public function __construct(InactiveExecutioner $inactiveExecutioner, \Symfony\Contracts\Translation\TranslatorInterface $translator, FormatterHelper $formatterHelper)
     {
         parent::__construct();
 

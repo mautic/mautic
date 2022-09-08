@@ -3,7 +3,6 @@
 namespace Mautic\PluginBundle\Command;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -11,8 +10,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class FetchLeadsCommand.
  */
-class FetchLeadsCommand extends ContainerAwareCommand
+class FetchLeadsCommand extends \Symfony\Component\Console\Command\Command
 {
+    private \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
+
+    public function __construct(\Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator, \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper)
+    {
+        $this->dataCollectorTranslator = $dataCollectorTranslator;
+        parent::__construct();
+        $this->integrationHelper = $integrationHelper;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -71,7 +80,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
     {
         $container = $this->getContainer();
 
-        $translator    = $container->get('translator');
+        $translator    = $this->dataCollectorTranslator;
         $integration   = $input->getOption('integration');
         $startDate     = $input->getOption('start-date');
         $endDate       = $input->getOption('end-date');
@@ -85,7 +94,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
             throw new \RuntimeException('An integration must be specified');
         }
 
-        $integrationHelper = $container->get('mautic.helper.integration');
+        $integrationHelper = $this->integrationHelper;
 
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
         if (!$integrationObject instanceof UnifiedIntegrationInterface) {
@@ -109,7 +118,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
         }
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $container->get('mautic.helper.integration');
+        $integrationHelper = $this->integrationHelper;
 
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
 

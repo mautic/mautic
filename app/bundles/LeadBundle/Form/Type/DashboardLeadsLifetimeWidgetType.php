@@ -6,7 +6,6 @@ use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class DashboardLeadsLifetimeWidgetType extends AbstractType
 {
@@ -14,7 +13,7 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
 
     private $translator;
 
-    public function __construct(ListModel $segmentModel, TranslatorInterface $translator)
+    public function __construct(ListModel $segmentModel, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->segmentModel = $segmentModel;
         $this->translator   = $translator;

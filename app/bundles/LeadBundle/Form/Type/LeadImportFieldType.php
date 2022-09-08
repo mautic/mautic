@@ -12,12 +12,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadImportFieldType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -26,7 +25,7 @@ class LeadImportFieldType extends AbstractType
      */
     private $entityManager;
 
-    public function __construct(TranslatorInterface $translator, EntityManager $entityManager)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, EntityManager $entityManager)
     {
         $this->translator    = $translator;
         $this->entityManager = $entityManager;

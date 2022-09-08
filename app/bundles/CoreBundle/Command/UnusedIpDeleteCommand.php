@@ -4,7 +4,6 @@ namespace Mautic\CoreBundle\Command;
 
 use Doctrine\DBAL\DBALException;
 use Mautic\LeadBundle\Model\IpAddressModel;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,9 +11,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command to delete unused IP addresses.
  */
-class UnusedIpDeleteCommand extends ContainerAwareCommand
+class UnusedIpDeleteCommand extends \Symfony\Component\Console\Command\Command
 {
     private const DEFAULT_LIMIT = 10000;
+    private \Mautic\LeadBundle\Model\IpAddressModel $ipAddressModel;
+
+    public function __construct(IpAddressModel $ipAddressModel)
+    {
+        $this->ipAddressModel = $ipAddressModel;
+        parent::__construct();
+    }
 
     protected function configure(): void
     {
@@ -40,7 +46,7 @@ EOT
     {
         $container = $this->getContainer();
         /** @var IpAddressModel $ipAddressModel */
-        $ipAddressModel = $container->get('mautic.lead.model.ipaddress');
+        $ipAddressModel = $this->ipAddressModel;
 
         try {
             $limit       = $input->getOption('limit');

@@ -10,7 +10,6 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class NotificationHelper
 {
@@ -25,7 +24,7 @@ class NotificationHelper
     private $notificationModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -42,7 +41,7 @@ class NotificationHelper
     public function __construct(
         UserModel $userModel,
         NotificationModel $notificationModel,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         Router $router,
         CoreParametersHelper $coreParametersHelper
     ) {

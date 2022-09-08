@@ -10,10 +10,20 @@ use Symfony\Component\HttpFoundation\Request;
 
 class UploadController extends DropzoneController
 {
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
+    private \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator;
+
+    public function __construct(\Symfony\Component\DependencyInjection\ContainerInterface $container, \Oneup\UploaderBundle\Uploader\Storage\StorageInterface $storage, \Oneup\UploaderBundle\Uploader\ErrorHandler\ErrorHandlerInterface $errorHandler, array $config, string $type, \Symfony\Component\HttpFoundation\RequestStack $requestStack, \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator)
+    {
+        $this->requestStack = $requestStack;
+        parent::__construct($container, $storage, $errorHandler, $config, $type);
+        $this->dataCollectorTranslator = $dataCollectorTranslator;
+    }
+
     public function upload(): JsonResponse
     {
         /** @var Request $request */
-        $request  = $this->container->get('request_stack')->getCurrentRequest();
+        $request  = $this->requestStack->getCurrentRequest();
         $response = new EmptyResponse();
         $files    = $this->getFiles($request->files);
 
@@ -26,12 +36,12 @@ class UploadController extends DropzoneController
                 } catch (\Exception $e) {
                     error_log($e);
 
-                    $error = new UploadException($this->container->get('translator')->trans('mautic.asset.error.file.failed'));
+                    $error = new UploadException($this->dataCollectorTranslator->trans('mautic.asset.error.file.failed'));
                     $this->errorHandler->addException($response, $error);
                 }
             }
         } else {
-            $error = new UploadException($this->container->get('translator')->trans('mautic.asset.error.file.failed'));
+            $error = new UploadException($this->dataCollectorTranslator->trans('mautic.asset.error.file.failed'));
             $this->errorHandler->addException($response, $error);
         }
 

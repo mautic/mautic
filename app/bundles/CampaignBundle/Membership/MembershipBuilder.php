@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class MembershipBuilder
 {
@@ -30,7 +29,7 @@ class MembershipBuilder
     private $leadRepository;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -63,7 +62,7 @@ class MembershipBuilder
         MembershipManager $manager,
         CampaignMemberRepository $campaignMemberRepository,
         LeadRepository $leadRepository,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->manager                  = $manager;
         $this->campaignMemberRepository = $campaignMemberRepository;

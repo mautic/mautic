@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
@@ -20,7 +19,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private $assetModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -36,7 +35,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
     public function __construct(
         AssetModel $assetModel,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         RouterInterface $router,
         DownloadRepository $downloadRepository
     ) {

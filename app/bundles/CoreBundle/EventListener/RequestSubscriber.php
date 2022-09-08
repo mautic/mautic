@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class RequestSubscriber implements EventSubscriberInterface
 {
@@ -19,7 +18,7 @@ class RequestSubscriber implements EventSubscriberInterface
     private $tokenManager;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -30,7 +29,7 @@ class RequestSubscriber implements EventSubscriberInterface
 
     public function __construct(
         CsrfTokenManagerInterface $tokenManager,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         TemplatingHelper $templating
     ) {
         $this->tokenManager = $tokenManager;

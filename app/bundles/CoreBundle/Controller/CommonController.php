@@ -22,12 +22,11 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CommonController.
  */
-class CommonController extends Controller implements MauticController
+class CommonController extends \Symfony\Bundle\FrameworkBundle\Controller\AbstractController implements MauticController
 {
     use FormThemeTrait;
 
@@ -57,7 +56,7 @@ class CommonController extends Controller implements MauticController
     protected $dispatcher;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
@@ -91,7 +90,7 @@ class CommonController extends Controller implements MauticController
         $this->dispatcher = $dispatcher;
     }
 
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(\Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }

@@ -10,7 +10,6 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
@@ -27,7 +26,7 @@ class PageSubscriber implements EventSubscriberInterface
     private $builderTokenHelperFactory;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -42,7 +41,7 @@ class PageSubscriber implements EventSubscriberInterface
     public function __construct(
         FormModel $formModel,
         BuilderTokenHelperFactory $builderTokenHelperFactory,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         CorePermissions $security
     ) {
         $this->formModel                 = $formModel;

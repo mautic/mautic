@@ -11,7 +11,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CategoryListType.
@@ -29,7 +28,7 @@ class CategoryListType extends AbstractType
     private $model;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -41,7 +40,7 @@ class CategoryListType extends AbstractType
     /**
      * CategoryListType constructor.
      */
-    public function __construct(EntityManager $em, TranslatorInterface $translator, CategoryModel $model, Router $router)
+    public function __construct(EntityManager $em, \Symfony\Contracts\Translation\TranslatorInterface $translator, CategoryModel $model, Router $router)
     {
         $this->em         = $em;
         $this->translator = $translator;

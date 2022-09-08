@@ -11,7 +11,6 @@ use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 {
@@ -48,7 +47,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @param array $options
      */
-    public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, $options = [])
+    public function __construct(ModelFactory $modelFactory, \Symfony\Contracts\Translation\TranslatorInterface $translator, Connection $connection, $options = [])
     {
         $this->modelFactory = $modelFactory;
         $this->translator   = $translator;

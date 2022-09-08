@@ -2,14 +2,12 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 class RelativeDate
 {
-    /** @var TranslatorInterface */
+    /** @var \Symfony\Contracts\Translation\TranslatorInterface */
     private $translator;
 
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }

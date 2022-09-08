@@ -9,7 +9,6 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ButtonSubscriber implements EventSubscriberInterface
 {
@@ -19,7 +18,7 @@ class ButtonSubscriber implements EventSubscriberInterface
     private $helper;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -30,7 +29,7 @@ class ButtonSubscriber implements EventSubscriberInterface
 
     public function __construct(
         IntegrationHelper $helper,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         RouterInterface $router
     ) {
         $this->helper     = $helper;

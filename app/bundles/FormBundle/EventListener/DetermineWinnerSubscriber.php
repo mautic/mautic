@@ -7,7 +7,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
@@ -17,11 +16,11 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     private $submissionRepository;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(SubmissionRepository $submissionRepository, TranslatorInterface $translator)
+    public function __construct(SubmissionRepository $submissionRepository, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->submissionRepository = $submissionRepository;
         $this->translator           = $translator;

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Field;
 
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class FieldList
 {
@@ -15,11 +14,11 @@ class FieldList
     private $leadFieldRepository;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(LeadFieldRepository $leadFieldRepository, TranslatorInterface $translator)
+    public function __construct(LeadFieldRepository $leadFieldRepository, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->leadFieldRepository = $leadFieldRepository;
         $this->translator          = $translator;

@@ -4,7 +4,6 @@ namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,8 +13,18 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 /**
  * CLI Command to purge old data per settings.
  */
-class CleanupMaintenanceCommand extends ContainerAwareCommand
+class CleanupMaintenanceCommand extends \Symfony\Component\Console\Command\Command
 {
+    private \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator;
+    private \Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher $traceableEventDispatcher;
+
+    public function __construct(\Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator, \Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher $traceableEventDispatcher)
+    {
+        $this->dataCollectorTranslator = $dataCollectorTranslator;
+        parent::__construct();
+        $this->traceableEventDispatcher = $traceableEventDispatcher;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -59,7 +68,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
-        $translator = $this->getContainer()->get('translator');
+        $translator = $this->dataCollectorTranslator;
         $translator->setLocale($this->getContainer()->getParameter('mautic.locale', 'en_US'));
 
         $daysOld       = $input->getOption('days-old');
@@ -88,9 +97,9 @@ EOT
             }
         }
 
-        $dispatcher = $this->getContainer()->get('event_dispatcher');
+        $dispatcher = $this->traceableEventDispatcher;
 
-        $event = $dispatcher->dispatch(CoreEvents::MAINTENANCE_CLEANUP_DATA, new MaintenanceEvent($daysOld, !empty($dryRun), !empty($gdpr)));
+        $event = $dispatcher->dispatch(new MaintenanceEvent($daysOld, !empty($dryRun), !empty($gdpr)), CoreEvents::MAINTENANCE_CLEANUP_DATA);
         $stats = $event->getStats();
 
         $rows = [];

@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Services;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ContactColumnsDictionary
 {
@@ -16,7 +15,7 @@ class ContactColumnsDictionary
 
     private $fieldList = [];
 
-    public function __construct(FieldModel $fieldModel, TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
+    public function __construct(FieldModel $fieldModel, \Symfony\Contracts\Translation\TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
         $this->fieldModel           = $fieldModel;
         $this->translator           = $translator;

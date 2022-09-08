@@ -12,8 +12,8 @@ class PluginConfiguration implements ConfigurationInterface
     // This is setup to validate plugin's composer.json
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root('');
+        $treeBuilder = new TreeBuilder('');
+        $rootNode    = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()

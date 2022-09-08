@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,8 +11,18 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 /**
  * CLI Command to install Mautic sample data.
  */
-class InstallDataCommand extends ContainerAwareCommand
+class InstallDataCommand extends \Symfony\Component\Console\Command\Command
 {
+    private \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator;
+    private \Mautic\CoreBundle\Factory\MauticFactory $mauticFactory;
+
+    public function __construct(\Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator, \Mautic\CoreBundle\Factory\MauticFactory $mauticFactory)
+    {
+        $this->dataCollectorTranslator = $dataCollectorTranslator;
+        parent::__construct();
+        $this->mauticFactory = $mauticFactory;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -45,8 +54,8 @@ EOT
     {
         $options    = $input->getOptions();
         $force      = $options['force'];
-        $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
+        $translator = $this->dataCollectorTranslator;
+        $translator->setLocale($this->mauticFactory->getParameter('locale'));
 
         if (!$force) {
             $helper         = $this->getHelper('question');

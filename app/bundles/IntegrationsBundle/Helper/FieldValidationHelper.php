@@ -11,7 +11,6 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class FieldValidationHelper
 {
@@ -21,7 +20,7 @@ class FieldValidationHelper
     private $fieldHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -30,7 +29,7 @@ class FieldValidationHelper
      */
     private $integrationObject;
 
-    public function __construct(FieldHelper $fieldHelper, TranslatorInterface $translator)
+    public function __construct(FieldHelper $fieldHelper, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->fieldHelper = $fieldHelper;
         $this->translator  = $translator;

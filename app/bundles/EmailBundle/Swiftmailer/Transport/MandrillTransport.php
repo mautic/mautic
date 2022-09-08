@@ -6,7 +6,6 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class MandrillTransport.
@@ -14,7 +13,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTransportInterface
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -26,7 +25,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
     /**
      * MandrillTransport constructor.
      */
-    public function __construct(TranslatorInterface $translator, TransportCallback $transportCallback)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, TransportCallback $transportCallback)
     {
         $this->translator        = $translator;
         $this->transportCallback = $transportCallback;

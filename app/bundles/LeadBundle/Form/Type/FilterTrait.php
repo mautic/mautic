@@ -12,7 +12,6 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -34,7 +33,7 @@ trait FilterTrait
     /**
      * @param $eventName
      */
-    public function buildFiltersForm($eventName, FormEvent $event, TranslatorInterface $translator, $currentListId = null)
+    public function buildFiltersForm($eventName, FormEvent $event, \Symfony\Contracts\Translation\TranslatorInterface $translator, $currentListId = null)
     {
         $data    = $event->getData();
         $form    = $event->getForm();

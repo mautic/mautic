@@ -7,7 +7,6 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class BroadcastSubscriber implements EventSubscriberInterface
 {
@@ -22,11 +21,11 @@ class BroadcastSubscriber implements EventSubscriberInterface
     private $em;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(EmailModel $emailModel, EntityManager $em, TranslatorInterface $translator)
+    public function __construct(EmailModel $emailModel, EntityManager $em, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->model      = $emailModel;
         $this->em         = $em;

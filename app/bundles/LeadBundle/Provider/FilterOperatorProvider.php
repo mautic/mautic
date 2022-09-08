@@ -7,13 +7,12 @@ namespace Mautic\LeadBundle\Provider;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 final class FilterOperatorProvider implements FilterOperatorProviderInterface
 {
     private EventDispatcherInterface $dispatcher;
 
-    private TranslatorInterface $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var mixed[]
@@ -22,7 +21,7 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
 
     public function __construct(
         EventDispatcherInterface $dispatcher,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->dispatcher = $dispatcher;
         $this->translator = $translator;

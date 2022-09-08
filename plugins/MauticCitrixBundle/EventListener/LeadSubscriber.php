@@ -12,7 +12,6 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
@@ -22,11 +21,11 @@ class LeadSubscriber implements EventSubscriberInterface
     private $model;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(CitrixModel $model, TranslatorInterface $translator)
+    public function __construct(CitrixModel $model, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->model      = $model;
         $this->translator = $translator;

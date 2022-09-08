@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class SegmentSubscriber implements EventSubscriberInterface
 {
@@ -24,7 +23,7 @@ class SegmentSubscriber implements EventSubscriberInterface
     private $auditLogModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -37,7 +36,7 @@ class SegmentSubscriber implements EventSubscriberInterface
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
         ListModel $listModel,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->ipLookupHelper    = $ipLookupHelper;
         $this->auditLogModel     = $auditLogModel;

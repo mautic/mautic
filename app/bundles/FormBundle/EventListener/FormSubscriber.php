@@ -19,7 +19,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
@@ -31,7 +30,7 @@ class FormSubscriber implements EventSubscriberInterface
 
     private CoreParametersHelper $coreParametersHelper;
 
-    private TranslatorInterface $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     private RouterInterface $router;
 
@@ -40,7 +39,7 @@ class FormSubscriber implements EventSubscriberInterface
         AuditLogModel $auditLogModel,
         MailHelper $mailer,
         CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         RouterInterface $router
     ) {
         $this->ipLookupHelper       = $ipLookupHelper;

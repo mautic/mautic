@@ -14,7 +14,6 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
@@ -24,7 +23,7 @@ class EmailSubscriber implements EventSubscriberInterface
     private $citrixModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -40,7 +39,7 @@ class EmailSubscriber implements EventSubscriberInterface
 
     public function __construct(
         CitrixModel $citrixModel,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         EventDispatcherInterface $dispatcher,
         TemplatingHelper $templating
     ) {

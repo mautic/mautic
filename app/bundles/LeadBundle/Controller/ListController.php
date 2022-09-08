@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ListController extends FormController
 {
@@ -764,7 +763,7 @@ class ListController extends FormController
         ) {
             return $this->accessDenied();
         }
-        /** @var TranslatorInterface $translator */
+        /** @var \Symfony\Contracts\Translation\TranslatorInterface $translator */
         $translator = $this->get('translator');
         /** @var ListModel $listModel */
         $listModel                    = $this->getModel('lead.list');

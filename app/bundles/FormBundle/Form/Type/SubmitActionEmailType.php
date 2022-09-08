@@ -13,7 +13,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class SubmitActionEmailType.
@@ -24,7 +23,7 @@ class SubmitActionEmailType extends AbstractType
     use ToBcBccFieldsTrait;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -36,7 +35,7 @@ class SubmitActionEmailType extends AbstractType
     /**
      * SubmitActionEmailType constructor.
      */
-    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
         $this->translator           = $translator;
         $this->coreParametersHelper = $coreParametersHelper;

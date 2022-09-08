@@ -10,7 +10,6 @@ use Mautic\EmailBundle\Swiftmailer\Transport\UnsubscriptionProcessorInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class Unsubscribe implements ProcessorInterface
 {
@@ -25,7 +24,7 @@ class Unsubscribe implements ProcessorInterface
     private $contactFinder;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -50,7 +49,7 @@ class Unsubscribe implements ProcessorInterface
     public function __construct(
         \Swift_Transport $transport,
         ContactFinder $contactFinder,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         LoggerInterface $logger,
         DoNotContactModel $doNotContact
     ) {

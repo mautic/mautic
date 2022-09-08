@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
@@ -35,7 +34,7 @@ class SearchSubscriber implements EventSubscriberInterface
     private $emailRepository;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -52,7 +51,7 @@ class SearchSubscriber implements EventSubscriberInterface
     public function __construct(
         LeadModel $leadModel,
         EmailRepository $emailRepository,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         CorePermissions $security,
         TemplatingHelper $templating
     ) {

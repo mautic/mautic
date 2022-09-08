@@ -5,7 +5,6 @@ namespace Mautic\CampaignBundle\Event;
 use Mautic\CampaignBundle\Event\Exception\KeyAlreadyRegisteredException;
 use Mautic\CoreBundle\Event\ComponentValidationTrait;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignBuilderEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
@@ -41,7 +40,7 @@ class CampaignBuilderEvent extends \Symfony\Contracts\EventDispatcher\Event
     /**
      * CampaignBuilderEvent constructor.
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }

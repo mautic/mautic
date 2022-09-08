@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Form\Type\DashboardLeadsLifetimeWidgetType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class DashboardSubscriber extends MainDashboardSubscriber
 {
@@ -66,11 +65,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $router;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
-    public function __construct(LeadModel $leadModel, ListModel $leadListModel, RouterInterface $router, TranslatorInterface $translator)
+    public function __construct(LeadModel $leadModel, ListModel $leadListModel, RouterInterface $router, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->leadModel     = $leadModel;
         $this->leadListModel = $leadListModel;

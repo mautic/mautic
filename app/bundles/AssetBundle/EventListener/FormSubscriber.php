@@ -18,7 +18,6 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
@@ -28,7 +27,7 @@ class FormSubscriber implements EventSubscriberInterface
     private $assetModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
@@ -59,7 +58,7 @@ class FormSubscriber implements EventSubscriberInterface
 
     public function __construct(
         AssetModel $assetModel,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
         ThemeHelperInterface $themeHelper,

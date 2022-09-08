@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Install\InstallService;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class SysinfoModel
 {
@@ -24,14 +23,14 @@ class SysinfoModel
     protected PathsHelper $pathsHelper;
     protected CoreParametersHelper $coreParametersHelper;
     protected Connection $connection;
-    private TranslatorInterface $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
     private InstallService $installService;
     private CheckStep $checkStep;
 
     public function __construct(
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         Connection $connection,
         InstallService $installService,
         CheckStep $checkStep

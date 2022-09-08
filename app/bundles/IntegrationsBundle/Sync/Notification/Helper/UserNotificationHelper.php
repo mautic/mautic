@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Sync\Notification\Helper;
 
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class UserNotificationHelper
 {
@@ -30,7 +29,7 @@ class UserNotificationHelper
     private $routeHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -49,7 +48,7 @@ class UserNotificationHelper
         UserHelper $userHelper,
         OwnerProvider $ownerProvider,
         RouteHelper $routeHelper,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->writer        = $writer;
         $this->userHelper    = $userHelper;

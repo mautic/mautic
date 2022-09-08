@@ -10,7 +10,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class IpLookupDownloadDataStoreButtonType extends AbstractType
 {
@@ -20,14 +19,14 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
     private $dateHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
     /**
      * IpLookupDownloadDataStoreButtonType constructor.
      */
-    public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
+    public function __construct(DateHelper $dateHelper, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->dateHelper = $dateHelper;
         $this->translator = $translator;

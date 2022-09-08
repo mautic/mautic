@@ -12,13 +12,12 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\CompanyExport;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\LeadExport;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class PushDataToPipedriveCommand extends ContainerAwareCommand
+class PushDataToPipedriveCommand extends \Symfony\Component\Console\Command\Command
 {
     private SymfonyStyle $io;
     private IntegrationHelper $integrationHelper;

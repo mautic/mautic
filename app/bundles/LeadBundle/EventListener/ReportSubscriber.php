@@ -18,7 +18,6 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
@@ -89,7 +88,7 @@ class ReportSubscriber implements EventSubscriberInterface
     private $companyReportData;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -101,7 +100,7 @@ class ReportSubscriber implements EventSubscriberInterface
         CompanyModel $companyModel,
         CompanyReportData $companyReportData,
         FieldsBuilder $fieldsBuilder,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->leadModel         = $leadModel;
         $this->stageModel        = $stageModel;

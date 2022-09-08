@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class AmazonCallback
 {
@@ -25,12 +24,12 @@ class AmazonCallback
      */
     const SNS_ADDRESS = 'no-reply@sns.amazonaws.com';
 
-    private TranslatorInterface $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
     private LoggerInterface $logger;
     private Client $httpClient;
     private TransportCallback $transportCallback;
 
-    public function __construct(TranslatorInterface $translator, LoggerInterface $logger, Client $httpClient, TransportCallback $transportCallback)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, LoggerInterface $logger, Client $httpClient, TransportCallback $transportCallback)
     {
         $this->translator        = $translator;
         $this->logger            = $logger;

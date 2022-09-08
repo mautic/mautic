@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CommonRepository extends EntityRepository
 {
@@ -33,7 +32,7 @@ class CommonRepository extends EntityRepository
     protected $currentUser;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
@@ -796,7 +795,7 @@ class CommonRepository extends EntityRepository
         $this->currentUser = $user;
     }
 
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(\Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }

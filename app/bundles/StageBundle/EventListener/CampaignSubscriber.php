@@ -13,7 +13,6 @@ use Mautic\StageBundle\Form\Type\StageActionChangeType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\StageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -28,11 +27,11 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $stageModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(LeadModel $leadModel, StageModel $stageModel, TranslatorInterface $translator)
+    public function __construct(LeadModel $leadModel, StageModel $stageModel, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->leadModel  = $leadModel;
         $this->stageModel = $stageModel;

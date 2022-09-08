@@ -24,14 +24,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class FieldType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -45,7 +44,7 @@ class FieldType extends AbstractType
      */
     private $identifierFields;
 
-    public function __construct(EntityManagerInterface $em, TranslatorInterface $translator, IdentifierFields $identifierFields)
+    public function __construct(EntityManagerInterface $em, \Symfony\Contracts\Translation\TranslatorInterface $translator, IdentifierFields $identifierFields)
     {
         $this->em               = $em;
         $this->translator       = $translator;

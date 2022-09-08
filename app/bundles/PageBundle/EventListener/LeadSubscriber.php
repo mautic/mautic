@@ -12,7 +12,6 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\VideoModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
@@ -29,7 +28,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private $pageVideoModel;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -41,7 +40,7 @@ class LeadSubscriber implements EventSubscriberInterface
     public function __construct(
         PageModel $pageModel,
         VideoModel $pageVideoModel,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         RouterInterface $router
     ) {
         $this->pageModel      = $pageModel;

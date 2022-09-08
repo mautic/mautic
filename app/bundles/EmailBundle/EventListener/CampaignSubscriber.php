@@ -28,7 +28,6 @@ use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -48,7 +47,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $sendEmailToUser;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -56,7 +55,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         EmailModel $emailModel,
         RealTimeExecutioner $realTimeExecutioner,
         SendEmailToUser $sendEmailToUser,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->emailModel          = $emailModel;
         $this->realTimeExecutioner = $realTimeExecutioner;

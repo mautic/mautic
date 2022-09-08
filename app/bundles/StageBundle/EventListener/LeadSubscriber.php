@@ -9,7 +9,6 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\StageBundle\Entity\LeadStageLogRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
@@ -24,7 +23,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private $leadStageLogRepository;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -36,7 +35,7 @@ class LeadSubscriber implements EventSubscriberInterface
     public function __construct(
         StagesChangeLogRepository $stagesChangeLogRepository,
         LeadStageLogRepository $leadStageLogRepository,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         RouterInterface $router
     ) {
         $this->stagesChangeLogRepository = $stagesChangeLogRepository;

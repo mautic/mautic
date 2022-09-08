@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Monolog\Logger;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldColumn
 {
@@ -48,7 +47,7 @@ class CustomFieldColumn
     private $fieldColumnDispatcher;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -59,7 +58,7 @@ class CustomFieldColumn
         LeadFieldSaver $leadFieldSaver,
         CustomFieldIndex $customFieldIndex,
         FieldColumnDispatcher $fieldColumnDispatcher,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->columnSchemaHelper    = $columnSchemaHelper;
         $this->schemaDefinition      = $schemaDefinition;

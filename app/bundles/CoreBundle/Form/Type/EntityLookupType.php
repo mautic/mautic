@@ -15,7 +15,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class EntityLookupType.
@@ -23,7 +22,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class EntityLookupType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -50,7 +49,7 @@ class EntityLookupType extends AbstractType
     /**
      * EntityLookupType constructor.
      */
-    public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, Router $router)
+    public function __construct(ModelFactory $modelFactory, \Symfony\Contracts\Translation\TranslatorInterface $translator, Connection $connection, Router $router)
     {
         $this->translator   = $translator;
         $this->router       = $router;

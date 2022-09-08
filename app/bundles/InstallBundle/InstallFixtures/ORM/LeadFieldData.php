@@ -17,6 +17,12 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
      * @var ContainerInterface
      */
     private $container;
+    private \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator;
+
+    public function __construct(\Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator)
+    {
+        $this->dataCollectorTranslator = $dataCollectorTranslator;
+    }
 
     /**
      * {@inheritdoc}
@@ -42,7 +48,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         $fieldGroups['lead']    = FieldModel::$coreFields;
         $fieldGroups['company'] = FieldModel::$coreCompanyFields;
 
-        $translator   = $this->container->get('translator');
+        $translator   = $this->dataCollectorTranslator;
         foreach ($fieldGroups as $fields) {
             $order = 1;
             foreach ($fields as $alias => $field) {

@@ -29,7 +29,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CommonApiController.
@@ -155,7 +154,7 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     protected $serializerGroups = [];
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     protected $translator;
 
@@ -649,7 +648,7 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
         $this->request = $request;
     }
 
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(\Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }

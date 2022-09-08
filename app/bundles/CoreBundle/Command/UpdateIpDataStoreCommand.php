@@ -3,15 +3,24 @@
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * CLI Command to fetch updated Maxmind database.
  */
-class UpdateIpDataStoreCommand extends ContainerAwareCommand
+class UpdateIpDataStoreCommand extends \Symfony\Component\Console\Command\Command
 {
+    private \Mautic\CoreBundle\IpLookup\AbstractLookup $lookup;
+    private \Mautic\CoreBundle\Factory\MauticFactory $mauticFactory;
+
+    public function __construct(\Mautic\CoreBundle\IpLookup\AbstractLookup $lookup, \Mautic\CoreBundle\Factory\MauticFactory $mauticFactory)
+    {
+        $this->lookup = $lookup;
+        parent::__construct();
+        $this->mauticFactory = $mauticFactory;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -33,8 +42,8 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $ipService  = $this->getContainer()->get('mautic.ip_lookup');
-        $factory    = $this->getContainer()->get('mautic.factory');
+        $ipService  = $this->lookup;
+        $factory    = $this->mauticFactory;
         $translator = $factory->getTranslator();
 
         if ($ipService instanceof AbstractLocalDataLookup) {

@@ -16,6 +16,12 @@ class RoleData extends AbstractFixture implements OrderedFixtureInterface, Conta
      * @var ContainerInterface
      */
     private $container;
+    private \Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator;
+
+    public function __construct(\Symfony\Component\Translation\DataCollectorTranslator $dataCollectorTranslator)
+    {
+        $this->dataCollectorTranslator = $dataCollectorTranslator;
+    }
 
     /**
      * {@inheritdoc}
@@ -39,7 +45,7 @@ class RoleData extends AbstractFixture implements OrderedFixtureInterface, Conta
             return;
         }
 
-        $translator = $this->container->get('translator');
+        $translator = $this->dataCollectorTranslator;
         $role       = new Role();
         $role->setName($translator->trans('mautic.user.role.admin.name', [], 'fixtures'));
         $role->setDescription($translator->trans('mautic.user.role.admin.description', [], 'fixtures'));

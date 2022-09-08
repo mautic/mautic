@@ -7,7 +7,6 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -40,11 +39,11 @@ class FieldAliasKeywordValidator extends ConstraintValidator
     private $em;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(ListModel $listModel, FieldAliasHelper $aliasHelper, EntityManager $em, TranslatorInterface $translator, ContactSegmentFilterDictionary $contactSegmentFilterDictionary)
+    public function __construct(ListModel $listModel, FieldAliasHelper $aliasHelper, EntityManager $em, \Symfony\Contracts\Translation\TranslatorInterface $translator, ContactSegmentFilterDictionary $contactSegmentFilterDictionary)
     {
         $this->listModel                      = $listModel;
         $this->aliasHelper                    = $aliasHelper;

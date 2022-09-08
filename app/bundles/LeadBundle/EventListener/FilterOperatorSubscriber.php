@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriber implements EventSubscriberInterface
 {
@@ -27,14 +26,14 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     private FieldChoicesProviderInterface $fieldChoicesProvider;
 
-    private TranslatorInterface $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(
         OperatorOptions $operatorOptions,
         LeadFieldRepository $leadFieldRepository,
         TypeOperatorProviderInterface $typeOperatorProvider,
         FieldChoicesProviderInterface $fieldChoicesProvider,
-        TranslatorInterface $translator
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ) {
         $this->operatorOptions      = $operatorOptions;
         $this->leadFieldRepository  = $leadFieldRepository;

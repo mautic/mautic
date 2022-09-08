@@ -4,7 +4,6 @@ namespace Mautic\ConfigBundle\Form\Helper;
 
 use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper as FieldHelper;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class RestrictionHelper
 {
@@ -12,7 +11,7 @@ class RestrictionHelper
     const MODE_MASK   = 'mask';
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -29,7 +28,7 @@ class RestrictionHelper
     /**
      * RestrictionHelper constructor.
      */
-    public function __construct(TranslatorInterface $translator, array $restrictedFields, $mode)
+    public function __construct(\Symfony\Contracts\Translation\TranslatorInterface $translator, array $restrictedFields, $mode)
     {
         $this->translator       = $translator;
         $this->restrictedFields = FieldHelper::prepareRestrictions($restrictedFields);

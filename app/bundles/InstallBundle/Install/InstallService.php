@@ -26,7 +26,6 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -61,7 +60,7 @@ class InstallService
                                 CacheHelper $cacheHelper,
                                 PathsHelper $pathsHelper,
                                 EntityManager $entityManager,
-                                TranslatorInterface $translator,
+                                \Symfony\Contracts\Translation\TranslatorInterface $translator,
                                 KernelInterface $kernel,
                                 ValidatorInterface $validator,
                                 UserPasswordEncoder $encoder)

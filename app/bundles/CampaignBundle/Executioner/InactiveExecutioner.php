@@ -17,7 +17,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class InactiveExecutioner implements ExecutionerInterface
 {
@@ -47,7 +46,7 @@ class InactiveExecutioner implements ExecutionerInterface
     private $progressBar;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
@@ -87,7 +86,7 @@ class InactiveExecutioner implements ExecutionerInterface
     public function __construct(
         InactiveContactFinder $inactiveContactFinder,
         LoggerInterface $logger,
-        TranslatorInterface $translator,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator,
         EventScheduler $scheduler,
         InactiveHelper $helper,
         EventExecutioner $executioner

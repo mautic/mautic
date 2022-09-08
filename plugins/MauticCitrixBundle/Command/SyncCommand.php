@@ -16,6 +16,14 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class SyncCommand extends ModeratedCommand
 {
+    private \MauticPlugin\MauticCitrixBundle\Model\CitrixModel $citrixModel;
+
+    public function __construct(\MauticPlugin\MauticCitrixBundle\Model\CitrixModel $citrixModel)
+    {
+        $this->citrixModel = $citrixModel;
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -42,7 +50,7 @@ class SyncCommand extends ModeratedCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $model   = $this->getContainer()->get('mautic.citrix.model.citrix');
+        $model   = $this->citrixModel;
         $options = $input->getOptions();
         $product = $options['product'];
 

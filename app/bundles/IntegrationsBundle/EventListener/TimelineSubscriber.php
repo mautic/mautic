@@ -8,7 +8,6 @@ use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TimelineSubscriber implements EventSubscriberInterface
 {
@@ -18,11 +17,11 @@ class TimelineSubscriber implements EventSubscriberInterface
     private $eventLogRepository;
 
     /**
-     * @var TranslatorInterface
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
      */
     private $translator;
 
-    public function __construct(LeadEventLogRepository $eventLogRepository, TranslatorInterface $translator)
+    public function __construct(LeadEventLogRepository $eventLogRepository, \Symfony\Contracts\Translation\TranslatorInterface $translator)
     {
         $this->eventLogRepository = $eventLogRepository;
         $this->translator         = $translator;
