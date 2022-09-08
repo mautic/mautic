@@ -244,13 +244,15 @@ class FieldType extends AbstractType
                         $properties = $data->getProperties();
                     }
 
+                    $propertiesList['list'] = isset($properties['list']) && 'lookup' === $type ? array_flip(array_filter($properties['list'])) : $properties['list'];
+
                     $form->add(
                         'properties',
                         SortableListType::class,
                         [
                             'required'          => false,
                             'label'             => 'mautic.lead.field.form.properties.select',
-                            'data'              => $properties,
+                            'data'              => $propertiesList,
                             'with_labels'       => ('lookup' !== $type),
                             'option_constraint' => [],
                         ]

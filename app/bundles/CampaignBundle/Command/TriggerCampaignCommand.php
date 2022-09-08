@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Command;
 
+use Exception;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
@@ -12,6 +13,8 @@ use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
+use Mautic\LeadBundle\Model\ListModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -95,6 +98,16 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     private $campaign;
 
+    /**
+     * @var ListModel
+     */
+    private $listModel;
+
+    /**
+     * @var SegmentCountCacheHelper
+     */
+    private $segmentCountCacheHelper;
+
     public function __construct(
         CampaignRepository $campaignRepository,
         EventDispatcherInterface $dispatcher,
@@ -103,18 +116,22 @@ class TriggerCampaignCommand extends ModeratedCommand
         ScheduledExecutioner $scheduledExecutioner,
         InactiveExecutioner $inactiveExecutioner,
         LoggerInterface $logger,
-        FormatterHelper $formatterHelper
+        FormatterHelper $formatterHelper,
+        ListModel $listModel,
+        SegmentCountCacheHelper $segmentCountCacheHelper
     ) {
         parent::__construct();
 
-        $this->campaignRepository   = $campaignRepository;
-        $this->dispatcher           = $dispatcher;
-        $this->translator           = $translator;
-        $this->kickoffExecutioner   = $kickoffExecutioner;
-        $this->scheduledExecutioner = $scheduledExecutioner;
-        $this->inactiveExecutioner  = $inactiveExecutioner;
-        $this->logger               = $logger;
-        $this->formatterHelper      = $formatterHelper;
+        $this->campaignRepository        = $campaignRepository;
+        $this->dispatcher                = $dispatcher;
+        $this->translator                = $translator;
+        $this->kickoffExecutioner        = $kickoffExecutioner;
+        $this->scheduledExecutioner      = $scheduledExecutioner;
+        $this->inactiveExecutioner       = $inactiveExecutioner;
+        $this->logger                    = $logger;
+        $this->formatterHelper           = $formatterHelper;
+        $this->listModel                 = $listModel;
+        $this->segmentCountCacheHelper   = $segmentCountCacheHelper;
     }
 
     /**
@@ -210,7 +227,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     /**
      * @return int|null
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -295,7 +312,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     private function triggerCampaign(Campaign $campaign)
     {
@@ -334,13 +351,16 @@ class TriggerCampaignCommand extends ModeratedCommand
             if (!$this->scheduleOnly && !$this->kickoffOnly) {
                 $this->executeInactive();
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             if ('prod' !== MAUTIC_ENV) {
                 // Throw the exception for dev/test mode
                 throw $exception;
             }
 
             $this->logger->error('CAMPAIGN: '.$exception->getMessage());
+        } finally {
+            // Update campaign linked segment cache count.
+            $this->updateCampaignSegmentContactCount($campaign);
         }
 
         // Don't detach in tests since this command will be ran multiple times in the same process
@@ -395,5 +415,18 @@ class TriggerCampaignCommand extends ModeratedCommand
         $counter = $this->inactiveExecutioner->execute($this->campaign, $this->limiter, $this->output);
 
         $this->writeCounts($this->output, $this->translator, $counter);
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function updateCampaignSegmentContactCount(Campaign $campaign): void
+    {
+        $segmentIds = $this->campaignRepository->getCampaignListIds((int) $campaign->getId());
+
+        foreach ($segmentIds as $segmentId) {
+            $totalLeadCount = $this->listModel->getRepository()->getLeadCount($segmentId);
+            $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+        }
     }
 }

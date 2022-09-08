@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
 use Mautic\CoreBundle\Templating\Helper\SlotsHelper;
@@ -24,8 +26,8 @@ class SlotExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            'slot'           => new TwigFunction('slot', [$this, 'getSlot'], ['is_safe' => ['html']]),
-            'slotHasContent' => new TwigFunction('slotHasContent', [$this, 'slotHasContent'], ['is_safe' => ['html']]),
+            new TwigFunction('slot', [$this, 'getSlot'], ['is_safe' => ['html']]),
+            new TwigFunction('slotHasContent', [$this, 'slotHasContent'], ['is_safe' => ['html']]),
         ];
     }
 
