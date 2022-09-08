@@ -7,6 +7,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -89,7 +90,7 @@ class ReportSubscriber implements EventSubscriberInterface
     private $companyReportData;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -101,7 +102,7 @@ class ReportSubscriber implements EventSubscriberInterface
         CompanyModel $companyModel,
         CompanyReportData $companyReportData,
         FieldsBuilder $fieldsBuilder,
-        TranslatorInterface $translator
+        Translator $translator
     ) {
         $this->leadModel         = $leadModel;
         $this->stageModel        = $stageModel;

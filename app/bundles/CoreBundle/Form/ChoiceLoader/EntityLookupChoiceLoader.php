@@ -36,7 +36,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $modelFactory;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 

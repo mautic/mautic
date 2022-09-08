@@ -17,12 +17,12 @@ class StageBuilderEvent extends Event
     private $actions = [];
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
     /**
-     * @param Translator $translator
+     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {

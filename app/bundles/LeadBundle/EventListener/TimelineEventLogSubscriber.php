@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -16,7 +17,7 @@ class TimelineEventLogSubscriber implements EventSubscriberInterface
      * TimelineEventLogSubscriber constructor.
      */
     public function __construct(
-        TranslatorInterface $translator,
+        Translator $translator,
         LeadEventLogRepository $leadEventLogRepository
     ) {
         $this->translator         = $translator;

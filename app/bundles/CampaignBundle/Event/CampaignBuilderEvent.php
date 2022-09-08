@@ -27,7 +27,7 @@ class CampaignBuilderEvent extends Event
     private $actions = [];
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     private $translator;
 

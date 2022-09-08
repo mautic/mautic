@@ -65,7 +65,7 @@ class ButtonHelper extends Helper
     private $templating;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     private $translator;
 

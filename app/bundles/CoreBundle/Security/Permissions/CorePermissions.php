@@ -14,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CorePermissions
 {
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
@@ -441,7 +441,7 @@ class CorePermissions
     }
 
     /**
-     * @return \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @return TranslatorInterface
      */
     protected function getTranslator()
     {

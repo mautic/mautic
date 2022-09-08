@@ -5,6 +5,7 @@ namespace Mautic\ApiBundle\Tests\EventListener;
 use Mautic\ApiBundle\EventListener\ApiSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Tests\CommonMocks;
+use Mautic\CoreBundle\Translation\Translator;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -44,7 +45,7 @@ class ApiSubscriberTest extends CommonMocks
         parent::setUp();
 
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->translator           = $this->createMock(Translator::class);
         $this->request              = $this->createMock(Request::class);
         $this->request->headers     = new ParameterBag();
         $this->event                = $this->createMock(GetResponseEvent::class);
