@@ -42,7 +42,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $processed  = 0;
         $container  = $this->getContainer();

@@ -46,7 +46,7 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
             ->addOption('query-count', null, InputOption::VALUE_OPTIONAL, 'The number of records to search for per iteration. Default is 100.', 100);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input  = $input;
         $this->output = $output;
@@ -72,7 +72,7 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
         if (!$monitorList->count()) {
             $this->output->writeln('No published monitors found. Make sure the id you supplied is published');
 
-            return;
+            return 0;
         }
 
         // max iterations

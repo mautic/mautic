@@ -31,7 +31,7 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $container    = $this->getContainer();
         $this->logger = $container->get('monolog.logger.mautic');

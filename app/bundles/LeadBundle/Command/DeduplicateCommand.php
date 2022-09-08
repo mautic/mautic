@@ -53,7 +53,7 @@ EOT
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $newerIntoOlder = (bool) $input->getOption('newer-into-older');
         $count          = $this->contactDeduper->deduplicate($newerIntoOlder, $output);
@@ -67,5 +67,7 @@ EOT
                 ]
             )
         );
+
+        return 0;
     }
 }

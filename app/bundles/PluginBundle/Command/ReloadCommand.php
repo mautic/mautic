@@ -29,7 +29,7 @@ class ReloadCommand extends ContainerAwareCommand
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeLn(
             $this->getContainer()->get('mautic.plugin.facade.reload')->reloadPlugins()

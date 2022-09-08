@@ -27,7 +27,7 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
         $model  = $this->getContainer()->get('mautic.webhook.model.webhook');

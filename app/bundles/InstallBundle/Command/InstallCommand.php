@@ -239,7 +239,7 @@ class InstallCommand extends ContainerAwareCommand
      *
      * @throws Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $container = $this->getContainer();
         /** @var \Mautic\InstallBundle\Install\InstallService $installer */
@@ -341,29 +341,26 @@ class InstallCommand extends ContainerAwareCommand
                 $messages = $this->stepAction($installer, ['site_url' => $siteUrl], $step);
                 if (!empty($messages)) {
                     if (isset($messages['requirements']) && !empty($messages['requirements'])) {
-                        // Stop install if requirements not met
                         $output->writeln('Missing requirements:');
                         $this->handleInstallerErrors($output, $messages['requirements']);
                         $output->writeln('Install canceled');
 
-                        return -$step;
+                        return (int) -$step;
                     } elseif (isset($messages['optional']) && !empty($messages['optional'])) {
                         $output->writeln('Missing optional settings:');
                         $this->handleInstallerErrors($output, $messages['optional']);
 
                         if (empty($options['force'])) {
-                            // Ask user to confirm install when optional settings missing
                             $helper   = $this->getHelper('question');
                             $question = new ConfirmationQuestion('Continue with install anyway? [yes/no]', false);
 
                             if (!$helper->ask($input, $output, $question)) {
-                                return -$step;
+                                return (int) -$step;
                             }
                         }
                     }
                 }
                 $output->writeln('Ready to Install!');
-                // Keep on with next step
                 $step = InstallService::DOCTRINE_STEP;
 
                 // no break
@@ -385,7 +382,7 @@ class InstallCommand extends ContainerAwareCommand
 
                     $output->writeln('Install canceled');
 
-                    return -$step;
+                    return (int) -$step;
                 }
 
                 $step = InstallService::DOCTRINE_STEP + .1;
@@ -425,7 +422,7 @@ class InstallCommand extends ContainerAwareCommand
 
                     $output->writeln('Install canceled');
 
-                    return -$step;
+                    return (int) -$step;
                 }
                 // Keep on with next step
                 $step = InstallService::EMAIL_STEP;
@@ -440,7 +437,7 @@ class InstallCommand extends ContainerAwareCommand
 
                     $output->writeln('Install canceled');
 
-                    return -$step;
+                    return (int) -$step;
                 }
                 // Keep on with next step
                 $step = InstallService::FINAL_STEP;
@@ -455,7 +452,7 @@ class InstallCommand extends ContainerAwareCommand
 
                     $output->writeln('Install canceled');
 
-                    return -$step;
+                    return (int) -$step;
                 }
         }
 

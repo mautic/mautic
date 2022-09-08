@@ -58,7 +58,7 @@ EOT
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->translator->setLocale($this->coreParametersHelper->get('locale'));
 

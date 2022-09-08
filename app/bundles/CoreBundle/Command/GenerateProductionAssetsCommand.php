@@ -30,7 +30,7 @@ EOT
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $container   = $this->getContainer();
         $assetHelper = $container->get('mautic.helper.assetgeneration');

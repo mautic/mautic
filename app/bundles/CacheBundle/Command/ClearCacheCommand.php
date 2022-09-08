@@ -20,7 +20,7 @@ class ClearCacheCommand extends ContainerAwareCommand
             ->setDescription('Clears Mautic\'s cache');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): ?int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var CacheProvider $cacheProvider */
         $cacheProvider = $this->getContainer()->get('mautic.cache.provider');

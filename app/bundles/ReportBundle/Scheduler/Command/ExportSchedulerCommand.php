@@ -44,7 +44,7 @@ class ExportSchedulerCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $report = $input->getOption('report');
 
@@ -53,7 +53,7 @@ class ExportSchedulerCommand extends Command
         } catch (\InvalidArgumentException $e) {
             $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');
 
-            return;
+            return 0;
         }
 
         try {
@@ -63,7 +63,9 @@ class ExportSchedulerCommand extends Command
         } catch (FileIOException $e) {
             $output->writeln('<error>'.$e->getMessage().'</error>');
 
-            return;
+            return 0;
         }
+
+        return 0;
     }
 }

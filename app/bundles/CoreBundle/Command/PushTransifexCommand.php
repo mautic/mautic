@@ -52,7 +52,7 @@ EOT
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 

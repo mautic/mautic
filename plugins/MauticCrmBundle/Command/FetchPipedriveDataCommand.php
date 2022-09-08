@@ -50,7 +50,7 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $container = $this->getContainer();
         $this->io  = new SymfonyStyle($input, $output);
@@ -62,7 +62,7 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
         if (!$integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
             $this->io->note('Pipedrive integration is disabled.');
 
-            return;
+            return 0;
         }
 
         $types = [
@@ -89,6 +89,8 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
         }
 
         $this->io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
+
+        return 0;
     }
 
     /**

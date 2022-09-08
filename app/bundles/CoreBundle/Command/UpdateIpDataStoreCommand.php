@@ -31,7 +31,7 @@ EOT
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $ipService  = $this->getContainer()->get('mautic.ip_lookup');
         $factory    = $this->getContainer()->get('mautic.factory');

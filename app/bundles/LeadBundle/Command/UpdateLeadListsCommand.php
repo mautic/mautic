@@ -52,7 +52,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $container  = $this->getContainer();
         $translator = $container->get('translator');
