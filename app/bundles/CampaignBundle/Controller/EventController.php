@@ -166,9 +166,9 @@ class EventController extends CommonFormController
                     $label,
                     [
                         '%number%' => $event['triggerInterval'],
-                        '%unit%'   => $translator->transChoice(
+                        '%unit%'   => $translator->trans(
                             'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
-                            $event['triggerInterval']
+                            ['%count%' => $event['triggerInterval']]
                         ),
                     ]
                 );
@@ -376,9 +376,9 @@ class EventController extends CommonFormController
                     $label,
                     [
                         '%number%' => $event['triggerInterval'],
-                        '%unit%'   => $this->translator->transChoice(
+                        '%unit%'   => $this->translator->trans(
                             'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
-                            $event['triggerInterval']
+                            ['%count%' => $event['triggerInterval']]
                         ),
                     ]
                 );

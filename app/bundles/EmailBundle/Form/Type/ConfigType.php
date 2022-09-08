@@ -203,7 +203,7 @@ class ConfigType extends AbstractType
                     new Email(
                         [
                             'message' => 'mautic.core.email.required',
-                            'strict'  => true,
+                            'mode'    => Email::VALIDATION_MODE_HTML5,
                         ]
                     ),
                 ],
@@ -226,7 +226,7 @@ class ConfigType extends AbstractType
                     new Email(
                         [
                             'message' => 'mautic.core.email.required',
-                            'strict'  => true,
+                            'mode'    => Email::VALIDATION_MODE_HTML5,
                         ]
                     ),
                 ],
@@ -374,6 +374,26 @@ class ConfigType extends AbstractType
                     'class'        => 'form-control',
                     'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getAmazonService().']}',
                     'tooltip'      => 'mautic.email.config.mailer.amazon_region.tooltip',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'placeholder' => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_sparkpost_region',
+            ChoiceType::class,
+            [
+                'choices'           => [
+                    'mautic.email.config.mailer.sparkpost_region.us'      => 'us',
+                    'mautic.email.config.mailer.sparkpost_region.eu'      => 'eu',
+                ],
+                'label'       => 'mautic.email.config.mailer.sparkpost_region',
+                'required'    => false,
+                'attr'        => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getSparkPostService().']}',
+                    'tooltip'      => 'mautic.email.config.mailer.sparkpost_region.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
                 'placeholder' => false,

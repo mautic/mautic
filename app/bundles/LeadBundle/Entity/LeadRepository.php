@@ -735,7 +735,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $nullExpr = $operators['null'][$exprType];
         $inExpr   = $operators['in'][$exprType];
         $xExpr    = $operators['x'][$exprType];
-
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous', [], null, 'en_US'):
@@ -798,6 +797,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                             $q->expr()->$eqExpr('list_lead.manually_removed', 0)
                         )
                     )
+                );
+                $filter->strict  = true;
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.company_id', [], null, 'en_US'):
+                $this->applySearchQueryRelationship(
+                    $q,
+                    [
+                        [
+                            'from_alias' => 'l',
+                            'table'      => 'companies_leads',
+                            'alias'      => 'comp_lead',
+                            'condition'  => 'l.id = comp_lead.lead_id',
+                        ],
+                    ],
+                    $innerJoinTables,
+                    $this->generateFilterExpression($q, 'comp_lead.company_id', $eqExpr, $unique, null)
                 );
                 $filter->strict  = true;
                 $returnParameter = true;
@@ -964,6 +981,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.list',
             'mautic.core.searchcommand.name',
             'mautic.lead.lead.searchcommand.company',
+            'mautic.lead.lead.searchcommand.company_id',
             'mautic.core.searchcommand.email',
             'mautic.lead.lead.searchcommand.owner',
             'mautic.core.searchcommand.ip',
@@ -1068,6 +1086,33 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         return $result;
+    }
+
+    /**
+     * Check Lead segments by ids.
+     *
+     * @param array<integer> $stages
+     */
+    public function isContactInOneOfStages(Lead $lead, array $stages = []): bool
+    {
+        if (empty($stages)) {
+            return false;
+        }
+
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('s.id')
+            ->from(MAUTIC_TABLE_PREFIX.'stages', 's');
+        $q->join('s', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.stage_id = s.id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('s.id', ':stageIds'),
+                    $q->expr()->eq('l.id', ':leadId')
+                )
+            )
+            ->setParameter('stageIds', $stages, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+            ->setParameter('leadId', $lead->getId());
+
+        return (bool) $q->execute()->fetchColumn();
     }
 
     /**

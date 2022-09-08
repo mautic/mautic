@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -266,11 +267,14 @@ trait FilterTrait
                 $choices = [];
                 if (!empty($field['properties']['list'])) {
                     $list    = $field['properties']['list'];
-                    $choices = ('boolean' === $fieldType)
-                        ?
-                        FormFieldHelper::parseBooleanList($list)
-                        :
-                        FormFieldHelper::parseList($list);
+                    $choices =
+                        ArrayHelper::flipArray(
+                            ('boolean' === $fieldType)
+                                ?
+                                FormFieldHelper::parseBooleanList($list)
+                                :
+                                FormFieldHelper::parseList($list)
+                        );
                 }
 
                 if ('select' === $fieldType) {
@@ -285,20 +289,18 @@ trait FilterTrait
                 $type                                       = ChoiceType::class;
             break;
             case 'lookup':
-                if ('number' !== $fieldType) {
-                    $attr = array_merge(
-                        $attr,
-                        [
-                            'data-toggle' => 'field-lookup',
-                            'data-target' => isset($data['field']) ? $data['field'] : '',
-                            'data-action' => 'lead:fieldList',
-                            'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
-                        ]
-                    );
+                $attr = array_merge(
+                    $attr,
+                    [
+                        'data-toggle' => 'field-lookup',
+                        'data-target' => isset($data['field']) ? $data['field'] : '',
+                        'data-action' => 'lead:fieldList',
+                        'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
+                    ]
+                );
 
-                    if (isset($field['properties']['list'])) {
-                        $attr['data-options'] = $field['properties']['list'];
-                    }
+                if (isset($field['properties']['list'])) {
+                    $attr['data-options'] = $field['properties']['list'];
                 }
 
                 break;

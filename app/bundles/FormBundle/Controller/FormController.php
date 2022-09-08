@@ -1169,7 +1169,6 @@ class FormController extends CommonFormController
                 'type'    => 'notice',
                 'msg'     => 'mautic.form.notice.batch_html_generated',
                 'msgVars' => [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ],
             ];

@@ -1574,7 +1574,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -1677,7 +1676,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -1774,7 +1772,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -1874,7 +1871,6 @@ class LeadController extends FormController
             $this->addFlash(
                 'mautic.lead.batch_leads_affected',
                 [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ]
             );
@@ -2041,5 +2037,37 @@ class LeadController extends FormController
         }
 
         return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']));
+    }
+
+    /**
+     * Loads a specific lead statistic info.
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function contactStatsAction(int $objectId)
+    {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model = $this->getModel('lead.lead');
+
+        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        $lead = $model->getEntity($objectId);
+
+        if (!$this->get('mautic.security')->hasEntityAccess(
+            'lead:leads:viewown',
+            'lead:leads:viewother',
+            $lead->getPermissionUser()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'emailStats' => $model->getLeadEmailStats($lead),
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Lead:lead_stats.html.php',
+            ]
+        );
     }
 }

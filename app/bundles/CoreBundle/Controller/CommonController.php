@@ -524,7 +524,7 @@ class CommonController extends Controller implements MauticController
     /**
      * Updates list filters, order, limit.
      *
-     * @param null $name
+     * @param string|null $name
      */
     protected function setListFilters($name = null)
     {
@@ -668,11 +668,11 @@ class CommonController extends Controller implements MauticController
             //message is already translated
             $translatedMessage = $message;
         } else {
-            if (isset($messageVars['pluralCount'])) {
-                $translatedMessage = $translator->transChoice($message, $messageVars['pluralCount'], $messageVars, $domain);
-            } else {
-                $translatedMessage = $translator->trans($message, $messageVars, $domain);
+            if (isset($messageVars['pluralCount']) && empty($messageVars['%count%'])) {
+                $messageVars['%count%'] = $messageVars['pluralCount'];
             }
+
+            $translatedMessage = $translator->trans($message, $messageVars, $domain);
         }
 
         if (null !== $title) {

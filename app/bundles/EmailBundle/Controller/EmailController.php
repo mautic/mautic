@@ -1208,16 +1208,15 @@ class EmailController extends FormController
                 $session->set('mautic.email.send.stats', $stats);
 
                 $status     = 'inprogress';
-                $batchlimit = $form['batchlimit']->getData();
 
                 $session->set('mautic.email.send.active', false);
             } else {
                 $stats      = $session->get('mautic.email.send.stats');
                 $progress   = $session->get('mautic.email.send.progress');
-                $batchlimit = 100;
                 $status     = (!empty($stats['failed'])) ? 'with_errors' : 'success';
             }
 
+            $batchlimit      = $this->coreParametersHelper->get('mailer_memory_msg_limit');
             $contentTemplate = 'MauticEmailBundle:Send:progress.html.php';
             $viewParameters  = [
                 'progress'   => $progress,

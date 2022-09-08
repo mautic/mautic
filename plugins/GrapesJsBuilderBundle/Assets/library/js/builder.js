@@ -16,6 +16,10 @@ import './grapesjs-custom.css';
  * @param actionName
  */
 function launchBuilderGrapesjs(formName) {
+  if (useBuilderForCodeMode() === false) {
+    return;
+  }
+
   const assets = AssetService.getAssets();
 
   const builder = new BuilderService(assets);
@@ -31,6 +35,22 @@ function launchBuilderGrapesjs(formName) {
 
   // Initialize GrapesJS
   builder.initGrapesJS(formName);
+}
+
+/**
+ * The user acknowledges the risk before editing an email or landing page created in Code Mode in the Builder
+ */
+function useBuilderForCodeMode() {
+  const theme = mQuery('.theme-selected').find('[data-theme]').attr('data-theme');
+  const isCodeMode = theme === 'mautic_code_mode';
+
+  if (isCodeMode) {
+    if (confirm(Mautic.translate('grapesjsbuilder.builder.warning.code_mode')) === false) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**
@@ -71,12 +91,34 @@ function setThemeHtml(theme) {
 }
 
 /**
+ * The textarea with the HTML source will be displayed if the code mode theme is selected
+ *
+ * @param theme
+ */
+function switchCustomHtml(theme) {
+  const customHtmlRow = mQuery('#custom-html-row');
+  const isPageMode = mQuery('[name="page"]').length !== 0;
+  const isCodeMode = theme === 'mautic_code_mode';
+  const advancedTab = isPageMode ? mQuery('#advanced-tab') : null;
+
+  if (isCodeMode === true) {
+    customHtmlRow.removeClass('hidden');
+    isPageMode && advancedTab.removeClass('hidden');
+  } else {
+    customHtmlRow.addClass('hidden');
+    isPageMode && advancedTab.addClass('hidden');
+  }
+}
+
+/**
  * Initialize original Mautic theme selection with grapejs specific modifications
  */
 function initSelectThemeGrapesjs(parentInitSelectTheme) {
   function childInitSelectTheme(themeField) {
     const builderUrl = mQuery('#builder_url');
     let url;
+
+    switchCustomHtml(themeField.val());
 
     // Replace Mautic URL by plugin URL
     if (builderUrl.length) {
@@ -91,6 +133,12 @@ function initSelectThemeGrapesjs(parentInitSelectTheme) {
 
     // Launch original Mautic.initSelectTheme function
     parentInitSelectTheme(themeField);
+
+    mQuery('[data-theme]').click((event) => {
+      const theme = mQuery(event.target).attr('data-theme');
+
+      switchCustomHtml(theme);
+    });
   }
   return childInitSelectTheme;
 }
