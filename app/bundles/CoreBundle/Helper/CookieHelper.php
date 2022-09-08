@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
-class CookieHelper
+class CookieHelper implements EventSubscriberInterface
 {
     private ?string $path;
     private ?string $domain;
@@ -16,6 +19,11 @@ class CookieHelper
     private bool $httponly;
     private RequestStack $requestStack;
     private ?Request $request = null;
+
+    /**
+     * @var array<string, Cookie>
+     */
+    private array $cookies = [];
 
     public function __construct(string $cookiePath, ?string $cookieDomain, bool $cookieSecure, bool $cookieHttp, RequestStack $requestStack)
     {
@@ -43,12 +51,8 @@ class CookieHelper
     /**
      * @param int|string|float|bool|object|null $value
      */
-    public function setCookie(string $name, $value, ?int $expire = 1800, ?string $path = null, ?string $domain = null, ?bool $secure = null, ?bool $httponly = null): ?string
+    public function setCookie(string $name, $value, ?int $expire = 1800, ?string $path = null, ?string $domain = null, ?bool $secure = null, ?bool $httponly = null): void
     {
-        if (null === $this->getRequest() || (defined('MAUTIC_TEST_ENV') && MAUTIC_TEST_ENV)) {
-            return null;
-        }
-
         if (null !== $value) {
             $value = (string) $value;
         }
@@ -65,9 +69,7 @@ class CookieHelper
             ($secure ?? $this->secure) ? Cookie::SAMESITE_LAX : null
         );
 
-        header('Set-Cookie: '.$cookie);
-
-        return (string) $cookie;
+        $this->cookies[$name] = $cookie;
     }
 
     /**
@@ -76,6 +78,20 @@ class CookieHelper
     public function deleteCookie(string $name, ?string $path = null, ?string $domain = null, ?bool $secure = null, ?bool $httponly = null): void
     {
         $this->setCookie($name, '', -86400, $path, $domain, $secure, $httponly);
+    }
+
+    public function onResponse(ResponseEvent $event): void
+    {
+        foreach ($this->cookies as $cookie) {
+            $event->getResponse()->headers->setCookie($cookie);
+        }
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::RESPONSE => 'onResponse',
+        ];
     }
 
     private function getRequest(): ?Request
