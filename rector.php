@@ -19,6 +19,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     );
 
     $rectorConfig->sets([
+        \Rector\Symfony\Set\SymfonySetList::SYMFONY_42,
         \Rector\Symfony\Set\SymfonySetList::SYMFONY_43,
         \Rector\Symfony\Set\SymfonySetList::SYMFONY_44,
 
