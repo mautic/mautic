@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\IdentifierFields;
@@ -31,7 +32,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FieldType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -45,7 +46,7 @@ class FieldType extends AbstractType
      */
     private $identifierFields;
 
-    public function __construct(EntityManagerInterface $em, TranslatorInterface $translator, IdentifierFields $identifierFields)
+    public function __construct(EntityManagerInterface $em, Translator $translator, IdentifierFields $identifierFields)
     {
         $this->em               = $em;
         $this->translator       = $translator;

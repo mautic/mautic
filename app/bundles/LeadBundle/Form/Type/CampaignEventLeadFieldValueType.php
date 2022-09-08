@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -17,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CampaignEventLeadFieldValueType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     protected $translator;
 
@@ -31,7 +32,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
      */
     protected $fieldModel;
 
-    public function __construct(TranslatorInterface $translator, LeadModel $leadModel, FieldModel $fieldModel)
+    public function __construct(Translator $translator, LeadModel $leadModel, FieldModel $fieldModel)
     {
         $this->translator = $translator;
         $this->leadModel  = $leadModel;
