@@ -2,12 +2,10 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 /**
  * Class BuildJsEvent.
  */
-class BuildJsEvent extends Event
+class BuildJsEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var string

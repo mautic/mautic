@@ -10,7 +10,6 @@ use Psr\Cache\InvalidArgumentException as Psr6CacheInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Cache\Simple\Psr6Cache;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -19,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 final class CacheProvider implements CacheProviderInterface
 {
     /**
-     * @var Psr6Cache
+     * @var \Symfony\Component\Cache\Psr16Cache
      */
     private $psr16;
 
@@ -54,10 +53,10 @@ final class CacheProvider implements CacheProviderInterface
         return $adaptor;
     }
 
-    public function getSimpleCache(): Psr6Cache
+    public function getSimpleCache(): \Symfony\Component\Cache\Psr16Cache
     {
         if (is_null($this->psr16)) {
-            $this->psr16 = new Psr6Cache($this->getCacheAdapter());
+            $this->psr16 = new \Symfony\Component\Cache\Psr16Cache($this->getCacheAdapter());
         }
 
         return $this->psr16;

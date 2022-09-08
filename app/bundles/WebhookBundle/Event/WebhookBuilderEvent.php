@@ -9,7 +9,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * Class WebhookBuilderEvent.
  */
-class WebhookBuilderEvent extends Event
+class WebhookBuilderEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var array

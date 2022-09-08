@@ -10,7 +10,7 @@ use Symfony\Component\Form\Form;
 /**
  * Class FormBuilderEvent.
  */
-class FormBuilderEvent extends Event
+class FormBuilderEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     use ComponentValidationTrait;
 

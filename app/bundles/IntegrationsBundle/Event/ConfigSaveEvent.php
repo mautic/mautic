@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Event;
 
 use Mautic\PluginBundle\Entity\Integration;
-use Symfony\Component\EventDispatcher\Event;
 
-class ConfigSaveEvent extends Event
+class ConfigSaveEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var Integration

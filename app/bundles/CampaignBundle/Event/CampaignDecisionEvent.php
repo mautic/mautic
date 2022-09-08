@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * @deprecated 2.13.0; to be removed in 3.0
  */
-class CampaignDecisionEvent extends Event
+class CampaignDecisionEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     protected $lead;
     protected $events;

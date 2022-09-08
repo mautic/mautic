@@ -22,7 +22,6 @@ use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -148,7 +147,7 @@ class CoreSubscriber implements EventSubscriberInterface
     /**
      * Add mauticForms in js script tag for Froala.
      */
-    public function onKernelRequestAddGlobalJS(FilterControllerEvent $event)
+    public function onKernelRequestAddGlobalJS(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
     {
         if (defined('MAUTIC_INSTALLER') || $this->userHelper->getUser()->isGuest() || !$event->isMasterRequest()) {
             return;
@@ -199,7 +198,7 @@ class CoreSubscriber implements EventSubscriberInterface
             //dispatch on login events
             if ($this->dispatcher->hasListeners(UserEvents::USER_LOGIN)) {
                 $loginEvent = new LoginEvent($this->userHelper->getUser());
-                $this->dispatcher->dispatch(UserEvents::USER_LOGIN, $loginEvent);
+                $this->dispatcher->dispatch($loginEvent, UserEvents::USER_LOGIN);
             }
         } else {
             $session->remove('mautic.user');
@@ -209,7 +208,7 @@ class CoreSubscriber implements EventSubscriberInterface
     /**
      * Populates namespace, bundle, controller, and action into request to be used throughout application.
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
     {
         $controller = $event->getController();
 

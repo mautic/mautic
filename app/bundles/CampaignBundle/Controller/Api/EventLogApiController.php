@@ -11,7 +11,6 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class EventLogApiController.
@@ -33,7 +32,7 @@ class EventLogApiController extends CommonApiController
     /** @var EventLogModel */
     protected $model;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
     {
         $this->model                    = $this->getModel('campaign.event_log');
         $this->entityClass              = 'Mautic\CampaignBundle\Entity\LeadEventLog';

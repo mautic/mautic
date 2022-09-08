@@ -9,7 +9,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * Class CampaignLeadChangeEvent.
  */
-class CampaignLeadChangeEvent extends Event
+class CampaignLeadChangeEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var Campaign

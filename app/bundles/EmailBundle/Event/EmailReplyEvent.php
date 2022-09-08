@@ -4,12 +4,11 @@ namespace Mautic\EmailBundle\Event;
 
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class EmailReplyEvent.
  */
-class EmailReplyEvent extends Event
+class EmailReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var Email

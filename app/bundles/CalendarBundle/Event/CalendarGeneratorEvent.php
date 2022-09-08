@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * Class CalendarGeneratorEvent.
  */
-class CalendarGeneratorEvent extends Event
+class CalendarGeneratorEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var array

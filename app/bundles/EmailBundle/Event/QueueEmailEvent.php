@@ -2,12 +2,10 @@
 
 namespace Mautic\EmailBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 /**
  * Class QueueEmailEvent.
  */
-class QueueEmailEvent extends Event
+class QueueEmailEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var \Swift_Message

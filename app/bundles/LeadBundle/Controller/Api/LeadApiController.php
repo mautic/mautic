@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class LeadApiController.
@@ -30,7 +29,7 @@ class LeadApiController extends CommonApiController
 
     const MODEL_ID = 'lead.lead';
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
     {
         $this->model            = $this->getModel(self::MODEL_ID);
         $this->entityClass      = Lead::class;

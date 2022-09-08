@@ -3,10 +3,9 @@
 namespace Mautic\SmsBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
 
-class ReplyEvent extends Event
+class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var Lead

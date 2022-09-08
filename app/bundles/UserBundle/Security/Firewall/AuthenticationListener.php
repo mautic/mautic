@@ -12,7 +12,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -84,7 +83,7 @@ class AuthenticationListener implements ListenerInterface
         $this->entityManager         = $entityManager;
     }
 
-    public function handle(GetResponseEvent $event)
+    public function handle(\Symfony\Component\HttpKernel\Event\RequestEvent $event)
     {
         if (null !== $this->tokenStorage->getToken()) {
             $this->setActivePermissionsOnAuthToken();
@@ -156,7 +155,7 @@ class AuthenticationListener implements ListenerInterface
 
         if (null !== $this->dispatcher) {
             $loginEvent = new InteractiveLoginEvent($request, $token);
-            $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
+            $this->dispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
         }
 
         if (null === $response) {

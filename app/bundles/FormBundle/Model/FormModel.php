@@ -22,7 +22,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -186,7 +185,7 @@ class FormModel extends CommonFormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -215,7 +214,7 @@ class FormModel extends CommonFormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -714,7 +713,7 @@ class FormModel extends CommonFormModel
         if (empty($customComponents)) {
             //build them
             $event = new FormBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(FormEvents::FORM_ON_BUILD, $event);
+            $this->dispatcher->dispatch($event, FormEvents::FORM_ON_BUILD);
             $customComponents['fields']     = $event->getFormFields();
             $customComponents['actions']    = $event->getSubmitActions();
             $customComponents['choices']    = $event->getSubmitActionGroups();

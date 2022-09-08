@@ -4,14 +4,13 @@ namespace MauticPlugin\MauticFocusBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class FocusApiController.
  */
 class FocusApiController extends CommonApiController
 {
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
     {
         parent::initialize($event);
 

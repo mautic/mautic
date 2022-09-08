@@ -8,7 +8,6 @@ use Mautic\FormBundle\Event\FormFieldEvent;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -169,11 +168,11 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * @return FormFieldEvent|Event|void|null
+     * @return FormFieldEvent|\Symfony\Contracts\EventDispatcher\Event|void|null
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
     {
         if (!$entity instanceof Field) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -201,7 +200,7 @@ class FieldModel extends CommonFormModel
                 $event = new FormFieldEvent($entity, $isNew);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -11,7 +10,7 @@ trigger_deprecation('mautic/core', '4.3', 'The "%s" class is deprecated, will be
 /**
  * @deprecated since M4, will be removed in M5 because it's not used
  */
-class CustomFormEvent extends Event
+class CustomFormEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var string

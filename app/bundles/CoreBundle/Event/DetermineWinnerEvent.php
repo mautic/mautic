@@ -2,9 +2,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
-class DetermineWinnerEvent extends Event
+class DetermineWinnerEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var array{

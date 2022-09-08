@@ -9,14 +9,13 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class WidgetApiController.
  */
 class WidgetApiController extends CommonApiController
 {
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
     {
         $this->model            = $this->getModel('dashboard');
         $this->entityClass      = 'Mautic\DashboardBundle\Entity\Widget';
@@ -37,7 +36,7 @@ class WidgetApiController extends CommonApiController
         $dispatcher = $this->dispatcher;
         $event      = new WidgetTypeListEvent();
         $event->setTranslator($this->get('translator'));
-        $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
+        $dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE);
         $view = $this->view(['success' => 1, 'types' => $event->getTypes()], Response::HTTP_OK);
 
         return $this->handleView($view);

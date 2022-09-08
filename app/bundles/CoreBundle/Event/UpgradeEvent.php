@@ -2,12 +2,10 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 /**
  * Class BuilderEvent.
  */
-class UpgradeEvent extends Event
+class UpgradeEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var array

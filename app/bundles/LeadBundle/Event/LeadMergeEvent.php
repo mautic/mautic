@@ -3,12 +3,11 @@
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class LeadEvent.
  */
-class LeadMergeEvent extends Event
+class LeadMergeEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     private $victor;
 

@@ -2,12 +2,10 @@
 
 namespace Mautic\PageBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 /**
  * Class UntrackableUrlsEvent.
  */
-class UntrackableUrlsEvent extends Event
+class UntrackableUrlsEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var array

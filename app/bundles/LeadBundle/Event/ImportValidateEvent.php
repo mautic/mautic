@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Event;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\Form;
 
-class ImportValidateEvent extends Event
+class ImportValidateEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     private string $routeObjectName;
     private Form $form;

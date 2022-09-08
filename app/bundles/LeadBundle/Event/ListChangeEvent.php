@@ -4,12 +4,11 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class ListChangeEvent.
  */
-class ListChangeEvent extends Event
+class ListChangeEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     private $lead;
     private $leads;

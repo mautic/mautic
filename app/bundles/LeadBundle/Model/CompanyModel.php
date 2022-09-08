@@ -20,7 +20,6 @@ use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Form\Type\CompanyType;
 use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -419,7 +418,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         if (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE))) {
             foreach ($dispatchEvents as $companyId) {
                 $event = new LeadChangeCompanyEvent($lead, $companyLeadAdd[$companyId]);
-                $this->dispatcher->dispatch(LeadEvents::LEAD_COMPANY_CHANGE, $event);
+                $this->dispatcher->dispatch($event, LeadEvents::LEAD_COMPANY_CHANGE);
 
                 unset($event);
             }
@@ -537,7 +536,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         if (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE))) {
             foreach ($dispatchEvents as $companyId) {
                 $event = new LeadChangeCompanyEvent($lead, $companyLeadRemove[$companyId], false);
-                $this->dispatcher->dispatch(LeadEvents::LEAD_COMPANY_CHANGE, $event);
+                $this->dispatcher->dispatch($event, LeadEvents::LEAD_COMPANY_CHANGE);
 
                 unset($event);
             }
@@ -611,7 +610,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
     {
         if (!$entity instanceof Company) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -640,7 +639,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

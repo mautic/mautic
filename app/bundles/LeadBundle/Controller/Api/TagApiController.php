@@ -4,11 +4,10 @@ namespace Mautic\LeadBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Entity\Tag;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class TagApiController extends CommonApiController
 {
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
     {
         $this->model           = $this->getModel('lead.tag');
         $this->entityClass     = Tag::class;

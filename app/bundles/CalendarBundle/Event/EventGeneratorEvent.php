@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * Class EventGeneratorEvent.
  */
-class EventGeneratorEvent extends Event
+class EventGeneratorEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var string

@@ -8,7 +8,6 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class CompanyApiController.
@@ -18,7 +17,7 @@ class CompanyApiController extends CommonApiController
     use CustomFieldsApiControllerTrait;
     use LeadAccessTrait;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
     {
         $this->model              = $this->getModel('lead.company');
         $this->entityClass        = Company::class;

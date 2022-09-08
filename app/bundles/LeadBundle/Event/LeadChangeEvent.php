@@ -3,9 +3,8 @@
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
 
-class LeadChangeEvent extends Event
+class LeadChangeEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var Lead

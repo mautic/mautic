@@ -9,7 +9,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * Class StageBuilderEvent.
  */
-class StageBuilderEvent extends Event
+class StageBuilderEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var array

@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Symfony\Component\EventDispatcher\Event;
 
-final class SegmentOperatorQueryBuilderEvent extends Event
+final class SegmentOperatorQueryBuilderEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     private QueryBuilder $queryBuilder;
 

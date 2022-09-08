@@ -6,9 +6,8 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
 
-final class DoNotContactAddEvent extends Event
+final class DoNotContactAddEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     public const ADD_DONOT_CONTACT = 'mautic.lead.add_donot_contact';
 

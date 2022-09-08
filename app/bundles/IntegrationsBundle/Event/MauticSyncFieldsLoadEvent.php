@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
-class MauticSyncFieldsLoadEvent extends Event
+class MauticSyncFieldsLoadEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var array

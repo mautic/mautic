@@ -9,7 +9,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 /**
  * Class BuilderEvent.
  */
-class BuilderEvent extends Event
+class BuilderEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     protected $slotTypes            = [];
     protected $sections             = [];

@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Mautic\DynamicContentBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
 
-final class ContactFiltersEvaluateEvent extends Event
+final class ContactFiltersEvaluateEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var mixed[]

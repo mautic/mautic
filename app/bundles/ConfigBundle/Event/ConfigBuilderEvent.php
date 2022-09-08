@@ -3,9 +3,8 @@
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Helper\BundleHelper;
-use Symfony\Component\EventDispatcher\Event;
 
-class ConfigBuilderEvent extends Event
+class ConfigBuilderEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var array

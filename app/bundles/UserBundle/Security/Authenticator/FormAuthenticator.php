@@ -82,7 +82,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
             if ($this->dispatcher->hasListeners(UserEvents::USER_FORM_AUTHENTICATION)) {
                 $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, ['sso_form'], false, null, true);
                 $authEvent    = new AuthenticationEvent($user, $token, $userProvider, $this->requestStack->getCurrentRequest(), false, $authenticatingService, $integrations);
-                $this->dispatcher->dispatch(UserEvents::USER_FORM_AUTHENTICATION, $authEvent);
+                $this->dispatcher->dispatch($authEvent, UserEvents::USER_FORM_AUTHENTICATION);
 
                 if ($authenticated = $authEvent->isAuthenticated()) {
                     $user                  = $authEvent->getUser();

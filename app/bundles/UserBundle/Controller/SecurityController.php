@@ -4,7 +4,6 @@ namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\Security\Core\Exception as Exception;
 use Symfony\Component\Security\Core\Security;
 
@@ -16,7 +15,7 @@ class SecurityController extends CommonController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
     {
         /** @var \Symfony\Component\Security\Core\Authorization\AuthorizationChecker $authChecker */
         $authChecker = $this->get('security.authorization_checker');

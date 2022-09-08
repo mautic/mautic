@@ -3,12 +3,11 @@
 namespace Mautic\PageBundle\Event;
 
 use Mautic\PageBundle\Entity\Page;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class PageDisplayEvent.
  */
-class PageDisplayEvent extends Event
+class PageDisplayEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var string

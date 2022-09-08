@@ -9,7 +9,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * Event that collects operators for different field types.
  */
-final class TypeOperatorsEvent extends Event
+final class TypeOperatorsEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var array<string,mixed[]>

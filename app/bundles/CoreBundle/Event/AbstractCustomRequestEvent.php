@@ -2,10 +2,9 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 
-abstract class AbstractCustomRequestEvent extends Event
+abstract class AbstractCustomRequestEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var Request

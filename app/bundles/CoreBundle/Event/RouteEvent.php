@@ -3,10 +3,9 @@
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Component\Config\Loader\Loader;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Routing\RouteCollection;
 
-class RouteEvent extends Event
+class RouteEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var Loader

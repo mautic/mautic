@@ -3,13 +3,12 @@
 namespace Mautic\UserBundle\Event;
 
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class LogoutEvent.
  */
-class LogoutEvent extends Event
+class LogoutEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var User

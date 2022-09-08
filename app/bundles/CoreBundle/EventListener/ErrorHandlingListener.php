@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\EventListener;
 use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class ErrorHandlingListener implements EventSubscriberInterface
@@ -33,7 +32,7 @@ class ErrorHandlingListener implements EventSubscriberInterface
             ->setDebugLogger($debugLogger);
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(\Symfony\Component\HttpKernel\Event\RequestEvent $event)
     {
         // Do nothing.  Just want symfony to call the class to set the error handling functions
     }

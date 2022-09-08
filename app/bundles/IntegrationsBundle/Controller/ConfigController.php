@@ -140,7 +140,7 @@ class ConfigController extends AbstractFormController
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->get('event_dispatcher');
         $configEvent     = new ConfigSaveEvent($this->integrationConfiguration);
-        $eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE, $configEvent);
+        $eventDispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE);
 
         // Show the form if there are errors and the plugin is published or the authorized button was clicked
         $integrationDetailsPost = $this->request->request->get('integration_details', []);
@@ -153,7 +153,7 @@ class ConfigController extends AbstractFormController
         $this->integrationsHelper->saveIntegrationConfiguration($this->integrationConfiguration);
 
         // Dispatch after save event
-        $eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_CONFIG_AFTER_SAVE, $configEvent);
+        $eventDispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_AFTER_SAVE);
 
         // Show the form if the apply button was clicked
         if ($this->isFormApplied($this->form)) {

@@ -3,12 +3,11 @@
 namespace Mautic\ChannelBundle\Event;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class ChannelBroadcastEvent.
  */
-class ChannelBroadcastEvent extends Event
+class ChannelBroadcastEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * Specific channel.

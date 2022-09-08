@@ -3,12 +3,11 @@
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class CustomAssetsEvent.
  */
-class CustomAssetsEvent extends Event
+class CustomAssetsEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var AssetsHelper

@@ -14,11 +14,10 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
-class TrackingEvent extends Event
+class TrackingEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var Lead

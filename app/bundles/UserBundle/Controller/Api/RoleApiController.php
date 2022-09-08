@@ -3,7 +3,6 @@
 namespace Mautic\UserBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class RoleApiController.
@@ -13,7 +12,7 @@ class RoleApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
     {
         $this->model            = $this->getModel('user.role');
         $this->entityClass      = 'Mautic\UserBundle\Entity\Role';

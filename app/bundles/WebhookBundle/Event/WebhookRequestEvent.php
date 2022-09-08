@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Mautic\WebhookBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
 
-class WebhookRequestEvent extends Event
+class WebhookRequestEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var string

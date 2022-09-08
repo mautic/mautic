@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Field\Event;
 
 use Mautic\LeadBundle\Entity\LeadField;
-use Symfony\Component\EventDispatcher\Event;
 
-final class AddColumnBackgroundEvent extends Event
+final class AddColumnBackgroundEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var LeadField

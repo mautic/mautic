@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Segment\OperatorOptions;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormInterface;
 
-final class FormAdjustmentEvent extends Event
+final class FormAdjustmentEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var FormInterface<FormInterface>

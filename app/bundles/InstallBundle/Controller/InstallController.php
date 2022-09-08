@@ -10,7 +10,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class InstallController extends CommonController
 {
@@ -23,7 +22,7 @@ class InstallController extends CommonController
     /**
      * Initialize controller.
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
     {
         $this->configurator = $this->container->get('mautic.configurator');
         $this->installer    = $this->container->get('mautic.install.service');

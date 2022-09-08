@@ -3,9 +3,8 @@
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
 
-class ContactIdentificationEvent extends Event
+class ContactIdentificationEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var array

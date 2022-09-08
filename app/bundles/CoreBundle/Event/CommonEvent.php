@@ -8,7 +8,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * Class CommonEvent.
  */
-class CommonEvent extends Event
+class CommonEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var \Doctrine\ORM\EntityManager

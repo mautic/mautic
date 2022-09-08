@@ -197,7 +197,7 @@ class TriggerModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -225,7 +225,7 @@ class TriggerModel extends CommonFormModel
                 $event = new Events\TriggerEvent($entity, $isNew);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }
@@ -280,7 +280,7 @@ class TriggerModel extends CommonFormModel
             //build them
             $events = [];
             $event  = new Events\TriggerBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(PointEvents::TRIGGER_ON_BUILD, $event);
+            $this->dispatcher->dispatch($event, PointEvents::TRIGGER_ON_BUILD);
             $events = $event->getEvents();
         }
 

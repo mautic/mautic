@@ -337,9 +337,9 @@ class FormModel extends AbstractCommonModel
      * @param object $entity
      * @param bool   $isNew
      *
-     * @return Event|null
+     * @return \Symfony\Contracts\EventDispatcher\Event|null
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
     {
         //...
 

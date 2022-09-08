@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\EventListener;
 use LightSaml\Error\LightSamlException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener as KernelExceptionListener;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -38,9 +37,9 @@ class ExceptionListener extends KernelExceptionListener
         $this->router = $router;
     }
 
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(\Symfony\Component\HttpKernel\Event\ExceptionEvent $event)
     {
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
 
         if ($exception instanceof LightSamlException) {
             // Redirect to login page with message
@@ -60,7 +59,7 @@ class ExceptionListener extends KernelExceptionListener
             $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
         }
 
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
         $request   = $event->getRequest();
         $request   = $this->duplicateRequest($exception, $request);
         try {

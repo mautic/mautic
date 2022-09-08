@@ -5,7 +5,6 @@ namespace Mautic\StageBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class PointApiController.
@@ -17,7 +16,7 @@ class StageApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
     {
         $this->model            = $this->getModel('stage');
         $this->entityClass      = 'Mautic\StageBundle\Entity\Stage';

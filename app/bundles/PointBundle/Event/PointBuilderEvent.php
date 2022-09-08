@@ -6,7 +6,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class PointBuilderEvent extends Event
+class PointBuilderEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var array

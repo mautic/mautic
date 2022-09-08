@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Event;
 
 use Mautic\FormBundle\Entity\Field;
-use Symfony\Component\EventDispatcher\Event;
 
-final class FormFieldEvent extends Event
+final class FormFieldEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var Field

@@ -12,7 +12,6 @@ use Mautic\StageBundle\Event\StageBuilderEvent;
 use Mautic\StageBundle\Event\StageEvent;
 use Mautic\StageBundle\Form\Type\StageType;
 use Mautic\StageBundle\StageEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -97,7 +96,7 @@ class StageModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
     {
         if (!$entity instanceof Stage) {
             throw new MethodNotAllowedHttpException(['Stage']);
@@ -126,7 +125,7 @@ class StageModel extends CommonFormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }
@@ -147,7 +146,7 @@ class StageModel extends CommonFormModel
             //build them
             $actions = [];
             $event   = new StageBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(StageEvents::STAGE_ON_BUILD, $event);
+            $this->dispatcher->dispatch($event, StageEvents::STAGE_ON_BUILD);
             $actions['actions'] = $event->getActions();
             $actions['list']    = $event->getActionList();
             $actions['choices'] = $event->getActionChoices();

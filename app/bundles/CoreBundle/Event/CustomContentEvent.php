@@ -2,9 +2,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
-class CustomContentEvent extends Event
+class CustomContentEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var string

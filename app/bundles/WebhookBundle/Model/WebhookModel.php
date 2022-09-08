@@ -22,7 +22,6 @@ use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\Form\Type\WebhookType;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\WebhookEvents;
-use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -198,7 +197,7 @@ class WebhookModel extends FormModel
             //build them
             $events = [];
             $event  = new Events\WebhookBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_ON_BUILD, $event);
+            $this->dispatcher->dispatch($event, WebhookEvents::WEBHOOK_ON_BUILD);
             $events = $event->getEvents();
         }
 
@@ -277,7 +276,7 @@ class WebhookModel extends FormModel
         // fire events for when the queues are created
         if ($this->dispatcher->hasListeners(WebhookEvents::WEBHOOK_QUEUE_ON_ADD)) {
             $webhookQueueEvent = $event = new Events\WebhookQueueEvent($queue, $webhook, true);
-            $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_QUEUE_ON_ADD, $webhookQueueEvent);
+            $this->dispatcher->dispatch($webhookQueueEvent, WebhookEvents::WEBHOOK_QUEUE_ON_ADD);
         }
 
         return $queue;
@@ -416,7 +415,7 @@ class WebhookModel extends FormModel
         $this->saveEntity($webhook);
 
         $event = new WebhookEvent($webhook, false, $reason);
-        $this->eventDispatcher->dispatch(WebhookEvents::WEBHOOK_KILL, $event);
+        $this->eventDispatcher->dispatch($event, WebhookEvents::WEBHOOK_KILL);
     }
 
     /**
@@ -580,7 +579,7 @@ class WebhookModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, SymfonyEvent $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
     {
         if (!$entity instanceof Webhook) {
             throw new MethodNotAllowedHttpException(['Webhook'], 'Entity must be of class Webhook()');
@@ -608,7 +607,7 @@ class WebhookModel extends FormModel
                 $event = new WebhookEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

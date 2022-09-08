@@ -271,11 +271,11 @@ class PluginController extends FormController
                         //redirect to the oauth URL
                         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
                         $event = $this->dispatcher->dispatch(
-                            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT,
                             new PluginIntegrationAuthRedirectEvent(
                                 $integrationObject,
                                 $integrationObject->getAuthLoginUrl()
-                            )
+                            ),
+                            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT
                         );
                         $oauthUrl = $event->getAuthUrl();
 

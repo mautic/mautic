@@ -10,7 +10,6 @@ use Mautic\ChannelBundle\Form\Type\MessageType;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -273,7 +272,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
     {
         if (!$entity instanceof Message) {
             throw new MethodNotAllowedHttpException(['Message']);
@@ -300,7 +299,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
             if (empty($event)) {
                 $event = new MessageEvent($entity, $isNew);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }

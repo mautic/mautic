@@ -2,12 +2,10 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 /**
  * Class GlobalSearchEvent.
  */
-class GlobalSearchEvent extends Event
+class GlobalSearchEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var array

@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
 
-final class DoNotContactRemoveEvent extends Event
+final class DoNotContactRemoveEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     public const REMOVE_DONOT_CONTACT = 'mautic.lead.remove_donot_contact';
 

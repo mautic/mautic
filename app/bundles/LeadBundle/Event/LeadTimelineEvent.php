@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
-class LeadTimelineEvent extends Event
+class LeadTimelineEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * Container with all filtered events.

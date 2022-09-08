@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 /**
  * Class AuthenticationEvent.
  */
-class AuthenticationEvent extends Event
+class AuthenticationEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var Response

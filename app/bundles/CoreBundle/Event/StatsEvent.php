@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\Event;
  * Class StatsEvent.
  * Used to get statistical data from subscribed tables.
  */
-class StatsEvent extends Event
+class StatsEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * Database table containing statistical data available to get the results from.

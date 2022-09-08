@@ -3,12 +3,11 @@
 namespace Mautic\UserBundle\Event;
 
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class LoginEvent.
  */
-class LoginEvent extends Event
+class LoginEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var User

@@ -124,7 +124,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 }
 
                 $iconEvent = new IconEvent($this->security);
-                $this->dispatcher->dispatch(CoreEvents::FETCH_ICONS, $iconEvent);
+                $this->dispatcher->dispatch($iconEvent, CoreEvents::FETCH_ICONS);
                 $event->setTemplateData(['logs' => $logs, 'icons' => $iconEvent->getIcons()]);
             }
 

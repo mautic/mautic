@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Event triggered when a transport service send Mautic a webhook request.
  */
-class TransportWebhookEvent extends Event
+class TransportWebhookEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var CallbackTransportInterface

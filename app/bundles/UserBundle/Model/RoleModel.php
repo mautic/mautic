@@ -7,7 +7,6 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Form\Type\RoleType;
 use Mautic\UserBundle\UserEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 
@@ -130,7 +129,7 @@ class RoleModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
@@ -158,7 +157,7 @@ class RoleModel extends FormModel
                 $event = new RoleEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }

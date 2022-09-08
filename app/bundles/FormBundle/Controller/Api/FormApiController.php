@@ -7,7 +7,6 @@ use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class FormApiController.
@@ -17,7 +16,7 @@ class FormApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
     {
         $this->model            = $this->getModel('form');
         $this->entityClass      = 'Mautic\FormBundle\Entity\Form';

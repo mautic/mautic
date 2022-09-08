@@ -3,12 +3,11 @@
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class IconEvent.
  */
-class IconEvent extends Event
+class IconEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var array
