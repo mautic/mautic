@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\Tests\Helper;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -16,7 +17,7 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $translatorMock = $this->getMockBuilder(TranslatorInterface::class)
+        $translatorMock = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
             ->getMock();
 

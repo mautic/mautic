@@ -2,7 +2,6 @@
 
 namespace Mautic\FormBundle\Helper;
 
-use Mautic\CoreBundle\Exception\UnexpectedTypeException;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
@@ -77,12 +76,8 @@ class FormFieldHelper extends AbstractFormFieldHelper
      *
      * @param ValidatorInterface $validator
      */
-    public function __construct(TranslatorInterface $translator, ValidatorInterface $validator = null)
+    public function __construct(Translator $translator, ValidatorInterface $validator = null)
     {
-        if (!$translator instanceof Translator) {
-            throw new UnexpectedTypeException($translator, Translator::class);
-        }
-
         $this->translator = $translator;
 
         if (null === $validator) {
