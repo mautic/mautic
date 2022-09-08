@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use Rector\Symfony\Set\SymfonySetList;
+
 return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->paths([__DIR__.'/app/bundles', __DIR__.'/plugins']);
+    $rectorConfig->symfonyContainerXml(__DIR__.'/var/cache/dev/appAppKernelDevDebugContainer.xml');
     $rectorConfig->skip(
         [
             __DIR__.'/*/test/*',
@@ -19,6 +22,10 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what rule sets will be applied
     // $rectorConfig->sets([\Rector\Set\ValueObject\SetList::DEAD_CODE]); // @todo implement the whole set. Start rule by rule bellow.
+
+    $rectorConfig->sets([
+        SymfonySetList::SYMFONY_44,
+    ]);
 
     // Define what signle rules will be applied
     $rectorConfig->rule(\Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector::class);
