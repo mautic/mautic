@@ -17726,11 +17726,6 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/ThemeHelper.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/ThemeHelper.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\TrackingPixelHelper\\:\\:sendResponse\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Helper/TrackingPixelHelper.php
@@ -66264,11 +66259,6 @@ parameters:
 			message: "#^Right side of && is always true\\.$#"
 			count: 1
 			path: app/bundles/UserBundle/Entity/User.php
-
-		-
-			message: "#^Method Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\ExpressionBuilder\\:\\:orX\\(\\) invoked with 2 parameters, 0\\-1 required\\.$#"
-			count: 1
-			path: app/bundles/UserBundle/Entity/UserRepository.php
 
 		-
 			message: "#^Method Mautic\\\\UserBundle\\\\Entity\\\\UserRepository\\:\\:addCatchAllWhereClause\\(\\) has parameter \\$filter with no type specified\\.$#"
