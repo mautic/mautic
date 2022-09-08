@@ -286,7 +286,7 @@ class UserRepository extends CommonRepository
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
                 case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->like('u.firstName', ':'.$unique),
                     $q->expr()->like('u.lastName', ':'.$unique)
                 );
