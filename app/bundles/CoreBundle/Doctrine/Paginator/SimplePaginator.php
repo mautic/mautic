@@ -13,6 +13,8 @@ use IteratorAggregate;
 /**
  * This is a fast paginator (unlike \Doctrine\ORM\Tools\Pagination\Paginator) that can handle simple queries using no joins or ManyToOne joins.
  * Do not use it if the $query uses oneToMany/ManyToMany joins or other complex parts (use \Doctrine\ORM\Tools\Pagination\Paginator instead).
+ *
+ * @implements IteratorAggregate<mixed>
  */
 class SimplePaginator implements IteratorAggregate, Countable
 {
