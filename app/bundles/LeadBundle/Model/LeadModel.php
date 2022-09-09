@@ -18,6 +18,8 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
@@ -2451,5 +2453,16 @@ class LeadModel extends FormModel
     public function getAvailableLeadFields(): array
     {
         return $this->availableLeadFields;
+    }
+
+    /**
+     * @return array<string, int|float>
+     */
+    public function getLeadEmailStats(Lead $lead): array
+    {
+        /** @var StatRepository $statRepository */
+        $statRepository = $this->em->getRepository(Stat::class);
+
+        return $statRepository->getStatsSummaryForContacts([$lead->getId()])[$lead->getId()];
     }
 }

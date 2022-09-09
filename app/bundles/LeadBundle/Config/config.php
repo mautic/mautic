@@ -136,6 +136,10 @@ return [
                 'path'       => '/segment/view/{objectId}/contact/{page}',
                 'controller' => 'MauticLeadBundle:List:contacts',
             ],
+            'mautic_contact_stats' => [
+                'path'       => '/contacts/view/{objectId}/stats',
+                'controller' => 'MauticLeadBundle:Lead:contactStats',
+            ],
         ],
         'api' => [
             'mautic_api_contactsstandard' => [
