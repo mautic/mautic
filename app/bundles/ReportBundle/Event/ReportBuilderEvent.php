@@ -123,14 +123,23 @@ class ReportBuilderEvent extends AbstractReportEvent
                 }
             );
         }
-
-        $this->tableArray[$context] = $data;
-
-        if ($this->context == $context) {
-            $this->stopPropagation();
+        if (isset($this->tableArray[$context])) {
+            unset($data['group']);
+            $this->tableArray[$context] = array_merge_recursive($this->tableArray[$context], $data);
+        } else {
+            $this->tableArray[$context] = $data;
         }
 
         return $this;
+    }
+
+    /**
+     * @param string            $context
+     * @param array<int|string> $data
+     */
+    public function appendToTable($context, array $data): void
+    {
+        $this->addTable($context, $data);
     }
 
     /**
