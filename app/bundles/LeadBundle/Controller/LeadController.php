@@ -1394,9 +1394,47 @@ class LeadController extends FormController
                             empty($email['fromname']) ? null : $email['fromname']
                         );
 
+                        // Attachments
+                        $assets = [];
+                        $assetsIds  = (!empty($email['assetAttachments'])) ? $email['assetAttachments'] : [];
+                        foreach($assetsIds as $assetId) {
+                            $model = $this->factory->getModel('asset');
+                            $asset = $model->getEntity($assetId);
+                            if ($asset->isPublished()) {
+                                $asset->setUploadDir($this->factory->getParameter('upload_dir'));
+                                $assets[$asset->getId()] = $asset;
+                            }
+                        }
+
+                        if (!empty($assets)) {
+                            foreach ($assets as $asset) {
+                                if(is_file($asset->getFilePath())) {
+                                    $mailer->message->attach(\Swift_Attachment::fromPath(
+                                        $asset->getFilePath(),
+                                        $asset->getMime()
+                                    )->setFilename($asset->getOriginalFileName()));
+                                }
+                            }
+                        }
+
+
+                        if(isset($email['attachments']) && !empty($email['attachments'])) {
+                            foreach($email['attachments'] as $attachment) {
+                                $identifier = time();
+                                $attachment->move($this->get('kernel')->getRootDir() . "/../media/attachments", $identifier . "-" . $attachment->getClientOriginalName());
+                                $mailer->message->attach(\Swift_Attachment::fromPath(
+                                    $this->get('kernel')->getRootDir() . "/../media/attachments/" . $identifier . "-" . $attachment->getClientOriginalName()
+                                )->setFilename($attachment->getClientOriginalName()));
+                            }
+                        }
+
                         // Set Content
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
+
+                        // Set BCC/CC
+                        $mailer->setBcc($email['bcc']);
+                        $mailer->setCc($email['cc']);
 
                         // Set lead
                         $mailer->setLead($leadFields);
