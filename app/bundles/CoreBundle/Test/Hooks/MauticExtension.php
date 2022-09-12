@@ -39,13 +39,15 @@ class MauticExtension implements AfterTestHook, BeforeFirstTestHook
         }
     }
 
+    /**
+     * To set a custom table prefix clear test cache and run.
+     *
+     * Example usage: `MAUTIC_TEST_PREFIX='custom_prefix_' php bin/phpunit`
+     */
     public function executeBeforeFirstTest(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            $x      = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            $prefix = substr(str_shuffle(str_repeat($x, (int) ceil(4 / strlen($x)))), 1, 4).'_';
-            define('MAUTIC_TABLE_PREFIX', 'prefix'.$prefix);
-            echo 'using db prefix '.$prefix.PHP_EOL;
-        }
+        $prefix = false === getenv('MAUTIC_TEST_PREFIX') ? 'test_' : getenv('MAUTIC_TEST_PREFIX');
+        define('MAUTIC_TABLE_PREFIX', $prefix);
+        echo 'using db prefix "'.$prefix.'"'.PHP_EOL;
     }
 }
