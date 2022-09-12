@@ -346,7 +346,7 @@ class UserModel extends FormModel
         $mailer = $this->mailHelper->getMailer();
         $mailer->setTo($email);
         $mailer->setSubject($this->translator->trans('mautic.email.user.new_user.subject'));
-        $text = $this->translator->trans('mautic.email.user.new_user.body', ['%username%' => $username, '%password%' => $password, '%link%' => $_SERVER['SERVER_NAME']]);
+        $text = $this->translator->trans('mautic.email.user.new_user.body', ['%username%' => $username, '%password%' => $password, '%link%' => $_SERVER['SERVER_NAME'].'/s/login']);
         $mailer->setBody($text);
         $mailer->send();
     }
