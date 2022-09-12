@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 trait TimelineEventLogTrait
 {

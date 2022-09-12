@@ -51,7 +51,7 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
     private $dispatcher;
 
     /**
-     * @var Translator|MockObject
+     * @var TranslatorInterface|MockObject
      */
     private $translator;
 

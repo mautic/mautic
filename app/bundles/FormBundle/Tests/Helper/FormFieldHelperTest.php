@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
