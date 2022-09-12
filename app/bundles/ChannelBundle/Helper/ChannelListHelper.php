@@ -7,7 +7,6 @@ use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChannelListHelper extends Helper
 {

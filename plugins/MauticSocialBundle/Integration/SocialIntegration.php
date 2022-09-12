@@ -55,7 +55,7 @@ abstract class SocialIntegration extends AbstractIntegration
         IntegrationHelper $integrationHelper
     ) {
         $this->integrationHelper = $integrationHelper;
-        $this->mauticTranslator = $mauticTranslator;
+        $this->mauticTranslator  = $mauticTranslator;
 
         parent::__construct(
             $eventDispatcher,

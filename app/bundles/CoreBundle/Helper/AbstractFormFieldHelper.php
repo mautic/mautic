@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Helper\ListParser\JsonListParser;
 use Mautic\CoreBundle\Helper\ListParser\ListParserInterface;
 use Mautic\CoreBundle\Helper\ListParser\ValueListParser;
 use Mautic\CoreBundle\Translation\Translator;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractFormFieldHelper
 {

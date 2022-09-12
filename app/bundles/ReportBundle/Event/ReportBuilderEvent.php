@@ -89,7 +89,7 @@ class ReportBuilderEvent extends AbstractReportEvent
         $data['group'] = (null == $group) ? $context : $group;
 
         foreach ($data['columns'] as $column => &$d) {
-            $d['label'] = $this->translator->trans($d['label']);
+            $d['label'] = null !== $d['label'] ? $this->translator->trans($d['label']) : '';
             if (!isset($d['alias'])) {
                 $d['alias'] = substr(
                     $column,
