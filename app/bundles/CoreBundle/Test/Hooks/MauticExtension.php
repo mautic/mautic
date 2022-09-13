@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Test\Hooks;
 
+use Mautic\CoreBundle\Test\EnvLoader;
 use PHPUnit\Framework\TestFailure;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Runner\AfterTestHook;
@@ -42,11 +43,12 @@ class MauticExtension implements AfterTestHook, BeforeFirstTestHook
     /**
      * To set a custom table prefix clear test cache and run.
      *
-     * Example usage: `MAUTIC_TEST_PREFIX='custom_prefix_' php bin/phpunit`
+     * Example usage: `MAUTIC_DB_PREFIX='custom_prefix_' php bin/phpunit`
      */
     public function executeBeforeFirstTest(): void
     {
-        $prefix = false === getenv('MAUTIC_TEST_PREFIX') ? 'test_' : getenv('MAUTIC_TEST_PREFIX');
+        EnvLoader::load();
+        $prefix = false === getenv('MAUTIC_DB_PREFIX') ? 'test_' : getenv('MAUTIC_DB_PREFIX');
         define('MAUTIC_TABLE_PREFIX', $prefix);
         echo 'using db prefix "'.$prefix.'"'.PHP_EOL;
     }
