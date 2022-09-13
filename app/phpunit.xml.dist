@@ -32,6 +32,7 @@
       <directory>./../plugins/*Bundle/Views</directory>
       <directory>middlewares/Tests</directory>
       <directory>bundles/CoreBundle/Test</directory>
+      <directory>bundles/EmailBundle/Tests/Entity</directory>
     </exclude>
   </coverage>
   <testsuites>
