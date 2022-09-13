@@ -75,6 +75,24 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'preferences_center_success_message',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.email.config.preferences_center_success_message',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                ],
+                'required'   => false,
+                'data'       => (array_key_exists('preferences_center_success_message', $options['data']) && !empty($options['data']['preferences_center_success_message']))
+                    ? $options['data']['preferences_center_success_message']
+                    : $this->translator->trans(
+                        'mautic.email.preferences_center_success_message.text'
+                    ),
+            ]
+        );
+
+        $builder->add(
             'webview_text',
             TextareaType::class,
             [

@@ -8,12 +8,14 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\Lead;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
         $this->configParams['show_contact_preferences'] = 1;
+
         parent::setUp();
     }
 
@@ -28,6 +30,20 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
         self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), $crawler->filter('form')->eq(0)->attr('action'));
+        $this->assertTrue($this->client->getResponse()->isOk());
+    }
+
+    public function testContactPreferencesSaveMessage(): void
+    {
+        $lead = $this->getLead();
+        $stat = $this->getStat(null, $lead);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->assertStringContainsString('/email/unsubscribe/tracking_hash_unsubscribe_form_email', $crawler->filter('form')->eq(0)->attr('action'));
+        $crawler = $this->client->submitForm('Save');
+
+        $this->assertEquals(1, $crawler->filter('#success-message-text')->count());
         $this->assertTrue($this->client->getResponse()->isOk());
     }
 
@@ -76,7 +92,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @throws \Doctrine\ORM\ORMException
      */
-    protected function getStat(Form $form = null): Stat
+    protected function getStat(Form $form = null, Lead $lead = null): Stat
     {
         $trackingHash = 'tracking_hash_unsubscribe_form_email';
         $emailName    = 'Test unsubscribe form email';
@@ -92,6 +108,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $stat = new Stat();
         $stat->setTrackingHash($trackingHash);
         $stat->setEmailAddress('john@doe.email');
+        $stat->setLead($lead);
         $stat->setDateSent(new \DateTime());
         $stat->setEmail($email);
         $this->em->persist($stat);
@@ -113,6 +130,15 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($form);
 
         return $form;
+    }
+
+    protected function getLead(): Lead
+    {
+        $lead = new Lead();
+        $lead->setEmail('john@doe.email');
+        $this->em->persist($lead);
+
+        return $lead;
     }
 
     public function testPreviewDisabledByDefault(): void
