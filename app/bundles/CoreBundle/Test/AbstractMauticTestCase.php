@@ -49,6 +49,11 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'mailer_from_name'                  => 'Mautic',
     ];
 
+    /**
+     * Flag to turn off the mockServices() method.
+     */
+    protected bool $useMockServices = true;
+
     protected function setUp(): void
     {
         $this->setUpSymfony($this->configParams);
@@ -72,7 +77,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
         $this->client->setServerParameter('HTTPS', $secure);
 
-        $this->mockServices();
+        if ($this->useMockServices) {
+            $this->mockServices();
+        }
     }
 
     /**
