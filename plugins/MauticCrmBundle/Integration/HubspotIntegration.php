@@ -23,16 +23,21 @@ use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @method HubspotApi getApiHelper
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
+  const ACCESS_KEY = 'accessKey';
+
     /**
      * @var UserHelper
      */
@@ -97,7 +102,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     public function getRequiredKeyFields()
     {
         return [
-            $this->getApiKey() => 'mautic.hubspot.form.apikey',
+            self::ACCESS_KEY   => 'mautic.hubspot.form.accessKey',
         ];
     }
 
@@ -127,6 +132,24 @@ class HubspotIntegration extends CrmAbstractIntegration
         return ['push_lead', 'get_leads'];
     }
 
+    public function getBearerToken($inAuthorization = false)
+    {
+    $tokenData = $this->getKeys();
+
+    return $tokenData[self::ACCESS_KEY] ?? null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFormSettings()
+    {
+        return [
+            'requires_callback'      => false,
+            'requires_authorization' => false,
+        ];
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -134,7 +157,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getAuthenticationType()
     {
-        return 'key';
+        return $this->getBearerToken() ? 'oauth2' : 'key';
     }
 
     /**
@@ -295,7 +318,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     {
         $keys = $this->getKeys();
 
-        return isset($keys[$this->getAuthTokenKey()]);
+        return isset($keys[$this->getAuthTokenKey()]) || isset($keys[self::ACCESS_KEY]);
     }
 
     /**
@@ -315,6 +338,21 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
+        if ('keys' === $formArea) {
+            $builder->add(
+                $this->getApiKey(),
+                TextType::class,
+                [
+                    'label'       => 'mautic.hubspot.form.apikey',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'attr'        => [
+                        'class' => 'form-control',
+                        'readonly' => true
+                    ],
+                    'required'    => false,
+                ]
+            );
+        }
         if ('features' == $formArea) {
             $builder->add(
                 'objects',

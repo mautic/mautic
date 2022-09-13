@@ -13,8 +13,11 @@ class HubspotApi extends CrmApi
 
     protected function request($operation, $parameters = [], $method = 'GET', $object = 'contacts')
     {
-        $hapikey = $this->integration->getHubSpotApiKey();
-        $url     = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $object, $operation, $hapikey);
+        if ($this->integration->getAuthenticationType() === 'oauth2') {
+            $url     = sprintf('%s/%s/%s/', $this->integration->getApiUrl(), $object, $operation );
+        } else {
+            $url     = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $object, $operation,  $this->integration->getHubSpotApiKey());
+        }
         $request = $this->integration->makeRequest($url, $parameters, $method, $this->requestSettings);
         if (isset($request['status']) && 'error' == $request['status']) {
             $message = $request['message'];
