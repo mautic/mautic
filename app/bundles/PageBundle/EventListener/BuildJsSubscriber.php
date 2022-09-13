@@ -227,10 +227,10 @@ JS;
             true
         );
 
-        $mauticBaseUrl     = str_replace('/index_dev.php', '', $mauticBaseUrl);
-        $mediaElementCss   = str_replace('/index_dev.php', '', $mediaElementCss);
-        $jQueryUrl         = str_replace('/index_dev.php', '', $jQueryUrl);
-        $froogaloop2       = str_replace('/index_dev.php', '', $froogaloop2);
+        $mauticBaseUrl   = str_replace('/index_dev.php', '', $mauticBaseUrl);
+        $mediaElementCss = str_replace('/index_dev.php', '', $mediaElementCss);
+        $jQueryUrl       = str_replace('/index_dev.php', '', $jQueryUrl);
+        $froogaloop2     = str_replace('/index_dev.php', '', $froogaloop2);
 
         $mediaElementJs = <<<'JS'
 /*!
