@@ -75,6 +75,8 @@ jobs:
         export DB_PORT_STRING="${{ matrix.db-types }}_port"
         export DB_PORT=${!DB_PORT_STRING}
         mysql -h 127.0.0.1 -P $DB_PORT -uroot mautictest -e 'show tables;'
+        ls -al .
+        cat .env
         if [[ "${{ matrix.php-versions }}" == "7.4" ]] && [[ "${{ matrix.db-types }}" == "mysql" ]]; then
           composer test -- --coverage-clover=coverage.xml
         else
