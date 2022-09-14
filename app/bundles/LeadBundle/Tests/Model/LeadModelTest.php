@@ -8,14 +8,12 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
-use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -47,11 +45,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|RequestStack
      */
     private $requestStackMock;
-
-    /**
-     * @var MockObject|CookieHelper
-     */
-    private $cookieHelperMock;
 
     /**
      * @var MockObject|IpLookupHelper
@@ -168,7 +161,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->requestStackMock          = $this->createMock(RequestStack::class);
-        $this->cookieHelperMock          = $this->createMock(CookieHelper::class);
         $this->ipLookupHelperMock        = $this->createMock(IpLookupHelper::class);
         $this->pathsHelperMock           = $this->createMock(PathsHelper::class);
         $this->integrationHelperkMock    = $this->createMock(IntegrationHelper::class);
@@ -192,7 +184,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManagerMock         = $this->createMock(EntityManager::class);
         $this->leadModel                 = new LeadModel(
             $this->requestStackMock,
-            $this->cookieHelperMock,
             $this->ipLookupHelperMock,
             $this->pathsHelperMock,
             $this->integrationHelperkMock,

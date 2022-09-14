@@ -42,18 +42,15 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private static $root;
 
-        /**
-         * ErrorHandler constructor.
-         */
         public function __construct()
         {
             self::$root = realpath(__DIR__.'/../../../../');
         }
 
         /**
-         * @param        $log
-         * @param string $context
-         * @param bool   $backtrace
+         * @param mixed               $log
+         * @param string|array<mixed> $context
+         * @param bool                $backtrace
          */
         public static function logDebugEntry($log, $context = 'null', $backtrace = false)
         {
@@ -176,23 +173,11 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         public function handleException($exception, $returnContent = false, $inTemplate = false)
         {
-            $inline = $inTemplate;
-            if (!$exception instanceof FatalThrowableError && defined('MAUTIC_DELEGATE_VIEW')) {
-                $inline = true;
-            }
-
             if (!$error = self::prepareExceptionForOutput($exception)) {
                 return false;
             }
-            if (isset($error['inline'])) {
-                $inline = $error['inline'];
-            }
 
-            if (!empty($GLOBALS['MAUTIC_AJAX_DIRECT_RENDER'])) {
-                $inline = true;
-            }
-
-            $content = $this->generateResponse($error, $inline, $inTemplate);
+            $content = $this->generateResponse($error, $inTemplate);
 
             $message = isset($error['logMessage']) ? $error['logMessage'] : $error['message'];
             $this->log(LogLevel::ERROR, "$message - in file {$error['file']} - at line {$error['line']}", [], $error['trace']);
@@ -351,7 +336,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
                 // Hide errors by default so we can format them
                 self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); //ini_get('display_errors'));
-                ini_set('display_errors', 0);
+                ini_set('display_errors', '0');
             }
 
             return self::$handler;
@@ -434,13 +419,12 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param      $error
-         * @param bool $inline
-         * @param bool $inTemplate
+         * @param mixed[] $error
+         * @param bool    $inTemplate
          *
          * @return mixed|string
          */
-        private function generateResponse($error, $inline = true, $inTemplate = false)
+        private function generateResponse($error, $inTemplate = false)
         {
             // Get a trace
             if ('dev' == self::$environment) {

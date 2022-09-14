@@ -637,7 +637,12 @@ return [
             ],
             'mautic.form.type.leadfield' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\FieldType::class,
-                'arguments' => ['translator', 'mautic.lead.repository.field'],
+                'arguments' => [
+                    'doctrine.orm.default_entity_manager',
+                    'translator',
+                    'mautic.lead.field.identifier_fields',
+                ],
+                'alias'     => 'leadfield',
             ],
             'mautic.form.type.lead.submitaction.pointschange' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType::class,
@@ -1126,7 +1131,6 @@ return [
                 'class'     => \Mautic\LeadBundle\Model\LeadModel::class,
                 'arguments' => [
                     'request_stack',
-                    'mautic.helper.cookie',
                     'mautic.helper.ip_lookup',
                     'mautic.helper.paths',
                     'mautic.helper.integration',
@@ -1493,6 +1497,13 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.lead.field.identifier_fields' => [
+                'class'     => \Mautic\LeadBundle\Field\IdentifierFields::class,
+                'arguments' => [
+                    'mautic.lead.field.fields_with_unique_identifier',
+                    'mautic.lead.field.field_list',
+                ],
+            ],
             'mautic.lead.field.lead_field_saver' => [
                 'class'     => Mautic\LeadBundle\Field\LeadFieldSaver::class,
                 'arguments' => [
@@ -1596,6 +1607,11 @@ return [
                 'class'     => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadDncData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
+                'optional'  => true,
+            ],
+            'mautic.lead.fixture.test.tag' => [
+                'class'     => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'optional'  => true,
             ],
         ],
