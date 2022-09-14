@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
@@ -100,7 +101,7 @@ class CommonRepository extends EntityRepository
                 foreach ($args['order'] as &$o) {
                     $alias = '';
                     if (false !== strpos($o, '.')) {
-                        list($alias, $o) = explode('.', $o);
+                        [$alias, $o] = explode('.', $o);
                     }
 
                     if (in_array($o, $properties)) {
@@ -311,7 +312,9 @@ class CommonRepository extends EntityRepository
     /**
      * Get a list of entities.
      *
-     * @return array|\Doctrine\ORM\Internal\Hydration\IterableResult|Paginator
+     * @param array<string,mixed> $args
+     *
+     * @return object[]|array<int,mixed>|\Doctrine\ORM\Internal\Hydration\IterableResult<object>|Paginator<object>|SimplePaginator<mixed>
      */
     public function getEntities(array $args = [])
     {
@@ -344,8 +347,13 @@ class CommonRepository extends EntityRepository
             // Hydrate one by one
             return $query->iterate(null, $hydrationMode);
         } elseif (empty($args['ignore_paginator'])) {
-            // Paginator
-            return new Paginator($query, false);
+            if (!empty($args['use_simple_paginator'])) {
+                // FAST paginator that can handle only simple queries using no joins or ManyToOne joins.
+                return new SimplePaginator($query);
+            } else {
+                // SLOW paginator that can handle complex queries using oneToMany/ManyToMany joins.
+                return new Paginator($query, false);
+            }
         } else {
             // All results
             return $query->getResult($hydrationMode);
@@ -405,7 +413,7 @@ class CommonRepository extends EntityRepository
             foreach ($filter['group'] as $orGroup) {
                 $groupExpr = $q->expr()->andX();
                 foreach ($orGroup as $subFilter) {
-                    list($subExpr, $subParameters) = $this->getFilterExpr($q, $subFilter);
+                    [$subExpr, $subParameters] = $this->getFilterExpr($q, $subFilter);
 
                     $groupExpr->add($subExpr);
                     if (!empty($subParameters)) {
@@ -422,7 +430,7 @@ class CommonRepository extends EntityRepository
                 $subFilter           = $filter;
                 $subFilter['column'] = trim($c);
 
-                list($subExpr, $parameterUsed) = $this->getFilterExpr($q, $subFilter, $unique);
+                [$subExpr, $parameterUsed] = $this->getFilterExpr($q, $subFilter, $unique);
 
                 if ($parameterUsed) {
                     $setParameter = true;
@@ -1203,7 +1211,7 @@ class CommonRepository extends EntityRepository
     {
         if (!empty($args['index_by'])) {
             if (is_array($args['index_by'])) {
-                list($indexAlias, $indexBy) = $args['index_by'];
+                [$indexAlias, $indexBy] = $args['index_by'];
             } else {
                 $indexAlias = $this->getTableAlias();
                 $indexBy    = $args['index_by'];
@@ -1295,7 +1303,7 @@ class CommonRepository extends EntityRepository
             $selects = [];
             foreach ($args['select'] as $select) {
                 if (false !== strpos($select, '.')) {
-                    list($alias, $select) = explode('.', $select);
+                    [$alias, $select] = explode('.', $select);
                 } else {
                     $alias = $this->getTableAlias();
                 }
@@ -1406,7 +1414,7 @@ class CommonRepository extends EntityRepository
                                     unset($criterion->parameters);
                                 }
                             } elseif (is_array($criterion)) {
-                                list($expr, $parameters) = $this->getFilterExpr($q, $criterion);
+                                [$expr, $parameters] = $this->getFilterExpr($q, $criterion);
                                 $queryExpression->add($expr);
                                 if (is_array($parameters)) {
                                     $queryParameters = array_merge($queryParameters, $parameters);
@@ -1438,7 +1446,7 @@ class CommonRepository extends EntityRepository
                 }
                 $this->advancedFilterCommands = $advancedFilters->commands;
 
-                list($expr, $parameters) = $this->addAdvancedSearchWhereClause($q, $advancedFilters);
+                [$expr, $parameters] = $this->addAdvancedSearchWhereClause($q, $advancedFilters);
                 $this->appendExpression($queryExpression, $expr);
 
                 if (is_array($parameters)) {
@@ -1655,20 +1663,20 @@ class CommonRepository extends EntityRepository
     {
         foreach ($parseFilters as $f) {
             if (isset($f->children)) {
-                list($expr, $params) = $this->addAdvancedSearchWhereClause($qb, $f);
+                [$expr, $params] = $this->addAdvancedSearchWhereClause($qb, $f);
             } else {
                 if (!empty($f->command)) {
                     if ($this->isSupportedSearchCommand($f->command, $f->string)) {
-                        list($expr, $params) = $this->addSearchCommandWhereClause($qb, $f);
+                        [$expr, $params] = $this->addSearchCommandWhereClause($qb, $f);
                     } else {
                         //treat the command:string as if its a single word
-                        $f->string           = $f->command.':'.$f->string;
-                        $f->not              = false;
-                        $f->strict           = true;
-                        list($expr, $params) = $this->addCatchAllWhereClause($qb, $f);
+                        $f->string       = $f->command.':'.$f->string;
+                        $f->not          = false;
+                        $f->strict       = true;
+                        [$expr, $params] = $this->addCatchAllWhereClause($qb, $f);
                     }
                 } else {
-                    list($expr, $params) = $this->addCatchAllWhereClause($qb, $f);
+                    [$expr, $params] = $this->addCatchAllWhereClause($qb, $f);
                 }
             }
             if (!empty($params)) {
@@ -1699,7 +1707,7 @@ class CommonRepository extends EntityRepository
             $col   = $f[$key];
             $alias = '';
             if (false !== strpos($col, '.')) {
-                list($alias, $col) = explode('.', $col);
+                [$alias, $col] = explode('.', $col);
             }
 
             if (in_array($col, $properties)) {
