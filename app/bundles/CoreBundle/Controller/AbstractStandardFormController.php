@@ -13,6 +13,12 @@ abstract class AbstractStandardFormController extends AbstractFormController
 {
     use FormErrorMessagesTrait;
 
+    public const ENGINE_TWIG = 'twig';
+    /**
+     * @deprecated The PHP templating engine is deprecated and will be removed in Mautic 5. Please use ENGINE_TWIG instead.
+     */
+    public const ENGINE_PHP  = 'php';
+
     /**
      * Get this controller's model name.
      */
@@ -716,15 +722,22 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return string
      */
-    protected function getTemplateName($file)
+    protected function getTemplateName($file, string $engine = self::ENGINE_TWIG)
     {
+        if (self::ENGINE_TWIG === $engine && strpos($file, '.php')) {
+            $file = str_replace('.php', '.twig', $file);
+        }
         if ($this->get('templating')->exists($this->getControllerBase().':'.$file)) {
             return $this->getControllerBase().':'.$file;
         } elseif ($this->get('templating')->exists($this->getTemplateBase().':'.$file)) {
             return $this->getTemplateBase().':'.$file;
-        } else {
+        } elseif ($this->get('templating')->exists('MauticCoreBundle:Standard:'.$file)) {
             return 'MauticCoreBundle:Standard:'.$file;
+        } elseif (self::ENGINE_TWIG === $engine) {
+            return $this->getTemplateName(str_replace('.twig', '.php', $file), self::ENGINE_PHP);
         }
+
+        throw new \Exception("Template {$file} not found");
     }
 
     /**
@@ -1091,7 +1104,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function viewStandard($objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item')
+    protected function viewStandard($objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item', string $engine = self::ENGINE_PHP)
     {
         $model    = $this->getModel($this->getModelName());
         $entity   = $model->getEntity($objectId);

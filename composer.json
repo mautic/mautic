@@ -88,13 +88,13 @@
       "url": "app",
       "options": {
         "versions": {
-            "mautic/core-lib": "4.1.0"
+            "mautic/core-lib": "4.4.x-dev"
         }
       }
     },
     {
       "type": "git",
-      "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
+      "url": "https://github.com/mautic/FOSOAuthServerBundle.git"
     }
   ],
   "conflict": {
@@ -123,6 +123,9 @@
     "remove-git-submodules": "find . -mindepth 2 -type d -name .git | xargs rm -rf"
   },
   "config": {
+    "platform": {
+      "php": "7.4"
+    },
     "bin-dir": "bin",
     "component-dir": "media/assets",
     "process-timeout": 5000,

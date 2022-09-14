@@ -169,10 +169,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', '');
-        }
-
         $this->leadModelMock                    = $this->createMock(LeadModel::class);
         $this->stageModelMock                   = $this->createMock(StageModel::class);
         $this->campaignModelMock                = $this->createMock(CampaignModel::class);
@@ -313,7 +309,10 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
     }
 
-    public function eventDataProvider()
+    /**
+     * @return array<int, array<int, string>>
+     */
+    public function eventDataProvider(): array
     {
         return [
             ['leads'],
@@ -326,7 +325,10 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function reportGraphEventDataProvider()
+    /**
+     * @return array<int, array<int, string>>
+     */
+    public function reportGraphEventDataProvider(): array
     {
         return [
             ['leads'],
@@ -336,7 +338,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testNotRelevantContextBuilder()
+    public function testNotRelevantContextBuilder(): void
     {
         $this->reportBuilderEventMock->method('checkContext')
             ->withConsecutive(
@@ -358,7 +360,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEventMock);
     }
 
-    public function testNotRelevantContextGenerate()
+    public function testNotRelevantContextGenerate(): void
     {
         $this->reportGeneratorEventMock->method('checkContext')
             ->withConsecutive(
@@ -386,7 +388,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider eventDataProvider
      */
-    public function testOnReportBuilder($event)
+    public function testOnReportBuilder(string $event): void
     {
         if ('companies' != $event) {
             $this->fieldsBuilderMock->expects($this->once())
@@ -460,7 +462,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                     'alias'   => 'stage_date_added',
                     'label'   => null,
                     'type'    => 'string',
-                    'formula' => '(SELECT MAX(stage_log.date_added) FROM lead_stages_change_log stage_log WHERE stage_log.stage_id = l.stage_id AND stage_log.lead_id = l.id)',
+                    'formula' => '(SELECT MAX(stage_log.date_added) FROM '.MAUTIC_TABLE_PREFIX.'lead_stages_change_log stage_log WHERE stage_log.stage_id = l.stage_id AND stage_log.lead_id = l.id)',
                 ];
                 break;
             case 'contact.frequencyrules':
@@ -841,7 +843,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider eventDataProvider
      */
-    public function testReportGenerate($context)
+    public function testReportGenerate(string $context): void
     {
         $this->reportGeneratorEventMock->method('checkContext')
             ->withConsecutive(
@@ -871,7 +873,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider ReportGraphEventDataProvider
      */
-    public function testonReportGraphGenerate($event)
+    public function testonReportGraphGenerate(string $event): void
     {
         $this->reportGraphEventMock->expects($this->once())
             ->method('checkContext')
@@ -950,7 +952,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider ReportGraphEventDataProvider
      */
-    public function testOnReportDisplay($event)
+    public function testOnReportDisplay(string $event): void
     {
         $this->reportBuilderEventMock->expects($this->any())
         ->method('checkContext')

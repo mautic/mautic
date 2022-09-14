@@ -12,7 +12,6 @@ use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
-use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -74,11 +73,6 @@ class LeadModel extends FormModel
      * @var RequestStack
      */
     protected $requestStack;
-
-    /**
-     * @var CookieHelper
-     */
-    protected $cookieHelper;
 
     /**
      * @var IpLookupHelper
@@ -194,7 +188,6 @@ class LeadModel extends FormModel
 
     public function __construct(
         RequestStack $requestStack,
-        CookieHelper $cookieHelper,
         IpLookupHelper $ipLookupHelper,
         PathsHelper $pathsHelper,
         IntegrationHelper $integrationHelper,
@@ -213,7 +206,6 @@ class LeadModel extends FormModel
         IpAddressModel $ipAddressModel
     ) {
         $this->requestStack         = $requestStack;
-        $this->cookieHelper         = $cookieHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
         $this->pathsHelper          = $pathsHelper;
         $this->integrationHelper    = $integrationHelper;
@@ -1109,12 +1101,12 @@ class LeadModel extends FormModel
     /**
      * Set frequency rules for lead per channel.
      *
-     * @param null $data
-     * @param null $leadLists
+     * @param array<mixed>    $data
+     * @param array<LeadList> $leadLists
      *
      * @return bool Returns true
      */
-    public function setFrequencyRules(Lead $lead, $data = null, $leadLists = null, $persist = true)
+    public function setFrequencyRules(Lead $lead, $data, $leadLists, $persist = true)
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();

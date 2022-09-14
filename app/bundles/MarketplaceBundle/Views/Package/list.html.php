@@ -114,5 +114,5 @@ $isComposerEnabled = $isComposerEnabled;
         ?>
     </div>
 <?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'custom.object.noresults.tip']); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['message' => 'marketplace.noresults.tip']); ?>
 <?php endif; ?>
