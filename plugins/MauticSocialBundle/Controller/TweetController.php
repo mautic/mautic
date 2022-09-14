@@ -55,14 +55,6 @@ class TweetController extends FormController
     /**
      * @return mixed
      */
-    protected function getControllerBase()
-    {
-        return 'MauticSocialBundle:Tweet';
-    }
-
-    /**
-     * @return mixed
-     */
     protected function getTranslationBase()
     {
         return 'mautic.integration.Twitter';

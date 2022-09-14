@@ -88,7 +88,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => $this->getControllerBase().':'.$this->getPostActionControllerAction('batchDelete'),
+            'contentTemplate' => $this->getControllerBase().'::'.$this->getPostActionControllerAction('batchDelete').'Action',
             'passthroughVars' => [
                 'mauticContent' => $this->getJsLoadMethodPrefix(),
             ],
@@ -294,7 +294,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => $this->getControllerBase().':'.$this->getPostActionControllerAction('delete'),
+            'contentTemplate' => $this->getControllerBase().'::'.$this->getPostActionControllerAction('delete').'Action',
             'passthroughVars' => [
                 'mauticContent' => $this->getJsLoadMethodPrefix(),
             ],
@@ -363,7 +363,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $page           = $this->get('session')->get('mautic.'.$this->getSessionBase().'.page', 1);
         $viewParameters = ['page' => $page];
 
-        $template = $this->getControllerBase().':'.$this->getPostActionControllerAction('edit');
+        $template = $this->getControllerBase().'::'.$this->getPostActionControllerAction('edit').'Action';
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
@@ -442,7 +442,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                         if (!$this->isFormApplied($form) && method_exists($this, 'viewAction')) {
                             $viewParameters                    = ['objectId' => $objectId, 'objectAction' => 'view'];
                             $returnUrl                         = $this->generateUrl($this->getActionRoute(), $viewParameters);
-                            $postActionVars['contentTemplate'] = $this->getControllerBase().':view';
+                            $postActionVars['contentTemplate'] = $this->getControllerBase().'::viewAction';
                         }
                     }
 
@@ -531,7 +531,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function getControllerBase()
     {
-        return 'MauticCoreBundle:Standard';
+        return static::class;
     }
 
     /**
@@ -727,9 +727,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         if (self::ENGINE_TWIG === $engine && strpos($file, '.php')) {
             $file = str_replace('.php', '.twig', $file);
         }
-        if ($this->get('templating')->exists($this->getControllerBase().':'.$file)) {
-            return $this->getControllerBase().':'.$file;
-        } elseif ($this->get('templating')->exists($this->getTemplateBase().':'.$file)) {
+        if ($this->get('templating')->exists($this->getTemplateBase().':'.$file)) {
             return $this->getTemplateBase().':'.$file;
         } elseif ($this->get('templating')->exists('MauticCoreBundle:Standard:'.$file)) {
             return 'MauticCoreBundle:Standard:'.$file;
@@ -917,7 +915,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     [
                         'returnUrl'       => $returnUrl,
                         'viewParameters'  => ['page' => $lastPage],
-                        'contentTemplate' => $this->getControllerBase().':'.$this->getPostActionControllerAction('index'),
+                        'contentTemplate' => $this->getControllerBase().'::'.$this->getPostActionControllerAction('index').'Action',
                         'passthroughVars' => [
                             'mauticContent' => $this->getJsLoadMethodPrefix(),
                         ],
@@ -1003,11 +1001,11 @@ abstract class AbstractStandardFormController extends AbstractFormController
                         if (method_exists($this, 'viewAction')) {
                             $viewParameters = ['objectId' => $entity->getId(), 'objectAction' => 'view'];
                             $returnUrl      = $this->generateUrl($this->getActionRoute(), $viewParameters);
-                            $template       = $this->getControllerBase().':view';
+                            $template       = $this->getControllerBase().'::viewAction';
                         } else {
                             $viewParameters = ['page' => $page];
                             $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
-                            $template       = $this->getControllerBase().':'.$this->getPostActionControllerAction('new');
+                            $template       = $this->getControllerBase().'::'.$this->getPostActionControllerAction('new').'Action';
                         }
                     }
                 }
@@ -1016,7 +1014,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
-                $template       = $this->getControllerBase().':'.$this->getPostActionControllerAction('new');
+                $template       = $this->getControllerBase().'::'.$this->getPostActionControllerAction('new').'Action';
             }
 
             $passthrough = [
@@ -1118,7 +1116,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     [
                         'returnUrl'       => $this->generateUrl($this->getIndexRoute(), ['page' => $page]),
                         'viewParameters'  => ['page' => $page],
-                        'contentTemplate' => $this->getControllerBase().':'.$this->getPostActionControllerAction('view'),
+                        'contentTemplate' => $this->getControllerBase().'::'.$this->getPostActionControllerAction('view').'Action',
                         'passthroughVars' => [
                             'mauticContent' => $this->getJsLoadMethodPrefix(),
                         ],

@@ -10,23 +10,23 @@ return [
         'main' => [
             RouteProvider::ROUTE_LIST => [
                 'path'       => '/marketplace/{page}',
-                'controller' => 'MarketplaceBundle:Package\List:list',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\Package\ListController::listAction',
                 'method'     => 'GET|POST',
                 'defaults'   => ['page' => 1],
             ],
             RouteProvider::ROUTE_DETAIL => [
                 'path'       => '/marketplace/detail/{vendor}/{package}',
-                'controller' => 'MarketplaceBundle:Package\Detail:view',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\Package\DetailController::viewAction',
                 'method'     => 'GET',
             ],
             RouteProvider::ROUTE_INSTALL => [
                 'path'       => '/marketplace/install/{vendor}/{package}',
-                'controller' => 'MarketplaceBundle:Package\Install:view',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\Package\InstallController::viewAction',
                 'method'     => 'GET|POST',
             ],
             RouteProvider::ROUTE_REMOVE => [
                 'path'       => '/marketplace/remove/{vendor}/{package}',
-                'controller' => 'MarketplaceBundle:Package\Remove:view',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\Package\RemoveController::viewAction',
                 'method'     => 'GET|POST',
             ],
             RouteProvider::ROUTE_CLEAR_CACHE => [

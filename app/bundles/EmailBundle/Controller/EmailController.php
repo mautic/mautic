@@ -216,7 +216,7 @@ class EmailController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticEmailBundle:Email:index',
+                    'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_email_index',
                         'mauticContent' => 'email',
@@ -280,7 +280,7 @@ class EmailController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticEmailBundle:Email:index',
+                    'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_email_index',
                         'mauticContent' => 'email',
@@ -415,7 +415,7 @@ class EmailController extends FormController
                         UrlGeneratorInterface::ABSOLUTE_URL
                     ),
                     'contacts' => $this->forward(
-                        'MauticEmailBundle:Email:contacts',
+                        'Mautic\EmailBundle\Controller\EmailController::contactsAction',
                         [
                             'objectId'   => $email->getId(),
                             'page'       => $this->get('session')->get('mautic.email.contact.page', 1),
@@ -507,7 +507,7 @@ class EmailController extends FormController
                             'objectId'     => $entity->getId(),
                         ];
                         $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
-                        $template  = 'MauticEmailBundle:Email:view';
+                        $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -516,7 +516,7 @@ class EmailController extends FormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_email_index', $viewParameters);
-                $template       = 'MauticEmailBundle:Email:index';
+                $template       = 'Mautic\EmailBundle\Controller\EmailController::indexAction';
                 //clear any modified content
                 $session->remove('mautic.emailbuilder.'.$entity->getSessionId().'.content');
             }
@@ -621,7 +621,7 @@ class EmailController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticEmailBundle:Email:index',
+            'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'email',
@@ -704,7 +704,7 @@ class EmailController extends FormController
                 $model->unlockEntity($entity);
             }
 
-            $template    = 'MauticEmailBundle:Email:view';
+            $template    = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
             $passthrough = [
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'email',
@@ -866,7 +866,7 @@ class EmailController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticEmailBundle:Email:index',
+            'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'email',
@@ -1041,7 +1041,7 @@ class EmailController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticEmailBundle:Page:index',
+            'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'page',
@@ -1085,7 +1085,7 @@ class EmailController extends FormController
                 'objectId'     => $objectId,
             ];
             $postActionVars['returnUrl']       = $this->generateUrl('mautic_page_action', $postActionVars['viewParameters']);
-            $postActionVars['contentTemplate'] = 'MauticEmailBundle:Email:view';
+            $postActionVars['contentTemplate'] = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
         } //else don't do anything
 
         return $this->postActionRedirect(
@@ -1119,7 +1119,7 @@ class EmailController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticEmailBundle:Email:index',
+            'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'email',
@@ -1260,7 +1260,7 @@ class EmailController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticEmailBundle:Email:index',
+            'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_email_index',
                 'mauticContent' => 'email',

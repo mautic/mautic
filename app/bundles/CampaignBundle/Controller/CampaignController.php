@@ -246,7 +246,7 @@ class CampaignController extends AbstractStandardFormController
                     [
                         'returnUrl'       => $returnUrl,
                         'viewParameters'  => ['page' => $lastPage],
-                        'contentTemplate' => 'MauticCampaignBundle:Campaign:index',
+                        'contentTemplate' => 'Mautic\CampaignBundle\Controller\CampaignController::indexAction',
                         'passthroughVars' => [
                             'mauticContent' => 'campaign',
                         ],
@@ -330,11 +330,11 @@ class CampaignController extends AbstractStandardFormController
                         if (method_exists($this, 'viewAction')) {
                             $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
                             $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
-                            $template       = 'MauticCampaignBundle:Campaign:view';
+                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
                         } else {
                             $viewParameters = ['page' => $page];
                             $returnUrl      = $this->generateUrl('mautic_campaign_index', $viewParameters);
-                            $template       = 'MauticCampaignBundle:Campaign:index';
+                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::indexAction';
                         }
                     }
                 }
@@ -343,7 +343,7 @@ class CampaignController extends AbstractStandardFormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
-                $template       = 'MauticCampaignBundle:Campaign:index';
+                $template       = 'Mautic\CampaignBundle\Controller\CampaignController::indexAction';
             }
 
             $passthrough = [
@@ -688,10 +688,7 @@ class CampaignController extends AbstractStandardFormController
         return $sessionId;
     }
 
-    /**
-     * @return string
-     */
-    protected function getControllerBase()
+    protected function getTemplateBase(): string
     {
         return 'MauticCampaignBundle:Campaign';
     }
