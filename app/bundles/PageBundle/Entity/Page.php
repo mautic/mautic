@@ -131,7 +131,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $sessionId;
 
     /**
-     * @var ArrayCollection<int, Submission>
+     * @var Collection<int, Submission>
      */
     private Collection $submissions;
 
@@ -837,24 +837,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     public function setCustomHtml($customHtml)
     {
         $this->customHtml = $customHtml;
-    }
-
-    /**
-     * Add submission.
-     */
-    public function addSubmission(Submission $submissions): self
-    {
-        $this->submissions[] = $submissions;
-
-        return $this;
-    }
-
-    /**
-     * Remove submission.
-     */
-    public function removeSubmission(Submission $submissions): void
-    {
-        $this->submissions->removeElement($submissions);
     }
 
     /**

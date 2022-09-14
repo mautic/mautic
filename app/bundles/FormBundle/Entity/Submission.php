@@ -91,6 +91,7 @@ class Submission
         $builder->addField('referer', 'text');
 
         $builder->createManyToOne('page', 'Mautic\PageBundle\Entity\Page')
+            ->inversedBy('submissions')
             ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
             ->fetchExtraLazy()
             ->build();
