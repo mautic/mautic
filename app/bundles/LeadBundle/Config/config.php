@@ -1131,7 +1131,6 @@ return [
                 'class'     => \Mautic\LeadBundle\Model\LeadModel::class,
                 'arguments' => [
                     'request_stack',
-                    'mautic.helper.cookie',
                     'mautic.helper.ip_lookup',
                     'mautic.helper.paths',
                     'mautic.helper.integration',

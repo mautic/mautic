@@ -822,7 +822,7 @@ return [
                 ],
             ],
             'mautic.helper.cookie' => [
-                'class'     => 'Mautic\CoreBundle\Helper\CookieHelper',
+                'class'     => Mautic\CoreBundle\Helper\CookieHelper::class,
                 'arguments' => [
                     '%mautic.cookie_path%',
                     '%mautic.cookie_domain%',
@@ -830,6 +830,7 @@ return [
                     '%mautic.cookie_httponly%',
                     'request_stack',
                 ],
+                'tag' => 'kernel.event_subscriber',
             ],
             'mautic.helper.cache_storage' => [
                 'class'     => Mautic\CoreBundle\Helper\CacheStorageHelper::class,

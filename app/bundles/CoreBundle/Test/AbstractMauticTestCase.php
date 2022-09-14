@@ -7,7 +7,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use InvalidArgumentException;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
-use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
@@ -108,16 +107,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     private function mockServices(): void
     {
-        $cookieHelper = $this->getMockBuilder(CookieHelper::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['setCookie', 'setCharset'])
-            ->getMock();
-
-        $cookieHelper->expects($this->any())
-            ->method('setCookie');
-
-        self::$container->set('mautic.helper.cookie', $cookieHelper);
-
         self::$container->set('session', new Session(new FixedMockFileSessionStorage()));
     }
 
