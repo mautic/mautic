@@ -131,8 +131,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $sessionId;
 
     /**
-     * @ORM\OneToMany(targetEntity="Mautic\FormBundle\Entity\Submission", mappedBy="page", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"dateSubmitted" = "DESC"})
+     * @var ArrayCollection<int, Submission>
      */
     private Collection $submissions;
 
@@ -841,7 +840,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Add submission
+     * Add submission.
      */
     public function addSubmission(Submission $submissions): self
     {
@@ -851,7 +850,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Remove submission
+     * Remove submission.
      */
     public function removeSubmission(Submission $submissions): void
     {
@@ -859,9 +858,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get submissions
+     * Get submissions.
      *
-     * @return Collection
+     * @return Collection<int, Submission>
      */
     public function getSubmissions(): Collection
     {

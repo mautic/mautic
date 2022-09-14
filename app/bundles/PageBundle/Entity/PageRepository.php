@@ -21,7 +21,6 @@ class PageRepository extends CommonRepository
 
         $q = $this
             ->createQueryBuilder('p')
-            ->select('p')
             // submission_count can be used in the order by clause without having it in the result
             ->select('p, ('.$sq->getDql().') as HIDDEN submission_count')
             ->leftJoin('p.category', 'c');
