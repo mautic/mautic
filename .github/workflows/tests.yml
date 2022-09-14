@@ -63,7 +63,9 @@ jobs:
         mysqldump --print-defaults
 
     - name: Set SYMFONY_ENV to test
-      run: echo "SYMFONY_ENV=test" >> $GITHUB_ENV
+      run: |
+        echo "SYMFONY_ENV=test" >> $GITHUB_ENV
+        echo "MAUTIC_ENV=test" >> $GITHUB_ENV
 
     - name: Install dependencies
       run: |
