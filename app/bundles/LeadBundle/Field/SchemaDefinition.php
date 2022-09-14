@@ -23,7 +23,7 @@ class SchemaDefinition
                 ],
             ];
         }
-
+        $schemaLength = null;
         switch ($type) {
             case 'datetime':
             case 'date':
@@ -53,10 +53,14 @@ class SchemaDefinition
                 $schemaType = 'text';
         }
 
+        if ('string' === $schemaType) {
+            $schemaLength = 191;
+        }
+
         return [
             'name'    => $alias,
             'type'    => $schemaType,
-            'options' => ['notnull' => false],
+            'options' => ['notnull' => false, 'length' => $schemaLength],
         ];
     }
 

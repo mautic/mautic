@@ -229,7 +229,9 @@ class AssetController extends FormController
         }
 
         $download = $this->request->query->get('download', 0);
-        $stream   = $this->request->query->get('stream', 0);
+
+        // Display the file directly in the browser by default
+        $stream   = $this->request->query->get('stream', '1');
 
         if ('1' === $download || '1' === $stream) {
             try {

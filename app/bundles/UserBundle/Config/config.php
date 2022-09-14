@@ -247,7 +247,7 @@ return [
                 ],
             ],
             'mautic.security.authentication_listener' => [
-                'class'     => 'Mautic\UserBundle\Security\Firewall\AuthenticationListener',
+                'class'     => \Mautic\UserBundle\Security\Firewall\AuthenticationListener::class,
                 'arguments' => [
                     'mautic.security.authentication_handler',
                     'security.token_storage',

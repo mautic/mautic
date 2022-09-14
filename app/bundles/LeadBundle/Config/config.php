@@ -136,6 +136,10 @@ return [
                 'path'       => '/segment/view/{objectId}/contact/{page}',
                 'controller' => 'Mautic\LeadBundle\Controller\ListController::contactsAction',
             ],
+            'mautic_contact_stats' => [
+                'path'       => '/contacts/view/{objectId}/stats',
+                'controller' => 'MauticLeadBundle:Lead:contactStats',
+            ],
         ],
         'api' => [
             'mautic_api_contactsstandard' => [
@@ -731,6 +735,9 @@ return [
             'mautic.form.type.campaignevent_lead_segments' => [
                 'class' => \Mautic\LeadBundle\Form\Type\CampaignEventLeadSegmentsType::class,
             ],
+            'mautic.form.type.campaignevent_lead_stages' => [
+                'class' => \Mautic\LeadBundle\Form\Type\CampaignEventLeadStagesType::class,
+            ],
             'mautic.form.type.campaignevent_lead_campaigns' => [
                 'class'     => Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType::class,
                 'arguments' => ['mautic.lead.model.list'],
@@ -1109,6 +1116,10 @@ return [
                 'arguments' => ['translator'],
                 'alias'     => 'lead_dnc_reason',
             ],
+            'mautic.helper.segment.count.cache' => [
+                'class'     => \Mautic\LeadBundle\Helper\SegmentCountCacheHelper::class,
+                'arguments' => ['mautic.helper.cache_storage'],
+            ],
         ],
         'models' => [
             'mautic.lead.model.lead' => [
@@ -1163,12 +1174,20 @@ return [
                     'mautic.lead.model.lead_segment_service',
                     'mautic.lead.segment.stat.chart.query.factory',
                     'request_stack',
+                    'mautic.helper.segment.count.cache',
                 ],
             ],
             'mautic.lead.repository.lead_segment_filter_descriptor' => [
                 'class'     => \Mautic\LeadBundle\Services\ContactSegmentFilterDictionary::class,
                 'arguments' => [
                     'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.service.segment_dependency_tree_factory' => [
+                'class'     => \Mautic\LeadBundle\Services\SegmentDependencyTreeFactory::class,
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'router',
                 ],
             ],
             'mautic.lead.repository.lead_segment_query_builder' => [

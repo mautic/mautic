@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Illuminate\Support\Collection;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -20,6 +19,8 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
@@ -58,12 +59,9 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Countries;
+use Tightenco\Collect\Support\Collection;
 
-/**
- * Class LeadModel
- * {@inheritdoc}
- */
 class LeadModel extends FormModel
 {
     use DefaultValueTrait;
@@ -1820,6 +1818,15 @@ class LeadModel extends FormModel
         $requestedCompanies = new Collection($companies);
         $currentCompanies   = (new Collection($leadCompanies))->keyBy('company_id');
 
+        // Add companies that are not in the array of found companies
+        $addCompanies = $requestedCompanies->reject(
+            // Reject if the lead is already in the given company
+            fn ($companyId) => $currentCompanies->has($companyId)
+        );
+        if ($addCompanies->count()) {
+            $this->companyModel->addLeadToCompany($addCompanies->toArray(), $lead);
+        }
+
         // Remove companies that are not in the array of given companies
         $removeCompanies = $currentCompanies->reject(
             function (array $company) use ($requestedCompanies) {
@@ -1829,15 +1836,6 @@ class LeadModel extends FormModel
         );
         if ($removeCompanies->count()) {
             $this->companyModel->removeLeadFromCompany($removeCompanies->keys()->toArray(), $lead);
-        }
-
-        // Add companies that are not in the array of found companies
-        $addCompanies = $requestedCompanies->reject(
-            // Reject if the lead is already in the given company
-            fn ($companyId) => $currentCompanies->has($companyId)
-        );
-        if ($addCompanies->count()) {
-            $this->companyModel->addLeadToCompany($addCompanies->toArray(), $lead);
         }
     }
 
@@ -1969,10 +1967,10 @@ class LeadModel extends FormModel
      * Get leads count per country name.
      * Can't use entity, because country is a custom field.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
-     * @param bool   $canViewOthers
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param mixed[]   $filters
+     * @param bool      $canViewOthers
      *
      * @return array
      */
@@ -1992,9 +1990,8 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
-
-        $countries = array_flip(Intl::getRegionBundle()->getCountryNames('en'));
+        $results   = $q->execute()->fetchAllAssociative();
+        $countries = array_flip(Countries::getNames('en'));
         $mapData   = [];
 
         // Convert country names to 2-char code
@@ -2464,5 +2461,16 @@ class LeadModel extends FormModel
     public function getAvailableLeadFields(): array
     {
         return $this->availableLeadFields;
+    }
+
+    /**
+     * @return array<string, int|float>
+     */
+    public function getLeadEmailStats(Lead $lead): array
+    {
+        /** @var StatRepository $statRepository */
+        $statRepository = $this->em->getRepository(Stat::class);
+
+        return $statRepository->getStatsSummaryForContacts([$lead->getId()])[$lead->getId()];
     }
 }

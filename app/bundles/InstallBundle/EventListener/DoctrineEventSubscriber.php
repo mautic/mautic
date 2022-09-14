@@ -24,7 +24,7 @@ class DoctrineEventSubscriber implements EventSubscriber
         $fieldGroups['companies'] = FieldModel::$coreCompanyFields;
 
         foreach ($fieldGroups as $tableName => $fields) {
-            $table = $schema->getTable($tableName);
+            $table = $schema->getTable(MAUTIC_TABLE_PREFIX.$tableName);
 
             foreach ($fields as $alias => $field) {
                 if (!$table->hasColumn($alias)) {

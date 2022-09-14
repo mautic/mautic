@@ -310,6 +310,7 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.stage.model.stage',
                     'mautic.helper.core_parameters',
+                    'mautic.helper.theme',
                 ],
             ],
             'mautic.form.type.email.utm_tags' => [
@@ -623,6 +624,7 @@ return [
                     'mautic.email.model.transport_callback',
                     'mautic.sparkpost.factory',
                     'monolog.logger.mautic',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.sparkpost.factory' => [
@@ -1010,5 +1012,6 @@ return [
         'mailer_mailjet_sandbox_default_mail' => null,
         'disable_trackable_urls'              => false,
         'theme_email_default'                 => 'blank',
+        'mailer_sparkpost_region'             => 'us',
     ],
 ];
