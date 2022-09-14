@@ -15,10 +15,29 @@ use Psr\Log\LoggerInterface;
 
 class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var GeneratedColumnsProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $generatedColumnsProvider;
+
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
+     */
     private $logger;
+
+    /**
+     * @var GenerateSchemaEventArgs|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $event;
+
+    /**
+     * @var Schema|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $schema;
+
+    /**
+     * @var Table|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $table;
 
     /**
@@ -29,8 +48,6 @@ class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->logger                   = $this->createMock(LoggerInterface::class);

@@ -17,7 +17,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['7.4']
+        php-versions: ['7.4', '8.0']
         db-types: ['mysql', 'mariadb']
   
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -63,7 +63,9 @@ jobs:
         mysqldump --print-defaults
 
     - name: Set SYMFONY_ENV to test
-      run: echo "SYMFONY_ENV=test" >> $GITHUB_ENV
+      run: |
+        echo "SYMFONY_ENV=test" >> $GITHUB_ENV
+        echo "MAUTIC_ENV=test" >> $GITHUB_ENV
 
     - name: Install dependencies
       run: |
@@ -114,8 +116,9 @@ jobs:
       fail-fast: false
       matrix:
         commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install']
+        php-versions: ['7.4', '8.0']
 
-    name: ${{ matrix.commands }}
+    name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 
     steps:
     - uses: actions/checkout@v2
@@ -129,7 +132,7 @@ jobs:
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
       with:
-        php-version: 7.4
+        php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Install dependencies

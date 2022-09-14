@@ -460,7 +460,7 @@ return [
                     'mautic.campaign.event_collector',
                     'mautic.campaign.scheduler',
                     'mautic.tracker.contact',
-                    'mautic.campaign.repository.lead',
+                    'mautic.campaign.helper.decision',
                 ],
             ],
             'mautic.campaign.executioner.inactive'     => [
@@ -474,6 +474,12 @@ return [
                     'mautic.campaign.event_executioner',
                 ],
             ],
+            'mautic.campaign.helper.decision' => [
+                'class'     => \Mautic\CampaignBundle\Executioner\Helper\DecisionHelper::class,
+                'arguments' => [
+                    'mautic.campaign.repository.lead',
+                ],
+            ],
             'mautic.campaign.helper.inactivity' => [
                 'class'     => \Mautic\CampaignBundle\Executioner\Helper\InactiveHelper::class,
                 'arguments' => [
@@ -482,6 +488,7 @@ return [
                     'mautic.campaign.repository.lead_event_log',
                     'mautic.campaign.repository.event',
                     'monolog.logger.mautic',
+                    'mautic.campaign.helper.decision',
                 ],
             ],
             'mautic.campaign.helper.removed_contact_tracker' => [

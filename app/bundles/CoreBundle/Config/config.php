@@ -1066,6 +1066,8 @@ return [
                 'arguments' => [
                     'mautic.helper.template.button',
                     'request_stack',
+                    'router',
+                    'translator',
                 ],
                 'tag' => 'twig.extension',
             ],
@@ -1106,6 +1108,18 @@ return [
                 'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ConfigExtension::class,
                 'arguments' => [
                     'mautic.helper.template.config',
+                ],
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.storage' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\StorageExtension::class,
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.publish_status' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\CoreHelpersExtension::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.template.date',
                 ],
                 'tag'       => 'twig.extension',
             ],

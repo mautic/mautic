@@ -199,7 +199,7 @@ class InputOptionsDAO
             $input['mautic-object-id'][$key] = preg_replace(
                 '/^contact:/',
                 Contact::NAME.':',
-                $mauticObjectId
+                "$mauticObjectId"
             );
         }
 
