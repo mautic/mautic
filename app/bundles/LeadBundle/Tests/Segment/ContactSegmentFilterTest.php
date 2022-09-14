@@ -34,7 +34,7 @@ class ContactSegmentFilterTest extends TestCase
     private $tableSchemaColumnCache;
 
     /**
-     * @var FilterQueryBuilderInterface|MockObject
+     * @var FilterQueryBuilderInterface&MockObject
      */
     private $filterQueryBuilder;
 

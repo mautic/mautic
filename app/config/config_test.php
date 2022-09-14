@@ -1,28 +1,14 @@
 <?php
 
 use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass;
+use Mautic\CoreBundle\Test\EnvLoader;
 use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Mock\Client;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Dotenv\Dotenv;
 
 /** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
-
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 $loader->import('config.php');
 
-// Load environment variables from .env.test file
-$env     = new Dotenv();
-$root    = __DIR__.'/../../';
-$envFile = file_exists($root.'.env') ? $root.'.env' : $root.'.env.dist';
-
-$env->load($envFile);
+EnvLoader::load();
 
 // Define some constants from .env
 defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
@@ -82,7 +68,6 @@ $container->loadFromExtension('doctrine', [
     ],
 ]);
 
-// Ensure the mautic.db_table_prefix is set to our phpunit configuration.
 $container->setParameter('mautic.db_table_prefix', MAUTIC_TABLE_PREFIX);
 
 $container->loadFromExtension('monolog', [
@@ -123,10 +108,6 @@ $container->loadFromExtension('liip_test_fixtures', [
     ],
     'keep_database_and_schema' => true,
 ]);
-
-// Enable api by default
-$container->setParameter('mautic.api_enabled', true);
-$container->setParameter('mautic.api_enable_basic_auth', true);
 
 $loader->import('security_test.php');
 

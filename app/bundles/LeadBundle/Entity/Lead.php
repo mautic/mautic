@@ -14,7 +14,7 @@ use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 
-class Lead extends FormEntity implements CustomFieldEntityInterface
+class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
 
@@ -452,6 +452,16 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 ]
             )
             ->build();
+    }
+
+    public static function getDefaultIdentifierFields(): array
+    {
+        return [
+            'firstname',
+            'lastname',
+            'company',
+            'email',
+        ];
     }
 
     /**

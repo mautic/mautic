@@ -53,8 +53,6 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $this->dateFrom     = new \DateTime('2018-01-01 12:00:00');
         $this->dateTo       = new \DateTime('2018-02-01 12:00:00');
         $this->unit         = 'd';
@@ -65,7 +63,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
     }
 
-    public function testClassicDateColumn()
+    public function testClassicDateColumn(): void
     {
         $this->createChartQuery();
 
@@ -88,7 +86,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $this->chartQuery->prepareTimeDataQuery('email_stats', $this->dateColumn);
     }
 
-    public function testGeneratedDateColumn()
+    public function testGeneratedDateColumn(): void
     {
         $this->createChartQuery();
 
@@ -306,6 +304,10 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $this->chartQuery = new ChartQuery($this->connection, $this->dateFrom, $this->dateTo, $this->unit);
     }
 
+    /**
+     * @param array<mixed> $expectedResult
+     * @param array<mixed> $data
+     */
     private function assertTimeDataWithoutSqlOrder($expectedResult, $data): void
     {
         $this->createChartQuery();
