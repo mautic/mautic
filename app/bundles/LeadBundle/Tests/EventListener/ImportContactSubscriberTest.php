@@ -4,22 +4,99 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Event\ImportInitEvent;
 use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
+use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\EventListener\ImportContactSubscriber;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Translation\TranslatorInterface;
 
 final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    public function testHandleValidateTags(): void
+    {
+        $tag = new Tag();
+        $tag->setTag('tagLabel');
+
+        $formMock = $this->createMock(Form::class);
+        $formMock->method('getData')
+            ->willReturn(
+                [
+                    'name' => 'Bud',
+                    'tags' => new ArrayCollection([$tag]),
+                ]
+            );
+
+        $event      = new ImportValidateEvent('contacts', $formMock);
+        $subscriber = new ImportContactSubscriber(
+            new class() extends FieldList {
+                public function __construct()
+                {
+                }
+
+                public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array
+                {
+                    return [];
+                }
+            },
+            $this->getCorePermissionsFake(),
+            $this->getLeadModelFake(),
+            $this->getTranslatorFake()
+        );
+
+        $subscriber->onValidateImport($event);
+
+        Assert::assertSame(['tagLabel'], $event->getTags());
+        Assert::assertSame(['name' => 'Bud'], $event->getMatchedFields());
+    }
+
+    /**
+     * @see https://github.com/mautic/mautic/issues/11080
+     */
+    public function testHandleFieldWithIntValues(): void
+    {
+        $formMock = $this->createMock(Form::class);
+        $formMock->method('getData')
+            ->willReturn(
+                [
+                    'name'           => 'Bud',
+                    'skip_if_exists' => 1,
+                ]
+            );
+
+        $event      = new ImportValidateEvent('contacts', $formMock);
+        $subscriber = new ImportContactSubscriber(
+            new class() extends FieldList {
+                public function __construct()
+                {
+                }
+
+                public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array
+                {
+                    return [];
+                }
+            },
+            $this->getCorePermissionsFake(),
+            $this->getLeadModelFake(),
+            $this->getTranslatorFake()
+        );
+
+        $subscriber->onValidateImport($event);
+
+        Assert::assertSame(['name' => 'Bud', 'skip_if_exists' => 1], $event->getMatchedFields());
+    }
+
     public function testOnImportInitForUknownObject(): void
     {
         $subscriber = new ImportContactSubscriber(

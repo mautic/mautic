@@ -234,6 +234,14 @@ class TransportType
     /**
      * @return string
      */
+    public function getSparkPostService()
+    {
+        return '"mautic.transport.sparkpost"';
+    }
+
+    /**
+     * @return string
+     */
     public function getMailjetService()
     {
         return '"mautic.transport.mailjet"';

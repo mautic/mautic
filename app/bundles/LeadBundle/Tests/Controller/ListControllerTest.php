@@ -133,16 +133,18 @@ class ListControllerTest extends MauticMysqlTestCase
     private function addContactsToSegment(array $contacts, string $segmentName): LeadList
     {
         $filters = [
-            'glue'       => 'and',
-            'field'      => 'company',
-            'object'     => 'lead',
-            'type'       => 'text',
-            'operator'   => 'contains',
-            'properties' => [
-                    'filter' => 'Acquia',
-                ],
-            'filter'  => 'Acquia',
-            'display' => null,
+            [
+                'glue'       => 'and',
+                'field'      => 'company',
+                'object'     => 'lead',
+                'type'       => 'text',
+                'operator'   => 'contains',
+                'properties' => [
+                        'filter' => 'Acquia',
+                    ],
+                'filter'  => 'Acquia',
+                'display' => null,
+            ],
         ];
 
         $segment = new LeadList();

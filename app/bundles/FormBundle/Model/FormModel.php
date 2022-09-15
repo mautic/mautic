@@ -158,9 +158,9 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param null $id
+     * @param string|int|null $id
      *
-     * @return Form
+     * @return Form|object|null
      */
     public function getEntity($id = null)
     {
