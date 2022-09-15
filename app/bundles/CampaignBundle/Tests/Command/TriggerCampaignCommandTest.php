@@ -552,7 +552,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
     /**
      * @see https://github.com/mautic/mautic/issues/11061
-     * 
+     *
      * This test will not fail if the infinite loop returns and instead run indefinitelly until a PHPUNIT timeout is reached.
      * I couldn't find an easy way to test for an infinite loop. But we'll know if it returns again.
      * We'll just spend more time figuring out which test is taking so long.
