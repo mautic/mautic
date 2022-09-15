@@ -11,6 +11,8 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\ListLead;
 
 class AbstractCampaignCommand extends MauticMysqlTestCase
 {
@@ -134,15 +136,27 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         return $campaign;
     }
 
-    protected function createCampaignLead(Campaign $campaign, Lead $lead): CampaignLead
+    protected function createCampaignLead(Campaign $campaign, Lead $lead, bool $manuallyRemoved = false): CampaignLead
     {
         $campaignLead = new CampaignLead();
         $campaignLead->setCampaign($campaign);
         $campaignLead->setLead($lead);
         $campaignLead->setDateAdded(new \DateTime());
+        $campaignLead->setManuallyRemoved($manuallyRemoved);
         $this->em->persist($campaignLead);
 
         return $campaignLead;
+    }
+
+    protected function createSegmentMember(LeadList $segment, Lead $lead): ListLead
+    {
+        $segmentMember = new ListLead();
+        $segmentMember->setLead($lead);
+        $segmentMember->setList($segment);
+        $segmentMember->setDateAdded(new \DateTime());
+        $this->em->persist($segmentMember);
+
+        return $segmentMember;
     }
 
     protected function createEvent(string $name, Campaign $campaign, string $type, string $eventType, array $property = null): Event
