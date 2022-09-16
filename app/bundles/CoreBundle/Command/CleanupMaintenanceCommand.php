@@ -4,7 +4,6 @@ namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,7 +13,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 /**
  * CLI Command to purge old data per settings.
  */
-class CleanupMaintenanceCommand extends ContainerAwareCommand
+class CleanupMaintenanceCommand extends ModeratedCommand
 {
     /**
      * {@inheritdoc}
@@ -51,6 +50,7 @@ You can also optionally specify a dry run without deleting any records:
 <info>php %command.full_name% --days-old=365 --dry-run</info>
 EOT
             );
+        parent::configure();
     }
 
     /**
@@ -58,6 +58,10 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (!$this->checkRunStatus($input, $output)) {
+            return 0;
+        }
+
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $this->getContainer()->get('translator');
         $translator->setLocale($this->getContainer()->getParameter('mautic.locale', 'en_US'));
@@ -84,6 +88,8 @@ EOT
             );
 
             if (!$helper->ask($input, $output, $question)) {
+                $this->completeRun();
+
                 return 0;
             }
         }
@@ -113,6 +119,8 @@ EOT
                 $output->writeln($query);
             }
         }
+
+        $this->completeRun();
 
         return 0;
     }

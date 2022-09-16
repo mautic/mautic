@@ -4,7 +4,6 @@ namespace Mautic\CoreBundle\Command;
 
 use Doctrine\DBAL\DBALException;
 use Mautic\LeadBundle\Model\IpAddressModel;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command to delete unused IP addresses.
  */
-class UnusedIpDeleteCommand extends ContainerAwareCommand
+class UnusedIpDeleteCommand extends ModeratedCommand
 {
     private const DEFAULT_LIMIT = 10000;
 
@@ -34,10 +33,14 @@ class UnusedIpDeleteCommand extends ContainerAwareCommand
 <info>php %command.full_name%</info>
 EOT
             );
+        parent::configure();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$this->checkRunStatus($input, $output)) {
+            return 0;
+        }
         $container = $this->getContainer();
         /** @var IpAddressModel $ipAddressModel */
         $ipAddressModel = $container->get('mautic.lead.model.ipaddress');
@@ -48,9 +51,11 @@ EOT
             $output->writeln(sprintf('<info>%s unused IP addresses have been deleted</info>', $deletedRows));
         } catch (DBALException $e) {
             $output->writeln(sprintf('<error>Deletion of unused IP addresses failed because of database error: %s</error>', $e->getMessage()));
+            $this->completeRun();
 
             return 1;
         }
+        $this->completeRun();
 
         return 0;
     }
