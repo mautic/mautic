@@ -18,7 +18,12 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     );
 
     // Define what rule sets will be applied
-    // $rectorConfig->sets([\Rector\Set\ValueObject\SetList::DEAD_CODE]); // @todo implement the whole set. Start rule by rule bellow.
+    $rectorConfig->sets([
+        \Rector\Symfony\Set\SymfonySetList::SYMFONY_40,
+
+        // @todo implement the whole set. Start rule by rule bellow.
+        // \Rector\Set\ValueObject\SetList::DEAD_CODE
+    ]);
 
     // Define what signle rules will be applied
     $rectorConfig->rule(\Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector::class);
