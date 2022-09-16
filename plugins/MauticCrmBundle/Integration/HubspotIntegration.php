@@ -28,15 +28,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @method HubspotApi getApiHelper
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
-  const ACCESS_KEY = 'accessKey';
+    const ACCESS_KEY = 'accessKey';
 
     /**
      * @var UserHelper
@@ -101,9 +99,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getRequiredKeyFields()
     {
-        return [
-            self::ACCESS_KEY   => 'mautic.hubspot.form.accessKey',
-        ];
+        return [];
     }
 
     /**
@@ -134,9 +130,9 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     public function getBearerToken($inAuthorization = false)
     {
-    $tokenData = $this->getKeys();
+        $tokenData = $this->getKeys();
 
-    return $tokenData[self::ACCESS_KEY] ?? null;
+        return $tokenData[self::ACCESS_KEY] ?? null;
     }
 
     /**
@@ -340,14 +336,28 @@ class HubspotIntegration extends CrmAbstractIntegration
     {
         if ('keys' === $formArea) {
             $builder->add(
+                   self::ACCESS_KEY,
+                   TextType::class,
+                   [
+                       'label'       => 'mautic.hubspot.form.accessKey',
+                       'label_attr'  => ['class' => 'control-label'],
+                       'attr'        => [
+                           'class'    => 'form-control',
+                           'readonly' => true,
+                       ],
+                       'required'    => false,
+                   ]
+               );
+
+            $builder->add(
                 $this->getApiKey(),
                 TextType::class,
                 [
                     'label'       => 'mautic.hubspot.form.apikey',
                     'label_attr'  => ['class' => 'control-label'],
                     'attr'        => [
-                        'class' => 'form-control',
-                        'readonly' => true
+                        'class'    => 'form-control',
+                        'readonly' => true,
                     ],
                     'required'    => false,
                 ]
