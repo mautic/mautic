@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
@@ -1386,17 +1387,59 @@ class LeadController extends FormController
                         // To lead
                         $mailer->addTo($leadEmail, $leadName);
 
-                        // From user
-                        $user = $this->get('mautic.helper.user')->getUser();
-
                         $mailer->setFrom(
                             $email['from'],
                             empty($email['fromname']) ? null : $email['fromname']
                         );
 
+                        // Attachments
+                        // From Assets
+                        $assets = [];
+                        $assetsIds  = $email['assetAttachments'] ?? [];
+                        $assetModel = $this->getModel('asset.asset');
+                        $uploadDir = $this->get('mautic.helper.core_parameters')->get('upload_dir');
+
+
+                        foreach($assetsIds as $assetId) {
+                            $asset = $assetModel->getEntity($assetId);
+                            if ($asset->isPublished()) {
+                                $asset->setUploadDir($uploadDir);
+                                $assets[] = $asset;
+                            }
+                        }
+
+                        if (!empty($assets)) {
+                            foreach ($assets as $asset) {
+                                if(is_file($asset->getFilePath())) {
+                                    /** @var MailHelper $mailer */
+                                    $mailer->message->addAttachment(
+                                        $asset->getFilePath(),
+                                        $asset->getOriginalFileName(),
+                                        $asset->getMime()
+                                    );
+                                }
+                            }
+                        }
+
+                        // Attachments from form
+                        if(isset($email['attachments']) && !empty($email['attachments'])) {
+                            foreach($email['attachments'] as $attachment) {
+                                /** @var UploadedFile $attachment */
+                                $mailer->message->addAttachment(
+                                    $attachment->getRealPath(),
+                                    $attachment->getClientOriginalName(),
+                                    $attachment->getMimeType()
+                                );
+                            }
+                        }
+
                         // Set Content
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
+
+                        // Set BCC/CC
+                        $mailer->setBcc($email['bcc']);
+                        $mailer->setCc($email['cc']);
 
                         // Set lead
                         $mailer->setLead($leadFields);
