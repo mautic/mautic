@@ -2,8 +2,6 @@
 
 namespace Mautic\PageBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -13,7 +11,6 @@ use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
-use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -130,18 +127,11 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     private $sessionId;
 
-    /**
-     * @var Collection<int, Submission>
-     */
-    private Collection $submissions;
-
     public function __clone()
     {
         $this->id = null;
         $this->clearTranslations();
         $this->clearVariants();
-
-        $this->submissions  = new ArrayCollection();
 
         parent::__clone();
     }
@@ -151,9 +141,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     public function __construct()
     {
-        $this->translationChildren = new ArrayCollection();
-        $this->variantChildren     = new ArrayCollection();
-        $this->submissions         = new ArrayCollection();
+        $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->variantChildren     = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -232,12 +221,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $builder->createField('noIndex', 'boolean')
             ->columnName('no_index')
             ->nullable()
-            ->build();
-
-        $builder->createOneToMany('submissions', Submission::class)
-            ->setOrderBy(['dateSubmitted' => 'DESC'])
-            ->mappedBy('page')
-            ->fetchExtraLazy()
             ->build();
 
         self::addTranslationMetadata($builder, self::class);
@@ -837,15 +820,5 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     public function setCustomHtml($customHtml)
     {
         $this->customHtml = $customHtml;
-    }
-
-    /**
-     * Get submissions.
-     *
-     * @return Collection<int, Submission>
-     */
-    public function getSubmissions(): Collection
-    {
-        return $this->submissions;
     }
 }

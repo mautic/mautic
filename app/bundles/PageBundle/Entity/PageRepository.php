@@ -14,6 +14,7 @@ class PageRepository extends CommonRepository
      */
     public function getEntities(array $args = [])
     {
+        //use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
         $sq = $this->_em->createQueryBuilder()
             ->select('count(fs.id)')
             ->from('MauticFormBundle:Submission', 'fs')
@@ -21,8 +22,7 @@ class PageRepository extends CommonRepository
 
         $q = $this
             ->createQueryBuilder('p')
-            // submission_count can be used in the order by clause without having it in the result
-            ->select('p, ('.$sq->getDql().') as HIDDEN submission_count')
+            ->select('p, ('.$sq->getDql().') as submission_count')
             ->leftJoin('p.category', 'c');
 
         $args['qb'] = $q;

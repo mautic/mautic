@@ -116,8 +116,8 @@ if ('index' == $tmpl) {
             </thead>
             <tbody>
             <?php
-            foreach ($items as $item):
-                $submissionsCount = count($item->getSubmissions());
+            foreach ($items as $i):
+                $item = $i[0];
             ?>
                 <tr>
                     <td>
@@ -199,10 +199,10 @@ if ('index' == $tmpl) {
                             'mautic_page_results',
                             ['objectId' => $item->getId()]
                         ); ?>" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs" <?php echo (0
-                        == $submissionsCount) ? 'disabled=disabled' : ''; ?>>
+                        == $i['submission_count']) ? 'disabled=disabled' : ''; ?>>
                             <?php echo $view['translator']->trans(
                                 'mautic.form.form.viewresults',
-                                ['%count%' => $submissionsCount]
+                                ['%count%' => $i['submission_count']]
                             ); ?>
                         </a>
                     </td>
