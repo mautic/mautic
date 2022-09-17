@@ -84,7 +84,7 @@ $container->loadFromExtension('framework', [
     'fragments'            => null,
     'http_method_override' => true,
     'mailer'               => [
-        'dsn' => '%mautic.mailer_dsn%',
+        'dsn' => '%env(MAUTIC_MAILER_DNS)%',
     ],
 
     /*'validation'           => array(
