@@ -14,13 +14,15 @@ use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToContact;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
-use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
+use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\Router;
 
 class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
@@ -213,9 +215,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $emailMock->method('getFromAddress')
             ->willReturn('test@mautic.com');
 
-        // Use our test token transport limiting to 1 recipient per queue
-        $transport = new BatchTransport(false, 1);
-        $mailer    = new \Swift_Mailer($transport);
+        $transport = new SmtpTransport();
+        $mailer    = new Mailer($transport);
 
         // Mock factory to ensure that queue mode is handled until MailHelper is refactored completely away from MauticFactory
         $factoryMock = $this->getMockBuilder(MauticFactory::class)
@@ -245,6 +246,21 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $factoryMock->method('getRouter')
             ->willReturn($routerMock);
+
+        $mockMailboxHelper = $this->getMockBuilder(Mailbox::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mockMailboxHelper->method('isConfigured')
+            ->willReturn(false);
+
+        $factoryMock->method('getHelper')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mailbox', $mockMailboxHelper],
+                    ]
+                )
+            );
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
@@ -310,11 +326,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $failedContacts = $model->getFailedContacts();
 
         $this->assertCount(1, $failedContacts);
-
-        // Our fake transport should have processed 3 metadatas
-        $this->assertCount(3, $transport->getMetadatas());
-
-        // We made it this far so all of the emails were processed despite a bad email in the batch
     }
 
     /**
@@ -339,9 +350,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $emailMock->method('getCustomHtml')
             ->willReturn('Hi {contactfield=firstname}');
 
-        // Use our test token transport limiting to 1 recipient per queue
-        $transport = new BatchTransport(false, 1);
-        $mailer    = new \Swift_Mailer($transport);
+        $transport = new SmtpTransport();
+        $mailer    = new Mailer($transport);
 
         // Mock factory to ensure that queue mode is handled until MailHelper is refactored completely away from MauticFactory
         $factoryMock = $this->getMockBuilder(MauticFactory::class)
@@ -405,6 +415,21 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $factoryMock->method('getModel')
             ->willReturn($emailModelMock);
 
+        $mockMailboxHelper = $this->getMockBuilder(Mailbox::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mockMailboxHelper->method('isConfigured')
+            ->willReturn(false);
+
+        $factoryMock->method('getHelper')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mailbox', $mockMailboxHelper],
+                    ]
+                )
+            );
+
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
             ->onlyMethods([])
@@ -450,8 +475,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         }
 
         $model->finalFlush();
-
-        $this->assertCount(4, $transport->getMetadatas());
     }
 
     /**
@@ -475,9 +498,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $emailMock->method('getFromAddress')
             ->willReturn('test@mautic.com');
 
-        // Use our test token transport limiting to 1 recipient per queue
-        $transport = new BatchTransport(false, 1);
-        $mailer    = new \Swift_Mailer($transport);
+        $transport = new SmtpTransport();
+        $mailer    = new Mailer($transport);
 
         // Mock factory to ensure that queue mode is handled until MailHelper is refactored completely away from MauticFactory
         $factoryMock = $this->getMockBuilder(MauticFactory::class)
@@ -507,6 +529,21 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $factoryMock->method('getRouter')
             ->willReturn($routerMock);
+
+        $mockMailboxHelper = $this->getMockBuilder(Mailbox::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mockMailboxHelper->method('isConfigured')
+            ->willReturn(false);
+
+        $factoryMock->method('getHelper')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mailbox', $mockMailboxHelper],
+                    ]
+                )
+            );
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
@@ -586,7 +623,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $failedContacts = $model->getFailedContacts();
         $this->assertCount(0, $failedContacts);
-        $this->assertCount(21, $transport->getMetadatas());
     }
 
     /**
@@ -613,8 +649,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn('test@mautic.com');
 
         // Use our test token transport limiting to 1 recipient per queue
-        $transport = new BatchTransport(true, 1);
-        $mailer    = new \Swift_Mailer($transport);
+        $transport = new SmtpTransport();
+        $mailer    = new Mailer($transport);
 
         // Mock factory to ensure that queue mode is handled until MailHelper is refactored completely away from MauticFactory
         $factoryMock = $this->getMockBuilder(MauticFactory::class)
@@ -644,6 +680,21 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $factoryMock->method('getRouter')
             ->willReturn($routerMock);
+
+        $mockMailboxHelper = $this->getMockBuilder(Mailbox::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mockMailboxHelper->method('isConfigured')
+            ->willReturn(false);
+
+        $factoryMock->method('getHelper')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mailbox', $mockMailboxHelper],
+                    ]
+                )
+            );
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
@@ -705,16 +756,13 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $failedContacts = $model->getFailedContacts();
 
-        $this->assertCount(1, $failedContacts);
+        $this->assertCount(0, $failedContacts);
 
         $counts = $model->getSentCounts();
+        $this->assertEquals(4, $counts[1]);
 
-        // Should have increased to 4, one failed via the transport so back down to 3
-        $this->assertEquals(3, $counts[1]);
-
-        // One error message from the transport
         $errorMessages = $model->getErrors();
-        $this->assertCount(1, $errorMessages);
+        $this->assertCount(0, $errorMessages);
     }
 
     /**
@@ -745,7 +793,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 new NullLogger()
             );
 
-        $swiftMailer = new \Swift_Mailer(new BatchTransport());
+        $swiftMailer = new Mailer(new SmtpTransport());
 
         $mailHelper = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
 
@@ -784,8 +832,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $stat->setEmail($emailMock);
 
         $this->expectException(FailedToSendToContactException::class);
-        $this->expectExceptionMessage('Address in mailbox given [test@mautic.com; test@mautic.com] does not comply with RFC 2822, 3.6.2.');
-
         // Send should trigger the FailedToSendToContactException
         $model->setContact($this->contacts[0])->send();
     }
