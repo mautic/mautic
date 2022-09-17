@@ -237,10 +237,10 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param string                              $column
-     * @param array<int,int|string>|int|null      $emailIds
-     * @param array<int,int|string>|int|true|null $listId
-     * @param bool                                $combined
+     * @param string                                       $column
+     * @param array<int, string>|array<int, int>|null      $emailIds
+     * @param array<int, string>|array<int, int>|bool|null $listId
+     * @param bool                                         $combined
      *
      * @return array|int
      */
@@ -688,8 +688,8 @@ class StatRepository extends CommonRepository
      */
     public function getStatsSummaryForContacts(array $contacts): array
     {
-        $queryBuilder               = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subQueryBuilder            = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $queryBuilder    = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $subQueryBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $leadAlias     = 'l'; // leads
         $statsAlias    = 'es'; // email_stats
