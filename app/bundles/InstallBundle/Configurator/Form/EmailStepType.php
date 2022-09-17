@@ -150,43 +150,6 @@ class EmailStepType extends AbstractType
         );
 
         $builder->add(
-            'mailer_sparkpost_region',
-            ChoiceType::class,
-            [
-                'choices'           => [
-                    'mautic.email.config.mailer.sparkpost_region.us'      => 'us',
-                    'mautic.email.config.mailer.sparkpost_region.eu'      => 'eu',
-                ],
-                'label'       => 'mautic.email.config.mailer.sparkpost_region',
-                'required'    => false,
-                'attr'        => [
-                    'class'        => 'form-control',
-                    'data-show-on' => '{"install_email_step_mailer_transport":['.$this->transportType->getSparkPostService().']}',
-                    'tooltip'      => 'mautic.email.config.mailer.sparkpost_region.tooltip',
-                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
-                ],
-                'placeholder' => false,
-            ]
-        );
-
-        $builder->add(
-            'mailer_amazon_other_region',
-            TextType::class,
-            [
-                'label'      => 'mautic.email.config.mailer.amazon_region.other',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'data-show-on' => '{"install_email_step_mailer_amazon_region":["other"]}',
-                    'data-hide-on' => '{"install_email_step_mailer_transport":['.$this->transportType->getServiceDoNotNeedAmazonRegion().']}',
-                    'tooltip'      => 'mautic.email.config.mailer.amazon_region.other.tooltip',
-                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
-                ],
-                'required'   => false,
-            ]
-        );
-
-        $builder->add(
             'mailer_port',
             TextType::class,
             [

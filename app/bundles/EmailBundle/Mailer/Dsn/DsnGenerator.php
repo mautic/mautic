@@ -14,6 +14,7 @@ class DsnGenerator
         'stream_max_entries',
         'tls',
         'redeliver_timeout',
+        'region',
     ];
 
     public static function getDsnString(Dsn $dsn): string
