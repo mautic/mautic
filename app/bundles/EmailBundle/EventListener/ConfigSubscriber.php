@@ -7,8 +7,9 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\ConfigType;
-use Mautic\EmailBundle\Mailer\Dsn\MailerDsnConvertor;
+use Mautic\EmailBundle\Helper\MailerDsnConvertor;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\EmailBundle\Model\TransportType;
 use Symfony\Component\Mailer\Transport\Dsn;
 
 class ConfigSubscriber implements EventSubscriberInterface
@@ -18,19 +19,32 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     private $coreParametersHelper;
 
+    /**
+     * @var TransportType
+     */
+    private TransportType $transportType;
+
+    /**
+     * Temp fields that will not be saved in env file
+     * but will be converted to Dsn string
+     *
+     * @var array
+     */
     private array $tempFields = [
         'mailer_transport',
         'mailer_host',
         'mailer_port',
         'mailer_user',
         'mailer_password',
-        'mailer_spool_type',
-        'mailer_amazon_region',
+        'mailer_encryption',
+        'mailer_auth_mode',
+        'mailer_api_key'
     ];
 
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(CoreParametersHelper $coreParametersHelper, TransportType $transportType)
     {
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->transportType = $transportType;
     }
 
     /**
@@ -58,13 +72,6 @@ class ConfigSubscriber implements EventSubscriberInterface
 
     public function onConfigBeforeSave(ConfigEvent $event)
     {
-        $event->unsetIfEmpty(
-            [
-                'mailer_password',
-                'mailer_api_key',
-            ]
-        );
-
         $data = $event->getConfig('emailconfig');
 
         // Get the original data so that passwords aren't lost
@@ -89,8 +96,13 @@ class ConfigSubscriber implements EventSubscriberInterface
                 }
             }
         }
+        
+        $data['mailer_dsn'] = MailerDsnConvertor::convertArrayToDsnString($data, $this->transportType->isServiceRequiresPassword());
 
-        $data['mailer_dsn'] = MailerDsnConvertor::convertArrayToDsnString($data);
+        foreach ($this->tempFields as $tempField) {
+            unset($data[$tempField]);
+        }
+
         $event->setConfig($data, 'emailconfig');
     }
 

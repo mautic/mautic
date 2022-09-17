@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Loader;
 
 use Mautic\EmailBundle\Loader\EnvVars\MailerEnvLoader;
+use Mautic\MessengerBundle\Loader\EnvVars\MessengerEnvLoader;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -59,7 +60,7 @@ class ParameterLoader
 
     public function loadIntoEnvironment()
     {
-        $envVariables      = new ParameterBag();
+        $envVariables = new ParameterBag();
         $defaultParameters = new ParameterBag(self::$defaultParameters);
 
         // Load from local configuration file first
@@ -73,6 +74,7 @@ class ParameterLoader
         EnvVars\SessionEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
         EnvVars\SiteUrlEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
         EnvVars\TwigEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        MessengerEnvLoader::load($this->parameterBag, $defaultParameters, $envVariables);
         MailerEnvLoader::load($this->parameterBag, $defaultParameters, $envVariables);
 
         // Load the values into the environment for cache use
@@ -87,7 +89,7 @@ class ParameterLoader
         /** @var array $paths */
         include $root.'/config/paths.php';
 
-        if (!isset($paths['local_config'])) {
+        if (! isset($paths['local_config'])) {
             if ($updateDefaultParameters) {
                 self::$defaultParameters['local_config_path'] = $root.'/config/local.php';
             }
@@ -132,7 +134,7 @@ class ParameterLoader
             /** @var array $config */
             $config = include $file->getPathname();
 
-            $parameters              = $config['parameters'] ?? [];
+            $parameters = $config['parameters'] ?? [];
             self::$defaultParameters = array_merge(self::$defaultParameters, $parameters);
         }
     }
@@ -140,7 +142,7 @@ class ParameterLoader
     private function loadLocalParameters(): void
     {
         $compiledParameters = [];
-        $localConfigFile    = self::getLocalConfigFile($this->rootPath);
+        $localConfigFile = self::getLocalConfigFile($this->rootPath);
 
         // Load parameters array from local configuration
         if (file_exists($localConfigFile)) {
@@ -173,7 +175,7 @@ class ParameterLoader
     private function createParameterBags(): void
     {
         $this->localParameterBag = new ParameterBag($this->localParameters);
-        $this->parameterBag      = new ParameterBag(array_merge(self::$defaultParameters, $this->localParameters));
+        $this->parameterBag = new ParameterBag(array_merge(self::$defaultParameters, $this->localParameters));
     }
 
     private function getLocalParametersFile(): string

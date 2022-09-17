@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class MauticCoreExtension extends Extension
 {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -40,7 +40,7 @@ class MauticCoreExtension extends Extension
         $serviceNames = [];
 
         foreach ($bundles as $bundle) {
-            if (!empty($bundle['config']['services'])) {
+            if (! empty($bundle['config']['services'])) {
                 $config = $bundle['config']['services'];
                 foreach ($config as $type => $services) {
                     switch ($type) {
@@ -83,7 +83,7 @@ class MauticCoreExtension extends Extension
                         }
                         $serviceNames[$name] = true;
 
-                        if (!is_array($details)) {
+                        if (! is_array($details)) {
                             // Set parameter
                             $container->setParameter($name, $details);
                             continue;
@@ -122,9 +122,9 @@ class MauticCoreExtension extends Extension
 
                         // Generate definition arguments
                         $definitionArguments = [];
-                        if (!isset($details['arguments'])) {
+                        if (! isset($details['arguments'])) {
                             $details['arguments'] = [];
-                        } elseif (!is_array($details['arguments'])) {
+                        } elseif (! is_array($details['arguments'])) {
                             $details['arguments'] = [$details['arguments']];
                         }
 
@@ -140,31 +140,31 @@ class MauticCoreExtension extends Extension
 
                         // Generate tag and tag arguments
                         if (isset($details['tags'])) {
-                            $tagArguments = (!empty($details['tagArguments'])) ? $details['tagArguments'] : [];
+                            $tagArguments = (! empty($details['tagArguments'])) ? $details['tagArguments'] : [];
                             foreach ($details['tags'] as $k => $tag) {
-                                if (!isset($tagArguments[$k])) {
+                                if (! isset($tagArguments[$k])) {
                                     $tagArguments[$k] = [];
                                 }
 
-                                if (!empty($details['alias'])) {
+                                if (! empty($details['alias'])) {
                                     $tagArguments[$k]['alias'] = $details['alias'];
                                 }
 
                                 $definition->addTag($tag, $tagArguments[$k]);
                             }
                         } else {
-                            $tag          = (!empty($details['tag'])) ? $details['tag'] : $defaultTag;
-                            $tagArguments = (!empty($details['tagArguments'])) ? $details['tagArguments'] : [];
+                            $tag = (! empty($details['tag'])) ? $details['tag'] : $defaultTag;
+                            $tagArguments = (! empty($details['tagArguments'])) ? $details['tagArguments'] : [];
 
-                            if (!empty($tag)) {
-                                if (!empty($details['alias'])) {
+                            if (! empty($tag)) {
+                                if (! empty($details['alias'])) {
                                     $tagArguments['alias'] = $details['alias'];
                                 }
 
                                 $definition->addTag($tag, $tagArguments);
 
                                 if ('mautic.email_transport' === $tag) {
-                                    $container->setAlias(sprintf('swiftmailer.mailer.transport.%s', $name), $alias);
+                                    $container->setAlias(sprintf('symfony.mailer.transport.%s', $name), $alias);
                                 }
                             }
 
@@ -178,32 +178,32 @@ class MauticCoreExtension extends Extension
                         $definition->setPublic($public);
 
                         // Set lazy service
-                        if (!empty($details['lazy'])) {
+                        if (! empty($details['lazy'])) {
                             $definition->setLazy($details['lazy']);
                         }
 
                         // Set synthetic service
-                        if (!empty($details['synthetic'])) {
+                        if (! empty($details['synthetic'])) {
                             $definition->setSynthetic($details['synthetic']);
                         }
 
                         // Set abstract service
-                        if (!empty($details['abstract'])) {
+                        if (! empty($details['abstract'])) {
                             $definition->setAbstract($details['abstract']);
                         }
 
                         // Set include file
-                        if (!empty($details['file'])) {
+                        if (! empty($details['file'])) {
                             $definition->setFile($details['file']);
                         }
 
                         // Set service configurator
-                        if (!empty($details['configurator'])) {
+                        if (! empty($details['configurator'])) {
                             $definition->setConfigurator($details['configurator']);
                         }
 
                         // Set factory - Preferred API since Symfony 2.6
-                        if (!empty($details['factory'])) {
+                        if (! empty($details['factory'])) {
                             $factory = $details['factory'];
 
                             /*
@@ -231,7 +231,7 @@ class MauticCoreExtension extends Extension
                         }
 
                         // Set method calls
-                        if (!empty($details['methodCalls'])) {
+                        if (! empty($details['methodCalls'])) {
                             foreach ($details['methodCalls'] as $method => $methodArguments) {
                                 $methodCallArguments = [];
                                 foreach ($methodArguments as $argument) {
@@ -243,14 +243,14 @@ class MauticCoreExtension extends Extension
                         }
 
                         // Set deprecated service
-                        if (!empty($details['decoratedService'])) {
+                        if (! empty($details['decoratedService'])) {
                             // This should be an array and the first parameter cannot be empty
-                            if (!is_array($details['decoratedService'])) {
+                            if (! is_array($details['decoratedService'])) {
                                 throw new InvalidArgumentException('The "decoratedService" definition must be an array.');
                             }
 
                             // The second parameter of setDecoratedService is optional, check if there is a second key in the array
-                            $secondParam = !empty($details['decoratedService'][1]) ? $details['decoratedService'][1] : null;
+                            $secondParam = ! empty($details['decoratedService'][1]) ? $details['decoratedService'][1] : null;
 
                             $definition->setDecoratedService($details['decoratedService'][0], $secondParam);
                         }
@@ -270,7 +270,8 @@ class MauticCoreExtension extends Extension
                     $options,
                 ]
             ))
-                ->addTag('knp_menu.renderer',
+                ->addTag(
+                    'knp_menu.renderer',
                     [
                         'alias' => $alias,
                     ]
@@ -300,7 +301,7 @@ class MauticCoreExtension extends Extension
             $definitionArguments[] = $argument;
         } elseif (0 === strpos($argument, '%')) {
             // Parameter
-            $argument              = str_replace('%%', '%', $argument);
+            $argument = str_replace('%%', '%', $argument);
             $definitionArguments[] = $container->getParameter(substr($argument, 1, -1));
         } elseif (is_bool($argument) || false !== strpos($argument, '\\')) {
             // Parameter or Class
@@ -310,11 +311,11 @@ class MauticCoreExtension extends Extension
             $definitionArguments[] = substr($argument, 1, -1);
         } elseif (0 === strpos($argument, '@=')) {
             // Expression
-            $argument              = substr($argument, 2);
+            $argument = substr($argument, 2);
             $definitionArguments[] = new Expression($argument);
         } elseif (0 === strpos($argument, '@')) {
             // Service
-            $argument              = substr($argument, 1);
+            $argument = substr($argument, 1);
             $definitionArguments[] = new Reference($argument);
         } else {
             // Reference

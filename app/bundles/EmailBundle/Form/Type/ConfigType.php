@@ -350,39 +350,6 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'mailer_amazon_region',
-            ChoiceType::class,
-            [
-                'choices'           => [
-                    'mautic.email.config.mailer.amazon_region.us_east_1'      => 'us-east-1',
-                    'mautic.email.config.mailer.amazon_region.us_east_2'      => 'us-east-2',
-                    'mautic.email.config.mailer.amazon_region.us_west_2'      => 'us-west-2',
-                    'mautic.email.config.mailer.amazon_region.ap_south_1'     => 'ap-south-1',
-                    'mautic.email.config.mailer.amazon_region.ap_northeast_2' => 'ap-northeast-2',
-                    'mautic.email.config.mailer.amazon_region.ap_southeast_1' => 'ap-southeast-1',
-                    'mautic.email.config.mailer.amazon_region.ap_southeast_2' => 'ap-southeast-2',
-                    'mautic.email.config.mailer.amazon_region.ap_northeast_1' => 'ap-northeast-1',
-                    'mautic.email.config.mailer.amazon_region.ca_central_1'   => 'ca-central-1',
-                    'mautic.email.config.mailer.amazon_region.eu_central_1'   => 'eu-central-1',
-                    'mautic.email.config.mailer.amazon_region.eu_west_1'      => 'eu-west-1',
-                    'mautic.email.config.mailer.amazon_region.eu_west_2'      => 'eu-west-2',
-                    'mautic.email.config.mailer.amazon_region.sa_east_1'      => 'sa-east-1',
-                    'mautic.email.config.mailer.amazon_region.us_gov_west_1'  => 'us-gov-west-1',
-                    'mautic.email.config.mailer.amazon_region.other'          => 'other',
-                ],
-                'label'       => 'mautic.email.config.mailer.amazon_region',
-                'required'    => false,
-                'attr'        => [
-                    'class'        => 'form-control',
-                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getAmazonService().']}',
-                    'tooltip'      => 'mautic.email.config.mailer.amazon_region.tooltip',
-                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
-                ],
-                'placeholder' => false,
-            ]
-        );
-
-        $builder->add(
             'mailer_port',
             TextType::class,
             [
@@ -398,29 +365,6 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $smtpServiceShowConditions = '{"config_emailconfig_mailer_transport":['.$this->transportType->getSmtpService().']}';
-        $builder->add(
-            'mailer_auth_mode',
-            ChoiceType::class,
-            [
-                'choices'           => [
-                    'mautic.email.config.mailer_auth_mode.plain'    => 'plain',
-                    'mautic.email.config.mailer_auth_mode.login'    => 'login',
-                    'mautic.email.config.mailer_auth_mode.cram-md5' => 'cram-md5',
-                ],
-                'label'       => 'mautic.email.config.mailer.auth.mode',
-                'label_attr'  => ['class' => 'control-label'],
-                'required'    => false,
-                'attr'        => [
-                    'class'        => 'form-control',
-                    'data-show-on' => $smtpServiceShowConditions,
-                    'tooltip'      => 'mautic.email.config.mailer.auth.mode.tooltip',
-                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
-                ],
-                'placeholder' => 'mautic.email.config.mailer_auth_mode.none',
-            ]
-        );
-
         $builder->add(
             'mailer_user',
             TextType::class,
@@ -429,14 +373,7 @@ class ConfigType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'data-show-on' => '{
-                        "config_emailconfig_mailer_auth_mode":[
-                            "plain",
-                            "login",
-                            "cram-md5"
-                        ],
-                        "config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresUser().']
-                    }',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresUser().']}',
                     'data-hide-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedUser().']}',
                     'tooltip'      => 'mautic.email.config.mailer.user.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
@@ -448,21 +385,14 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_password',
-            TextType::class,
+            PasswordType::class,
             [
                 'label'      => 'mautic.email.config.mailer.password',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'placeholder'  => 'mautic.user.user.form.passwordplaceholder',
-                    'data-show-on' => '{
-                        "config_emailconfig_mailer_auth_mode":[
-                            "plain",
-                            "login",
-                            "cram-md5"
-                        ],
-                        "config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresPassword().']
-                    }',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresPassword().']}',
                     'data-hide-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedPassword().']}',
                     'tooltip'      => 'mautic.email.config.mailer.password.tooltip',
                     'autocomplete' => 'off',
@@ -481,32 +411,13 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class'        => 'form-control',
                     'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresApiKey().']}',
+                    'data-hide-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedUser().']}',
                     'tooltip'      => 'mautic.email.config.mailer.apikey.tooltop',
                     'autocomplete' => 'off',
                     'placeholder'  => 'mautic.email.config.mailer.apikey.placeholder',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
                 'required'   => false,
-            ]
-        );
-
-        $builder->add(
-            'mailer_encryption',
-            ChoiceType::class,
-            [
-                'choices'           => [
-                    'mautic.email.config.mailer_encryption.ssl' => 'ssl',
-                    'mautic.email.config.mailer_encryption.tls' => 'tls',
-                ],
-                'label'       => 'mautic.email.config.mailer.encryption',
-                'required'    => false,
-                'attr'        => [
-                    'class'        => 'form-control',
-                    'data-show-on' => $smtpServiceShowConditions,
-                    'tooltip'      => 'mautic.email.config.mailer.encryption.tooltip',
-                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
-                ],
-                'placeholder' => 'mautic.email.config.mailer_encryption.none',
             ]
         );
 
@@ -533,47 +444,6 @@ class ConfigType extends AbstractType
                     'class'   => 'btn btn-info',
                     'onclick' => 'Mautic.sendTestEmail()',
                 ],
-            ]
-        );
-
-        $builder->add(
-            'mailer_mailjet_sandbox',
-            YesNoButtonGroupType::class,
-            [
-                'label'      => 'mautic.email.config.mailer.mailjet.sandbox',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.email.config.mailer.mailjet.sandbox',
-                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getMailjetService().']}',
-                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
-                ],
-                'data'       => empty($options['data']['mailer_mailjet_sandbox']) ? false : true,
-                'required'   => false,
-            ]
-        );
-
-        $builder->add(
-            'mailer_mailjet_sandbox_default_mail',
-            TextType::class,
-            [
-                'label'       => 'mautic.email.config.mailer.mailjet.sandbox.mail',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.email.config.mailer.mailjet.sandbox.mail',
-                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getMailjetService().']}',
-                    'data-hide-on' => '{"config_emailconfig_mailer_mailjet_sandbox_0":"checked"}',
-                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
-                ],
-                'constraints' => [
-                    new Email(
-                        [
-                            'message' => 'mautic.core.email.required',
-                        ]
-                    ),
-                ],
-                'required'    => false,
             ]
         );
 
@@ -732,6 +602,60 @@ class ConfigType extends AbstractType
                 'required'   => false,
             ]
         );
+        
+        //Inject config elements for SMTP transport (buit-in)
+        $smtpServiceShowConditions = '{"config_emailconfig_mailer_transport":['.$this->transportType->getSmtpService().']}';
+        
+        $builder->add(
+            'mailer_auth_mode',
+            ChoiceType::class,
+            [
+                'choices'           => [
+                    'mautic.email.config.mailer_auth_mode.plain'    => 'plain',
+                    'mautic.email.config.mailer_auth_mode.login'    => 'login',
+                    'mautic.email.config.mailer_auth_mode.cram-md5' => 'cram-md5',
+                ],
+                'label'       => 'mautic.email.config.mailer.auth.mode',
+                'label_attr'  => ['class' => 'control-label'],
+                'required'    => false,
+                'attr'        => [
+                    'class'        => 'form-control',
+                    'data-show-on' => $smtpServiceShowConditions,
+                    'tooltip'      => 'mautic.email.config.mailer.auth.mode.tooltip',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'placeholder' => 'mautic.email.config.mailer_auth_mode.none',
+            ]
+        );
+        
+        
+        $builder->add(
+                    'mailer_encryption',
+                    ChoiceType::class,
+                    [
+                        'choices'           => [
+                            'mautic.email.config.mailer_encryption.ssl' => 'ssl',
+                            'mautic.email.config.mailer_encryption.tls' => 'tls',
+                        ],
+                        'label'       => 'mautic.email.config.mailer.encryption',
+                        'required'    => false,
+                        'attr'        => [
+                            'class'        => 'form-control',
+                            'data-show-on' => $smtpServiceShowConditions,
+                            'tooltip'      => 'mautic.email.config.mailer.encryption.tooltip',
+                            'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                        ],
+                        'placeholder' => 'mautic.email.config.mailer_encryption.none',
+                    ]
+                );
+        
+        
+        // Inject any other elements of other bundles
+        foreach ($this->transportType->getTrasportConfig() as $class) {
+            $configForm = new $class($this->translator, $builder, $options);
+            $configForm->buildForm($builder, $options);
+        }
+
     }
 
     /**

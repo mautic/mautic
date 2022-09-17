@@ -231,6 +231,7 @@ return [
                 'class'     => \Mautic\EmailBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'mautic.email.transport_type',
                 ],
             ],
             'mautic.email.pagebundle.subscriber' => [
@@ -554,25 +555,9 @@ return [
             'mautic.email.transport_wrapper' => [
                 'class'     => \Mautic\EmailBundle\Mailer\Transport\TransportWrapper::class,
             ],
-            'mautic.email.transport_extension.ses_api' => [
-                'class'     => \Mautic\EmailBundle\Mailer\Transport\SesApiTransportExtension::class,
-                'arguments' => [
-                    'mautic.email.amazon.callback',
-                ],
-                'tags' => ['mautic.email.transport_extension'],
-            ],
             'mautic.email.transport_extension.smtp' => [
                 'class'     => \Mautic\EmailBundle\Mailer\Transport\SmtpTransportExtension::class,
                 'tags'      => ['mautic.email.transport_extension'],
-            ],
-            'mautic.email.amazon.callback' => [
-                'class'     => \Mautic\EmailBundle\Mailer\Callback\AmazonCallback::class,
-                'arguments' => [
-                    'monolog.logger.mautic',
-                    'mautic.http.client',
-                    'translator',
-                    'mautic.email.model.transport_callback',
-                ],
             ],
         ],
         'models' => [
@@ -631,14 +616,14 @@ return [
             ],
         ],
         'commands' => [
-//            'mautic.email.command.fetch' => [
-//                'class'     => \Mautic\EmailBundle\Command\ProcessFetchEmailCommand::class,
-//                'arguments' => [
-//                    'mautic.helper.core_parameters',
-//                    'mautic.email.fetcher',
-//                ],
-//                'tag' => 'console.command',
-//            ],
+            'mautic.email.command.fetch' => [
+                'class'     => \Mautic\EmailBundle\Command\ProcessFetchEmailCommand::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.email.fetcher',
+                ],
+                'tag' => 'console.command',
+            ],
         ],
         'validator' => [
             'mautic.email.validator.multiple_emails_valid_validator' => [
@@ -689,18 +674,14 @@ return [
         ],
     ],
     'parameters' => [
-        'mailer_api_key'                 => null, // Api key from mail delivery provider.
         'mailer_from_name'               => 'Mautic',
         'mailer_from_email'              => 'email@yoursite.com',
         'mailer_reply_to_email'          => null,
         'mailer_return_path'             => null,
         'mailer_append_tracking_pixel'   => true,
         'mailer_convert_embed_images'    => false,
-        'mailer_encryption'              => null, //tls or ssl,
-        'mailer_auth_mode'               => null, //plain, login or cram-md5
-        'mailer_amazon_region'           => 'us-east-1',
         'mailer_custom_headers'          => [],
-        'mailer_dsn'                     => 'null://null',
+        'mailer_dsn'                     => 'smtp://user:pass@smtp.example.com:port',
         'unsubscribe_text'               => null,
         'webview_text'                   => null,
         'unsubscribe_message'            => null,
@@ -756,8 +737,6 @@ return [
         'show_contact_preferred_channels'     => false,
         'show_contact_categories'             => false,
         'show_contact_segments'               => false,
-        'mailer_mailjet_sandbox'              => false,
-        'mailer_mailjet_sandbox_default_mail' => null,
         'disable_trackable_urls'              => false,
         'theme_email_default'                 => 'blank',
     ],

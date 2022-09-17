@@ -6,17 +6,20 @@ class TransportType
 {
     public const TRANSPORT_ALIAS = 'transport_alias';
 
-    public const FIELD_HOST     = 'field_host';
-    public const FIELD_PORT     = 'field_port';
-    public const FIELD_USER     = 'field_user';
+    public const FIELD_HOST = 'field_host';
+
+    public const FIELD_PORT = 'field_port';
+
+    public const FIELD_USER = 'field_user';
+
     public const FIELD_PASSWORD = 'field_password';
-    public const FIELD_API_KEY  = 'field_api_key';
+
+    public const FIELD_API_KEY = 'field_api_key';
 
     /**
      * @var array
      */
     private $transportTypes = [
-        'ses+api'  => 'mautic.email.config.mailer_transport.amazon_api',
         'smtp'     => 'mautic.email.config.mailer_transport.smtp',
     ];
 
@@ -38,45 +41,20 @@ class TransportType
      * @var array
      */
     private $showUser = [
-        'mautic.transport.mailjet',
-        'mautic.transport.sendgrid',
-        'mautic.transport.pepipost',
-        'mautic.transport.elasticemail',
-        'ses+api',
-        'mautic.transport.postmark',
-        'gmail',
-        // smtp is left out on purpose as the auth_mode will manage displaying this field
+        'smtp',
     ];
 
     /**
      * @var array
      */
     private $showPassword = [
-        'mautic.transport.mailjet',
-        'mautic.transport.sendgrid',
-        'mautic.transport.pepipost',
-        'mautic.transport.elasticemail',
-        'ses+smtp',
-        'ses+api',
-        'mautic.transport.postmark',
-        'gmail',
-        // smtp is left out on purpose as the auth_mode will manage displaying this field
+        'smtp',
     ];
 
     /**
      * @var array
      */
     private $showApiKey = [
-        'mautic.transport.sparkpost',
-        'mautic.transport.mandrill',
-        'mautic.transport.sendgrid_api',
-    ];
-
-    /**
-     * @var array
-     */
-    private $showAmazonRegion = [
-        'ses+api',
     ];
 
     /**
@@ -86,6 +64,11 @@ class TransportType
     {
         return $this->transportTypes;
     }
+
+    /**
+     * @var string[]
+     */
+    private $transportConfigModels = [];
 
     /**
      * @return string
@@ -116,24 +99,14 @@ class TransportType
      */
     public function getServiceDoNotNeedUser()
     {
-        // The auth_mode data-show-on will handle smtp
-        $tempTransports = $this->transportTypes;
-        unset($tempTransports['smtp']);
-
-        $transports       = array_keys($tempTransports);
-        $doNotRequireUser = array_diff($transports, $this->showUser);
+        $doNotRequireUser = array_diff($this->transportTypes, $this->showUser);
 
         return $this->getString($doNotRequireUser);
     }
 
     public function getServiceDoNotNeedPassword()
     {
-        // The auth_mode data-show-on will handle smtp
-        $tempTransports = $this->transportTypes;
-        unset($tempTransports['smtp']);
-
-        $transports       = array_keys($tempTransports);
-        $doNotRequireUser = array_diff($transports, $this->showPassword);
+        $doNotRequireUser = array_diff($this->transportTypes, $this->showPassword);
 
         return $this->getString($doNotRequireUser);
     }
@@ -144,6 +117,14 @@ class TransportType
     public function getServiceRequiresPassword()
     {
         return $this->getString($this->showPassword);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isServiceRequiresPassword() : bool
+    {
+        return ($this->getServiceRequiresPassword() !== '') ? true : false;
     }
 
     /**
@@ -163,27 +144,11 @@ class TransportType
     }
 
     /**
-     * @return string
+     * @return string[]
      */
-    public function getAmazonService()
+    public function getTrasportConfig(): array
     {
-        return $this->getString($this->showAmazonRegion);
-    }
-
-    /**
-     * @return string
-     */
-    public function getSparkPostService()
-    {
-        return '"mautic.transport.sparkpost"';
-    }
-
-    /**
-     * @return string
-     */
-    public function getMailjetService()
-    {
-        return '"mautic.transport.mailjet"';
+        return $this->transportConfigModels;
     }
 
     /**

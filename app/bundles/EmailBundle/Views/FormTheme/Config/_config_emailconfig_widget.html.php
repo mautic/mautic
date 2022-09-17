@@ -55,14 +55,6 @@ $template = '<div class="col-md-6">{content}</div>';
             <?php endif; ?>
 
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_region', $template); ?>
-            </div>
-
-            <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_sparkpost_region', $template); ?>
-            </div>
-
-            <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_host', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_port', $template); ?>
             </div>
@@ -72,18 +64,36 @@ $template = '<div class="col-md-6">{content}</div>';
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_auth_mode', $template); ?>
             </div>
 
+
+
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_user', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_password', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_api_key', $template); ?>
             </div>
+            
+            <?php
+                /**
+                 * Options below will be used to compose the Dsn string
+                 * they will not be saved in the env file.
+                 */
+                $i = 0;
+    $mailerKeys = array_filter($fields, function ($key) {
+        return strpos($key, 'mailer_option') === 0;
+    }, ARRAY_FILTER_USE_KEY);
 
-            <?php if (isset($fields['mailer_transport'])): ?>
-                <div class="row">
-                    <?php echo $view['form']->rowIfExists($fields, 'mailer_mailjet_sandbox', $template); ?>
-                    <?php echo $view['form']->rowIfExists($fields, 'mailer_mailjet_sandbox_default_mail', $template); ?>
-                </div>
-            <?php endif; ?>
+    foreach ($mailerKeys as $key) {
+        if ($i % 2 == 0) {
+            echo "<div class='row'>";
+        }
+        echo $view['form']->rowIfExists($fields, $key, $template);
+        $i++;
+        if ($i % 2 == 0) {
+            echo '</div>';
+        }
+    }
+    ?>
+
 
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_custom_headers', $template); ?>

@@ -28,27 +28,6 @@ class MailerDsnConvertorTest extends \PHPUnit\Framework\TestCase
                 ],
                 'null://null',
             ],
-            'ses+api://KEY:SECRET@default' => [
-                [
-                    'mailer_transport' => 'ses+api',
-                    'mailer_host'      => null,
-                    'mailer_user'      => 'KEY',
-                    'mailer_password'  => 'SECRET',
-                    'mailer_port'      => 100,
-                ],
-                'ses+api://KEY:SECRET@default',
-            ],
-            'ses+api://KEY:SECRET@default?region=region' => [
-                [
-                    'mailer_transport'     => 'ses+api',
-                    'mailer_host'          => null,
-                    'mailer_user'          => 'KEY',
-                    'mailer_password'      => 'SECRET',
-                    'mailer_port'          => 100,
-                    'mailer_amazon_region' => 'region',
-                ],
-                'ses+api://KEY:SECRET@default?region=region',
-            ],
         ];
     }
 }

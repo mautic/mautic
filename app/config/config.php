@@ -22,7 +22,7 @@ $container->loadFromExtension('sensio_framework_extra', [
 ]);
 
 // Build and store Mautic bundle metadata
-$symfonyBundles        = $container->getParameter('kernel.bundles');
+$symfonyBundles = $container->getParameter('kernel.bundles');
 $bundleMetadataBuilder = new \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder($symfonyBundles, $paths, $root);
 
 $container->setParameter('mautic.bundles', $bundleMetadataBuilder->getCoreBundleMetadata());
@@ -34,8 +34,8 @@ $container->setParameter('mautic.ip_lookup_services', $bundleMetadataBuilder->ge
 // Load parameters
 include __DIR__.'/parameters.php';
 $container->loadFromExtension('mautic_core');
-$parameterLoader         = new \Mautic\CoreBundle\Loader\ParameterLoader();
-$configParameterBag      = $parameterLoader->getParameterBag();
+$parameterLoader = new \Mautic\CoreBundle\Loader\ParameterLoader();
+$configParameterBag = $parameterLoader->getParameterBag();
 $localConfigParameterBag = $parameterLoader->getLocalParameterBag();
 
 // Set template engines
@@ -45,10 +45,10 @@ $engines = ['php', 'twig'];
 // This cannot be set dynamically
 
 if (defined('MAUTIC_INSTALLER')) {
-    $request      = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+    $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
     $secureCookie = $request->isSecure();
 } else {
-    $siteUrl      = $configParameterBag->get('site_url');
+    $siteUrl = $configParameterBag->get('site_url');
     $secureCookie = ($siteUrl && 0 === strpos($siteUrl, 'https'));
 }
 
@@ -94,9 +94,6 @@ $container->loadFromExtension('framework', [
         ],
         'transports'  => [
             'email_transport' => [
-<<<<<<< HEAD
-                'dsn' => '%env(MAUTIC_MESSENGER_EMAIL_TRANSPORT_DSN)%',
-=======
                 'dsn'            => '%env(MAUTIC_MESSENGER_EMAIL_TRANSPORT_DSN)%',
                 'options'        => [
                     'consumer'    => '%env(MAUTIC_MESSENGER_CONSUMER_NAME)%',
@@ -107,7 +104,7 @@ $container->loadFromExtension('framework', [
                     'multiplier'  => $configParameterBag->get('messenger_retry_strategy_multiplier', 2),
                     'max_delay'   => $configParameterBag->get('messenger_retry_strategy_max_delay', 0),
                 ],
->>>>>>> 0d6a79bc75 (Add retry strategy parameters. Add validation group for redis messenger)
+
             ],
         ],
         'routing' => [

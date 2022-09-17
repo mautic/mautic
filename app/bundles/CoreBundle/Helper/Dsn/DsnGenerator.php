@@ -4,19 +4,6 @@ namespace Mautic\CoreBundle\Helper\Dsn;
 
 class DsnGenerator
 {
-    private const ALLOWED_OPTIONS = [
-        'auto_setup',
-        'group',
-        'consumer',
-        'delete_after_ack',
-        'delete_after_reject',
-        'lazy',
-        'stream_max_entries',
-        'tls',
-        'redeliver_timeout',
-        'region',
-    ];
-
     public static function getDsnString(Dsn $dsn): string
     {
         $dsnString = $dsn->getScheme().'://';
@@ -38,8 +25,8 @@ class DsnGenerator
         }
 
         $options = [];
-        foreach (self::ALLOWED_OPTIONS as $option) {
-            if (null !== $dsn->getOption($option)) {
+        foreach ($dsn->getOptions() as $option => $value) {
+            if (null !== $value) {
                 $options[$option] = $dsn->getOption($option);
             }
         }
