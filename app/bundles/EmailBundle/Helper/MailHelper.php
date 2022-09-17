@@ -13,11 +13,9 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Exception\PartialEmailSendFailure;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
-use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email as MailerEmail;
 use Symfony\Component\Mime\Header\HeaderInterface;
@@ -43,7 +41,7 @@ class MailHelper
      */
     protected $factory;
 
-    protected $mailer;
+    protected MailerInterface $mailer;
 
     protected $transport;
 
@@ -222,13 +220,6 @@ class MailHelper
     private $messageSentCount = 0;
 
     /**
-     * Large batch mail sends may result on timeouts with SMTP servers. This will will keep track of when a transport was last started and force a restart after set number of minutes.
-     *
-     * @var int
-     */
-    private $transportStartTime;
-
-    /**
      * Simply a md5 of the content so that event listeners can easily determine if the content has been changed.
      *
      * @var string
@@ -286,14 +277,7 @@ class MailHelper
      */
     public function getSampleMailer($cleanSlate = true)
     {
-        $queueMode = $this->factory->getParameter('mailer_spool_type');
-        if ('file' != $queueMode) {
-            return $this->getMailer($cleanSlate);
-        }
-
-        $transport  = $this->factory->get('swiftmailer.mailer.default.transport.real');
-        $mailer     = new Mailer($transport);
-        $mailHelper = new self($this->factory, $mailer, $this->from);
+        $mailHelper = new self($this->factory, $this->mailer, $this->from);
 
         return $mailHelper->getMailer($cleanSlate);
     }
@@ -341,9 +325,9 @@ class MailHelper
         }
         // Set system return path if applicable
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
-            $this->message->setReturnPath($bounceEmail);
+            $this->message->returnPath($bounceEmail);
         } elseif (!empty($this->returnPath)) {
-            $this->message->setReturnPath($this->returnPath);
+            $this->message->returnPath($this->returnPath);
         }
 
         if (empty($this->fatal)) {
@@ -410,8 +394,6 @@ class MailHelper
             }
 
             try {
-                $this->transportStartTime = time();
-
                 $failures = null;
 
                 $this->mailer->send($this->message, $failures);
@@ -444,8 +426,6 @@ class MailHelper
         }
 
         ++$this->messageSentCount;
-        $this->checkIfTransportNeedsRestart();
-
         $error = empty($this->errors);
 
         if (!$isQueueFlush) {
@@ -556,7 +536,7 @@ class MailHelper
      *
      * @return bool
      */
-    public function flushMalQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'])
+    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'])
     {
         // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
         $flushed = empty($this->fatal);
@@ -644,7 +624,6 @@ class MailHelper
         $this->internalSend     = false;
         $this->fatal            = false;
         $this->idHashState      = true;
-        $this->checkIfTransportNeedsRestart(true);
 
         if ($cleanSlate) {
             $this->appendTrackingPixel = false;
@@ -652,19 +631,17 @@ class MailHelper
             $this->from                = $this->systemFrom;
             $this->replyTo             = $this->systemReplyTo;
             $this->headers             = [];
-            [];
-            $this->source         = [];
-            $this->assets         = [];
-            $this->globalTokens   = [];
-            $this->assets         = [];
-            $this->attachedAssets = [];
-            $this->email          = null;
-            $this->copies         = [];
-            $this->message        = $this->getMessageInstance();
-            $this->subject        = '';
-            $this->plainText      = '';
-            $this->plainTextSet   = false;
-            $this->body           = [
+            $this->source              = [];
+            $this->globalTokens        = [];
+            $this->assets              = [];
+            $this->attachedAssets      = [];
+            $this->email               = null;
+            $this->copies              = [];
+            $this->message             = $this->getMessageInstance();
+            $this->subject             = '';
+            $this->plainText           = '';
+            $this->plainTextSet        = false;
+            $this->body                = [
                 'content'     => '',
                 'contentType' => 'text/html',
                 'charset'     => null,
@@ -750,7 +727,7 @@ class MailHelper
     /**
      * Get a MauticMessage/Email instance.
      *
-     * @return bool|MauticMessage
+     * @return bool|MauticMessage|MailerEmail
      */
     public function getMessageInstance()
     {
@@ -773,33 +750,7 @@ class MailHelper
      */
     public function attachFile($filePath, $fileName = null, $contentType = null, $inline = false)
     {
-        if ($this->tokenizationEnabled) {
-            // Stash attachment to be processed by the transport
-            $this->message->addAttachment($filePath, $fileName, $contentType, $inline);
-        } else {
-            // filePath can contain the value of a local file path or the value of an URL where the file can be found
-            if (filter_var($filePath, FILTER_VALIDATE_URL) || (file_exists($filePath) && is_readable($filePath))) {
-                try {
-                    $attachment = \Swift_Attachment::fromPath($filePath);
-
-                    if (!empty($fileName)) {
-                        $attachment->setFilename($fileName);
-                    }
-
-                    if (!empty($contentType)) {
-                        $attachment->setContentType($contentType);
-                    }
-
-                    if ($inline) {
-                        $attachment->setDisposition('inline');
-                    }
-
-                    $this->message->attach($attachment);
-                } catch (\Exception $e) {
-                    error_log($e);
-                }
-            }
-        }
+        $this->message->addAttachment($filePath, $fileName, $contentType, $inline);
     }
 
     /**
@@ -1002,8 +953,6 @@ class MailHelper
             }, []);
         }
 
-        $this->checkBatchMaxRecipients(count($addresses));
-
         try {
             foreach ($addresses as $address => $name) {
                 $this->message->addTo(new Address($address, $name ?? ''));
@@ -1028,8 +977,6 @@ class MailHelper
      */
     public function addTo($address, $name = null)
     {
-        $this->checkBatchMaxRecipients();
-
         try {
             $name = $this->cleanName($name);
             $this->message->addTo(new Address($address, $name ?? ''));
@@ -1053,11 +1000,9 @@ class MailHelper
      */
     public function setCc($addresses, $name = null)
     {
-        $this->checkBatchMaxRecipients(count($addresses), 'cc');
-
         try {
             $name = $this->cleanName($name);
-            $this->message->setCc($addresses, $name);
+            $this->message->cc($addresses, $name);
 
             return true;
         } catch (\Exception $e) {
@@ -1077,8 +1022,6 @@ class MailHelper
      */
     public function addCc($address, $name = null)
     {
-        $this->checkBatchMaxRecipients(1, 'cc');
-
         try {
             $name = $this->cleanName($name);
             $this->message->addCc($address, $name);
@@ -1101,11 +1044,9 @@ class MailHelper
      */
     public function setBcc($addresses, $name = null)
     {
-        $this->checkBatchMaxRecipients(count($addresses), 'bcc');
-
         try {
             $name = $this->cleanName($name);
-            $this->message->setBcc($addresses, $name);
+            $this->message->bcc($addresses, $name);
 
             return true;
         } catch (\Exception $e) {
@@ -1125,8 +1066,6 @@ class MailHelper
      */
     public function addBcc($address, $name = null)
     {
-        $this->checkBatchMaxRecipients(1, 'bcc');
-
         try {
             $name = $this->cleanName($name);
             $this->message->addBcc(new Address($address, $name ?? ''));
@@ -1136,28 +1075,6 @@ class MailHelper
             $this->logError($e, 'bcc');
 
             return false;
-        }
-    }
-
-    /**
-     * @param int    $toBeAdded
-     * @param string $type
-     *
-     * @throws BatchQueueMaxException
-     */
-    protected function checkBatchMaxRecipients($toBeAdded = 1, $type = 'to')
-    {
-        if ($this->queueEnabled) {
-            // Check if max batching has been hit
-            $maxAllowed = $this->transport->getMaxBatchLimit();
-
-            if ($maxAllowed > 0) {
-                $currentCount = $this->transport->getBatchRecipientCount($this->message, $toBeAdded, $type);
-
-                if ($currentCount > $maxAllowed) {
-                    throw new BatchQueueMaxException();
-                }
-            }
         }
     }
 
@@ -1185,7 +1102,7 @@ class MailHelper
     public function setReturnPath($address)
     {
         try {
-            $this->message->setReturnPath($address);
+            $this->message->returnPath($address);
         } catch (\Exception $e) {
             $this->logError($e, 'return path');
         }
@@ -1239,7 +1156,9 @@ class MailHelper
         $this->appendTrackingPixel = true;
 
         // Add the trackingID to the $message object in order to update the stats if the email failed to send
-        $this->message->leadIdHash = $idHash;
+        if ($this->message instanceof MauticMessage) {
+            $this->message->updateLeadIdHash($idHash);
+        }
     }
 
     /**
@@ -1537,7 +1456,7 @@ class MailHelper
     public function parsePlainText($content = null)
     {
         if (null == $content) {
-            if (!$content = $this->message->getBody()) {
+            if (!$content = $this->message->getHtmlBody()) {
                 $content = $this->body['content'];
             }
         }
@@ -1642,16 +1561,6 @@ class MailHelper
     {
         $this->errors = [];
         $this->fatal  = false;
-    }
-
-    /**
-     * Return transport.
-     *
-     * @return TransportInterface
-     */
-    public function getTransport()
-    {
-        return $this->transport;
     }
 
     /**
@@ -1926,31 +1835,6 @@ class MailHelper
         }
 
         return $monitoredEmail;
-    }
-
-    /**
-     * A large number of mail sends may result on timeouts with SMTP servers. This checks for the number of email sends and restarts the transport if necessary.
-     *
-     * @param bool $force
-     */
-    public function checkIfTransportNeedsRestart($force = false)
-    {
-        // Check if we should restart the SMTP transport
-        if ($this->transport instanceof \Swift_SmtpTransport) {
-            $maxNumberOfMessages = (method_exists($this->transport, 'getNumberOfMessagesTillRestart'))
-                ? $this->transport->getNumberOfMessagesTillRestart() : 50;
-
-            $maxNumberOfMinutes = (method_exists($this->transport, 'getNumberOfMinutesTillRestart'))
-                ? $this->transport->getNumberOfMinutesTillRestart() : 2;
-
-            $numberMinutesRunning = floor(time() - $this->transportStartTime) / 60;
-
-            if ($force || $this->messageSentCount >= $maxNumberOfMessages || $numberMinutesRunning >= $maxNumberOfMinutes) {
-                // Stop the transport
-                $this->transport->stop();
-                $this->messageSentCount = 0;
-            }
-        }
     }
 
     /**

@@ -10,11 +10,14 @@ class DsnGeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataDsnProvider
      */
-    public function testGetDsnString(Dsn $dsn, string $dsnString)
+    public function testGetDsnString(Dsn $dsn, string $dsnString): void
     {
         $this->assertEquals($dsnString, DsnGenerator::getDsnString($dsn));
     }
 
+    /**
+     * @return array<string, array<int, string|\Symfony\Component\Mailer\Transport\Dsn>>
+     */
     public function dataDsnProvider(): array
     {
         return [

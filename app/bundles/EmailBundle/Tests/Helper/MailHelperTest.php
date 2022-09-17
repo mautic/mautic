@@ -14,14 +14,10 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mime\Header\HeaderInterface;
 
 class MailHelperTest extends TestCase
 {
-    /**
-     * @var MauticFactory|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $mockFactory;
-
     /**
      * @var array
      */
@@ -59,8 +55,6 @@ class MailHelperTest extends TestCase
     protected function setUp(): void
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
-
-        $this->mockFactory = $this->createMock(MauticFactory::class);
     }
 
     public function testBatchIsEnabledWithBcTokenInterface()
@@ -320,13 +314,13 @@ class MailHelperTest extends TestCase
 
         $customHeadersFounds = [];
 
-        /** @var $headers */
+        /** @var array<\Symfony\Component\Mime\Header\AbstractHeader> $headers */
         $headers = $mailer->message->getHeaders()->all();
         foreach ($headers as $header) {
             if (false !== strpos($header->getName(), 'X-Mautic-Test')) {
                 $customHeadersFounds[] = $header->getName();
 
-                $this->assertEquals('test', $header->getValue());
+                $this->assertEquals('test', $header->getBody());
             }
         }
 
@@ -352,7 +346,7 @@ class MailHelperTest extends TestCase
         $mailer->setEmail($email);
         $mailer->send();
 
-        /** @var $headers */
+        /** @var array<HeaderInterface> $headers */
         $headers = $mailer->message->getHeaders()->all();
         foreach ($headers as $header) {
             $this->assertFalse(strpos($header->getName(), 'X-Mautic-Test'), 'System headers were not supposed to be set');
@@ -381,13 +375,13 @@ class MailHelperTest extends TestCase
 
         $customHeadersFounds = [];
 
-        /** @var $headers */
+        /** @var array<\Symfony\Component\Mime\Header\AbstractHeader> $headers */
         $headers = $mailer->message->getHeaders()->all();
         foreach ($headers as $header) {
             if (false !== strpos($header->getName(), 'X-Mautic-Test')) {
                 $customHeadersFounds[] = $header->getName();
 
-                $this->assertEquals('test2', $header->getValue());
+                $this->assertEquals('test2', $header->getBody());
             }
         }
 
