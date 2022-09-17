@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -13,7 +12,6 @@ use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Mailer;
 
@@ -62,14 +60,252 @@ class MailHelperTest extends TestCase
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
 
-        $this->mockFactory = $this->createMock(MauticFactory::class);
+        $this->mockFactory           = $this->createMock(MauticFactory::class);
+        $this->swiftEventsDispatcher = $this->createMock(\Swift_Events_EventDispatcher::class);
+        $this->delegatingSpool       = $this->createMock(DelegatingSpool::class);
+
+        $this->spoolTransport = new SpoolTransport($this->swiftEventsDispatcher, $this->delegatingSpool);
+    }
+
+    public function testQueueModeThrowsExceptionWhenBatchLimitHit()
+    {
+        $this->expectException(BatchQueueMaxException::class);
+
+        $mockFactory = $this->getMockBuilder(MauticFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mockFactory->method('getParameter')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mailer_return_path', false, null],
+                        ['mailer_spool_type', false, 'memory'],
+                    ]
+                )
+            );
+
+        $mailer = new Mailer(new BatchTransport());
+
+        $mailer = new MailHelper($mockFactory, $mailer, ['nobody@nowhere.com' => 'No Body']);
+
+        // Enable queue mode
+        $mailer->enableQueue();
+        $mailer->addTo('somebody@somewhere.com');
+        $mailer->addTo('somebodyelse@somewhere.com');
+        $mailer->addTo('somebodyelse2@somewhere.com');
+        $mailer->addTo('somebodyelse3@somewhere.com');
+        $mailer->addTo('somebodyelse4@somewhere.com');
+    }
+
+    public function testQueueModeDisabledDoesNotThrowsExceptionWhenBatchLimitHit()
+    {
+        $mockFactory = $this->getMockBuilder(MauticFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mockFactory->method('getParameter')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mailer_return_path', false, null],
+                        ['mailer_spool_type', false, 'memory'],
+                    ]
+                )
+            );
+
+        $swiftMailer = new Swift_Mailer(new BatchTransport());
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+
+        // Enable queue mode
+        try {
+            $mailer->addTo('somebody@somewhere.com');
+            $mailer->addTo('somebodyelse@somewhere.com');
+        } catch (BatchQueueMaxException $exception) {
+            $this->fail('BatchQueueMaxException thrown');
+        }
+
+        // Otherwise success
+        $this->assertTrue(true);
+    }
+
+    public function testQueuedEmailFromOverride()
+    {
+        $mockFactory = $this->getMockFactory(false);
+
+        $transport   = new BatchTransport();
+        $swiftMailer = new Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->enableQueue();
+
+        $email = new Email();
+        $email->setFromAddress('override@nowhere.com');
+        $email->setFromName('Test');
+        $email->setUseOwnerAsMailer(false);
+
+        $mailer->setEmail($email);
+
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $mailer->flushQueue();
+        $from = $mailer->message->getFrom();
+
+        $this->assertTrue(array_key_exists('override@nowhere.com', $from));
+        $this->assertTrue(1 === count($from));
+
+        $mailer->reset();
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+        $mailer->flushQueue();
+        $from = $mailer->message->getFrom();
+
+        $this->assertTrue(array_key_exists('nobody@nowhere.com', $from));
+        $this->assertTrue(1 === count($from));
+    }
+
+    public function testBatchMode()
+    {
+        $mockFactory = $this->getMockFactory(false);
+
+        $transport   = new BatchTransport(true);
+        $swiftMailer = new Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->enableQueue();
+
+        $email = new Email();
+        $email->setSubject('Hello');
+        $mailer->setEmail($email);
+
+        $mailer->addTo($this->contacts[0]['email']);
+        $mailer->setLead($this->contacts[0]);
+        $mailer->queue();
+        $mailer->flushQueue();
+        $errors = $mailer->getErrors();
+        $this->assertEmpty($errors['failures'], var_export($errors, true));
+
+        $mailer->reset(false);
+        $mailer->setEmail($email);
+        $mailer->addTo($this->contacts[1]['email']);
+        $mailer->setLead($this->contacts[1]);
+        $mailer->queue();
+        $mailer->flushQueue();
+        $errors = $mailer->getErrors();
+        $this->assertEmpty($errors['failures'], var_export($errors, true));
+    }
+
+    public function testQueuedOwnerAsMailer()
+    {
+        $mockFactory = $this->getMockFactory();
+
+        $transport   = new BatchTransport();
+        $swiftMailer = new Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+
+        $email = new Email();
+        $email->setUseOwnerAsMailer(true);
+        $mailer->setEmail($email);
+
+        $mailer->enableQueue();
+
+        $mailer->setSubject('Hello');
+
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $mailer->flushQueue([]);
+
+        $this->assertEmpty($mailer->getErrors()['failures']);
+
+        $fromAddresses = $transport->getFromAddresses();
+        $metadatas     = $transport->getMetadatas();
+
+        $this->assertEquals(3, count($fromAddresses));
+        $this->assertEquals(3, count($metadatas));
+        $this->assertEquals(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
+
+        foreach ($metadatas as $key => $metadata) {
+            $this->assertTrue(isset($metadata[$this->contacts[$key]['email']]));
+
+            if (0 === $key) {
+                // Should have two contacts
+                $this->assertEquals(2, count($metadata));
+                $this->assertTrue(isset($metadata['contact4@somewhere.com']));
+            } else {
+                $this->assertEquals(1, count($metadata));
+            }
+
+            // Check that signatures are valid
+            if (1 === $key) {
+                // There should not be a signature token because owner was not set and token events have not been dispatched
+                $this->assertFalse(isset($metadata['tokens']['{signature}']));
+            } else {
+                $this->assertEquals($metadata[$this->contacts[$key]['email']]['tokens']['{signature}'], 'owner '.$this->contacts[$key]['owner_id']);
+
+                if (0 === $key) {
+                    // Ensure the last contact has the correct signature
+                    $this->assertEquals($metadata['contact4@somewhere.com']['tokens']['{signature}'], 'owner '.$this->contacts[$key]['owner_id']);
+                }
+            }
+        }
+
+        // Validate that the message object only has the contacts for the last "from" group to ensure we aren't sending duplicates
+        $this->assertEquals(['contact3@somewhere.com' => null], $mailer->message->getTo());
+    }
+
+    public function testMailAsOwnerWithEncodedCharactersInName()
+    {
+        $mockFactory = $this->getMockFactory();
+
+        $transport   = new BatchTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body&#39;s Business']);
+        $email  = new Email();
+        $email->setUseOwnerAsMailer(true);
+
+        $mailer->setEmail($email);
+        $mailer->enableQueue();
+        $mailer->enableQueue();
+
+        $mailer->setSubject('Hello');
+
+        $contacts                = $this->contacts;
+        $contacts[3]['owner_id'] = 3;
+
+        foreach ($contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $mailer->flushQueue([]);
+
+        $fromAddresses = $transport->getFromAddresses();
+        $fromNames     = $transport->getFromNames();
+
+        $this->assertEquals(4, count($fromAddresses));
+        $this->assertEquals(4, count($fromNames));
+        $this->assertEquals(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com', 'owner3@owner.com'], $fromAddresses);
+        $this->assertEquals([null, "No Body's Business", null, "John S'mith"], $fromNames);
     }
 
     public function testBatchIsEnabledWithBcTokenInterface()
     {
         $mockFactory = $this->getMockFactory();
 
-        $transport = new BcInterfaceTokenTransport();
+        $transport     = new BcInterfaceTokenTransport();
         $symfonyMailer = new Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
@@ -91,7 +327,7 @@ class MailHelperTest extends TestCase
         $this->assertEmpty($mailer->getErrors());
 
         $fromAddresses = $transport->getFromAddresses();
-        $metadatas = $transport->getMetadatas();
+        $metadatas     = $transport->getMetadatas();
 
         $this->assertEquals(4, count($fromAddresses));
         $this->assertEquals(4, count($metadatas));
@@ -101,7 +337,7 @@ class MailHelperTest extends TestCase
     {
         $mockFactory = $this->getMockFactory();
 
-        $transport = new BcInterfaceTokenTransport();
+        $transport     = new BcInterfaceTokenTransport();
         $symfonyMailer = new Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
@@ -125,11 +361,11 @@ class MailHelperTest extends TestCase
 
     public function testStandardEmailFrom()
     {
-        $mockFactory = $this->getMockFactory(true);
-        $transport = new SmtpTransport();
+        $mockFactory   = $this->getMockFactory(true);
+        $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
-        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
-        $email = new Email();
+        $mailer        = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
+        $email         = new Email();
 
         $email->setUseOwnerAsMailer(false);
         $email->setFromAddress('override@nowhere.com');
@@ -148,11 +384,11 @@ class MailHelperTest extends TestCase
 
     public function testStandardEmailReplyTo()
     {
-        $mockFactory = $this->getMockFactory(true);
-        $transport = new SmtpTransport();
+        $mockFactory   = $this->getMockFactory(true);
+        $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
-        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
-        $email = new Email();
+        $mailer        = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
+        $email         = new Email();
 
         $mailer->setEmail($email);
         $replyTo = $mailer->message->getReplyTo() ? $mailer->message->getReplyTo()[0]->getAddress() : null;
@@ -166,11 +402,11 @@ class MailHelperTest extends TestCase
 
     public function testEmailReplyToWithFromEmail(): void
     {
-        $mockFactory = $this->getMockFactory(true);
-        $transport = new SmtpTransport();
+        $mockFactory   = $this->getMockFactory(true);
+        $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
-        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
-        $email = new Email();
+        $mailer        = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
+        $email         = new Email();
 
         // From address is set
         $email->setFromAddress('from@nowhere.com');
@@ -185,11 +421,11 @@ class MailHelperTest extends TestCase
         $parameterMap = [
             ['mailer_reply_to_email', false, 'admin@mautic.com'],
         ];
-        $factoryMock = $this->getMockFactory(true, $parameterMap);
-        $transport = new SmtpTransport();
+        $factoryMock   = $this->getMockFactory(true, $parameterMap);
+        $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
-        $mailer = new MailHelper($factoryMock, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
-        $email = new Email();
+        $mailer        = new MailHelper($factoryMock, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
+        $email         = new Email();
 
         // From address is set
         $email->setFromAddress('from@nowhere.com');
@@ -203,7 +439,7 @@ class MailHelperTest extends TestCase
     {
         $mockFactory = $this->getMockFactory();
 
-        $transport = new SmtpTransport();
+        $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
@@ -234,7 +470,7 @@ class MailHelperTest extends TestCase
 
     public function testValidateValidEmails()
     {
-        $helper = $this->mockEmptyMailHelper();
+        $helper    = $this->mockEmptyMailHelper();
         $addresses = [
             'john@doe.com',
             'john@doe.email',
@@ -312,7 +548,7 @@ class MailHelperTest extends TestCase
         ];
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
-        $transport = new SmtpTransport();
+        $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
@@ -342,7 +578,7 @@ class MailHelperTest extends TestCase
         ];
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
-        $transport = new SmtpTransport();
+        $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
@@ -368,7 +604,7 @@ class MailHelperTest extends TestCase
         ];
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
-        $transport = new SmtpTransport();
+        $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
@@ -398,8 +634,8 @@ class MailHelperTest extends TestCase
 
     protected function mockEmptyMailHelper()
     {
-        $mockFactory = $this->getMockFactory();
-        $transport = new SmtpTransport();
+        $mockFactory   = $this->getMockFactory();
+        $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
 
         return new MailHelper($mockFactory, $symfonyMailer);

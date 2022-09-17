@@ -3,10 +3,6 @@
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
-use Symfony\Component\Mailer\Envelope;
-use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\Transport\TransportInterface;
-use Symfony\Component\Mime\RawMessage;
 
 class BcInterfaceTokenTransport implements TransportInterface
 {

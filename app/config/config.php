@@ -84,23 +84,8 @@ $container->loadFromExtension('framework', [
     'fragments'            => null,
     'http_method_override' => true,
     'mailer'               => [
-        //'message_bus' => 'email.bus', // The message_bus option was introduced in Symfony 5.1.
-        'dsn'         => '%env(MAUTIC_MAILER_DNS)%',
+        'dsn' => '%mautic.mailer_dsn%',
     ],
-    'messenger'            => [
-        'default_bus' => 'email.bus',
-        'buses'       => [
-            'email.bus' => null,
-        ],
-        'transports'  => [
-            'email_transport' => [
-                'dsn' => '%env(MAUTIC_MESSENGER_EMAIL_TRANSPORT_DSN)%',
-            ]
-        ],
-        'routing' => [
-            'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
-        ]
-    ]
 
     /*'validation'           => array(
         'static_method' => array('loadValidatorMetadata')
