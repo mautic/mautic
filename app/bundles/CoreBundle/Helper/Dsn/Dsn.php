@@ -14,12 +14,27 @@ class Dsn
 
     private ?int $port;
 
+    /**
+     * Query string array to be added to DSN.
+     *
+     * @var array<string,string>
+     */
     private array $options;
 
     private const ALLOWED_DSN_ARRAY = [
         'sync://' => ['sync', ''],
     ];
 
+    /**
+     * Create a new DSN.
+     *
+     * @param string                $scheme   The DSN scheme (e.g. sync://)
+     * @param string                $host     The DSN host (e.g. localhost)
+     * @param string                $user     The DSN user (e.g. root)
+     * @param string                $password The DSN password (e.g. root)
+     * @param int                   $port     The DSN port (e.g. 3306)
+     * @param array<string, string> $options  The DSN options (e.g. ['charset' => 'utf8'])
+     */
     public function __construct(string $scheme, string $host, string $user = null, string $password = null, int $port = null, array $options = [])
     {
         $this->scheme   = $scheme;
@@ -30,6 +45,13 @@ class Dsn
         $this->options  = $options;
     }
 
+    /**
+     * Convert from a DSN string to a DSN object.
+     *
+     * @param string $dsn The DSN string
+     *
+     * @return self The DSN object
+     */
     public static function fromString(string $dsn): self
     {
         if (array_key_exists($dsn, self::ALLOWED_DSN_ARRAY)) {
@@ -100,7 +122,7 @@ class Dsn
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
     public function getOptions()
     {

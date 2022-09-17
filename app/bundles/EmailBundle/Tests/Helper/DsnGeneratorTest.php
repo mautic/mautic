@@ -15,6 +15,11 @@ class DsnGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dsnString, DsnGenerator::getDsnString($dsn));
     }
 
+    /**
+     * data to test DSN conversion.
+     *
+     * @return array<string, array>  tests
+     */
     public function dataDsnProvider(): array
     {
         return [

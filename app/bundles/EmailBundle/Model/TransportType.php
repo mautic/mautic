@@ -145,7 +145,7 @@ class TransportType
     }
 
     /**
-     * @return string[]
+     * @return array<array<string>>
      */
     public function getTrasportConfig(): array
     {
@@ -153,7 +153,7 @@ class TransportType
     }
 
     /**
-     * @return string[]
+     * @return array<string>
      */
     public function getTransportDsnConvertors(): array
     {

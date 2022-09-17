@@ -24,6 +24,8 @@ class ConfigSubscriber implements EventSubscriberInterface
     /**
      * Temp fields that will not be saved in env file
      * but will be converted to Dsn string.
+     *
+     * @var array<string>
      */
     private array $tempFields = [
         'mailer_transport',
@@ -109,6 +111,13 @@ class ConfigSubscriber implements EventSubscriberInterface
         $event->setConfig($data, 'emailconfig');
     }
 
+    /**
+     * return parsed paramters from the config.
+     *
+     * @param ConfigBuilderEvent $event config builder event
+     *
+     * @return array<string, string>  the parsed parameters
+     */
     private function getParameters(ConfigBuilderEvent $event): array
     {
         $parameters       = $event->getParametersFromConfig('MauticEmailBundle');

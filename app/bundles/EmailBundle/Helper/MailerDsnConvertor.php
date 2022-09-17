@@ -11,13 +11,20 @@ class MailerDsnConvertor
      * Includes the types that can be added as options to
      * the Dsn string.
      *
-     * @var array
+     * @var array<string, string>
      */
     private const SUPPORTED_OPTIONS = [
         'encryption' => 'mailer_encryption',
         'auth_mode'  => 'mailer_auth_mode',
     ];
 
+    /**
+     * convert the mailer_* fields to a DSN string.
+     *
+     * @param string $dsnString The DSN string
+     *
+     * @return array<string, mixed>              the array of DSN options
+     */
     public static function convertDsnToArray(string $dsnString): array
     {
         $parameters = [];
@@ -37,6 +44,14 @@ class MailerDsnConvertor
         return $parameters;
     }
 
+    /**
+     * Convert the DSN options to a DSN string.
+     *
+     * @param array<string> $parameters     The array of DSN options
+     * @param array<string> $convertorClass The class to use for converting the DSN options
+     *
+     * @return string The DSN string
+     */
     public static function convertArrayToDsnString(array $parameters, array $convertorClass): string
     {
         /**
@@ -80,6 +95,13 @@ class MailerDsnConvertor
         }
     }
 
+    /**
+     * find the host of DSN string.
+     *
+     * @param array<string> $parameters The array of DSN options
+     *
+     * @return string The host of DSN string
+     */
     public static function getDefaultHost(array $parameters): string
     {
         if ('null' === $parameters['mailer_transport']) {
@@ -91,11 +113,25 @@ class MailerDsnConvertor
         return $parameters['mailer_host'];
     }
 
+    /**
+     * find the port of DSN string.
+     *
+     * @param array<string> $parameters The array of DSN options
+     *
+     * @return int The port of DSN string
+     */
     public static function getPort(array $parameters): ?int
     {
         return $parameters['mailer_port'] ? (int) $parameters['mailer_port'] : null;
     }
 
+    /**
+     * find the password of DSN string.
+     *
+     * @param array<string> $parameters The array of DSN options
+     *
+     * @return string The password of DSN string
+     */
     public static function getPassword(array $parameters): ?string
     {
         if (empty($parameters['mailer_password'])) {
