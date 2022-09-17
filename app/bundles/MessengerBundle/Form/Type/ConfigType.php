@@ -1,31 +1,13 @@
 <?php
 
-/*
- * @copyright   2022 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\MessengerBundle\Form\Type;
 
-use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
-use Mautic\CoreBundle\Form\Type\SortableListType;
-use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use Mautic\MessengerBundle\Model\MessengerType;
+use Mautic\MessengerBundle\Model\TransportType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class ConfigType.
@@ -37,26 +19,22 @@ class ConfigType extends AbstractType
      */
     private $translator;
 
-    /**
-     * @var MessengerType
-     */
-    private MessengerType $messengerType;
+    private TransportType $transportType;
 
     public function __construct(
         TranslatorInterface $translator,
-        MessengerType $messengerType
+        TransportType $transportType
     ) {
-        $this->translator = $translator;
-        $this->messengerType = $messengerType;
+        $this->translator    = $translator;
+        $this->transportType = $transportType;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         /***
          * General fields that should show for all the transports
          */
-        $messengerConditions = '{"config_messengerconfig_messenger_type":["async"]}';
+        $messengerConditions     = '{"config_messengerconfig_messenger_type":["async"]}';
         $messengerHideConditions = '{"config_messengerconfig_messenger_type":["sync"]}';
 
         $builder->add(
@@ -64,7 +42,7 @@ class ConfigType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => [
-                    'mautic.messenger.config.enabled.true' => 'async',
+                    'mautic.messenger.config.enabled.true'    => 'async',
                     'mautic.messenger.config.enabled.false'   => 'sync',
                 ],
                 'label'       => 'mautic.messenger.config.enabled',
@@ -82,7 +60,7 @@ class ConfigType extends AbstractType
             'messenger_transport',
             ChoiceType::class,
             [
-                'choices'           => $this->getMessengerTypeChoices(),
+                'choices'           => $this->getTrasportTypeChoices(),
                 'label'             => 'mautic.messenger.config.transport',
                 'required'          => false,
                 'attr'              => [
@@ -155,17 +133,17 @@ class ConfigType extends AbstractType
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getBlockPrefix()
     {
         return 'messengerconfig';
     }
 
-    private function getMessengerTypeChoices(): array
+    private function getTrasportTypeChoices(): array
     {
-        $choices = [];
-        $transports = $this->messengerType->getMessengerTypes();
+        $choices    = [];
+        $transports = $this->transportType->getTrasportTypes();
 
         foreach ($transports as $value => $label) {
             $choices[$this->translator->trans($label)] = $value;

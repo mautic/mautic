@@ -2,48 +2,55 @@
 
 namespace Mautic\MessengerBundle\Model;
 
-class MessengerType
+class TransportType
 {
+    public const TRANSPORT_ALIAS = 'transport_alias';
+
+    public const TRANSPORT_OPTIONS = 'transport_options';
+
     /**
      * @var string[]
      */
-    private $messengerTypes = [
-        'doctrine' => 'mautic.messenger.config.transport.doctrine',
+    private $transportTypes = [
+        'mautic.messenger.doctrine' => 'mautic.messenger.config.transport.doctrine',
     ];
+
+    /**
+     * @param $serviceId
+     * @param $translatableAlias
+     */
+    public function addTransport($serviceId, $translatableAlias)
+    {
+        $this->transportTypes[$serviceId] = $translatableAlias;
+    }
 
     /**
      * @var string[]
      */
     private $showHost = [
-
     ];
 
     private array $showPort = [
-
     ];
 
     private array $showStream = [
-
     ];
 
     private array $showGroup = [
-
     ];
 
     private array $showAutoSetup = [
-
     ];
 
     private array $showTls = [
-
     ];
 
     /**
      * @return string[]
      */
-    public function getMessengerTypes(): array
+    public function getTrasportTypes(): array
     {
-        return $this->messengerTypes;
+        return $this->transportTypes;
     }
 
     public function getServiceRequiresHost(): string
