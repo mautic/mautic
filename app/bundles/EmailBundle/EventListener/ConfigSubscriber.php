@@ -8,7 +8,6 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\ConfigType;
 use Mautic\EmailBundle\Mailer\Dsn\MailerDsnConvertor;
-use Mautic\EmailBundle\Mailer\Dsn\MessengerDsnConvertor;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mailer\Transport\Dsn;
 
@@ -27,13 +26,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         'mailer_password',
         'mailer_spool_type',
         'mailer_amazon_region',
-        'mailer_messenger_type',
-        'mailer_messenger_host',
-        'mailer_messenger_port',
-        'mailer_messenger_stream',
-        'mailer_messenger_group',
-        'mailer_messenger_auto_setup',
-        'mailer_messenger_tls',
     ];
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
@@ -79,7 +71,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         $monitoredEmail = $this->coreParametersHelper->get('monitored_email');
         if (isset($data['monitored_email'])) {
             foreach ($data['monitored_email'] as $key => $monitor) {
-                if (empty($monitor['password']) && !empty($monitoredEmail[$key]['password'])) {
+                if (empty($monitor['password']) && ! empty($monitoredEmail[$key]['password'])) {
                     $data['monitored_email'][$key]['password'] = $monitoredEmail[$key]['password'];
                 }
 
@@ -87,41 +79,30 @@ class ConfigSubscriber implements EventSubscriberInterface
                     if (empty($monitor['host']) || empty($monitor['address']) || empty($monitor['folder'])) {
                         // Reset to defaults
                         $data['monitored_email'][$key]['override_settings'] = 0;
-                        $data['monitored_email'][$key]['address']           = null;
-                        $data['monitored_email'][$key]['host']              = null;
-                        $data['monitored_email'][$key]['user']              = null;
-                        $data['monitored_email'][$key]['password']          = null;
-                        $data['monitored_email'][$key]['encryption']        = '/ssl';
-                        $data['monitored_email'][$key]['port']              = '993';
+                        $data['monitored_email'][$key]['address'] = null;
+                        $data['monitored_email'][$key]['host'] = null;
+                        $data['monitored_email'][$key]['user'] = null;
+                        $data['monitored_email'][$key]['password'] = null;
+                        $data['monitored_email'][$key]['encryption'] = '/ssl';
+                        $data['monitored_email'][$key]['port'] = '993';
                     }
                 }
             }
         }
 
-        $data['mailer_dsn']           = MailerDsnConvertor::convertArrayToDsnString($data);
-        $data['mailer_messenger_dsn'] = MessengerDsnConvertor::convertArrayToDsnString($data);
-
-        foreach ($this->tempFields as $tempField) {
-            unset($data[$tempField]);
-        }
-
+        $data['mailer_dsn'] = MailerDsnConvertor::convertArrayToDsnString($data);
         $event->setConfig($data, 'emailconfig');
     }
 
     private function getParameters(ConfigBuilderEvent $event): array
     {
-        $parameters       = $event->getParametersFromConfig('MauticEmailBundle');
+        $parameters = $event->getParametersFromConfig('MauticEmailBundle');
         $loadedParameters = $this->coreParametersHelper->all();
 
         //parse dsn parameters to user friendly
-        if (!empty($loadedParameters['mailer_dsn'])) {
+        if (! empty($loadedParameters['mailer_dsn'])) {
             $mailerParameters = MailerDsnConvertor::convertDsnToArray($loadedParameters['mailer_dsn']);
-            $parameters       = array_merge($parameters, $mailerParameters);
-        }
-
-        if (!empty($loadedParameters['mailer_messenger_dsn'])) {
-            $messengerParameters = MessengerDsnConvertor::convertDsnToArray($loadedParameters['mailer_messenger_dsn']);
-            $parameters          = array_merge($parameters, $messengerParameters);
+            $parameters = array_merge($parameters, $mailerParameters);
         }
 
         return $parameters;

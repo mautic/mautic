@@ -2,6 +2,9 @@
 
 namespace Mautic\EmailBundle\Mailer\Dsn;
 
+use Mautic\CoreBundle\Helper\Dsn\Dsn;
+use Mautic\CoreBundle\Helper\Dsn\DsnGenerator;
+
 class MailerDsnConvertor
 {
     private const SUPPORTED_OPTIONS = [
@@ -21,14 +24,14 @@ class MailerDsnConvertor
     {
         $parameters = [];
 
-        $dsn                                 = Dsn::fromString($dsnString);
-        $parameters['mailer_dsn']            = $dsnString;
-        $parameters['mailer_transport']      = $dsn->getScheme();
-        $parameters['mailer_host']           = $dsn->getHost();
-        $parameters['mailer_port']           = $dsn->getPort();
-        $parameters['mailer_user']           = $dsn->getUser();
-        $parameters['mailer_password']       = $dsn->getPassword();
-        $parameters['mailer_amazon_region']  = $dsn->getOption('region');
+        $dsn = Dsn::fromString($dsnString);
+        $parameters['mailer_dsn'] = $dsnString;
+        $parameters['mailer_transport'] = $dsn->getScheme();
+        $parameters['mailer_host'] = $dsn->getHost();
+        $parameters['mailer_port'] = $dsn->getPort();
+        $parameters['mailer_user'] = $dsn->getUser();
+        $parameters['mailer_password'] = $dsn->getPassword();
+        $parameters['mailer_amazon_region'] = $dsn->getOption('region');
 
         return $parameters;
     }
@@ -42,7 +45,7 @@ class MailerDsnConvertor
 
         $options = [];
         foreach (self::SUPPORTED_OPTIONS as $option => $parameterName) {
-            if (array_key_exists($parameterName, $parameters) && !empty($parameters[$parameterName])) {
+            if (array_key_exists($parameterName, $parameters) && ! empty($parameters[$parameterName])) {
                 $options[$option] = $parameters[$parameterName];
             }
         }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\EmailBundle\Model;
+namespace Mautic\MessengerBundle\Model;
 
 class MessengerType
 {
@@ -8,34 +8,34 @@ class MessengerType
      * @var string[]
      */
     private $messengerTypes = [
-        'redis' => 'redis',
+        'doctrine' => 'mautic.messenger.config.transport.doctrine',
     ];
 
     /**
      * @var string[]
      */
     private $showHost = [
-        'redis',
+
     ];
 
     private array $showPort = [
-        'redis',
+
     ];
 
     private array $showStream = [
-        'redis',
+
     ];
 
     private array $showGroup = [
-        'redis',
+
     ];
 
     private array $showAutoSetup = [
-        'redis',
+
     ];
 
     private array $showTls = [
-        'redis',
+
     ];
 
     /**

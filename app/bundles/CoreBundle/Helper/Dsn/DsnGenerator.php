@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\EmailBundle\Mailer\Dsn;
+namespace Mautic\CoreBundle\Helper\Dsn;
 
 class DsnGenerator
 {
@@ -20,20 +20,20 @@ class DsnGenerator
     public static function getDsnString(Dsn $dsn): string
     {
         $dsnString = $dsn->getScheme().'://';
-        if (!empty($dsn->getUser())) {
+        if (! empty($dsn->getUser())) {
             $dsnString .= $dsn->getUser();
         }
-        if (!empty($dsn->getPassword())) {
+        if (! empty($dsn->getPassword())) {
             $dsnString .= ':'.$dsn->getPassword();
         }
-        if (!empty($dsn->getUser()) || !empty($dsn->getPassword())) {
+        if (! empty($dsn->getUser()) || ! empty($dsn->getPassword())) {
             $dsnString .= '@';
         }
         $dsnString .= $dsn->getHost();
-        if (!empty($dsn->getPort())) {
+        if (! empty($dsn->getPort())) {
             $dsnString .= ':'.$dsn->getPort();
         }
-        if (!empty($dsn->getOption('path'))) {
+        if (! empty($dsn->getOption('path'))) {
             $dsnString .= '/'.$dsn->getOption('path');
         }
 
@@ -43,7 +43,7 @@ class DsnGenerator
                 $options[$option] = $dsn->getOption($option);
             }
         }
-        if (!empty($options)) {
+        if (! empty($options)) {
             $dsnString .= '?'.http_build_query($options);
         }
 

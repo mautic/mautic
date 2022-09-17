@@ -339,7 +339,6 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.email.transport_type',
-                    'mautic.email.messenger_type',
                 ],
             ],
             'mautic.form.type.coreconfig_monitored_mailboxes' => [
@@ -630,10 +629,6 @@ return [
                 'class'     => \Mautic\EmailBundle\Model\TransportType::class,
                 'arguments' => [],
             ],
-            'mautic.email.messenger_type' => [
-                'class'     => \Mautic\EmailBundle\Model\MessengerType::class,
-                'arguments' => [],
-            ],
         ],
         'commands' => [
 //            'mautic.email.command.fetch' => [
@@ -706,7 +701,6 @@ return [
         'mailer_amazon_region'           => 'us-east-1',
         'mailer_custom_headers'          => [],
         'mailer_dsn'                     => 'null://null',
-        'mailer_messenger_dsn'           => 'sync://',
         'unsubscribe_text'               => null,
         'webview_text'                   => null,
         'unsubscribe_message'            => null,
@@ -766,9 +760,5 @@ return [
         'mailer_mailjet_sandbox_default_mail' => null,
         'disable_trackable_urls'              => false,
         'theme_email_default'                 => 'blank',
-        'messenger_retry_strategy_max_retries'=> 3,
-        'messenger_retry_strategy_delay'      => 1000,
-        'messenger_retry_strategy_multiplier' => 2,
-        'messenger_retry_strategy_max_delay'  => 0,
     ],
 ];
