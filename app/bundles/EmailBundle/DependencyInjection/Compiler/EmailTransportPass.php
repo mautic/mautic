@@ -13,6 +13,7 @@ class EmailTransportPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
+        dd($container);
         $definition     = $container->getDefinition('mautic.email.transport_wrapper');
         $taggedServices = $container->findTaggedServiceIds('mautic.email.transport_extension');
         foreach ($taggedServices as $id => $tags) {

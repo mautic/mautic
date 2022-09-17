@@ -16,6 +16,10 @@ class TransportType
 
     public const FIELD_API_KEY = 'field_api_key';
 
+    public const TRANSPORT_OPTIONS = 'transport_options';
+
+    public const DSN_CONVERTOR = 'transport_dsn';
+
     /**
      * @var array
      */
@@ -58,17 +62,22 @@ class TransportType
     ];
 
     /**
+     * @var array<array<string>>
+     */
+    private $transportConfigModels = [];
+
+    /**
+     * @var string[]
+     */
+    private $transportDsnConvertors = [];
+
+    /**
      * @return array
      */
     public function getTransportTypes()
     {
         return $this->transportTypes;
     }
-
-    /**
-     * @var string[]
-     */
-    private $transportConfigModels = [];
 
     /**
      * @return string

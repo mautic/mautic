@@ -9,6 +9,7 @@ class TransportWrapper
 
     public function addTransportExtension(TransportExtensionInterface $transportExtension): void
     {
+        dd($transportExtension);
         foreach ($transportExtension->getSupportedSchemes() as $scheme) {
             $this->transportExtensions[$scheme] = $transportExtension;
         }
