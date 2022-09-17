@@ -536,8 +536,8 @@ class InstallService
         }
 
         if ($step instanceof EmailStep && !empty($data['mailer_transport'])) {
-            $step->mailer_dsn           = MailerDsnConvertor::convertArrayToDsnString($data);
-            $step->mailer_messenger_dsn = MessengerDsnConvertor::convertArrayToDsnString($data, []);
+            $step->mailer_dsn    = MailerDsnConvertor::convertArrayToDsnString($data);
+            $step->messenger_dsn = MessengerDsnConvertor::convertArrayToDsnString($data, []);
         }
 
         return $this->saveConfiguration($data, $step, true);

@@ -24,30 +24,35 @@ class TransportType
      * @var array
      */
     private $transportTypes = [
+        'smtp' => 'mautic.email.config.mailer_transport.smtp',
     ];
 
     /**
      * @var array
      */
     private $showHost = [
+        'smtp',
     ];
 
     /**
      * @var array
      */
     private $showPort = [
+        'smtp',
     ];
 
     /**
      * @var array
      */
     private $showUser = [
+        'smtp',
     ];
 
     /**
      * @var array
      */
     private $showPassword = [
+        'smtp',
     ];
 
     /**
@@ -141,7 +146,7 @@ class TransportType
      */
     public function getSmtpService()
     {
-        return '"mautic.email.transport_extension.smtp"';
+        return '"smtp"';
     }
 
     /**

@@ -96,7 +96,7 @@ class EmailStep implements StepInterface
     /**
      * @var string
      */
-    public $messenger_dsn = 'async://';
+    public $messenger_dsn = 'doctrine://default';
 
     /**
      * @var string

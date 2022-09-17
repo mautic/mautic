@@ -52,7 +52,7 @@ class MailerDsnConvertor
      *
      * @return string The DSN string
      */
-    public static function convertArrayToDsnString(array $parameters, array $convertorClass): string
+    public static function convertArrayToDsnString(array $parameters, array $convertorClass = []): string
     {
         /**
          * We need to make sure that we have
