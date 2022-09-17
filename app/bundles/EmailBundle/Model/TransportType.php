@@ -16,7 +16,6 @@ class TransportType
      * @var array
      */
     private $transportTypes = [
-        'ses+smtp' => 'mautic.email.config.mailer_transport.amazon',
         'ses+api'  => 'mautic.email.config.mailer_transport.amazon_api',
         'smtp'     => 'mautic.email.config.mailer_transport.smtp',
     ];
@@ -33,7 +32,6 @@ class TransportType
      */
     private $showPort = [
         'smtp',
-        'ses+smtp',
     ];
 
     /**
@@ -44,7 +42,6 @@ class TransportType
         'mautic.transport.sendgrid',
         'mautic.transport.pepipost',
         'mautic.transport.elasticemail',
-        'ses+smtp',
         'ses+api',
         'mautic.transport.postmark',
         'gmail',
@@ -79,7 +76,6 @@ class TransportType
      * @var array
      */
     private $showAmazonRegion = [
-        'ses+smtp',
         'ses+api',
     ];
 

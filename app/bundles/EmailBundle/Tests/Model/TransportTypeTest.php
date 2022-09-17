@@ -11,7 +11,6 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
         $transportType = new TransportType();
 
         $expected = [
-            'ses+smtp' => 'mautic.email.config.mailer_transport.amazon',
             'ses+api'  => 'mautic.email.config.mailer_transport.amazon_api',
             'smtp'     => 'mautic.email.config.mailer_transport.smtp',
         ];
@@ -32,7 +31,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"ses+smtp","ses+api"';
+        $expected = '"ses+api"';
 
         $this->assertSame($expected, $transportType->getAmazonService());
     }
