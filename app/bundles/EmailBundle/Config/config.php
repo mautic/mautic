@@ -366,17 +366,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.guzzle.client.factory' => [
-                'class' => \Mautic\EmailBundle\Mailer\Guzzle\ClientFactory::class,
-            ],
-            /*
-             * Needed for Sparkpost integration. Can be removed when this integration is moved to
-             * its own plugin.
-             */
-            'mautic.guzzle.client' => [
-                'class'     => \Http\Adapter\Guzzle7\Client::class,
-                'factory'   => ['@mautic.guzzle.client.factory', 'create'],
-            ],
             'mautic.helper.mailbox' => [
                 'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
                 'arguments' => [

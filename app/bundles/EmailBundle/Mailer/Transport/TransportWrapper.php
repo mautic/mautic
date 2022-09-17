@@ -16,7 +16,7 @@ class TransportWrapper
 
     public function isSupportCallback(string $transportName): bool
     {
-        if (!array_key_exists($transportName, $this->transportExtensions)) {
+        if (! array_key_exists($transportName, $this->transportExtensions)) {
             return false;
         }
 
@@ -28,7 +28,7 @@ class TransportWrapper
      */
     public function getTransportExtension(string $transportName): TransportExtensionInterface
     {
-        if (!array_key_exists($transportName, $this->transportExtensions)) {
+        if (! array_key_exists($transportName, $this->transportExtensions)) {
             throw new \LogicException('Transport Extension '.$transportName.' is not found');
         }
 
