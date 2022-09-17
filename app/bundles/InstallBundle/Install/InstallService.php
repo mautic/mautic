@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Release\ThisRelease;
+use Mautic\EmailBundle\Mailer\Dsn\DsnGenerator;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
@@ -25,6 +26,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -528,6 +530,16 @@ class InstallService
 
             return $messages;
         }
+
+        $step->mailer_dsn = DsnGenerator::getDsnString(
+            new Dsn(
+                $data['mailer_transport'],
+                $data['mailer_host'],
+                $data['mailer_user'],
+                $data['mailer_password'],
+                $data['mailer_port'] ? (int) $data['mailer_port'] : null
+            )
+        );
 
         return $this->saveConfiguration($data, $step, true);
     }

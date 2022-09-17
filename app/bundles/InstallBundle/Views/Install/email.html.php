@@ -31,14 +31,7 @@ if ('index' === $tmpl) {
         </div>
     </div>
 
-    <h4 class="mb-10 mt-10">
-        <?php echo $view['translator']->trans('mautic.install.email.header.spooler'); ?> <i class="ml-5 fa fa-info-circle" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.install.email.subheader.spooler'); ?>"></i>
-    </h4>
     <div class="row">
-        <div class="col-sm-6">
-            <?php echo $view['form']->row($form['mailer_spool_type']); ?>
-        </div>
-
         <div class="col-sm-6">
             <?php echo $view['form']->row($form['mailer_transport']); ?>
         </div>

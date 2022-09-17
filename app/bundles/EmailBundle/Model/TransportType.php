@@ -18,17 +18,17 @@ class TransportType
     private $transportTypes = [
         'mautic.transport.amazon'       => 'mautic.email.config.mailer_transport.amazon',
         'mautic.transport.amazon_api'   => 'mautic.email.config.mailer_transport.amazon_api',
-        'mautic.transport.elasticemail' => 'mautic.email.config.mailer_transport.elasticemail',
-        'gmail'                         => 'mautic.email.config.mailer_transport.gmail',
-        'mautic.transport.mandrill'     => 'mautic.email.config.mailer_transport.mandrill',
-        'mautic.transport.mailjet'      => 'mautic.email.config.mailer_transport.mailjet',
+       // 'mautic.transport.elasticemail' => 'mautic.email.config.mailer_transport.elasticemail',
+       // 'gmail'                         => 'mautic.email.config.mailer_transport.gmail',
+      //  'mautic.transport.mandrill'     => 'mautic.email.config.mailer_transport.mandrill',
+      //  'mautic.transport.mailjet'      => 'mautic.email.config.mailer_transport.mailjet',
         'smtp'                          => 'mautic.email.config.mailer_transport.smtp',
-        'mautic.transport.postmark'     => 'mautic.email.config.mailer_transport.postmark',
-        'mautic.transport.sendgrid'     => 'mautic.email.config.mailer_transport.sendgrid',
-        'mautic.transport.pepipost'     => 'mautic.email.config.mailer_transport.pepipost',
-        'mautic.transport.sendgrid_api' => 'mautic.email.config.mailer_transport.sendgrid_api',
-        'sendmail'                      => 'mautic.email.config.mailer_transport.sendmail',
-        'mautic.transport.sparkpost'    => 'mautic.email.config.mailer_transport.sparkpost',
+//        'mautic.transport.postmark'     => 'mautic.email.config.mailer_transport.postmark',
+//        'mautic.transport.sendgrid'     => 'mautic.email.config.mailer_transport.sendgrid',
+//        'mautic.transport.pepipost'     => 'mautic.email.config.mailer_transport.pepipost',
+//        'mautic.transport.sendgrid_api' => 'mautic.email.config.mailer_transport.sendgrid_api',
+//        'sendmail'                      => 'mautic.email.config.mailer_transport.sendmail',
+//        'mautic.transport.sparkpost'    => 'mautic.email.config.mailer_transport.sparkpost',
     ];
 
     /**

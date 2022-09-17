@@ -83,6 +83,9 @@ $container->loadFromExtension('framework', [
     ],
     'fragments'            => null,
     'http_method_override' => true,
+    'mailer'               => [
+        'dsn' => '%mautic.mailer_dsn%',
+    ],
 
     /*'validation'           => array(
         'static_method' => array('loadValidatorMetadata')
@@ -141,21 +144,6 @@ $container->loadFromExtension('doctrine_migrations', [
     'table_name'      => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
     'name'            => 'Mautic Migrations',
     'custom_template' => '%kernel.project_dir%/app/migrations/Migration.template',
-]);
-
-// Swiftmailer Configuration
-$container->loadFromExtension('swiftmailer', [
-    'transport'  => '%mautic.mailer_transport%',
-    'host'       => '%mautic.mailer_host%',
-    'port'       => '%mautic.mailer_port%',
-    'username'   => '%mautic.mailer_user%',
-    'password'   => '%mautic.mailer_password%',
-    'encryption' => '%mautic.mailer_encryption%',
-    'auth_mode'  => '%mautic.mailer_auth_mode%',
-    'spool'      => [
-        'type' => 'service',
-        'id'   => 'mautic.transport.spool',
-    ],
 ]);
 
 //KnpMenu Configuration

@@ -8,9 +8,12 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Stream;
 use Http\Mock\Client;
 use Http\Promise\Promise;
+<<<<<<< HEAD
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+=======
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+>>>>>>> 8f41338829 (Replacing Swift message using. Add mailer_dsn parameter for symfony mailer)
 use Mautic\EmailBundle\Model\TransportCallback;
-use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
 use Mautic\LeadBundle\Entity\DoNotContact;
