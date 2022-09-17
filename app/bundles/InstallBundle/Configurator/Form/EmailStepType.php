@@ -229,7 +229,7 @@ class EmailStepType extends AbstractType
             ]
         );
 
-        $builder->add('mailer_dsn', HiddenType::class, [
+        $builder->add('messenger_type', HiddenType::class, [
             'data'   => 'async',
         ]);
 

@@ -17,7 +17,8 @@ class EmailStep implements StepInterface
         'mailer_api_key',
         'mailer_encryption',
         'mailer_auth_mode',
-        'mailer_messenger_type',
+        'messenger_type',
+        'messenger_transport',
     ];
 
     /**
@@ -95,12 +96,12 @@ class EmailStep implements StepInterface
     /**
      * @var string
      */
-    public $messenger_dsn = 'sync://';
+    public $messenger_dsn = 'async://';
 
     /**
      * @var string
      */
-    public $mailer_messenger_type;
+    public $messenger_type;
 
     /**
      * @var string
