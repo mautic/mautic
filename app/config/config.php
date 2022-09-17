@@ -94,7 +94,7 @@ $container->loadFromExtension('framework', [
         ],
         'transports'  => [
             'email_transport' => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_EMAIL_TRANSPORT_DSN)%',
+                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
                 'options'        => [
                     'consumer'    => '%env(MAUTIC_MESSENGER_CONSUMER_NAME)%',
                 ],
