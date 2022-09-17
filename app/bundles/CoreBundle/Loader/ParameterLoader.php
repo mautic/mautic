@@ -60,7 +60,7 @@ class ParameterLoader
 
     public function loadIntoEnvironment()
     {
-        $envVariables = new ParameterBag();
+        $envVariables      = new ParameterBag();
         $defaultParameters = new ParameterBag(self::$defaultParameters);
 
         // Load from local configuration file first
@@ -89,7 +89,7 @@ class ParameterLoader
         /** @var array $paths */
         include $root.'/config/paths.php';
 
-        if (! isset($paths['local_config'])) {
+        if (!isset($paths['local_config'])) {
             if ($updateDefaultParameters) {
                 self::$defaultParameters['local_config_path'] = $root.'/config/local.php';
             }
@@ -134,7 +134,7 @@ class ParameterLoader
             /** @var array $config */
             $config = include $file->getPathname();
 
-            $parameters = $config['parameters'] ?? [];
+            $parameters              = $config['parameters'] ?? [];
             self::$defaultParameters = array_merge(self::$defaultParameters, $parameters);
         }
     }
@@ -142,7 +142,7 @@ class ParameterLoader
     private function loadLocalParameters(): void
     {
         $compiledParameters = [];
-        $localConfigFile = self::getLocalConfigFile($this->rootPath);
+        $localConfigFile    = self::getLocalConfigFile($this->rootPath);
 
         // Load parameters array from local configuration
         if (file_exists($localConfigFile)) {
@@ -175,7 +175,7 @@ class ParameterLoader
     private function createParameterBags(): void
     {
         $this->localParameterBag = new ParameterBag($this->localParameters);
-        $this->parameterBag = new ParameterBag(array_merge(self::$defaultParameters, $this->localParameters));
+        $this->parameterBag      = new ParameterBag(array_merge(self::$defaultParameters, $this->localParameters));
     }
 
     private function getLocalParametersFile(): string

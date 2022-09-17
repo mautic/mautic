@@ -1,8 +1,8 @@
 <?php
 
-namespace Mautic\EmailBundle\Tests\Mailer\Dsn;
+namespace Mautic\EmailBundle\Tests\Helper;
 
-use Mautic\EmailBundle\Mailer\Dsn\MailerDsnConvertor;
+use Mautic\EmailBundle\Helper\MailerDsnConvertor;
 
 class MailerDsnConvertorTest extends \PHPUnit\Framework\TestCase
 {

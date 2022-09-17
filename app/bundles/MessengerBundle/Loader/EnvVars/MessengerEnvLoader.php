@@ -17,6 +17,6 @@ class MessengerEnvLoader implements EnvVarsInterface
         $envVars->set('MAUTIC_MESSENGER_TRANSPORT_DSN', $config->get('messenger_dsn'));
 
         $consumerValue = getenv('MAUTIC_MESSENGER_CONSUMER_NAME');
-        $envVars->set('MAUTIC_MESSENGER_CONSUMER_NAME', ! empty($consumerValue) ? $consumerValue : 'consumer');
+        $envVars->set('MAUTIC_MESSENGER_CONSUMER_NAME', !empty($consumerValue) ? $consumerValue : 'consumer');
     }
 }

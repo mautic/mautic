@@ -98,4 +98,12 @@ class Dsn
     {
         return $this->options[$key] ?? $default;
     }
+
+    /**
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
 }

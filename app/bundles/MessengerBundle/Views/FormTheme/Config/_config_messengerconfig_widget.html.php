@@ -10,6 +10,8 @@
  */
 $fields = $form->children;
 $fieldKeys = array_keys($fields);
+//we want to show these keys no matter what is the transport selected
+$retryKeys = ['messenger_retry_strategy_max_retries', 'messenger_retry_strategy_delay', 'messenger_retry_strategy_multiplier', 'messenger_retry_strategy_max_delay'];
 $template = '<div class="col-md-6">{content}</div>';
 ?>
 
@@ -20,21 +22,22 @@ $template = '<div class="col-md-6">{content}</div>';
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.messengerconfig'); ?></h3>
     </div>
     <div class="panel-body">
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'messenger_type', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'messenger_transport', $template); ?>
-        </div>
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'messenger_host', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'messenger_port', $template); ?>
-        </div>
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'messenger_stream', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'messenger_auto_setup', $template); ?>
-        </div>
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'messenger_tls', $template); ?>
-        </div>
+    <?php
+        $i = 0;
+foreach ($fieldKeys as $key) {
+    if (in_array($key, $retryKeys)) {
+        continue;
+    }
+    if (0 == $i % 2) {
+        echo "<div class='row'>";
+    }
+    echo $view['form']->rowIfExists($fields, $key, $template);
+    $i++;
+    if (0 == $i % 2) {
+        echo '</div>';
+    }
+}
+?>
         <?php if (isset($fields['messenger_type'])): ?>
             <div class="panel panel-default">
                 <div class="panel-heading">

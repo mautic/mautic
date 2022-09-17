@@ -79,16 +79,16 @@ $template = '<div class="col-md-6">{content}</div>';
                  */
                 $i = 0;
     $mailerKeys = array_filter($fields, function ($key) {
-        return strpos($key, 'mailer_option') === 0;
+        return 0 === strpos($key, 'mailer_option');
     }, ARRAY_FILTER_USE_KEY);
 
     foreach ($mailerKeys as $key) {
-        if ($i % 2 == 0) {
+        if (0 == $i % 2) {
             echo "<div class='row'>";
         }
         echo $view['form']->rowIfExists($fields, $key, $template);
         $i++;
-        if ($i % 2 == 0) {
+        if (0 == $i % 2) {
             echo '</div>';
         }
     }

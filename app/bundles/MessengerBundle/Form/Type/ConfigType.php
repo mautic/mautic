@@ -2,7 +2,7 @@
 
 namespace Mautic\MessengerBundle\Form\Type;
 
-use Mautic\MessengerBundle\Model\TransportType;
+use Mautic\MessengerBundle\Model\MessengerTransportType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -19,22 +19,28 @@ class ConfigType extends AbstractType
      */
     private $translator;
 
-    private TransportType $transportType;
+    private MessengerTransportType $transportType;
 
     public function __construct(
         TranslatorInterface $translator,
-        TransportType $transportType
+        MessengerTransportType $transportType
     ) {
-        $this->translator    = $translator;
+        $this->translator = $translator;
         $this->transportType = $transportType;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    /***
+     * For doctorine we are using the default settings
+     * for other transports their settings should be injected here
+     * Here is an example of the fields that needs to be added
+     * https://symfony.com/doc/current/messenger.html#doctrine-transport
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /***
          * General fields that should show for all the transports
          */
-        $messengerConditions     = '{"config_messengerconfig_messenger_type":["async"]}';
+        $messengerConditions = '{"config_messengerconfig_messenger_type":["async"]}';
         $messengerHideConditions = '{"config_messengerconfig_messenger_type":["sync"]}';
 
         $builder->add(
@@ -133,16 +139,21 @@ class ConfigType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getBlockPrefix()
     {
         return 'messengerconfig';
     }
 
+    /**
+     * Get a sorted list of available transport types.
+     *
+     * @return array $choices
+     */
     private function getTrasportTypeChoices(): array
     {
-        $choices    = [];
+        $choices = [];
         $transports = $this->transportType->getTrasportTypes();
 
         foreach ($transports as $value => $label) {

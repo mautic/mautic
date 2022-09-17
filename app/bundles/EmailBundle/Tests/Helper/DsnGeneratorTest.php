@@ -1,9 +1,9 @@
 <?php
 
-namespace Mautic\EmailBundle\Tests\Mailer\Dsn;
+namespace Mautic\EmailBundle\Tests\Helper;
 
-use Mautic\EmailBundle\Mailer\Dsn\Dsn;
-use Mautic\EmailBundle\Mailer\Dsn\DsnGenerator;
+use Mautic\CoreBundle\Helper\Dsn\Dsn;
+use Mautic\CoreBundle\Helper\Dsn\DsnGenerator;
 
 class DsnGeneratorTest extends \PHPUnit\Framework\TestCase
 {

@@ -26,15 +26,6 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $transportType->getSmtpService());
     }
 
-    public function testAmazonService()
-    {
-        $transportType = new TransportType();
-
-        $expected = '"ses+api"';
-
-        $this->assertSame($expected, $transportType->getAmazonService());
-    }
-
     public function testRequiresPassword()
     {
         $transportType = new TransportType();

@@ -20,6 +20,7 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
+use Mautic\MessengerBundle\Model\MessengerTransportType;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -246,7 +247,7 @@ class RestrictionHelperTest extends TypeTestCase
 
         // Register monitored email listeners
         $dispatcher = new EventDispatcher();
-        $bouncer    = $this->getMockBuilder(Bounce::class)
+        $bouncer = $this->getMockBuilder(Bounce::class)
             ->disableOriginalConstructor()
             ->getMock();
         $dispatcher->addSubscriber(new ProcessBounceSubscriber($bouncer));
@@ -262,6 +263,12 @@ class RestrictionHelperTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $transportType->method('getTransportTypes')
+            ->willReturn([]);
+
+        $messengerType = $this->getMockBuilder(MessengerTransportType::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $messengerType->method('getTrasportTypes')
             ->willReturn([]);
 
         // This is what we're really testing here

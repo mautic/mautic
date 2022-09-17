@@ -34,7 +34,7 @@ class ConfigType extends AbstractType
         TranslatorInterface $translator,
         TransportType $transportType
     ) {
-        $this->translator = $translator;
+        $this->translator    = $translator;
         $this->transportType = $transportType;
     }
 
@@ -67,7 +67,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.email.config.unsubscribe_text.tooltip',
                 ],
                 'required'   => false,
-                'data'       => (array_key_exists('unsubscribe_text', $options['data']) && ! empty($options['data']['unsubscribe_text']))
+                'data'       => (array_key_exists('unsubscribe_text', $options['data']) && !empty($options['data']['unsubscribe_text']))
                     ? $options['data']['unsubscribe_text']
                     : $this->translator->trans(
                         'mautic.email.unsubscribe.text',
@@ -87,7 +87,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.email.config.webview_text.tooltip',
                 ],
                 'required'   => false,
-                'data'       => (array_key_exists('webview_text', $options['data']) && ! empty($options['data']['webview_text']))
+                'data'       => (array_key_exists('webview_text', $options['data']) && !empty($options['data']['webview_text']))
                     ? $options['data']['webview_text']
                     : $this->translator->trans(
                         'mautic.email.webview.text',
@@ -107,7 +107,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.email.config.unsubscribe_message.tooltip',
                 ],
                 'required'   => false,
-                'data'       => (array_key_exists('unsubscribe_message', $options['data']) && ! empty($options['data']['unsubscribe_message']))
+                'data'       => (array_key_exists('unsubscribe_message', $options['data']) && !empty($options['data']['unsubscribe_message']))
                     ? $options['data']['unsubscribe_message']
                     : $this->translator->trans(
                         'mautic.email.unsubscribed.success',
@@ -130,7 +130,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.email.config.resubscribe_message.tooltip',
                 ],
                 'required'   => false,
-                'data'       => (array_key_exists('resubscribe_message', $options['data']) && ! empty($options['data']['resubscribe_message']))
+                'data'       => (array_key_exists('resubscribe_message', $options['data']) && !empty($options['data']['resubscribe_message']))
                     ? $options['data']['resubscribe_message']
                     : $this->translator->trans(
                         'mautic.email.resubscribed.success',
@@ -153,7 +153,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.email.config.default_signature_text.tooltip',
                 ],
                 'required'   => false,
-                'data'       => (! empty($options['data']['default_signature_text']))
+                'data'       => (!empty($options['data']['default_signature_text']))
                     ? $options['data']['default_signature_text']
                     : $this->translator->trans(
                         'mautic.email.default.signature',
@@ -602,10 +602,10 @@ class ConfigType extends AbstractType
                 'required'   => false,
             ]
         );
-        
+
         //Inject config elements for SMTP transport (buit-in)
         $smtpServiceShowConditions = '{"config_emailconfig_mailer_transport":['.$this->transportType->getSmtpService().']}';
-        
+
         $builder->add(
             'mailer_auth_mode',
             ChoiceType::class,
@@ -627,8 +627,7 @@ class ConfigType extends AbstractType
                 'placeholder' => 'mautic.email.config.mailer_auth_mode.none',
             ]
         );
-        
-        
+
         $builder->add(
                     'mailer_encryption',
                     ChoiceType::class,
@@ -648,18 +647,16 @@ class ConfigType extends AbstractType
                         'placeholder' => 'mautic.email.config.mailer_encryption.none',
                     ]
                 );
-        
-        
+
         // Inject any other elements of other bundles
         foreach ($this->transportType->getTrasportConfig() as $class) {
             $configForm = new $class($this->translator, $builder, $options);
             $configForm->buildForm($builder, $options);
         }
-
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getBlockPrefix()
     {
@@ -671,7 +668,7 @@ class ConfigType extends AbstractType
      */
     private function getTransportChoices()
     {
-        $choices = [];
+        $choices    = [];
         $transports = $this->transportType->getTransportTypes();
 
         foreach ($transports as $value => $label) {

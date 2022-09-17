@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2022 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\MessengerBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
@@ -16,7 +7,8 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\MessengerBundle\Form\Type\ConfigType;
-use Mautic\MessengerBundle\Helper\DsnDoctrineConvertor;
+use Mautic\MessengerBundle\Helper\MessengerDsnConvertor;
+use Mautic\MessengerBundle\Model\MessengerTransportType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
@@ -30,9 +22,12 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     private $coreParametersHelper;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    private MessengerTransportType $transportType;
+
+    public function __construct(CoreParametersHelper $coreParametersHelper, MessengerTransportType $transportType)
     {
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->transportType = $transportType;
     }
 
     /**
@@ -46,7 +41,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addTemporaryFields($this->tempFields);
 
@@ -59,14 +54,14 @@ class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    public function onConfigBeforeSave(ConfigEvent $event)
+    public function onConfigBeforeSave(ConfigEvent $event): void
     {
         $data = $event->getConfig('messengerconfig');
         $data['messenger_dsn'] = DsnDoctrineConvertor::convertArrayToDsnString($data);
 
-        foreach ($this->tempFields as $tempField) {
-            unset($data[$tempField]);
-        }
+        $data['messenger_dsn'] = MessengerDsnConvertor::convertArrayToDsnString($data, $this->transportType->getTransportDsnConvertors());
+
+        $data = \array_intersect_key($data, array_flip($this->keepFields));
 
         $event->setConfig($data, 'messengerconfig');
     }
@@ -75,9 +70,8 @@ class ConfigSubscriber implements EventSubscriberInterface
     {
         $parameters = $event->getParametersFromConfig('MauticMessengerBundle');
         $loadedParameters = $this->coreParametersHelper->all();
-
         if (! empty($loadedParameters['messenger_dsn'])) {
-            $messengerParameters = DsnDoctrineConvertor::convertDsnToArray($loadedParameters['messenger_dsn']);
+            $messengerParameters = MessengerDsnConvertor::convertDsnToArray($loadedParameters['messenger_dsn']);
             $parameters = array_merge($parameters, $messengerParameters);
         }
 

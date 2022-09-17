@@ -21,7 +21,7 @@ return [
         ],
         'models' => [
             'mautic.messenger.transport_type' => [
-                'class'     => \Mautic\MessengerBundle\Model\TransportType::class,
+                'class'     => \Mautic\MessengerBundle\Model\MessengerTransportType::class,
                 'arguments' => [],
             ],
         ],

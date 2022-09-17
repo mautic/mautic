@@ -37,9 +37,9 @@ class PublicController extends CommonFormController
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->getModel('email');
-        $stat = $model->getEmailStatus($idHash);
+        $stat  = $model->getEmailStatus($idHash);
 
-        if (! empty($stat)) {
+        if (!empty($stat)) {
             if ($this->get('mautic.security')->isAnonymous()) {
                 $model->hitEmail($stat, $this->request, true);
             }
@@ -59,7 +59,7 @@ class PublicController extends CommonFormController
                 $subject = EmojiHelper::toEmoji($subject, 'short');
 
                 // Replace tokens
-                if (! empty($tokens)) {
+                if (!empty($tokens)) {
                     $content = str_ireplace(array_keys($tokens), $tokens, $content);
                     $subject = str_ireplace(array_keys($tokens), $tokens, $subject);
                 }
@@ -71,7 +71,7 @@ class PublicController extends CommonFormController
             $content = $this->get('mautic.helper.template.analytics')->addCode($content);
 
             // Add subject as title
-            if (! empty($subject)) {
+            if (!empty($subject)) {
                 if (false !== strpos($content, '<title></title>')) {
                     $content = str_replace('<title></title>', "<title>$subject</title>", $content);
                 } elseif (false === strpos($content, '<title>')) {
@@ -120,19 +120,19 @@ class PublicController extends CommonFormController
     {
         // Find the email
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model = $this->getModel('email');
+        $model      = $this->getModel('email');
         $translator = $this->get('translator');
-        $stat = $model->getEmailStatus($idHash);
-        $message = '';
-        $email = null;
-        $lead = null;
-        $template = null;
-        $session = $this->get('session');
+        $stat       = $model->getEmailStatus($idHash);
+        $message    = '';
+        $email      = null;
+        $lead       = null;
+        $template   = null;
+        $session    = $this->get('session');
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
 
-        if (! empty($stat)) {
+        if (!empty($stat)) {
             if ($email = $stat->getEmail()) {
                 $template = $email->getTemplate();
                 if ('mautic_code_mode' === $template) {
@@ -144,15 +144,15 @@ class PublicController extends CommonFormController
                 $unsubscribeForm = $email->getUnsubscribeForm();
                 if (null != $unsubscribeForm && $unsubscribeForm->isPublished()) {
                     $formTemplate = $unsubscribeForm->getTemplate();
-                    $formModel = $this->getModel('form');
-                    $formContent = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
+                    $formModel    = $this->getModel('form');
+                    $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
                 }
             }
         }
 
         if (empty($template) && empty($formTemplate)) {
             $template = $this->coreParametersHelper->get('theme');
-        } elseif (! empty($formTemplate)) {
+        } elseif (!empty($formTemplate)) {
             $template = $formTemplate;
         }
 
@@ -161,7 +161,7 @@ class PublicController extends CommonFormController
             $template = $theme->getTheme();
         }
         $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
-        if (! empty($stat)) {
+        if (!empty($stat)) {
             $successSessionName = 'mautic.email.prefscenter.success';
 
             if ($lead = $stat->getLead()) {
@@ -178,7 +178,7 @@ class PublicController extends CommonFormController
                 $successSessionName .= ".{$lead->getId()}";
             }
 
-            if (! $this->get('mautic.helper.core_parameters')->get('show_contact_preferences')) {
+            if (!$this->get('mautic.helper.core_parameters')->get('show_contact_preferences')) {
                 $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $translator);
             } elseif ($lead) {
                 $action = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
@@ -225,7 +225,7 @@ class PublicController extends CommonFormController
                         // update show pref center slots by looking for their presence in the html
                         /** @var \Mautic\CoreBundle\Templating\Helper\FormHelper $formHelper */
                         $formHelper = $this->get('templating.helper.form');
-                        $params = array_merge(
+                        $params     = array_merge(
                             $viewParameters,
                             [
                                 'form'                         => $formView,
@@ -242,7 +242,7 @@ class PublicController extends CommonFormController
                         $this->get('event_dispatcher')
                             ->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
                         $html = $event->getContent();
-                        if (! $session->has($successSessionName)) {
+                        if (!$session->has($successSessionName)) {
                             $successMessageDataSlots = [
                                 'data-slot="successmessage"',
                                 'class="pref-successmessage"',
@@ -302,7 +302,7 @@ class PublicController extends CommonFormController
             'message'  => $message,
         ];
 
-        if (! empty($formContent)) {
+        if (!empty($formContent)) {
             $viewParams['content'] = $formContent;
             if (in_array('form', $config['features'])) {
                 $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':form.html.php');
@@ -327,11 +327,11 @@ class PublicController extends CommonFormController
     {
         //find the email
         $model = $this->getModel('email');
-        $stat = $model->getEmailStatus($idHash);
+        $stat  = $model->getEmailStatus($idHash);
 
-        if (! empty($stat)) {
+        if (!empty($stat)) {
             $email = $stat->getEmail();
-            $lead = $stat->getLead();
+            $lead  = $stat->getLead();
 
             if ($lead) {
                 // Set the lead as current lead
@@ -350,7 +350,7 @@ class PublicController extends CommonFormController
             $model->removeDoNotContact($stat->getEmailAddress());
 
             $message = $this->coreParametersHelper->get('resubscribe_message');
-            if (! $message) {
+            if (!$message) {
                 $message = $this->translator->trans(
                     'mautic.email.resubscribed.success',
                     [
@@ -371,7 +371,7 @@ class PublicController extends CommonFormController
                 $message
             );
         } else {
-            $email = $lead = false;
+            $email   = $lead   = false;
             $message = $this->translator->trans('mautic.email.stat_record.not_found');
         }
 
@@ -391,7 +391,7 @@ class PublicController extends CommonFormController
 
         $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
-        if (! empty($analytics)) {
+        if (!empty($analytics)) {
             $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
         }
 
@@ -422,7 +422,7 @@ class PublicController extends CommonFormController
 
         /** @var TransportWrapper $realTransport */
         $realTransport = $this->container->get('mautic.email.transport_wrapper');
-        if (! $realTransport->isSupportCallback($transport)) {
+        if (!$realTransport->isSupportCallback($transport)) {
             return $this->notFound();
         }
 
@@ -445,7 +445,7 @@ class PublicController extends CommonFormController
     public function previewAction($objectId)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model = $this->getModel('email');
+        $model       = $this->getModel('email');
         $emailEntity = $model->getEntity($objectId);
 
         if (null === $emailEntity) {
@@ -453,9 +453,9 @@ class PublicController extends CommonFormController
         }
 
         if (
-            ($this->get('mautic.security')->isAnonymous() && (! $emailEntity->getIsPublished() || ! $emailEntity->isPublicPreview()))
-            || (! $this->get('mautic.security')->isAnonymous()
-                && ! $this->get('mautic.security')->hasEntityAccess(
+            ($this->get('mautic.security')->isAnonymous() && (!$emailEntity->getIsPublished() || !$emailEntity->isPublicPreview()))
+            || (!$this->get('mautic.security')->isAnonymous()
+                && !$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
                     $emailEntity->getCreatedBy()
@@ -468,10 +468,10 @@ class PublicController extends CommonFormController
         $idHash = 'xxxxxxxxxxxxxx';
 
         $BCcontent = $emailEntity->getContent();
-        $content = $emailEntity->getCustomHtml();
-        if (empty($content) && ! empty($BCcontent)) {
+        $content   = $emailEntity->getCustomHtml();
+        if (empty($content) && !empty($BCcontent)) {
             $template = $emailEntity->getTemplate();
-            $slots = $this->factory->getTheme($template)->getSlots('email');
+            $slots    = $this->factory->getTheme($template)->getSlots('email');
 
             $assetsHelper = $this->factory->getHelper('template.assets');
 
@@ -506,7 +506,7 @@ class PublicController extends CommonFormController
         // Prepare a fake lead
         /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
         $fieldModel = $this->getModel('lead.field');
-        $fields = $fieldModel->getFieldList(false, false);
+        $fields     = $fieldModel->getFieldList(false, false);
         array_walk(
             $fields,
             function (&$field) {
@@ -551,7 +551,7 @@ class PublicController extends CommonFormController
 
         foreach ($slots as $slot => $slotConfig) {
             if (is_numeric($slot)) {
-                $slot = $slotConfig;
+                $slot       = $slotConfig;
                 $slotConfig = [];
             }
 
@@ -571,7 +571,7 @@ class PublicController extends CommonFormController
 
         // if additional data were sent with the tracking pixel
         $query_string = $this->request->server->get('QUERY_STRING');
-        if (! $query_string) {
+        if (!$query_string) {
             $logger->log('error', $integration.': query string is not available');
 
             return;
@@ -584,7 +584,7 @@ class PublicController extends CommonFormController
         parse_str($query_string, $query);
 
         // URL attr 'd' is encoded so let's decode it first.
-        if (! isset($query['d'], $query['sig'])) {
+        if (!isset($query['d'], $query['sig'])) {
             $logger->log('error', $integration.': query variables are not found');
 
             return;
@@ -592,9 +592,9 @@ class PublicController extends CommonFormController
 
         // get secret from plugin settings
         $integrationHelper = $this->get('mautic.helper.integration');
-        $myIntegration = $integrationHelper->getIntegrationObject($integration);
+        $myIntegration     = $integrationHelper->getIntegrationObject($integration);
 
-        if (! $myIntegration) {
+        if (!$myIntegration) {
             $logger->log('error', $integration.': integration not found');
 
             return;
@@ -606,14 +606,14 @@ class PublicController extends CommonFormController
         if (false === strpos($salt, '$1$')) {
             $salt = '$1$'.$salt;
         } // add MD5 prefix
-        $cr = crypt(urlencode($query['d']), $salt);
+        $cr    = crypt(urlencode($query['d']), $salt);
         $mySig = hash('crc32b', $cr); // this hash type is used in c#
 
         // compare signatures
         if (hash_equals($mySig, $query['sig'])) {
             // decode and parse query variables
             $b64 = base64_decode($query['d']);
-            $gz = gzdecode($b64);
+            $gz  = gzdecode($b64);
             parse_str($gz, $query);
         } else {
             // signatures don't match: stop
@@ -622,7 +622,7 @@ class PublicController extends CommonFormController
             unset($query);
         }
 
-        if (empty($query) || ! isset($query['email'], $query['subject'], $query['body'])) {
+        if (empty($query) || !isset($query['email'], $query['subject'], $query['body'])) {
             $logger->log('error', $integration.': query variables are empty');
 
             return;
@@ -637,7 +637,7 @@ class PublicController extends CommonFormController
 
         // email is a semicolon delimited list of emails
         $emails = explode(';', $query['email']);
-        $repo = $this->getModel('lead')->getRepository();
+        $repo   = $this->getModel('lead')->getRepository();
 
         foreach ($emails as $email) {
             $lead = $repo->getLeadByEmail($email);
@@ -657,7 +657,7 @@ class PublicController extends CommonFormController
             // stat doesn't exist, create one
             if (null === $stat) {
                 $lead['email'] = $email; // needed for stat
-                $stat = $this->addStat($lead, $email, $query, $idHash);
+                $stat          = $this->addStat($lead, $email, $query, $idHash);
             }
 
             $stat->setSource('email.client');
@@ -726,7 +726,7 @@ class PublicController extends CommonFormController
     private function createLead($email, $repo)
     {
         $model = $this->getModel('lead.lead');
-        $lead = $model->getEntity();
+        $lead  = $model->getEntity();
         // set custom field values
         $data = ['email' => $email];
         $model->setFieldValues($lead, $data, true);
@@ -750,7 +750,7 @@ class PublicController extends CommonFormController
         $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 
         $message = $this->coreParametersHelper->get('unsubscribe_message');
-        if (! $message) {
+        if (!$message) {
             $message = $translator->trans(
                 'mautic.email.unsubscribed.success',
                 [
