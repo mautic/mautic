@@ -17,6 +17,8 @@ use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email as MailerEmail;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -753,7 +755,7 @@ class MailHelper
     public function getMessageInstance()
     {
         try {
-            return $this->tokenizationEnabled ? MauticMessage::newInstance() : (new Email());
+            return $this->tokenizationEnabled ? MauticMessage::newInstance() : (new MailerEmail());
         } catch (\Exception $e) {
             $this->logError($e);
 
@@ -1003,7 +1005,9 @@ class MailHelper
         $this->checkBatchMaxRecipients(count($addresses));
 
         try {
-            $this->message->to($addresses);
+            foreach ($addresses as $address => $name) {
+                $this->message->addTo(new Address($address, $name ?? ''));
+            }
             $this->queuedRecipients = array_merge($this->queuedRecipients, $addresses);
 
             return true;
