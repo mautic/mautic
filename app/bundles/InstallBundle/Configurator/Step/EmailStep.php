@@ -14,18 +14,10 @@ class EmailStep implements StepInterface
         'mailer_port',
         'mailer_user',
         'mailer_password',
-        'mailer_amazon_region',
         'mailer_api_key',
         'mailer_encryption',
         'mailer_auth_mode',
-        'mailer_spool_type',
         'mailer_messenger_type',
-        'mailer_messenger_host',
-        'mailer_messenger_port',
-        'mailer_messenger_stream',
-        'mailer_messenger_group',
-        'mailer_messenger_auto_setup',
-        'mailer_messenger_tls',
     ];
 
     /**
@@ -81,20 +73,6 @@ class EmailStep implements StepInterface
     public $mailer_password;
 
     /**
-     * Amazon Region.
-     *
-     * @var string
-     */
-    public $mailer_amazon_region = 'us-east-1';
-
-    /**
-     * Mailer API key if applicable.
-     *
-     * @var string
-     */
-    public $mailer_api_key;
-
-    /**
      * SMTP encryption
      * Required in step.
      *
@@ -117,12 +95,7 @@ class EmailStep implements StepInterface
     /**
      * @var string
      */
-    public $mailer_messenger_dsn = 'sync://';
-
-    /**
-     * @var string
-     */
-    public $mailer_spool_type = 'sync';
+    public $messenger_dsn = 'sync://';
 
     /**
      * @var string
@@ -132,37 +105,15 @@ class EmailStep implements StepInterface
     /**
      * @var string
      */
-    public $mailer_messenger_host;
-
-    /**
-     * @var string
-     */
-    public $mailer_messenger_port;
-
-    /**
-     * @var string
-     */
-    public $mailer_messenger_stream = 'messages';
-
-    /**
-     * @var string
-     */
-    public $mailer_messenger_group = 'symfony';
-
-    /**
-     * @var string
-     */
-    public $mailer_messenger_auto_setup = 'true';
-
-    /**
-     * @var string
-     */
-    public $mailer_messenger_tls = 'false';
+    public $messenger_transport = 'mautic.messenger.doctrine';
 
     public ?int $messenger_retry_strategy_max_retries = 3;
-    public ?int $messenger_retry_strategy_delay       = 1000;
-    public ?int $messenger_retry_strategy_multiplier  = 2;
-    public ?int $messenger_retry_strategy_max_delay   = 0;
+
+    public ?int $messenger_retry_strategy_delay = 1000;
+
+    public ?int $messenger_retry_strategy_multiplier = 2;
+
+    public ?int $messenger_retry_strategy_max_delay = 0;
 
     public function __construct(Session $session)
     {

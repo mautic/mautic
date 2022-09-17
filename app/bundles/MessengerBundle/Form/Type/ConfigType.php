@@ -25,7 +25,7 @@ class ConfigType extends AbstractType
         TranslatorInterface $translator,
         MessengerTransportType $transportType
     ) {
-        $this->translator = $translator;
+        $this->translator    = $translator;
         $this->transportType = $transportType;
     }
 
@@ -40,7 +40,7 @@ class ConfigType extends AbstractType
         /***
          * General fields that should show for all the transports
          */
-        $messengerConditions = '{"config_messengerconfig_messenger_type":["async"]}';
+        $messengerConditions     = '{"config_messengerconfig_messenger_type":["async"]}';
         $messengerHideConditions = '{"config_messengerconfig_messenger_type":["sync"]}';
 
         $builder->add(
@@ -139,7 +139,7 @@ class ConfigType extends AbstractType
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getBlockPrefix()
     {
@@ -153,8 +153,8 @@ class ConfigType extends AbstractType
      */
     private function getTrasportTypeChoices(): array
     {
-        $choices = [];
-        $transports = $this->transportType->getTrasportTypes();
+        $choices    = [];
+        $transports = $this->transportType->getTransportTypes();
 
         foreach ($transports as $value => $label) {
             $choices[$this->translator->trans($label)] = $value;

@@ -28,7 +28,7 @@ return [
     ],
 
     'parameters' => [
-        'messenger_type'                      => 'sync', // sync means no queue, async means there is queue
+        'messenger_type'                      => 'async', // sync means no queue, async means there is queue
         'messenger_dsn'                       => 'doctrine://default', // default is doctrine://default
         'messenger_retry_strategy_max_retries'=> 3, /// Maximum number of retries for a failed send
         'messenger_retry_strategy_delay'      => 1000, /// Delay in milliseconds between retries

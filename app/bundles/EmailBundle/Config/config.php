@@ -670,7 +670,7 @@ return [
         'mailer_append_tracking_pixel'   => true,
         'mailer_convert_embed_images'    => false,
         'mailer_custom_headers'          => [],
-        'mailer_dsn'                     => 'smtp://user:pass@smtp.example.com:port',
+        'mailer_dsn'                     => 'smtp://localhost:25',
         'unsubscribe_text'               => null,
         'webview_text'                   => null,
         'unsubscribe_message'            => null,

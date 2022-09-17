@@ -263,7 +263,7 @@ class RestrictionHelperTest extends TypeTestCase
         $messengerType = $this->getMockBuilder(MessengerTransportType::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $messengerType->method('getTrasportTypes')
+        $messengerType->method('getTransportTypes')
             ->willReturn([]);
 
         // This is what we're really testing here

@@ -186,8 +186,8 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
 
         // Find save & close button
-        $buttonCrawler  = $crawler->selectButton('config[buttons][save]');
-        $form           = $buttonCrawler->form();
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
 
         // Fetch available option for 404_page field
         $availableOptions = $form['config[coreconfig][404_page]']->availableOptionValues();
@@ -223,8 +223,8 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
 
-        $buttonCrawler  =  $crawler->selectButton('config[buttons][save]');
-        $form           = $buttonCrawler->form();
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
 
         $send_notification_to_author           = '0';
         $campaign_notification_email_addresses = 'a@test.com, b@test.com';

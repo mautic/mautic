@@ -55,20 +55,6 @@ if ('index' === $tmpl) {
             </div>
         </div>
     </div>
-    <div id="amazonRegion">
-        <div class="row">
-            <div class="col-sm-6">
-                <?php echo $view['form']->row($form['mailer_amazon_region']); ?>
-            </div>
-        </div>
-    </div>
-    <div id="SparkpostRegion">
-        <div class="row">
-            <div class="col-sm-12">
-                <?php echo $view['form']->row($form['mailer_sparkpost_region']); ?>
-            </div>
-        </div>
-    </div>
     <div id="authDetails">
         <div class="row">
             <div class="col-sm-6">
@@ -78,10 +64,10 @@ if ('index' === $tmpl) {
                 <?php echo $view['form']->row($form['mailer_password']); ?>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <?php echo $view['form']->row($form['mailer_api_key']); ?>
-            </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <?php echo $view['form']->row($form['messenger_transport']); ?>
         </div>
     </div>
     <div class="row mt-20">

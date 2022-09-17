@@ -31,7 +31,7 @@ class MessengerDsnConvertor
              * We will use a static Dsn string, that matches the default Dsn string
              * https://symfony.com/doc/current/messenger.html#doctrine-transport
              */
-            return 'doctrine://default?table_name=table_name&queue_name=default&redeliver_timeout=3600&auto_setup=true';
+            return 'doctrine://default';
         } else {
             $class_name = $convertorClass[$parameters['messenger_transport']];
             $convertor  = new \ReflectionClass($class_name);
