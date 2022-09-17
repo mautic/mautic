@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Mailer\Transport;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;

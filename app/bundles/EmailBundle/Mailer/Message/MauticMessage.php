@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Mailer\Message;
 
 use Symfony\Component\Mime\Email;
@@ -20,7 +19,7 @@ class MauticMessage extends Email
      * @param string $subject
      * @param string $body
      */
-    public static function newInstance(?string $subject = null, ?string $body = null): MauticMessage
+    public static function newInstance(?string $subject = null, ?string $body = null): self
     {
         return (new self())
             ->subject($subject)

@@ -5838,7 +5838,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "9c7d0595fd1f1a96c412bead154ec0cae20c1006"
+                "reference": "02c99c5c111c5022f9ddced02d0b0c88b018d57b"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5911,6 +5911,9 @@
                 "symfony/http-kernel": "~4.4.0",
                 "symfony/intl": "~4.4.0",
                 "symfony/lock": "^5.1",
+                "symfony/mailer": "^5.4",
+                "symfony/messenger": "^5.4",
+                "symfony/mime": "^5.4",
                 "symfony/monolog-bridge": "~4.4.0",
                 "symfony/monolog-bundle": "~3.5.0",
                 "symfony/options-resolver": "~4.4.0",
@@ -5926,7 +5929,6 @@
                 "symfony/security-core": "~4.4.0",
                 "symfony/security-csrf": "~4.4.0",
                 "symfony/stopwatch": "~4.4.0",
-                "symfony/swiftmailer-bundle": "~3.3",
                 "symfony/templating": "~4.4.0",
                 "symfony/translation": "~4.4.0",
                 "symfony/twig-bundle": "~4.4.0",
@@ -8939,82 +8941,6 @@
             "time": "2022-03-14T15:07:52+00:00"
         },
         {
-            "name": "swiftmailer/swiftmailer",
-            "version": "v6.3.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/swiftmailer/swiftmailer.git",
-                "reference": "8a5d5072dca8f48460fce2f4131fcc495eec654c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/8a5d5072dca8f48460fce2f4131fcc495eec654c",
-                "reference": "8a5d5072dca8f48460fce2f4131fcc495eec654c",
-                "shasum": ""
-            },
-            "require": {
-                "egulias/email-validator": "^2.0|^3.1",
-                "php": ">=7.0.0",
-                "symfony/polyfill-iconv": "^1.0",
-                "symfony/polyfill-intl-idn": "^1.10",
-                "symfony/polyfill-mbstring": "^1.0"
-            },
-            "require-dev": {
-                "mockery/mockery": "^1.0",
-                "symfony/phpunit-bridge": "^4.4|^5.4"
-            },
-            "suggest": {
-                "ext-intl": "Needed to support internationalized email addresses"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "6.2-dev"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "lib/swift_required.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Chris Corbyn"
-                },
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                }
-            ],
-            "description": "Swiftmailer, free feature-rich PHP mailer",
-            "homepage": "https://swiftmailer.symfony.com",
-            "keywords": [
-                "email",
-                "mail",
-                "mailer"
-            ],
-            "support": {
-                "issues": "https://github.com/swiftmailer/swiftmailer/issues",
-                "source": "https://github.com/swiftmailer/swiftmailer/tree/v6.3.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/swiftmailer/swiftmailer",
-                    "type": "tidelift"
-                }
-            ],
-            "abandoned": "symfony/mailer",
-            "time": "2021-10-18T15:26:12+00:00"
-        },
-        {
             "name": "symfony/amazon-mailer",
             "version": "v5.4.8",
             "source": {
@@ -9083,85 +9009,17 @@
             "time": "2022-04-12T16:18:39+00:00"
         },
         {
-            "name": "symfony/amazon-mailer",
-            "version": "v5.4.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/amazon-mailer.git",
-                "reference": "8ffe8053a854ca376b126eecd0e3a55f5b4ae8bf"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/amazon-mailer/zipball/8ffe8053a854ca376b126eecd0e3a55f5b4ae8bf",
-                "reference": "8ffe8053a854ca376b126eecd0e3a55f5b4ae8bf",
-                "shasum": ""
-            },
-            "require": {
-                "async-aws/ses": "^1.0",
-                "php": ">=7.2.5",
-                "psr/event-dispatcher": "^1",
-                "symfony/deprecation-contracts": "^2.1|^3",
-                "symfony/mailer": "^4.4.21|^5.2.6|^6.0"
-            },
-            "require-dev": {
-                "symfony/http-client": "^4.4|^5.0|^6.0"
-            },
-            "type": "symfony-mailer-bridge",
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Mailer\\Bridge\\Amazon\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Amazon Mailer Bridge",
-            "homepage": "https://symfony.com",
-            "support": {
-                "source": "https://github.com/symfony/amazon-mailer/tree/v5.4.3"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2022-01-02T09:53:40+00:00"
-        },
-        {
             "name": "symfony/amqp-messenger",
-            "version": "v5.4.3",
+            "version": "v5.4.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/amqp-messenger.git",
-                "reference": "13c19454f3f122d8c16a9860e8ff8f008334f46f"
+                "reference": "def93f2a7841cfa1a4a1fa487b84054d0d53e521"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/amqp-messenger/zipball/13c19454f3f122d8c16a9860e8ff8f008334f46f",
-                "reference": "13c19454f3f122d8c16a9860e8ff8f008334f46f",
+                "url": "https://api.github.com/repos/symfony/amqp-messenger/zipball/def93f2a7841cfa1a4a1fa487b84054d0d53e521",
+                "reference": "def93f2a7841cfa1a4a1fa487b84054d0d53e521",
                 "shasum": ""
             },
             "require": {
@@ -9201,7 +9059,7 @@
             "description": "Symfony AMQP extension Messenger Bridge",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/amqp-messenger/tree/v5.4.3"
+                "source": "https://github.com/symfony/amqp-messenger/tree/v5.4.13"
             },
             "funding": [
                 {
@@ -9217,7 +9075,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-02T09:53:40+00:00"
+            "time": "2022-09-11T09:11:59+00:00"
         },
         {
             "name": "symfony/asset",
@@ -10030,16 +9888,16 @@
         },
         {
             "name": "symfony/doctrine-messenger",
-            "version": "v5.4.3",
+            "version": "v5.4.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/doctrine-messenger.git",
-                "reference": "335428f424807178c57b89fd2bed714fba4bf4af"
+                "reference": "7649a80e917b47c5072480a2d763c2422da239d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/doctrine-messenger/zipball/335428f424807178c57b89fd2bed714fba4bf4af",
-                "reference": "335428f424807178c57b89fd2bed714fba4bf4af",
+                "url": "https://api.github.com/repos/symfony/doctrine-messenger/zipball/7649a80e917b47c5072480a2d763c2422da239d2",
+                "reference": "7649a80e917b47c5072480a2d763c2422da239d2",
                 "shasum": ""
             },
             "require": {
@@ -10053,7 +9911,7 @@
             },
             "require-dev": {
                 "doctrine/dbal": "^2.13|^3.0",
-                "doctrine/persistence": "^1.3|^2",
+                "doctrine/persistence": "^1.3|^2|^3",
                 "symfony/property-access": "^4.4|^5.0|^6.0",
                 "symfony/serializer": "^4.4|^5.0|^6.0"
             },
@@ -10083,7 +9941,7 @@
             "description": "Symfony Doctrine Messenger Bridge",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/doctrine-messenger/tree/v5.4.3"
+                "source": "https://github.com/symfony/doctrine-messenger/tree/v5.4.12"
             },
             "funding": [
                 {
@@ -10099,7 +9957,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-02T09:53:40+00:00"
+            "time": "2022-08-09T12:54:00+00:00"
         },
         {
             "name": "symfony/dotenv",
@@ -11547,16 +11405,16 @@
         },
         {
             "name": "symfony/messenger",
-            "version": "v5.4.3",
+            "version": "v5.4.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/messenger.git",
-                "reference": "4319c25b76573cff46f112ee8cc83fffa4b97579"
+                "reference": "de4b258a5551934460c422620b61cf0a35744f51"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/messenger/zipball/4319c25b76573cff46f112ee8cc83fffa4b97579",
-                "reference": "4319c25b76573cff46f112ee8cc83fffa4b97579",
+                "url": "https://api.github.com/repos/symfony/messenger/zipball/de4b258a5551934460c422620b61cf0a35744f51",
+                "reference": "de4b258a5551934460c422620b61cf0a35744f51",
                 "shasum": ""
             },
             "require": {
@@ -11617,7 +11475,7 @@
             "description": "Helps applications send and receive messages to/from other applications or via message queues",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/messenger/tree/v5.4.3"
+                "source": "https://github.com/symfony/messenger/tree/v5.4.14"
             },
             "funding": [
                 {
@@ -11633,7 +11491,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-12T18:55:10+00:00"
+            "time": "2022-10-10T09:32:54+00:00"
         },
         {
             "name": "symfony/mime",
@@ -11998,89 +11856,6 @@
             ],
             "support": {
                 "source": "https://github.com/symfony/polyfill-ctype/tree/v1.26.0"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2022-05-24T11:49:31+00:00"
-        },
-        {
-            "name": "symfony/polyfill-iconv",
-            "version": "v1.26.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/polyfill-iconv.git",
-                "reference": "143f1881e655bebca1312722af8068de235ae5dc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-iconv/zipball/143f1881e655bebca1312722af8068de235ae5dc",
-                "reference": "143f1881e655bebca1312722af8068de235ae5dc",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.1"
-            },
-            "provide": {
-                "ext-iconv": "*"
-            },
-            "suggest": {
-                "ext-iconv": "For best performance"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "1.26-dev"
-                },
-                "thanks": {
-                    "name": "symfony/polyfill",
-                    "url": "https://github.com/symfony/polyfill"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "bootstrap.php"
-                ],
-                "psr-4": {
-                    "Symfony\\Polyfill\\Iconv\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony polyfill for the Iconv extension",
-            "homepage": "https://symfony.com",
-            "keywords": [
-                "compatibility",
-                "iconv",
-                "polyfill",
-                "portable",
-                "shim"
-            ],
-            "support": {
-                "source": "https://github.com/symfony/polyfill-iconv/tree/v1.26.0"
             },
             "funding": [
                 {
@@ -13061,16 +12836,16 @@
         },
         {
             "name": "symfony/redis-messenger",
-            "version": "v5.4.3",
+            "version": "v5.4.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/redis-messenger.git",
-                "reference": "34cf2f97b4da520a43e2b1973ea6cf1c68850280"
+                "reference": "d3028b772de91e9aa0342c92ff71c77b130ac9c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/redis-messenger/zipball/34cf2f97b4da520a43e2b1973ea6cf1c68850280",
-                "reference": "34cf2f97b4da520a43e2b1973ea6cf1c68850280",
+                "url": "https://api.github.com/repos/symfony/redis-messenger/zipball/d3028b772de91e9aa0342c92ff71c77b130ac9c4",
+                "reference": "d3028b772de91e9aa0342c92ff71c77b130ac9c4",
                 "shasum": ""
             },
             "require": {
@@ -13108,7 +12883,7 @@
             "description": "Symfony Redis extension Messenger Bridge",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/redis-messenger/tree/v5.4.3"
+                "source": "https://github.com/symfony/redis-messenger/tree/v5.4.13"
             },
             "funding": [
                 {
@@ -13124,7 +12899,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-02T09:53:40+00:00"
+            "time": "2022-09-11T09:11:59+00:00"
         },
         {
             "name": "symfony/routing",
@@ -13709,87 +13484,6 @@
                 }
             ],
             "time": "2022-10-05T15:16:54+00:00"
-        },
-        {
-            "name": "symfony/swiftmailer-bundle",
-            "version": "v3.5.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/swiftmailer-bundle.git",
-                "reference": "9daab339f226ac958192bf89836cb3378cc0e652"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/swiftmailer-bundle/zipball/9daab339f226ac958192bf89836cb3378cc0e652",
-                "reference": "9daab339f226ac958192bf89836cb3378cc0e652",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.1",
-                "swiftmailer/swiftmailer": "^6.1.3",
-                "symfony/config": "^4.4|^5.0",
-                "symfony/dependency-injection": "^4.4|^5.0",
-                "symfony/http-kernel": "^4.4|^5.0"
-            },
-            "conflict": {
-                "twig/twig": "<1.41|>=2.0,<2.10"
-            },
-            "require-dev": {
-                "symfony/console": "^4.4|^5.0",
-                "symfony/framework-bundle": "^4.4|^5.0",
-                "symfony/phpunit-bridge": "^4.4|^5.0",
-                "symfony/yaml": "^4.4|^5.0"
-            },
-            "type": "symfony-bundle",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "3.5-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Bundle\\SwiftmailerBundle\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony SwiftmailerBundle",
-            "homepage": "http://symfony.com",
-            "support": {
-                "issues": "https://github.com/symfony/swiftmailer-bundle/issues",
-                "source": "https://github.com/symfony/swiftmailer-bundle/tree/v3.5.4"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "abandoned": "symfony/mailer",
-            "time": "2022-02-06T08:03:40+00:00"
         },
         {
             "name": "symfony/templating",

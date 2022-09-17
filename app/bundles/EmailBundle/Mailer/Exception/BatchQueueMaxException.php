@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Mailer\Exception;
 
 class BatchQueueMaxException extends \Exception
