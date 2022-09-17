@@ -11,6 +11,7 @@ use Mautic\EmailBundle\Helper\MailerDsnConvertor;
 use Mautic\EmailBundle\Model\TransportType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
@@ -20,6 +21,11 @@ class ConfigSubscriber implements EventSubscriberInterface
     private $coreParametersHelper;
 
     private TransportType $transportType;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
 
     /**
      * Temp fields that will not be saved in env file
@@ -36,10 +42,11 @@ class ConfigSubscriber implements EventSubscriberInterface
         'mailer_api_key',
     ];
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, TransportType $transportType)
+    public function __construct(CoreParametersHelper $coreParametersHelper, TransportType $transportType, TranslatorInterface $translator)
     {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->transportType        = $transportType;
+        $this->translator           = $translator;
     }
 
     /**
@@ -92,7 +99,8 @@ class ConfigSubscriber implements EventSubscriberInterface
             }
         }
 
-        $data['mailer_dsn'] = MailerDsnConvertor::convertArrayToDsnString($data, $this->transportType->isServiceRequiresPassword());
+        $data['mailer_transport'] = $this->translator->trans($data['mailer_transport']);
+        $data['mailer_dsn']       = MailerDsnConvertor::convertArrayToDsnString($data, $this->transportType->isServiceRequiresPassword());
 
         foreach ($this->tempFields as $tempField) {
             unset($data[$tempField]);

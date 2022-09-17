@@ -24,35 +24,30 @@ class TransportType
      * @var array
      */
     private $transportTypes = [
-        'smtp'     => 'mautic.email.config.mailer_transport.smtp',
     ];
 
     /**
      * @var array
      */
     private $showHost = [
-        'smtp',
     ];
 
     /**
      * @var array
      */
     private $showPort = [
-        'smtp',
     ];
 
     /**
      * @var array
      */
     private $showUser = [
-        'smtp',
     ];
 
     /**
      * @var array
      */
     private $showPassword = [
-        'smtp',
     ];
 
     /**
@@ -115,9 +110,9 @@ class TransportType
 
     public function getServiceDoNotNeedPassword()
     {
-        $doNotRequireUser = array_diff($this->transportTypes, $this->showPassword);
+        $doNotRequirePassword = array_diff($this->transportTypes, $this->showPassword);
 
-        return $this->getString($doNotRequireUser);
+        return $this->getString($doNotRequirePassword);
     }
 
     /**
@@ -146,7 +141,7 @@ class TransportType
      */
     public function getSmtpService()
     {
-        return '"smtp"';
+        return '"mautic.email.transport_extension.smtp"';
     }
 
     /**
@@ -163,5 +158,37 @@ class TransportType
     private function getString(array $services)
     {
         return '"'.implode('","', $services).'"';
+    }
+
+    public function addTransport(string $serviceId, string $translatableAlias, bool $showHost, bool $showPort, bool $showUser, bool $showPassword, bool $showApiKey, string $options, string $dsnConvertor): void
+    {
+        $this->transportTypes[$serviceId] = $translatableAlias;
+
+        if ($showHost) {
+            $this->showHost[] = $serviceId;
+        }
+
+        if ($showPort) {
+            $this->showPort[] = $serviceId;
+        }
+
+        if ($showUser) {
+            $this->showUser[] = $serviceId;
+        }
+
+        if ($showPassword) {
+            $this->showPassword[] = $serviceId;
+        }
+
+        if ($showApiKey) {
+            $this->showApiKey[] = $serviceId;
+        }
+
+        if (!empty($options)) {
+            $this->transportConfigModels[$serviceId] = $options;
+        }
+        if (!empty($dsnConvertor)) {
+            $this->transportDsnConvertors[$serviceId] = $dsnConvertor;
+        }
     }
 }

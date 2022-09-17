@@ -232,6 +232,7 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.email.transport_type',
+                    'translator',
                 ],
             ],
             'mautic.email.pagebundle.subscriber' => [
@@ -543,10 +544,19 @@ return [
             ],
             'mautic.email.transport_wrapper' => [
                 'class'     => \Mautic\EmailBundle\Mailer\Transport\TransportWrapper::class,
+                'arguments' => [],
             ],
             'mautic.email.transport_extension.smtp' => [
-                'class'     => \Mautic\EmailBundle\Mailer\Transport\SmtpTransportExtension::class,
-                'tags'      => ['mautic.email.transport_extension'],
+                'class'        => \Mautic\EmailBundle\Mailer\Transport\SmtpTransportExtension::class,
+                'tagArguments' => [
+                    \Mautic\EmailBundle\Model\TransportType::TRANSPORT_ALIAS   => 'mautic.email.config.mailer_transport.smtp',
+                    \Mautic\EmailBundle\Model\TransportType::FIELD_HOST        => true,
+                    \Mautic\EmailBundle\Model\TransportType::FIELD_PORT        => true,
+                    \Mautic\EmailBundle\Model\TransportType::FIELD_USER        => true,
+                    \Mautic\EmailBundle\Model\TransportType::FIELD_PASSWORD    => true,
+                    \Mautic\EmailBundle\Model\TransportType::FIELD_PASSWORD    => true,
+                ],
+                'tag'      => 'mautic.email.transport_extension',
             ],
         ],
         'models' => [
