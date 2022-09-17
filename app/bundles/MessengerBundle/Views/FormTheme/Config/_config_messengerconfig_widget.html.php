@@ -8,11 +8,11 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$fields = $form->children;
+$fields    = $form->children;
 $fieldKeys = array_keys($fields);
 //we want to show these keys no matter what is the transport selected
 $retryKeys = ['messenger_retry_strategy_max_retries', 'messenger_retry_strategy_delay', 'messenger_retry_strategy_multiplier', 'messenger_retry_strategy_max_delay'];
-$template = '<div class="col-md-6">{content}</div>';
+$template  = '<div class="col-md-6">{content}</div>';
 ?>
 
 
@@ -32,7 +32,7 @@ foreach ($fieldKeys as $key) {
         echo "<div class='row'>";
     }
     echo $view['form']->rowIfExists($fields, $key, $template);
-    $i++;
+    ++$i;
     if (0 == $i % 2) {
         echo '</div>';
     }

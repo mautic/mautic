@@ -104,7 +104,6 @@ $container->loadFromExtension('framework', [
                     'multiplier'  => $configParameterBag->get('messenger_retry_strategy_multiplier', 2),
                     'max_delay'   => $configParameterBag->get('messenger_retry_strategy_max_delay', 0),
                 ],
-
             ],
         ],
         'routing' => [

@@ -10,8 +10,8 @@ class DsnDoctrineConvertor
     {
         $parameters = [];
 
-        $dsn = Dsn::fromString($dsnString);
-        $parameters['messenger_dsn'] = $dsnString;
+        $dsn                          = Dsn::fromString($dsnString);
+        $parameters['messenger_dsn']  = $dsnString;
         $parameters['messenger_type'] = $dsn->getScheme();
 
         return $parameters;

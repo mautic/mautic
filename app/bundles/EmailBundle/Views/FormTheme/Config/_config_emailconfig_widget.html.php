@@ -8,9 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$fields = $form->children;
+$fields    = $form->children;
 $fieldKeys = array_keys($fields);
-$template = '<div class="col-md-6">{content}</div>';
+$template  = '<div class="col-md-6">{content}</div>';
 ?>
 
 <?php if (count(array_intersect($fieldKeys, ['mailer_from_name', 'mailer_from_email', 'mailer_reply_to_email',  'mailer_transport', 'mailer_spool_type']))): ?>
@@ -78,7 +78,7 @@ $template = '<div class="col-md-6">{content}</div>';
                  * they will not be saved in the env file.
                  */
                 $i = 0;
-    $mailerKeys = array_filter($fields, function ($key) {
+    $mailerKeys    = array_filter($fields, function ($key) {
         return 0 === strpos($key, 'mailer_option');
     }, ARRAY_FILTER_USE_KEY);
 
@@ -87,7 +87,7 @@ $template = '<div class="col-md-6">{content}</div>';
             echo "<div class='row'>";
         }
         echo $view['form']->rowIfExists($fields, $key, $template);
-        $i++;
+        ++$i;
         if (0 == $i % 2) {
             echo '</div>';
         }

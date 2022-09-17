@@ -22,12 +22,12 @@ class Dsn
 
     public function __construct(string $scheme, string $host, string $user = null, string $password = null, int $port = null, array $options = [])
     {
-        $this->scheme = $scheme;
-        $this->host = $host;
-        $this->user = $user;
+        $this->scheme   = $scheme;
+        $this->host     = $host;
+        $this->user     = $user;
         $this->password = $password;
-        $this->port = $port;
-        $this->options = $options;
+        $this->port     = $port;
+        $this->options  = $options;
     }
 
     public static function fromString(string $dsn): self
@@ -40,11 +40,11 @@ class Dsn
             throw new \InvalidArgumentException(sprintf('The "%s" DSN is invalid.', $dsn));
         }
 
-        if (! isset($parsedDsn['scheme'])) {
+        if (!isset($parsedDsn['scheme'])) {
             throw new \InvalidArgumentException(sprintf('The "%s" DSN must contain a scheme.', $dsn));
         }
 
-        if (! isset($parsedDsn['host'])) {
+        if (!isset($parsedDsn['host'])) {
             throw new \InvalidArgumentException(sprintf('The "%s" DSN must contain a host (use "default" by default).', $dsn));
         }
 
@@ -53,11 +53,11 @@ class Dsn
             $options['path'] = trim($parsedDsn['path'], '/');
         }
 
-        $user = '' !== ($parsedDsn['user'] ?? '') ? urldecode($parsedDsn['user']) : null;
+        $user     = '' !== ($parsedDsn['user'] ?? '') ? urldecode($parsedDsn['user']) : null;
         $password = '' !== ($parsedDsn['pass'] ?? '') ? urldecode($parsedDsn['pass']) : null;
-        $port = $parsedDsn['port'] ?? null;
+        $port     = $parsedDsn['port'] ?? null;
         parse_str($parsedDsn['query'] ?? '', $query);
-        if (! empty($query)) {
+        if (!empty($query)) {
             $options = array_merge($options, $query);
         }
 
