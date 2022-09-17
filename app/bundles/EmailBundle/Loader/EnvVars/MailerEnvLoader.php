@@ -10,5 +10,6 @@ class MailerEnvLoader implements EnvVarsInterface
     public static function load(ParameterBag $config, ParameterBag $defaultConfig, ParameterBag $envVars): void
     {
         $envVars->set('MAUTIC_MAILER_DNS', $config->get('mailer_dsn'));
+        $envVars->set('MAUTIC_MESSENGER_EMAIL_TRANSPORT_DSN', $config->get('mailer_messenger_dsn'));
     }
 }

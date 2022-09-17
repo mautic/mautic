@@ -2,11 +2,11 @@
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Transport;
 
+use Mautic\EmailBundle\Mailer\Transport\BounceProcessorInterface;
+use Mautic\EmailBundle\Mailer\Transport\UnsubscriptionProcessorInterface;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail;
-use Mautic\EmailBundle\Swiftmailer\Transport\BounceProcessorInterface;
-use Mautic\EmailBundle\Swiftmailer\Transport\UnsubscriptionProcessorInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\NullTransport;
