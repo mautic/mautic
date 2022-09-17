@@ -30,7 +30,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.pepipost","mautic.transport.elasticemail","ses+smtp","ses+api","mautic.transport.postmark","gmail"';
+        $expected = '"smtp"';
 
         $this->assertSame($expected, $transportType->getServiceRequiresPassword());
     }

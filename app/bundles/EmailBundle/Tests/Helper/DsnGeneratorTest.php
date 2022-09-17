@@ -31,10 +31,7 @@ class DsnGeneratorTest extends \PHPUnit\Framework\TestCase
                 new Dsn('smtp', 'host', 'user', 'password', 25), 'smtp://user:password@host:25',
             ],
             'redis with host port and path' => [
-                new Dsn('redis', 'host', null, null, 63197, ['path' => 'emails']), 'redis://host:63197/emails',
-            ],
-            'redis with host port and path and option' => [
-                new Dsn('redis', 'host', null, null, 63197, ['path' => 'emails', 'auto_setup' => 'true']), 'redis://host:63197/emails?auto_setup=true',
+                new Dsn('smtp', 'host', 'user', 'password', 25, ['encryption' => 'tls', 'auth_mode'=>'login']), 'smtp://user:password@host:25?encryption=tls&auth_mode=login',
             ],
         ];
     }
