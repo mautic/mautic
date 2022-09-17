@@ -30,13 +30,12 @@ class HubspotApi extends CrmApi
         }
 
         if (isset($request['error']) && 401 == $request['error']['code']) {
-            $message = $request['error']['message'];
+            $response = json_decode($request['error']['message'] ?? null, true);
 
-            if (isset($message)) {
-                $cleanMessage = substr(stristr($message, '"message":"'), strlen('"message":"')) ?? $message;
-                throw new ApiErrorException($cleanMessage);
+            if (isset($response)) {
+                throw new ApiErrorException($response['message'], $request['error']['code']);
             } else {
-                throw new ApiErrorException($message);
+                throw new ApiErrorException('401 Unauthorized - Error with Hubspot API', $request['error']['code']);
             }
         }
 
