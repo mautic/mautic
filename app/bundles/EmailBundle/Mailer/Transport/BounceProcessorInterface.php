@@ -1,13 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\EmailBundle\Mailer\Transport;
 
@@ -23,9 +15,7 @@ interface BounceProcessorInterface
     /**
      * Get the email address that bounced.
      *
-     * @return BouncedEmail
-     *
      * @throws BounceNotFound
      */
-    public function processBounce(Message $message);
+    public function processBounce(Message $message): BouncedEmail;
 }

@@ -45,7 +45,7 @@ class AmazonCallback
     /**
      * Handle bounces & complaints from Amazon.
      */
-    public function processCallbackRequest(Request $request)
+    public function processCallbackRequest(Request $request): void
     {
         $payload = json_decode($request->getContent(), true);
 
@@ -70,7 +70,7 @@ class AmazonCallback
      *
      * @param array $payload from Amazon SES
      */
-    public function processJsonPayload(array $payload, $type)
+    public function processJsonPayload(array $payload, string $type): void
     {
         switch ($type) {
             case 'SubscriptionConfirmation':
@@ -153,7 +153,7 @@ class AmazonCallback
     /**
      * @throws BounceNotFound
      */
-    public function processBounce(Message $message)
+    public function processBounce(Message $message): BouncedEmail
     {
         if (self::SNS_ADDRESS !== $message->fromAddress) {
             throw new BounceNotFound();
@@ -177,11 +177,9 @@ class AmazonCallback
     }
 
     /**
-     * @return UnsubscribedEmail
-     *
      * @throws UnsubscriptionNotFound
      */
-    public function processUnsubscription(Message $message)
+    public function processUnsubscription(Message $message): UnsubscribedEmail
     {
         if (self::SNS_ADDRESS !== $message->fromAddress) {
             throw new UnsubscriptionNotFound();
@@ -198,10 +196,8 @@ class AmazonCallback
 
     /**
      * @param string $body
-     *
-     * @return array
      */
-    public function getSnsPayload($body)
+    public function getSnsPayload($body): array
     {
         return json_decode(strtok($body, "\n"), true);
     }

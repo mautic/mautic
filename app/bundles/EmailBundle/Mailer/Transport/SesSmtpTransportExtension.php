@@ -4,9 +4,11 @@ namespace Mautic\EmailBundle\Mailer\Transport;
 
 use Mautic\EmailBundle\Mailer\Callback\AmazonCallback;
 use Mautic\EmailBundle\MonitoredEmail\Message;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail;
 use Symfony\Component\HttpFoundation\Request;
 
-class SesSmtpTransportExtension implements CallbackTransportInterface, TransportExtensionInterface, BounceProcessorInterface
+class SesSmtpTransportExtension implements CallbackTransportInterface, TransportExtensionInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
 {
     private AmazonCallback $amazonCallback;
 
@@ -15,6 +17,7 @@ class SesSmtpTransportExtension implements CallbackTransportInterface, Transport
         $this->amazonCallback = $amazonCallback;
     }
 
+    /** @return string[] */
     public function getSupportedSchemes(): array
     {
         return ['amazon', 'ses'];
@@ -25,13 +28,13 @@ class SesSmtpTransportExtension implements CallbackTransportInterface, Transport
         $this->amazonCallback->processCallbackRequest($request);
     }
 
-    public function processBounce(Message $message)
+    public function processBounce(Message $message): BouncedEmail
     {
-        $this->amazonCallback->processBounce($message);
+        return $this->amazonCallback->processBounce($message);
     }
 
-    public function processUnsubscription(Message $message)
+    public function processUnsubscription(Message $message): UnsubscribedEmail
     {
-        $this->amazonCallback->processUnsubscription($message);
+        return $this->amazonCallback->processUnsubscription($message);
     }
 }

@@ -2,19 +2,12 @@
 
 namespace Mautic\EmailBundle\Mailer\Transport;
 
-use Symfony\Component\Mailer\Transport\TransportInterface;
-
 class TransportWrapper
 {
-    private TransportInterface $transport;
+    /** @var array <string, TransportExtensionInterface> */
     private array $transportExtensions = [];
 
-    public function __construct(TransportInterface $transport)
-    {
-        $this->transport = $transport;
-    }
-
-    public function addTransportExtension(TransportExtensionInterface $transportExtension)
+    public function addTransportExtension(TransportExtensionInterface $transportExtension): void
     {
         foreach ($transportExtension->getSupportedSchemes() as $scheme) {
             $this->transportExtensions[$scheme] = $transportExtension;
@@ -30,10 +23,13 @@ class TransportWrapper
         return $this->transportExtensions[$transportName] instanceof CallbackTransportInterface;
     }
 
+    /**
+     * @throws \LogicException
+     */
     public function getTransportExtension(string $transportName): TransportExtensionInterface
     {
         if (!array_key_exists($transportName, $this->transportExtensions)) {
-            return new \LogicException('Transport Extension '.$transportName.' is not found');
+            throw new \LogicException('Transport Extension '.$transportName.' is not found');
         }
 
         return $this->transportExtensions[$transportName];

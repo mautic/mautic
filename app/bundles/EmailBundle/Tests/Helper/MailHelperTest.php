@@ -428,7 +428,7 @@ class MailHelperTest extends TestCase
         $parameterMap = array_merge(
             [
                 ['mailer_return_path', false, null],
-                ['mailer_spool_type', false, 'memory'],
+                ['mailer_spool_type', false, 'sync'],
                 ['mailer_is_owner', false, $mailIsOwner],
             ],
             $parameterMap
@@ -481,7 +481,7 @@ class MailHelperTest extends TestCase
                 $this->returnValueMap(
                     [
                         ['mailer_return_path', false, null],
-                        ['mailer_spool_type', false, 'memory'],
+                        ['mailer_spool_type', false, 'sync'],
                     ]
                 )
             );

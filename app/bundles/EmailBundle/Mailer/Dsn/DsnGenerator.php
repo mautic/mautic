@@ -22,6 +22,9 @@ class DsnGenerator
         if (!empty($dsn->getPort())) {
             $dsnString .= ':'.$dsn->getPort();
         }
+        if (!empty($dsn->getOption('path'))) {
+            $dsnString .= '/'.$dsn->getOption('path');
+        }
 
         return $dsnString;
     }
