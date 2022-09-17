@@ -71,28 +71,22 @@ $template  = '<div class="col-md-6">{content}</div>';
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_password', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_api_key', $template); ?>
             </div>
-            
+            <div class="row">
             <?php
+
                 /**
                  * Options below will be used to compose the Dsn string
                  * they will not be saved in the env file.
                  */
-                $i = 0;
-    $mailerKeys    = array_filter($fields, function ($key) {
-        return 0 === strpos($key, 'mailer_option');
-    }, ARRAY_FILTER_USE_KEY);
+                $mailerKeys = array_filter($fields, function ($key) {
+                    return 0 === strpos($key, 'mailer_option');
+                }, ARRAY_FILTER_USE_KEY);
 
-    foreach ($mailerKeys as $key) {
-        if (0 == $i % 2) {
-            echo "<div class='row'>";
-        }
+    foreach ($mailerKeys as $key => $item) {
         echo $view['form']->rowIfExists($fields, $key, $template);
-        ++$i;
-        if (0 == $i % 2) {
-            echo '</div>';
-        }
     }
     ?>
+            </div>
 
 
             <div class="row">

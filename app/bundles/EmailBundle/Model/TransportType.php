@@ -153,6 +153,14 @@ class TransportType
     }
 
     /**
+     * @return string[]
+     */
+    public function getTransportDsnConvertors(): array
+    {
+        return $this->transportDsnConvertors;
+    }
+
+    /**
      * @return string
      */
     private function getString(array $services)
@@ -184,10 +192,10 @@ class TransportType
             $this->showApiKey[] = $serviceId;
         }
 
-        if (!empty($options)) {
+        if ($options) {
             $this->transportConfigModels[$serviceId] = $options;
         }
-        if (!empty($dsnConvertor)) {
+        if ($dsnConvertor) {
             $this->transportDsnConvertors[$serviceId] = $dsnConvertor;
         }
     }

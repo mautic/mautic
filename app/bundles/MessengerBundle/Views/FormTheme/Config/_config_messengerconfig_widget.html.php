@@ -22,22 +22,17 @@ $template  = '<div class="col-md-6">{content}</div>';
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.messengerconfig'); ?></h3>
     </div>
     <div class="panel-body">
+    <div class='row'>
     <?php
         $i = 0;
 foreach ($fieldKeys as $key) {
     if (in_array($key, $retryKeys)) {
         continue;
     }
-    if (0 == $i % 2) {
-        echo "<div class='row'>";
-    }
     echo $view['form']->rowIfExists($fields, $key, $template);
-    ++$i;
-    if (0 == $i % 2) {
-        echo '</div>';
-    }
 }
 ?>
+    </div>
         <?php if (isset($fields['messenger_type'])): ?>
             <div class="panel panel-default">
                 <div class="panel-heading">

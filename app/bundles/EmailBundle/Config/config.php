@@ -546,7 +546,7 @@ return [
                 'class'     => \Mautic\EmailBundle\Mailer\Transport\TransportWrapper::class,
                 'arguments' => [],
             ],
-            'mautic.email.transport_extension.smtp' => [
+            'smtp' => [
                 'class'        => \Mautic\EmailBundle\Mailer\Transport\SmtpTransportExtension::class,
                 'tagArguments' => [
                     \Mautic\EmailBundle\Model\TransportType::TRANSPORT_ALIAS   => 'mautic.email.config.mailer_transport.smtp',

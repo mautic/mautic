@@ -31,43 +31,53 @@ class MailerDsnConvertor
         $parameters['mailer_password']  = $dsn->getPassword();
 
         foreach ($dsn->getOptions() as $option => $value) {
-            $parameters['mailer_'.$option] = $value;
+            $parameters['mailer_option_'.$option] = $value;
         }
 
         return $parameters;
     }
 
-    public static function convertArrayToDsnString(array $parameters, bool $requirePassword = true): string
+    public static function convertArrayToDsnString(array $parameters, array $convertorClass): string
     {
-        $host = self::getDefaultHost($parameters);
-        if (empty($host)) {
-            return '';
-        }
-
-        $options = [];
-        foreach (self::SUPPORTED_OPTIONS as $option => $parameterName) {
-            if (array_key_exists($parameterName, $parameters) && !empty($parameters[$parameterName])) {
-                $options[$option] = $parameters[$parameterName];
-            }
-        }
         /**
          * We need to make sure that we have
          * both the user name and password before storing.
          * If the username is empty we need to flush the old password.
          */
-        $password = (!empty($parameters['mailer_user'])) ? self::getPassword($parameters) : null;
-        $user     = (!empty($parameters['mailer_user'])) ? $parameters['mailer_user'] : null;
+        $password                      = (!empty($parameters['mailer_user'])) ? self::getPassword($parameters) : null;
+        $user                          = (!empty($parameters['mailer_user'])) ? $parameters['mailer_user'] : null;
+        $parameters['mailer_password'] = $password;
 
-        return DsnGenerator::getDsnString(
-            new Dsn(
-                $parameters['mailer_transport'],
-                $host,
-                $user,
-                $password,
-                self::getPort($parameters),
-                $options
-            )
-        );
+        if ('smtp' === $parameters['mailer_transport']) {
+            $host = self::getDefaultHost($parameters);
+            if (empty($host)) {
+                return '';
+            }
+
+            $options = [];
+            foreach (self::SUPPORTED_OPTIONS as $option => $parameterName) {
+                if (array_key_exists($parameterName, $parameters) && !empty($parameters[$parameterName])) {
+                    $options[$option] = $parameters[$parameterName];
+                }
+            }
+
+            return DsnGenerator::getDsnString(
+                new Dsn(
+                    $parameters['mailer_transport'],
+                    $host,
+                    $user,
+                    $password,
+                    self::getPort($parameters),
+                    $options
+                )
+            );
+        } else {
+            $class_name = $convertorClass[$parameters['mailer_transport']];
+            $convertor  = new \ReflectionClass($class_name);
+            $instance   = $convertor->newInstanceWithoutConstructor();
+
+            return $instance->convertArrayToDsnString($parameters);
+        }
     }
 
     public static function getDefaultHost(array $parameters): string

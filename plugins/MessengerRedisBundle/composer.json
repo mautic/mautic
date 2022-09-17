@@ -1,0 +1,19 @@
+{
+    "name": "steer-campaign/plugin-messenger-redis",
+    "description": "Messenger Redis Plugin",
+    "type": "mautic-plugin",
+    "keywords": [
+        "mautic",
+        "plugin",
+        "integration",
+        "Steer Campaign"
+    ],
+    "extra": {
+        "install-directory-name": "MessengerRedisBundle"
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.4.0 <8.1",
+        "symfony/redis-messenger": "^5.4"
+    }
+}

@@ -11,7 +11,6 @@ use Mautic\EmailBundle\Helper\MailerDsnConvertor;
 use Mautic\EmailBundle\Model\TransportType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mailer\Transport\Dsn;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
@@ -21,11 +20,6 @@ class ConfigSubscriber implements EventSubscriberInterface
     private $coreParametersHelper;
 
     private TransportType $transportType;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
 
     /**
      * Temp fields that will not be saved in env file
@@ -42,11 +36,10 @@ class ConfigSubscriber implements EventSubscriberInterface
         'mailer_api_key',
     ];
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, TransportType $transportType, TranslatorInterface $translator)
+    public function __construct(CoreParametersHelper $coreParametersHelper, TransportType $transportType)
     {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->transportType        = $transportType;
-        $this->translator           = $translator;
     }
 
     /**
@@ -99,11 +92,18 @@ class ConfigSubscriber implements EventSubscriberInterface
             }
         }
 
-        $data['mailer_transport'] = $this->translator->trans($data['mailer_transport']);
-        $data['mailer_dsn']       = MailerDsnConvertor::convertArrayToDsnString($data, $this->transportType->isServiceRequiresPassword());
+        $data['mailer_dsn']       = MailerDsnConvertor::convertArrayToDsnString($data, $this->transportType->getTransportDsnConvertors());
 
-        foreach ($this->tempFields as $tempField) {
-            unset($data[$tempField]);
+        // remove options that are now part of the DSN string
+        $mailerKeys = array_filter($data, function ($key) {
+            return 0 === strpos($key, 'mailer_option');
+        }, ARRAY_FILTER_USE_KEY);
+
+        $removeKeys = \array_merge($this->tempFields, $mailerKeys);
+
+        // remove the parameters that are not to be saved in the env file
+        foreach ($removeKeys as $key => $tempField) {
+            unset($data[$key]);
         }
 
         $event->setConfig($data, 'emailconfig');

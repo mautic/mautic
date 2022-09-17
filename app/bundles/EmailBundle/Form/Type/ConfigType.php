@@ -647,6 +647,7 @@ class ConfigType extends AbstractType
                         'placeholder' => 'mautic.email.config.mailer_encryption.none',
                     ]
                 );
+
         // Inject any other elements of other bundles
         foreach ($this->transportType->getTrasportConfig() as $class) {
             $configForm = new $class($this->translator, $builder, $options);

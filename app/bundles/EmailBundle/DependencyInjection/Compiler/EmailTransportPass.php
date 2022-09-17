@@ -20,19 +20,20 @@ class EmailTransportPass implements CompilerPassInterface
 
         $definition     = $container->getDefinition('mautic.email.transport_type');
         $taggedServices = $container->findTaggedServiceIds('mautic.email.transport_extension');
+        $wrapper        = $container->getDefinition('mautic.email.transport_wrapper');
         foreach ($taggedServices as $id => $tags) {
             $definition->addMethodCall('addTransport', [
                 $id,
                 !empty($tags[0][TransportType::TRANSPORT_ALIAS]) ? $tags[0][TransportType::TRANSPORT_ALIAS] : $id,
-                !empty($tags[0][TransportType::FIELD_HOST]),
-                !empty($tags[0][TransportType::FIELD_PORT]),
-                !empty($tags[0][TransportType::FIELD_USER]),
-                !empty($tags[0][TransportType::FIELD_PASSWORD]),
-                !empty($tags[0][TransportType::FIELD_API_KEY]),
-                !empty($tags[0][TransportType::TRANSPORT_OPTIONS]),
-                !empty($tags[0][TransportType::DSN_CONVERTOR]),
+                !empty($tags[0][TransportType::FIELD_HOST]) ? $tags[0][TransportType::FIELD_HOST] : false,
+                !empty($tags[0][TransportType::FIELD_PORT]) ? $tags[0][TransportType::FIELD_PORT] : false,
+                !empty($tags[0][TransportType::FIELD_USER]) ? $tags[0][TransportType::FIELD_USER] : false,
+                !empty($tags[0][TransportType::FIELD_PASSWORD]) ? $tags[0][TransportType::FIELD_PASSWORD] : false,
+                !empty($tags[0][TransportType::FIELD_API_KEY]) ? $tags[0][TransportType::FIELD_API_KEY] : false,
+                !empty($tags[0][TransportType::TRANSPORT_OPTIONS]) ? $tags[0][TransportType::TRANSPORT_OPTIONS] : false,
+                !empty($tags[0][TransportType::DSN_CONVERTOR]) ? $tags[0][TransportType::DSN_CONVERTOR] : false,
             ]);
-            ///            $definition->addMethodCall('addTransportExtension', [new Reference($id, 1)]);
+            $wrapper->addMethodCall('addTransportExtension', [new Reference($id)]);
         }
     }
 }
