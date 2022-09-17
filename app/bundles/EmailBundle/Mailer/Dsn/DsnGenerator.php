@@ -2,10 +2,20 @@
 
 namespace Mautic\EmailBundle\Mailer\Dsn;
 
-use Symfony\Component\Mailer\Transport\Dsn;
-
 class DsnGenerator
 {
+    private const ALLOWED_OPTIONS = [
+        'auto_setup',
+        'group',
+        'consumer',
+        'delete_after_ack',
+        'delete_after_reject',
+        'lazy',
+        'stream_max_entries',
+        'tls',
+        'redeliver_timeout',
+    ];
+
     public static function getDsnString(Dsn $dsn): string
     {
         $dsnString = $dsn->getScheme().'://';
@@ -24,6 +34,16 @@ class DsnGenerator
         }
         if (!empty($dsn->getOption('path'))) {
             $dsnString .= '/'.$dsn->getOption('path');
+        }
+
+        $options = [];
+        foreach (self::ALLOWED_OPTIONS as $option) {
+            if (null !== $dsn->getOption($option)) {
+                $options[$option] = $dsn->getOption($option);
+            }
+        }
+        if (!empty($options)) {
+            $dsnString .= '?'.http_build_query($options);
         }
 
         return $dsnString;

@@ -2,8 +2,8 @@
 
 namespace Mautic\EmailBundle\Tests\Mailer\Dsn;
 
+use Mautic\EmailBundle\Mailer\Dsn\Dsn;
 use Mautic\EmailBundle\Mailer\Dsn\DsnGenerator;
-use Symfony\Component\Mailer\Transport\Dsn;
 
 class DsnGeneratorTest extends \PHPUnit\Framework\TestCase
 {
@@ -15,9 +15,6 @@ class DsnGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dsnString, DsnGenerator::getDsnString($dsn));
     }
 
-    /**
-     * @return array<string, array<int, string|\Symfony\Component\Mailer\Transport\Dsn>>
-     */
     public function dataDsnProvider(): array
     {
         return [
@@ -35,6 +32,9 @@ class DsnGeneratorTest extends \PHPUnit\Framework\TestCase
             ],
             'redis with host port and path' => [
                 new Dsn('redis', 'host', null, null, 63197, ['path' => 'emails']), 'redis://host:63197/emails',
+            ],
+            'redis with host port and path and option' => [
+                new Dsn('redis', 'host', null, null, 63197, ['path' => 'emails', 'auto_setup' => 'true']), 'redis://host:63197/emails?auto_setup=true',
             ],
         ];
     }
