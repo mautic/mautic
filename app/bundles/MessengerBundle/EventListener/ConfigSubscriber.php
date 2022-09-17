@@ -7,6 +7,7 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\MessengerBundle\Form\Type\ConfigType;
+use Mautic\MessengerBundle\Helper\DsnDoctrineConvertor;
 use Mautic\MessengerBundle\Helper\MessengerDsnConvertor;
 use Mautic\MessengerBundle\Model\MessengerTransportType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -27,7 +28,7 @@ class ConfigSubscriber implements EventSubscriberInterface
     public function __construct(CoreParametersHelper $coreParametersHelper, MessengerTransportType $transportType)
     {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->transportType        = $transportType;
+        $this->transportType = $transportType;
     }
 
     /**
@@ -56,23 +57,23 @@ class ConfigSubscriber implements EventSubscriberInterface
 
     public function onConfigBeforeSave(ConfigEvent $event): void
     {
-        $data                  = $event->getConfig('messengerconfig');
+        $data = $event->getConfig('messengerconfig');
         $data['messenger_dsn'] = DsnDoctrineConvertor::convertArrayToDsnString($data);
 
         $data['messenger_dsn'] = MessengerDsnConvertor::convertArrayToDsnString($data, $this->transportType->getTransportDsnConvertors());
 
-        $data = \array_intersect_key($data, array_flip($this->keepFields));
+        $data = \array_intersect_key($data, array_flip($this->tempFields));
 
         $event->setConfig($data, 'messengerconfig');
     }
 
     private function getParameters(ConfigBuilderEvent $event): array
     {
-        $parameters       = $event->getParametersFromConfig('MauticMessengerBundle');
+        $parameters = $event->getParametersFromConfig('MauticMessengerBundle');
         $loadedParameters = $this->coreParametersHelper->all();
-        if (!empty($loadedParameters['messenger_dsn'])) {
+        if (! empty($loadedParameters['messenger_dsn'])) {
             $messengerParameters = MessengerDsnConvertor::convertDsnToArray($loadedParameters['messenger_dsn']);
-            $parameters          = array_merge($parameters, $messengerParameters);
+            $parameters = array_merge($parameters, $messengerParameters);
         }
 
         return $parameters;

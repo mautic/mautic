@@ -22,7 +22,7 @@ class MessengerTransportType
      * @var string[]
      */
     private $transportTypes = [
-        'mautic.messenger.doctrine' => 'mautic.messenger.config.transport.doctrine',
+        'doctrine' => 'mautic.messenger.config.transport.doctrine',
     ];
 
     /**
