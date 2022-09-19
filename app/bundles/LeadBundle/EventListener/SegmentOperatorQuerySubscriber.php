@@ -101,11 +101,20 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         $operator    = 'multiselect' === $event->getFilter()->getOperator() ? 'regexp' : 'notRegexp';
         $expressions = [];
 
+        $queryBuilder = $event->getQueryBuilder();
+
         foreach ($event->getParameterHolder() as $parameter) {
-            $expressions[] = $event->getQueryBuilder()->expr()->$operator($leadsTableAlias.'.'.$event->getFilter()->getField(), $parameter);
+            $expressions[] = $queryBuilder->expr()->$operator($leadsTableAlias.'.'.$event->getFilter()->getField(), $parameter);
         }
 
-        $event->addExpression($event->getQueryBuilder()->expr()->andX($expressions));
+        if ('notRegexp' === $operator) {
+            $expressions = $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->andX($expressions),
+                $queryBuilder->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
+            );
+        }
+
+        $event->addExpression($queryBuilder->expr()->andX($expressions));
         $event->stopPropagation();
     }
 
