@@ -16,6 +16,7 @@ return [
                 'class'     => \Mautic\MessengerBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'mautic.messenger.transport_type',
                 ],
             ],
         ],

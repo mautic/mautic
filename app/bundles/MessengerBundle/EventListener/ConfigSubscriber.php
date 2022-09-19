@@ -16,6 +16,10 @@ class ConfigSubscriber implements EventSubscriberInterface
 {
     private array $tempFields = [
         'messenger_transport',
+        'messenger_host',
+        'messenger_port',
+        'messenger_user',
+        'messenger_password',
     ];
 
     /**
@@ -28,7 +32,7 @@ class ConfigSubscriber implements EventSubscriberInterface
     public function __construct(CoreParametersHelper $coreParametersHelper, MessengerTransportType $transportType)
     {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->transportType = $transportType;
+        $this->transportType        = $transportType;
     }
 
     /**
@@ -58,22 +62,29 @@ class ConfigSubscriber implements EventSubscriberInterface
     public function onConfigBeforeSave(ConfigEvent $event): void
     {
         $data = $event->getConfig('messengerconfig');
-        $data['messenger_dsn'] = DsnDoctrineConvertor::convertArrayToDsnString($data);
+        if ('sync' === $data['messenger_type']) {
+            $data['messenger_dsn'] = 'sync://';
+        } else {
+            if ('doctrine' === $data['messenger_transport']) {
+                $data['messenger_dsn'] = DsnDoctrineConvertor::convertArrayToDsnString($data);
+            } else {
+                $data['messenger_dsn'] = MessengerDsnConvertor::convertArrayToDsnString($data, $this->transportType->getTransportDsnConvertors());
+            }
+        }
 
-        $data['messenger_dsn'] = MessengerDsnConvertor::convertArrayToDsnString($data, $this->transportType->getTransportDsnConvertors());
-
-        $data = \array_intersect_key($data, array_flip($this->tempFields));
-
+        foreach ($this->tempFields as $tempField) {
+            unset($data[$tempField]);
+        }
         $event->setConfig($data, 'messengerconfig');
     }
 
     private function getParameters(ConfigBuilderEvent $event): array
     {
-        $parameters = $event->getParametersFromConfig('MauticMessengerBundle');
+        $parameters       = $event->getParametersFromConfig('MauticMessengerBundle');
         $loadedParameters = $this->coreParametersHelper->all();
-        if (! empty($loadedParameters['messenger_dsn'])) {
+        if (!empty($loadedParameters['messenger_dsn'])) {
             $messengerParameters = MessengerDsnConvertor::convertDsnToArray($loadedParameters['messenger_dsn']);
-            $parameters = array_merge($parameters, $messengerParameters);
+            $parameters          = array_merge($parameters, $messengerParameters);
         }
 
         return $parameters;

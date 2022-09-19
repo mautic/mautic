@@ -10,13 +10,13 @@ class MessengerDsnConvertor
     {
         $parameters = [];
 
-        $dsn = Dsn::fromString($dsnString);
-        $parameters['messenger_dsn'] = $dsnString;
+        $dsn                               = Dsn::fromString($dsnString);
+        $parameters['messenger_dsn']       = $dsnString;
         $parameters['messenger_transport'] = 'mautic.messenger.'.$dsn->getScheme();
-        $parameters['messenger_host'] = $dsn->getHost();
-        $parameters['messenger_port'] = $dsn->getPort();
-        $parameters['messenger_user'] = $dsn->getUser();
-        $parameters['messenger_password'] = $dsn->getPassword();
+        $parameters['messenger_host']      = $dsn->getHost();
+        $parameters['messenger_port']      = $dsn->getPort();
+        $parameters['messenger_user']      = $dsn->getUser();
+        $parameters['messenger_password']  = $dsn->getPassword();
         foreach ($dsn->getOptions() as $option => $value) {
             $parameters['messenger_'.$option] = $value;
         }
@@ -26,18 +26,21 @@ class MessengerDsnConvertor
 
     public static function convertArrayToDsnString(array $parameters, array $convertorClass): string
     {
-        if ('doctrine' === $parameters['messenger_transport']) {
-            /*
-             * We will use a static Dsn string, that matches the default Dsn string
-             * https://symfony.com/doc/current/messenger.html#doctrine-transport
-             */
-            return 'doctrine://default';
-        } else {
-            $class_name = $convertorClass[$parameters['messenger_transport']];
-            $convertor = new \ReflectionClass($class_name);
-            $instance = $convertor->newInstanceWithoutConstructor();
+        switch ($parameters['messenger_transport']) {
+            case 'sync':
+                return 'sync://';
+            case 'doctrine':
+                /*
+                * We will use a static Dsn string, that matches the default Dsn string
+                * https://symfony.com/doc/current/messenger.html#doctrine-transport
+                */
+                return 'doctrine://default';
+            default:
+                $class_name = $convertorClass[$parameters['messenger_transport']];
+                $convertor  = new \ReflectionClass($class_name);
+                $instance   = $convertor->newInstanceWithoutConstructor();
 
-            return $instance->convertArrayToDsnString($parameters);
+                return $instance->convertArrayToDsnString($parameters);
         }
     }
 }
