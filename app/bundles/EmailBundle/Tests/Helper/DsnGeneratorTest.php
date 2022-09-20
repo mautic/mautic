@@ -18,7 +18,7 @@ class DsnGeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * data to test DSN conversion.
      *
-     * @return array<string, array>  tests
+     * @return array<string, array<Dsn | string>>
      */
     public function dataDsnProvider(): array
     {

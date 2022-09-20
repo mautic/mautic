@@ -8,6 +8,8 @@ class MailerDsnConvertorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataConvertArrayToDsnStringProvider
+     *
+     * @param array<string> $parameters
      */
     public function testConvertArrayToDsnString(array $parameters, string $dsn): void
     {
@@ -15,6 +17,11 @@ class MailerDsnConvertorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dsn, $convertedDsn);
     }
 
+    /**
+     * data to test DSN conversion.
+     *
+     * @return array<string, array<int, array<string, string|null>|string>>
+     */
     public function dataConvertArrayToDsnStringProvider(): array
     {
         return [

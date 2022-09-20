@@ -301,7 +301,7 @@ class EmailStepType extends AbstractType
     }
 
     /**
-     * @return array
+     * @return array<string>
      */
     private function getMessengerTransportChoices()
     {

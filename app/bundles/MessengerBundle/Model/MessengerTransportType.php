@@ -26,35 +26,38 @@ class MessengerTransportType
     ];
 
     /**
-     * @var array
+     * @var array<string>
      */
     private $showHost = [];
 
     /**
-     * @var array
+     * @var array<string>
      */
     private $showPort = [];
 
     /**
-     * @var array
+     * @var array<string>
      */
     private $showUser = [];
 
     /**
-     * @var array
+     * @var array<string>
      */
     private $showPassword = [];
 
     /**
-     * @var array
+     * @var array<string>
      */
     private $transportConfigModels = [];
 
     /**
-     * @var array
+     * @var array<string>
      */
     private $transportDsnConvertors = [];
 
+    /**
+     * Add New Transprot to the Messenger bundle configuration.
+     */
     public function addTransport(string $serviceId, string $translatableAlias, bool $showHost, bool $showPort, bool $showUser, bool $showPassword, string $options, string $dsnConvertor): void
     {
         $this->transportTypes[$serviceId] = $translatableAlias;
@@ -80,20 +83,23 @@ class MessengerTransportType
     }
 
     /**
-     * @return string[]
+     * @return array<string>
      */
     public function getTransportTypes(): array
     {
         return $this->transportTypes;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getTrasportConfig(): array
     {
         return $this->transportConfigModels;
     }
 
     /**
-     * @return string[]
+     * @return array<string>
      */
     public function getTransportDsnConvertors(): array
     {
@@ -133,9 +139,9 @@ class MessengerTransportType
     }
 
     /**
-     * @return string
+     * @param array<string> $services
      */
-    private function getString(array $services)
+    private function getString(array $services): string
     {
         return '"'.implode('","', $services).'"';
     }

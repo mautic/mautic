@@ -6,6 +6,11 @@ use Mautic\CoreBundle\Helper\Dsn\Dsn;
 
 class MessengerDsnConvertor
 {
+    /**
+     * return an array based on dsn string for any transport.
+     *
+     * @return array<string>
+     */
     public static function convertDsnToArray(string $dsnString): array
     {
         $parameters = [];
@@ -24,6 +29,12 @@ class MessengerDsnConvertor
         return $parameters;
     }
 
+    /**
+     * return the dsn string for any transport.
+     *
+     * @param array<string> $parameters
+     * @param array<string> $convertorClass
+     */
     public static function convertArrayToDsnString(array $parameters, array $convertorClass): string
     {
         switch ($parameters['messenger_transport']) {

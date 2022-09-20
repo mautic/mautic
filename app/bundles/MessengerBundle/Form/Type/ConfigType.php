@@ -149,7 +149,7 @@ class ConfigType extends AbstractType
     /**
      * Get a sorted list of available transport types.
      *
-     * @return array $choices
+     * @return array<string> $choices
      */
     private function getTrasportTypeChoices(): array
     {

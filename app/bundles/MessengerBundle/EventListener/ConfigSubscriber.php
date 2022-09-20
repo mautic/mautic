@@ -14,6 +14,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var array<string>
+     */
     private array $tempFields = [
         'messenger_transport',
         'messenger_host',
@@ -36,7 +39,7 @@ class ConfigSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array
+     * @return array<string, array<int, int|string>>
      */
     public static function getSubscribedEvents()
     {
@@ -78,6 +81,9 @@ class ConfigSubscriber implements EventSubscriberInterface
         $event->setConfig($data, 'messengerconfig');
     }
 
+    /**
+     * @return array<string>
+     */
     private function getParameters(ConfigBuilderEvent $event): array
     {
         $parameters       = $event->getParametersFromConfig('MauticMessengerBundle');

@@ -6,6 +6,11 @@ use Mautic\CoreBundle\Helper\Dsn\Dsn;
 
 class DsnDoctrineConvertor
 {
+    /**
+     * return an array based on dsn string for doctrine transport.
+     *
+     * @return array<string>
+     */
     public static function convertDsnToArray(string $dsnString): array
     {
         $parameters = [];
@@ -17,6 +22,11 @@ class DsnDoctrineConvertor
         return $parameters;
     }
 
+    /**
+     * return the dsn string for doctrine transport.
+     *
+     * @param array<string> $parameters
+     */
     public static function convertArrayToDsnString(array $parameters): string
     {
         /*
