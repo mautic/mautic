@@ -1,9 +1,0 @@
-{
-    "subtree-splits": [
-        {
-            "name": "theme-oxygen",
-            "directory": "themes/oxygen",
-            "target": "git@github.com:mautic/theme-oxygen.git"
-        }
-    ]
-}

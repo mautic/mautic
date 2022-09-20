@@ -1,9 +1,0 @@
-{
-    "subtree-splits": [
-        {
-            "name": "theme-brienz",
-            "directory": "themes/brienz",
-            "target": "git@github.com:mautic/theme-brienz.git"
-        }
-    ]
-}
