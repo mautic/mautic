@@ -47,6 +47,7 @@ class ConfigType extends AbstractType
                     'unsubscribe_text'       => 'html',
                     'unsubscribe_message'    => 'html',
                     'resubscribe_message'    => 'html',
+                    'do_not_contact_text'    => 'html',
                     'webview_text'           => 'html',
                     // Encode special chars to keep congruent with Email entity custom headers
                     'mailer_custom_headers'  => 'clean',
@@ -69,6 +70,26 @@ class ConfigType extends AbstractType
                     ? $options['data']['unsubscribe_text']
                     : $this->translator->trans(
                         'mautic.email.unsubscribe.text',
+                        ['%link%' => '|URL|']
+                    ),
+            ]
+        );
+
+        $builder->add(
+            'do_not_contact_text',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.email.config.do_not_contact_text',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.do_not_contact_text.tooltip',
+                ],
+                'required'   => false,
+                'data'       => (array_key_exists('do_not_contact_text', $options['data']) && !empty($options['data']['do_not_contact_text']))
+                    ? $options['data']['do_not_contact_text']
+                    : $this->translator->trans(
+                        'mautic.email.do_not_contact.text',
                         ['%link%' => '|URL|']
                     ),
             ]
@@ -841,6 +862,20 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.email.config.show.contact.preferred.channels',
                 ],
                 'data'       => empty($options['data']['show_contact_preferred_channels']) ? false : true,
+                'required'   => false,
+            ]
+        );
+        $builder->add(
+            'show_contact_dnc',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.config.show.contact.dnc',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.show.contact.dnc.tooltip',
+                ],
+                'data'       => empty($options['data']['show_contact_dnc']) ? false : true,
                 'required'   => false,
             ]
         );

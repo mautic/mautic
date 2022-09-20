@@ -9,18 +9,13 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class UntrackableUrlsEvent extends Event
 {
-    /**
-     * @var array
-     */
     private $doNotTrack = [
         '{webview_url}',
         '{unsubscribe_url}',
+        '{dnc_url}',
         '{trackable=(.*?)}',
     ];
 
-    /**
-     * @var string
-     */
     private $content;
 
     /**
