@@ -23,7 +23,6 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $mailer = $this->getMockBuilder(MailerInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $swiftMailer->method('getTransport')->willReturn('');
 
         $tokens = [
             '{test}' => 'value',

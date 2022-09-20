@@ -18,15 +18,15 @@ class MailerDsnConvertorTest extends \PHPUnit\Framework\TestCase
     public function dataConvertArrayToDsnStringProvider(): array
     {
         return [
-            'null://null' => [
+            'smtp://null' => [
                 [
-                    'mailer_transport' => 'null',
+                    'mailer_transport' => 'smtp',
                     'mailer_host'      => 'null',
                     'mailer_user'      => null,
                     'mailer_password'  => null,
                     'mailer_port'      => null,
                 ],
-                'null://null',
+                'smtp://null',
             ],
         ];
     }

@@ -9,8 +9,12 @@ use Symfony\Component\Mime\RawMessage;
 
 class SmtpTransport implements TransportInterface
 {
+    public RawMessage $sentMessage;
+
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
+        $this->sentMessage = clone $message;
+
         return null;
     }
 

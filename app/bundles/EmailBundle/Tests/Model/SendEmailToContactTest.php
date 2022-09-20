@@ -784,9 +784,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 new NullLogger()
             );
 
-        $swiftMailer = new Mailer(new SmtpTransport());
+        $mailer = new Mailer(new SmtpTransport());
 
-        $mailHelper = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailHelper = new MailHelper($mockFactory, $mailer, ['nobody@nowhere.com' => 'No Body']);
 
         $statRepository = $this->getMockBuilder(StatRepository::class)
             ->disableOriginalConstructor()
