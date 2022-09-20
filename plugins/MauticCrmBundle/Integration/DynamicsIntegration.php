@@ -218,7 +218,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    public function populateLeadData($lead, $config = [], $object = 'Contacts')
+    public function populateLeadData($lead, $config = [], $object = 'contacts')
     {
         if ('company' === $object) {
             $object = 'accounts';
@@ -404,7 +404,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'contacts')
     {
-        if ('Contact' === $object) {
+        if ('Contact' === $object || 'Contacts' === $object) {
             $object = 'contacts';
         }
         $executed    = 0;
@@ -574,7 +574,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     $recordId = $entityData['accountid'];
                     // first try to find integration entity
                     $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Dynamics', $object, 'company',
-                        null, null, null, false, 0, 0, "'".$recordId."'");
+                        null, null, null, false, 0, 0, $recordId);
                     if (count($integrationId)) { // company exists, then update local fields
                         /** @var Company $entity */
                         $entity        = $this->companyModel->getEntity($integrationId[0]['internal_entity_id']);
@@ -624,7 +624,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     $recordId = $entityData['contactid'];
                     // first try to find integration entity
                     $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Dynamics', $object, 'lead',
-                        null, null, null, false, 0, 0, "'".$recordId."'");
+                        null, null, null, false, 0, 0, $recordId);
                     if (count($integrationId)) { // lead exists, then update
                         /** @var Lead $entity */
                         $entity        = $this->leadModel->getEntity($integrationId[0]['internal_entity_id']);
