@@ -222,7 +222,7 @@ class DynamicsApi extends CrmApi
     {
         $a_data      = [];
         $input       = $response->getBody();
-        $contentType = $response->getHeaders()['Content-Type'];
+        $contentType = $response->getHeaders()['Content-Type'][0];
         // grab multipart boundary from content type header
         preg_match('/boundary=(.*)$/', $contentType, $matches);
         $boundary = $matches[1];
