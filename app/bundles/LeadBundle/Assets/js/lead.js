@@ -585,7 +585,7 @@ Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptio
 
     mQuery('#' + displayId).attr('data-lookup-callback', 'updateLookupListFilter');
 
-    Mautic.activateFieldTypeahead(displayId, filterId, [], 'lead:fieldList')
+    Mautic.activateFieldTypeahead(displayId, filterId, [], mQuery('#' + displayId).data('action') || 'lead:fieldList');
 
     mQuery = mQueryBackup;
 };

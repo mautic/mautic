@@ -5,23 +5,23 @@ return [
         'public' => [
             'mautic_installer_home' => [
                 'path'       => '/installer',
-                'controller' => 'MauticInstallBundle:Install:step',
+                'controller' => 'Mautic\InstallBundle\Controller\InstallController::stepAction',
             ],
             'mautic_installer_remove_slash' => [
                 'path'       => '/installer/',
-                'controller' => 'MauticCoreBundle:Common:removeTrailingSlash',
+                'controller' => 'Mautic\CoreBundle\Controller\CommonController::removeTrailingSlashAction',
             ],
             'mautic_installer_step' => [
                 'path'       => '/installer/step/{index}',
-                'controller' => 'MauticInstallBundle:Install:step',
+                'controller' => 'Mautic\InstallBundle\Controller\InstallController::stepAction',
             ],
             'mautic_installer_final' => [
                 'path'       => '/installer/final',
-                'controller' => 'MauticInstallBundle:Install:final',
+                'controller' => 'Mautic\InstallBundle\Controller\InstallController::finalAction',
             ],
             'mautic_installer_catchcall' => [
                 'path'         => '/installer/{noerror}',
-                'controller'   => 'MauticInstallBundle:Install:step',
+                'controller'   => 'Mautic\InstallBundle\Controller\InstallController::stepAction',
                 'requirements' => [
                     'noerror' => '^(?).+',
                 ],

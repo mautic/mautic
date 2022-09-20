@@ -43,8 +43,6 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $this->queryBuilderMock = $this->createMock(QueryBuilder::class);
         $this->mockConnection   = $this->createMock(Connection::class);
         $this->em               = $this->createMock(EntityManager::class);

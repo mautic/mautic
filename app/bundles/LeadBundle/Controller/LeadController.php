@@ -129,7 +129,7 @@ class LeadController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticLeadBundle:Lead:index',
+                    'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'lead',
@@ -304,7 +304,7 @@ class LeadController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticLeadBundle:Lead:index',
+                    'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'contact',
@@ -388,7 +388,7 @@ class LeadController extends FormController
                     'doNotContact'      => end($dnc),
                     'doNotContactSms'   => end($dncSms),
                     'leadNotes'         => $this->forward(
-                        'MauticLeadBundle:Note:index',
+                        'Mautic\LeadBundle\Controller\NoteController::indexAction',
                         [
                             'leadId'     => $lead->getId(),
                             'ignoreAjax' => 1,
@@ -507,14 +507,14 @@ class LeadController extends FormController
                     if ($inQuickForm) {
                         $viewParameters = ['page' => $page];
                         $returnUrl      = $this->generateUrl('mautic_contact_index', $viewParameters);
-                        $template       = 'MauticLeadBundle:Lead:index';
+                        $template       = 'Mautic\LeadBundle\Controller\LeadController::indexAction';
                     } elseif ($form->get('buttons')->get('save')->isClicked()) {
                         $viewParameters = [
                             'objectAction' => 'view',
                             'objectId'     => $lead->getId(),
                         ];
                         $returnUrl = $this->generateUrl('mautic_contact_action', $viewParameters);
-                        $template  = 'MauticLeadBundle:Lead:view';
+                        $template  = 'Mautic\LeadBundle\Controller\LeadController::viewAction';
                     } else {
                         return $this->editAction($lead->getId(), true);
                     }
@@ -529,7 +529,7 @@ class LeadController extends FormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_contact_index', $viewParameters);
-                $template       = 'MauticLeadBundle:Lead:index';
+                $template       = 'Mautic\LeadBundle\Controller\LeadController::indexAction';
             }
 
             if ($cancelled || $valid) { //cancelled or success
@@ -597,7 +597,7 @@ class LeadController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:Lead:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'lead',
@@ -720,7 +720,7 @@ class LeadController extends FormController
                         [
                             'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
                             'viewParameters'  => $viewParameters,
-                            'contentTemplate' => 'MauticLeadBundle:Lead:view',
+                            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::viewAction',
                         ]
                     )
                 );
@@ -796,7 +796,7 @@ class LeadController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:Lead:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'lead',
@@ -926,7 +926,7 @@ class LeadController extends FormController
                     [
                         'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
                         'viewParameters'  => $viewParameters,
-                        'contentTemplate' => 'MauticLeadBundle:Lead:view',
+                        'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::viewAction',
                         'passthroughVars' => [
                             'closeModal' => 1,
                         ],
@@ -1006,7 +1006,7 @@ class LeadController extends FormController
                         'objectAction' => 'view',
                     ]),
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'MauticLeadBundle:Lead:view',
+                    'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::viewAction',
                     'passthroughVars' => [
                         'closeModal' => 1,
                     ],
@@ -1058,7 +1058,7 @@ class LeadController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:Lead:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'lead',
@@ -1123,7 +1123,7 @@ class LeadController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:Lead:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'lead',
@@ -1470,7 +1470,7 @@ class LeadController extends FormController
                 [
                     'returnUrl'       => $this->generateUrl($route, $viewParameters),
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'MauticLeadBundle:Lead:'.$func,
+                    'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::'.$func.'Action',
                     'passthroughVars' => [
                         'mauticContent' => 'lead',
                         'closeModal'    => 1,

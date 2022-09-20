@@ -744,6 +744,15 @@
       ]
     },
     {
+      "login": "automatyzuj",
+      "name": "automatyzuj",
+      "avatar_url": "https://avatars.githubusercontent.com/u/104569506?v=4",
+      "profile": "https://github.com/automatyzuj",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
       "login": "KN4CK3R",
       "name": "KN4CK3R",
       "avatar_url": "https://avatars.githubusercontent.com/u/1666336?v=4",
@@ -759,6 +768,43 @@
       "profile": "http://benjamin.leveque.me",
       "contributions": [
         "code"
+      ]
+    },
+    {
+      "login": "uzegonemad",
+      "name": "Benjamin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/430255?v=4",
+      "profile": "https://buzelac.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "IrisAmrein",
+      "name": "Iris Amrein",
+      "avatar_url": "https://avatars.githubusercontent.com/u/70972871?v=4",
+      "profile": "https://github.com/IrisAmrein",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "pety-dc",
+      "name": "peter.osvath",
+      "avatar_url": "https://avatars.githubusercontent.com/u/25766885?v=4",
+      "profile": "https://github.com/pety-dc",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "poweriguana",
+      "name": "poweriguana",
+      "avatar_url": "https://avatars.githubusercontent.com/u/86078621?v=4",
+      "profile": "https://github.com/poweriguana",
+      "contributions": [
+        "userTesting",
+        "projectManagement"
       ]
     },
     {

@@ -17,7 +17,7 @@ class RandomParameterName
      */
     public function generateRandomParameterName(): string
     {
-        $value = base_convert($this->lastUsedParameterId, 10, 36);
+        $value = base_convert((string) $this->lastUsedParameterId, 10, 36);
 
         ++$this->lastUsedParameterId;
 
