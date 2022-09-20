@@ -119,14 +119,14 @@ class EmailStep implements StepInterface
     public function __construct(Session $session)
     {
         $user = $session->get('mautic.installer.user');
-        if (! empty($user)) {
+        if (!empty($user)) {
             $this->mailer_from_email = $user->email;
-            $this->mailer_from_name = $user->firstname.' '.$user->lastname;
+            $this->mailer_from_name  = $user->firstname.' '.$user->lastname;
         }
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getFormType()
     {
@@ -134,7 +134,7 @@ class EmailStep implements StepInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function checkRequirements()
     {
@@ -142,7 +142,7 @@ class EmailStep implements StepInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function checkOptionalSettings()
     {
@@ -150,7 +150,7 @@ class EmailStep implements StepInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getTemplate()
     {
@@ -158,14 +158,14 @@ class EmailStep implements StepInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function update(StepInterface $data)
     {
         $parameters = [];
 
         foreach ($data as $key => $value) {
-            if (! in_array($key, self::SKIP_PARAMETERS)) {
+            if (!in_array($key, self::SKIP_PARAMETERS)) {
                 $parameters[$key] = $value;
             }
         }
