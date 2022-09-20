@@ -54,14 +54,14 @@ class AppKernel extends Kernel
 
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true): Response
     {
-        if (false !== strpos($request->getRequestUri(), 'installer') || ! $this->isInstalled()) {
+        if (false !== strpos($request->getRequestUri(), 'installer') || !$this->isInstalled()) {
             defined('MAUTIC_INSTALLER') or define('MAUTIC_INSTALLER', 1);
         }
 
         if (defined('MAUTIC_INSTALLER')) {
             $uri = $request->getRequestUri();
             if (false === strpos($uri, 'installer')) {
-                $base = $request->getBaseUrl();
+                $base   = $request->getBaseUrl();
                 $prefix = '';
                 //check to see if the .htaccess file exists or if not running under apache
                 if (false === stripos($request->server->get('SERVER_SOFTWARE', ''), 'apache')
@@ -91,7 +91,7 @@ class AppKernel extends Kernel
         }
 
         // Check for an an active db connection and die with error if unable to connect
-        if (! defined('MAUTIC_INSTALLER')) {
+        if (!defined('MAUTIC_INSTALLER')) {
             $db = $this->getContainer()->get('database_connection');
             try {
                 $db->connect();
@@ -158,7 +158,7 @@ class AppKernel extends Kernel
         ];
 
         $queueProtocol = $this->getParameterLoader()->getLocalParameterBag()->get('queue_protocol', '');
-        $bundles[] = new Mautic\QueueBundle\MauticQueueBundle($queueProtocol);
+        $bundles[]     = new Mautic\QueueBundle\MauticQueueBundle($queueProtocol);
         switch ($queueProtocol) {
             case QueueProtocol::RABBITMQ:
                 $bundles[] = new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle();
@@ -178,7 +178,7 @@ class AppKernel extends Kernel
             ->name('*Bundle.php');
 
         foreach ($finder as $file) {
-            $dirname = basename($file->getRelativePath());
+            $dirname  = basename($file->getRelativePath());
             $filename = substr($file->getFilename(), 0, -4);
 
             $class = '\\MauticPlugin'.'\\'.$dirname.'\\'.$filename;
@@ -220,7 +220,7 @@ class AppKernel extends Kernel
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function boot(): void
     {
@@ -232,7 +232,7 @@ class AppKernel extends Kernel
         $parameterLoader = $this->getParameterLoader();
         $parameterLoader->loadIntoEnvironment();
 
-        if (! defined('MAUTIC_TABLE_PREFIX')) {
+        if (!defined('MAUTIC_TABLE_PREFIX')) {
             //set the table prefix before boot
             define('MAUTIC_TABLE_PREFIX', $parameterLoader->getLocalParameterBag()->get('db_table_prefix', ''));
         }
@@ -253,7 +253,7 @@ class AppKernel extends Kernel
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
@@ -275,10 +275,10 @@ class AppKernel extends Kernel
     {
         if (null === $this->installed) {
             $localParameters = $this->getParameterLoader()->getLocalParameterBag();
-            $dbDriver = $localParameters->get('db_driver');
-            $mailerFromName = $localParameters->get('mailer_from_name');
+            $dbDriver        = $localParameters->get('db_driver');
+            $mailerFromName  = $localParameters->get('mailer_from_name');
 
-            $this->installed = ! empty($dbDriver) && ! empty($mailerFromName);
+            $this->installed = !empty($dbDriver) && !empty($mailerFromName);
         }
 
         return $this->installed;
@@ -290,7 +290,7 @@ class AppKernel extends Kernel
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @api
      */
