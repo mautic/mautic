@@ -413,12 +413,10 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * Validate and parse link for tracking.
-     *
-     * @param $url
-     *
-     * @return bool|array<string, string> array 0=trackingKey, 1=$trackingUrl
+     * 
+     * @return bool|non-empty-array<mixed, mixed>
      */
-    protected function prepareUrlForTracking($url)
+    protected function prepareUrlForTracking(string $url)
     {
         // Ensure it's clean
         $url = trim($url);
