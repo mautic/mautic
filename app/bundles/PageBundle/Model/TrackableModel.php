@@ -416,7 +416,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @param $url
      *
-     * @return array[$trackingKey, $trackingUrl]|false
+     * @return bool|array<$trackingKey, $trackingUrl>
      */
     protected function prepareUrlForTracking($url)
     {
@@ -439,7 +439,8 @@ class TrackableModel extends AbstractCommonModel
         // Convert URL
         $urlParts = parse_url($url);
 
-        if (!$this->isValidUrl($urlParts, false)) {
+        // We need to ignore not parsable and invalid urls
+        if (false === $urlParts || !$this->isValidUrl($urlParts, false)) {
             return false;
         }
 
