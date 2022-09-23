@@ -499,7 +499,7 @@ return [
                     'mautic.helper.core_parameters',
                     '%kernel.cache_dir%',
                     '%kernel.logs_dir%',
-                    '%kernel.root_dir%',
+                    '%kernel.project_dir%',
                 ],
             ],
             'mautic.helper.ip_lookup' => [
