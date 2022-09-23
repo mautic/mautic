@@ -464,8 +464,6 @@ class ThemeHelper implements ThemeHelperInterface
 
             return $tmpPath;
         }
-
-        return false;
     }
 
     /**
