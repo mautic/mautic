@@ -22,7 +22,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Symfony\Set\SymfonySetList::SYMFONY_40,
         \Rector\Symfony\Set\SymfonySetList::SYMFONY_41,
 
-        // @todo implement the whole set. Start rule by rule bellow.
+        // @todo implement the whole set. Start rule by rule below.
         // \Rector\Set\ValueObject\SetList::DEAD_CODE
     ]);
 
