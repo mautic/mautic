@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
