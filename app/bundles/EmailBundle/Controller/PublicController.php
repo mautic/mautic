@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use LogicException;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
@@ -326,12 +327,14 @@ class PublicController extends CommonFormController
 
             if ($lead) {
                 // Set the lead as current lead
-                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-                $leadModel = $this->getModel('lead');
                 $this->get('mautic.tracker.contact')->setTrackedContact($lead);
 
+                if (!$this->translator instanceof LocaleAwareInterface) {
+                    throw new LogicException(sprintf('$this->translator must be an instance of "%s"', LocaleAwareInterface::class));
+                }
+
                 // Set lead lang
-                if ($lead->getPreferredLocale() && $this->translator instanceof LocaleAwareInterface) {
+                if ($lead->getPreferredLocale()) {
                     $this->translator->setLocale($lead->getPreferredLocale());
                 }
             }
