@@ -57,6 +57,11 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     const SEGMENT_B = 'segment B';
 
     /**
+     * @var Connection|MockObject
+     */
+    private $connection;
+
+    /**
      * @var MockObject|IpLookupHelper
      */
     private $ipLookupHelper;

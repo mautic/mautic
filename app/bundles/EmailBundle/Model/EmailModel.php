@@ -191,7 +191,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->doNotContact             = $doNotContact;
         $this->statsCollectionHelper    = $statsCollectionHelper;
         $this->corePermissions          = $corePermissions;
-        $this->connection = $connection;
+        $this->connection               = $connection;
     }
 
     /**
