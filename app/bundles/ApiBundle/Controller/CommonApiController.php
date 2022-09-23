@@ -1320,8 +1320,8 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     /**
      * {@inheritdoc}
      *
-     * @param array<string, mixed>|Paginator|null $data
-     * @param null                                $statusCode
+     * @param array<string, mixed>|Paginator<mixed>|null $data
+     * @param null                                       $statusCode
      */
     protected function view($data = null, $statusCode = null, array $headers = [])
     {
