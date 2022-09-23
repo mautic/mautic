@@ -13,7 +13,7 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
 {
