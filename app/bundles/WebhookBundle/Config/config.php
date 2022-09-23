@@ -5,11 +5,11 @@ return [
         'main' => [
             'mautic_webhook_index' => [
                 'path'       => '/webhooks/{page}',
-                'controller' => 'MauticWebhookBundle:Webhook:index',
+                'controller' => 'Mautic\WebhookBundle\Controller\WebhookController::indexAction',
             ],
             'mautic_webhook_action' => [
                 'path'       => '/webhooks/{objectAction}/{objectId}',
-                'controller' => 'MauticWebhookBundle:Webhook:execute',
+                'controller' => 'Mautic\WebhookBundle\Controller\WebhookController::executeAction',
             ],
         ],
         'api' => [
@@ -17,11 +17,11 @@ return [
                 'standard_entity' => true,
                 'name'            => 'hooks',
                 'path'            => '/hooks',
-                'controller'      => 'MauticWebhookBundle:Api\WebhookApi',
+                'controller'      => 'Mautic\WebhookBundle\Controller\Api\WebhookApiController',
             ],
             'mautic_api_webhookevents' => [
                 'path'       => '/hooks/triggers',
-                'controller' => 'MauticWebhookBundle:Api\WebhookApi:getTriggers',
+                'controller' => 'Mautic\WebhookBundle\Controller\Api\WebhookApiController::getTriggersAction',
             ],
         ],
     ],

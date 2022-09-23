@@ -5,11 +5,11 @@ return [
         'main' => [
             'mautic_calendar_index' => [
                 'path'       => '/calendar',
-                'controller' => 'MauticCalendarBundle:Default:index',
+                'controller' => 'Mautic\CalendarBundle\Controller\DefaultController::indexAction',
             ],
             'mautic_calendar_action' => [
                 'path'       => '/calendar/{objectAction}',
-                'controller' => 'MauticCalendarBundle:Default:execute',
+                'controller' => 'Mautic\CalendarBundle\Controller\DefaultController::executeAction',
             ],
         ],
     ],

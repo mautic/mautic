@@ -4,8 +4,13 @@ on:
     tags:
       - '*'
 
+permissions:
+  contents: read
+
 jobs:
   release:
+    permissions:
+      contents: write  # for actions/create-release to create a release
     name: Create draft release
     runs-on: ubuntu-latest
     if: github.repository == 'mautic/mautic'

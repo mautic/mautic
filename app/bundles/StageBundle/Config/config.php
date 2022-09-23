@@ -5,11 +5,11 @@ return [
         'main' => [
             'mautic_stage_index' => [
                 'path'       => '/stages/{page}',
-                'controller' => 'MauticStageBundle:Stage:index',
+                'controller' => 'Mautic\StageBundle\Controller\StageController::indexAction',
             ],
             'mautic_stage_action' => [
                 'path'       => '/stages/{objectAction}/{objectId}',
-                'controller' => 'MauticStageBundle:Stage:execute',
+                'controller' => 'Mautic\StageBundle\Controller\StageController::executeAction',
             ],
         ],
         'api' => [
@@ -17,16 +17,16 @@ return [
                 'standard_entity' => true,
                 'name'            => 'stages',
                 'path'            => '/stages',
-                'controller'      => 'MauticStageBundle:Api\StageApi',
+                'controller'      => 'Mautic\StageBundle\Controller\Api\StageApiController',
             ],
             'mautic_api_stageddcontact' => [
                 'path'       => '/stages/{id}/contact/{contactId}/add',
-                'controller' => 'MauticStageBundle:Api\StageApi:addContact',
+                'controller' => 'Mautic\StageBundle\Controller\Api\StageApiController::addContactAction',
                 'method'     => 'POST',
             ],
             'mautic_api_stageremovecontact' => [
                 'path'       => '/stages/{id}/contact/{contactId}/remove',
-                'controller' => 'MauticStageBundle:Api\StageApi:removeContact',
+                'controller' => 'Mautic\StageBundle\Controller\Api\StageApiController::removeContactAction',
                 'method'     => 'POST',
             ],
         ],
