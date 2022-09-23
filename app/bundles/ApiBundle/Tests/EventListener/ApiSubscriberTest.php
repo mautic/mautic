@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ApiSubscriberTest extends CommonMocks
 {
@@ -21,17 +20,17 @@ class ApiSubscriberTest extends CommonMocks
     private $coreParametersHelper;
 
     /**
-     * @var TranslatorInterface|MockObject
+     * @var Translator&MockObject
      */
     private $translator;
 
     /**
-     * @var Request|MockObject
+     * @var Request&MockObject
      */
     private $request;
 
     /**
-     * @var GetResponseEvent|MockObject
+     * @var GetResponseEvent&MockObject
      */
     private $event;
 
