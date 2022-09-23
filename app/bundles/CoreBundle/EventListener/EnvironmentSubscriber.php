@@ -49,7 +49,7 @@ class EnvironmentSubscriber implements EventSubscriberInterface
     /**
      * Set default locale.
      */
-    public function onKernelRequestSetLocale(RequestEvent $event)
+    public function onKernelRequestSetLocale(RequestEvent $event): void
     {
         $request = $event->getRequest();
 
