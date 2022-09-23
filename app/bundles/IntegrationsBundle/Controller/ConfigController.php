@@ -38,11 +38,6 @@ class ConfigController extends AbstractFormController
     protected $request;
 
     /**
-     * @var Form
-     */
-    private $form;
-
-    /**
      * @var BasicIntegration|ConfigFormInterface
      */
     private $integrationObject;
@@ -86,10 +81,10 @@ class ConfigController extends AbstractFormController
         $this->request = $request;
 
         // Create the form
-        $this->form = $this->getForm();
+        $form = $this->getForm();
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            return $this->submitForm();
+            return $this->submitForm($form);
         }
 
         // Clear the session of previously stored fields in case it got stuck
@@ -97,15 +92,15 @@ class ConfigController extends AbstractFormController
         $session = $this->get('session');
         $session->remove("$integration-fields");
 
-        return $this->showForm();
+        return $this->showForm($form);
     }
 
     /**
      * @return JsonResponse|Response
      */
-    private function submitForm()
+    private function submitForm(Form $form)
     {
-        if ($this->isFormCancelled($this->form)) {
+        if ($this->isFormCancelled($form)) {
             return $this->closeForm();
         }
 
@@ -114,7 +109,7 @@ class ConfigController extends AbstractFormController
         $fieldMappings = $settings['sync']['fieldMappings'] ?? [];
 
         // Submit the form
-        $this->form->handleRequest($this->request);
+        $form->handleRequest($this->request);
         if ($this->integrationObject instanceof ConfigFormSyncInterface) {
             $integration   = $this->integrationObject->getName();
             $settings      = $this->integrationConfiguration->getFeatureSettings();
@@ -131,7 +126,7 @@ class ConfigController extends AbstractFormController
 
             /** @var FieldValidationHelper $fieldValidator */
             $fieldValidator = $this->get('mautic.integrations.helper.field_validator');
-            $fieldValidator->validateRequiredFields($this->form, $this->integrationObject, $settings['sync']['fieldMappings']);
+            $fieldValidator->validateRequiredFields($form, $this->integrationObject, $settings['sync']['fieldMappings']);
 
             $this->integrationConfiguration->setFeatureSettings($settings);
         }
@@ -145,8 +140,8 @@ class ConfigController extends AbstractFormController
         // Show the form if there are errors and the plugin is published or the authorized button was clicked
         $integrationDetailsPost = $this->request->request->get('integration_details', []);
         $authorize              = !empty($integrationDetailsPost['in_auth']);
-        if (!$this->form->isValid() && ($this->integrationConfiguration->getIsPublished() || $authorize)) {
-            return $this->showForm();
+        if ($form->isSubmitted() && !$form->isValid() && ($this->integrationConfiguration->getIsPublished() || $authorize)) {
+            return $this->showForm($form);
         }
 
         // Save the integration configuration
@@ -156,12 +151,12 @@ class ConfigController extends AbstractFormController
         $eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_CONFIG_AFTER_SAVE, $configEvent);
 
         // Show the form if the apply button was clicked
-        if ($this->isFormApplied($this->form)) {
+        if ($this->isFormApplied($form)) {
             // Regenerate the form
             $this->resetFieldsInSession();
-            $this->form = $this->getForm();
+            $form = $this->getForm();
 
-            return $this->showForm();
+            return $this->showForm($form);
         }
 
         // Otherwise close the modal
@@ -186,10 +181,10 @@ class ConfigController extends AbstractFormController
     /**
      * @return JsonResponse|Response
      */
-    private function showForm()
+    private function showForm(Form $form)
     {
         $integrationObject = $this->integrationObject;
-        $form              = $this->setFormTheme($this->form, 'IntegrationsBundle:Config:form.html.php');
+        $form              = $this->setFormTheme($form, 'IntegrationsBundle:Config:form.html.php');
         $formHelper        = $this->get('templating.helper.form');
 
         $showFeaturesTab =
