@@ -85,7 +85,6 @@ class DelegatingSpool extends \Swift_FileSpool
             return $rootPath.'/../var/spool';
         }
 
-        $filePath = str_replace('%kernel.root_dir%', $rootPath, $filePath);
         $filePath = str_replace('%kernel.project_dir%', $rootPath.'/..', $filePath);
 
         return $filePath;

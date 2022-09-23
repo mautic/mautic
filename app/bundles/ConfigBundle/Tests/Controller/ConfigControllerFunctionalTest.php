@@ -57,7 +57,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     public function testValuesAreEscapedProperly(): void
     {
         $url             = 'https://test.us/create?key=2MLzQFXBSqd2nqwGero90CpB1jX1FbVhhRd51ojr&domain=https%3A%2F%2Ftest.us%2F&longUrl=';
-        $trackIps        = "%ip1%\n%ip2%\n%kernel.root_dir%\n%kernel.project_dir%";
+        $trackIps        = "%ip1%\n%ip2%\n%kernel.project_dir%";
         $googleAnalytics = 'reveal pass: %mautic.db_password%';
 
         // request config edit page
@@ -98,7 +98,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             [
                 $this->escape('%ip1%'),
                 $this->escape('%ip2%'),
-                '%kernel.root_dir%',
                 '%kernel.project_dir%',
             ],
             $configParameters['do_not_track_ips']

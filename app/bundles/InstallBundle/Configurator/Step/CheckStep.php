@@ -62,19 +62,19 @@ class CheckStep implements StepInterface
 
     /**
      * @param Configurator $configurator Configurator service
-     * @param string       $kernelRoot   Kernel root path
+     * @param string       $projectDir   Kernel root path
      * @param RequestStack $requestStack Request stack
      */
     public function __construct(
         Configurator $configurator,
-        $kernelRoot,
+        string $projectDir,
         RequestStack $requestStack,
         OpenSSLCipher $openSSLCipher
     ) {
         $request = $requestStack->getCurrentRequest();
 
         $this->configIsWritable = $configurator->isFileWritable();
-        $this->kernelRoot       = $kernelRoot;
+        $this->kernelRoot       = $projectDir.'/app';
         if (!empty($request)) {
             $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
         }
@@ -110,17 +110,11 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.config.unwritable';
         }
 
-        $cashPath = str_replace('%kernel.root_dir%', $this->kernelRoot, $this->cache_path);
-        $cashPath = str_replace('%kernel.project_dir%', $this->kernelRoot.'/..', $this->cache_path);
-
-        if (!is_writable($cashPath)) {
+        if (!is_writable(str_replace('%kernel.project_dir%', $this->kernelRoot.'/..', $this->cache_path))) {
             $messages[] = 'mautic.install.cache.unwritable';
         }
 
-        $logPath = str_replace('%kernel.root_dir%', $this->kernelRoot, $this->log_path);
-        $logPath = str_replace('%kernel.project_dir%', $this->kernelRoot.'/..', $this->log_path);
-
-        if (!is_writable($logPath)) {
+        if (!is_writable(str_replace('%kernel.project_dir%', $this->kernelRoot.'/..', $this->log_path))) {
             $messages[] = 'mautic.install.logs.unwritable';
         }
 

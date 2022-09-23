@@ -41,10 +41,8 @@ if (file_exists(MAUTIC_UPGRADE_ROOT.'/app/release_metadata.json')) {
 
 // Get local parameters
 $localParameters = get_local_config();
-$cacheDir        = (isset($localParameters['cache_path'])) ? str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $localParameters['cache_path'].'/prod') : MAUTIC_APP_ROOT.'/../var/cache/prod';
-$cacheDir        = str_replace('%kernel.project_dir%', MAUTIC_ROOT, $cacheDir);
-$logDir          = (isset($localParameters['log_path'])) ? str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $localParameters['log_path'].'/prod') : MAUTIC_APP_ROOT.'/../var/logs';
-$logDir          = str_replace('%kernel.project_dir%', MAUTIC_ROOT, $logDir);
+$cacheDir        = (isset($localParameters['cache_path'])) ? str_replace('%kernel.project_dir%', MAUTIC_ROOT, $localParameters['cache_path'].'/prod') : MAUTIC_ROOT.'/var/cache/prod';
+$logDir          = (isset($localParameters['log_path'])) ? str_replace('%kernel.project_dir%', MAUTIC_ROOT, $localParameters['log_path'].'/prod') : MAUTIC_ROOT.'/var/logs';
 
 define('MAUTIC_CACHE_DIR', $cacheDir);
 define('MAUTIC_UPGRADE_ERROR_LOG', $logDir.'/upgrade_errors.php');
@@ -58,8 +56,7 @@ if (isset($_COOKIE['mautic_session_name'])) {
     $sessionValue = $_COOKIE[$_COOKIE['mautic_session_name']];
 
     include MAUTIC_APP_ROOT.'/config/paths.php';
-    $localConfigPath = str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $paths['local_config']);
-    $localConfigPath = str_replace('%kernel.project_dir%', MAUTIC_ROOT, $localConfigPath);
+    $localConfigPath = str_replace('%kernel.project_dir%', MAUTIC_ROOT, $paths['local_config']);
 
     $newSessionName = md5(md5($localConfigPath).$localParameters['secret_key']);
 
@@ -185,8 +182,7 @@ function get_local_config()
         include MAUTIC_APP_ROOT.'/config/paths.php';
 
         // Include local config to get cache_path
-        $localConfig = str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $paths['local_config']);
-        $localConfig = str_replace('%kernel.project_dir%', MAUTIC_ROOT, $localConfig);
+        $localConfig = str_replace('%kernel.project_dir%', MAUTIC_ROOT, $paths['local_config']);
 
         /** @var array $parameters */
         include $localConfig;

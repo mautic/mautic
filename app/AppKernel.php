@@ -45,7 +45,7 @@ class AppKernel extends Kernel
          * if no database settings have been provided yet.
          */
         if (!defined('MAUTIC_DB_SERVER_VERSION')) {
-            $localConfigFile = ParameterLoader::getLocalConfigFile($this->getRootDir(), false);
+            $localConfigFile = ParameterLoader::getLocalConfigFile($this->getProjectDir().'/app', false);
             define('MAUTIC_DB_SERVER_VERSION', file_exists($localConfigFile) ? null : '5.7');
         }
 
@@ -284,11 +284,6 @@ class AppKernel extends Kernel
         return $this->installed;
     }
 
-    public function getRootDir(): string
-    {
-        return __DIR__;
-    }
-
     public function getProjectDir(): string
     {
         return dirname(__DIR__);
@@ -303,10 +298,8 @@ class AppKernel extends Kernel
     {
         if ($cachePath = $this->getParameterLoader()->getLocalParameterBag()->get('cache_path')) {
             $envFolder = ('/' != substr($cachePath, -1)) ? '/'.$this->environment : $this->environment;
-            $path      = str_replace('%kernel.root_dir%', $this->getRootDir(), $cachePath.$envFolder);
-            $path      = str_replace('%kernel.project_dir%', $this->getProjectDir(), $path);
 
-            return $path;
+            return str_replace('%kernel.project_dir%', $this->getProjectDir(), $cachePath.$envFolder);
         }
 
         return $this->getProjectDir().'/var/cache/'.$this->getEnvironment();
@@ -315,10 +308,7 @@ class AppKernel extends Kernel
     public function getLogDir(): string
     {
         if ($logPath = $this->getParameterLoader()->getLocalParameterBag()->get('log_path')) {
-            $logPath = str_replace('%kernel.root_dir%', $this->getRootDir(), $logPath);
-            $logPath = str_replace('%kernel.project_dir%', $this->getProjectDir(), $logPath);
-
-            return $logPath;
+            return str_replace('%kernel.project_dir%', $this->getProjectDir(), $logPath);
         }
 
         return $this->getProjectDir().'/var/logs';
@@ -329,9 +319,7 @@ class AppKernel extends Kernel
      */
     public function getLocalConfigFile(): string
     {
-        $root = $this->getRootDir();
-
-        return ParameterLoader::getLocalConfigFile($root);
+        return ParameterLoader::getLocalConfigFile($this->getProjectDir().'/app');
     }
 
     private function getParameterLoader(): ParameterLoader
@@ -341,15 +329,5 @@ class AppKernel extends Kernel
         }
 
         return $this->parameterLoader = new ParameterLoader();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function getKernelParameters(): array
-    {
-        return array_merge(parent::getKernelParameters(), [
-            'kernel.root_dir' => $this->getRootDir(),
-        ]);
     }
 }
