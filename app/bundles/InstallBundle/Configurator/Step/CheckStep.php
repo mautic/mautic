@@ -36,7 +36,7 @@ class CheckStep implements StepInterface
      *
      * @var string
      */
-    public $cache_path = '%kernel.root_dir%/../var/cache';
+    public $cache_path = '%kernel.project_dir%/var/cache';
 
     /**
      * Absolute path to log directory.
@@ -44,7 +44,7 @@ class CheckStep implements StepInterface
      *
      * @var string
      */
-    public $log_path = '%kernel.root_dir%/../var/logs';
+    public $log_path = '%kernel.project_dir%/var/logs';
 
     /**
      * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs.
@@ -110,11 +110,17 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.config.unwritable';
         }
 
-        if (!is_writable(str_replace('%kernel.root_dir%', $this->kernelRoot, $this->cache_path))) {
+        $cashPath = str_replace('%kernel.root_dir%', $this->kernelRoot, $this->cache_path);
+        $cashPath = str_replace('%kernel.project_dir%', $this->kernelRoot.'/..', $this->cache_path);
+
+        if (!is_writable($cashPath)) {
             $messages[] = 'mautic.install.cache.unwritable';
         }
 
-        if (!is_writable(str_replace('%kernel.root_dir%', $this->kernelRoot, $this->log_path))) {
+        $logPath = str_replace('%kernel.root_dir%', $this->kernelRoot, $this->log_path);
+        $logPath = str_replace('%kernel.project_dir%', $this->kernelRoot.'/..', $this->log_path);
+
+        if (!is_writable($logPath)) {
             $messages[] = 'mautic.install.logs.unwritable';
         }
 
