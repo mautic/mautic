@@ -18,6 +18,7 @@ use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
@@ -38,42 +39,36 @@ class InstallService
     const EMAIL_STEP    = 3;
     const FINAL_STEP    = 4;
 
-    private $configurator;
+    private Configurator $configurator;
+    private CacheHelper $cacheHelper;
+    protected PathsHelper $pathsHelper;
+    private EntityManager $entityManager;
+    private TranslatorInterface $translator;
+    private KernelInterface $kernel;
+    private ValidatorInterface $validator;
+    private UserPasswordEncoder $encoder;
+    private ContainerInterface $container;
 
-    private $cacheHelper;
-
-    protected $pathsHelper;
-
-    private $entityManager;
-
-    private $translator;
-
-    private $kernel;
-
-    private $validator;
-
-    private $encoder;
-
-    /**
-     * InstallService constructor.
-     */
-    public function __construct(Configurator $configurator,
-                                CacheHelper $cacheHelper,
-                                PathsHelper $pathsHelper,
-                                EntityManager $entityManager,
-                                TranslatorInterface $translator,
-                                KernelInterface $kernel,
-                                ValidatorInterface $validator,
-                                UserPasswordEncoder $encoder)
-    {
-        $this->configurator             = $configurator;
-        $this->cacheHelper              = $cacheHelper;
-        $this->pathsHelper              = $pathsHelper;
-        $this->entityManager            = $entityManager;
-        $this->translator               = $translator;
-        $this->kernel                   = $kernel;
-        $this->validator                = $validator;
-        $this->encoder                  = $encoder;
+    public function __construct(
+        Configurator $configurator,
+        CacheHelper $cacheHelper,
+        PathsHelper $pathsHelper,
+        EntityManager $entityManager,
+        TranslatorInterface $translator,
+        KernelInterface $kernel,
+        ValidatorInterface $validator,
+        UserPasswordEncoder $encoder,
+        ContainerInterface $container
+    ) {
+        $this->configurator  = $configurator;
+        $this->cacheHelper   = $cacheHelper;
+        $this->pathsHelper   = $pathsHelper;
+        $this->entityManager = $entityManager;
+        $this->translator    = $translator;
+        $this->kernel        = $kernel;
+        $this->validator     = $validator;
+        $this->encoder       = $encoder;
+        $this->container     = $container;
     }
 
     /**
@@ -346,12 +341,12 @@ class InstallService
     /**
      * Load the database fixtures in the database.
      */
-    public function createFixturesStep(ContainerInterface $container): array
+    public function createFixturesStep(): array
     {
         $messages = [];
 
         try {
-            $this->installDatabaseFixtures($container);
+            $this->installDatabaseFixtures();
         } catch (\Exception $exception) {
             $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.adding.fixtures',
@@ -368,11 +363,11 @@ class InstallService
      *
      * @throws \InvalidArgumentException
      */
-    public function installDatabaseFixtures(ContainerInterface $container): void
+    public function installDatabaseFixtures(): void
     {
         $paths  = [dirname(__DIR__).'/InstallFixtures/ORM'];
         /** @phpstan-ignore-next-line */
-        $loader = new ContainerAwareLoader($container);
+        $loader = new ContainerAwareLoader($this->container);
 
         foreach ($paths as $path) {
             if (is_dir($path)) {
@@ -407,12 +402,13 @@ class InstallService
 
         //ensure the username and email are unique
         try {
-            $existingUser = $entityManager->getRepository('MauticUserBundle:User')->find(1);
+            /** @var User $existingUser */
+            $existingUser = $entityManager->getRepository(User::class)->find(1);
         } catch (\Exception $e) {
             $existingUser = null;
         }
 
-        if (null != $existingUser) {
+        if (null !== $existingUser) {
             $user = $existingUser;
         } else {
             $user = new User();
@@ -473,7 +469,7 @@ class InstallService
 
         $adminRole = null;
         try {
-            $adminRole = $entityManager->getReference('MauticUserBundle:Role', 1);
+            $adminRole = $entityManager->getReference(Role::class, 1);
         } catch (\Exception $exception) {
             $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.getting.role',

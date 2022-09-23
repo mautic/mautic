@@ -10,7 +10,6 @@ use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -165,10 +164,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $application->setCatchExceptions(false);
 
         if ($command) {
-            if ($command instanceof ContainerAwareCommand) {
-                $command->setContainer(self::$container);
-            }
-
             // Register the command
             $application->add($command);
         }

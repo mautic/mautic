@@ -14,9 +14,6 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Class CitrixModel.
- */
 class CitrixModel extends FormModel
 {
     /**
@@ -29,9 +26,6 @@ class CitrixModel extends FormModel
      */
     protected $eventModel;
 
-    /**
-     * CitrixModel constructor.
-     */
     public function __construct(LeadModel $leadModel, EventModel $eventModel)
     {
         $this->leadModel  = $leadModel;
@@ -236,12 +230,12 @@ class CitrixModel extends FormModel
     }
 
     /**
-     * @param      $product
-     * @param      $productId
-     * @param      $eventName
-     * @param      $eventDesc
-     * @param int  $count
-     * @param null $output
+     * @param mixed                $product
+     * @param mixed                $productId
+     * @param mixed                $eventName
+     * @param mixed                $eventDesc
+     * @param int                  $count
+     * @param OutputInterface|null $output
      */
     public function syncEvent($product, $productId, $eventName, $eventDesc, &$count = 0, $output = null)
     {

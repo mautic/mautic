@@ -165,6 +165,26 @@ return [
                 'arguments' => \Mautic\ChannelBundle\Entity\MessageQueue::class,
             ],
         ],
+        'commands' => [
+            'mautic.channel.command.process_marketing_messages_queue' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\ChannelBundle\Command\ProcessMarketingMessagesQueueCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.channel.model.queue',
+                    'mautic.helper.paths',
+                ],
+            ],
+            'mautic.channel.command.send_channel_broadcast' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\ChannelBundle\Command\SendChannelBroadcastCommand::class,
+                'arguments' => [
+                    'translator',
+                    'event_dispatcher',
+                    'mautic.helper.paths',
+                ],
+            ],
+        ],
     ],
 
     'parameters' => [
