@@ -307,7 +307,7 @@ return [
     ],
 
     'parameters' => [
-        'report_temp_dir'                     => '%kernel.root_dir%/../media/files/temp',
+        'report_temp_dir'                     => '%kernel.project_dir%/media/files/temp',
         'report_export_batch_size'            => 1000,
         'report_export_max_filesize_in_bytes' => 5000000,
         'csv_always_enclose'                  => false,

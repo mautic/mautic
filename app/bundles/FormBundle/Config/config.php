@@ -485,7 +485,7 @@ return [
     ],
 
     'parameters' => [
-        'form_upload_dir'        => '%kernel.root_dir%/../media/files/form',
+        'form_upload_dir'        => '%kernel.project_dir%/media/files/form',
         'blacklisted_extensions' => ['php', 'sh'],
         'do_not_submit_emails'   => [],
     ],
