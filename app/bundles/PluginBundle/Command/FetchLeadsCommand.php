@@ -2,20 +2,27 @@
 
 namespace Mautic\PluginBundle\Command;
 
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class FetchLeadsCommand.
- */
-class FetchLeadsCommand extends ContainerAwareCommand
+class FetchLeadsCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    private TranslatorInterface $translator;
+    private IntegrationHelper $integrationHelper;
+
+    public function __construct(TranslatorInterface $translator, IntegrationHelper $integrationHelper)
+    {
+        parent::__construct();
+
+        $this->translator        = $translator;
+        $this->integrationHelper = $integrationHelper;
+    }
+
     protected function configure()
     {
         $this
@@ -64,14 +71,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
-
-        $translator    = $container->get('translator');
         $integration   = $input->getOption('integration');
         $startDate     = $input->getOption('start-date');
         $endDate       = $input->getOption('end-date');
@@ -85,11 +86,9 @@ class FetchLeadsCommand extends ContainerAwareCommand
             throw new \RuntimeException('An integration must be specified');
         }
 
-        $integrationHelper = $container->get('mautic.helper.integration');
-
-        $integrationObject = $integrationHelper->getIntegrationObject($integration);
+        $integrationObject = $this->integrationHelper->getIntegrationObject($integration);
         if (!$integrationObject instanceof UnifiedIntegrationInterface) {
-            $availableIntegrations = array_filter($integrationHelper->getIntegrationObjects(),
+            $availableIntegrations = array_filter($this->integrationHelper->getIntegrationObjects(),
                 function (UnifiedIntegrationInterface $availableIntegration) {
                     return $availableIntegration->isConfigured();
                 });
@@ -108,13 +107,10 @@ class FetchLeadsCommand extends ContainerAwareCommand
             return 255;
         }
 
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $container->get('mautic.helper.integration');
-
-        $integrationObject = $integrationHelper->getIntegrationObject($integration);
+        $integrationObject = $this->integrationHelper->getIntegrationObject($integration);
 
         if (!$integrationObject->isAuthorized()) {
-            $output->writeln(sprintf('<error>ERROR:</error> <info>'.$translator->trans('mautic.plugin.command.notauthorized').'</info>', $integration));
+            $output->writeln(sprintf('<error>ERROR:</error> <info>'.$this->translator->trans('mautic.plugin.command.notauthorized').'</info>', $integration));
 
             return 255;
         }
@@ -144,8 +140,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
 
         if (isset($supportedFeatures) && in_array('get_leads', $supportedFeatures)) {
             if (null !== $integrationObject && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
-                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
-                $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
+                $output->writeln('<info>'.$this->translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
+                $output->writeln('<comment>'.$this->translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
                 //Handle case when integration object are named "Contacts" and "Leads"
                 $leadObjectName = 'Lead';
@@ -175,7 +171,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                     return strtolower($i);
                 }, $config['objects']), true)) {
                     $output->writeln('');
-                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.contacts.starting').'</comment>');
+                    $output->writeln('<comment>'.$this->translator->trans('mautic.plugin.command.fetch.contacts.starting').'</comment>');
                     $contactList = [];
                     $results     = $integrationObject->getLeads($params, null, $contactsExecuted, $contactList, $contactObjectName);
                     if (is_array($results)) {
@@ -191,12 +187,12 @@ class FetchLeadsCommand extends ContainerAwareCommand
 
                 if ($processed) {
                     $output->writeln(
-                        '<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', ['%events%' => $processed])
+                        '<comment>'.$this->translator->trans('mautic.plugin.command.fetch.leads.events_executed', ['%events%' => $processed])
                         .'</comment>'."\n"
                     );
                 } else {
                     $output->writeln(
-                        '<comment>'.$translator->trans(
+                        '<comment>'.$this->translator->trans(
                             'mautic.plugin.command.fetch.leads.events_executed_breakout',
                             ['%updated%' => $updated, '%created%' => $created]
                         )
@@ -212,8 +208,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 )
             ) {
                 $updated = $created = $processed = 0;
-                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
-                $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
+                $output->writeln('<info>'.$this->translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
+                $output->writeln('<comment>'.$this->translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
 
                 $results = $integrationObject->getCompanies($params);
                 if (is_array($results)) {
@@ -226,12 +222,12 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 $output->writeln('');
                 if ($processed) {
                     $output->writeln(
-                        '<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.events_executed', ['%events%' => $processed])
+                        '<comment>'.$this->translator->trans('mautic.plugin.command.fetch.companies.events_executed', ['%events%' => $processed])
                         .'</comment>'."\n"
                     );
                 } else {
                     $output->writeln(
-                        '<comment>'.$translator->trans(
+                        '<comment>'.$this->translator->trans(
                             'mautic.plugin.command.fetch.companies.events_executed_breakout',
                             ['%updated%' => $updated, '%created%' => $created]
                         )
@@ -242,7 +238,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
         }
 
         if (isset($supportedFeatures) && in_array('push_leads', $supportedFeatures) && method_exists($integrationObject, 'pushLeads')) {
-            $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.leads', ['%integration%' => $integration]).'</info>');
+            $output->writeln('<info>'.$this->translator->trans('mautic.plugin.command.pushing.leads', ['%integration%' => $integration]).'</info>');
             $result  = $integrationObject->pushLeads($params);
             $ignored = 0;
 
@@ -255,7 +251,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 list($updated, $created) = $result;
             }
             $output->writeln(
-                '<comment>'.$translator->trans(
+                '<comment>'.$this->translator->trans(
                     'mautic.plugin.command.fetch.pushing.leads.events_executed',
                     [
                         '%updated%' => $updated,
@@ -268,7 +264,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
             );
 
             if (in_array('push_companies', $supportedFeatures) && method_exists($integrationObject, 'pushCompanies')) {
-                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.companies', ['%integration%' => $integration]).'</info>');
+                $output->writeln('<info>'.$this->translator->trans('mautic.plugin.command.pushing.companies', ['%integration%' => $integration]).'</info>');
                 $result  = $integrationObject->pushCompanies($params);
                 $ignored = 0;
 
@@ -281,7 +277,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                     list($updated, $created) = $result;
                 }
                 $output->writeln(
-                    '<comment>'.$translator->trans(
+                    '<comment>'.$this->translator->trans(
                         'mautic.plugin.command.fetch.pushing.companies.events_executed',
                         [
                             '%updated%' => $updated,

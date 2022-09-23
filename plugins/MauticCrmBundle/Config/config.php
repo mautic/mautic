@@ -285,6 +285,9 @@ return [
                 'arguments' => [
                     'mautic.helper.integration',
                     'templating.helper.translator',
+                    'mautic_integration.pipedrive.import.owner',
+                    'mautic_integration.pipedrive.import.company',
+                    'mautic_integration.pipedrive.import.lead',
                 ],
             ],
             'mautic_integration.pipedrive.data_push' => [

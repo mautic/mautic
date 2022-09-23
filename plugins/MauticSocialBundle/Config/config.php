@@ -297,6 +297,12 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.social.command.social_monitoring' => [
+                'class'     => \MauticPlugin\MauticSocialBundle\Command\MauticSocialMonitoringCommand::class,
+                'arguments' => [
+                    'mautic.social.model.monitoring',
+                ],
+            ],
         ],
     ],
     'menu' => [

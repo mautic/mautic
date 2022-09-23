@@ -170,5 +170,30 @@ return [
                 'class' => Mautic\PluginBundle\Model\IntegrationEntityModel::class,
             ],
         ],
+        'commands' => [
+            'mautic.plugin.command.fetch_leads' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\PluginBundle\Command\FetchLeadsCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.integration',
+                ],
+            ],
+            'mautic.plugin.command.push_activity' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\PluginBundle\Command\PushLeadActivityCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.integration',
+                ],
+            ],
+            'mautic.plugin.command.reload' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\PluginBundle\Command\ReloadCommand::class,
+                'arguments' => [
+                    'mautic.plugin.facade.reload',
+                ],
+            ],
+        ],
     ],
 ];
