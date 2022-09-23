@@ -145,6 +145,7 @@ jobs:
         if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
           composer phpstan
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
+          bin/console cache:warmup
           composer rector -- --dry-run --no-progress-bar
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
