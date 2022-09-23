@@ -95,16 +95,4 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
 
         return $this->trans($alternative, $parameters, $domain, $locale);
     }
-
-    /**
-     * Passes through all unknown calls onto the translator object.
-     *
-     * @param mixed $args
-     *
-     * @return mixed
-     */
-    public function __call(string $method, $args)
-    {
-        return $this->translator->{$method}(...$args);
-    }
 }
