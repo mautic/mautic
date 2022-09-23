@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\DBAL\Cache\CacheException;
@@ -239,9 +230,9 @@ class CampaignController extends AbstractStandardFormController
         }
 
         $orderBy    = $session->get('mautic.campaign.orderby', 'c.dateModified');
-        $orderByDir = $session->get('mautic.campaign.orderbydir', 'DESC');
+        $orderByDir = $session->get('mautic.campaign.orderbydir', $this->getDefaultOrderDirection());
 
-        list($count, $items) = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
+        [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
@@ -255,7 +246,7 @@ class CampaignController extends AbstractStandardFormController
                     [
                         'returnUrl'       => $returnUrl,
                         'viewParameters'  => ['page' => $lastPage],
-                        'contentTemplate' => 'MauticCampaignBundle:Campaign:index',
+                        'contentTemplate' => 'Mautic\CampaignBundle\Controller\CampaignController::indexAction',
                         'passthroughVars' => [
                             'mauticContent' => 'campaign',
                         ],
@@ -339,11 +330,11 @@ class CampaignController extends AbstractStandardFormController
                         if (method_exists($this, 'viewAction')) {
                             $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
                             $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
-                            $template       = 'MauticCampaignBundle:Campaign:view';
+                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
                         } else {
                             $viewParameters = ['page' => $page];
                             $returnUrl      = $this->generateUrl('mautic_campaign_index', $viewParameters);
-                            $template       = 'MauticCampaignBundle:Campaign:index';
+                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::indexAction';
                         }
                     }
                 }
@@ -351,8 +342,8 @@ class CampaignController extends AbstractStandardFormController
                 $this->afterFormProcessed($valid, $campaign, $form, 'new');
             } else {
                 $viewParameters = ['page' => $page];
-                $returnUrl      = $this->generateUrl('c', $viewParameters);
-                $template       = 'MauticCampaignBundle:Campaign:index';
+                $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
+                $template       = 'Mautic\CampaignBundle\Controller\CampaignController::indexAction';
             }
 
             $passthrough = [
@@ -551,10 +542,10 @@ class CampaignController extends AbstractStandardFormController
     {
         $sessionId = $this->getCampaignSessionId($entity, $action, $objectId);
         //set added/updated events
-        list($this->modifiedEvents, $this->deletedEvents, $this->campaignEvents) = $this->getSessionEvents($sessionId);
+        [$this->modifiedEvents, $this->deletedEvents, $this->campaignEvents] = $this->getSessionEvents($sessionId);
 
         //set added/updated sources
-        list($this->addedSources, $this->deletedSources, $campaignSources) = $this->getSessionSources($sessionId, $isClone);
+        [$this->addedSources, $this->deletedSources, $campaignSources]     = $this->getSessionSources($sessionId, $isClone);
         $this->connections                                                 = $this->getSessionCanvasSettings($sessionId);
 
         if ($isPost) {
@@ -615,7 +606,7 @@ class CampaignController extends AbstractStandardFormController
         }
 
         if ($isClone) {
-            list($this->addedSources, $this->deletedSources, $campaignSources) = $this->getSessionSources($objectId, $isClone);
+            [$this->addedSources, $this->deletedSources, $campaignSources] = $this->getSessionSources($objectId, $isClone);
             $this->getCampaignModel()->setLeadSources($entity, $campaignSources, []);
             // If this is a clone, we need to save the entity first to properly build the events, sources and canvas settings
             $this->getCampaignModel()->getRepository()->saveEntity($entity);
@@ -697,10 +688,7 @@ class CampaignController extends AbstractStandardFormController
         return $sessionId;
     }
 
-    /**
-     * @return string
-     */
-    protected function getControllerBase()
+    protected function getTemplateBase(): string
     {
         return 'MauticCampaignBundle:Campaign';
     }
@@ -745,7 +733,7 @@ class CampaignController extends AbstractStandardFormController
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    list($clmn, $fltr) = explode(':', $updatedFilter);
+                    [$clmn, $fltr] = explode(':', $updatedFilter);
 
                     $newFilters[$clmn][] = $fltr;
                 }
@@ -1017,9 +1005,9 @@ class CampaignController extends AbstractStandardFormController
                         'mautic.campaign.connection.trigger.interval.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
                         [
                             '%number%' => $event['triggerInterval'],
-                            '%unit%'   => $translator->transChoice(
+                            '%unit%'   => $translator->trans(
                                 'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
-                                $event['triggerInterval']
+                                ['%count%' => $event['triggerInterval']]
                             ),
                         ]
                     );
@@ -1203,5 +1191,10 @@ class CampaignController extends AbstractStandardFormController
         }
 
         return $campaignLogCountsProcessed;
+    }
+
+    protected function getDefaultOrderDirection(): string
+    {
+        return 'DESC';
     }
 }

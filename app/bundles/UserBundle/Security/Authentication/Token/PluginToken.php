@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Authentication\Token;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -94,18 +85,22 @@ class PluginToken extends AbstractToken
 
     /**
      * {@inheritdoc}
+     *
+     * @return array<mixed>
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([$this->authenticatingService, $this->credentials, $this->providerKey, parent::serialize()]);
+        return [$this->authenticatingService, $this->credentials, $this->providerKey, parent::__serialize()];
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param array<mixed> $data
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $data): void
     {
-        list($this->authenticatingService, $this->credentials, $this->providerKey, $parentStr) = unserialize($serialized);
-        parent::unserialize($parentStr);
+        [$this->authenticatingService, $this->credentials, $this->providerKey, $parentStr] = $data;
+        parent::__unserialize($parentStr);
     }
 }

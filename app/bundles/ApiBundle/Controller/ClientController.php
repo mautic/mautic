@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Controller;
 
 use Mautic\ApiBundle\Model\ClientModel;
@@ -66,7 +57,7 @@ class ClientController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticApiBundle:Client:index',
+                    'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_client_index',
                         'mauticContent' => 'client',
@@ -163,7 +154,7 @@ class ClientController extends FormController
         return $this->postActionRedirect(
             [
                 'returnUrl'       => $this->generateUrl('mautic_user_account'),
-                'contentTemplate' => 'MauticUserBundle:Profile:index',
+                'contentTemplate' => 'Mautic\UserBundle\Controller\ProfileController::indexAction',
                 'passthroughVars' => [
                     'success' => $success,
                 ],
@@ -241,7 +232,7 @@ class ClientController extends FormController
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
-                        'contentTemplate' => 'MauticApiBundle:Client:index',
+                        'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
                         'passthroughVars' => [
                             'activeLink'    => '#mautic_client_index',
                             'mauticContent' => 'client',
@@ -290,7 +281,7 @@ class ClientController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticApiBundle:Client:index',
+            'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_client_index',
                 'mauticContent' => 'client',
@@ -395,7 +386,7 @@ class ClientController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticApiBundle:Client:index',
+            'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_client_index',
                 'success'       => $success,

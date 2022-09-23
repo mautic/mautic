@@ -2,13 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved.
- * @author      Mautic
- * @link        https://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -34,8 +27,13 @@ final class Version20201125155904 extends AbstractMauticMigration
         );
 
         $this->skipIf(
+            $schema->getTable($this->getTableName())->hasIndex($this->getIndexWithPrefix()),
+            sprintf('Index %s already exists. Skipping the migration', $this->getIndexWithPrefix())
+        );
+
+        $this->skipIf(
             !$schema->getTable($this->getTableName())->hasIndex(LeadEventLog::INDEX_SEARCH),
-            sprintf("Index %s doesn't exists. Skipping the migration", LeadEventLog::INDEX_SEARCH)
+            sprintf('Index %s does not exist. Skipping the migration', LeadEventLog::INDEX_SEARCH)
         );
     }
 

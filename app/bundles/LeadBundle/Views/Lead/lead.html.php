@@ -203,6 +203,12 @@ $view['slots']->set(
                             </a>
                         </li>
                     <?php endif; ?>
+
+                    <li>
+                        <a href="#lead-stats" class="group" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.lead.stats'); ?>
+                        </a>
+                    </li>
                 </ul>
 
                 <!-- start: tab-content -->
@@ -214,33 +220,41 @@ $view['slots']->set(
                                 <div class="panel shd-none mb-0">
                                     <table class="table table-bordered table-striped mb-0">
                                         <tbody>
+                                        <?php if ('core' == $group): ?>
+                                            <?php echo $view->render(
+                                                'MauticCoreBundle:Helper:details.html.php',
+                                                ['entity' => $lead]
+                                            ); ?>
+                                        <?php endif; ?>
                                         <?php foreach ($fields[$group] as $field): ?>
-                                            <tr>
-                                                <td width="20%"><span class="fw-b textTitle"><?php echo $view->escape($field['label']); ?></span>
-                                                </td>
-                                                <td>
-                                                    <?php if ('core' == $group && 'country' == $field['alias'] && !empty($flag)): ?>
-                                                    <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
-                                                    <span class="mt-1"><?php echo $view->escape($field['value']); ?>
-                                                    <?php else: ?>
-                                                        <?php if ('multiselect' === $field['type']): ?>
-                                                            <?php if (is_array($field['value'])): ?>
-                                                                <?php echo implode(', ', $field['value']); ?>
+                                            <?php if (isset($field['value'])): ?>
+                                                <tr>
+                                                    <td width="20%"><span class="fw-b textTitle"><?php echo $view->escape($field['label']); ?></span>
+                                                    </td>
+                                                    <td>
+                                                        <?php if ('core' == $group && 'country' == $field['alias'] && !empty($flag)): ?>
+                                                        <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
+                                                        <span class="mt-1"><?php echo $view->escape($field['value']); ?>
                                                             <?php else: ?>
-                                                                <?php echo str_replace('|', ', ', $view->escape($field['normalizedValue'])); ?>
-                                                            <?php endif; ?>
-                                                        <?php elseif (is_string($field['value']) && 'url' === $field['type']): ?>
-                                                            <a href="<?php echo $view->escape($field['value']); ?>" target="_blank">
+                                                                <?php if ('multiselect' === $field['type']): ?>
+                                                                    <?php if (is_array($field['value'])): ?>
+                                                                        <?php echo implode(', ', $field['value']); ?>
+                                                                    <?php else: ?>
+                                                                        <?php echo str_replace('|', ', ', $view->escape($field['normalizedValue'])); ?>
+                                                                    <?php endif; ?>
+                                                                <?php elseif (is_string($field['value']) && 'url' === $field['type']): ?>
+                                                                    <a href="<?php echo $view->escape($field['value']); ?>" target="_blank">
                                                                 <?php echo $field['value']; ?>
                                                             </a>
-                                                        <?php elseif (is_string($field['value']) && 'datetime' === $field['type']): ?>
-                                                            <?php echo $view['date']->toFullConcat($field['value'], 'UTC'); ?>
-                                                        <?php else: ?>
-                                                            <?php echo $view->escape($field['normalizedValue']); ?>
-                                                        <?php endif; ?>
-                                                    <?php endif; ?>
-                                                </td>
-                                            </tr>
+                                                                <?php elseif (is_string($field['value']) && 'datetime' === $field['type']): ?>
+                                                                    <?php echo $view['date']->toFullConcat($field['value'], 'UTC'); ?>
+                                                                <?php else: ?>
+                                                                    <?php echo $view->escape($field['normalizedValue']); ?>
+                                                                <?php endif; ?>
+                                                            <?php endif; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endif; ?>
                                         <?php endforeach; ?>
                                         </tbody>
                                     </table>
@@ -254,6 +268,11 @@ $view['slots']->set(
                             <?php echo $view->render('MauticLeadBundle:Lead:devices.html.php', ['devices' => $devices]); ?>
                         </div>
                     <?php endif; ?>
+
+                    <div class="tab-pane fade bdr-w-0" id="lead-stats"
+                         data-target-url="<?php echo $view['router']->url('mautic_contact_stats', ['objectId' => $lead->getId()]); ?>">
+                        <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                    </div>
                 </div>
             </div>
             <!--/ lead detail collapseable -->
@@ -458,10 +477,9 @@ $view['slots']->set(
                 $style = !empty($color) ? ' style="font-color: '.$color.' !important;"' : '';
                 ?>
                 <h1 <?php echo $style; ?>>
-                    <?php echo $view['translator']->transChoice(
+                    <?php echo $view['translator']->trans(
                         'mautic.lead.points.count',
-                        $lead->getPoints(),
-                        ['%points%' => $lead->getPoints()]
+                        ['%count%' => $lead->getPoints()]
                     ); ?>
                 </h1>
                 <hr/>

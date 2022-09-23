@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncProcess;
 
 use Mautic\IntegrationsBundle\Event\SyncEvent;
@@ -152,7 +143,7 @@ class SyncProcess
         // Tell listeners sync is done
         $this->eventDispatcher->dispatch(
             IntegrationEvents::INTEGRATION_POST_EXECUTE,
-            new SyncEvent($this->mappingManualDAO->getIntegration(), $this->inputOptionsDAO->getStartDateTime(), $this->inputOptionsDAO->getEndDateTime())
+            new SyncEvent($this->inputOptionsDAO)
         );
     }
 

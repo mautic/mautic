@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StatsBundle\Aggregate\Collection\DAO;
 
 use Exception;
@@ -83,9 +74,9 @@ class StatsDAO
             $week = CalculatorHelper::getWeekFromDayString($day);
             if (!isset($flattenedWeeks[$week])) {
                 $flattenedWeeks[$week] = new WeekStat();
-                $flattenedWeeks[$week]->setCount($stats->getCount());
+                $flattenedWeeks[$week]->setCount($stats->getSum());
             } else {
-                $flattenedWeeks[$week]->addToCount($stats->getCount());
+                $flattenedWeeks[$week]->addToCount($stats->getSum());
             }
         }
 
@@ -131,7 +122,7 @@ class StatsDAO
             $stats = $dayStats->getStats();
 
             foreach ($stats as $hour => $hourStat) {
-                $flattenedHours[$hour] = $hourStat->getCount();
+                $flattenedHours[$hour] = $hourStat;
             }
         }
 

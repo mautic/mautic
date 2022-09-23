@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -144,7 +135,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Get a model instance from the service container.
      *
-     * @param $modelNameKey
+     * @param string $modelNameKey
      *
      * @return AbstractCommonModel
      */
@@ -440,7 +431,7 @@ class CommonController extends AbstractController implements MauticController
         $parameters = ['request' => $this->request, 'exception' => $exception];
         $query      = ['ignoreAjax' => true, 'request' => $this->request, 'subrequest' => true];
 
-        return $this->forward('MauticCoreBundle:Exception:show', $parameters, $query);
+        return $this->forward('Mautic\CoreBundle\Controller\ExceptionController::showAction', $parameters, $query);
     }
 
     /**
@@ -536,7 +527,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Updates list filters, order, limit.
      *
-     * @param null $name
+     * @param string|null $name
      */
     protected function setListFilters($name = null)
     {
@@ -547,10 +538,14 @@ class CommonController extends AbstractController implements MauticController
         }
         $name = 'mautic.'.$name;
 
+        if (false === $this->request->query->has('orderby') && false === $session->has("$name.orderbydir")) {
+            $session->set("$name.orderbydir", $this->getDefaultOrderDirection());
+        }
+
         if ($this->request->query->has('orderby')) {
             $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
             $dir     = $session->get("$name.orderbydir", 'ASC');
-            $dir     = ('ASC' == $dir) ? 'DESC' : 'ASC';
+            $dir     = $orderBy === $session->get("$name.orderby") || false == $session->has("$name.orderby") ? (('ASC' == $dir) ? 'DESC' : 'ASC') : $dir;
             $session->set("$name.orderby", $orderBy);
             $session->set("$name.orderbydir", $dir);
         }
@@ -647,8 +642,6 @@ class CommonController extends AbstractController implements MauticController
      * @param string|null $level
      * @param string|null $domain
      * @param bool|null   $addNotification
-     *
-     * @deprecated Will be removed in Mautic 3.0. Use CommonController::flashBag->addFlash() instead.
      */
     public function addFlash($message, $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false)
     {
@@ -678,11 +671,11 @@ class CommonController extends AbstractController implements MauticController
             //message is already translated
             $translatedMessage = $message;
         } else {
-            if (isset($messageVars['pluralCount'])) {
-                $translatedMessage = $translator->transChoice($message, $messageVars['pluralCount'], $messageVars, $domain);
-            } else {
-                $translatedMessage = $translator->trans($message, $messageVars, $domain);
+            if (isset($messageVars['pluralCount']) && empty($messageVars['%count%'])) {
+                $messageVars['%count%'] = $messageVars['pluralCount'];
             }
+
+            $translatedMessage = $translator->trans($message, $messageVars, $domain);
         }
 
         if (null !== $title) {
@@ -770,5 +763,13 @@ class CommonController extends AbstractController implements MauticController
         $data = new DataExporterHelper();
 
         return $data->getDataForExport($start, $model, $args, $resultsCallback);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultOrderDirection()
+    {
+        return 'ASC';
     }
 }

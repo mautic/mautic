@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
@@ -56,8 +47,7 @@ class BatchSegmentController extends AbstractFormController
             }
 
             $this->addFlash('mautic.lead.batch_leads_affected', [
-                'pluralCount' => count($contactIds),
-                '%count%'     => count($contactIds),
+                '%count%' => count($contactIds),
             ]);
         } else {
             $this->addFlash('mautic.core.error.ids.missing');

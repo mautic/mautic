@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Controller\MauticController;
@@ -356,7 +347,7 @@ class CoreSubscriber implements EventSubscriberInterface
                                 $standardDetails,
                                 [
                                     'path'       => $pathBase.$standardDetails['path'],
-                                    'controller' => $controller.':'.$standardDetails['action'],
+                                    'controller' => $controller.':'.$standardDetails['action'].'Action',
                                     'method'     => $standardDetails['method'],
                                 ]
                             );

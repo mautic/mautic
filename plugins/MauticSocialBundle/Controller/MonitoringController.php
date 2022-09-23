@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -73,7 +64,7 @@ class MonitoringController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticSocialBundle:Monitoring:index',
+                    'contentTemplate' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_social_index',
                         'mauticContent' => 'monitoring',
@@ -152,7 +143,7 @@ class MonitoringController extends FormController
         ///Check for a submitted form and process it
         if ('POST' == $method) {
             $viewParameters = ['page' => $page];
-            $template       = 'MauticSocialBundle:Monitoring:index';
+            $template       = 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::indexAction';
             $valid          = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -186,7 +177,7 @@ class MonitoringController extends FormController
                         'objectAction' => 'view',
                         'objectId'     => $entity->getId(),
                     ];
-                    $template = 'MauticSocialBundle:Monitoring:view';
+                    $template = 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::viewAction';
                 }
             }
             $returnUrl = $this->generateUrl('mautic_social_index', $viewParameters);
@@ -347,7 +338,7 @@ class MonitoringController extends FormController
                         [
                             'returnUrl'       => $this->generateUrl('mautic_social_action', $viewParameters),
                             'viewParameters'  => $viewParameters,
-                            'contentTemplate' => 'MauticSocialBundle:Monitoring:view',
+                            'contentTemplate' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::viewAction',
                         ]
                     )
                 );
@@ -417,7 +408,7 @@ class MonitoringController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticSocialMonitoringBundle:Monitoring:index',
+                    'contentTemplate' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_social_index',
                         'mauticContent' => 'monitoring',
@@ -469,7 +460,7 @@ class MonitoringController extends FormController
                     'security'         => $security,
                     'leadStats'        => $chart->render(),
                     'monitorLeads'     => $this->forward(
-                        'MauticSocialBundle:Monitoring:contacts',
+                        'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::contactsAction',
                         [
                             'objectId'   => $monitoringEntity->getId(),
                             'page'       => $page,
@@ -508,7 +499,7 @@ class MonitoringController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticSocialBundle:Monitoring:index',
+            'contentTemplate' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_social_index',
                 'mauticContent' => 'monitoring',
@@ -575,7 +566,7 @@ class MonitoringController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticSocialBundle:Monitoring:index',
+            'contentTemplate' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_social_index',
                 'mauticContent' => 'monitoring',

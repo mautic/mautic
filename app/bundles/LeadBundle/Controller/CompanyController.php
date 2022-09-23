@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -87,7 +78,7 @@ class CompanyController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticLeadBundle:Company:index',
+                    'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'company',
@@ -222,7 +213,7 @@ class CompanyController extends FormController
 
         $viewParameters = ['page' => $page];
         $returnUrl      = $this->generateUrl('mautic_company_index', $viewParameters);
-        $template       = 'MauticLeadBundle:Company:index';
+        $template       = 'Mautic\LeadBundle\Controller\CompanyController::indexAction';
 
         ///Check for a submitted form and process it
         if ('POST' == $this->request->getMethod()) {
@@ -257,7 +248,7 @@ class CompanyController extends FormController
 
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
-                        $template  = 'MauticLeadBundle:Company:index';
+                        $template  = 'Mautic\LeadBundle\Controller\CompanyController::indexAction';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -350,7 +341,7 @@ class CompanyController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => $viewParameters,
-            'contentTemplate' => 'MauticLeadBundle:Company:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
@@ -423,7 +414,7 @@ class CompanyController extends FormController
                             '%url%'       => $this->generateUrl(
                                 'mautic_company_action',
                                 [
-                                    'objectAction' => 'edit',
+                                    'objectAction' => 'view',
                                     'objectId'     => $entity->getId(),
                                 ]
                             ),
@@ -432,7 +423,7 @@ class CompanyController extends FormController
 
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
-                        $template  = 'MauticLeadBundle:Company:index';
+                        $template  = 'Mautic\LeadBundle\Controller\CompanyController::indexAction';
                     }
                 }
             } else {
@@ -440,7 +431,7 @@ class CompanyController extends FormController
                 $model->unlockEntity($entity);
 
                 $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
-                $template  = 'MauticLeadBundle:Company:index';
+                $template  = 'Mautic\LeadBundle\Controller\CompanyController::indexAction';
             }
 
             $passthrough = [
@@ -549,7 +540,7 @@ class CompanyController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticLeadBundle:Company:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
@@ -703,7 +694,7 @@ class CompanyController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:Company:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
@@ -762,7 +753,7 @@ class CompanyController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:Company:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
@@ -800,7 +791,6 @@ class CompanyController extends FormController
                 $this->addFlash(
                     'mautic.company.notice.batch_deleted',
                     [
-                        'pluralCount' => $deleted,
                         '%count%'     => $deleted,
                     ]
                 );
@@ -847,7 +837,7 @@ class CompanyController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:Company:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
@@ -936,7 +926,7 @@ class CompanyController extends FormController
                 [
                     'returnUrl'       => $this->generateUrl('mautic_company_action', $viewParameters),
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'MauticLeadBundle:Company:edit',
+                    'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::editAction',
                     'passthroughVars' => [
                         'closeModal' => 1,
                     ],

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Controller;
 
 use Mautic\ChannelBundle\Entity\Channel;
@@ -133,7 +124,7 @@ class MessageController extends AbstractStandardFormController
 
                 $messagedLeads = [
                     'all' => $this->forward(
-                        'MauticChannelBundle:Message:contacts',
+                        'Mautic\ChannelBundle\Controller\MessageController::contactsAction',
                         [
                             'objectId'   => $message->getId(),
                             'page'       => $this->get('session')->get('mautic.'.$this->getSessionBase('all').'.contact.page', 1),
@@ -151,7 +142,7 @@ class MessageController extends AbstractStandardFormController
                         );
 
                         $messagedLeads[$channel->getChannel()] = $this->forward(
-                            'MauticChannelBundle:Message:contacts',
+                            'Mautic\ChannelBundle\Controller\MessageController::contactsAction',
                             [
                                 'objectId' => $message->getId(),
                                 'page'     => $this->get('session')->get(
@@ -197,10 +188,7 @@ class MessageController extends AbstractStandardFormController
         return $this->deleteStandard($objectId);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getControllerBase()
+    protected function getTemplateBase(): string
     {
         return 'MauticChannelBundle:Message';
     }

@@ -1,45 +1,36 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 $firewalls = [
     'install' => [
         'pattern'   => '^/installer',
-        'anonymous' => true,
+        'anonymous' => 'lazy',
         'context'   => 'mautic',
         'security'  => false,
     ],
     'dev' => [
         'pattern'   => '^/(_(profiler|wdt)|css|images|js)/',
         'security'  => true,
-        'anonymous' => true,
+        'anonymous' => 'lazy',
     ],
     'login' => [
         'pattern'   => '^/s/login$',
-        'anonymous' => true,
+        'anonymous' => 'lazy',
         'context'   => 'mautic',
     ],
     'sso_login' => [
         'pattern'            => '^/s/sso_login',
-        'anonymous'          => true,
+        'anonymous'          => 'lazy',
         'mautic_plugin_auth' => true,
         'context'            => 'mautic',
     ],
     'saml_login' => [
         'pattern'   => '^/s/saml/login$',
-        'anonymous' => true,
+        'anonymous' => 'lazy',
         'context'   => 'mautic',
     ],
     'saml_discovery' => [
         'pattern'   => '^/saml/discovery$',
-        'anonymous' => true,
+        'anonymous' => 'lazy',
         'context'   => 'mautic',
     ],
     'oauth2_token' => [
@@ -53,7 +44,7 @@ $firewalls = [
             'check_path' => '/oauth/v2/authorize_login_check',
             'login_path' => '/oauth/v2/authorize_login',
         ],
-        'anonymous' => true,
+        'anonymous' => 'lazy',
     ],
     'api' => [
         'pattern'            => '^/api',
@@ -92,7 +83,7 @@ $firewalls = [
         ],
         'remember_me' => [
             'secret'   => '%mautic.rememberme_key%',
-            'lifetime' => (int) $container->getParameter('mautic.rememberme_lifetime'),
+            'lifetime' => '%mautic.rememberme_lifetime%',
             'path'     => '%mautic.rememberme_path%',
             'domain'   => '%mautic.rememberme_domain%',
         ],
@@ -101,7 +92,7 @@ $firewalls = [
     ],
     'public' => [
         'pattern'   => '^/',
-        'anonymous' => true,
+        'anonymous' => 'lazy',
         'context'   => 'mautic',
     ],
 ];

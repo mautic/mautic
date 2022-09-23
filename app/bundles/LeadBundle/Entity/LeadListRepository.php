@@ -1,24 +1,16 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Exception;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class LeadListRepository extends CommonRepository
 {
-    use OperatorListTrait;
+    use OperatorListTrait; // @deprecated to be removed in Mautic 3. Not used inside this class.
     use ExpressionHelperTrait;
     use RegexTrait;
 
@@ -65,7 +57,7 @@ class LeadListRepository extends CommonRepository
                 ->setParameter('listId', $id)
                 ->getQuery()
                 ->getSingleResult();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $entity = null;
         }
 
@@ -269,22 +261,31 @@ class LeadListRepository extends CommonRepository
      * @param int|int[] $listIds
      *
      * @return array|int
+     *
+     * @throws Exception
      */
     public function getLeadCount($listIds)
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $q->select('count(l.lead_id) as thecount, l.leadlist_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l');
-
-        $returnArray = (is_array($listIds));
-
-        if (!$returnArray) {
+        if (!(is_array($listIds))) {
             $listIds = [$listIds];
         }
 
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('count(l.lead_id) as thecount, l.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l');
+
+        $expression   = null;
+        $countListIds = count($listIds);
+
+        if (1 === $countListIds) {
+            $q          = $this->forceUseIndex($q, MAUTIC_TABLE_PREFIX.'manually_removed');
+            $expression = $q->expr()->eq('l.leadlist_id', $listIds[0]);
+        } else {
+            $expression = $q->expr()->in('l.leadlist_id', $listIds);
+        }
+
         $q->where(
-            $q->expr()->in('l.leadlist_id', $listIds),
+            $expression,
             $q->expr()->eq('l.manually_removed', ':false')
         )
             ->setParameter('false', false, 'boolean')
@@ -304,7 +305,17 @@ class LeadListRepository extends CommonRepository
             }
         }
 
-        return ($returnArray) ? $return : $return[$listIds[0]];
+        return (1 === $countListIds) ? $return[$listIds[0]] : $return;
+    }
+
+    private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
+    {
+        $fromPart             = $qb->getQueryPart('from');
+        $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], $indexName);
+        $qb->resetQueryPart('from');
+        $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
+
+        return $qb;
     }
 
     /**
@@ -423,7 +434,7 @@ class LeadListRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter)
     {
-        list($expr, $parameters) = parent::addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = parent::addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -528,5 +539,15 @@ class LeadListRepository extends CommonRepository
     public function getTableAlias()
     {
         return 'l';
+    }
+
+    public function leadListExists(int $id): bool
+    {
+        $tableName = MAUTIC_TABLE_PREFIX.'lead_lists';
+        $result    = (int) $this->getEntityManager()->getConnection()
+            ->executeQuery("SELECT EXISTS(SELECT 1 FROM {$tableName} WHERE id = {$id})")
+            ->fetchColumn();
+
+        return 1 === $result;
     }
 }

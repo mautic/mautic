@@ -7,21 +7,33 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Tightenco\Collect\Support\Collection;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     */
+    protected function createLeadCompany(Lead $contactA, Company $company): CompanyLead
     {
-        parent::setUp();
+        $leadCompany = new CompanyLead();
+        $leadCompany->setLead($contactA);
+        $leadCompany->setCompany($company);
+        $leadCompany->setDateAdded(new \DateTime());
+        $this->em->persist($leadCompany);
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+        return $leadCompany;
     }
 
     protected function beforeBeginTransaction(): void
@@ -294,6 +306,48 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertEquals(true, (strlen($content) > 10000));
     }
 
+    public function testContactsAreAddedAndRemovedFromCompanies(): void
+    {
+        // Running all these in one test to avoid having to re-load fixtures multiple time
+        $this->loadFixtures([LoadLeadData::class, LoadCompanyData::class]);
+
+        $this->client->catchExceptions(false);
+
+        // Delete all company associations for this test because the fixures have mismatching data to start with
+        $this->connection->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.'companies_leads')
+            ->execute();
+
+        // Test a single company is added and is set as primary
+        $this->assertCompanyAssociation([1], 1);
+
+        // Test that a company a contact is already part of does not change anything
+        $this->assertCompanyAssociation([1], 1);
+
+        // Test that multiple companies are added and one primary is set
+        $this->assertCompanyAssociation([1, 2, 3], 1);
+
+        // Test that removing a company will leave the two remaining with one set as primary
+        $this->assertCompanyAssociation([1, 3], 1);
+
+        // Test that adding a company in addition to others will set it as primary
+        $this->assertCompanyAssociation([1, 2, 3], 1);
+
+        // Test that removing all companies will empty the lead's primary company
+        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
+        $saveButton = $crawler->selectButton('lead[buttons][save]');
+        $form       = $saveButton->form();
+        $form['lead[companies]']->setValue([]);
+        $this->client->submit($form);
+        $companies  = $this->getCompanyLeads(1);
+        $collection = new Collection($companies);
+        // Should have no companies associated
+        $this->assertCount(0, $collection);
+        // Primary company name should match
+        $primaryCompanyName = $this->getLeadPrimaryCompany(1);
+        $this->assertEmpty($primaryCompanyName);
+    }
+
     private function getMembersForCampaign(int $campaignId): array
     {
         return $this->connection->createQueryBuilder()
@@ -308,7 +362,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     {
         return $this->connection->createQueryBuilder()
             ->select('ll.id', 'll.name', 'll.category_id')
-            ->from('lead_lists', 'll')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'll')
             ->execute()
             ->fetchAllAssociative();
     }
@@ -322,6 +376,12 @@ class LeadControllerTest extends MauticMysqlTestCase
         $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
         $expectedPlaceholder = self::$container->get('translator')->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
+
+        // Test that a locale option is present correctly.
+        $this->assertStringContainsString(
+            '<option value="cs_CZ" >Czech (Czechia)</option>',
+            $this->client->getResponse()->getContent()
+        );
     }
 
     public function testAddContactsErrorMessage(): void
@@ -345,6 +405,46 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('firstname: This field is required.', $clientResponse->getContent());
     }
 
+    public function testAddContactsErrorMessageForEmailWithTwoDots(): void
+    {
+        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues(
+            [
+                'lead[email]' => 'john..doe@email.com',
+            ]
+        );
+
+        $this->client->submit($form);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertStringContainsString('email: john..doe@email.com is invalid.', $clientResponse->getContent());
+    }
+
+    public function testCompanyIdSearchCommand(): void
+    {
+        $contactA = $this->createContact('contact@a.email');
+        $contactB = $this->createContact('contact@b.email');
+        $contactC = $this->createContact('contact@c.email');
+
+        $companyName = 'Doe Corp';
+        $company     = new Company();
+        $company->setName($companyName);
+        $this->em->persist($company);
+
+        $this->em->flush();
+
+        $this->createLeadCompany($contactA, $company);
+        $this->createLeadCompany($contactB, $company);
+
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=company_id:'.$company->getId());
+
+        $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
+        $this->assertEquals(2, $leadsTableRows->count(), $crawler->html());
+    }
+
     private function createContact(string $email): Lead
     {
         $lead = new Lead();
@@ -354,6 +454,21 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $lead;
+    }
+
+    public function testLookupTypeFieldOnError(): void
+    {
+        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues(
+            [
+                'lead[title]' => 'Custom title longer like 191 characters Custom title longer like 191 characters Custom title longer like 191 characters Custom title longer like 191 characters Custom title longer like 191 characters Custom title longer like 191 characters ',
+            ]
+        );
+
+        $this->client->submit($form);
+        $clientResponse = $this->client->getResponse();
+        $this->assertStringContainsString('title: This value is too long. It should have 191 characters or less', $clientResponse->getContent());
     }
 
     private function createCampaign(): Campaign
@@ -392,5 +507,119 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $campaign;
+    }
+
+    /**
+     * @return Lead[]
+     */
+    private function getCompanyLeads(int $leadId): array
+    {
+        return $this->connection->createQueryBuilder()
+            ->select('cl.lead_id, cl.company_id, cl.is_primary, c.companyname')
+            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
+            ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'c', 'c.id = cl.company_id')
+            ->where("cl.lead_id = {$leadId}")
+            ->orderBy('cl.company_id')
+            ->execute()
+            ->fetchAll();
+    }
+
+    private function getLeadPrimaryCompany(int $leadId): ?string
+    {
+        return $this->connection->createQueryBuilder()
+            ->select('l.company')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where("l.id = {$leadId}")
+            ->execute()
+            ->fetchColumn();
+    }
+
+    /**
+     * @param int[] $expectedCompanies
+     */
+    private function assertCompanyAssociation(array $expectedCompanies, int $leadId): void
+    {
+        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
+        $saveButton = $crawler->selectButton('lead[buttons][save]');
+        $form       = $saveButton->form();
+        $form['lead[companies]']->setValue($expectedCompanies);
+        $crawler    = $this->client->submit($form);
+        $companies  = $this->getCompanyLeads($leadId);
+        $collection = (new Collection($companies))->keyBy('company_id');
+        // Should have only one company associated
+        $this->assertCount(count($expectedCompanies), $collection);
+        $this->assertEquals($expectedCompanies, $collection->keys()->toArray());
+        // Only one should be primary
+        $primary = $collection->reject(
+            function (array $company) {
+                return empty($company['is_primary']);
+            }
+        );
+        $this->assertCount(1, $primary);
+        // Primary company name should match
+        $primaryCompanyName = $this->getLeadPrimaryCompany($leadId);
+        $this->assertEquals($primary->first()['companyname'], $primaryCompanyName);
+        // Primary company should be in the UI of the details dropdown tray
+        $details = $crawler->filter('#lead-details')->html();
+        $this->assertStringContainsString($primaryCompanyName, $details);
+    }
+
+    public function testContactCompanyEditShowsOldCompanyNameInAuditLog(): void
+    {
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::$container->get('mautic.lead.model.company');
+        /** @var LeadModel $contactModel */
+        $contactModel = self::$container->get('mautic.lead.model.lead');
+
+        // Create companies
+        $company = (new Company())
+            ->setName('Co.');
+        $newCompany = (new Company())
+            ->setName('New Co.');
+        $companyModel->saveEntities([$company, $newCompany]);
+        $companyId    = $company->getId();
+        $newCompanyId = $newCompany->getId();
+
+        // Create contact with first 'Co.' company
+        $contact = (new Lead())
+            ->setFirstname('C1')
+            ->setCompany($company);
+        $contactModel->saveEntity($contact);
+
+        // Check contact detail view audit log
+        $createAuditLog        = $this->getContactAuditLogForSpecificAction($contact, 'create');
+        $createAuditLogDetails = $createAuditLog->getDetails();
+        // `dateIdentified` is added to the audit log when contact is identified, we want to remove this for easier comparison
+        unset($createAuditLogDetails['dateIdentified']);
+        Assert::assertSame(
+            [
+                'firstname' => [null, 'C1'],
+                'company'   => [null, $companyId],
+            ],
+            $createAuditLogDetails
+        );
+
+        // Edit contact with second 'New Co.' company
+        $contact->setCompany($newCompany);
+        $contactModel->saveEntity($contact);
+
+        // Check contact detail view audit log for old value
+        $updateAuditLog = $this->getContactAuditLogForSpecificAction($contact, 'update');
+        Assert::assertSame(
+            [
+                'company' => [$companyId, $newCompanyId],
+            ],
+            $updateAuditLog->getDetails()
+        );
+    }
+
+    private function getContactAuditLogForSpecificAction(Lead $contact, string $action): AuditLog
+    {
+        return $this->em->getRepository(AuditLog::class)->findOneBy([
+            'bundle'   => 'lead',
+            'object'   => 'lead',
+            'objectId' => $contact->getId(),
+            'action'   => $action,
+        ]);
     }
 }

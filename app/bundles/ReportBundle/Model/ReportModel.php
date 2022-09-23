@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Model;
 
 use Doctrine\DBAL\Connections\MasterSlaveConnection;
@@ -668,7 +659,7 @@ class ReportModel extends FormModel
             $data = $event->getData();
         }
 
-        if (MAUTIC_ENV == 'dev') {
+        if ($this->isDebugMode()) {
             $debugData['query'] = $query->getSQL();
             $params             = $query->getParameters();
 
@@ -752,7 +743,7 @@ class ReportModel extends FormModel
         $countQb->select('count(*)')
             ->from('('.$qb->getSQL().')', 'c');
 
-        if (MAUTIC_ENV == 'dev') {
+        if ($this->isDebugMode()) {
             $debugData['count_query'] = $countQb->getSQL();
         }
 
@@ -800,5 +791,10 @@ class ReportModel extends FormModel
         }
 
         return $this->em->getConnection();
+    }
+
+    protected function isDebugMode(): bool
+    {
+        return MAUTIC_ENV == 'dev' || $this->coreParametersHelper->get('debug');
     }
 }

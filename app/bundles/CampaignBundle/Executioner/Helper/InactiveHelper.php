@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -16,6 +7,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
+use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Psr\Log\LoggerInterface;
 
@@ -46,6 +38,8 @@ class InactiveHelper
      */
     private $logger;
 
+    private DecisionHelper $decisionHelper;
+
     /**
      * @var \DateTime
      */
@@ -59,13 +53,15 @@ class InactiveHelper
         InactiveContactFinder $inactiveContactFinder,
         LeadEventLogRepository $eventLogRepository,
         EventRepository $eventRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        DecisionHelper $decisionHelper
     ) {
         $this->scheduler               = $scheduler;
         $this->inactiveContactFinder   = $inactiveContactFinder;
         $this->eventLogRepository      = $eventLogRepository;
         $this->eventRepository         = $eventRepository;
         $this->logger                  = $logger;
+        $this->decisionHelper          = $decisionHelper;
     }
 
     /**
@@ -94,14 +90,22 @@ class InactiveHelper
         \DateTime $now,
         ArrayCollection $contacts,
         $lastActiveEventId,
-        ArrayCollection $negativeChildren
+        ArrayCollection $negativeChildren,
+        Event $event
     ) {
         $contactIds                 = $contacts->getKeys();
         $lastActiveDates            = $this->getLastActiveDates($lastActiveEventId, $contactIds);
         $this->earliestInactiveDate = $now;
 
-        /* @var Event $event */
         foreach ($contactIds as $contactId) {
+            try {
+                $this->decisionHelper->checkIsDecisionApplicableForContact($event, $contacts->get($contactId));
+            } catch (DecisionNotApplicableException $e) {
+                $this->logger->debug($e->getMessage());
+                $contacts->remove($contactId);
+                continue;
+            }
+
             if (!isset($lastActiveDates[$contactId])) {
                 // This contact does not have a last active date so likely the event is scheduled
                 $contacts->remove($contactId);

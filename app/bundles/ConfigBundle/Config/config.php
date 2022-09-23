@@ -1,24 +1,15 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_config_action' => [
                 'path'       => '/config/{objectAction}/{objectId}',
-                'controller' => 'MauticConfigBundle:Config:execute',
+                'controller' => 'Mautic\ConfigBundle\Controller\ConfigController::executeAction',
             ],
             'mautic_sysinfo_index' => [
                 'path'       => '/sysinfo',
-                'controller' => 'MauticConfigBundle:Sysinfo:index',
+                'controller' => 'Mautic\ConfigBundle\Controller\SysinfoController::indexAction',
             ],
         ],
     ],
@@ -73,6 +64,8 @@ return [
                     'mautic.helper.core_parameters',
                     'translator',
                     'doctrine.dbal.default_connection',
+                    'mautic.install.service',
+                    'mautic.install.configurator.step.check',
                 ],
             ],
         ],

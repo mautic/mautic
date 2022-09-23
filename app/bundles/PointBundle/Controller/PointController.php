@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
@@ -70,7 +61,7 @@ class PointController extends AbstractFormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'MauticPointBundle:Point:index',
+                'contentTemplate' => 'Mautic\PointBundle\Controller\PointController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_point_index',
                     'mauticContent' => 'point',
@@ -155,7 +146,7 @@ class PointController extends AbstractFormController
 
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
-                        $template  = 'MauticPointBundle:Point:index';
+                        $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -163,7 +154,7 @@ class PointController extends AbstractFormController
                 }
             } else {
                 $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
-                $template  = 'MauticPointBundle:Point:index';
+                $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -228,7 +219,7 @@ class PointController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => $viewParameters,
-            'contentTemplate' => 'MauticPointBundle:Point:index',
+            'contentTemplate' => 'Mautic\PointBundle\Controller\PointController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
@@ -286,7 +277,7 @@ class PointController extends AbstractFormController
 
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
-                        $template  = 'MauticPointBundle:Point:index';
+                        $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
                     }
                 }
             } else {
@@ -294,7 +285,7 @@ class PointController extends AbstractFormController
                 $model->unlockEntity($entity);
 
                 $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
-                $template  = 'MauticPointBundle:Point:index';
+                $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -376,7 +367,7 @@ class PointController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPointBundle:Point:index',
+            'contentTemplate' => 'Mautic\PointBundle\Controller\PointController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
@@ -433,7 +424,7 @@ class PointController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPointBundle:Point:index',
+            'contentTemplate' => 'Mautic\PointBundle\Controller\PointController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',

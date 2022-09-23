@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle;
 
 /**
@@ -126,4 +117,22 @@ final class PluginEvents
      * @var string
      */
     const ON_FORM_SUBMIT_ACTION_TRIGGERED = 'mautic.plugin.on_form_submit_action_triggered';
+
+    /**
+     * The mautic.plugin.on_plugin_update event is dispatched when a plugin is updated.
+     *
+     * The event listener receives a Mautic\PluginBundle\Event\PluginUpdateEvent instance.
+     *
+     * @var string
+     */
+    const ON_PLUGIN_UPDATE = 'mautic.plugin.on_plugin_update';
+
+    /**
+     * The mautic.plugin.on_plugin_install event is dispatched when a plugin is installed.
+     *
+     * The event listener receives a Mautic\PluginBundle\Event\PluginInstallEvent instance.
+     *
+     * @var string
+     */
+    const ON_PLUGIN_INSTALL = 'mautic.plugin.on_plugin_install';
 }

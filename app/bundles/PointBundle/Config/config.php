@@ -1,36 +1,27 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_pointtriggerevent_action' => [
                 'path'       => '/points/triggers/events/{objectAction}/{objectId}',
-                'controller' => 'MauticPointBundle:TriggerEvent:execute',
+                'controller' => 'Mautic\PointBundle\Controller\TriggerEventController::executeAction',
             ],
             'mautic_pointtrigger_index' => [
                 'path'       => '/points/triggers/{page}',
-                'controller' => 'MauticPointBundle:Trigger:index',
+                'controller' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
             ],
             'mautic_pointtrigger_action' => [
                 'path'       => '/points/triggers/{objectAction}/{objectId}',
-                'controller' => 'MauticPointBundle:Trigger:execute',
+                'controller' => 'Mautic\PointBundle\Controller\TriggerController::executeAction',
             ],
             'mautic_point_index' => [
                 'path'       => '/points/{page}',
-                'controller' => 'MauticPointBundle:Point:index',
+                'controller' => 'Mautic\PointBundle\Controller\PointController::indexAction',
             ],
             'mautic_point_action' => [
                 'path'       => '/points/{objectAction}/{objectId}',
-                'controller' => 'MauticPointBundle:Point:execute',
+                'controller' => 'Mautic\PointBundle\Controller\PointController::executeAction',
             ],
         ],
         'api' => [
@@ -38,30 +29,30 @@ return [
                 'standard_entity' => true,
                 'name'            => 'points',
                 'path'            => '/points',
-                'controller'      => 'MauticPointBundle:Api\PointApi',
+                'controller'      => 'Mautic\PointBundle\Controller\Api\PointApiController',
             ],
             'mautic_api_getpointactiontypes' => [
                 'path'       => '/points/actions/types',
-                'controller' => 'MauticPointBundle:Api\PointApi:getPointActionTypes',
+                'controller' => 'Mautic\PointBundle\Controller\Api\PointApiController::getPointActionTypesAction',
             ],
             'mautic_api_pointtriggersstandard' => [
                 'standard_entity' => true,
                 'name'            => 'triggers',
                 'path'            => '/points/triggers',
-                'controller'      => 'MauticPointBundle:Api\TriggerApi',
+                'controller'      => 'Mautic\PointBundle\Controller\Api\TriggerApiController',
             ],
             'mautic_api_getpointtriggereventtypes' => [
                 'path'       => '/points/triggers/events/types',
-                'controller' => 'MauticPointBundle:Api\TriggerApi:getPointTriggerEventTypes',
+                'controller' => 'Mautic\PointBundle\Controller\Api\TriggerApiController::getPointTriggerEventTypesAction',
             ],
             'mautic_api_pointtriggerdeleteevents' => [
                 'path'       => '/points/triggers/{triggerId}/events/delete',
-                'controller' => 'MauticPointBundle:Api\TriggerApi:deletePointTriggerEvents',
+                'controller' => 'Mautic\PointBundle\Controller\Api\TriggerApiController::deletePointTriggerEventsAction',
                 'method'     => 'DELETE',
             ],
             'mautic_api_adjustcontactpoints' => [
                 'path'       => '/contacts/{leadId}/points/{operator}/{delta}',
-                'controller' => 'MauticPointBundle:Api\PointApi:adjustPoints',
+                'controller' => 'Mautic\PointBundle\Controller\Api\PointApiController::adjustPointsAction',
                 'method'     => 'POST',
             ],
         ],

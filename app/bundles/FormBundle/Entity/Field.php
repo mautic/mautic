@@ -1,20 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -944,10 +936,10 @@ class Field
 
             if ('notIn' === $this->conditions['expr']) {
                 // value not matched
-                if ('' !== $value && !in_array($value, $this->conditions['values'])) {
+                if ('' !== $value && !in_array(InputHelper::string($value), $this->conditions['values'])) {
                     return true;
                 }
-            } elseif (in_array($value, $this->conditions['values'])) {
+            } elseif (in_array(InputHelper::string($value), $this->conditions['values'])) {
                 return true;
             }
         }

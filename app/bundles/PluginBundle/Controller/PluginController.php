@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -434,7 +425,7 @@ class PluginController extends FormController
             [
                 'returnUrl'       => $this->generateUrl('mautic_plugin_index', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'MauticPluginBundle:Plugin:index',
+                'contentTemplate' => 'Mautic\PluginBundle\Controller\PluginController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'plugin',

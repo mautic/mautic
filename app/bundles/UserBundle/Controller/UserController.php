@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -72,7 +63,7 @@ class UserController extends FormController
                     'page' => $lastPage,
                     'tmpl' => $tmpl,
                 ],
-                'contentTemplate' => 'MauticUserBundle:User:index',
+                'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_user_index',
                     'mauticContent' => 'user',
@@ -187,7 +178,7 @@ class UserController extends FormController
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticUserBundle:User:index',
+                    'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_user_index',
                         'mauticContent' => 'user',
@@ -234,7 +225,7 @@ class UserController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:User:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',
                 'mauticContent' => 'user',
@@ -358,7 +349,7 @@ class UserController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:User:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',
                 'route'         => $returnUrl,
@@ -423,7 +414,7 @@ class UserController extends FormController
         if (null === $user) {
             return $this->postActionRedirect([
                 'returnUrl'       => $this->generateUrl('mautic_dashboard_index'),
-                'contentTemplate' => 'MauticUserBundle:User:contact',
+                'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::contactAction',
                 'flashes'         => [
                     [
                         'type'    => 'error',
@@ -540,7 +531,7 @@ class UserController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:User:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',
                 'mauticContent' => 'user',

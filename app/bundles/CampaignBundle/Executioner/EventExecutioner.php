@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -148,7 +139,10 @@ class EventExecutioner
     }
 
     /**
-     * @param bool $isInactiveEvent
+     * @param ArrayCollection<int,Lead> $contacts
+     * @param bool                      $isInactiveEvent
+     *
+     * @return void
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException

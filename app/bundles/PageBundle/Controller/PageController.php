@@ -113,8 +113,8 @@ class PageController extends FormController
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
 
-        $orderBy    = $this->get('session')->get('mautic.page.orderby', 'p.title');
-        $orderByDir = $this->get('session')->get('mautic.page.orderbydir', 'DESC');
+        $orderBy    = $this->get('session')->get('mautic.page.orderby', 'p.dateModified');
+        $orderByDir = $this->get('session')->get('mautic.page.orderbydir', $this->getDefaultOrderDirection());
         $pages      = $model->getEntities(
             [
                 'start'      => $start,
@@ -133,7 +133,7 @@ class PageController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'MauticPageBundle:Page:index',
+                'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_page_index',
                     'mauticContent' => 'page',
@@ -188,7 +188,7 @@ class PageController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'MauticPageBundle:Page:index',
+                'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_page_index',
                     'mauticContent' => 'page',
@@ -377,6 +377,7 @@ class PageController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
+                    $entity->setDateModified(new \DateTime());
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
@@ -396,7 +397,7 @@ class PageController extends FormController
                             'objectId'     => $entity->getId(),
                         ];
                         $returnUrl = $this->generateUrl('mautic_page_action', $viewParameters);
-                        $template  = 'MauticPageBundle:Page:view';
+                        $template  = 'Mautic\PageBundle\Controller\PageController::viewAction';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -405,7 +406,7 @@ class PageController extends FormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_page_index', $viewParameters);
-                $template       = 'MauticPageBundle:Page:index';
+                $template       = 'Mautic\PageBundle\Controller\PageController::indexAction';
                 //clear any modified content
                 $session->remove('mautic.pagebuilder.'.$entity->getSessionId().'.content');
             }
@@ -484,7 +485,7 @@ class PageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPageBundle:Page:index',
+            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -557,7 +558,7 @@ class PageController extends FormController
                     array_merge($postActionVars, [
                         'returnUrl'       => $this->generateUrl('mautic_page_action', $viewParameters),
                         'viewParameters'  => $viewParameters,
-                        'contentTemplate' => 'MauticPageBundle:Page:view',
+                        'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::viewAction',
                     ])
                 );
             }
@@ -675,7 +676,7 @@ class PageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPageBundle:Page:index',
+            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -736,7 +737,7 @@ class PageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPageBundle:Page:index',
+            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -908,7 +909,7 @@ class PageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPageBundle:Page:index',
+            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -952,7 +953,7 @@ class PageController extends FormController
                 'objectId'     => $objectId,
             ];
             $postActionVars['returnUrl']       = $this->generateUrl('mautic_page_action', $postActionVars['viewParameters']);
-            $postActionVars['contentTemplate'] = 'MauticPageBundle:Page:view';
+            $postActionVars['contentTemplate'] = 'Mautic\PageBundle\Controller\PageController::viewAction';
         } //else don't do anything
 
         return $this->postActionRedirect(
@@ -1031,7 +1032,7 @@ class PageController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $pageListPage],
-                    'contentTemplate' => 'MauticPageBundle:Page:index',
+                    'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_page_index',
                         'mauticContent' => 'page',
@@ -1109,7 +1110,7 @@ class PageController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticPageBundle:Page:results',
+                    'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::resultsAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_page_index',
                         'mauticContent' => 'pageresult',
@@ -1174,7 +1175,7 @@ class PageController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $pageListPage],
-                    'contentTemplate' => 'MauticPageBundle:Page:index',
+                    'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_page_index',
                         'mauticContent' => 'page',
@@ -1213,5 +1214,15 @@ class PageController extends FormController
         $model = $this->getModel('form.submission');
 
         return $model->exportResultsForPage($format, $activePage, $args);
+    }
+
+    public function getModelName(): string
+    {
+        return 'page';
+    }
+
+    protected function getDefaultOrderDirection()
+    {
+        return 'DESC';
     }
 }

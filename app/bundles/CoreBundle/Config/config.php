@@ -1,69 +1,60 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_core_ajax' => [
                 'path'       => '/ajax',
-                'controller' => 'MauticCoreBundle:Ajax:delegateAjax',
+                'controller' => 'Mautic\CoreBundle\Controller\AjaxController::delegateAjaxAction',
             ],
             'mautic_core_update' => [
                 'path'       => '/update',
-                'controller' => 'MauticCoreBundle:Update:index',
+                'controller' => 'Mautic\CoreBundle\Controller\UpdateController::indexAction',
             ],
             'mautic_core_update_schema' => [
                 'path'       => '/update/schema',
-                'controller' => 'MauticCoreBundle:Update:schema',
+                'controller' => 'Mautic\CoreBundle\Controller\UpdateController::schemaAction',
             ],
             'mautic_core_form_action' => [
                 'path'       => '/action/{objectAction}/{objectModel}/{objectId}',
-                'controller' => 'MauticCoreBundle:Form:execute',
+                'controller' => 'Mautic\CoreBundle\Controller\FormController::executeAction',
                 'defaults'   => [
                     'objectModel' => '',
                 ],
             ],
             'mautic_core_file_action' => [
                 'path'       => '/file/{objectAction}/{objectId}',
-                'controller' => 'MauticCoreBundle:File:execute',
+                'controller' => 'Mautic\CoreBundle\Controller\FileController::executeAction',
             ],
             'mautic_themes_index' => [
                 'path'       => '/themes',
-                'controller' => 'MauticCoreBundle:Theme:index',
+                'controller' => 'Mautic\CoreBundle\Controller\ThemeController::indexAction',
             ],
             'mautic_themes_action' => [
                 'path'       => '/themes/{objectAction}/{objectId}',
-                'controller' => 'MauticCoreBundle:Theme:execute',
+                'controller' => 'Mautic\CoreBundle\Controller\ThemeController::executeAction',
             ],
         ],
         'public' => [
             'mautic_js' => [
                 'path'       => '/mtc.js',
-                'controller' => 'MauticCoreBundle:Js:index',
+                'controller' => 'Mautic\CoreBundle\Controller\JsController::indexAction',
             ],
             'mautic_base_index' => [
                 'path'       => '/',
-                'controller' => 'MauticCoreBundle:Default:index',
+                'controller' => 'Mautic\CoreBundle\Controller\DefaultController::indexAction',
             ],
             'mautic_secure_root' => [
                 'path'       => '/s',
-                'controller' => 'MauticCoreBundle:Default:redirectSecureRoot',
+                'controller' => 'Mautic\CoreBundle\Controller\DefaultController::redirectSecureRootAction',
             ],
             'mautic_secure_root_slash' => [
                 'path'       => '/s/',
-                'controller' => 'MauticCoreBundle:Default:redirectSecureRoot',
+                'controller' => 'Mautic\CoreBundle\Controller\DefaultController::redirectSecureRootAction',
             ],
             'mautic_remove_trailing_slash' => [
                 'path'         => '/{url}',
-                'controller'   => 'MauticCoreBundle:Common:removeTrailingSlash',
+                'controller'   => 'Mautic\CoreBundle\Controller\CommonController::removeTrailingSlashAction',
                 'method'       => 'GET',
                 'requirements' => [
                     'url' => '.*/$',
@@ -73,39 +64,39 @@ return [
         'api' => [
             'mautic_core_api_file_list' => [
                 'path'       => '/files/{dir}',
-                'controller' => 'MauticCoreBundle:Api\FileApi:list',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\FileApiController::listAction',
             ],
             'mautic_core_api_file_create' => [
                 'path'       => '/files/{dir}/new',
-                'controller' => 'MauticCoreBundle:Api\FileApi:create',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\FileApiController::createAction',
                 'method'     => 'POST',
             ],
             'mautic_core_api_file_delete' => [
                 'path'       => '/files/{dir}/{file}/delete',
-                'controller' => 'MauticCoreBundle:Api\FileApi:delete',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\FileApiController::deleteAction',
                 'method'     => 'DELETE',
             ],
             'mautic_core_api_theme_list' => [
                 'path'       => '/themes',
-                'controller' => 'MauticCoreBundle:Api\ThemeApi:list',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\ThemeApiController::listAction',
             ],
             'mautic_core_api_theme_get' => [
                 'path'       => '/themes/{theme}',
-                'controller' => 'MauticCoreBundle:Api\ThemeApi:get',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\ThemeApiController::getAction',
             ],
             'mautic_core_api_theme_create' => [
                 'path'       => '/themes/new',
-                'controller' => 'MauticCoreBundle:Api\ThemeApi:new',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\ThemeApiController::newAction',
                 'method'     => 'POST',
             ],
             'mautic_core_api_theme_delete' => [
                 'path'       => '/themes/{theme}/delete',
-                'controller' => 'MauticCoreBundle:Api\ThemeApi:delete',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\ThemeApiController::deleteAction',
                 'method'     => 'DELETE',
             ],
             'mautic_core_api_stats' => [
                 'path'       => '/stats/{table}',
-                'controller' => 'MauticCoreBundle:Api\StatsApi:list',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\StatsApiController::listAction',
                 'defaults'   => [
                     'table' => '',
                 ],
@@ -158,6 +149,16 @@ return [
                     'request_stack',
                     'mautic.core.model.notification',
                 ],
+            ],
+            'mautic.core.service.local_file_adapter' => [
+                'class'     => \Mautic\CoreBundle\Service\LocalFileAdapterService::class,
+                'arguments' => [
+                    '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
+                ],
+            ],
+            'mautic.core.service.log_processor' => [
+                'class'     => \Mautic\CoreBundle\Monolog\LogProcessor::class,
+                'tags'      => ['monolog.processor'],
             ],
         ],
         'events' => [
@@ -489,6 +490,13 @@ return [
                 ],
                 'alias' => 'security',
             ],
+            'mautic.helper.template.translator' => [
+                'class'     => \Mautic\CoreBundle\Templating\Helper\TranslatorHelper::class,
+                'arguments' => [
+                    'translator',
+                ],
+                'alias' => 'translator',
+            ],
             'mautic.helper.paths' => [
                 'class'     => 'Mautic\CoreBundle\Helper\PathsHelper',
                 'arguments' => [
@@ -786,7 +794,7 @@ return [
                 'class'     => 'Mautic\CoreBundle\EventListener\ExceptionListener',
                 'arguments' => [
                     'router',
-                    '"MauticCoreBundle:Exception:show"',
+                    'Mautic\CoreBundle\Controller\ExceptionController::showAction',
                     'monolog.logger.mautic',
                 ],
                 'tag'          => 'kernel.event_listener',
@@ -814,7 +822,7 @@ return [
                 ],
             ],
             'mautic.helper.cookie' => [
-                'class'     => 'Mautic\CoreBundle\Helper\CookieHelper',
+                'class'     => Mautic\CoreBundle\Helper\CookieHelper::class,
                 'arguments' => [
                     '%mautic.cookie_path%',
                     '%mautic.cookie_domain%',
@@ -822,6 +830,7 @@ return [
                     '%mautic.cookie_httponly%',
                     'request_stack',
                 ],
+                'tag' => 'kernel.event_subscriber',
             ],
             'mautic.helper.cache_storage' => [
                 'class'     => Mautic\CoreBundle\Helper\CacheStorageHelper::class,
@@ -855,6 +864,7 @@ return [
                     '%kernel.cache_dir%',
                     'session',
                     'mautic.helper.paths',
+                    'kernel',
                 ],
             ],
             'mautic.helper.templating' => [
@@ -910,6 +920,13 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.helper.composer' => [
+                'class'     => \Mautic\CoreBundle\Helper\ComposerHelper::class,
+                'arguments' => [
+                    'kernel',
+                    'monolog.logger.mautic',
+                ],
+            ],
             // Menu
             'mautic.helper.menu' => [
                 'class'     => 'Mautic\CoreBundle\Menu\MenuHelper',
@@ -925,6 +942,10 @@ return [
             ],
             'mautic.helper.random' => [
                 'class' => \Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class,
+            ],
+            'mautic.helper.command' => [
+                'class'     => \Mautic\CoreBundle\Helper\CommandHelper::class,
+                'arguments' => 'kernel',
             ],
             'mautic.menu_renderer' => [
                 'class'     => \Mautic\CoreBundle\Menu\MenuRenderer::class,
@@ -997,6 +1018,110 @@ return [
                     'templating.helper.assets',
                 ],
                 'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.menu' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\MenuExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.menu',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.gravatar' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\GravatarExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.gravatar',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.version' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\VersionExtension::class,
+                'arguments' => [
+                    'mautic.helper.app_version',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.mautibot' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\MautibotExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.mautibot',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.formatter' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\FormatterExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.formatter',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.date' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\DateExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.date',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.button' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ButtonExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.button',
+                    'request_stack',
+                    'router',
+                    'translator',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.content' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ContentExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.content',
+                ],
+                'tag' => 'twig.extension',
+            ],
+            'templating.twig.extension.numeric' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\NumericExtension::class,
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.form' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\FormExtension::class,
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.class' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ClassExtension::class,
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.security' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\SecurityExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.security',
+                ],
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.translator' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\TranslatorExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.translator',
+                ],
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.config' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ConfigExtension::class,
+                'arguments' => [
+                    'mautic.helper.template.config',
+                ],
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.storage' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\StorageExtension::class,
+                'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.publish_status' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\CoreHelpersExtension::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.template.date',
+                ],
+                'tag'       => 'twig.extension',
             ],
             // Schema
             'mautic.schema.helper.column' => [
@@ -1744,5 +1869,6 @@ return [
                 'font' => 'メイリオ, Meiryo, ＭＳ Ｐゴシック, MS PGothic, ヒラギノ角ゴ Pro W3, Hiragino Kaku Gothic Pro,Osaka, sans-serif',
             ],
         ],
+        'composer_updates' => false,
     ],
 ];
