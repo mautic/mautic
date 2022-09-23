@@ -65,7 +65,7 @@ class AppKernel extends Kernel
                 $prefix = '';
                 //check to see if the .htaccess file exists or if not running under apache
                 if (false === stripos($request->server->get('SERVER_SOFTWARE', ''), 'apache')
-                    || !file_exists(__DIR__.'../.htaccess')
+                    || !file_exists($this->getProjectDir().'/.htaccess')
                     && false === strpos(
                         $base,
                         'index'
@@ -169,7 +169,7 @@ class AppKernel extends Kernel
         }
 
         // dynamically register Mautic Plugin Bundles
-        $searchPath = dirname(__DIR__).'/plugins';
+        $searchPath = $this->getProjectDir().'/plugins';
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
             ->followLinks()
@@ -212,8 +212,8 @@ class AppKernel extends Kernel
         }
 
         // Check for local bundle inclusion
-        if (file_exists(__DIR__.'/config/bundles_local.php')) {
-            include __DIR__.'/config/bundles_local.php';
+        if (file_exists($this->getProjectDir().'/app/config/bundles_local.php')) {
+            include $this->getProjectDir().'/app/config/bundles_local.php';
         }
 
         return $bundles;
@@ -257,7 +257,7 @@ class AppKernel extends Kernel
      */
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
-        $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.php');
+        $loader->load($this->getProjectDir().'/app/config/config_'.$this->getEnvironment().'.php');
     }
 
     /**
@@ -303,20 +303,24 @@ class AppKernel extends Kernel
     {
         if ($cachePath = $this->getParameterLoader()->getLocalParameterBag()->get('cache_path')) {
             $envFolder = ('/' != substr($cachePath, -1)) ? '/'.$this->environment : $this->environment;
+            $path = str_replace('%kernel.root_dir%', $this->getRootDir(), $cachePath.$envFolder);
+            $path = str_replace('%kernel.project_dir%', $this->getProjectDir(), $path);
 
-            return str_replace('%kernel.root_dir%', $this->getRootDir(), $cachePath.$envFolder);
+            return $path;
         }
 
-        return dirname(__DIR__).'/var/cache/'.$this->getEnvironment();
+        return $this->getProjectDir().'/var/cache/'.$this->getEnvironment();
     }
 
     public function getLogDir(): string
     {
         if ($logPath = $this->getParameterLoader()->getLocalParameterBag()->get('log_path')) {
-            return str_replace('%kernel.root_dir%', $this->getRootDir(), $logPath);
+            $logPath = str_replace('%kernel.root_dir%', $this->getRootDir(), $logPath);
+            $logPath = str_replace('%kernel.project_dir%', $this->getProjectDir(), $logPath);
+            return $logPath;
         }
 
-        return dirname(__DIR__).'/var/logs';
+        return $this->getProjectDir().'/var/logs';
     }
 
     /**
