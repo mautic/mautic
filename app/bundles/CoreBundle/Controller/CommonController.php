@@ -428,7 +428,7 @@ class CommonController extends AbstractController implements MauticController
         $parameters = ['request' => $this->request, 'exception' => $exception];
         $query      = ['ignoreAjax' => true, 'request' => $this->request, 'subrequest' => true];
 
-        return $this->forward('MauticCoreBundle:Exception:show', $parameters, $query);
+        return $this->forward('Mautic\CoreBundle\Controller\ExceptionController::showAction', $parameters, $query);
     }
 
     /**
@@ -524,7 +524,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Updates list filters, order, limit.
      *
-     * @param null $name
+     * @param string|null $name
      */
     protected function setListFilters($name = null)
     {

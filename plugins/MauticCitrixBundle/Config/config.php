@@ -9,11 +9,11 @@ return [
         'public' => [
             'mautic_citrix_proxy' => [
                 'path'       => '/citrix/proxy',
-                'controller' => 'MauticCitrixBundle:Public:proxy',
+                'controller' => 'MauticPlugin\MauticCitrixBundle\Controller\PublicController::proxyAction',
             ],
             'mautic_citrix_sessionchanged' => [
                 'path'       => '/citrix/sessionChanged',
-                'controller' => 'MauticCitrixBundle:Public:sessionChanged',
+                'controller' => 'MauticPlugin\MauticCitrixBundle\Controller\PublicController::sessionChangedAction',
             ],
         ],
     ],

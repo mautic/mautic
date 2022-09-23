@@ -76,7 +76,7 @@ class UserNotificationHelper
         $owners                       = $this->ownerProvider->getOwnersForObjectIds($mauticObject, [$id]);
 
         if (!empty($owners[0]['owner_id'])) {
-            $this->writeMessage($message, $link, $owners[0]['owner_id']);
+            $this->writeMessage($message, $link, (int) $owners[0]['owner_id']);
 
             return;
         }

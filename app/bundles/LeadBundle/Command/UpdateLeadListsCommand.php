@@ -126,7 +126,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     );
                     if ($enableTimeMeasurement) {
                         $totalTime = round(microtime(true) - $startTimeForSingleSegment, 2);
-                        $output->writeln($translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime])."\n");
+                        $output->writeln('<fg=cyan>'.$translator->trans('mautic.lead.list.rebuild.contacts.time', ['%time%' => $totalTime]).'</>'."\n");
                     }
                 }
 
@@ -140,7 +140,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
         if ($enableTimeMeasurement) {
             $totalTime = round(microtime(true) - $startTime, 2);
-            $output->writeln($translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime]));
+            $output->writeln('<fg=magenta>'.$translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime]).'</>'."\n");
         }
 
         return 0;

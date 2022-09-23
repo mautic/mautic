@@ -42,7 +42,7 @@
                     <?php echo $view['form']->row($form['triggerIntervalUnit']); ?>
                 </div>
             </div>
-            <div id="interval_settings" class="hide">
+            <div id="interval_settings">
                 <hr />
                 <div class="row">
                     <div class="col-sm-12">

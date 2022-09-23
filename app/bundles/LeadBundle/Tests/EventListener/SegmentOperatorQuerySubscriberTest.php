@@ -11,8 +11,9 @@ use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-final class SegmentOperatorQuerySubscriberTest extends \PHPUnit\Framework\TestCase
+final class SegmentOperatorQuerySubscriberTest extends TestCase
 {
     /**
      * @var MockObject|QueryBuilder
@@ -37,8 +38,6 @@ final class SegmentOperatorQuerySubscriberTest extends \PHPUnit\Framework\TestCa
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->queryBuilder         = $this->createMock(QueryBuilder::class);
         $this->expressionBuilder    = $this->createMock(ExpressionBuilder::class);
@@ -68,7 +67,10 @@ final class SegmentOperatorQuerySubscriberTest extends \PHPUnit\Framework\TestCa
         $this->assertFalse($event->wasOperatorHandled());
     }
 
-    public function testOnEmptyOperatorIfEmpty(): void
+    /**
+     * @dataProvider dataOnEmptyOperatorIfEmpty
+     */
+    public function testOnEmptyOperatorIfEmpty(bool $doesColumnSupportEmptyValue, string $expectedExpression): void
     {
         $event = new SegmentOperatorQueryBuilderEvent(
             $this->queryBuilder,
@@ -85,24 +87,51 @@ final class SegmentOperatorQuerySubscriberTest extends \PHPUnit\Framework\TestCa
         $this->contactSegmentFilter->method('getGlue')
             ->willReturn(CompositeExpression::TYPE_AND);
 
+        $this->contactSegmentFilter->method('doesColumnSupportEmptyValue')
+            ->willReturn($doesColumnSupportEmptyValue);
+
         $this->queryBuilder->expects($this->once())
             ->method('addLogic')
             ->with(
-                $this->isInstanceOf(CompositeExpression::class),
+                $this->callback(function (CompositeExpression $expression) use ($expectedExpression) {
+                    $this->assertSame($expectedExpression, (string) $expression);
+
+                    return true;
+                }),
                 CompositeExpression::TYPE_AND
             );
 
         $this->expressionBuilder->expects($this->once())
             ->method('isNull')
-            ->with('l.email');
+            ->with('l.email')
+            ->willReturnCallback(function ($x) {
+                return $x.' IS NULL';
+            });
 
-        $this->expressionBuilder->expects($this->once())
+        $this->expressionBuilder->expects($doesColumnSupportEmptyValue ? $this->once() : $this->never())
             ->method('eq')
-            ->with('l.email');
+            ->with('l.email')
+            ->willReturnCallback(function ($x, $y) {
+                return $x.' = '.$y;
+            });
+
+        $this->expressionBuilder->expects($doesColumnSupportEmptyValue ? $this->once() : $this->never())
+            ->method('literal')
+            ->with('')
+            ->willReturn("''");
 
         $this->subscriber->onEmptyOperator($event);
 
         $this->assertTrue($event->wasOperatorHandled());
+    }
+
+    /**
+     * @return iterable<array<bool|string>>
+     */
+    public function dataOnEmptyOperatorIfEmpty(): iterable
+    {
+        yield [false, 'l.email IS NULL'];
+        yield [true, "(l.email IS NULL) OR (l.email = '')"];
     }
 
     public function testOnNotEmptyOperatorIfNotEmpty(): void
@@ -124,7 +153,10 @@ final class SegmentOperatorQuerySubscriberTest extends \PHPUnit\Framework\TestCa
         $this->assertFalse($event->wasOperatorHandled());
     }
 
-    public function testOnNotEmptyOperatorIfEmpty(): void
+    /**
+     * @dataProvider dataOnNotEmptyOperatorIfEmpty
+     */
+    public function testOnNotEmptyOperatorIfEmpty(bool $doesColumnSupportEmptyValue, string $expectedExpression): void
     {
         $event = new SegmentOperatorQueryBuilderEvent(
             $this->queryBuilder,
@@ -141,24 +173,51 @@ final class SegmentOperatorQuerySubscriberTest extends \PHPUnit\Framework\TestCa
         $this->contactSegmentFilter->method('getGlue')
             ->willReturn(CompositeExpression::TYPE_AND);
 
+        $this->contactSegmentFilter->method('doesColumnSupportEmptyValue')
+            ->willReturn($doesColumnSupportEmptyValue);
+
         $this->queryBuilder->expects($this->once())
             ->method('addLogic')
             ->with(
-                $this->isInstanceOf(CompositeExpression::class),
+                $this->callback(function (CompositeExpression $expression) use ($expectedExpression) {
+                    $this->assertSame($expectedExpression, (string) $expression);
+
+                    return true;
+                }),
                 CompositeExpression::TYPE_AND
             );
 
         $this->expressionBuilder->expects($this->once())
             ->method('isNotNull')
-            ->with('l.email');
+            ->with('l.email')
+            ->willReturnCallback(function ($x) {
+                return $x.' IS NOT NULL';
+            });
 
-        $this->expressionBuilder->expects($this->once())
+        $this->expressionBuilder->expects($doesColumnSupportEmptyValue ? $this->once() : $this->never())
             ->method('neq')
-            ->with('l.email');
+            ->with('l.email')
+            ->willReturnCallback(function ($x, $y) {
+                return $x.' <> '.$y;
+            });
+
+        $this->expressionBuilder->expects($doesColumnSupportEmptyValue ? $this->once() : $this->never())
+            ->method('literal')
+            ->with('')
+            ->willReturn("''");
 
         $this->subscriber->onNotEmptyOperator($event);
 
         $this->assertTrue($event->wasOperatorHandled());
+    }
+
+    /**
+     * @return iterable<array<bool|string>>
+     */
+    public function dataOnNotEmptyOperatorIfEmpty(): iterable
+    {
+        yield [false, 'l.email IS NOT NULL'];
+        yield [true, "(l.email IS NOT NULL) AND (l.email <> '')"];
     }
 
     public function testOnNegativeOperatorsIfNotNegativeOperator(): void

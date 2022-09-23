@@ -90,14 +90,13 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testEncodedCharactersNotCreatingDuplicates()
     {
         $tagInputName    = 'hello" world';
-        $tagExpectedName = 'hello&#34; world';
 
         $this->client->request('POST', '/api/tags/new', ['tag' => $tagInputName]);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $tagId          = $response['tag']['id'];
         $this->assertGreaterThan(0, $tagId);
-        $this->assertEquals($tagExpectedName, $response['tag']['tag']);
+        $this->assertEquals($tagInputName, $response['tag']['tag']);
 
         // Try to create duplicate
         $this->client->request('POST', '/api/tags/new', ['tag' => $tagInputName]);
