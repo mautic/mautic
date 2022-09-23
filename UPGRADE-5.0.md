@@ -15,3 +15,4 @@
         * Mautic\UserBundle\Entity\User::isAccountNonLocked()
         * Mautic\UserBundle\Entity\User::isCredentialsNonExpired()
         * Mautic\UserBundle\Entity\User::isEnabled()
+    * Two French regions were updates based on ISO_3166-2 (Val-d\'Oise, La Réunion). If you use it in API, please change values to Val d\'Oise or Réunion
