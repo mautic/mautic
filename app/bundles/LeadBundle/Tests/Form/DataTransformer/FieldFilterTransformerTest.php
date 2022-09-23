@@ -4,37 +4,69 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Form\DataTransformer;
 
+use Generator;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Translation\TranslatorInterface;
 
 final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject|TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var FieldFilterTransformer
-     */
-    private $transformer;
+    private FieldFilterTransformer $transformer;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translator  = $this->createMock(TranslatorInterface::class);
-        $this->transformer = new FieldFilterTransformer($this->translator);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->withConsecutive(
+                ['mautic.lead.list.month_last'],
+                ['mautic.lead.list.month_next'],
+                ['mautic.lead.list.month_this'],
+                ['mautic.lead.list.today'],
+                ['mautic.lead.list.tomorrow'],
+                ['mautic.lead.list.yesterday'],
+                ['mautic.lead.list.week_last'],
+                ['mautic.lead.list.week_next'],
+                ['mautic.lead.list.week_this'],
+                ['mautic.lead.list.year_last'],
+                ['mautic.lead.list.year_next'],
+                ['mautic.lead.list.year_this'],
+                ['mautic.lead.list.anniversary'],
+                ['mautic.lead.list.ago'],
+                ['mautic.lead.list.first_day_of'],
+                ['mautic.lead.list.last_day_of']
+            )
+            ->willReturnOnConsecutiveCalls(
+                'this month',
+                'today',
+                'tomorrow',
+                'yesterday',
+                'last week',
+                'next week',
+                'this week',
+                'last year',
+                'next year',
+                'this year',
+                'anniversary',
+                'ago',
+                'first day of',
+                'last day of',
+            );
+
+        $this->transformer = new FieldFilterTransformer($translator);
     }
 
-    public function testTransform(): void
+    /**
+     * @dataProvider dateProvider
+     */
+    public function testTransform(string $value, string $expected): void
     {
         $filters = $this->transformer->transform([
             [
                 'type'       => 'datetime',
                 'properties' => [
-                    'filter' => '2020-03-17 17:22:34',
+                    'filter' => $value,
                 ],
             ],
         ]);
@@ -44,7 +76,7 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
                 [
                     'type'       => 'datetime',
                     'properties' => [
-                        'filter' => '2020-03-17 17:22',
+                        'filter' => $expected,
                     ],
                 ],
             ],
@@ -75,13 +107,16 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testReverseTransform(): void
+    /**
+     * @dataProvider dateProvider
+     */
+    public function testReverseTransform(string $value, string $expected): void
     {
         $filters = $this->transformer->reverseTransform([
             [
                 'type'       => 'datetime',
                 'properties' => [
-                    'filter' => '2020-03-17 17:22:34',
+                    'filter' => $value,
                 ],
             ],
         ]);
@@ -91,7 +126,7 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
                 [
                     'type'       => 'datetime',
                     'properties' => [
-                        'filter' => '2020-03-17 17:22',
+                        'filter' => $expected,
                     ],
                 ],
             ],
@@ -120,5 +155,15 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
             ],
             $filters
         );
+    }
+
+    /**
+     * @return Generator<array<int, string>>
+     */
+    public function dateProvider(): Generator
+    {
+        yield ['2020-03-17 17:22:34', '2020-03-17 17:22'];
+        yield ['2 days ago', '2 days ago'];
+        yield ['first day of August 2022', 'first day of August 2022'];
     }
 }
