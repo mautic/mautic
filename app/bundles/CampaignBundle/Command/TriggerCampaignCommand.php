@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
@@ -20,7 +21,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -28,65 +28,22 @@ class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
 
-    /**
-     * @var CampaignRepository
-     */
-    private $campaignRepository;
-
-    /**
-     * @var EventDispatcher
-     */
-    private $dispatcher;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var KickoffExecutioner
-     */
-    private $kickoffExecutioner;
-
-    /**
-     * @var ScheduledExecutioner
-     */
-    private $scheduledExecutioner;
-
-    /**
-     * @var InactiveExecutioner
-     */
-    private $inactiveExecutioner;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var FormatterHelper
-     */
-    private $formatterHelper;
+    private CampaignRepository $campaignRepository;
+    private EventDispatcherInterface $dispatcher;
+    private TranslatorInterface $translator;
+    private KickoffExecutioner $kickoffExecutioner;
+    private ScheduledExecutioner $scheduledExecutioner;
+    private InactiveExecutioner $inactiveExecutioner;
+    private LoggerInterface $logger;
+    private FormatterHelper $formatterHelper;
+    private bool $kickoffOnly  = false;
+    private bool $inactiveOnly = false;
+    private bool $scheduleOnly = false;
 
     /**
      * @var OutputInterface
      */
     protected $output;
-
-    /**
-     * @var bool
-     */
-    private $kickoffOnly = false;
-
-    /**
-     * @var bool
-     */
-    private $inactiveOnly = false;
-
-    /**
-     * @var bool
-     */
-    private $scheduleOnly = false;
 
     /**
      * @var ContactLimiter
@@ -118,9 +75,10 @@ class TriggerCampaignCommand extends ModeratedCommand
         LoggerInterface $logger,
         FormatterHelper $formatterHelper,
         ListModel $listModel,
-        SegmentCountCacheHelper $segmentCountCacheHelper
+        SegmentCountCacheHelper $segmentCountCacheHelper,
+        PathsHelper $pathsHelper
     ) {
-        parent::__construct();
+        parent::__construct($pathsHelper);
 
         $this->campaignRepository        = $campaignRepository;
         $this->dispatcher                = $dispatcher;
@@ -134,9 +92,6 @@ class TriggerCampaignCommand extends ModeratedCommand
         $this->segmentCountCacheHelper   = $segmentCountCacheHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this

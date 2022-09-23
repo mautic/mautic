@@ -498,7 +498,7 @@ return [
                 'alias' => 'translator',
             ],
             'mautic.helper.paths' => [
-                'class'     => 'Mautic\CoreBundle\Helper\PathsHelper',
+                'class'     => \Mautic\CoreBundle\Helper\PathsHelper::class,
                 'arguments' => [
                     'mautic.helper.user',
                     'mautic.helper.core_parameters',
@@ -625,6 +625,7 @@ return [
                 'arguments' => [
                     'transifex.factory',
                     'translator',
+                    'mautic.helper.paths',
                     'mautic.helper.core_parameters',
                 ],
             ],
@@ -634,6 +635,7 @@ return [
                 'arguments' => [
                     'transifex.factory',
                     'translator',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.core.command.do_not_sell' => [
@@ -649,8 +651,8 @@ return [
                 'class'     => \Mautic\CoreBundle\Command\ApplyUpdatesCommand::class,
                 'arguments' => [
                     'translator',
-                    'mautic.helper.core_parameters',
                     'mautic.update.step_provider',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.core.command.maxmind.purge' => [
@@ -659,6 +661,60 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.maxmind.doNotSellList',
+                ],
+            ],
+            'mautic.core.command.cleanup_maintenance' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\CleanupMaintenanceCommand::class,
+                'arguments' => [
+                    'translator',
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.core.command.convert_config' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\ConvertConfigCommand::class,
+                'arguments' => [
+                    'mautic.helper.paths',
+                ],
+            ],
+            'mautic.core.command.find_updates' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\FindUpdatesCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.update',
+                ],
+            ],
+            'mautic.core.command.generate_assets' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\GenerateProductionAssetsCommand::class,
+                'arguments' => [
+                    'mautic.helper.assetgeneration',
+                    'mautic.helper.paths',
+                    'translator',
+                ],
+            ],
+            'mautic.core.command.install_data' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\InstallDataCommand::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.core.command.unused_ip_delete' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\UnusedIpDeleteCommand::class,
+                'arguments' => [
+                    'mautic.lead.model.ipaddress',
+                ],
+            ],
+            'mautic.core.command.update_ip_data_store' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\UpdateIpDataStoreCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.ip_lookup',
                 ],
             ],
         ],

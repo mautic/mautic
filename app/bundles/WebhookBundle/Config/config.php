@@ -123,6 +123,10 @@ return [
             'mautic.webhook.command.process.queues' => [
                 'class'     => \Mautic\WebhookBundle\Command\ProcessWebhookQueuesCommand::class,
                 'tag'       => 'console.command',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.webhook.model.webhook',
+                ],
             ],
             'mautic.webhook.command.delete.logs' => [
                 'class'     => \Mautic\WebhookBundle\Command\DeleteWebhookLogsCommand::class,
