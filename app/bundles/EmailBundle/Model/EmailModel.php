@@ -2344,4 +2344,34 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     {
         return $this->updatingTranslationChildren;
     }
+
+    /**
+     * @param string $route
+     * @param array  $routeParams
+     * @param bool   $absolute
+     * @param array  $clickthrough
+     * @param array  $utmTags
+     */
+    public function buildUrl(
+        $route,
+        $routeParams = [],
+        $absolute = true,
+        $clickthrough = [],
+        $utmTags = [],
+        bool $useConfiguredUrl = true
+    ): string {
+        $parts = parse_url($this->coreParametersHelper->get('site_url') ?: '');
+        dump($parts);
+        if (!$useConfiguredUrl || false === $parts) {
+            return parent::buildUrl($route, $routeParams, $absolute, $clickthrough, $utmTags);
+        }
+
+        $this->router->getContext()->setHost($parts['host']);
+        $this->router->getContext()->setScheme($parts['scheme']);
+
+        $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
+        $url           = $this->router->generate($route, $routeParams, $referenceType);
+
+        return $url.((!empty($clickthrough)) ? '?ct='.$this->encodeArrayForUrl($clickthrough) : '');
+    }
 }
