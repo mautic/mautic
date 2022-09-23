@@ -537,8 +537,7 @@ class ChartQuery extends AbstractChart
     public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't')
     {
         $query->select('COUNT('.$tablePrefix.'.'.$dateColumn1.') AS count');
-        $query->where('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') >= :startSecond');
-        $query->andWhere('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') < :endSecond');
+        $query->where($tablePrefix.'.generated_date_diff BETWEEN :endSecond AND :startSecond');
 
         $query->setParameter('startSecond', $startSecond);
         $query->setParameter('endSecond', $endSecond);

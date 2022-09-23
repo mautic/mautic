@@ -180,6 +180,9 @@ return [
                     'mautic.campaign.repository.lead',
                 ],
             ],
+            'mautic.campaign.generated_columns.subscriber' => [
+                'class'     => \Mautic\CampaignBundle\EventListener\GeneratedColumnSubscriber::class,
+            ],
         ],
         'forms'        => [
             'mautic.campaign.type.form'                 => [

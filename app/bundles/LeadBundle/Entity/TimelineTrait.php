@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\ForwardCompatibility\Result;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -17,6 +18,7 @@ trait TimelineTrait
      * @param array        $serializedColumns     Array of columns to unserialize
      * @param array        $dateTimeColumns       Array of columns to be converted to \DateTime
      * @param null         $resultsParserCallback Callback to custom parse results
+     * @param null         $preferredIndex        Preferred index to be used on the query for performance reasons
      *
      * @return array
      */
@@ -27,7 +29,8 @@ trait TimelineTrait
         $timestampColumn,
         $serializedColumns = [],
         $dateTimeColumns = [],
-        $resultsParserCallback = null
+        $resultsParserCallback = null,
+        $preferredIndex = null
     ) {
         if (!empty($options['unitCounts'])) {
             list($tablePrefix, $column) = explode('.', $timestampColumn);
@@ -86,7 +89,16 @@ trait TimelineTrait
             }
         }
 
-        $results = $query->execute()->fetchAll();
+        if ($preferredIndex) {
+            $sql = $query->getSQL();
+            $sql = preg_replace('#(\bFROM\s*\w+\s*\w+)#', '\1 USE INDEX ('.$preferredIndex.')', $sql);
+
+            $results = Result::ensure(
+                $query->getConnection()->executeQuery($sql, $query->getParameters(), $query->getParameterTypes())
+            )->fetchAll();
+        } else {
+            $results = $query->execute()->fetchAll();
+        }
 
         if (!empty($serializedColumns) || !empty($dateTimeColumns) || is_callable($resultsParserCallback)) {
             // Convert to array or \DateTime since we're using DBAL here

@@ -119,7 +119,17 @@ class LeadEventLogRepository extends CommonRepository
             $qb->andWhere($qb->expr()->like($alias.'.properties', $qb->expr()->literal('%'.$options['search'].'%')));
         }
 
-        return $this->getTimelineResults($qb, $options, $alias.'.action', $alias.'.date_added', [], ['date_added']);
+        $preferred_index = null;
+
+        if ($contact && $bundle && $object && $actions) {
+            $preferred_index = 'search_1';
+        } elseif ($contact && $bundle && $object) {
+            $preferred_index = 'search_2';
+        } elseif ($contact && $actions) {
+            $preferred_index = 'search_3';
+        }
+
+        return $this->getTimelineResults($qb, $options, $alias.'.action', $alias.'.date_added', [], ['date_added'], null, $preferred_index);
     }
 
     /**
