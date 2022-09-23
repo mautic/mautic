@@ -6,7 +6,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class MandrillTransport.
@@ -177,7 +177,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
 
                             // If CC and BCC, remove the ct from URLs to prevent false lead tracking
                             foreach ($ccMergeVars['vars'] as &$var) {
-                                if (false !== strpos($var['content'], 'http') && $ctPos = false !== strpos($var['content'], 'ct=')) {
+                                if (false !== strpos($var['content'], 'http') && ($ctPos = strpos($var['content'], 'ct=')) !== false) {
                                     // URL so make sure a ct query is not part of it
                                     $var['content'] = substr($var['content'], 0, $ctPos);
                                 }

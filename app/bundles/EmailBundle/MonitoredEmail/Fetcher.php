@@ -7,7 +7,7 @@ use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Fetcher
 {

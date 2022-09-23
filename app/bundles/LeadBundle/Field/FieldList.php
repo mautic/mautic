@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Field;
 
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldList
 {

@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Install\InstallService;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SysinfoModel
 {

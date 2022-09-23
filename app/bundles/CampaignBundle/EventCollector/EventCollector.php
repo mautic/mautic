@@ -9,7 +9,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor;
 use Mautic\CampaignBundle\EventCollector\Builder\ConnectionBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventCollector
 {

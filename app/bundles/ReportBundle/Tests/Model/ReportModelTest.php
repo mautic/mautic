@@ -5,6 +5,7 @@ namespace Mautic\ReportBundle\Tests\Model;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
@@ -13,7 +14,6 @@ use Mautic\ReportBundle\Model\ExcelExporter;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Tests\Fixtures;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Translation\Translator;
 
 class ReportModelTest extends \PHPUnit\Framework\TestCase
 {

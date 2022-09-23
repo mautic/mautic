@@ -1,9 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Command;
 
 use Exception;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Lead;
+use Mautic\CampaignBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
@@ -541,6 +548,53 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
         Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
         Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
+    }
+
+    /**
+     * @see https://github.com/mautic/mautic/issues/11061
+     *
+     * This test will not fail if the infinite loop returns and instead run indefinitelly until a PHPUNIT timeout is reached.
+     * I couldn't find an easy way to test for an infinite loop. But we'll know if it returns again.
+     * We'll just spend more time figuring out which test is taking so long.
+     */
+    public function testCampaignInfiniteLoop(): void
+    {
+        $campaignMemberRepo = $this->em->getRepository(Lead::class);
+        \assert($campaignMemberRepo instanceof LeadRepository);
+
+        $segmentMemberRepo = $this->em->getRepository(ListLead::class);
+        \assert($segmentMemberRepo instanceof ListLeadRepository);
+
+        $campaignRepo = $this->em->getRepository(Campaign::class);
+        \assert($campaignRepo instanceof CampaignRepository);
+
+        // Clear the campaign and segment members as those are manually_added.
+        $campaignMemberRepo->deleteEntities($campaignMemberRepo->findAll());
+        $segmentMemberRepo->deleteEntities($segmentMemberRepo->findAll());
+
+        $campaign = $campaignRepo->find(1); // Created in parent::setUp()
+        \assert($campaign instanceof Campaign);
+
+        $campaign->setAllowRestart(true);
+
+        $campaignRepo->saveEntity($campaign);
+
+        $john = $this->createLead('John');
+        $jane = $this->createLead('Jane');
+        $this->createSegmentMember($campaign->getLists()->first(), $john);
+        $this->createSegmentMember($campaign->getLists()->first(), $jane);
+        $this->createCampaignLead($campaign, $john);
+        $this->createCampaignLead($campaign, $jane, true); // Manually removed.
+        $this->em->flush();
+        $this->em->clear();
+
+        $tStart = microtime(true);
+
+        $this->runCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
+
+        $tDiff = microtime(true) - $tStart;
+
+        $this->assertLessThan(10, $tDiff, 'The campaign rebuild takes more than 10 seconds, probably an infinite loop.');
     }
 
     /**

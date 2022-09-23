@@ -7,9 +7,9 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Throws an exception if the field alias is equal some segment filter keyword.

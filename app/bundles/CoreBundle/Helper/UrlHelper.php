@@ -224,6 +224,12 @@ class UrlHelper
             return $url;
         }
 
+        $isMailto = 0 === strpos($url, 'mailto:');
+
+        if ($isMailto) {
+            return $url;
+        }
+
         $containSlashes = false !== strpos($url, '://');
 
         if (!$containSlashes) {
