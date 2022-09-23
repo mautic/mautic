@@ -428,7 +428,7 @@ class CommonController extends Controller implements MauticController
         $parameters = ['request' => $this->request, 'exception' => $exception];
         $query      = ['ignoreAjax' => true, 'request' => $this->request, 'subrequest' => true];
 
-        return $this->forward('MauticCoreBundle:Exception:show', $parameters, $query);
+        return $this->forward('Mautic\CoreBundle\Controller\ExceptionController::showAction', $parameters, $query);
     }
 
     /**

@@ -86,7 +86,7 @@ class AppKernel extends Kernel
          * If we've already sent the response headers, and we have a session
          * set in the request, set that as the session in the container.
          */
-        if (headers_sent() && $request->getSession()) {
+        if (headers_sent() && $request->hasSession()) {
             $this->getContainer()->set('session', $request->getSession());
         }
 
@@ -203,6 +203,7 @@ class AppKernel extends Kernel
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
             $bundles[] = new Webfactory\Bundle\ExceptionsBundle\WebfactoryExceptionsBundle();
             $bundles[] = new Fidry\PsyshBundle\PsyshBundle();
+            $bundles[] = new Symfony\Bundle\MakerBundle\MakerBundle();
         }
 
         if (in_array($this->getEnvironment(), ['test'])) {

@@ -464,8 +464,6 @@ class ThemeHelper implements ThemeHelperInterface
 
             return $tmpPath;
         }
-
-        return false;
     }
 
     /**
@@ -582,7 +580,7 @@ class ThemeHelper implements ThemeHelperInterface
 
     public function getCurrentTheme(string $template, string $specificFeature): string
     {
-        if (!in_array($template, array_keys($this->getInstalledThemes($specificFeature)))) {
+        if ('mautic_code_mode' !== $template && !in_array($template, array_keys($this->getInstalledThemes($specificFeature)))) {
             return $this->coreParametersHelper->get('theme_email_default');
         }
 

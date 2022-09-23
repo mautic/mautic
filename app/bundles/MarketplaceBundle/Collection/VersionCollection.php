@@ -56,21 +56,20 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
         return new self(array_values(array_filter($this->records, $callback)));
     }
 
+    /**
+     * Finds the latest stable version. If no stable version is found, returns the version with latest timestamp.
+     */
+    public function findLatestStableVersionPackage(): ?Version
+    {
+        return $this->sortByLatest()->filter(fn (Version $version) => $version->isStable())->first();
+    }
+
+    /**
+     * Finds the latest stable version. If no stable version is found, returns the version with latest timestamp.
+     */
     public function findLatestVersionPackage(): ?Version
     {
-        $latestVersion = null;
-
-        $this->map(function (Version $version) use (&$latestVersion) {
-            if (empty($latestVersion)) {
-                $latestVersion = $version;
-            }
-
-            if (version_compare($version->version, $latestVersion->version, '>')) {
-                $latestVersion = $version;
-            }
-        });
-
-        return $latestVersion;
+        return $this->sortByLatest()->first();
     }
 
     public function current(): Version
@@ -78,7 +77,12 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
         return $this->records[$this->position];
     }
 
-    public function next()
+    public function first(): ?Version
+    {
+        return $this->records[0] ?? null;
+    }
+
+    public function next(): void
     {
         ++$this->position;
     }
@@ -88,12 +92,12 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
         return $this->position;
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->records[$this->position]);
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
@@ -103,7 +107,7 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
         return count($this->records);
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (is_null($offset)) {
             $this->records[] = $value;
@@ -112,12 +116,12 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
         }
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->records[$offset]);
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->records[$offset]);
     }

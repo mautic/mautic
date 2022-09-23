@@ -5,25 +5,25 @@ return [
         'main' => [
             'mautic_report_index' => [
                 'path'       => '/reports/{page}',
-                'controller' => 'MauticReportBundle:Report:index',
+                'controller' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
             ],
             'mautic_report_export' => [
                 'path'       => '/reports/view/{objectId}/export/{format}',
-                'controller' => 'MauticReportBundle:Report:export',
+                'controller' => 'Mautic\ReportBundle\Controller\ReportController::exportAction',
                 'defaults'   => [
                     'format' => 'csv',
                 ],
             ],
             'mautic_report_download' => [
                 'path'       => '/reports/download/{reportId}/{format}',
-                'controller' => 'MauticReportBundle:Report:download',
+                'controller' => 'Mautic\ReportBundle\Controller\ReportController::downloadAction',
                 'defaults'   => [
                     'format' => 'csv',
                 ],
             ],
             'mautic_report_view' => [
                 'path'       => '/reports/view/{objectId}/{reportPage}',
-                'controller' => 'MauticReportBundle:Report:view',
+                'controller' => 'Mautic\ReportBundle\Controller\ReportController::viewAction',
                 'defaults'   => [
                     'reportPage' => 1,
                 ],
@@ -33,7 +33,7 @@ return [
             ],
             'mautic_report_schedule_preview' => [
                 'path'       => '/reports/schedule/preview/{isScheduled}/{scheduleUnit}/{scheduleDay}/{scheduleMonthFrequency}',
-                'controller' => 'MauticReportBundle:Schedule:index',
+                'controller' => 'Mautic\ReportBundle\Controller\ScheduleController::indexAction',
                 'defaults'   => [
                     'isScheduled'            => 0,
                     'scheduleUnit'           => '',
@@ -43,21 +43,21 @@ return [
             ],
             'mautic_report_schedule' => [
                 'path'       => '/reports/schedule/{reportId}/now',
-                'controller' => 'MauticReportBundle:Schedule:now',
+                'controller' => 'Mautic\ReportBundle\Controller\ScheduleController::nowAction',
             ],
             'mautic_report_action' => [
                 'path'       => '/reports/{objectAction}/{objectId}',
-                'controller' => 'MauticReportBundle:Report:execute',
+                'controller' => 'Mautic\ReportBundle\Controller\ReportController::executeAction',
             ],
         ],
         'api' => [
             'mautic_api_getreports' => [
                 'path'       => '/reports',
-                'controller' => 'MauticReportBundle:Api\ReportApi:getEntities',
+                'controller' => 'Mautic\ReportBundle\Controller\Api\ReportApiController::getEntitiesAction',
             ],
             'mautic_api_getreport' => [
                 'path'       => '/reports/{id}',
-                'controller' => 'MauticReportBundle:Api\ReportApi:getReport',
+                'controller' => 'Mautic\ReportBundle\Controller\Api\ReportApiController::getReportAction',
             ],
         ],
     ],
