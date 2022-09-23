@@ -7,6 +7,7 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,55 +18,22 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
-    /**
-     * @var CampaignRepository
-     */
-    private $campaignRepository;
+    private CampaignRepository $campaignRepository;
+    private TranslatorInterface $translator;
+    private MembershipBuilder $membershipBuilder;
+    private LoggerInterface $logger;
+    private FormatterHelper $formatterHelper;
+    private int $runLimit = 0;
+    private ContactLimiter $contactLimiter;
+    private bool $quiet = false;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var MembershipBuilder
-     */
-    private $membershipBuilder;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var FormatterHelper
-     */
-    private $formatterHelper;
-
-    /**
-     * @var int
-     */
-    private $runLimit;
-
-    /**
-     * @var ContactLimiter
-     */
-    private $contactLimiter;
-
-    /**
-     * @var bool
-     */
-    private $quiet;
-
-    /**
-     * UpdateLeadCampaignsCommand constructor.
-     */
     public function __construct(
         CampaignRepository $campaignRepository,
         TranslatorInterface $translator,
         MembershipBuilder $membershipBuilder,
         LoggerInterface $logger,
-        FormatterHelper $formatterHelper
+        FormatterHelper $formatterHelper,
+        PathsHelper $pathsHelper
     ) {
         $this->campaignRepository = $campaignRepository;
         $this->translator         = $translator;
@@ -73,7 +41,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         $this->logger             = $logger;
         $this->formatterHelper    = $formatterHelper;
 
-        parent::__construct();
+        parent::__construct($pathsHelper);
     }
 
     protected function configure()
@@ -151,7 +119,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         $threadId       = $input->getOption('thread-id');
         $maxThreads     = $input->getOption('max-threads');
         $this->runLimit = $input->getOption('max-contacts');
-        $this->quiet    = $input->getOption('quiet');
+        $this->quiet    = (bool) $input->getOption('quiet');
         $this->output   = ($this->quiet) ? new NullOutput() : $output;
 
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {

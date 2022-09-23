@@ -877,6 +877,7 @@ return [
                     'swiftmailer.mailer.default.transport.real',
                     'event_dispatcher',
                     'mautic.helper.core_parameters',
+                    'mautic.helper.paths',
                 ],
                 'tag' => 'console.command',
             ],

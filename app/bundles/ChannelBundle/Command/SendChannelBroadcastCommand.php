@@ -5,19 +5,30 @@ namespace Mautic\ChannelBundle\Command;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CLI Command to send a scheduled broadcast.
  */
 class SendChannelBroadcastCommand extends ModeratedCommand
 {
-    /**
-     * {@inheritdoc}
-     */
+    private EventDispatcherInterface $dispatcher;
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper)
+    {
+        $this->dispatcher = $dispatcher;
+        $this->translator = $translator;
+
+        parent::__construct($pathsHelper);
+    }
+
     protected function configure()
     {
         $this->setName('mautic:broadcasts:send')
@@ -78,18 +89,13 @@ EOT
             return 0;
         }
 
-        $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->get('mautic.helper.core_parameters')->get('locale'));
-
-        $dispatcher = $this->getContainer()->get('event_dispatcher');
-
         $event = new ChannelBroadcastEvent($channel, $channelId, $output);
         $event->setLimit($limit);
         $event->setBatch($batch);
         $event->setMinContactIdFilter($minContactId);
         $event->setMaxContactIdFilter($maxContactId);
 
-        $dispatcher->dispatch(ChannelEvents::CHANNEL_BROADCAST, $event);
+        $this->dispatcher->dispatch(ChannelEvents::CHANNEL_BROADCAST, $event);
 
         $results = $event->getResults();
 
@@ -104,7 +110,7 @@ EOT
 
         $table = new Table($output);
         $table
-            ->setHeaders([$translator->trans('mautic.core.channel'), $translator->trans('mautic.core.channel.broadcast_success_count'), $translator->trans('mautic.core.channel.broadcast_failed_count')])
+            ->setHeaders([$this->translator->trans('mautic.core.channel'), $this->translator->trans('mautic.core.channel.broadcast_success_count'), $this->translator->trans('mautic.core.channel.broadcast_failed_count')])
             ->setRows($rows);
         $table->render();
 

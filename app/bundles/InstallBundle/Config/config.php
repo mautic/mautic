@@ -71,6 +71,16 @@ return [
                 'arguments' => ['session'],
             ],
         ],
+        'commands' => [
+            'mautic.install.command.install' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\InstallBundle\Command\InstallCommand::class,
+                'arguments' => [
+                    'mautic.install.service',
+                    'doctrine',
+                ],
+            ],
+        ],
         'other' => [
             'mautic.install.configurator.step.check' => [
                 'class'     => \Mautic\InstallBundle\Configurator\Step\CheckStep::class,
@@ -113,7 +123,7 @@ return [
                 ],
             ],
             'mautic.install.service' => [
-                'class'     => 'Mautic\InstallBundle\Install\InstallService',
+                'class'     => \Mautic\InstallBundle\Install\InstallService::class,
                 'arguments' => [
                     'mautic.configurator',
                     'mautic.helper.cache',
@@ -123,6 +133,7 @@ return [
                     'kernel',
                     'validator',
                     'security.password_encoder',
+                    'service_container',
                 ],
             ],
             'mautic.install.leadcolumns' => [

@@ -1542,6 +1542,7 @@ return [
                 'arguments' => [
                     'mautic.lead.deduper',
                     'translator',
+                    'mautic.helper.paths',
                 ],
                 'tag' => 'console.command',
             ],
@@ -1551,6 +1552,24 @@ return [
                     'mautic.lead.field.settings.background_service',
                     'translator',
                     'mautic.lead.repository.field',
+                ],
+                'tag' => 'console.command',
+            ],
+            'mautic.lead.command.update_lead_lists' => [
+                'class'     => \Mautic\LeadBundle\Command\UpdateLeadListsCommand::class,
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'translator',
+                    'mautic.helper.paths',
+                    'monolog.logger.mautic',
+                ],
+                'tag' => 'console.command',
+            ],
+            'mautic.lead.command.import' => [
+                'class'     => \Mautic\LeadBundle\Command\ImportCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.lead.model.import',
                 ],
                 'tag' => 'console.command',
             ],
