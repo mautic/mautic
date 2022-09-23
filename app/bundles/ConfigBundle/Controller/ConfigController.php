@@ -260,7 +260,7 @@ class ConfigController extends FormController
      */
     private function mergeParamsWithLocal(array &$forms): void
     {
-        $doNotChange = $this->getParameter('mautic.security.restrictedConfigFields');
+        $doNotChange = $this->container->getParameter('mautic.security.restrictedConfigFields');
         /** @var PathsHelper $pathsHelper */
         $pathsHelper     = $this->get('mautic.helper.paths');
         $localConfigFile = $pathsHelper->getLocalConfigurationFile();
