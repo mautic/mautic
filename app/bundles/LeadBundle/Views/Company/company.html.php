@@ -252,7 +252,7 @@ $view['slots']->set(
             </div>
             <div class="panel-body pt-sm">
             <?php if ($company->getOwner()) : ?>
-                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.lead.field.owner'); ?></h6>
+                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.company.field.owner'); ?></h6>
                 <p class="text-muted"><?php echo $view->escape($company->getOwner()->getName()); ?></p>
             <?php endif; ?>
 

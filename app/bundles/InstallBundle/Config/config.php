@@ -5,23 +5,23 @@ return [
         'public' => [
             'mautic_installer_home' => [
                 'path'       => '/installer',
-                'controller' => 'MauticInstallBundle:Install:step',
+                'controller' => 'Mautic\InstallBundle\Controller\InstallController::stepAction',
             ],
             'mautic_installer_remove_slash' => [
                 'path'       => '/installer/',
-                'controller' => 'MauticCoreBundle:Common:removeTrailingSlash',
+                'controller' => 'Mautic\CoreBundle\Controller\CommonController::removeTrailingSlashAction',
             ],
             'mautic_installer_step' => [
                 'path'       => '/installer/step/{index}',
-                'controller' => 'MauticInstallBundle:Install:step',
+                'controller' => 'Mautic\InstallBundle\Controller\InstallController::stepAction',
             ],
             'mautic_installer_final' => [
                 'path'       => '/installer/final',
-                'controller' => 'MauticInstallBundle:Install:final',
+                'controller' => 'Mautic\InstallBundle\Controller\InstallController::finalAction',
             ],
             'mautic_installer_catchcall' => [
                 'path'         => '/installer/{noerror}',
-                'controller'   => 'MauticInstallBundle:Install:step',
+                'controller'   => 'Mautic\InstallBundle\Controller\InstallController::stepAction',
                 'requirements' => [
                     'noerror' => '^(?).+',
                 ],
@@ -46,11 +46,6 @@ return [
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => [],
             ],
-             'mautic.install.fixture.remove_duplicate_index' => [
-                 'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\RemoveDuplicateIndexData::class,
-                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                 'arguments' => [],
-             ],
             'mautic.install.fixture.grape_js' => [
                 'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\GrapesJsData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,

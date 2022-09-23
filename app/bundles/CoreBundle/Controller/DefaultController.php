@@ -35,7 +35,7 @@ class DefaultController extends CommonController
 
             $request->attributes->set('ignore_mismatch', true);
 
-            return $this->forward('MauticPageBundle:Public:index', ['slug' => $slug]);
+            return $this->forward('Mautic\PageBundle\Controller\PublicController::indexAction', ['slug' => $slug]);
         }
     }
 
@@ -55,7 +55,7 @@ class DefaultController extends CommonController
             $results = [];
         }
 
-        return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.php',
+        return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.twig',
             [
                 'results'      => $results,
                 'searchString' => $searchStr,
@@ -75,7 +75,7 @@ class DefaultController extends CommonController
 
         return $this->delegateView(
             [
-                'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.php',
+                'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.twig',
                 'viewParameters'  => [
                     'showNewIndicator' => $showNewIndicator,
                     'notifications'    => $notifications,

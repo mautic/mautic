@@ -82,7 +82,7 @@ class AssetController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['asset' => $lastPage],
-                'contentTemplate' => 'MauticAssetBundle:Asset:index',
+                'contentTemplate' => 'Mautic\AssetBundle\Controller\AssetController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_asset_index',
                     'mauticContent' => 'asset',
@@ -149,7 +149,7 @@ class AssetController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'MauticAssetBundle:Asset:index',
+                'contentTemplate' => 'Mautic\AssetBundle\Controller\AssetController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_asset_index',
                     'mauticContent' => 'asset',
@@ -229,7 +229,9 @@ class AssetController extends FormController
         }
 
         $download = $this->request->query->get('download', 0);
-        $stream   = $this->request->query->get('stream', 0);
+
+        // Display the file directly in the browser by default
+        $stream   = $this->request->query->get('stream', '1');
 
         if ('1' === $download || '1' === $stream) {
             try {
@@ -348,12 +350,12 @@ class AssetController extends FormController
                         'objectId'     => $entity->getId(),
                     ];
                     $returnUrl = $this->generateUrl('mautic_asset_action', $viewParameters);
-                    $template  = 'MauticAssetBundle:Asset:view';
+                    $template  = 'Mautic\AssetBundle\Controller\AssetController::viewAction';
                 }
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_asset_index', $viewParameters);
-                $template       = 'MauticAssetBundle:Asset:index';
+                $template       = 'Mautic\AssetBundle\Controller\AssetController::indexAction';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -440,7 +442,7 @@ class AssetController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticAssetBundle:Asset:index',
+            'contentTemplate' => 'Mautic\AssetBundle\Controller\AssetController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_asset_index',
                 'mauticContent' => 'asset',
@@ -508,7 +510,7 @@ class AssetController extends FormController
                         'objectId'     => $entity->getId(),
                     ]);
                     $viewParams = ['objectId' => $entity->getId()];
-                    $template   = 'MauticAssetBundle:Asset:view';
+                    $template   = 'Mautic\AssetBundle\Controller\AssetController::viewAction';
                 }
             } else {
                 //clear any modified content
@@ -518,7 +520,7 @@ class AssetController extends FormController
 
                 $returnUrl  = $this->generateUrl('mautic_asset_index', ['page' => $page]);
                 $viewParams = ['page' => $page];
-                $template   = 'MauticAssetBundle:Asset:index';
+                $template   = 'Mautic\AssetBundle\Controller\AssetController::indexAction';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -614,7 +616,7 @@ class AssetController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticAssetBundle:Asset:index',
+            'contentTemplate' => 'Mautic\AssetBundle\Controller\AssetController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_asset_index',
                 'mauticContent' => 'asset',
@@ -677,7 +679,7 @@ class AssetController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticAssetBundle:Asset:index',
+            'contentTemplate' => 'Mautic\AssetBundle\Controller\AssetController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_asset_index',
                 'mauticContent' => 'asset',
