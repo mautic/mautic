@@ -50,6 +50,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EmailModel extends FormModel implements AjaxLookupModelInterface
 {
@@ -2346,11 +2347,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param string $route
-     * @param array  $routeParams
-     * @param bool   $absolute
-     * @param array  $clickthrough
-     * @param array  $utmTags
+     * @param string                                   $route
+     * @param array<string, string>|array<string, int> $routeParams
+     * @param bool                                     $absolute
+     * @param array<array<string>>                     $clickthrough
+     * @param array<string>                            $utmTags
      */
     public function buildUrl(
         $route,
@@ -2361,13 +2362,17 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         bool $useConfiguredUrl = true
     ): string {
         $parts = parse_url($this->coreParametersHelper->get('site_url') ?: '');
-        dump($parts);
+
         if (!$useConfiguredUrl || false === $parts) {
             return parent::buildUrl($route, $routeParams, $absolute, $clickthrough, $utmTags);
         }
 
-        $this->router->getContext()->setHost($parts['host']);
-        $this->router->getContext()->setScheme($parts['scheme']);
+        if (!empty($parts['host'])) {
+            $this->router->getContext()->setHost($parts['host']);
+        }
+        if (!empty($parts['scheme'])) {
+            $this->router->getContext()->setScheme($parts['scheme']);
+        }
 
         $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate($route, $routeParams, $referenceType);
