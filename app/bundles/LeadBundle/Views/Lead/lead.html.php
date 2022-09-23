@@ -203,6 +203,12 @@ $view['slots']->set(
                             </a>
                         </li>
                     <?php endif; ?>
+
+                    <li>
+                        <a href="#lead-stats" class="group" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.lead.stats'); ?>
+                        </a>
+                    </li>
                 </ul>
 
                 <!-- start: tab-content -->
@@ -262,6 +268,11 @@ $view['slots']->set(
                             <?php echo $view->render('MauticLeadBundle:Lead:devices.html.php', ['devices' => $devices]); ?>
                         </div>
                     <?php endif; ?>
+
+                    <div class="tab-pane fade bdr-w-0" id="lead-stats"
+                         data-target-url="<?php echo $view['router']->url('mautic_contact_stats', ['objectId' => $lead->getId()]); ?>">
+                        <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                    </div>
                 </div>
             </div>
             <!--/ lead detail collapseable -->

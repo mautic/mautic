@@ -64,7 +64,7 @@ class TriggerController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'MauticPointBundle:Trigger:index',
+                'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_pointtrigger_index',
                     'mauticContent' => 'pointTrigger',
@@ -121,7 +121,7 @@ class TriggerController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'MauticPointBundle:Trigger:index',
+                'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_pointtrigger_index',
                     'mauticContent' => 'pointTrigger',
@@ -232,7 +232,7 @@ class TriggerController extends FormController
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_pointtrigger_index', $viewParameters);
-                $template       = 'MauticPointBundle:Trigger:index';
+                $template       = 'Mautic\PointBundle\Controller\TriggerController::indexAction';
 
                 //clear temporary fields
                 $this->clearSessionComponents($sessionId);
@@ -300,7 +300,7 @@ class TriggerController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPointBundle:Trigger:index',
+            'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
@@ -377,7 +377,7 @@ class TriggerController extends FormController
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_pointtrigger_index', $viewParameters);
-                $template       = 'MauticPointBundle:Trigger:index';
+                $template       = 'Mautic\PointBundle\Controller\TriggerController::indexAction';
 
                 //remove fields from session
                 $this->clearSessionComponents($objectId);
@@ -479,7 +479,7 @@ class TriggerController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPointBundle:Trigger:index',
+            'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
@@ -536,7 +536,7 @@ class TriggerController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPointBundle:Trigger:index',
+            'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',

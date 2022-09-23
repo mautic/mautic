@@ -5,23 +5,23 @@ return [
         'main' => [
             'mautic_message_index' => [
                 'path'       => '/messages/{page}',
-                'controller' => 'MauticChannelBundle:Message:index',
+                'controller' => 'Mautic\ChannelBundle\Controller\MessageController::indexAction',
             ],
             'mautic_message_contacts' => [
                 'path'       => '/messages/contacts/{objectId}/{channel}/{page}',
-                'controller' => 'MauticChannelBundle:Message:contacts',
+                'controller' => 'Mautic\ChannelBundle\Controller\MessageController::contactsAction',
             ],
             'mautic_message_action' => [
                 'path'       => '/messages/{objectAction}/{objectId}',
-                'controller' => 'MauticChannelBundle:Message:execute',
+                'controller' => 'Mautic\ChannelBundle\Controller\MessageController::executeAction',
             ],
             'mautic_channel_batch_contact_set' => [
                 'path'       => '/channels/batch/contact/set',
-                'controller' => 'MauticChannelBundle:BatchContact:set',
+                'controller' => 'Mautic\ChannelBundle\Controller\BatchContactController::setAction',
             ],
             'mautic_channel_batch_contact_view' => [
                 'path'       => '/channels/batch/contact/view',
-                'controller' => 'MauticChannelBundle:BatchContact:index',
+                'controller' => 'Mautic\ChannelBundle\Controller\BatchContactController::indexAction',
             ],
         ],
         'api' => [
@@ -29,7 +29,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'messages',
                 'path'            => '/messages',
-                'controller'      => 'MauticChannelBundle:Api\MessageApi',
+                'controller'      => 'Mautic\ChannelBundle\Controller\Api\MessageApiController',
             ],
         ],
         'public' => [

@@ -46,7 +46,7 @@ class FileHelper
         }
 
         $sSuffix = substr($sSize, -1);
-        $iValue  = substr($sSize, 0, -1);
+        $iValue  = (int) substr($sSize, 0, -1);
 
         //missing breaks are important
         switch (strtoupper($sSuffix)) {

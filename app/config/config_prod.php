@@ -63,6 +63,7 @@ $container->loadFromExtension('twig', [
         '%kernel.project_dir%/app/bundles' => 'bundles',
     ],
     'form_themes' => [
+        // Can be found at bundles/CoreBundle/Resources/views/mautic_form_layout.html.twig
         '@MauticCore/FormTheme/mautic_form_layout.html.twig',
     ],
 ]);
