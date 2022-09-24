@@ -129,6 +129,11 @@ class HubspotIntegration extends CrmAbstractIntegration
         return ['push_lead', 'get_leads'];
     }
 
+    /**
+     * @param bool $inAuthorization
+     *
+     * @return mixed|string|null
+     */
     public function getBearerToken($inAuthorization = false)
     {
         $tokenData = $this->getKeys();
@@ -137,7 +142,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
+     * @return array<string,bool>
      */
     public function getFormSettings()
     {
@@ -329,9 +334,9 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
-     * @param array                                             $data
-     * @param string                                            $formArea
+     * @param FormBuilder $builder
+     * @param array       $data
+     * @param string      $formArea
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
