@@ -77,7 +77,7 @@ jobs:
         export DB_PORT_STRING="${{ matrix.db-types }}_port"
         export DB_PORT=${!DB_PORT_STRING}
 
-        if [[ "${{ matrix.php-versions }}" == "7.4" ]] && [[ "${{ matrix.db-types }}" == "mysql" ]]; then
+        if [[ "${{ matrix.php-versions }}" == "8.0" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
           composer test -- --coverage-clover=coverage.xml
         else
           composer test
@@ -87,7 +87,7 @@ jobs:
         mariadb_port: ${{ job.services.mariadb.ports[3306] }}
 
     - name: Upload coverage report
-      if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' && github.repository == 'mautic/mautic' }}
+      if: ${{ matrix.php-versions == '8.0' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
       uses: codecov/codecov-action@v2
       with:
         files: ./coverage.xml
