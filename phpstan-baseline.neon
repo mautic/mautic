@@ -706,11 +706,6 @@ parameters:
 			path: app/bundles/ApiBundle/Event/ClientEvent.php
 
 		-
-			message: "#^Call to an undefined method Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\:\\:hasId\\(\\)\\.$#"
-			count: 1
-			path: app/bundles/ApiBundle/EventListener/ApiSubscriber.php
-
-		-
 			message: "#^Method Mautic\\\\ApiBundle\\\\EventListener\\\\ApiSubscriber\\:\\:onKernelRequest\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/ApiBundle/EventListener/ApiSubscriber.php
@@ -772,11 +767,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$entityName of method Doctrine\\\\ORM\\\\EntityManager\\:\\:getRepository\\(\\) expects class\\-string\\<MauticUserBundle\\:User\\>, string given\\.$#"
-			count: 1
-			path: app/bundles/ApiBundle/EventListener/OAuthEventListener.php
-
-		-
-			message: "#^Property Mautic\\\\ApiBundle\\\\EventListener\\\\OAuthEventListener\\:\\:\\$translator \\(Symfony\\\\Bundle\\\\FrameworkBundle\\\\Translation\\\\Translator\\) does not accept Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\.$#"
 			count: 1
 			path: app/bundles/ApiBundle/EventListener/OAuthEventListener.php
 
@@ -2752,16 +2742,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\CampaignBundle\\\\Command\\\\TriggerCampaignCommand\\:\\:triggerCampaign\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CampaignBundle/Command/TriggerCampaignCommand.php
-
-		-
-			message: "#^Parameter \\#1 \\$event of method Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcher\\:\\:dispatch\\(\\) expects object, string given\\.$#"
-			count: 1
-			path: app/bundles/CampaignBundle/Command/TriggerCampaignCommand.php
-
-		-
-			message: "#^Property Mautic\\\\CampaignBundle\\\\Command\\\\TriggerCampaignCommand\\:\\:\\$dispatcher \\(Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcher\\) does not accept Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcherInterface\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Command/TriggerCampaignCommand.php
 
@@ -4892,11 +4872,6 @@ parameters:
 
 		-
 			message: "#^Property Mautic\\\\CampaignBundle\\\\Event\\\\CampaignBuilderEvent\\:\\:\\$sortCache type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CampaignBundle/Event/CampaignBuilderEvent.php
-
-		-
-			message: "#^Property Mautic\\\\CampaignBundle\\\\Event\\\\CampaignBuilderEvent\\:\\:\\$translator \\(Symfony\\\\Bundle\\\\FrameworkBundle\\\\Translation\\\\Translator\\) does not accept Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Event/CampaignBuilderEvent.php
 
@@ -9681,11 +9656,6 @@ parameters:
 			path: app/bundles/ChannelBundle/Form/Type/MessageType.php
 
 		-
-			message: "#^Call to an undefined method Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\:\\:hasId\\(\\)\\.$#"
-			count: 2
-			path: app/bundles/ChannelBundle/Helper/ChannelListHelper.php
-
-		-
 			message: "#^Method Mautic\\\\ChannelBundle\\\\Helper\\\\ChannelListHelper\\:\\:getChannelLabel\\(\\) has parameter \\$channel with no type specified\\.$#"
 			count: 1
 			path: app/bundles/ChannelBundle/Helper/ChannelListHelper.php
@@ -9813,11 +9783,6 @@ parameters:
 		-
 			message: "#^Call to an undefined method Mautic\\\\CampaignBundle\\\\Entity\\\\LeadEventLogRepository\\:\\:getEventLogs\\(\\)\\.$#"
 			count: 1
-			path: app/bundles/ChannelBundle/Model/MessageModel.php
-
-		-
-			message: "#^Call to an undefined method Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\:\\:hasId\\(\\)\\.$#"
-			count: 3
 			path: app/bundles/ChannelBundle/Model/MessageModel.php
 
 		-
@@ -10931,11 +10896,6 @@ parameters:
 			path: app/bundles/CoreBundle/Command/CleanupMaintenanceCommand.php
 
 		-
-			message: "#^Method Symfony\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\:\\:getParameter\\(\\) invoked with 2 parameters, 1 required\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Command/CleanupMaintenanceCommand.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Command\\\\ConvertConfigCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Command/ConvertConfigCommand.php
@@ -11036,57 +10996,12 @@ parameters:
 			path: app/bundles/CoreBundle/Command/PullTransifexCommand.php
 
 		-
-			message: "#^Iterating over an object of an unknown class UnitEnum\\.$#"
-			count: 2
-			path: app/bundles/CoreBundle/Command/PullTransifexCommand.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Command\\\\PullTransifexCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Command/PullTransifexCommand.php
 
 		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Command\\\\PullTransifexCommand\\:\\:getLanguageFiles\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Command/PullTransifexCommand.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Command\\\\PullTransifexCommand\\:\\:\\$coreParametersHelper has no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Command/PullTransifexCommand.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Command\\\\PullTransifexCommand\\:\\:\\$transifexFactory has no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Command/PullTransifexCommand.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Command\\\\PullTransifexCommand\\:\\:\\$translator has no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Command/PullTransifexCommand.php
-
-		-
-			message: "#^Iterating over an object of an unknown class UnitEnum\\.$#"
-			count: 2
-			path: app/bundles/CoreBundle/Command/PushTransifexCommand.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Command\\\\PushTransifexCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Command/PushTransifexCommand.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Command\\\\PushTransifexCommand\\:\\:getLanguageFiles\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Command/PushTransifexCommand.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Command\\\\PushTransifexCommand\\:\\:\\$transifexFactory has no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Command/PushTransifexCommand.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Command\\\\PushTransifexCommand\\:\\:\\$translator has no type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Command/PushTransifexCommand.php
 
@@ -11979,16 +11894,6 @@ parameters:
 			message: "#^Method Mautic\\\\CoreBundle\\\\DependencyInjection\\\\Compiler\\\\TemplatingPass\\:\\:process\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/DependencyInjection/Compiler/TemplatingPass.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\DependencyInjection\\\\Compiler\\\\TranslationsPass\\:\\:process\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/DependencyInjection/Compiler/TranslationsPass.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between null and Symfony\\\\Component\\\\DependencyInjection\\\\Definition will always evaluate to false\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/DependencyInjection/Compiler/TranslationsPass.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\DependencyInjection\\\\Compiler\\\\UpdateStepPass\\:\\:process\\(\\) has no return type specified\\.$#"
@@ -15176,11 +15081,6 @@ parameters:
 			path: app/bundles/CoreBundle/Form/ChoiceLoader/EntityLookupChoiceLoader.php
 
 		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Form\\\\ChoiceLoader\\\\EntityLookupChoiceLoader\\:\\:\\$translator \\(Mautic\\\\CoreBundle\\\\Translation\\\\Translator\\) does not accept Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Form/ChoiceLoader/EntityLookupChoiceLoader.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\DataTransformer\\\\ArrayLinebreakTransformer\\:\\:reverseTransform\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Form/DataTransformer/ArrayLinebreakTransformer.php
@@ -15984,11 +15884,6 @@ parameters:
 			message: "#^Parameter \\$field of method Mautic\\\\CoreBundle\\\\Form\\\\Validator\\\\Constraints\\\\FileEncodingValidator\\:\\:validate\\(\\) has invalid type Mautic\\\\CoreBundle\\\\Form\\\\Validator\\\\Constraints\\\\LeadField\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Form/Validator/Constraints/FileEncodingValidator.php
-
-		-
-			message: "#^Call to an undefined method Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\:\\:transConditional\\(\\)\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/AbstractFormFieldHelper.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\AbstractFormFieldHelper\\:\\:formatList\\(\\) has parameter \\$choices with no type specified\\.$#"
@@ -18746,11 +18641,6 @@ parameters:
 			path: app/bundles/CoreBundle/Security/Permissions/CorePermissions.php
 
 		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Security\\\\Permissions\\\\CorePermissions\\:\\:getTranslator\\(\\) should return Symfony\\\\Bundle\\\\FrameworkBundle\\\\Translation\\\\Translator but returns Symfony\\\\Component\\\\Translation\\\\Translator\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Security/Permissions/CorePermissions.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Security\\\\Permissions\\\\CorePermissions\\:\\:registerPermissionClasses\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Security/Permissions/CorePermissions.php
@@ -18787,11 +18677,6 @@ parameters:
 
 		-
 			message: "#^Property Mautic\\\\CoreBundle\\\\Security\\\\Permissions\\\\CorePermissions\\:\\:\\$pluginBundles type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Security/Permissions/CorePermissions.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Security\\\\Permissions\\\\CorePermissions\\:\\:\\$translator \\(Symfony\\\\Component\\\\Translation\\\\Translator\\) does not accept Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Security/Permissions/CorePermissions.php
 
@@ -19151,11 +19036,6 @@ parameters:
 			path: app/bundles/CoreBundle/Templating/Helper/ButtonHelper.php
 
 		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\ButtonHelper\\:\\:\\$translator \\(Symfony\\\\Bundle\\\\FrameworkBundle\\\\Translation\\\\Translator\\) does not accept Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/ButtonHelper.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\ContentHelper\\:\\:getCustomContent\\(\\) has parameter \\$context with no type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Templating/Helper/ContentHelper.php
@@ -19219,51 +19099,6 @@ parameters:
 			message: "#^Parameter \\$range of method Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\DateHelper\\:\\:formatRange\\(\\) has invalid type Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\DateInterval\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Templating/Helper/DateHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\ExceptionHelper\\:\\:fileExcerpt\\(\\) should return string but return statement is missing\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/ExceptionHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\ExceptionHelper\\:\\:formatArgs\\(\\) has parameter \\$args with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/ExceptionHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\ExceptionHelper\\:\\:formatArgsAsText\\(\\) has parameter \\$args with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/ExceptionHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\ExceptionHelper\\:\\:formatFileFromText\\(\\) has parameter \\$text with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/ExceptionHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\ExceptionHelper\\:\\:getFileLink\\(\\) should return string but returns false\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/ExceptionHelper.php
-
-		-
-			message: "#^Parameter \\#2 \\$line of method Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\ExceptionHelper\\:\\:formatFile\\(\\) expects int, string given\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/ExceptionHelper.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\ExceptionHelper\\:\\:\\$fileLinkFormat has no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/ExceptionHelper.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\ExceptionHelper\\:\\:\\$rootDir has no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/ExceptionHelper.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/ExceptionHelper.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\FormHelper\\:\\:containsErrors\\(\\) has parameter \\$exluding with no value type specified in iterable type array\\.$#"
@@ -19964,26 +19799,6 @@ parameters:
 			message: "#^Method Mautic\\\\CoreBundle\\\\Tests\\\\Unit\\\\Command\\\\MaxMindDoNotSellPurgeCommandTest\\:\\:buildMockEntityManager\\(\\) has parameter \\$dataToReturn with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Tests/Unit/Command/MaxMindDoNotSellPurgeCommandTest.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Tests\\\\Unit\\\\Command\\\\ModeratedCommandTest\\:\\:testDeprecatedForceOptionIsRecognized\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Command/ModeratedCommandTest.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Tests\\\\Unit\\\\Command\\\\ModeratedCommandTest\\:\\:testFileLock\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Command/ModeratedCommandTest.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Tests\\\\Unit\\\\Command\\\\ModeratedCommandTest\\:\\:testLockByPassDoesNotAttemptToCreateALock\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Command/ModeratedCommandTest.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Tests\\\\Unit\\\\Command\\\\ModeratedCommandTest\\:\\:testUnableToWriteLockFileThrowsAnException\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Command/ModeratedCommandTest.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Tests\\\\Unit\\\\Command\\\\src\\\\FakeModeratedCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
@@ -21484,26 +21299,6 @@ parameters:
 			message: "#^Parameter \\#2 \\$maxUploadSizeMB of method Mautic\\\\CoreBundle\\\\Validator\\\\FileUploadValidator\\:\\:checkFileSize\\(\\) expects string, int given\\.$#"
 			count: 2
 			path: app/bundles/CoreBundle/Tests/Unit/Validator/FileUploadValidatorTest.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Translation\\\\Translator\\:\\:loadCatalogue\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Translation/Translator.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Translation\\\\Translator\\:\\:transConditional\\(\\) has parameter \\$alternative with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Translation/Translator.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Translation\\\\Translator\\:\\:transConditional\\(\\) has parameter \\$parameters with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Translation/Translator.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Translation\\\\Translator\\:\\:transConditional\\(\\) has parameter \\$preferred with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Translation/Translator.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Update\\\\Step\\\\RemoveDeletedFilesStep\\:\\:deleteFile\\(\\) has no return type specified\\.$#"
@@ -30676,31 +30471,6 @@ parameters:
 			path: app/bundles/EmailBundle/Tests/Command/ProcessEmailQueueCommandTest.php
 
 		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Command\\\\ProcessEmailQueueCommandTest\\:\\:\\$application has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Command/ProcessEmailQueueCommandTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Command\\\\ProcessEmailQueueCommandTest\\:\\:\\$container has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Command/ProcessEmailQueueCommandTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Command\\\\ProcessEmailQueueCommandTest\\:\\:\\$coreParametersHelper has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Command/ProcessEmailQueueCommandTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Command\\\\ProcessEmailQueueCommandTest\\:\\:\\$dispatcher has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Command/ProcessEmailQueueCommandTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Command\\\\ProcessEmailQueueCommandTest\\:\\:\\$transport has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Command/ProcessEmailQueueCommandTest.php
-
-		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Controller\\\\Api\\\\EmailApiControllerFunctionalTest\\:\\:testReplyActionIfNotFound\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Controller/Api/EmailApiControllerFunctionalTest.php
@@ -34826,11 +34596,6 @@ parameters:
 			path: app/bundles/FormBundle/Model/FormModel.php
 
 		-
-			message: "#^Parameter \\#1 \\$translator of class Mautic\\\\FormBundle\\\\Event\\\\FormBuilderEvent constructor expects Symfony\\\\Bundle\\\\FrameworkBundle\\\\Translation\\\\Translator, Symfony\\\\Component\\\\Translation\\\\TranslatorInterface given\\.$#"
-			count: 1
-			path: app/bundles/FormBundle/Model/FormModel.php
-
-		-
 			message: "#^Variable \\$pages in empty\\(\\) always exists and is not falsy\\.$#"
 			count: 1
 			path: app/bundles/FormBundle/Model/FormModel.php
@@ -35386,11 +35151,6 @@ parameters:
 			path: app/bundles/InstallBundle/Command/InstallCommand.php
 
 		-
-			message: "#^Method Mautic\\\\InstallBundle\\\\Command\\\\InstallCommand\\:\\:handleInstallerErrors\\(\\) has parameter \\$messages with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Command/InstallCommand.php
-
-		-
 			message: "#^Method Mautic\\\\InstallBundle\\\\Command\\\\InstallCommand\\:\\:stepAction\\(\\) has parameter \\$params with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Command/InstallCommand.php
@@ -35776,46 +35536,6 @@ parameters:
 			path: app/bundles/InstallBundle/Install/InstallService.php
 
 		-
-			message: "#^Property Mautic\\\\InstallBundle\\\\Install\\\\InstallService\\:\\:\\$cacheHelper has no type specified\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Install/InstallService.php
-
-		-
-			message: "#^Property Mautic\\\\InstallBundle\\\\Install\\\\InstallService\\:\\:\\$configurator has no type specified\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Install/InstallService.php
-
-		-
-			message: "#^Property Mautic\\\\InstallBundle\\\\Install\\\\InstallService\\:\\:\\$encoder has no type specified\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Install/InstallService.php
-
-		-
-			message: "#^Property Mautic\\\\InstallBundle\\\\Install\\\\InstallService\\:\\:\\$entityManager has no type specified\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Install/InstallService.php
-
-		-
-			message: "#^Property Mautic\\\\InstallBundle\\\\Install\\\\InstallService\\:\\:\\$kernel has no type specified\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Install/InstallService.php
-
-		-
-			message: "#^Property Mautic\\\\InstallBundle\\\\Install\\\\InstallService\\:\\:\\$pathsHelper has no type specified\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Install/InstallService.php
-
-		-
-			message: "#^Property Mautic\\\\InstallBundle\\\\Install\\\\InstallService\\:\\:\\$translator has no type specified\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Install/InstallService.php
-
-		-
-			message: "#^Property Mautic\\\\InstallBundle\\\\Install\\\\InstallService\\:\\:\\$validator has no type specified\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Install/InstallService.php
-
-		-
 			message: "#^Variable \\$configurator in PHPDoc tag @var does not match assigned variable \\$params\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Install/InstallService.php
@@ -35859,16 +35579,6 @@ parameters:
 			message: "#^Parameter \\#1 \\$isAdmin of method Mautic\\\\UserBundle\\\\Entity\\\\Role\\:\\:setIsAdmin\\(\\) expects bool, int given\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/InstallFixtures/ORM/RoleData.php
-
-		-
-			message: "#^Property Mautic\\\\InstallBundle\\\\Tests\\\\Command\\\\InstallCommandTest\\:\\:\\$container has no type specified\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Tests/Command/InstallCommandTest.php
-
-		-
-			message: "#^Property Mautic\\\\InstallBundle\\\\Tests\\\\Command\\\\InstallCommandTest\\:\\:\\$installer has no type specified\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Tests/Command/InstallCommandTest.php
 
 		-
 			message: "#^Method Mautic\\\\InstallBundle\\\\Tests\\\\Controller\\\\InstallControllerTest\\:\\:testStepActionWhenInstalled\\(\\) has no return type specified\\.$#"
@@ -37834,31 +37544,6 @@ parameters:
 			message: "#^Parameter \\#2 \\$fieldHelper of class Mautic\\\\IntegrationsBundle\\\\Sync\\\\SyncDataExchange\\\\Internal\\\\ReportBuilder\\\\PartialObjectReportBuilder constructor expects Mautic\\\\IntegrationsBundle\\\\Sync\\\\SyncDataExchange\\\\Helper\\\\FieldHelper, PHPUnit\\\\Framework\\\\MockObject\\\\MockObject given\\.$#"
 			count: 1
 			path: app/bundles/IntegrationsBundle/Tests/Unit/Sync/SyncDataExchange/Internal/ReportBuilder/PartialObjectReportBuilderTest.php
-
-		-
-			message: "#^Cannot call method next\\(\\) on array\\|Doctrine\\\\ORM\\\\Tools\\\\Pagination\\\\Paginator\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Command/CheckQueryBuildersCommand.php
-
-		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Command\\\\CheckQueryBuildersCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Command/CheckQueryBuildersCommand.php
-
-		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Command\\\\CheckQueryBuildersCommand\\:\\:format_period\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Command/CheckQueryBuildersCommand.php
-
-		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Command\\\\CheckQueryBuildersCommand\\:\\:format_period\\(\\) has parameter \\$inputSeconds with no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Command/CheckQueryBuildersCommand.php
-
-		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Command\\\\CheckQueryBuildersCommand\\:\\:runSegment\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Command/CheckQueryBuildersCommand.php
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Command\\\\DeduplicateCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
@@ -42716,11 +42401,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/LeadListRepository.php
 
 		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Entity\\\\CommonRepository\\:\\:\\$translator \\(Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadListRepository.php
-
-		-
 			message: "#^Return type \\(string\\) of method Mautic\\\\LeadBundle\\\\Entity\\\\LeadListRepository\\:\\:getDefaultOrder\\(\\) should be compatible with return type \\(array\\) of method Mautic\\\\CoreBundle\\\\Entity\\\\CommonRepository\\:\\:getDefaultOrder\\(\\)$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadListRepository.php
@@ -43257,11 +42937,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\#2 \\$leadIds of method Mautic\\\\LeadBundle\\\\Entity\\\\FrequencyRuleRepository\\:\\:getFrequencyRules\\(\\) expects null, array\\<int, \\(int\\|string\\)\\> given\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Entity\\\\CommonRepository\\:\\:\\$translator \\(Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadRepository.php
 
@@ -45021,11 +44696,6 @@ parameters:
 			path: app/bundles/LeadBundle/EventListener/ReportDNCSubscriber.php
 
 		-
-			message: "#^Call to an undefined method Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\:\\:hasId\\(\\)\\.$#"
-			count: 3
-			path: app/bundles/LeadBundle/EventListener/ReportSubscriber.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\EventListener\\\\ReportSubscriber\\:\\:getSubscribedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/EventListener/ReportSubscriber.php
@@ -45311,11 +44981,6 @@ parameters:
 			path: app/bundles/LeadBundle/EventListener/SetContactAvatarFormSubscriber.php
 
 		-
-			message: "#^Call to an undefined method Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\:\\:hasId\\(\\)\\.$#"
-			count: 4
-			path: app/bundles/LeadBundle/EventListener/TimelineEventLogCampaignSubscriber.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\EventListener\\\\TimelineEventLogCampaignSubscriber\\:\\:addEvents\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/EventListener/TimelineEventLogCampaignSubscriber.php
@@ -45424,11 +45089,6 @@ parameters:
 			message: "#^Parameter \\#6 \\$object of method Mautic\\\\LeadBundle\\\\EventListener\\\\TimelineEventLogCampaignSubscriber\\:\\:addEvents\\(\\) expects null, string given\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/EventListener/TimelineEventLogCampaignSubscriber.php
-
-		-
-			message: "#^Call to an undefined method Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\:\\:hasId\\(\\)\\.$#"
-			count: 4
-			path: app/bundles/LeadBundle/EventListener/TimelineEventLogSegmentSubscriber.php
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\EventListener\\\\TimelineEventLogSegmentSubscriber\\:\\:addEvents\\(\\) has no return type specified\\.$#"
@@ -45549,11 +45209,6 @@ parameters:
 			message: "#^Parameter \\#6 \\$object of method Mautic\\\\LeadBundle\\\\EventListener\\\\TimelineEventLogSegmentSubscriber\\:\\:addEvents\\(\\) expects null, string given\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/EventListener/TimelineEventLogSegmentSubscriber.php
-
-		-
-			message: "#^Call to an undefined method Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\:\\:hasId\\(\\)\\.$#"
-			count: 4
-			path: app/bundles/LeadBundle/EventListener/TimelineEventLogSubscriber.php
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\EventListener\\\\TimelineEventLogSubscriber\\:\\:addEvents\\(\\) has no return type specified\\.$#"
@@ -48301,11 +47956,6 @@ parameters:
 			path: app/bundles/LeadBundle/Model/LeadModel.php
 
 		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Model\\\\AbstractCommonModel\\:\\:\\$translator \\(Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Model/LeadModel.php
-
-		-
 			message: "#^Property Mautic\\\\LeadBundle\\\\Model\\\\LeadModel\\:\\:\\$availableLeadFields type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Model/LeadModel.php
@@ -48571,11 +48221,6 @@ parameters:
 			path: app/bundles/LeadBundle/Model/ListModel.php
 
 		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Model\\\\ListModel\\:\\:getVersionNew\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Model/ListModel.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Model\\\\ListModel\\:\\:removeLead\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Model/ListModel.php
@@ -48607,11 +48252,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\#5 \\$options of method Mautic\\\\CoreBundle\\\\Helper\\\\Chart\\\\ChartQuery\\:\\:count\\(\\) expects array, null given\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Model/ListModel.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Model\\\\AbstractCommonModel\\:\\:\\$translator \\(Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Model/ListModel.php
 
@@ -53756,11 +53396,6 @@ parameters:
 			path: app/bundles/PageBundle/Controller/PublicController.php
 
 		-
-			message: "#^Parameter \\#2 \\$status of method Symfony\\\\Bundle\\\\FrameworkBundle\\\\Controller\\\\Controller\\:\\:redirect\\(\\) expects int, string given\\.$#"
-			count: 1
-			path: app/bundles/PageBundle/Controller/PublicController.php
-
-		-
 			message: "#^Parameter \\#5 \\$query of method Mautic\\\\PageBundle\\\\Model\\\\PageModel\\:\\:hitPage\\(\\) expects array, string\\|null given\\.$#"
 			count: 1
 			path: app/bundles/PageBundle/Controller/PublicController.php
@@ -58881,11 +58516,6 @@ parameters:
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
 		-
-			message: "#^Method Mautic\\\\PluginBundle\\\\Integration\\\\AbstractIntegration\\:\\:getTranslator\\(\\) should return Mautic\\\\CoreBundle\\\\Translation\\\\Translator but returns Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\.$#"
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
 			message: "#^Method Mautic\\\\PluginBundle\\\\Integration\\\\AbstractIntegration\\:\\:getUserData\\(\\) has parameter \\$identifier with no type specified\\.$#"
 			count: 1
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
@@ -63636,11 +63266,6 @@ parameters:
 			path: app/bundles/SmsBundle/EventListener/MessageQueueSubscriber.php
 
 		-
-			message: "#^Call to an undefined method Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\:\\:hasId\\(\\)\\.$#"
-			count: 4
-			path: app/bundles/SmsBundle/EventListener/ReplySubscriber.php
-
-		-
 			message: "#^Method Mautic\\\\SmsBundle\\\\EventListener\\\\ReplySubscriber\\:\\:addEvents\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/SmsBundle/EventListener/ReplySubscriber.php
@@ -64641,11 +64266,6 @@ parameters:
 			path: app/bundles/StageBundle/Entity/StageRepository.php
 
 		-
-			message: "#^Call to method trans\\(\\) on an unknown class Mautic\\\\StageBundle\\\\Event\\\\Translator\\.$#"
-			count: 2
-			path: app/bundles/StageBundle/Event/StageBuilderEvent.php
-
-		-
 			message: "#^Method Mautic\\\\StageBundle\\\\Event\\\\StageBuilderEvent\\:\\:addAction\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/StageBundle/Event/StageBuilderEvent.php
@@ -64691,27 +64311,7 @@ parameters:
 			path: app/bundles/StageBundle/Event/StageBuilderEvent.php
 
 		-
-			message: "#^PHPDoc tag @param for parameter \\$translator with type Mautic\\\\StageBundle\\\\Event\\\\Translator is not subtype of native type Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\.$#"
-			count: 1
-			path: app/bundles/StageBundle/Event/StageBuilderEvent.php
-
-		-
-			message: "#^Parameter \\$translator of method Mautic\\\\StageBundle\\\\Event\\\\StageBuilderEvent\\:\\:__construct\\(\\) has invalid type Mautic\\\\StageBundle\\\\Event\\\\Translator\\.$#"
-			count: 1
-			path: app/bundles/StageBundle/Event/StageBuilderEvent.php
-
-		-
 			message: "#^Property Mautic\\\\StageBundle\\\\Event\\\\StageBuilderEvent\\:\\:\\$actions type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/StageBundle/Event/StageBuilderEvent.php
-
-		-
-			message: "#^Property Mautic\\\\StageBundle\\\\Event\\\\StageBuilderEvent\\:\\:\\$translator \\(Mautic\\\\StageBundle\\\\Event\\\\Translator\\) does not accept Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\.$#"
-			count: 1
-			path: app/bundles/StageBundle/Event/StageBuilderEvent.php
-
-		-
-			message: "#^Property Mautic\\\\StageBundle\\\\Event\\\\StageBuilderEvent\\:\\:\\$translator has unknown class Mautic\\\\StageBundle\\\\Event\\\\Translator as its type\\.$#"
 			count: 1
 			path: app/bundles/StageBundle/Event/StageBuilderEvent.php
 
@@ -64976,22 +64576,7 @@ parameters:
 			path: app/bundles/StageBundle/Tests/Unit/EventListener/CampaignSubscriberTest.php
 
 		-
-			message: "#^Method class@anonymous/app/bundles/StageBundle/Tests/Unit/EventListener/CampaignSubscriberTest\\.php\\:445\\:\\:getLocale\\(\\) should return string but return statement is missing\\.$#"
-			count: 1
-			path: app/bundles/StageBundle/Tests/Unit/EventListener/CampaignSubscriberTest.php
-
-		-
-			message: "#^Method class@anonymous/app/bundles/StageBundle/Tests/Unit/EventListener/CampaignSubscriberTest\\.php\\:445\\:\\:setLocale\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/StageBundle/Tests/Unit/EventListener/CampaignSubscriberTest.php
-
-		-
 			message: "#^Method class@anonymous/app/bundles/StageBundle/Tests/Unit/EventListener/CampaignSubscriberTest\\.php\\:445\\:\\:trans\\(\\) has parameter \\$parameters with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/StageBundle/Tests/Unit/EventListener/CampaignSubscriberTest.php
-
-		-
-			message: "#^Method class@anonymous/app/bundles/StageBundle/Tests/Unit/EventListener/CampaignSubscriberTest\\.php\\:445\\:\\:transChoice\\(\\) has parameter \\$parameters with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/StageBundle/Tests/Unit/EventListener/CampaignSubscriberTest.php
 
@@ -66487,11 +66072,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$entityName of method Doctrine\\\\ORM\\\\EntityManager\\:\\:getRepository\\(\\) expects class\\-string\\<MauticUserBundle\\:Role\\>, string given\\.$#"
-			count: 1
-			path: app/bundles/UserBundle/Model/UserModel.php
-
-		-
-			message: "#^Parameter \\#2 \\$parameters of method Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\:\\:trans\\(\\) expects array, string given\\.$#"
 			count: 1
 			path: app/bundles/UserBundle/Model/UserModel.php
 
@@ -69226,26 +68806,6 @@ parameters:
 			path: plugins/MauticCitrixBundle/Model/CitrixModel.php
 
 		-
-			message: "#^Method MauticPlugin\\\\MauticCitrixBundle\\\\Model\\\\CitrixModel\\:\\:syncEvent\\(\\) has parameter \\$eventDesc with no type specified\\.$#"
-			count: 1
-			path: plugins/MauticCitrixBundle/Model/CitrixModel.php
-
-		-
-			message: "#^Method MauticPlugin\\\\MauticCitrixBundle\\\\Model\\\\CitrixModel\\:\\:syncEvent\\(\\) has parameter \\$eventName with no type specified\\.$#"
-			count: 1
-			path: plugins/MauticCitrixBundle/Model/CitrixModel.php
-
-		-
-			message: "#^Method MauticPlugin\\\\MauticCitrixBundle\\\\Model\\\\CitrixModel\\:\\:syncEvent\\(\\) has parameter \\$product with no type specified\\.$#"
-			count: 1
-			path: plugins/MauticCitrixBundle/Model/CitrixModel.php
-
-		-
-			message: "#^Method MauticPlugin\\\\MauticCitrixBundle\\\\Model\\\\CitrixModel\\:\\:syncEvent\\(\\) has parameter \\$productId with no type specified\\.$#"
-			count: 1
-			path: plugins/MauticCitrixBundle/Model/CitrixModel.php
-
-		-
 			message: "#^Parameter \\#1 \\$entityName of method Doctrine\\\\ORM\\\\EntityManager\\:\\:getRepository\\(\\) expects class\\-string\\<MauticCitrixBundle\\:CitrixEvent\\>, string given\\.$#"
 			count: 1
 			path: plugins/MauticCitrixBundle/Model/CitrixModel.php
@@ -69366,32 +68926,12 @@ parameters:
 			path: plugins/MauticClearbitBundle/Controller/PublicController.php
 
 		-
-			message: "#^Call to an undefined method Symfony\\\\Component\\\\Routing\\\\RouterInterface\\:\\:trans\\(\\)\\.$#"
-			count: 8
-			path: plugins/MauticClearbitBundle/EventListener/ButtonSubscriber.php
-
-		-
-			message: "#^Call to an undefined method Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\:\\:generate\\(\\)\\.$#"
-			count: 4
-			path: plugins/MauticClearbitBundle/EventListener/ButtonSubscriber.php
-
-		-
 			message: "#^Method MauticPlugin\\\\MauticClearbitBundle\\\\EventListener\\\\ButtonSubscriber\\:\\:injectViewButtons\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: plugins/MauticClearbitBundle/EventListener/ButtonSubscriber.php
 
 		-
 			message: "#^Parameter \\#3 \\$route of method Mautic\\\\CoreBundle\\\\Event\\\\CustomButtonEvent\\:\\:addButton\\(\\) expects string\\|null, array\\<int, array\\<string, string\\>\\|string\\> given\\.$#"
-			count: 1
-			path: plugins/MauticClearbitBundle/EventListener/ButtonSubscriber.php
-
-		-
-			message: "#^Property MauticPlugin\\\\MauticClearbitBundle\\\\EventListener\\\\ButtonSubscriber\\:\\:\\$router \\(Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\) does not accept Symfony\\\\Component\\\\Routing\\\\RouterInterface\\.$#"
-			count: 1
-			path: plugins/MauticClearbitBundle/EventListener/ButtonSubscriber.php
-
-		-
-			message: "#^Property MauticPlugin\\\\MauticClearbitBundle\\\\EventListener\\\\ButtonSubscriber\\:\\:\\$translator \\(Symfony\\\\Component\\\\Routing\\\\RouterInterface\\) does not accept Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\.$#"
 			count: 1
 			path: plugins/MauticClearbitBundle/EventListener/ButtonSubscriber.php
 
@@ -70562,16 +70102,6 @@ parameters:
 
 		-
 			message: "#^Method MauticPlugin\\\\MauticCrmBundle\\\\Command\\\\FetchPipedriveDataCommand\\:\\:getData\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: plugins/MauticCrmBundle/Command/FetchPipedriveDataCommand.php
-
-		-
-			message: "#^Method MauticPlugin\\\\MauticCrmBundle\\\\Command\\\\FetchPipedriveDataCommand\\:\\:getData\\(\\) has parameter \\$endPoint with no type specified\\.$#"
-			count: 1
-			path: plugins/MauticCrmBundle/Command/FetchPipedriveDataCommand.php
-
-		-
-			message: "#^Method MauticPlugin\\\\MauticCrmBundle\\\\Command\\\\FetchPipedriveDataCommand\\:\\:getData\\(\\) has parameter \\$type with no type specified\\.$#"
 			count: 1
 			path: plugins/MauticCrmBundle/Command/FetchPipedriveDataCommand.php
 
@@ -77957,21 +77487,6 @@ parameters:
 			path: plugins/MauticSocialBundle/Command/MauticSocialMonitoringCommand.php
 
 		-
-			message: "#^Property MauticPlugin\\\\MauticSocialBundle\\\\Command\\\\MauticSocialMonitoringCommand\\:\\:\\$batchSize has no type specified\\.$#"
-			count: 1
-			path: plugins/MauticSocialBundle/Command/MauticSocialMonitoringCommand.php
-
-		-
-			message: "#^Property MauticPlugin\\\\MauticSocialBundle\\\\Command\\\\MauticSocialMonitoringCommand\\:\\:\\$maxPerIterations \\(int\\|null\\) does not accept float\\.$#"
-			count: 1
-			path: plugins/MauticSocialBundle/Command/MauticSocialMonitoringCommand.php
-
-		-
-			message: "#^Property MauticPlugin\\\\MauticSocialBundle\\\\Command\\\\MauticSocialMonitoringCommand\\:\\:\\$monitorRepo has no type specified\\.$#"
-			count: 1
-			path: plugins/MauticSocialBundle/Command/MauticSocialMonitoringCommand.php
-
-		-
 			message: "#^Strict comparison using \\!\\=\\= between null and null will always evaluate to false\\.$#"
 			count: 1
 			path: plugins/MauticSocialBundle/Command/MauticSocialMonitoringCommand.php
@@ -78159,11 +77674,6 @@ parameters:
 		-
 			message: "#^Parameter \\#1 \\$className of method Doctrine\\\\Persistence\\\\ObjectManager\\:\\:getRepository\\(\\) expects class\\-string\\<MauticLeadBundle\\:DoNotContact\\>, string given\\.$#"
 			count: 1
-			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
-
-		-
-			message: "#^Parameter \\#3 \\$action of method MauticPlugin\\\\MauticSocialBundle\\\\Model\\\\MonitoringModel\\:\\:createForm\\(\\) expects null, string given\\.$#"
-			count: 2
 			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
 
 		-
@@ -79157,11 +78667,6 @@ parameters:
 			path: plugins/MauticSocialBundle/Integration/LinkedInIntegration.php
 
 		-
-			message: "#^Call to an undefined method Symfony\\\\Component\\\\Translation\\\\TranslatorInterface\\:\\:transConditional\\(\\)\\.$#"
-			count: 7
-			path: plugins/MauticSocialBundle/Integration/SocialIntegration.php
-
-		-
 			message: "#^Call to method add\\(\\) on an unknown class Mautic\\\\PluginBundle\\\\Integration\\\\Form\\.$#"
 			count: 1
 			path: plugins/MauticSocialBundle/Integration/SocialIntegration.php
@@ -79332,21 +78837,6 @@ parameters:
 			path: plugins/MauticSocialBundle/Model/MonitoringModel.php
 
 		-
-			message: "#^Method MauticPlugin\\\\MauticSocialBundle\\\\Model\\\\MonitoringModel\\:\\:getFormByType\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: plugins/MauticSocialBundle/Model/MonitoringModel.php
-
-		-
-			message: "#^Method MauticPlugin\\\\MauticSocialBundle\\\\Model\\\\MonitoringModel\\:\\:getNetworkTypes\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: plugins/MauticSocialBundle/Model/MonitoringModel.php
-
-		-
-			message: "#^Method MauticPlugin\\\\MauticSocialBundle\\\\Model\\\\MonitoringModel\\:\\:getRepository\\(\\) should return bool\\|Mautic\\\\CoreBundle\\\\Entity\\\\CommonRepository but returns Doctrine\\\\ORM\\\\EntityRepository\\<MauticSocialBundle\\:Monitoring\\>\\.$#"
-			count: 1
-			path: plugins/MauticSocialBundle/Model/MonitoringModel.php
-
-		-
 			message: "#^Method MauticPlugin\\\\MauticSocialBundle\\\\Model\\\\MonitoringModel\\:\\:saveEntity\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: plugins/MauticSocialBundle/Model/MonitoringModel.php
@@ -79357,32 +78847,7 @@ parameters:
 			path: plugins/MauticSocialBundle/Model/MonitoringModel.php
 
 		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\|null\\)\\: Unexpected token \"\\|\", expected type at offset 53$#"
-			count: 1
-			path: plugins/MauticSocialBundle/Model/MonitoringModel.php
-
-		-
-			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
-			count: 1
-			path: plugins/MauticSocialBundle/Model/MonitoringModel.php
-
-		-
-			message: "#^PHPDoc tag @var does not specify variable name\\.$#"
-			count: 1
-			path: plugins/MauticSocialBundle/Model/MonitoringModel.php
-
-		-
-			message: "#^Parameter \\#1 \\$entityName of method Doctrine\\\\ORM\\\\EntityManager\\:\\:getRepository\\(\\) expects class\\-string\\<MauticSocialBundle\\:Monitoring\\>, string given\\.$#"
-			count: 1
-			path: plugins/MauticSocialBundle/Model/MonitoringModel.php
-
-		-
 			message: "#^Property MauticPlugin\\\\MauticSocialBundle\\\\Model\\\\MonitoringModel\\:\\:\\$networkTypes has no type specified\\.$#"
-			count: 1
-			path: plugins/MauticSocialBundle/Model/MonitoringModel.php
-
-		-
-			message: "#^Variable \\$action in empty\\(\\) always exists and is always falsy\\.$#"
 			count: 1
 			path: plugins/MauticSocialBundle/Model/MonitoringModel.php
 
@@ -79700,4 +79165,3 @@ parameters:
 			message: "#^Call to an undefined method MauticPlugin\\\\MauticTagManagerBundle\\\\Security\\\\Permissions\\\\TagManagerPermissions\\:\\:expects\\(\\)\\.$#"
 			count: 1
 			path: plugins/MauticTagManagerBundle/Tests/Unit/Security/Permissions/TagManagerPermissionsTest.php
-
