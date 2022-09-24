@@ -8,16 +8,16 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
-        // Wait 20 seconds then execute the campaign again to send scheduled events
-        sleep(20);
+        // Wait 4 seconds then execute the campaign again to send scheduled events
+        sleep(4);
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // No open email decisions should be recorded yet
         $byEvent = $this->getCampaignEventLogs([3]);
         $this->assertCount(0, $byEvent[3]);
 
-        // Wait 20 seconds to go beyond the inaction timeframe
-        sleep(20);
+        // Wait 4 seconds to go beyond the inaction timeframe
+        sleep(4);
 
         // Now they should be inactive
         $this->runCommand('mautic:campaigns:validate', ['--decision-id' => 3, '--contact-id' => 1]);
@@ -32,16 +32,16 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
-        // Wait 20 seconds then execute the campaign again to send scheduled events
-        sleep(20);
+        // Wait 4 seconds then execute the campaign again to send scheduled events
+        sleep(4);
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
         // No open email decisions should be recorded yet
         $byEvent = $this->getCampaignEventLogs([3]);
         $this->assertCount(0, $byEvent[3]);
 
-        // Wait 20 seconds to go beyond the inaction timeframe
-        sleep(20);
+        // Wait 4 seconds to go beyond the inaction timeframe
+        sleep(4);
 
         // Now they should be inactive
         $this->runCommand('mautic:campaigns:validate', ['--decision-id' => 3, '--contact-ids' => '1,2,3']);
@@ -56,16 +56,16 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
-        // Wait 20 seconds then execute the campaign again to send scheduled events
-        sleep(20);
+        // Wait 4 seconds then execute the campaign again to send scheduled events
+        sleep(4);
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
         // No open email decisions should be recorded yet
         $byEvent = $this->getCampaignEventLogs([3]);
         $this->assertCount(0, $byEvent[3]);
 
-        // Wait 20 seconds to go beyond the inaction timeframe
-        sleep(20);
+        // Wait 4 seconds to go beyond the inaction timeframe
+        sleep(4);
 
         // Remove a contact from the campaign
         $this->db->createQueryBuilder()->update(MAUTIC_TABLE_PREFIX.'campaign_leads')
