@@ -349,7 +349,6 @@ class HubspotIntegration extends CrmAbstractIntegration
                        'label_attr'  => ['class' => 'control-label'],
                        'attr'        => [
                            'class'    => 'form-control',
-                           'readonly' => true,
                        ],
                        'required'    => false,
                    ]
