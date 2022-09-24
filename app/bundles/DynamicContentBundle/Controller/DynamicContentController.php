@@ -113,7 +113,7 @@ class DynamicContentController extends FormController
      */
     public function newAction($entity = null)
     {
-        if (!$this->accessGranted('dynamiccontent:dynamiccontents:viewown')) {
+        if (!$this->get('mautic.security')->isGranted('dynamiccontent:dynamiccontents:create')) {
             return $this->accessDenied();
         }
 
@@ -485,6 +485,8 @@ class DynamicContentController extends FormController
                     'msg'     => 'mautic.dynamicContent.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
+
+                return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
             } elseif (!$this->get('mautic.security')->hasEntityAccess(
                 'dynamiccontent:dynamiccontents:deleteown',
                 'dynamiccontent:dynamiccontents:deleteother',
