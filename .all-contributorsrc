@@ -842,6 +842,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "AlanWierzchonCA",
+      "name": "Alan Wierzchoń",
+      "avatar_url": "https://avatars.githubusercontent.com/u/100592709?v=4",
+      "profile": "https://github.com/AlanWierzchonCA",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
