@@ -2,7 +2,8 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,7 +11,7 @@ use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 
-abstract class ModeratedCommand extends ContainerAwareCommand
+abstract class ModeratedCommand extends Command
 {
     const MODE_PID   = 'pid';
     const MODE_FLOCK = 'flock';
@@ -37,6 +38,15 @@ abstract class ModeratedCommand extends ContainerAwareCommand
      * @var OutputInterface
      */
     protected $output;
+
+    protected PathsHelper $pathsHelper;
+
+    public function __construct(PathsHelper $pathsHelper)
+    {
+        $this->pathsHelper = $pathsHelper;
+
+        parent::__construct();
+    }
 
     /**
      * Set moderation options.
@@ -91,7 +101,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         $this->moderationKey = $this->getName().$moderationKey;
 
         // Setup the run directory for lock/pid files
-        $this->runDirectory = $this->getContainer()->getParameter('kernel.cache_dir').'/../run';
+        $this->runDirectory = $this->pathsHelper->getSystemPath('cache').'/../run';
         if (!file_exists($this->runDirectory) && !@mkdir($this->runDirectory)) {
             // This needs to throw an exception in order to not silently fail when there is an issue
             throw new \RuntimeException($this->runDirectory.' could not be created.');

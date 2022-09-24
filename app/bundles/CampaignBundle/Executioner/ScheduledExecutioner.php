@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ScheduledExecutioner implements ExecutionerInterface
 {

@@ -61,7 +61,7 @@ class TriggerApiController extends CommonApiController
                 $triggerEventForm = $this->createTriggerEventEntityForm($triggerEventEntity);
                 $triggerEventForm->submit($eventParams, 'PATCH' !== $method);
 
-                if (!$triggerEventForm->isValid()) {
+                if (!($triggerEventForm->isSubmitted() && $triggerEventForm->isValid())) {
                     $formErrors = $this->getFormErrorMessages($triggerEventForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
 

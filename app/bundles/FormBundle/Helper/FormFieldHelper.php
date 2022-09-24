@@ -3,8 +3,8 @@
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EqualTo;
@@ -75,7 +75,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
      *
      * @param ValidatorInterface $validator
      */
-    public function __construct(TranslatorInterface $translator, ValidatorInterface $validator = null)
+    public function __construct(Translator $translator, ValidatorInterface $validator = null)
     {
         $this->translator = $translator;
 
