@@ -380,12 +380,28 @@ class ReportSubscriber implements EventSubscriberInterface
             case self::CONTEXT_PAGE_HITS:
                 $event->applyDateFilters($qb, 'date_hit', 'ph');
 
-                $qb->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
-                    ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id')
-                    ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'tp', 'p.id = tp.id')
-                    ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'vp', 'p.id = vp.id')
-                    ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'r', 'r.id = ph.redirect_id')
-                    ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = ph.device_id');
+                $qb->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
+
+                if ($event->usesColumnWithPrefix('tp') && $event->usesColumnWithPrefix('vp')) {
+                    $qb->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id')
+                       ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'tp', 'p.id = tp.id')
+                       ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'vp', 'p.id = vp.id');
+                } elseif ($event->usesColumnWithPrefix('tp')) {
+                    $qb->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id')
+                       ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'tp', 'p.id = tp.id');
+                } elseif ($event->usesColumnWithPrefix('vp')) {
+                    $qb->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id')
+                       ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'vp', 'p.id = vp.id');
+                } elseif ($event->usesColumnWithPrefix('p')) {
+                    $qb->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
+                }
+
+                if ($event->usesColumnWithPrefix('r')) {
+                    $qb->leftJoin('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'r', 'r.id = ph.redirect_id');
+                }
+                if ($event->usesColumnWithPrefix('ds')) {
+                    $qb->leftJoin('ph', MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = ph.device_id');
+                }
 
                 $event->addIpAddressLeftJoin($qb, 'ph');
                 $event->addCategoryLeftJoin($qb, 'p');
@@ -447,7 +463,9 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 case 'mautic.page.graph.line.time.on.site':
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
-                    $queryBuilder->select('TIMESTAMPDIFF(SECOND, ph.date_hit, ph.date_left) as data, ph.date_hit as date');
+                    $queryBuilder->select('generated_date_diff, ph.date_hit as date');
+                    $queryBuilder->resetQueryPart('join');
+                    $queryBuilder->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
                     $queryBuilder->andWhere($qb->expr()->isNotNull('ph.date_left'));
 
                     $hits = $chartQuery->loadAndBuildTimeData($queryBuilder);
@@ -464,6 +482,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
                     foreach ($timesOnSite as $time) {
                         $q = clone $queryBuilder;
+                        $q->resetQueryPart('join');
                         $chartQuery->modifyCountDateDiffQuery($q, 'date_hit', 'date_left', $time['from'], $time['till'], 'ph');
                         $data = $chartQuery->fetchCountDateDiff($q);
                         $chart->setDataset($time['label'], $data);
@@ -523,6 +542,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     break;
                 case 'mautic.page.graph.pie.devices':
                     $queryBuilder->select('ds.device, COUNT(distinct(ph.id)) as the_count')
+                        ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = ph.device_id')
                         ->groupBy('ds.device');
                     $data  = $queryBuilder->execute()->fetchAll();
                     $chart = new PieChart();

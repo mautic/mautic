@@ -83,14 +83,13 @@ class LeadEventLogRepository extends CommonRepository
                     '
                       )
                         ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
-                        ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
+                        ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id and e.event_type != :eventType')
                         ->join('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
                         ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fl', 'fl.log_id = ll.id')
-                        ->andWhere('e.event_type != :eventType')
                         ->setParameter('eventType', 'decision');
 
         if ($leadId) {
-            $query->where('ll.lead_id = '.(int) $leadId);
+            $query->andWhere('ll.lead_id = '.(int) $leadId);
         }
 
         if (isset($options['scheduledState'])) {
@@ -124,7 +123,17 @@ class LeadEventLogRepository extends CommonRepository
             );
         }
 
-        return $this->getTimelineResults($query, $options, 'e.name', 'll.date_triggered', ['metadata'], ['dateTriggered', 'triggerDate']);
+        $preferred_index = null;
+
+        if ($leadId && isset($options['scheduledState'])) {
+            if ($options['order']) {
+                $preferred_index = 'search_1';
+            } else {
+                $preferred_index = 'campaign_event_upcoming_search';
+            }
+        }
+
+        return $this->getTimelineResults($query, $options, 'e.name', 'll.date_triggered', ['metadata'], ['dateTriggered', 'triggerDate'], null, $preferred_index);
     }
 
     /**
