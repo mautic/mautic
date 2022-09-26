@@ -86,6 +86,7 @@ $firewalls = [
             'lifetime' => '%mautic.rememberme_lifetime%',
             'path'     => '%mautic.rememberme_path%',
             'domain'   => '%mautic.rememberme_domain%',
+            'samesite' => 'lax',
         ],
         'fos_oauth'     => true,
         'context'       => 'mautic',
