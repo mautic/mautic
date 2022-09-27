@@ -35716,11 +35716,6 @@ parameters:
 			path: app/bundles/InstallBundle/Tests/Install/InstallServiceTest.php
 
 		-
-			message: "#^Method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:getParameter\\(\\) has invalid return type UnitEnum\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
-
-		-
 			message: "#^Method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:getParameter\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
@@ -35737,11 +35732,6 @@ parameters:
 
 		-
 			message: "#^Method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:setParameter\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
-
-		-
-			message: "#^Parameter \\$value of method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:setParameter\\(\\) has invalid type UnitEnum\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
 
