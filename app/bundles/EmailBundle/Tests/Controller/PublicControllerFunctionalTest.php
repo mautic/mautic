@@ -15,8 +15,6 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['show_contact_preferences']           = 1;
-        $this->configParams['preferences_center_success_message'] = 'Success';
-
         parent::setUp();
     }
 
@@ -36,7 +34,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testContactPreferencesSaveMessage(): void
     {
-        $lead = $this->getLead();
+        $lead = $this->createLead();
         $stat = $this->getStat(null, $lead);
         $this->em->flush();
 
@@ -45,7 +43,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submitForm('Save');
 
         $this->assertEquals(1, $crawler->filter('#success-message-text')->count());
-        $this->assertEquals('Success', $crawler->filter('#success-message-text')->text());
+        $this->assertEquals('Preferences saved successfully', trim($crawler->filter('#success-message-text')->text()));
         $this->assertTrue($this->client->getResponse()->isOk());
     }
 

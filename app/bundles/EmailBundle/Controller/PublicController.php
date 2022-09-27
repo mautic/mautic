@@ -191,7 +191,7 @@ class PublicController extends CommonFormController
                 ];
 
                 if ($session->get($successSessionName)) {
-                    $viewParameters['successMessage'] = $this->coreParametersHelper->getParameter('preferences_center_success_message');
+                    $viewParameters['successMessage'] = $this->translator->trans('mautic.email.preferences_center_success_message.text');
                 }
 
                 $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);
