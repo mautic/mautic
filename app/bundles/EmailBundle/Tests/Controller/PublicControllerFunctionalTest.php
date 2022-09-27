@@ -45,6 +45,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submitForm('Save');
 
         $this->assertEquals(1, $crawler->filter('#success-message-text')->count());
+        $this->assertEquals('Success', $crawler->filter('#success-message-text')->text());
         $this->assertTrue($this->client->getResponse()->isOk());
     }
 
@@ -133,7 +134,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         return $form;
     }
 
-    protected function getLead(): Lead
+    protected function createLead(): Lead
     {
         $lead = new Lead();
         $lead->setEmail('john@doe.email');
