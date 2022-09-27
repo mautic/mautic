@@ -3,9 +3,9 @@
 namespace Mautic\UserBundle\Security\Authentication\Token;
 
 use InvalidArgumentException;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 
 class PluginToken extends AbstractToken implements GuardTokenInterface
@@ -19,8 +19,8 @@ class PluginToken extends AbstractToken implements GuardTokenInterface
     private ?Response $response;
 
     /**
-     * @param User|string|null $user
-     * @param array<string>    $roles
+     * @param UserInterface|string|null $user
+     * @param array<string>             $roles
      */
     public function __construct(
         ?string $providerKey,

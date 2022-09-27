@@ -73,10 +73,8 @@ class SecurityController extends CommonController
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';
-            } elseif ($error instanceof \Exception) {
-                $msg = $error->getMessage();
             } else {
-                $msg = $error;
+                $msg = $error->getMessage();
             }
 
             $this->addFlash($msg, [], 'error', null, false);

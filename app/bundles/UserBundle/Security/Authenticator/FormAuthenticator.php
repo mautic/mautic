@@ -7,6 +7,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\AuthenticationEvent;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\UserEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -26,7 +27,6 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
 use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class FormAuthenticator extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
 {
@@ -169,28 +169,5 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
     protected function getLoginUrl(): string
     {
         return $this->urlGenerator->generate(self::LOGIN_ROUTE);
-    }
-
-    public function createAuthenticatedToken(UserInterface $user, $providerKey): PluginToken
-    {
-        if ($user instanceof User) {
-            return new PluginToken(
-                $providerKey,
-                $this->authenticatingService,
-                $user,
-                $user->getPassword(),
-                $user->getRoles(),
-                $this->authEventResponse
-            );
-        }
-
-        return new PluginToken(
-            $providerKey,
-            $this->authenticatingService,
-            $user,
-            '',
-            [],
-            $this->authEventResponse
-        );
     }
 }
