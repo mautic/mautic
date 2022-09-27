@@ -42,7 +42,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         Assert::assertTrue($response->isOk(), $response->getContent());
         $responseData = json_decode($response->getContent(), true);
-        Assert::assertSame(1, $responseData['success'], $response->getContent());
+        Assert::assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
     }
 
     /**
@@ -54,7 +54,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
             'country'  => ['country', 'India'],
             'region'   => ['state', 'Arizona'],
             'timezone' => ['timezone', 'Marigot'],
-            'locale'   => ['preferred_locale', 'Afrikaans'],
+            'locale'   => ['preferred_locale', 'af'],
         ];
     }
 }
