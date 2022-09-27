@@ -125,6 +125,13 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Rector Cache
+      uses: actions/cache@v3
+      with:
+        path: ./var/cache/rector
+        key: ${{ runner.os }}-rector-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-rector-
+
     - name: Get changed files
       id: changed-files
       uses: tj-actions/changed-files@v18.7
@@ -145,6 +152,7 @@ jobs:
         if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
           composer phpstan
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
+          export SYMFONY_ENV=test
           bin/console cache:warmup
           composer rector -- --dry-run --no-progress-bar
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
