@@ -14,7 +14,7 @@ class PluginToken extends AbstractToken implements GuardTokenInterface
 
     private string $credentials;
 
-    private string $authenticatingService;
+    private ?string $authenticatingService;
 
     private ?Response $response;
 
@@ -36,7 +36,10 @@ class PluginToken extends AbstractToken implements GuardTokenInterface
             throw new InvalidArgumentException('$providerKey must not be empty.');
         }
 
-        $this->setUser($user);
+        if (null !== $user) {
+            $this->setUser($user);
+        }
+
         $this->authenticatingService = $authenticatingService;
         $this->credentials           = $credentials;
         $this->providerKey           = $providerKey;
