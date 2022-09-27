@@ -9,13 +9,13 @@ use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class AbstractCommonModel
 {
@@ -40,7 +40,7 @@ abstract class AbstractCommonModel
     protected $router;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     protected $translator;
 
@@ -79,7 +79,7 @@ abstract class AbstractCommonModel
         $this->router = $router;
     }
 
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(Translator $translator)
     {
         $this->translator = $translator;
     }

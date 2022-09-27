@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Tag;
@@ -17,7 +18,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ImportContactSubscriber implements EventSubscriberInterface
 {
@@ -170,7 +171,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
         // In case $matchedFields['tags'] === null ...
         $tags = ArrayHelper::pickValue('tags', $matchedFields, []);
         // ...we must ensure we pass an [] to array_map
-        $tags = is_array($tags) ? $tags : [];
+        $tags = $tags instanceof ArrayCollection ? $tags->toArray() : [];
 
         return array_map(fn (Tag $tag) => $tag->getTag(), $tags);
     }
@@ -195,7 +196,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
         $missingRequiredFields = array_diff_key($requiredFields, array_flip($matchedFields));
 
         // Check for the presense of company mapped fields
-        $companyFields = array_filter($matchedFields, fn ($fieldname) => 0 === strpos($fieldname, 'company'));
+        $companyFields = array_filter($matchedFields, fn ($fieldname) => is_string($fieldname) && 0 === strpos($fieldname, 'company'));
 
         // If we have any, ensure all required company fields are mapped.
         if (count($companyFields)) {

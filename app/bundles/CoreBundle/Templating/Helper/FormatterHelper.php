@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Templating\Helper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormatterHelper extends Helper
 {

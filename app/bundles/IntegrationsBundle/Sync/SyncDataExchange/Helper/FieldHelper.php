@@ -19,7 +19,7 @@ use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInte
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldHelper
 {
@@ -163,7 +163,7 @@ class FieldHelper
         $this->syncFields[$objectName]['mautic_internal_id'] = $this->translator->trans('mautic.core.id');
 
         if (Contact::NAME !== $objectName) {
-            uasort($this->syncFields[$objectName], 'strnatcmp');
+            uksort($this->syncFields[$objectName], 'strnatcmp');
 
             return $this->syncFields[$objectName];
         }
@@ -177,7 +177,7 @@ class FieldHelper
         // Add the timeline link
         $this->syncFields[$objectName]['mautic_internal_contact_timeline'] = $this->translator->trans('mautic.integration.sync.contact_timeline');
 
-        uasort($this->syncFields[$objectName], 'strnatcmp');
+        uksort($this->syncFields[$objectName], 'strnatcmp');
 
         return $this->syncFields[$objectName];
     }

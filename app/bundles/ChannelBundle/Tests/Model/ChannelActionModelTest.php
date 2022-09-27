@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
 {

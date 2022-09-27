@@ -18,13 +18,18 @@ class DoctrineEventSubscriber implements EventSubscriber
 
     public function postGenerateSchema(GenerateSchemaEventArgs $args): void
     {
-        $schema = $args->getSchema();
-
-        $fieldGroups['leads']     = FieldModel::$coreFields;
-        $fieldGroups['companies'] = FieldModel::$coreCompanyFields;
+        $fieldGroups = [
+            'leads'     => FieldModel::$coreFields,
+            'companies' => FieldModel::$coreCompanyFields,
+        ];
 
         foreach ($fieldGroups as $tableName => $fields) {
-            $table = $schema->getTable(MAUTIC_TABLE_PREFIX.$tableName);
+            $fullTableName = MAUTIC_TABLE_PREFIX.$tableName;
+            if (!$args->getSchema()->hasTable($fullTableName)) {
+                // Ignore during plugin installations as not all tables are present in the schema.
+                continue;
+            }
+            $table = $args->getSchema()->getTable($fullTableName);
 
             foreach ($fields as $alias => $field) {
                 if (!$table->hasColumn($alias)) {
