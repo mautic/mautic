@@ -14,7 +14,7 @@ use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInte
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldHelperTest extends TestCase
 {
@@ -94,10 +94,10 @@ class FieldHelperTest extends TestCase
 
         $this->assertEquals(
             [
+                'email',
+                'mautic_internal_contact_timeline',
                 'mautic_internal_dnc_email',
                 'mautic_internal_id',
-                'mautic_internal_contact_timeline',
-                'email',
             ],
             array_keys($fields)
         );
@@ -120,10 +120,10 @@ class FieldHelperTest extends TestCase
 
         $this->assertEquals(
             [
+                'email',
+                'mautic_internal_contact_timeline',
                 'mautic_internal_dnc_email',
                 'mautic_internal_id',
-                'mautic_internal_contact_timeline',
-                'email',
             ],
             array_keys($fields)
         );

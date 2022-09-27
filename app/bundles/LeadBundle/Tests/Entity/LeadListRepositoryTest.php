@@ -45,8 +45,6 @@ class LeadListRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $this->connection       = $this->createMock(Connection::class);
         $entityManager          = $this->createMock(EntityManager::class);
         $classMetadata          = $this->createMock(ClassMetadata::class);
@@ -128,7 +126,7 @@ class LeadListRepositoryTest extends TestCase
                 ],
                 [
                     MAUTIC_TABLE_PREFIX.'lead_lists_leads',
-                    'l USE INDEX '.MAUTIC_TABLE_PREFIX.'(manually_removed)',
+                    'l USE INDEX ('.MAUTIC_TABLE_PREFIX.'manually_removed)',
                 ]
             )
             ->willReturnOnConsecutiveCalls($this->queryBuilderMock, $this->queryBuilderMock);

@@ -29,7 +29,7 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CoreSubscriber implements EventSubscriberInterface
 {
@@ -347,7 +347,7 @@ class CoreSubscriber implements EventSubscriberInterface
                                 $standardDetails,
                                 [
                                     'path'       => $pathBase.$standardDetails['path'],
-                                    'controller' => $controller.':'.$standardDetails['action'],
+                                    'controller' => $controller.':'.$standardDetails['action'].'Action',
                                     'method'     => $standardDetails['method'],
                                 ]
                             );

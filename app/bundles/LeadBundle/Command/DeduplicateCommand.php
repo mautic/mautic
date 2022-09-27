@@ -3,11 +3,12 @@
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DeduplicateCommand extends ModeratedCommand
 {
@@ -21,12 +22,9 @@ class DeduplicateCommand extends ModeratedCommand
      */
     private $translator;
 
-    /**
-     * DeduplicateCommand constructor.
-     */
-    public function __construct(ContactDeduper $contactDeduper, TranslatorInterface $translator)
+    public function __construct(ContactDeduper $contactDeduper, TranslatorInterface $translator, PathsHelper $pathsHelper)
     {
-        parent::__construct();
+        parent::__construct($pathsHelper);
 
         $this->contactDeduper = $contactDeduper;
         $this->translator     = $translator;

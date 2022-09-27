@@ -857,7 +857,7 @@ class AjaxController extends CommonAjaxController
                         $options = FormFieldHelper::getTimezonesChoices();
                         break;
                     case 'locale':
-                        $options = FormFieldHelper::getLocaleChoices();
+                        $options = array_flip(FormFieldHelper::getLocaleChoices());
                         break;
                     case 'date':
                     case 'datetime':
@@ -996,9 +996,8 @@ class AjaxController extends CommonAjaxController
     private function prepareJsonResponse(int $leadCount): array
     {
         return [
-            'html' => $this->translator->transChoice(
+            'html' => $this->translator->trans(
                 'mautic.lead.list.viewleads_count',
-                $leadCount,
                 ['%count%' => $leadCount]
             ),
             'leadCount' => $leadCount,

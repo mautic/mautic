@@ -3,22 +3,42 @@
 namespace Mautic\EmailBundle\Tests\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Command\ProcessEmailQueueCommand;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject&CoreParametersHelper
+     */
     private $coreParametersHelper;
+
+    /**
+     * @var MockObject&PathsHelper
+     */
+    private $pathsHelper;
+
+    /**
+     * @var MockObject&EventDispatcherInterface
+     */
     private $dispatcher;
-    private $container;
+
+    /**
+     * @var MockObject&\Swift_Transport
+     */
     private $transport;
+
+    /**
+     * @var MockObject&Application
+     */
     private $application;
 
     /**
@@ -32,7 +52,7 @@ class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->container            = $this->createMock(Container::class);
+        $this->pathsHelper          = $this->createMock(PathsHelper::class);
         $this->transport            = $this->createMock(\Swift_Transport::class);
         $this->application          = $this->createMock(Application::class);
 
@@ -47,8 +67,12 @@ class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
         $inputDefinition->method('getOptions')
             ->willReturn([]);
 
-        $this->command = new ProcessEmailQueueCommand($this->transport, $this->dispatcher, $this->coreParametersHelper);
-        $this->command->setContainer($this->container);
+        $this->command = new ProcessEmailQueueCommand(
+            $this->transport,
+            $this->dispatcher,
+            $this->coreParametersHelper,
+            $this->pathsHelper
+        );
         $this->command->setApplication($this->application);
     }
 

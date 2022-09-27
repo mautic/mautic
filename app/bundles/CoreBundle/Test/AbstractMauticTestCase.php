@@ -7,11 +7,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use InvalidArgumentException;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
-use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -106,22 +104,12 @@ abstract class AbstractMauticTestCase extends WebTestCase
         return $this->traitLoadFixtureFiles($paths, $append, $omName, $registryName, $purgeMode);
     }
 
-    private function mockServices()
+    private function mockServices(): void
     {
-        $cookieHelper = $this->getMockBuilder(CookieHelper::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['setCookie', 'setCharset'])
-            ->getMock();
-
-        $cookieHelper->expects($this->any())
-            ->method('setCookie');
-
-        self::$container->set('mautic.helper.cookie', $cookieHelper);
-
         self::$container->set('session', new Session(new FixedMockFileSessionStorage()));
     }
 
-    protected function applyMigrations()
+    protected function applyMigrations(): void
     {
         $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
         $output = new BufferedOutput();
@@ -131,7 +119,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $application->run($input, $output);
     }
 
-    protected function installDatabaseFixtures(array $classNames = [])
+    protected function installDatabaseFixtures(array $classNames = []): void
     {
         $this->loadFixtures($classNames);
     }
@@ -176,10 +164,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $application->setCatchExceptions(false);
 
         if ($command) {
-            if ($command instanceof ContainerAwareCommand) {
-                $command->setContainer(self::$container);
-            }
-
             // Register the command
             $application->add($command);
         }

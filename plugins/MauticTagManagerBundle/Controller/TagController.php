@@ -100,7 +100,7 @@ class TagController extends FormController
                     'page' => $lastPage,
                     'tmpl' => $tmpl,
                 ],
-                'contentTemplate' => 'MauticTagManagerBundle:Tag:index',
+                'contentTemplate' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_tagmanager_index',
                     'mauticContent' => 'tagmanager',
@@ -196,7 +196,7 @@ class TagController extends FormController
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticTagManagerBundle:Tag:index',
+                    'contentTemplate' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_tagmanager_index',
                         'mauticContent' => 'tagmanager',
@@ -396,13 +396,13 @@ class TagController extends FormController
         if ($objectId) {
             $returnUrl       = $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId'=> $objectId]);
             $viewParameters  = ['objectAction' => 'view', 'objectId'=> $objectId];
-            $contentTemplate = 'MauticTagManagerBundle:Tag:view';
+            $contentTemplate = 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::viewAction';
         } else {
             //set the page we came from
             $page            = $this->get('session')->get('mautic.tagmanager.page', 1);
             $returnUrl       = $this->generateUrl('mautic_tagmanager_index', ['page' => $page]);
             $viewParameters  = ['page' => $page];
-            $contentTemplate = 'MauticTagManagerBundle:Tag:index';
+            $contentTemplate = 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction';
         }
 
         return [
@@ -441,7 +441,7 @@ class TagController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'MauticTagManagerBundle:Tag:index',
+                'contentTemplate' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_tagmanager_index',
                     'mauticContent' => 'tagmanager',
@@ -489,7 +489,7 @@ class TagController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:index',
+            'contentTemplate' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'mauticContent' => 'tagmanager',
@@ -558,7 +558,7 @@ class TagController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:index',
+            'contentTemplate' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'mauticContent' => 'tagmanager',

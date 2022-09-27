@@ -10,13 +10,13 @@ return [
         'public' => [
             'mautic_plugin_clearbit_index' => [
                 'path'       => '/clearbit/callback',
-                'controller' => 'MauticClearbitBundle:Public:callback',
+                'controller' => 'MauticPlugin\MauticClearbitBundle\Controller\PublicController::callbackAction',
             ],
         ],
         'main' => [
             'mautic_plugin_clearbit_action' => [
                 'path'       => '/clearbit/{objectAction}/{objectId}',
-                'controller' => 'MauticClearbitBundle:Clearbit:execute',
+                'controller' => 'MauticPlugin\MauticClearbitBundle\Controller\ClearbitController::executeAction',
             ],
         ],
     ],

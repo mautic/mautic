@@ -13,13 +13,6 @@ use PHPUnit\Framework\Assert;
 
 class LeadDetailFunctionalTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-    }
-
     public function testCustomFieldOrderIsRespected(): void
     {
         $lead = new Lead();
@@ -50,7 +43,7 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $lead->setFields([
             'core' => [
                 'First Name' => [
-                    'value' => 'Joe',
+                    'value' => 'John',
                 ],
                 'Last Name' => [
                     'value' => 'Doe',
