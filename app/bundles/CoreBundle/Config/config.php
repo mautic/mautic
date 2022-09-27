@@ -409,11 +409,6 @@ return [
                 ],
                 'alias' => 'date',
             ],
-            'mautic.helper.template.exception' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\ExceptionHelper',
-                'arguments' => '%kernel.root_dir%',
-                'alias'     => 'exception',
-            ],
             'mautic.helper.template.gravatar' => [
                 'class'     => \Mautic\CoreBundle\Templating\Helper\GravatarHelper::class,
                 'arguments' => [

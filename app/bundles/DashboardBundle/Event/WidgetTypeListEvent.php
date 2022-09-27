@@ -5,7 +5,7 @@ namespace Mautic\DashboardBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class WidgetTypeListEvent.
