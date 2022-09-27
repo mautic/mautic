@@ -4,101 +4,141 @@ declare(strict_types=1);
 
 namespace Mautic\Middleware\Tests;
 
-use Mautic\Middleware\ConfigAwareTrait;
+use Exception;
+use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\Middleware\HSTSMiddleware;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Util\Exception;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use PHPUnit\Framework\ExpectationFailedException as PHPUnitException;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionProperty;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class HSTSMiddlewareTest extends \PHPUnit\Framework\TestCase
+class HSTSMiddlewareTest extends AbstractMauticTestCase
 {
-    use ConfigAwareTrait;
-
     const HSTS_KEY = 'strict-transport-security';
 
-    protected bool $enableHSTS;
-    protected bool $includeDubDomains;
-    protected int $expireTime;
-    protected array $responseHeaders;
-    protected string $HSTSValue;
+    protected ReflectionProperty $addHSTS;
+    protected ReflectionProperty $includeDubDomains;
+    protected HSTSMiddleware $middleware;
+    protected ReflectionClass $middlewareReflection;
 
     /**
-     * @throws RedirectionExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
+     * @throws ReflectionException
      */
     protected function setUp(): void
     {
-        $config                  = $this->getConfig();
-        $this->enableHSTS        = array_key_exists('headers_sts', $config) && (bool) $config['headers_sts'];
-        $this->includeDubDomains = array_key_exists('headers_sts_subdomains', $config) && (bool) $config['headers_sts_subdomains'];
-        $this->expireTime        = $config['headers_sts_expire_time'] ?? 0;
+        parent::setUp();
+        $this->middleware           = new HSTSMiddleware($this->client->getKernel());
+        $this->middlewareReflection = new ReflectionClass($this->middleware);
 
-        $client                = HttpClient::create();
-        $response              = $client->request('GET', ($config['site_url'] ?? '').'s/login');
-        $this->responseHeaders = $response->getHeaders();
+        $this->addHSTS = $this->middlewareReflection->getProperty('enableHSTS');
+        $this->addHSTS->setAccessible(true);
 
-        if ($this->enableHSTS) {
-            $this->HSTSValue = $this->responseHeaders[self::HSTS_KEY][0] ?? '';
-
-            if (isset($this->responseHeaders[self::HSTS_KEY]) && isset($this->responseHeaders[self::HSTS_KEY][0])) {
-                $this->HSTSValue = $this->responseHeaders[self::HSTS_KEY][0];
-            } else {
-                throw new Exception('Strict-Transport-Security is enabled but is missing from the response headers');
-            }
-        }
+        $this->includeDubDomains = $this->middlewareReflection->getProperty('includeDubDomains');
+        $this->includeDubDomains->setAccessible(true);
     }
 
-    public function testPresence(): void
+    protected function testResponseHeaders(): void
     {
-        if (!empty($this->responseHeaders) && $this->enableHSTS) {
-            Assert::assertArrayHasKey(
-                self::HSTS_KEY,
-                $this->responseHeaders,
-                'Strict-Transport-Security is enabled but is missing from the response headers'
-            );
-        } else {
-            Assert::assertArrayNotHasKey(
-                self::HSTS_KEY,
-                $this->responseHeaders,
-                'Strict-Transport-Security is disabled but is present in response headers'
-            );
-        }
+        $response = $this->getMiddlewareResponse();
+
+        Assert::assertNotEmpty($response->headers);
     }
 
-    public function testIncludeSubdomains(): void
+    public function testHSTSEnabled(): void
     {
-        if ($this->enableHSTS) {
-            $needle = 'includeSubDomains';
+        $this->setHSTS(true);
+        $response = $this->getMiddlewareResponse();
 
-            if ($this->includeDubDomains) {
-                Assert::assertStringContainsString(
-                    $needle,
-                    $this->HSTSValue,
-                    'Option include Subdomains is enabled but is missing from the HSTS value'
-                );
-            } else {
-                Assert::assertStringNotContainsStringIgnoringCase(
-                    $needle,
-                    $this->HSTSValue,
-                    'Option include Subdomains is disabled but is present in HSTS value'
-                );
-            }
-        }
+        Assert::assertTrue(
+            $response->headers->has(self::HSTS_KEY),
+            'Strict-Transport-Security is enabled but is missing from the response headers'
+        );
     }
 
+    public function testHSTSDisabled(): void
+    {
+        $this->setHSTS(false);
+        $response = $this->getMiddlewareResponse();
+
+        Assert::assertFalse(
+            $response->headers->has(self::HSTS_KEY),
+            'Strict-Transport-Security is disabled but is present in response headers'
+        );
+    }
+
+    public function testIncludeSubdomainsEnabled(): void
+    {
+        $needle = 'includeSubDomains';
+        $this->setHSTS(true);
+        $this->setIncludeDubDomainsValue(true);
+        $response = $this->getMiddlewareResponse();
+
+        Assert::assertStringContainsString(
+            $needle,
+            $response->headers->get(self::HSTS_KEY),
+            'Option include Subdomains is enabled but is missing from the HSTS value'
+        );
+    }
+
+    public function testIncludeSubdomainsDisabled(): void
+    {
+        $needle = 'includeSubDomains';
+        $this->setHSTS(true);
+        $this->setIncludeDubDomainsValue(false);
+
+        $response = $this->getMiddlewareResponse();
+
+        Assert::assertStringNotContainsStringIgnoringCase(
+            $needle,
+            $this->getHSTSValue($response),
+            'Option include Subdomains is disabled but is present in HSTS value'
+        );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
     public function testExpireTime(): void
     {
-        if ($this->enableHSTS) {
-            Assert::assertMatchesRegularExpression(
-                '/max-age='.$this->expireTime.'(; includeSubDomains)?/',
-                $this->HSTSValue,
-                'Expire time does not match the configuration'
-            );
+        $this->setHSTS(true);
+        $expireTimeValue = 12345;
+        $expireTime      = $this->middlewareReflection->getProperty('expireTime');
+        $expireTime->setAccessible(true);
+        $expireTime->setValue($this->middleware, $expireTimeValue);
+
+        $response = $this->getMiddlewareResponse();
+
+        Assert::assertMatchesRegularExpression(
+            '/max-age='.$expireTimeValue.'(; includeSubDomains)?/',
+            $this->getHSTSValue($response),
+            'Expire time does not match the configuration'
+        );
+    }
+
+    private function setHSTS(bool $value): void
+    {
+        $this->addHSTS->setValue($this->middleware, $value);
+    }
+
+    private function setIncludeDubDomainsValue(bool $value): void
+    {
+        $this->includeDubDomains->setValue($this->middleware, $value);
+    }
+
+    private function getHSTSValue(Response $response): string
+    {
+        return $response->headers->get(self::HSTS_KEY) ?? '';
+    }
+
+    private function getMiddlewareResponse(): Response
+    {
+        try {
+            return $this->middleware->handle(Request::create('s/login', Request::METHOD_GET));
+        } catch (Exception $e) {
+            throw new PHPUnitException($e->getMessage());
         }
     }
 }
