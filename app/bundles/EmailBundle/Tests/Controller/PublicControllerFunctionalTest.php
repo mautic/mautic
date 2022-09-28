@@ -14,7 +14,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
-        $this->configParams['show_contact_preferences']           = 1;
+        $this->configParams['show_contact_preferences'] = 1;
         parent::setUp();
     }
 
