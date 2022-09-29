@@ -135,9 +135,9 @@ export default class BuilderService {
           { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-'] },
           { name: 'colors', items: ['TextColor', 'BGColor'] },
           { name: 'document', items: ['Source'] },
-          { name: 'insert', items: ['SpecialChar'] },
+          { name: 'insert', items: ['SpecialChar','Token'] },
         ],
-        extraPlugins: ['sharedspace', 'colorbutton'],
+        extraPlugins: ['sharedspace', 'colorbutton', 'mautictoken'],
       },
     };
   }
