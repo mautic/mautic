@@ -461,8 +461,8 @@ class TagController extends FormController
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId' => $tag->getId()]),
             'viewParameters' => [
-                'tag' => $tag,
-                'security' => $security
+                'tag'      => $tag,
+                'security' => $security,
             ],
             'contentTemplate' => 'MauticTagManagerBundle:Tag:details.html.twig',
             'passthroughVars' => [
