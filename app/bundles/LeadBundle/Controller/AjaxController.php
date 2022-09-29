@@ -78,6 +78,10 @@ class AjaxController extends CommonAjaxController
                     $name = $this->translator->trans('mautic.lead.lead.anonymous');
                 }
 
+                if ($lead->getOwner()){
+                    $name.= $this->translator->trans('mautic.lead.lead.created_by_owner', ['%owner%'=> $lead->getOwner()->getName()]);
+                }
+
                 $leadLink = $this->generateUrl('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $lead->getId()]);
 
                 $dataArray['items'][] = [
@@ -983,3 +987,4 @@ class AjaxController extends CommonAjaxController
         ];
     }
 }
+
