@@ -14,9 +14,9 @@ class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
 
     const PRIORITY = 900;
 
-    protected bool $enableHSTS        = false;
-    protected bool $includeDubDomains = false;
-    protected int $expireTime         = 0;
+    protected bool $enableHSTS;
+    protected bool $includeDubDomains;
+    protected int $expireTime;
     protected HttpKernelInterface $app;
 
     public function __construct(HttpKernelInterface $app)
@@ -25,7 +25,7 @@ class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
         $this->config            = $this->getConfig();
         $this->enableHSTS        = array_key_exists('headers_sts', $this->config) && (bool) $this->config['headers_sts'];
         $this->includeDubDomains = array_key_exists('headers_sts_subdomains', $this->config) && (bool) $this->config['headers_sts_subdomains'];
-        $this->expireTime        = $this->config['headers_sts_expire_time'] ?? 0;
+        $this->expireTime        = $this->config['headers_sts_expire_time'] ?? 60;
     }
 
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response

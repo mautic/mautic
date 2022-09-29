@@ -12,6 +12,7 @@ use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -645,13 +646,14 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'headers_sts_expire_time',
-            NumberType::class,
+            IntegerType::class,
             [
                 'label' => 'mautic.core.config.response.headers.sts.expire_time',
-                'data'  => $options['data']['headers_sts_expire_time'] ?? 0,
+                'data'  => $options['data']['headers_sts_expire_time'] ?? 60,
                 'attr'  => [
                     'class'        => 'form-control',
                     'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                    'min'          => 60,
                 ],
             ]
         );
