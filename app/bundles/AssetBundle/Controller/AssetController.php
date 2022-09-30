@@ -502,24 +502,20 @@ class AssetController extends FormController
                             'objectId'     => $entity->getId(),
                         ]),
                     ]);
-
-                    $returnUrl = $this->generateUrl('mautic_asset_action', [
-                        'objectAction' => 'view',
-                        'objectId'     => $entity->getId(),
-                    ]);
-                    $viewParams = ['objectId' => $entity->getId()];
-                    $template   = 'MauticAssetBundle:Asset:view';
                 }
             } else {
                 //clear any modified content
                 $session->remove('mautic.asestbuilder.'.$objectId.'.content');
                 //unlock the entity
                 $model->unlockEntity($entity);
-
-                $returnUrl  = $this->generateUrl('mautic_asset_index', ['page' => $page]);
-                $viewParams = ['page' => $page];
-                $template   = 'MauticAssetBundle:Asset:index';
             }
+
+            $returnUrl = $this->generateUrl('mautic_asset_action', [
+                'objectAction' => 'view',
+                'objectId'     => $entity->getId(),
+            ]);
+            $viewParams = ['objectId' => $entity->getId()];
+            $template   = 'MauticAssetBundle:Asset:view';
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
