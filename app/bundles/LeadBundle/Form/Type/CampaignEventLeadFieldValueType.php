@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -100,10 +101,10 @@ class CampaignEventLeadFieldValueType extends AbstractType
                                 $fieldValues = FormFieldHelper::getCountryChoices();
                                 break;
                             case 'region':
-                                $fieldValues = FormFieldHelper::getRegionChoices();
+                                $fieldValues = ArrayHelper::flatten(FormFieldHelper::getRegionChoices());
                                 break;
                             case 'timezone':
-                                $fieldValues = FormFieldHelper::getTimezonesChoices();
+                                $fieldValues = ArrayHelper::flatten(FormFieldHelper::getTimezonesChoices());
                                 break;
                             case 'locale':
                                 // Locales are flipped. And yes, we will flip the array again below.
