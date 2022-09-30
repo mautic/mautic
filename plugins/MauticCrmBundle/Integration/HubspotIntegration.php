@@ -33,10 +33,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
+    protected UserHelper $userHelper;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -92,65 +89,100 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * {@inheritdoc}
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
-            $this->getApiKey() => 'mautic.hubspot.form.apikey',
+            $this->getAppIdKey()        => 'mautic.hubspot.form.app_id',
+            $this->getClientIdKey()     => 'mautic.hubspot.form.client_id',
+            $this->getClientSecretKey() => 'mautic.hubspot.form.client_secret',
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getApiKey()
+    public function getAppIdKey(): string
     {
-        return 'hapikey';
+        return 'app_id';
     }
 
     /**
-     * Get the array key for the auth token.
-     *
-     * @return string
+     * @return array<int, string>
      */
-    public function getAuthTokenKey()
-    {
-        return 'hapikey';
-    }
-
-    /**
-     * @return array
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead', 'get_leads'];
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
-        return 'key';
+        return 'oauth2';
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl()
+    public function getApiUrl(): string
     {
         return 'https://api.hubapi.com';
     }
 
     /**
-     * Get if data priority is enabled in the integration or not default is false.
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function getDataPriority()
+    public function getAuthenticationUrl(): string
+    {
+        return 'https://app.hubspot.com/oauth/authorize';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAccessTokenUrl(): string
+    {
+        return $this->getApiUrl().'/oauth/v1/token';
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getRefreshTokenKeys(): array
+    {
+        return ['refresh_token', 'expires'];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function prepareResponseForExtraction($data): array
+    {
+        if (is_array($data) && isset($data['expires_in'])) {
+            $data['expires'] = $data['expires_in'] + time();
+        }
+
+        return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAuthScope(): string
+    {
+        return 'crm.objects.companies.read crm.objects.contacts.read';
+    }
+
+    public function getBearerToken($inAuthorization = false): ?string
+    {
+        if (!$inAuthorization && isset($this->keys[$this->getAuthTokenKey()])) {
+            return $this->keys[$this->getAuthTokenKey()];
+        }
+
+        return null;
+    }
+
+    /**
+     * Get if data priority is enabled in the integration or not default is false.
+     */
+    public function getDataPriority(): string
     {
         return true;
     }
@@ -291,7 +323,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      *
      * @return bool
      */
-    public function isAuthorized()
+    public function isAuthorized(): bool
     {
         $keys = $this->getKeys();
 
