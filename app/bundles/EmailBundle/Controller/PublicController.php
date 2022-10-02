@@ -260,6 +260,14 @@ class PublicController extends CommonFormController
                 }
 
                 if (empty($html)) {
+                    // If the session has the 'mautic.email.prefscenter.success' attribute, a success message is displayed
+                    if ($session->has($successSessionName)) {
+                        $displaySuccessMessage = true;
+                        $session->remove($successSessionName);
+                    } else {
+                        $displaySuccessMessage = false;
+                    }
+
                     $html = $this->get('mautic.helper.templating')->getTemplating()->render(
                         'MauticEmailBundle:Lead:preference_options.html.php',
                         array_merge(
@@ -273,6 +281,7 @@ class PublicController extends CommonFormController
                                         'objectId'     => $lead->getId(),
                                     ]
                                 ),
+                                'displaySuccessMessage' => $displaySuccessMessage,
                             ]
                         )
                     );

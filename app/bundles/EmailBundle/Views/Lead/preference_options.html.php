@@ -152,7 +152,13 @@ JS;
                 ?>
             </div>
             <div class="panel-footer text-left">
-                <?php echo $view['form']->row($form['buttons']['save']); unset($form['buttons']['cancel']); ?></div>
+                <?php echo $view['form']->row($form['buttons']['save']); unset($form['buttons']['cancel']); ?>
+                <?php if (true === $displaySuccessMessage): ?>
+                    <div class="text-success" style="margin-top: 15px;">
+                        <?php echo $view['translator']->trans('mautic.core.slot.label.successmessage.insert'); ?>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 
