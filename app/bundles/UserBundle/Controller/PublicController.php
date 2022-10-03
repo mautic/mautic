@@ -16,10 +16,6 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Type\PasswordResetConfirmType;
 use Mautic\UserBundle\Form\Type\PasswordResetType;
 use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends FormController
 {
@@ -66,7 +62,7 @@ class PublicController extends FormController
         ]);
     }
 
-    public function passwordResetConfirmAction(): RedirectResponse|JsonResponse|Response
+    public function passwordResetConfirmAction(): mixed
     {
         /** @var UserModel $model */
         $model = $this->getModel('user');
@@ -100,10 +96,8 @@ class PublicController extends FormController
                             $encodedPassword = $model->checkNewPassword($user, $encoder, $data['plainPassword']);
                             $user->setPassword($encodedPassword);
                             $model->saveEntity($user);
-
                             $this->addFlash('mautic.user.user.notice.passwordreset.success');
                             $this->request->getSession()->remove('resetToken');
-
                             return $this->redirect($this->generateUrl('login'));
                         }
 
