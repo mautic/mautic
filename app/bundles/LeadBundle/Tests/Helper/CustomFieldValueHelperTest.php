@@ -131,7 +131,7 @@ class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAnonimizationFields()
+    public function testAnonimizationFields(): void
     {
         $fields = [
             'core' => [

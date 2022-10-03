@@ -38,23 +38,23 @@ class ReportModel extends FormModel
 {
     const CHANNEL_FEATURE = 'reporting';
 
-    private $reportBuilderData;
+    private array $reportBuilderData;
 
-    protected $defaultPageLimit;
+    protected mixed $defaultPageLimit;
 
-    protected $templatingHelper;
+    protected TemplatingHelper $templatingHelper;
 
-    protected $channelListHelper;
+    protected ChannelListHelper $channelListHelper;
 
-    protected $session;
+    protected Session $session;
 
-    protected $fieldModel;
+    protected FieldModel $fieldModel;
 
-    protected $reportHelper;
+    protected ReportHelper $reportHelper;
 
-    private $csvExporter;
+    private CsvExporter $csvExporter;
 
-    private $excelExporter;
+    private ExcelExporter $excelExporter;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,

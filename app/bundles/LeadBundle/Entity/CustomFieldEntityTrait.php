@@ -12,18 +12,18 @@ trait CustomFieldEntityTrait
     /**
      * Used by Mautic to populate the fields pulled from the DB.
      */
-    protected $fields = [];
+    protected array $fields = [];
 
     /**
      * Just a place to store updated field values so we don't have to loop through them again comparing.
      */
-    protected $updatedFields = [];
+    protected array $updatedFields = [];
 
     /**
      * A place events can use to pass data around on the object to prevent issues like creating a contact and having it processed to be sent back
      * to the origin of creation in a webhook (like Pipedrive).
      */
-    protected $eventData = [];
+    protected array $eventData = [];
 
     /**
      * @param $name
@@ -257,7 +257,7 @@ trait CustomFieldEntityTrait
      *
      * @return array
      */
-    public function getAnonimizationProfileFields()
+    public function getAnonimizationProfileFields(): array
     {
         if (isset($this->fields['core'])) {
             $fieldValues = [
