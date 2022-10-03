@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Decorator;
 
 use Mautic\LeadBundle\Entity\RegexTrait;
@@ -114,6 +105,9 @@ class BaseDecorator implements FilterDecoratorInterface
         }
 
         switch ($contactSegmentFilterCrate->getOperator()) {
+            case 'in':
+            case '!in':
+                return !is_array($filter) ? explode('|', $filter) : $filter;
             case 'like':
             case '!like':
                 return false === strpos($filter, '%') ? '%'.$filter.'%' : $filter;

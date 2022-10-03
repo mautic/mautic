@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -81,6 +72,11 @@ class CampaignSubscriber implements EventSubscriberInterface
      * @var CoreParametersHelper
      */
     private $coreParametersHelper;
+
+    /**
+     * @var array
+     */
+    private $fields;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -494,12 +490,13 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $operators = $this->leadModel->getFilterExpressionFunctions();
                 $field     = $event->getConfig()['field'];
                 $value     = $event->getConfig()['value'];
-                $fields    = $lead->getFields(true);
+                $fields    = $this->getFields($lead);
 
-                $result = $this->leadFieldModel->getRepository()->compareValue(
+                $fieldValue = isset($fields[$field]) ? CustomFieldHelper::fieldValueTransfomer($fields[$field], $value) : $value;
+                $result     = $this->leadFieldModel->getRepository()->compareValue(
                     $lead->getId(),
                     $field,
-                    CustomFieldHelper::fieldValueTransfomer($fields[$field], $value),
+                    $fieldValue,
                     $operators[$event->getConfig()['operator']]['expr']
                 );
             }
@@ -520,5 +517,16 @@ class CampaignSubscriber implements EventSubscriberInterface
             $event->getConfig()['field'],
             $triggerDate->format('Y-m-d')
         );
+    }
+
+    protected function getFields(Lead $lead): array
+    {
+        if (!$this->fields) {
+            $contactFields = $lead->getFields(true);
+            $companyFields = $this->leadFieldModel->getFieldListWithProperties('company');
+            $this->fields  = array_merge($contactFields, $companyFields);
+        }
+
+        return $this->fields;
     }
 }

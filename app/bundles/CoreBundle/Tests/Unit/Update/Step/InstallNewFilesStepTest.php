@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Exception\UpdateFailedException;
@@ -17,7 +8,7 @@ use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\CoreBundle\Update\Step\InstallNewFilesStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InstallNewFilesStepTest extends AbstractStepTest
 {
@@ -82,7 +73,7 @@ class InstallNewFilesStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
 
         $this->assertFileExists($resourcePath.'/update');
-        $this->assertFileNotExists($resourcePath.'/update-test.zip');
+        $this->assertFileDoesNotExist($resourcePath.'/update-test.zip');
 
         // Cleanup
         $filesystem = new Filesystem();
@@ -118,7 +109,7 @@ class InstallNewFilesStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
 
         $this->assertFileExists($resourcePath.'/update');
-        $this->assertFileNotExists($resourcePath.'/update-test.zip');
+        $this->assertFileDoesNotExist($resourcePath.'/update-test.zip');
 
         // Cleanup
         $filesystem = new Filesystem();

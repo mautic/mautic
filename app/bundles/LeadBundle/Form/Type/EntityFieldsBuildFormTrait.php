@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\BooleanType;
@@ -22,12 +13,14 @@ use Mautic\CoreBundle\Form\Type\TimezoneType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Form\FieldAliasToFqcnMap;
+use Mautic\LeadBundle\Form\Validator\Constraints\EmailAddress;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Validator\Constraints\Length;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -155,9 +148,7 @@ trait EntityFieldsBuildFormTrait
                         $opts['data']                = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
                     } else {
                         $opts['attr']['data-toggle'] = 'time';
-                        $opts['model_timezone']      = 'UTC';
                         // $opts['with_seconds']   = true; // @todo figure out why this cause the contact form to fail.
-                        $opts['view_timezone'] = date_default_timezone_get();
                         $opts['data']          = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
                     }
 
@@ -254,6 +245,7 @@ trait EntityFieldsBuildFormTrait
                     switch ($type) {
                         case LookupType::class:
                             $attr['data-target'] = $alias;
+                            $constraints[]       = new Length(['max' => 191]);
                             if (!empty($properties['list'])) {
                                 $attr['data-options'] = FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, array_keys(FormFieldHelper::parseList($properties['list'])));
                             }
@@ -261,11 +253,7 @@ trait EntityFieldsBuildFormTrait
                         case EmailType::class:
                             // Enforce a valid email
                             $attr['data-encoding'] = 'email';
-                            $constraints[]         = new Email(
-                                [
-                                    'message' => 'mautic.core.email.required',
-                                ]
-                            );
+                            $constraints[]         = new EmailAddress();
                             break;
                         case TextType::class:
                             $constraints[] = new Length(['max' => 191]);
@@ -273,6 +261,12 @@ trait EntityFieldsBuildFormTrait
 
                         case MultiselectType::class:
                             $constraints[] = new Length(['max' => 65535]);
+                            break;
+
+                        case TextareaType::class:
+                            if (!empty($properties['allowHtml'])) {
+                                $cleaningRules[$field['alias']] = 'html';
+                            }
                             break;
                     }
 

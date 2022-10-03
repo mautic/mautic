@@ -2,19 +2,11 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Helper;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
+use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
@@ -191,5 +183,17 @@ class FieldHelperTest extends TestCase
             Contact::ENTITY,
             $this->fieldHelper->getFieldObjectName(Contact::NAME)
         );
+    }
+
+    public function testGetNormalizedFieldType(): void
+    {
+        $this->assertEquals(NormalizedValueDAO::BOOLEAN_TYPE, $this->fieldHelper->getNormalizedFieldType('boolean'));
+        $this->assertEquals(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('date'));
+        $this->assertEquals(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('datetime'));
+        $this->assertEquals(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('time'));
+        $this->assertEquals(NormalizedValueDAO::FLOAT_TYPE, $this->fieldHelper->getNormalizedFieldType('number'));
+        $this->assertEquals(NormalizedValueDAO::SELECT_TYPE, $this->fieldHelper->getNormalizedFieldType('select'));
+        $this->assertEquals(NormalizedValueDAO::MULTISELECT_TYPE, $this->fieldHelper->getNormalizedFieldType('multiselect'));
+        $this->assertEquals(NormalizedValueDAO::STRING_TYPE, $this->fieldHelper->getNormalizedFieldType('default'));
     }
 }

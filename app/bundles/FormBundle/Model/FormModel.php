@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Model;
 
 use DOMDocument;
@@ -16,7 +7,7 @@ use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
@@ -51,7 +42,7 @@ class FormModel extends CommonFormModel
     protected $templatingHelper;
 
     /**
-     * @var ThemeHelper
+     * @var ThemeHelperInterface
      */
     protected $themeHelper;
 
@@ -101,7 +92,7 @@ class FormModel extends CommonFormModel
     public function __construct(
         RequestStack $requestStack,
         TemplatingHelper $templatingHelper,
-        ThemeHelper $themeHelper,
+        ThemeHelperInterface $themeHelper,
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
         FormFieldHelper $fieldHelper,
@@ -270,8 +261,16 @@ class FormModel extends CommonFormModel
             }
             $field->setForm($entity);
             $field->setSessionId($key);
-            $field->setOrder($order);
-            ++$order;
+            if (!$field->getParent()) {
+                $field->setOrder($order);
+                ++$order;
+            } else {
+                if (isset($sessionFields[$field->getParent()]['order'])) {
+                    $field->setOrder($sessionFields[$field->getParent()]['order']);
+                } else {
+                    $field->setOrder($order);
+                }
+            }
             $entity->addField($properties['id'], $field);
         }
 
@@ -521,6 +520,40 @@ class FormModel extends CommonFormModel
             return ($a->getOrder() < $b->getOrder()) ? -1 : 1;
         });
 
+        [$pages, $lastPage] = $this->getPages($fields);
+        $html               = $this->templatingHelper->getTemplating()->render(
+            $theme.'MauticFormBundle:Builder:form.html.php',
+            [
+                'fieldSettings'  => $this->getCustomComponents()['fields'],
+                'viewOnlyFields' => $this->getCustomComponents()['viewOnlyFields'],
+                'fields'         => $fields,
+                'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
+                'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'form'           => $entity,
+                'theme'          => $theme,
+                'submissions'    => $submissions,
+                'lead'           => $lead,
+                'formPages'      => $pages,
+                'lastFormPage'   => $lastPage,
+                'style'          => $style,
+                'inBuilder'      => false,
+            ]
+        );
+
+        if (!$entity->usesProgressiveProfiling()) {
+            $entity->setCachedHtml($html);
+
+            if ($persist) {
+                //bypass model function as events aren't needed for this
+                $this->getRepository()->saveEntity($entity);
+            }
+        }
+
+        return $html;
+    }
+
+    public function getPages(array $fields): array
+    {
         $pages = ['open' => [], 'close' => []];
 
         $openFieldId  =
@@ -560,35 +593,7 @@ class FormModel extends CommonFormModel
             }
         }
 
-        $html = $this->templatingHelper->getTemplating()->render(
-            $theme.'MauticFormBundle:Builder:form.html.php',
-            [
-                'fieldSettings'  => $this->getCustomComponents()['fields'],
-                'viewOnlyFields' => $this->getCustomComponents()['viewOnlyFields'],
-                'fields'         => $fields,
-                'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
-                'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
-                'form'           => $entity,
-                'theme'          => $theme,
-                'submissions'    => $submissions,
-                'lead'           => $lead,
-                'formPages'      => $pages,
-                'lastFormPage'   => $lastPage,
-                'style'          => $style,
-                'inBuilder'      => false,
-            ]
-        );
-
-        if (!$entity->usesProgressiveProfiling()) {
-            $entity->setCachedHtml($html);
-
-            if ($persist) {
-                //bypass model function as events aren't needed for this
-                $this->getRepository()->saveEntity($entity);
-            }
-        }
-
-        return $html;
+        return [$pages, $lastPage];
     }
 
     /**
@@ -683,7 +688,7 @@ class FormModel extends CommonFormModel
         ];
         $ignoreTypes = $this->getCustomComponents()['viewOnlyFields'];
         foreach ($fields as $f) {
-            if (!in_array($f->getType(), $ignoreTypes) && false !== $f->getSaveResult()) {
+            if (!in_array($f->getType(), $ignoreTypes)) {
                 $columns[] = [
                     'name'    => $f->getAlias(),
                     'type'    => 'text',
@@ -1083,10 +1088,26 @@ class FormModel extends CommonFormModel
             return;
         }
 
+        $list = $this->getContactFieldPropertiesList($contactFieldAlias);
+
+        if (!empty($list)) {
+            $formFieldProps['list'] = ['list' => $list];
+            if (array_key_exists('optionlist', $formFieldProps)) {
+                $formFieldProps['optionlist'] = ['list' => $list];
+            }
+            $formField->setProperties($formFieldProps);
+        }
+    }
+
+    /**
+     * @return mixed[]|null
+     */
+    public function getContactFieldPropertiesList(string $contactFieldAlias): ?array
+    {
         $contactField = $this->leadFieldModel->getEntityByAlias($contactFieldAlias);
 
         if (empty($contactField) || !in_array($contactField->getType(), ContactFieldHelper::getListTypes())) {
-            return;
+            return null;
         }
 
         $contactFieldProps = $contactField->getProperties();
@@ -1095,7 +1116,7 @@ class FormModel extends CommonFormModel
             case 'select':
             case 'multiselect':
             case 'lookup':
-                $list = isset($contactFieldProps['list']) ? $contactFieldProps['list'] : [];
+                $list = $contactFieldProps['list'] ?? [];
                 break;
             case 'boolean':
                 $list = [$contactFieldProps['no'], $contactFieldProps['yes']];
@@ -1113,16 +1134,10 @@ class FormModel extends CommonFormModel
                 $list = ContactFieldHelper::getLocaleChoices();
                 break;
             default:
-                return;
+                return null;
         }
 
-        if (!empty($list)) {
-            $formFieldProps['list'] = ['list' => $list];
-            if (array_key_exists('optionlist', $formFieldProps)) {
-                $formFieldProps['optionlist'] = ['list' => $list];
-            }
-            $formField->setProperties($formFieldProps);
-        }
+        return $list;
     }
 
     /**

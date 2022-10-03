@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Joomla\Filter\InputFilter;
@@ -33,6 +24,31 @@ class InputHelper
      * @var InputFilter
      */
     private static $strictHtmlFilter;
+
+    /**
+     * Adjust the boolean values from text to boolean.
+     * Do not convert null to false.
+     * Do not convert invalid values to false, but return null.
+     *
+     * @param bool|int|string|null $value
+     *
+     * @return bool|null
+     */
+    public static function boolean($value)
+    {
+        // Common strings used that filter_var does not parse yet.
+        switch (strtoupper((string) $value)) {
+            case 'T':
+            case 'Y':
+                return true;
+
+            case 'F':
+            case 'N':
+                return false;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    }
 
     /**
      * @param bool $html

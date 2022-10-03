@@ -1,18 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Helper;
 
 use Doctrine\Common\Collections\Collection;
-use Joomla\Http\Http;
+use GuzzleHttp\Client;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
@@ -23,31 +14,19 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CampaignHelper
 {
-    /**
-     * @var Http
-     */
-    protected $connector;
-
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
+    protected Client $client;
+    protected CompanyModel $companyModel;
 
     /**
      * Cached contact values in format [contact_id => [key1 => val1, key2 => val1]].
-     *
-     * @var array
      */
-    private $contactsValues = [];
+    private array $contactsValues = [];
 
-    /**
-     * @var EventDispatcher
-     */
-    private $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
-    public function __construct(Http $connector, $companyModel, EventDispatcherInterface $dispatcher)
+    public function __construct(Client $client, CompanyModel $companyModel, EventDispatcherInterface $dispatcher)
     {
-        $this->connector    = $connector;
+        $this->client       = $client;
         $this->companyModel = $companyModel;
         $this->dispatcher   = $dispatcher;
     }
@@ -112,26 +91,38 @@ class CampaignHelper
         switch ($method) {
             case 'get':
                 $payload  = $url.(parse_url($url, PHP_URL_QUERY) ? '&' : '?').http_build_query($payload);
-                $response = $this->connector->get($payload, $headers, $timeout);
+                $response = $this->client->get($payload, [
+                    \GuzzleHttp\RequestOptions::HEADERS => $headers,
+                    \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                ]);
                 break;
             case 'post':
             case 'put':
             case 'patch':
-                $headers = array_change_key_case($headers);
+                $headers  = array_change_key_case($headers);
+                $options  = [
+                    \GuzzleHttp\RequestOptions::HEADERS     => $headers,
+                    \GuzzleHttp\RequestOptions::TIMEOUT     => $timeout,
+                ];
                 if (array_key_exists('content-type', $headers) && 'application/json' == strtolower($headers['content-type'])) {
-                    $payload                 = json_encode($payload);
+                    $options[\GuzzleHttp\RequestOptions::BODY] = json_encode($payload);
+                } else {
+                    $options[\GuzzleHttp\RequestOptions::FORM_PARAMS] = $payload;
                 }
-                $response = $this->connector->$method($url, $payload, $headers, $timeout);
+            $response = $this->client->request($method, $url, $options);
                 break;
             case 'delete':
-                $response = $this->connector->delete($url, $headers, $timeout, $payload);
+                $response = $this->client->delete($url, [
+                    \GuzzleHttp\RequestOptions::HEADERS => $headers,
+                    \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                ]);
                 break;
             default:
                 throw new \InvalidArgumentException('HTTP method "'.$method.' is not supported."');
         }
 
-        if (!in_array($response->code, [200, 201])) {
-            throw new \OutOfRangeException('Campaign webhook response returned error code: '.$response->code);
+        if (!in_array($response->getStatusCode(), [200, 201])) {
+            throw new \OutOfRangeException('Campaign webhook response returned error code: '.$response->getStatusCode());
         }
     }
 

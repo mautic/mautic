@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Menu;
 
 use Knp\Menu\FactoryInterface;
@@ -120,6 +111,11 @@ class MenuBuilder
             $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
 
             $menuItems    = $event->getMenuItems();
+
+            // KNP Menu explicitly requires a menu name since v3
+            if (empty($menuItems['name'])) {
+                $menuItems['name'] = $name;
+            }
             $menus[$name] = $loader->load($menuItems);
         }
 

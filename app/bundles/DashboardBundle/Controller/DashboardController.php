@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
@@ -320,8 +311,11 @@ class DashboardController extends AbstractFormController
         }
 
         $name = $this->getNameFromRequest();
+
+        /** @var DashboardModel $dashboardModel */
+        $dashboardModel = $this->getModel('dashboard');
         try {
-            $this->getModel('dashboard')->saveSnapshot($name);
+            $dashboardModel->saveSnapshot($name);
             $type = 'notice';
             $msg  = $this->translator->trans('mautic.dashboard.notice.save', [
                 '%name%'    => $name,

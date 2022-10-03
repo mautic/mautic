@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -214,16 +205,12 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getExecutionDateTime')
             ->willReturn(new \DateTime());
 
-        $this->eventScheduler->expects($this->at(1))
+        $this->eventScheduler->expects($this->exactly(2))
             ->method('shouldSchedule')
-            ->willReturn(true);
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $this->eventScheduler->expects($this->once())
             ->method('scheduleForContact');
-
-        $this->eventScheduler->expects($this->at(3))
-            ->method('shouldSchedule')
-            ->willReturn(false);
 
         // This is how we know if the test failed/passed
         $this->executioner->expects($this->once())
@@ -361,16 +348,12 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getExecutionDateTime')
             ->willReturn(new \DateTime());
 
-        $this->eventScheduler->expects($this->at(1))
+        $this->eventScheduler->expects($this->exactly(2))
             ->method('shouldSchedule')
-            ->willReturn(true);
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $this->eventScheduler->expects($this->once())
             ->method('scheduleForContact');
-
-        $this->eventScheduler->expects($this->at(3))
-            ->method('shouldSchedule')
-            ->willReturn(false);
 
         $this->executioner->expects($this->once())
             ->method('executeEventsForContact');

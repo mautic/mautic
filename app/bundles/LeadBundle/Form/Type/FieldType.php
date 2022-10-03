@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
@@ -138,25 +129,37 @@ class FieldType extends AbstractType
             ]
         );
 
-        $listChoices = [
-            'country'  => FormFieldHelper::getCountryChoices(),
-            'region'   => FormFieldHelper::getRegionChoices(),
-            'timezone' => FormFieldHelper::getTimezonesChoices(),
-            'locale'   => FormFieldHelper::getLocaleChoices(),
-            'select'   => [],
-        ];
+        $builder->add(
+            'properties_textarea_template',
+            YesNoButtonGroupType::class,
+            [
+                'label'       => 'mautic.lead.field.form.properties.allowhtml',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'required'    => false,
+                'mapped'      => false,
+                'data'        => isset($options['data']->getProperties()['allowHtml']) ? $options['data']->getProperties()['allowHtml'] : false,
+            ]
+        );
 
+        $listChoices = [
+            'country'       => FormFieldHelper::getCountryChoices(),
+            'region'        => FormFieldHelper::getRegionChoices(),
+            'timezone'      => FormFieldHelper::getTimezonesChoices(),
+            'locale'        => FormFieldHelper::getLocaleChoices(),
+            'select'        => [],
+        ];
         foreach ($listChoices as $listType => $choices) {
             $builder->add(
                 'default_template_'.$listType,
                 ChoiceType::class,
                 [
-                    'choices'           => $choices,
-                    'label'             => 'mautic.core.defaultvalue',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'attr'              => ['class' => 'form-control not-chosen'],
-                    'required'          => false,
-                    'mapped'            => false,
+                    'choices'     => $choices,
+                    'label'       => 'mautic.core.defaultvalue',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'attr'        => ['class' => 'form-control not-chosen'],
+                    'required'    => false,
+                    'mapped'      => false,
                 ]
             );
         }
@@ -223,7 +226,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $event) use ($listChoices, $type) {
+        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options) {
             $cleaningRules = [];
             $form          = $event->getForm();
             $data          = $event->getData();
@@ -263,6 +266,8 @@ class FieldType extends AbstractType
                             'attr'              => ['class' => 'form-control'],
                             'required'          => false,
                             'choices'           => array_flip($list),
+                            'multiple'          => 'multiselect' === $type,
+                            'data'              => 'multiselect' === $type ? explode('|', $options['data']->getDefaultValue()) : $options['data']->getDefaultValue(),
                         ]
                     );
                     break;

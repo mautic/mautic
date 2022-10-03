@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\DAO;
 
 use DateTimeImmutable;
@@ -36,6 +27,7 @@ class InputOptionsDAOTest extends TestCase
                 'integration-object-id' => ['Lead:hfskjdhf', 'Lead:hfskjdhr'],
                 'start-datetime'        => '2019-09-12T12:01:20',
                 'end-datetime'          => '2019-10-12T12:01:20',
+                'option'                => ['custom1:1', 'custom2:2'],
             ]
         );
 
@@ -48,6 +40,7 @@ class InputOptionsDAOTest extends TestCase
         $this->assertSame(['hfskjdhf', 'hfskjdhr'], $inputOptionsDAO->getIntegrationObjectIds()->getObjectIdsFor('Lead'));
         $this->assertSame('2019-09-12T12:01:20+00:00', $inputOptionsDAO->getStartDateTime()->format(DATE_ATOM));
         $this->assertSame('2019-10-12T12:01:20+00:00', $inputOptionsDAO->getEndDateTime()->format(DATE_ATOM));
+        $this->assertSame(['custom1' => '1', 'custom2' => '2'], $inputOptionsDAO->getOptions());
     }
 
     public function testWorkflowFromCliWithNoValuesSet(): void
@@ -67,6 +60,7 @@ class InputOptionsDAOTest extends TestCase
         $this->assertNull($inputOptionsDAO->getIntegrationObjectIds());
         $this->assertNull($inputOptionsDAO->getStartDateTime());
         $this->assertNull($inputOptionsDAO->getEndDateTime());
+        $this->assertEmpty($inputOptionsDAO->getOptions());
     }
 
     public function testWorkflowFromServiceWithAllValuesSet(): void
@@ -75,6 +69,7 @@ class InputOptionsDAOTest extends TestCase
         $integrationObjectIds = new ObjectIdsDAO();
         $start                = new DateTimeImmutable('2019-09-12T12:01:20', new DateTimeZone('UTC'));
         $end                  = new DateTimeImmutable('2019-10-12T12:01:20', new DateTimeZone('UTC'));
+        $options              = ['custom1' => 1, 'custom2' => 2];
         $inputOptionsDAO      = new InputOptionsDAO(
             [
                 'integration'           => 'Magento',
@@ -85,6 +80,7 @@ class InputOptionsDAOTest extends TestCase
                 'integration-object-id' => $integrationObjectIds,
                 'start-datetime'        => $start,
                 'end-datetime'          => $end,
+                'options'               => $options,
             ]
         );
 
@@ -96,5 +92,6 @@ class InputOptionsDAOTest extends TestCase
         $this->assertSame($integrationObjectIds, $inputOptionsDAO->getIntegrationObjectIds());
         $this->assertSame($start, $inputOptionsDAO->getStartDateTime());
         $this->assertSame($end, $inputOptionsDAO->getEndDateTime());
+        $this->assertSame($options, $inputOptionsDAO->getOptions());
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -26,7 +17,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         $dateHelperMock = $this->createMock(DateHelper::class);
 
         $dateHelperMock->expects($this->any())
-            ->method('toFull')
+            ->method('toFullConcat')
             ->willReturn('2017-10-01');
 
         $translator = $this->createMock(TranslatorInterface::class);

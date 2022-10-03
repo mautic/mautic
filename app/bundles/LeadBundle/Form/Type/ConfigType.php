@@ -1,17 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -23,6 +16,24 @@ class ConfigType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add(
+            'contact_unique_identifiers_operator',
+            ChoiceType::class,
+            [
+                'choices'           => [
+                    'mautic.core.config.contact_unique_identifiers_operator.or'    => CompositeExpression::TYPE_OR,
+                    'mautic.core.config.contact_unique_identifiers_operator.and'   => CompositeExpression::TYPE_AND,
+                ],
+                'label'             => 'mautic.core.config.unique_identifiers_operator',
+                'required'          => false,
+                'attr'              => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.unique_identifiers_operator.tooltip',
+                ],
+                'placeholder'       => false,
+            ]
+        );
+
         $builder->add(
             'background_import_if_more_rows_than',
             NumberType::class,

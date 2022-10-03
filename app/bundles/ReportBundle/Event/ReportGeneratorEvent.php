@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Event;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
@@ -323,7 +314,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function addCompanyLeftJoin(QueryBuilder $queryBuilder, $companyPrefix = self::COMPANY_PREFIX, $contactPrefix = self::CONTACT_PREFIX)
     {
-        if ($this->usesColumnWithPrefix($companyPrefix)) {
+        $queryParts    =  $queryBuilder->getQueryParts();
+        $alreadyJoined = isset($queryParts['join']['companies_lead']);
+        if (!$alreadyJoined && $this->usesColumnWithPrefix($companyPrefix)) {
             $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', $contactPrefix.'.id = companies_lead.lead_id');
             $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', $companyPrefix, 'companies_lead.company_id = '.$companyPrefix.'.id');
         }

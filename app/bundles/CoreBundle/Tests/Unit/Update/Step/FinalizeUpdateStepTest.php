@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -90,8 +81,8 @@ class FinalizeUpdateStepTest extends AbstractStepTest
 
         $this->step->execute($this->progressBar, $this->input, $this->output);
 
-        $this->assertFileNotExists(__DIR__.'/resources/upgrade.php');
-        $this->assertFileNotExists(__DIR__.'/resources/lastUpdateCheck.txt');
+        $this->assertFileDoesNotExist(__DIR__.'/resources/upgrade.php');
+        $this->assertFileDoesNotExist(__DIR__.'/resources/lastUpdateCheck.txt');
 
         $this->assertEquals($updateSuccessfulKey, trim($this->progressBar->getMessage()));
     }
@@ -127,7 +118,7 @@ class FinalizeUpdateStepTest extends AbstractStepTest
 
         $this->step->execute($this->progressBar, $this->input, $this->output);
 
-        $this->assertFileNotExists(__DIR__.'/resources/upgrade.php');
-        $this->assertFileNotExists(__DIR__.'/resources/lastUpdateCheck.txt');
+        $this->assertFileDoesNotExist(__DIR__.'/resources/upgrade.php');
+        $this->assertFileDoesNotExist(__DIR__.'/resources/lastUpdateCheck.txt');
     }
 }

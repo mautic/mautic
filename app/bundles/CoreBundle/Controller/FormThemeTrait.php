@@ -1,30 +1,23 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 
 trait FormThemeTrait
 {
     /**
      * Sets a specific theme for the form.
      *
-     * @param string $template
-     * @param mixed  $themes
+     * @param FormInterface<FormInterface> $form
+     * @param string                       $template
+     * @param mixed                        $themes
      *
      * @return \Symfony\Component\Form\FormView
      */
-    protected function setFormTheme(Form $form, $template, $themes = null)
+    protected function setFormTheme(FormInterface $form, $template, $themes = null)
     {
         $formView = $form->createView();
 

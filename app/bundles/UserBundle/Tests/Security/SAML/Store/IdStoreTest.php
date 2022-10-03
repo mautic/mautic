@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use LightSaml\Provider\TimeProvider\TimeProviderInterface;
 use Mautic\UserBundle\Entity\IdEntry;
 use Mautic\UserBundle\Security\SAML\Store\IdStore;

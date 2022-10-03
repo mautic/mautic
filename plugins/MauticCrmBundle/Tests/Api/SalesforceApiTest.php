@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
@@ -19,17 +12,12 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that a locked record request is retried up to 3 times
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::analyzeResponse()
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::processError()
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::checkIfLockedRequestShouldBeRetried()
      */
-    public function testRecordLockedErrorIsRetriedThreeTimes()
+    public function testRecordLockedErrorIsRetriedThreeTimes(): void
     {
-        $integration = $this->getMockBuilder(SalesforceIntegration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $integration = $this->createMock(SalesforceIntegration::class);
+        $message     = 'unable to obtain exclusive access to this record or 1 records: 70137000000Ugy3AAC';
 
-        $message = 'unable to obtain exclusive access to this record or 1 records: 70137000000Ugy3AAC';
         $integration->expects($this->exactly(3))
             ->method('makeRequest')
             ->willReturn(
@@ -54,42 +42,27 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Test that a locked record request is retried up to 3 times with last one being successful so no exception should be thrown
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::analyzeResponse()
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::processError()
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::checkIfLockedRequestShouldBeRetried()
      */
-    public function testRecordLockedErrorIsRetriedThreeTimesWithLastOneSuccessful()
+    public function testRecordLockedErrorIsRetriedThreeTimesWithLastOneSuccessful(): void
     {
-        $integration = $this->getMockBuilder(SalesforceIntegration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $integration = $this->createMock(SalesforceIntegration::class);
+        $message     = 'unable to obtain exclusive access to this record or 1 records: 70137000000Ugy3AAC';
 
-        $message = 'unable to obtain exclusive access to this record or 1 records: 70137000000Ugy3AAC';
-        $integration->expects($this->at(1))
+        $integration->expects($this->exactly(3))
             ->method('makeRequest')
-            ->willReturn(
+            ->willReturnOnConsecutiveCalls(
                 [
                     [
                         'errorCode' => 'UNABLE_TO_LOCK_ROW',
                         'message'   => $message,
                     ],
-                ]
-            );
-
-        $integration->expects($this->at(2))
-            ->method('makeRequest')
-            ->willReturn(
+                ],
                 [
                     [
                         'errorCode' => 'UNABLE_TO_LOCK_ROW',
                         'message'   => $message,
                     ],
-                ]
-            );
-
-        $integration->expects($this->at(3))
-            ->method('makeRequest')
-            ->willReturn(
+                ],
                 [
                     [
                         'success' => true,
@@ -108,36 +81,28 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Test that a locked record request is retried 2 times with 3rd being successful
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::analyzeResponse()
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::processError()
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::checkIfLockedRequestShouldBeRetried()
      */
-    public function testRecordLockedErrorIsRetriedTwoTimesWithThirdSuccess()
+    public function testRecordLockedErrorIsRetriedTwoTimesWithThirdSuccess(): void
     {
-        $integration = $this->getMockBuilder(SalesforceIntegration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $integration = $this->createMock(SalesforceIntegration::class);
+        $message     = 'unable to obtain exclusive access to this record or 1 records: 70137000000Ugy3AAC';
 
-        $message = 'unable to obtain exclusive access to this record or 1 records: 70137000000Ugy3AAC';
-        $integration->expects($this->at(1))
+        $integration->expects($this->exactly(2))
             ->method('makeRequest')
-            ->willReturn(
+            ->willReturnOnConsecutiveCalls(
                 [
                     [
                         'errorCode' => 'UNABLE_TO_LOCK_ROW',
                         'message'   => $message,
                     ],
-                ]
-            );
-        $integration->expects($this->at(0))
-            ->method('makeRequest')
-            ->willReturn(
+                ],
                 [
                     [
                         ['success' => true],
                     ],
                 ]
             );
+
         $api = new SalesforceApi($integration);
 
         try {
@@ -149,26 +114,20 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Test that a session expired should attempt a refresh before failing
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::analyzeResponse()
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::processError()
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::revalidateSession()
      */
-    public function testSessionExpiredIsRefreshed()
+    public function testSessionExpiredIsRefreshed(): void
     {
-        $integration = $this->getMockBuilder(SalesforceIntegration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $integration = $this->createMock(SalesforceIntegration::class);
+        $message     = '["errorCode":"INVALID_SESSION_ID","body":"Session expired or invalid"]';
 
         $integration->expects($this->exactly(2))
             ->method('authCallback');
 
-        $message = 'Session expired';
         $integration->expects($this->exactly(2))
             ->method('makeRequest')
             ->willReturn(
                 [
                     [
-                        'errorCode' => 'INVALID_SESSION_ID',
                         'message'   => $message,
                     ],
                 ]
@@ -186,36 +145,25 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Test that a session expired should attempt a refresh but not throw an exception if successful on second request
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::analyzeResponse()
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::processError()
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::revalidateSession()
      */
-    public function testSessionExpiredIsRefreshedWithoutThrowingExceptionOnSecondRequestWithSuccess()
+    public function testSessionExpiredIsRefreshedWithoutThrowingExceptionOnSecondRequestWithSuccess(): void
     {
-        $integration = $this->getMockBuilder(SalesforceIntegration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $integration = $this->createMock(SalesforceIntegration::class);
+        $message     = 'Session expired';
 
         $integration->expects($this->once())
             ->method('authCallback');
 
-        $message = 'Session expired';
-
         // Test again but both attempts should fail resulting in
-        $integration->expects($this->at(1))
+        $integration->expects($this->exactly(2))
             ->method('makeRequest')
-            ->willReturn(
+            ->willReturnOnConsecutiveCalls(
                 [
                     [
                         'errorCode' => 'INVALID_SESSION_ID',
                         'message'   => $message,
                     ],
-                ]
-            );
-
-        $integration->expects($this->at(2))
-            ->method('makeRequest')
-            ->willReturn(
+                ],
                 [
                     ['success' => true],
                 ]
@@ -232,16 +180,12 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Test that an exception is thrown for all other errors
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::analyzeResponse()
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::processError()
      */
-    public function testErrorDoesNotRetryRequest()
+    public function testErrorDoesNotRetryRequest(): void
     {
-        $integration = $this->getMockBuilder(SalesforceIntegration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $integration = $this->createMock(SalesforceIntegration::class);
+        $message     = 'Fatal error';
 
-        $message = 'Fatal error';
         $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturn(
@@ -266,10 +210,8 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Test that a backslash and a single quote are escaped for SF queries
-     *
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue()
      */
-    public function testCompanyQueryIsEscapedCorrectly()
+    public function testCompanyQueryIsEscapedCorrectly(): void
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
@@ -314,11 +256,58 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @testdox Test that a backslash and a single quote are escaped for SF queries
+     * @testdox Test that a backslash and an html entity of single quote are escaped for SF queries
      *
      * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue()
      */
-    public function testContactQueryIsEscapedCorrectly()
+    public function testCompanyQueryWithHtmlEntitiesIsEscapedCorrectly()
+    {
+        $integration = $this->getMockBuilder(SalesforceIntegration::class)
+            ->disableOriginalConstructor()
+            ->setMethodsExcept(['cleanPushData'])
+            ->getMock();
+
+        $integration->expects($this->exactly(1))
+            ->method('mergeConfigToFeatureSettings')
+            ->willReturn(
+                [
+                    'objects' => [
+                        'company',
+                    ],
+                ]
+            );
+
+        $integration->expects($this->exactly(1))
+            ->method('makeRequest')
+            ->willReturnCallback(
+                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                    $this->assertEquals(
+                        $parameters,
+                        [
+                            'q' => 'select Id from Account where Name = \'Some\\\\thing\\\' E\\\'lse\' and BillingCountry =  \'Some\\\\Where\\\' E\\\'lse\' and BillingCity =  \'Some\\\\Where\\\' E\\\'lse\' and BillingState =  \'Some\\\\Where\\\' E\\\'lse\'',
+                        ]
+                    );
+                }
+            );
+
+        $api = new SalesforceApi($integration);
+
+        $api->getCompany(
+            [
+                'company' => [
+                    'BillingCountry' => 'Some\\Where&#39; E\'lse',
+                    'BillingCity'    => 'Some\\Where&#39; E\'lse',
+                    'BillingState'   => 'Some\\Where&#39; E\'lse',
+                    'Name'           => 'Some\\thing&#39; E\'lse',
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @testdox Test that a backslash and a single quote are escaped for SF queries
+     */
+    public function testContactQueryIsEscapedCorrectly(): void
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
@@ -359,10 +348,8 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Test that a backslash and a single quote are escaped for SF queries
-     *
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue()
      */
-    public function testLeadQueryIsEscapedCorrectly()
+    public function testLeadQueryIsEscapedCorrectly(): void
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()

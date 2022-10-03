@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
@@ -43,7 +36,7 @@ class ConsoleErrorListener
             $exception->getMessage(),
             $exception->getFile(),
             $exception->getLine(),
-            $command->getName(),
+            empty($command) ? 'UNKNOWN' : $command->getName(),
             $trace
         );
 

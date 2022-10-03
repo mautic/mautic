@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -434,7 +425,7 @@ class MonitoringController extends FormController
         }
 
         // Audit Log
-        $logs = $this->getModel('core.auditLog')->getLogForObject('monitoring', $objectId);
+        $logs = $this->getModel('core.auditlog')->getLogForObject('monitoring', $objectId);
 
         $returnUrl = $this->generateUrl(
             'mautic_social_action',
@@ -663,6 +654,6 @@ class MonitoringController extends FormController
             'ipAddress' => $this->container->get('mautic.helper.ip_lookup')->getIpAddressFromRequest(),
         ];
 
-        $this->getModel('core.auditLog')->writeToLog($log);
+        $this->getModel('core.auditlog')->writeToLog($log);
     }
 }

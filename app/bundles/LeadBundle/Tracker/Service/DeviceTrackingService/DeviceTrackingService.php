@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tracker\Service\DeviceTrackingService;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,7 +8,6 @@ use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final class DeviceTrackingService implements DeviceTrackingServiceInterface
@@ -152,10 +142,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         $this->cookieHelper->deleteCookie('mtc_sid');
     }
 
-    /**
-     * @return string|null
-     */
-    private function getTrackedIdentifier()
+    private function getTrackedIdentifier(): ?string
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -176,10 +163,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         return $deviceTrackingId;
     }
 
-    /**
-     * @return string
-     */
-    private function getUniqueTrackingIdentifier()
+    private function getUniqueTrackingIdentifier(): string
     {
         do {
             $generatedIdentifier = $this->randomHelper->generate(23);

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'name'        => 'CRM',
     'description' => 'Enables integration with Mautic supported CRMs.',
@@ -73,7 +64,7 @@ return [
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
@@ -95,7 +86,7 @@ return [
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
@@ -116,7 +107,7 @@ return [
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
@@ -138,7 +129,7 @@ return [
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
@@ -159,7 +150,7 @@ return [
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
@@ -180,7 +171,7 @@ return [
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
@@ -201,7 +192,7 @@ return [
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
@@ -222,7 +213,7 @@ return [
                     'request_stack',
                     'router',
                     'translator',
-                    'logger',
+                    'monolog.logger.mautic',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',

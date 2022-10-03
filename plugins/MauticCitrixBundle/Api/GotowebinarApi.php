@@ -20,11 +20,6 @@ class GotowebinarApi extends CitrixApi
             'module'          => 'G2W',
             'method'          => $method,
             'parameters'      => $parameters,
-            'requestSettings' => [
-              'headers' => [
-                  'Accept' => 'application/json;charset=UTF-8',
-              ],
-            ],
         ];
 
         return parent::_request($operation, $settings,

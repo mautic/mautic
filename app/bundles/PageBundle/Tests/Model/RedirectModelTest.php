@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
@@ -22,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class RedirectModelTest extends PageTestAbstract
 {
-    public function testCreateRedirectEntity_WhenCalled_ReturnsRedirect()
+    public function testCreateRedirectEntityWhenCalledReturnsRedirect()
     {
         $redirectModel = $this->getRedirectModel();
         $entity        = $redirectModel->createRedirectEntity('http://some-url.com');
@@ -30,7 +21,7 @@ class RedirectModelTest extends PageTestAbstract
         $this->assertInstanceOf(Redirect::class, $entity);
     }
 
-    public function testGenerateRedirectUrl_WhenCalled_ReturnsValidUrl()
+    public function testGenerateRedirectUrlWhenCalledReturnsValidUrl()
     {
         $redirect = new Redirect();
         $redirect->setUrl('http://some-url.com');

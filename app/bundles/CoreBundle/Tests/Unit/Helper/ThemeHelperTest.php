@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
@@ -17,6 +10,7 @@ use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Templating\TemplateNameParser;
 use Mautic\CoreBundle\Templating\TemplateReference;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -59,12 +53,13 @@ class ThemeHelperTest extends TestCase
     private $builderIntegrationsHelper;
 
     /**
-     * @var ThemeHelper
+     * @var ThemeHelperInterface
      */
     private $themeHelper;
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->pathsHelper         = $this->createMock(PathsHelper::class);
         $this->templatingHelper    = $this->createMock(TemplatingHelper::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
@@ -86,7 +81,7 @@ class ThemeHelperTest extends TestCase
         );
     }
 
-    public function testExceptionThrownWithMissingConfig()
+    public function testExceptionThrownWithMissingConfig(): void
     {
         $this->expectException(FileNotFoundException::class);
 
@@ -106,7 +101,7 @@ class ThemeHelperTest extends TestCase
         $this->themeHelper->install(__DIR__.'/resource/themes/missing-config.zip');
     }
 
-    public function testExceptionThrownWithMissingMessage()
+    public function testExceptionThrownWithMissingMessage(): void
     {
         $this->expectException(FileNotFoundException::class);
 
@@ -126,7 +121,7 @@ class ThemeHelperTest extends TestCase
         $this->themeHelper->install(__DIR__.'/resource/themes/missing-message.zip');
     }
 
-    public function testExceptionThrownWithMissingFeature()
+    public function testExceptionThrownWithMissingFeature(): void
     {
         $this->expectException(FileNotFoundException::class);
 
@@ -146,7 +141,7 @@ class ThemeHelperTest extends TestCase
         $this->themeHelper->install(__DIR__.'/resource/themes/missing-feature.zip');
     }
 
-    public function testThemeIsInstalled()
+    public function testThemeIsInstalled(): void
     {
         $fs = new Filesystem();
         $fs->copy(__DIR__.'/resource/themes/good.zip', __DIR__.'/resource/themes/good-tmp.zip');
@@ -162,7 +157,7 @@ class ThemeHelperTest extends TestCase
         $fs->remove(__DIR__.'/resource/themes/good-tmp');
     }
 
-    public function testThemeFallbackToDefaultIfTemplateIsMissing()
+    public function testThemeFallbackToDefaultIfTemplateIsMissing(): void
     {
         $templateNameParser = $this->createMock(TemplateNameParser::class);
         $this->templatingHelper->expects($this->once())
@@ -176,20 +171,13 @@ class ThemeHelperTest extends TestCase
 
         $templating = $this->createMock(DelegatingEngine::class);
 
-        // twig does not exist
-        $templating->expects($this->at(0))
+        $templating->expects($this->exactly(3))
             ->method('exists')
-            ->willReturn(false);
-
-        // php does not exist
-        $templating->expects($this->at(1))
-            ->method('exists')
-            ->willReturn(false);
-
-        // default themes twig exists
-        $templating->expects($this->at(2))
-            ->method('exists')
-            ->willReturn(true);
+            ->willReturnOnConsecutiveCalls(
+                false, // twig does not exist
+                false, // php does not exist
+                true // default themes twig exists
+            );
 
         $this->templatingHelper->expects($this->once())
             ->method('getTemplating')
@@ -200,7 +188,7 @@ class ThemeHelperTest extends TestCase
                 function ($path, $absolute) {
                     switch ($path) {
                         case 'themes':
-                            return ($absolute) ? __DIR__.'/../../../../../../resource/themes' : 'themes';
+                            return ($absolute) ? __DIR__.'/../../../../../../themes' : 'themes';
                         case 'themes_root':
                             return __DIR__.'/../../../../../..';
                     }
@@ -213,7 +201,7 @@ class ThemeHelperTest extends TestCase
         $this->assertEquals(':nature:page.html.twig', $template);
     }
 
-    public function testThemeFallbackToNextBestIfTemplateIsMissingForBothRequestedAndDefaultThemes()
+    public function testThemeFallbackToNextBestIfTemplateIsMissingForBothRequestedAndDefaultThemes(): void
     {
         $templateNameParser = $this->createMock(TemplateNameParser::class);
         $this->templatingHelper->expects($this->once())
@@ -299,7 +287,10 @@ class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function exists($files)
+                /**
+                 * @param string $files
+                 */
+                public function exists($files): bool
                 {
                     if ('/path/to/themes/new-theme-name' === $files) {
                         return false;
@@ -308,7 +299,13 @@ class ThemeHelperTest extends TestCase
                     return true;
                 }
 
-                public function mirror($originDir, $targetDir, ?\Traversable $iterator = null, $options = [])
+                /**
+                 * @param string               $originDir
+                 * @param string               $targetDir
+                 * @param ?\Traversable<mixed> $iterator
+                 * @param mixed[]              $options
+                 */
+                public function mirror($originDir, $targetDir, ?\Traversable $iterator = null, $options = []): void
                 {
                     Assert::assertSame('/path/to/themes/origin-template-dir', $originDir);
                     Assert::assertSame('/path/to/themes/new-theme-name', $targetDir);
@@ -321,14 +318,15 @@ class ThemeHelperTest extends TestCase
                     return '{"name":"Origin Theme"}';
                 }
 
-                public function dumpFile($filename, $content)
+                public function dumpFile($filename, $content): void
                 {
                     Assert::assertSame('/path/to/themes/new-theme-name/config.json', $filename);
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
                 }
             },
             new class() extends Finder {
-                private $dirs = [];
+                /** @var \SplFileInfo[] */
+                private array $dirs = [];
 
                 public function __construct()
                 {
@@ -343,6 +341,9 @@ class ThemeHelperTest extends TestCase
                     return $this;
                 }
 
+                /**
+                 * @return \ArrayIterator<int,\SplFileInfo>
+                 */
                 public function getIterator()
                 {
                     return new \ArrayIterator($this->dirs);
@@ -389,6 +390,9 @@ class ThemeHelperTest extends TestCase
                 {
                 }
 
+                /**
+                 * @param string $files
+                 */
                 public function exists($files)
                 {
                     if ('/path/to/themes/requested-theme-dir' === $files) {
@@ -398,6 +402,12 @@ class ThemeHelperTest extends TestCase
                     return true;
                 }
 
+                /**
+                 * @param ?\Traversable<mixed> $iterator
+                 * @param array<mixed>         $options
+                 *
+                 * @return void
+                 */
                 public function mirror($originDir, $targetDir, ?\Traversable $iterator = null, $options = [])
                 {
                     Assert::assertSame('/path/to/themes/origin-template-dir', $originDir);
@@ -411,6 +421,9 @@ class ThemeHelperTest extends TestCase
                     return '{"name":"Origin Theme"}';
                 }
 
+                /**
+                 * @return void
+                 */
                 public function dumpFile($filename, $content)
                 {
                     Assert::assertSame('/path/to/themes/requested-theme-dir/config.json', $filename);
@@ -418,7 +431,10 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new class() extends Finder {
-                private $dirs = [];
+                /**
+                 * @var \SplFileInfo[]
+                 */
+                private array $dirs = [];
 
                 public function __construct()
                 {
@@ -433,7 +449,10 @@ class ThemeHelperTest extends TestCase
                     return $this;
                 }
 
-                public function getIterator()
+                /**
+                 * @return \ArrayIterator<int,\SplFileInfo>
+                 */
+                public function getIterator(): \ArrayIterator
                 {
                     return new \ArrayIterator($this->dirs);
                 }

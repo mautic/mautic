@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -46,7 +37,7 @@ class ReportSubscriberTest extends TestCase
     {
         $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'checkContext',
                 'addGraph',
                 'getStandardColumns',
@@ -117,7 +108,7 @@ class ReportSubscriberTest extends TestCase
         $mockQueryBuilder = $this->createMock(QueryBuilder::class);
         $mockEvent        = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'getContext',
                 'getQueryBuilder',
                 'addCategoryLeftJoin',
@@ -145,7 +136,7 @@ class ReportSubscriberTest extends TestCase
         $mockQueryBuilder = $this->createMock(QueryBuilder::class);
         $mockEvent        = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'getContext',
                 'getQueryBuilder',
                 'addCategoryLeftJoin',

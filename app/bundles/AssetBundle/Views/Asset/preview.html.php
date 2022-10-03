@@ -13,7 +13,7 @@
 <h5 class="fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.preview'); ?></h5>
 <div class="text-center">
     <?php if ($activeAsset->isImage()): ?>
-        <img src="<?php echo $assetDownloadUrl.'?stream=1'; ?>" alt="<?php echo $activeAsset->getTitle(); ?>" class="img-thumbnail" />
+        <img src="<?php echo $assetDownloadUrl.'?stream=1'; ?>" alt="<?php echo $view->escape($activeAsset->getTitle()); ?>" class="img-thumbnail" />
     <?php elseif ('pdf' == strtolower($activeAsset->getFileType())) : ?>
         <iframe src="<?php echo $assetDownloadUrl.'?stream=1'; ?>#view=FitH" class="col-sm-12"></iframe>
     <?php elseif (0 === strpos($activeAsset->getMime(), 'video') || in_array($activeAsset->getExtension(), ['mpg', 'mpeg', 'mp4', 'webm'])): ?>

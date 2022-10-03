@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
@@ -118,12 +109,6 @@ class ConfigController extends AbstractFormController
             return $this->closeForm();
         }
 
-        // Dispatch event prior to saving the Integration
-        /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->get('event_dispatcher');
-        $configEvent     = new ConfigSaveEvent($this->integrationConfiguration);
-        $eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE, $configEvent);
-
         // Get the fields before the form binds partial data due to pagination
         $settings      = $this->integrationConfiguration->getFeatureSettings();
         $fieldMappings = $settings['sync']['fieldMappings'] ?? [];
@@ -150,6 +135,12 @@ class ConfigController extends AbstractFormController
 
             $this->integrationConfiguration->setFeatureSettings($settings);
         }
+
+        // Dispatch event prior to saving the Integration. Bundles/plugins may need to modify some field values before save
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->get('event_dispatcher');
+        $configEvent     = new ConfigSaveEvent($this->integrationConfiguration);
+        $eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE, $configEvent);
 
         // Show the form if there are errors
         if (!$this->form->isValid() && (!$this->integrationObject instanceof ConfigFormAuthorizeButtonInterface || $this->integrationObject->isAuthorized())) {

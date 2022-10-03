@@ -13,7 +13,7 @@ $fieldKeys = array_keys($fields);
 $template  = '<div class="col-md-6">{content}</div>';
 ?>
 
-<?php if (count(array_intersect($fieldKeys, ['mailer_from_name', 'mailer_from_email', 'mailer_transport', 'mailer_spool_type']))): ?>
+<?php if (count(array_intersect($fieldKeys, ['mailer_from_name', 'mailer_from_email', 'mailer_reply_to_email',  'mailer_transport', 'mailer_spool_type']))): ?>
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.mail'); ?></h3>
@@ -22,6 +22,9 @@ $template  = '<div class="col-md-6">{content}</div>';
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_from_name', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_from_email', $template); ?>
+            </div>
+            <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_reply_to_email', $template); ?>
             </div>
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_return_path', $template); ?>

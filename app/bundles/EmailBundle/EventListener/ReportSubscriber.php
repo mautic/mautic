@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
@@ -422,6 +413,10 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 if ($this->companyReportData->eventHasCompanyColumns($event)) {
                     $event->addCompanyLeftJoin($qb);
+                }
+
+                if (!$event->hasGroupBy()) {
+                    $qb->groupBy('es.id');
                 }
 
                 break;

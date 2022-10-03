@@ -22,6 +22,7 @@ if (!empty($userId)) {
 $view['slots']->set('headerTitle', $header);
 
 // Render the templates so they don't get rendered automatically
+$textareaTemplate        = $view['form']->row($form['properties_textarea_template']);
 $selectTemplate          = $view['form']->row($form['properties_select_template']);
 $lookupTemplate          = $view['form']->row($form['properties_lookup_template']);
 $defaultTextTemplate     = $view['form']->widget($form['default_template_text']);
@@ -88,7 +89,7 @@ $defaultTimezoneTemplate = $view['form']->widget($form['default_template_timezon
                             ]);
                             break;
                         case 'select':
-                        case 'multiselect':
+                            case 'multiselect':
                             echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
                                 'form'           => $form['properties'],
                                 'selectTemplate' => $selectTemplate,
@@ -98,8 +99,15 @@ $defaultTimezoneTemplate = $view['form']->widget($form['default_template_timezon
                             echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
                                 'form'           => $form['properties'],
                                 'selectTemplate' => $lookupTemplate,
-                                'isLookup'       => 'lookup',
+                                'type'           => 'lookup',
                             ]);
+                                break;
+                        case 'textarea':
+                            echo $view->render('MauticLeadBundle:Field:properties_textarea.html.php', [
+                                'form'             => $form['properties'],
+                                'textareaTemplate' => $textareaTemplate,
+                            ]);
+                                break;
                         endswitch;
                         ?>
                     </div>
@@ -191,8 +199,15 @@ $defaultTimezoneTemplate = $view['form']->widget($form['default_template_timezon
         'selectTemplate' => $selectTemplate,
     ]);
     echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
+        'selectTemplate' => $selectTemplate,
+        'type'           => 'multiselect',
+    ]);
+    echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
         'selectTemplate' => $lookupTemplate,
-        'isLookup'       => 'lookup',
+        'type'           => 'lookup',
+    ]);
+    echo $view->render('MauticLeadBundle:Field:properties_textarea.html.php', [
+        'textareaTemplate' => $textareaTemplate,
     ]);
 ?>
 </div>

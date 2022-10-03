@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -19,7 +10,7 @@ class CookieHelper
     const SAME_SITE_VALUE = 'None';
     private $path;
     private $domain;
-    private $secure       = false;
+    private $secure       = true;
     private $httponly     = false;
     private $request;
 

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
@@ -420,6 +411,19 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
             'type'     => 'multiselect',
             'filter'   => [2, 4],
             'operator' => '!in',
+        ]);
+
+        $this->assertSame($expected, $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+
+        $expected = [
+            '(([|]|^)Value \(1\)([|]|$))',
+            '(([|]|^)Value 2([|]|$))',
+        ];
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'     => 'multiselect',
+            'filter'   => ['Value (1)', 'Value 2'],
+            'operator' => 'in',
         ]);
 
         $this->assertSame($expected, $baseDecorator->getParameterValue($contactSegmentFilterCrate));

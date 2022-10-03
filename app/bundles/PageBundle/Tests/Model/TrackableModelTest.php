@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Tests\Model;
 
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
@@ -36,7 +27,7 @@ class TrackableModelTest extends TestCase
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
-            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
+            ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
             ->getMock();
 
         $mockModel->expects($this->once())
@@ -84,7 +75,7 @@ class TrackableModelTest extends TestCase
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
-            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
+            ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
             ->getMock();
 
         $mockModel->expects($this->once())
@@ -616,7 +607,7 @@ TEXT;
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
-            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
+            ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
             ->getMock();
 
         $mockModel->expects($this->once())

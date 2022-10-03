@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Event;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -243,5 +234,57 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->reportGeneratorEvent->usesColumn('comp.name'));
         $this->assertTrue($this->reportGeneratorEvent->usesColumn('foo.is_published'));
         $this->assertFalse($this->reportGeneratorEvent->usesColumn('foo.bar'));
+    }
+
+    public function testAddCompanyLeftJoinWhenColumnIsNotUsed(): void
+    {
+        $this->report->expects($this->once())
+      ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
+      ->willReturn(['e.id', 'e.title']);
+
+        $this->queryBuilder->expects($this->never())
+      ->method('leftJoin');
+
+        $this->reportGeneratorEvent->addCompanyLeftJoin($this->queryBuilder, ReportGeneratorEvent::COMPANY_PREFIX);
+    }
+
+    public function testAddCompanyLeftJoinWhenColumnIsUsed(): void
+    {
+        $this->report->expects($this->once())
+      ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
+      ->willReturn(['e.id', 'e.title', 'comp.name']);
+
+        $this->queryBuilder->expects($this->exactly(2))
+      ->method('leftJoin')
+      ->withConsecutive(
+        [
+          'l',
+          MAUTIC_TABLE_PREFIX.'companies_leads',
+          'companies_lead',
+          ReportGeneratorEvent::CONTACT_PREFIX.'.id = companies_lead.lead_id',
+        ],
+        [
+          'companies_lead',
+          MAUTIC_TABLE_PREFIX.'companies',
+          ReportGeneratorEvent::COMPANY_PREFIX,
+          'companies_lead.company_id = '.ReportGeneratorEvent::COMPANY_PREFIX.'.id',
+        ]
+      );
+        $this->reportGeneratorEvent->addCompanyLeftJoin($this->queryBuilder, ReportGeneratorEvent::COMPANY_PREFIX);
+    }
+
+    public function testAddCompanyLeftJoinOnlyOnceWhenTableAlreadyJoined(): void
+    {
+        $this->queryBuilder->expects($this->once())
+      ->method('getQueryParts')
+      ->willReturn([
+        'join' => [
+          'companies_lead' => [],
+        ],
+      ]);
+        $this->queryBuilder->expects($this->never())
+      ->method('leftJoin');
+
+        $this->reportGeneratorEvent->addCompanyLeftJoin($this->queryBuilder, ReportGeneratorEvent::COMPANY_PREFIX);
     }
 }

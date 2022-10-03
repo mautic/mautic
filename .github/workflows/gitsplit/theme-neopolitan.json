@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-neopolitan",
+            "directory": "themes/neopolitan",
+            "target": "git@github.com:mautic/theme-neopolitan.git"
+        }
+    ]
+}

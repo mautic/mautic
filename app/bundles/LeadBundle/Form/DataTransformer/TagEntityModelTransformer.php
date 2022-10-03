@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\DataTransformer;
 
 use Doctrine\ORM\EntityManager;
@@ -117,7 +108,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
         ]);
 
         if (!count($entities)) {
-            throw new TransformationFailedException(sprintf('Tags for "%s" does not exist!', $id));
+            throw new TransformationFailedException(sprintf('Tags for "%s" does not exist!', implode(', ', $id)));
         }
 
         return $entities;

@@ -18,4 +18,5 @@ hooks:
   post-start:
     # Fix line endings on Windows
     - exec: sed -i -e 's/\r$//' ./.ddev/mautic-setup.sh
-    - exec: "./.ddev/mautic-setup.sh"
+    - exec: sed -i -e 's/\r$//' ./.git/hooks/*
+    - exec: "yes | ./.ddev/mautic-setup.sh"
