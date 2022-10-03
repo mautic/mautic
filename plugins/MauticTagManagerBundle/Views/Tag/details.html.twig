@@ -30,7 +30,7 @@
                     <div class="box-layout">
 
                         <div class="col-xs-10">
-                            <div class="text-white dark-sm mb-0">{{  tag.getDescription()|raw }}</div>
+                            <div class="text-white dark-sm mb-0">{{ tag.getDescription()|raw }}{#TODO: Replace 'raw' #}</div>
                         </div>
 
                     </div>
@@ -42,7 +42,7 @@
                                 <tbody>
                                 <tr>
                                     <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.core.id{% endtrans %}</span></td>
-                                    <td>{{  tag.getId() }}</td>
+                                    <td>{{ tag.getId() }}</td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -56,7 +56,7 @@
                 <span data-toggle="tooltip" title="Detail">
                     <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
                        data-target="#sms-details">
-                        <span class="caret"></span>{% trans %} mautic.core.details {% endtrans %}
+                        <span class="caret"></span>{% trans %}mautic.core.details{% endtrans %}
                     </a>
                 </span>
                 </div>
@@ -64,7 +64,7 @@
         </div>
 
         <!--/ right section -->
-        <input name="entityId" id="entityId" type="hidden" value="{{  tag.getId()|escape }}" />
+        <input name="entityId" id="entityId" type="hidden" value="{{ tag.getId()|escape }}" />
     </div>
     <!--/ end: box layout -->
 

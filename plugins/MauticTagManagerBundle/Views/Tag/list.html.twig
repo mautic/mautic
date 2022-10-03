@@ -46,8 +46,8 @@
                                     'langVar': 'tagmanager.tag',
                                     'routeBase': 'tagmanager',
                                     'templateButtons': {
-                                    'delete': permissions['tagManager:tagManager:delete'],
-                                }
+                                        'delete': permissions['tagManager:tagManager:delete'],
+                                    }
                                 }) }}
                             {{ include(
                                 'MauticCoreBundle:Helper:tableheader.html.twig',
@@ -120,7 +120,7 @@
                                     {% set description = item.getDescription() %}
                                     {% if description %}
                                         <div class="text-muted mt-4">
-                                            <small>{{ description|raw }}</small>
+                                            <small>{{ description|raw }} {#TODO: Replace 'raw' #}</small>
                                         </div>
                                     {% endif %}
                                 </td>
@@ -152,129 +152,3 @@
         </div>
     </div>
 {% endblock %}
-{#
-{% block content %}
-    <h1>Hey</h1>
-    {% if items|length %}
-        <div class="table-responsive">
-            <table class="table table-hover table-striped table-bordered" id="tagsTable">
-                <thead>
-                <tr>
-                    {{ include(
-                        'MauticCoreBundle:Helper:tableheader.html.twig',
-                        {
-                            'checkall': 'true',
-                            'target': '#tagsTable',
-                            'langVar': 'tagmanager.tag',
-                            'routeBase': 'tagmanager',
-                            'templateButtons': {
-                            'delete': permissions['tagManager:tagManager:delete'],
-                        }
-                        }) }}
-                    {{ include(
-                        'MauticCoreBundle:Helper:tableheader.html.twig',
-                        {
-                            'sessionVar': 'tags',
-                            'orderBy'   : 'lt.tag',
-                            'text'      : 'mautic.core.name',
-                            'class'     : 'col-tag-name',
-                        }
-                    ) }}
-
-                    {{ include(
-                        'MauticCoreBundle:Helper:tableheader.html.twig',
-                        {
-                            'sessionVar' : 'tags',
-                            'text'       : 'mautic.lead.list.thead.leadcount',
-                            'class'      : 'visible-md visible-lg col-tag-leadcount',
-                        }
-                    ) }}
-
-                    {{ include(
-                        'MauticCoreBundle:Helper:tableheader.html.twig',
-                        {
-                            'sessionVar' : 'tags',
-                            'orderBy'    : 'lt.id',
-                            'text'       : 'mautic.core.id',
-                            'class'      : 'visible-md visible-lg col-tag-id',
-                        }
-                    ) }}
-                </tr>
-                </thead>
-                <tbody>
-                {% for item in items %}
-                    <tr>
-                        <td>
-                            {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
-                                item: item,
-                                templateButtons: {
-                                    edit: permissions['tagManager:tagManager:edit'],
-                                    delete: permission['tagManager:tagManager:delete'],
-                                },
-                                routeBase: 'tagmanager',
-                                langVar: 'tagmanager.tag',
-                                nameGetter: nameGetter,
-                                custom: {
-                                    0: {
-                                        attr : {
-                                            'data-toggle': 'ajax',
-                                            href: '',
-                                        },
-                                        icon: 'fa-users',
-                                        label: 'mautic.lead.list.view_contacts'
-                                    }
-                                }
-                            }) }}
-                            {{- include(
-                                'MauticCoreBundle:Helper:list_actions.html.php',
-                                {
-                                    'item': item,
-                                    'templateButtons': {
-                                    'edit'   : permissions['tagManager:tagManager:edit'],
-                                    'delete' : permissions['tagManager:tagManager:delete'],
-                                },
-                                    'routeBase'  : 'tagmanager',
-                                    'langVar'    : 'tagmanager.tag',
-                                    'nameGetter' : nameGetter,
-                                    'custom'     : {
-                                    0: {
-                                        'attr': {
-                                            'data-toggle': 'ajax',
-                                            'href' : path('mautic_contact_index', {
-                                                'search' : "listCommand:{item.getTag()}",
-                                            })
-                                        },
-                                        'icon' : 'fa-users',
-                                        'label' : 'mautic.lead.list.view_contacts',
-                                    },
-                                },
-                                }
-                            ) -}}
-                        </td>
-                        <td>
-                            <div>
-                                {% if permissions['tagManager:tagManager:edit'] %}
-                                    <a href="{{ path('mautic_tagmanager_action', {
-                                        objectAction: 'view',
-                                        objectId: item.getId()
-                                    }) }}" data-toggle="ajax">
-                                        {{ item.getTag() }}
-                                    </a>
-                                {% else %}
-                                    {{ item.getTag() }}
-                                {% endif %}
-                            </div>
-                            {% set description = item.getDescription() %}
-                            {% if description %}
-                            <div class="text-muted mt-4">
-                                <small>{{ description }}</small>
-                            </div>
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% endif %}
-{% endblock %}#}
