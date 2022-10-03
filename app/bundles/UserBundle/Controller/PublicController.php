@@ -12,9 +12,14 @@
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Type\PasswordResetConfirmType;
 use Mautic\UserBundle\Form\Type\PasswordResetType;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends FormController
 {
@@ -23,7 +28,7 @@ class PublicController extends FormController
      */
     public function passwordResetAction()
     {
-        /** @var \Mautic\UserBundle\Model\UserModel $model */
+        /** @var UserModel $model */
         $model = $this->getModel('user');
 
         $data   = ['identifier' => ''];
@@ -61,9 +66,9 @@ class PublicController extends FormController
         ]);
     }
 
-    public function passwordResetConfirmAction()
+    public function passwordResetConfirmAction(): RedirectResponse|JsonResponse|Response
     {
-        /** @var \Mautic\UserBundle\Model\UserModel $model */
+        /** @var UserModel $model */
         $model = $this->getModel('user');
 
         $data   = ['identifier' => '', 'password' => '', 'password_confirm' => ''];
@@ -80,7 +85,7 @@ class PublicController extends FormController
             if ($isValid = $this->isFormValid($form)) {
                 //find the user
                 $data = $form->getData();
-                /** @var \Mautic\UserBundle\Entity\User $user */
+                /** @var User $user */
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
                 if (null == $user) {
@@ -97,7 +102,6 @@ class PublicController extends FormController
                             $model->saveEntity($user);
 
                             $this->addFlash('mautic.user.user.notice.passwordreset.success');
-
                             $this->request->getSession()->remove('resetToken');
 
                             return $this->redirect($this->generateUrl('login'));
