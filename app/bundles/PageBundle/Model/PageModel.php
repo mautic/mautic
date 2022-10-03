@@ -629,43 +629,41 @@ class PageModel extends FormModel
         // Check if this is a unique page hit
         $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
 
-        if (!empty($page)) {
-            if ($page instanceof Page) {
-                $hit->setPageLanguage($page->getLanguage());
+        if ($page instanceof Page) {
+            $hit->setPageLanguage($page->getLanguage());
 
-                $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
+            $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
 
-                try {
-                    $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
-                } catch (\Exception $exception) {
+            try {
+                $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
+            } catch (\Exception $exception) {
+                $this->logger->addError(
+                    $exception->getMessage(),
+                    ['exception' => $exception]
+                );
+            }
+        } elseif ($page instanceof Redirect) {
+            try {
+                $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
+
+                // If this is a trackable, up the trackable counts as well
+                if ($hit->getSource() && $hit->getSourceId()) {
+                    $this->pageTrackableModel->getRepository()->upHitCount(
+                        $page->getId(),
+                        $hit->getSource(),
+                        $hit->getSourceId(),
+                        1,
+                        $isUnique
+                    );
+                }
+            } catch (\Exception $exception) {
+                if (MAUTIC_ENV === 'dev') {
+                    throw $exception;
+                } else {
                     $this->logger->addError(
                         $exception->getMessage(),
                         ['exception' => $exception]
                     );
-                }
-            } elseif ($page instanceof Redirect) {
-                try {
-                    $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
-
-                    // If this is a trackable, up the trackable counts as well
-                    if ($hit->getSource() && $hit->getSourceId()) {
-                        $this->pageTrackableModel->getRepository()->upHitCount(
-                            $page->getId(),
-                            $hit->getSource(),
-                            $hit->getSourceId(),
-                            1,
-                            $isUnique
-                        );
-                    }
-                } catch (\Exception $exception) {
-                    if (MAUTIC_ENV === 'dev') {
-                        throw $exception;
-                    } else {
-                        $this->logger->addError(
-                            $exception->getMessage(),
-                            ['exception' => $exception]
-                        );
-                    }
                 }
             }
         }
@@ -694,7 +692,7 @@ class PageModel extends FormModel
         if (!empty($browserLanguages)) {
             $languages = explode(',', $browserLanguages);
             foreach ($languages as $k => $l) {
-                if ($pos = false !== strpos(';q=', $l)) {
+                if (($pos = strpos(';q=', $l)) !== false) {
                     //remove weights
                     $languages[$k] = substr($l, 0, $pos);
                 }

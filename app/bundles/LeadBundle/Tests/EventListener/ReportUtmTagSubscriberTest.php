@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -137,10 +137,6 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testReportGenerateNoJoinedTables(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', '');
-        }
-
         $reportGeneratorEventMock = $this->getReportGeneratorEventMock();
         $reportUtmTagSubscriber   = $this->getReportUtmTagSubscriber();
         $queryBuilderMock         = $this->getQueryBuilderMock();
@@ -154,10 +150,6 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testReportGenerateWithUsers(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', '');
-        }
-
         $reportGeneratorEventMock = $this->getReportGeneratorEventMock();
         $reportUtmTagSubscriber   = $this->getReportUtmTagSubscriber();
         $queryBuilderMock         = $this->getQueryBuilderMock();

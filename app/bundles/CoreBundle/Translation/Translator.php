@@ -2,13 +2,67 @@
 
 namespace Mautic\CoreBundle\Translation;
 
-use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
+use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
+use Symfony\Component\Translation\MessageCatalogueInterface;
+use Symfony\Component\Translation\TranslatorBagInterface;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Extended Translator service.
  */
-class Translator extends BaseTranslator
+class Translator implements TranslatorInterface, WarmableInterface, TranslatorBagInterface, LocaleAwareInterface
 {
+    /**
+     * @var TranslatorInterface&WarmableInterface&TranslatorBagInterface&LocaleAwareInterface
+     */
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        if (!$translator instanceof WarmableInterface) {
+            throw new \InvalidArgumentException('Passed $translator must implement '.WarmableInterface::class);
+        }
+
+        if (!$translator instanceof TranslatorBagInterface) {
+            throw new \InvalidArgumentException('Passed $translator must implement '.TranslatorBagInterface::class);
+        }
+
+        if (!$translator instanceof LocaleAwareInterface) {
+            throw new \InvalidArgumentException('Passed $translator must implement '.LocaleAwareInterface::class);
+        }
+
+        $this->translator = $translator;
+    }
+
+    /**
+     * @param array<mixed> $parameters
+     */
+    public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
+    {
+        return $this->translator->trans($id, $parameters, $domain, $locale);
+    }
+
+    public function warmUp($cacheDir): void
+    {
+        $this->translator->warmUp($cacheDir);
+    }
+
+    public function getCatalogue($locale = null): MessageCatalogueInterface
+    {
+        return $this->translator->getCatalogue($locale);
+    }
+
+    public function getLocale(): string
+    {
+        return $this->translator->getLocale();
+    }
+
+    public function setLocale(string $locale): void
+    {
+        $this->translator->setLocale($locale);
+    }
+
     /**
      * Check if the specified message ID exists.
      *
@@ -18,58 +72,27 @@ class Translator extends BaseTranslator
      *
      * @return bool true if the message has a translation, false otherwise
      */
-    public function hasId($id, $domain = null, $locale = null)
+    public function hasId(string $id, ?string $domain = null, ?string $locale = null): bool
     {
-        if (null === $locale) {
-            $locale = $this->getLocale();
-        } else {
-            $this->assertValidLocale($locale);
-        }
-
         if (null === $domain) {
             $domain = 'messages';
         }
 
-        if (!isset($this->catalogues[$locale])) {
-            $this->loadCatalogue($locale);
-        }
-
-        return $this->getCatalogue($locale)->has((string) $id, $domain);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function loadCatalogue($locale)
-    {
-        if ('en_US' != $locale) {
-            // Always force en_US so that it's available for fallback
-            $this->addResource('mautic', null, 'en_US', 'messages');
-        }
-
-        $this->addResource('mautic', null, $locale, 'messages');
-
-        parent::loadCatalogue($locale);
+        return $this->getCatalogue($locale)->has($id, $domain);
     }
 
     /**
      * Checks for $preferred string existence and returns translation if it does.  Otherwise, returns translation for
      * $alternative.
      *
-     * @param      $preferred
-     * @param      $alternative
-     * @param      $parameters
-     * @param null $domain
-     * @param null $locale
-     *
-     * @return string
+     * @param array<mixed> $parameters
      */
-    public function transConditional($preferred, $alternative, $parameters = [], $domain = null, $locale = null)
+    public function transConditional(string $preferred, string $alternative, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
         if ($this->hasId($preferred, $domain, $locale)) {
             return $this->trans($preferred, $parameters, $domain, $locale);
-        } else {
-            return $this->trans($alternative, $parameters, $domain, $locale);
         }
+
+        return $this->trans($alternative, $parameters, $domain, $locale);
     }
 }

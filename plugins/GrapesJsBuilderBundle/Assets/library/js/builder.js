@@ -16,6 +16,10 @@ import './grapesjs-custom.css';
  * @param actionName
  */
 function launchBuilderGrapesjs(formName) {
+  if (useBuilderForCodeMode() === false) {
+    return;
+  }
+
   const assets = AssetService.getAssets();
 
   const builder = new BuilderService(assets);
@@ -31,6 +35,22 @@ function launchBuilderGrapesjs(formName) {
 
   // Initialize GrapesJS
   builder.initGrapesJS(formName);
+}
+
+/**
+ * The user acknowledges the risk before editing an email or landing page created in Code Mode in the Builder
+ */
+function useBuilderForCodeMode() {
+  const theme = mQuery('.theme-selected').find('[data-theme]').attr('data-theme');
+  const isCodeMode = theme === 'mautic_code_mode';
+
+  if (isCodeMode) {
+    if (confirm(Mautic.translate('grapesjsbuilder.builder.warning.code_mode')) === false) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**

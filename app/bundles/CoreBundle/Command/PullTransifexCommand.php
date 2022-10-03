@@ -5,39 +5,40 @@ namespace Mautic\CoreBundle\Command;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Factory\TransifexFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\Transifex\Connector\Statistics;
 use Mautic\Transifex\Connector\Translations;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CLI Command to pull language resources from Transifex.
  */
-class PullTransifexCommand extends ContainerAwareCommand
+class PullTransifexCommand extends Command
 {
-    private $transifexFactory;
-    private $translator;
-    private $coreParametersHelper;
+    private TransifexFactory $transifexFactory;
+    private TranslatorInterface $translator;
+    private PathsHelper $pathsHelper;
+    private CoreParametersHelper $coreParametersHelper;
 
     public function __construct(
         TransifexFactory $transifexFactory,
         TranslatorInterface $translator,
+        PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper
     ) {
         $this->transifexFactory     = $transifexFactory;
         $this->translator           = $translator;
+        $this->pathsHelper          = $pathsHelper;
         $this->coreParametersHelper = $coreParametersHelper;
 
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this->setName('mautic:transifex:pull')
@@ -55,17 +56,12 @@ EOT
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->translator->setLocale($this->coreParametersHelper->get('locale'));
-
         $options        = $input->getOptions();
         $languageFilter = $options['language'];
         $files          = $this->getLanguageFiles();
-        $translationDir = dirname($this->getContainer()->getParameter('kernel.root_dir')).'/translations/';
+        $translationDir = $this->pathsHelper->getTranslationsPath().'/';
 
         try {
             $transifex = $this->transifexFactory->getTransifex();
@@ -160,13 +156,13 @@ EOT
     /**
      * Returns Mautic translation files.
      *
-     * @return array
+     * @return array<string,string[]>
      */
-    private function getLanguageFiles()
+    private function getLanguageFiles(): array
     {
         $files         = [];
-        $mauticBundles = $this->getContainer()->getParameter('mautic.bundles');
-        $pluginBundles = $this->getContainer()->getParameter('mautic.plugin.bundles');
+        $mauticBundles = $this->coreParametersHelper->get('bundles');
+        $pluginBundles = $this->coreParametersHelper->get('plugin.bundles');
 
         foreach ($mauticBundles as $bundle) {
             // Parse the namespace into a filepath

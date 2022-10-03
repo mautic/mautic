@@ -255,7 +255,7 @@ class CampaignApiController extends CommonApiController
         ];
 
         return $this->forward(
-            'MauticCoreBundle:Api\StatsApi:list',
+            'Mautic\CoreBundle\Controller\Api\StatsApiController::listAction',
             [
                 'table'     => 'campaign_leads',
                 'itemsName' => 'contacts',

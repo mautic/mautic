@@ -163,7 +163,7 @@ class ThemeController extends FormController
 
         $response = new Response();
         $response->headers->set('Content-Type', 'application/octet-stream');
-        $response->headers->set('Content-Length', filesize($zipPath));
+        $response->headers->set('Content-Length', (string) filesize($zipPath));
 
         $stream = $this->request->get('stream', 0);
 
@@ -280,7 +280,7 @@ class ThemeController extends FormController
     {
         return [
             'returnUrl'       => $this->generateUrl('mautic_themes_index'),
-            'contentTemplate' => 'MauticCoreBundle:theme:index',
+            'contentTemplate' => 'Mautic\CoreBundle\Controller\themeController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_themes_index',
                 'mauticContent' => 'theme',

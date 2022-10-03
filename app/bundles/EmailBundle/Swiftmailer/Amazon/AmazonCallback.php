@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AmazonCallback
 {
@@ -45,8 +45,6 @@ class AmazonCallback
      */
     public function processCallbackRequest(Request $request)
     {
-        $this->logger->debug('Receiving webhook from Amazon');
-
         $payload = json_decode($request->getContent(), true);
 
         if (0 !== json_last_error()) {
@@ -59,6 +57,8 @@ class AmazonCallback
 
         // determine correct key for message type (global or via ConfigurationSet)
         $type = (array_key_exists('Type', $payload) ? $payload['Type'] : $payload['eventType']);
+
+        $this->logger->debug('Receiving webhook from Amazon', ['Type'=>$type]);
 
         return $this->processJsonPayload($payload, $type);
     }

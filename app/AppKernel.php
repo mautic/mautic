@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\QueueBundle\Queue\QueueProtocol;
@@ -35,8 +26,6 @@ class AppKernel extends Kernel
     private $parameterLoader;
 
     /**
-     * Constructor.
-     *
      * @param string $environment The environment
      * @param bool   $debug       Whether to enable debugging or not
      *
@@ -97,7 +86,7 @@ class AppKernel extends Kernel
          * If we've already sent the response headers, and we have a session
          * set in the request, set that as the session in the container.
          */
-        if (headers_sent() && $request->getSession()) {
+        if (headers_sent() && $request->hasSession()) {
             $this->getContainer()->set('session', $request->getSession());
         }
 
@@ -214,6 +203,7 @@ class AppKernel extends Kernel
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
             $bundles[] = new Webfactory\Bundle\ExceptionsBundle\WebfactoryExceptionsBundle();
             $bundles[] = new Fidry\PsyshBundle\PsyshBundle();
+            $bundles[] = new Symfony\Bundle\MakerBundle\MakerBundle();
         }
 
         if (in_array($this->getEnvironment(), ['test'])) {

@@ -349,7 +349,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param      $campaignId
+     * @param int  $campaignId
      * @param bool $campaignCanBeRestarted
      *
      * @return CountResult
@@ -371,7 +371,7 @@ class LeadRepository extends CommonRepository
             );
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter, true);
-        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb, $campaignCanBeRestarted);
+        $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
 
         if (!$campaignCanBeRestarted) {
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
@@ -383,10 +383,15 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param      $campaignId
+     * Get all contacts based on the campaigns segment
+     * a limit for how many contacts to process at one time
+     * and the campaign setting if a contact is allowed to restart
+     * a campaign.
+     *
+     * @param int  $campaignId
      * @param bool $campaignCanBeRestarted
      *
-     * @return array
+     * @return array<int|string, string>
      */
     public function getCampaignContactsBySegments($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false)
     {
@@ -405,7 +410,7 @@ class LeadRepository extends CommonRepository
             );
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter);
-        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb, $campaignCanBeRestarted);
+        $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
 
         if (!$campaignCanBeRestarted) {
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
@@ -537,25 +542,31 @@ class LeadRepository extends CommonRepository
         return $segments;
     }
 
-    /**
-     * @param $campaignId
-     */
-    private function updateQueryWithExistingMembershipExclusion($campaignId, QueryBuilder $qb, $campaignCanBeRestarted = false)
+    private function updateQueryWithExistingMembershipExclusion(int $campaignId, QueryBuilder $qb, bool $campaignCanBeRestarted = false)
     {
-        $membershipConditions = [
+        $membershipConditions = $qb->expr()->and(
             $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
-            $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
-        ];
+            $qb->expr()->eq('cl.campaign_id', (int) $campaignId)
+        );
 
         if ($campaignCanBeRestarted) {
-            $membershipConditions[] = $qb->expr()->eq('cl.manually_removed', 0);
+            $alreadyInCampaign           = $qb->expr()->eq('cl.manually_removed', 0);
+            $removedFromCampaignManually = $qb->expr()->and(
+                $qb->expr()->eq('cl.manually_removed', 1),
+                $qb->expr()->isNull('cl.date_last_exited'),
+            );
+
+            $membershipConditions = $qb->expr()->and(
+                $membershipConditions,
+                $qb->expr()->or($alreadyInCampaign, $removedFromCampaignManually)
+            );
         }
 
         $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
-                $qb->expr()->andX(...$membershipConditions)
+                $qb->expr()->andX($membershipConditions)
             );
 
         $qb->andWhere(
