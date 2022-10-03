@@ -16,10 +16,10 @@ class IntegrationsBundle extends AbstractPluginBundle
 {
     public function build(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new IntegrationsPass());
-        $container->addCompilerPass(new AuthenticationIntegrationPass());
-        $container->addCompilerPass(new SyncIntegrationsPass());
-        $container->addCompilerPass(new ConfigIntegrationPass());
-        $container->addCompilerPass(new BuilderIntegrationPass());
+        $container->addCompilerPass(new IntegrationsPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new AuthenticationIntegrationPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new SyncIntegrationsPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new ConfigIntegrationPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new BuilderIntegrationPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
     }
 }

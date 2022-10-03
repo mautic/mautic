@@ -31,12 +31,4 @@ class TimezoneType extends AbstractType
     {
         return ChoiceType::class;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'timezone';
-    }
 }

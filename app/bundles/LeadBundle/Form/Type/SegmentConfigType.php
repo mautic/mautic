@@ -28,12 +28,4 @@ class SegmentConfigType extends AbstractType
             ]
         );
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'segment_config';
-    }
 }
