@@ -31,22 +31,7 @@ return [
             ],
             RouteProvider::ROUTE_CLEAR_CACHE => [
                 'path'       => '/marketplace/clear/cache',
-                'controller' => 'MarketplaceBundle:Cache:clear',
-                'method'     => 'GET',
-            ],
-            RouteProvider::ROUTE_INSTALL => [
-                'path'       => '/marketplace/install/{vendor}/{package}',
-                'controller' => 'MarketplaceBundle:Package\Install:view',
-                'method'     => 'GET|POST',
-            ],
-            RouteProvider::ROUTE_REMOVE => [
-                'path'       => '/marketplace/remove/{vendor}/{package}',
-                'controller' => 'MarketplaceBundle:Package\Remove:view',
-                'method'     => 'GET|POST',
-            ],
-            RouteProvider::ROUTE_CLEAR_CACHE => [
-                'path'       => '/marketplace/clear/cache',
-                'controller' => 'MarketplaceBundle:Cache:clear',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\CacheController::clearAction',
                 'method'     => 'GET',
             ],
         ],
