@@ -55,8 +55,6 @@ final class MauticReportBuilderTest extends TestCase
 
     public function testColumnSanitization(): void
     {
-        $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
-
         $report = new Report();
         $report->setColumns(['a.b', 'b.c']);
         $builder = $this->buildBuilder($report);
@@ -268,7 +266,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
 
         Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `l`.`id`, `l`.`email` WHERE (l.id IN (SELECT DISTINCT lead_id FROM lead_tags_xref ltx WHERE ltx.tag_id IN (1, 2))) AND (l.id NOT IN (SELECT DISTINCT lead_id FROM lead_tags_xref ltx WHERE ltx.tag_id IN (3)))
+            SELECT `l`.`id`, `l`.`email` WHERE (l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 2))) AND (l.id NOT IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (3)))
         ')), $query->getSql());
     }
 
