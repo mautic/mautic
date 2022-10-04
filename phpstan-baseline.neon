@@ -35716,11 +35716,6 @@ parameters:
 			path: app/bundles/InstallBundle/Tests/Install/InstallServiceTest.php
 
 		-
-			message: "#^Method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:getParameter\\(\\) has invalid return type UnitEnum\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
-
-		-
 			message: "#^Method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:getParameter\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
@@ -35737,11 +35732,6 @@ parameters:
 
 		-
 			message: "#^Method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:setParameter\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
-
-		-
-			message: "#^Parameter \\$value of method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:setParameter\\(\\) has invalid type UnitEnum\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
 
@@ -55881,16 +55871,6 @@ parameters:
 			path: app/bundles/PageBundle/Model/TrackableModel.php
 
 		-
-			message: "#^Method Mautic\\\\PageBundle\\\\Model\\\\TrackableModel\\:\\:prepareUrlForTracking\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
-			message: "#^Method Mautic\\\\PageBundle\\\\Model\\\\TrackableModel\\:\\:prepareUrlForTracking\\(\\) has parameter \\$url with no type specified\\.$#"
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
 			message: "#^Method Mautic\\\\PageBundle\\\\Model\\\\TrackableModel\\:\\:validateTokenIsTrackable\\(\\) has parameter \\$token with no type specified\\.$#"
 			count: 1
 			path: app/bundles/PageBundle/Model/TrackableModel.php
@@ -55912,11 +55892,6 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @return has invalid value \\(array\\[\\$tokenizedParams\\[\\], \\$untokenizedParams\\[\\]\\]\\)\\: Unexpected token \"\\[\", expected TOKEN_HORIZONTAL_WS at offset 140$#"
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(array\\[\\$trackingKey, \\$trackingUrl\\]\\|false\\)\\: Unexpected token \"\\[\", expected TOKEN_HORIZONTAL_WS at offset 102$#"
 			count: 1
 			path: app/bundles/PageBundle/Model/TrackableModel.php
 
