@@ -830,6 +830,7 @@ return [
                     'mautic.lead.model.dnc',
                     'mautic.email.helper.stats_collection',
                     'mautic.security',
+                    'doctrine.dbal.default_connection',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [
