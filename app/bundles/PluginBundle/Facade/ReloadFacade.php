@@ -4,7 +4,7 @@ namespace Mautic\PluginBundle\Facade;
 
 use Mautic\PluginBundle\Helper\ReloadHelper;
 use Mautic\PluginBundle\Model\PluginModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReloadFacade
 {
@@ -38,11 +38,9 @@ class ReloadFacade
         $enabledPlugins          = $this->reloadHelper->enableFoundPlugins($plugins, $installedPlugins);
         $updatedPlugins          = $this->reloadHelper->updatePlugins($plugins, $installedPlugins, $pluginMetadata, $installedPluginsSchemas);
         $installedPlugins        = $this->reloadHelper->installPlugins($plugins, $installedPlugins, $pluginMetadata, $installedPluginsSchemas);
-        $persist                 = array_values($disabledPlugins + $enabledPlugins + $updatedPlugins + $installedPlugins);
+        $persist                 = array_values((array) ($disabledPlugins + $enabledPlugins + $updatedPlugins + $installedPlugins));
 
-        if (!empty($persist)) {
-            $this->pluginModel->saveEntities($persist);
-        }
+        $this->pluginModel->saveEntities($persist);
 
         // Alert the user to the number of additions
         return $this->translator->trans(

@@ -15,6 +15,15 @@ return [
                 ],
             ],
         ],
+        'commands' => [
+            'mautic.queue.command.fetch_leads' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\QueueBundle\Command\ConsumeQueueCommand::class,
+                'arguments' => [
+                    'mautic.queue.service',
+                ],
+            ],
+        ],
         'other' => [
             'mautic.queue.service' => [
                 'class'     => \Mautic\QueueBundle\Queue\QueueService::class,

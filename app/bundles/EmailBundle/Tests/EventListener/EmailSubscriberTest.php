@@ -12,7 +12,7 @@ use Mautic\EmailBundle\Event\QueueEmailEvent;
 use Mautic\EmailBundle\EventListener\EmailSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 {

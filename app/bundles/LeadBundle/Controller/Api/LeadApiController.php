@@ -690,6 +690,6 @@ class LeadApiController extends CommonApiController
     {
         $form->submit($data, 'PATCH' !== $this->request->getMethod());
 
-        return $form->isValid();
+        return $form->isSubmitted() && $form->isValid();
     }
 }

@@ -155,7 +155,7 @@ class InstallController extends CommonController
 
                             return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1.2]));
                         case 2:
-                            $messages = $this->installer->createFixturesStep($this->container);
+                            $messages = $this->installer->createFixturesStep();
                             if (!empty($messages)) {
                                 $this->handleInstallerErrors($form, $messages);
 

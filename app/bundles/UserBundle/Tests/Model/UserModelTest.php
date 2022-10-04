@@ -3,6 +3,7 @@
 namespace Mautic\UserBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
@@ -13,7 +14,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserModelTest extends TestCase
 {
@@ -66,7 +67,7 @@ class UserModelTest extends TestCase
         $this->entityManager    = $this->createMock(EntityManager::class);
         $this->user             = $this->createMock(User::class);
         $this->router           = $this->createMock(Router::class);
-        $this->translator       = $this->createMock(TranslatorInterface::class);
+        $this->translator       = $this->createMock(Translator::class);
         $this->userToken        = $this->createMock(UserToken::class);
         $this->logger           = $this->createMock(Logger::class);
 
