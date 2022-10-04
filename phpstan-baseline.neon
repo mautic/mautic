@@ -421,11 +421,6 @@ parameters:
 			path: app/bundles/ApiBundle/Controller/CommonApiController.php
 
 		-
-			message: "#^Parameter \\#3 \\$referenceType of method Symfony\\\\Bundle\\\\FrameworkBundle\\\\Controller\\\\AbstractController\\:\\:generateUrl\\(\\) expects int, true given\\.$#"
-			count: 1
-			path: app/bundles/ApiBundle/Controller/CommonApiController.php
-
-		-
 			message: "#^Parameter \\#6 \\$entity of method Mautic\\\\ApiBundle\\\\Controller\\\\CommonApiController\\:\\:setBatchError\\(\\) expects null, mixed given\\.$#"
 			count: 1
 			path: app/bundles/ApiBundle/Controller/CommonApiController.php
@@ -1369,6 +1364,11 @@ parameters:
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: app/bundles/AssetBundle/Controller/AjaxController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\AssetBundle\\\\Controller\\\\Api\\\\AssetApiController\\:\\:get\\(\\)\\.$#"
+			count: 1
+			path: app/bundles/AssetBundle/Controller/Api/AssetApiController.php
 
 		-
 			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Model\\\\AbstractCommonModel\\:\\:generateUrl\\(\\)\\.$#"
@@ -2941,9 +2941,14 @@ parameters:
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
 		-
-			message: "#^Parameter \\#3 \\$referenceType of method Symfony\\\\Bundle\\\\FrameworkBundle\\\\Controller\\\\AbstractController\\:\\:generateUrl\\(\\) expects int, true given\\.$#"
+			message: "#^Call to an undefined method Mautic\\\\CampaignBundle\\\\Controller\\\\Api\\\\EventApiController\\:\\:generateUrl\\(\\)\\.$#"
 			count: 1
-			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
+			path: app/bundles/CampaignBundle/Controller/Api/EventApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\CampaignBundle\\\\Controller\\\\Api\\\\EventApiController\\:\\:get\\(\\)\\.$#"
+			count: 3
+			path: app/bundles/CampaignBundle/Controller/Api/EventApiController.php
 
 		-
 			message: "#^Call to method getRepository\\(\\) on an unknown class Mautic\\\\LeadBundle\\\\Controller\\\\LeadModel\\.$#"
@@ -2999,6 +3004,16 @@ parameters:
 			message: "#^PHPDoc tag @var for variable \\$model contains unknown class Mautic\\\\LeadBundle\\\\Controller\\\\LeadModel\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Controller/Api/EventApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\CampaignBundle\\\\Controller\\\\Api\\\\EventLogApiController\\:\\:generateUrl\\(\\)\\.$#"
+			count: 1
+			path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\CampaignBundle\\\\Controller\\\\Api\\\\EventLogApiController\\:\\:get\\(\\)\\.$#"
+			count: 3
+			path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
 
 		-
 			message: "#^Call to method getRepository\\(\\) on an unknown class Mautic\\\\LeadBundle\\\\Controller\\\\LeadModel\\.$#"
@@ -6254,6 +6269,11 @@ parameters:
 			message: "#^PHPDoc tag @var above foreach loop does not specify variable name\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Executioner/EventExecutioner.php
+
+		-
+			message: "#^Argument of an invalid type int supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: app/bundles/CampaignBundle/Executioner/Helper/InactiveHelper.php
 
 		-
 			message: "#^Argument of an invalid type int supplied for foreach, only iterables are supported\\.$#"
@@ -11286,6 +11306,16 @@ parameters:
 			path: app/bundles/CoreBundle/Controller/Api/StatsApiController.php
 
 		-
+			message: "#^Access to an undefined property Mautic\\\\CoreBundle\\\\Controller\\\\Api\\\\ThemeApiController\\:\\:\\$container\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/Controller/Api/ThemeApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Controller\\\\Api\\\\ThemeApiController\\:\\:get\\(\\)\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/Controller/Api/ThemeApiController.php
+
+		-
 			message: "#^Call to method delete\\(\\) on an unknown class Mautic\\\\CoreBundle\\\\Controller\\\\Api\\\\Mautic\\\\CoreBundle\\\\Helper\\\\ThemeHelper\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Controller/Api/ThemeApiController.php
@@ -11991,9 +12021,19 @@ parameters:
 			path: app/bundles/CoreBundle/Doctrine/AbstractMauticMigration.php
 
 		-
+			message: "#^PHPDoc type string of property Mautic\\\\CoreBundle\\\\Doctrine\\\\AbstractMauticMigration\\:\\:\\$platform is not covariant with PHPDoc type Doctrine\\\\DBAL\\\\Platforms\\\\AbstractPlatform of overridden property Doctrine\\\\Migrations\\\\AbstractMigration\\:\\:\\$platform\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/Doctrine/AbstractMauticMigration.php
+
+		-
 			message: "#^Property Mautic\\\\CoreBundle\\\\Doctrine\\\\AbstractMauticMigration\\:\\:\\$supported type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Doctrine/AbstractMauticMigration.php
+
+		-
+			message: "#^Call to __construct\\(\\) on an existing object is not allowed\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/Doctrine/Connection/ConnectionWrapper.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Doctrine\\\\Connection\\\\ConnectionWrapper\\:\\:initConnection\\(\\) has parameter \\$dbParams with no value type specified in iterable type array\\.$#"
@@ -13169,6 +13209,11 @@ parameters:
 			message: "#^Property Mautic\\\\CoreBundle\\\\Entity\\\\IpAddress\\:\\:\\$id is never written, only read\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Entity/IpAddress.php
+
+		-
+			message: "#^Parameter \\#2 \\$array of function implode expects array\\<string\\>, array\\<int, array\\<int\\>\\> given\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/Entity/IpAddressRepository.php
 
 		-
 			message: "#^Parameter \\#2 \\$array of function implode expects array\\<string\\>, array\\<int, array\\<int\\>\\> given\\.$#"
@@ -14397,6 +14442,11 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Event\\\\TokenReplacementEvent\\:\\:setContent\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/Event/TokenReplacementEvent.php
+
+		-
+			message: "#^PHPDoc type Mautic\\\\CoreBundle\\\\Entity\\\\CommonEntity\\|string of property Mautic\\\\CoreBundle\\\\Event\\\\TokenReplacementEvent\\:\\:\\$entity is not covariant with PHPDoc type object of overridden property Mautic\\\\CoreBundle\\\\Event\\\\CommonEvent\\:\\:\\$entity\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Event/TokenReplacementEvent.php
 
@@ -16767,6 +16817,11 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\DateTimeHelper\\:\\:validateMysqlDateTimeUnit\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/Helper/DateTimeHelper.php
+
+		-
+			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Helper/DateTimeHelper.php
 
@@ -21376,6 +21431,11 @@ parameters:
 			path: app/bundles/DashboardBundle/Controller/Api/WidgetApiController.php
 
 		-
+			message: "#^Call to an undefined method Mautic\\\\DashboardBundle\\\\Controller\\\\Api\\\\WidgetApiController\\:\\:get\\(\\)\\.$#"
+			count: 1
+			path: app/bundles/DashboardBundle/Controller/Api/WidgetApiController.php
+
+		-
 			message: "#^Parameter \\#1 \\$data of method Mautic\\\\ApiBundle\\\\Controller\\\\CommonApiController\\:\\:view\\(\\) expects null, array\\<string, array\\|int\\> given\\.$#"
 			count: 1
 			path: app/bundles/DashboardBundle/Controller/Api/WidgetApiController.php
@@ -23423,6 +23483,16 @@ parameters:
 		-
 			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Model\\\\AbstractCommonModel\\:\\:sendEmailToLists\\(\\)\\.$#"
 			count: 1
+			path: app/bundles/EmailBundle/Controller/Api/EmailApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\EmailBundle\\\\Controller\\\\Api\\\\EmailApiController\\:\\:generateUrl\\(\\)\\.$#"
+			count: 1
+			path: app/bundles/EmailBundle/Controller/Api/EmailApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\EmailBundle\\\\Controller\\\\Api\\\\EmailApiController\\:\\:get\\(\\)\\.$#"
+			count: 5
 			path: app/bundles/EmailBundle/Controller/Api/EmailApiController.php
 
 		-
@@ -32231,6 +32301,16 @@ parameters:
 			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
 
 		-
+			message: "#^Call to an undefined method Mautic\\\\FormBundle\\\\Controller\\\\Api\\\\FormApiController\\:\\:generateUrl\\(\\)\\.$#"
+			count: 1
+			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\FormBundle\\\\Controller\\\\Api\\\\FormApiController\\:\\:get\\(\\)\\.$#"
+			count: 2
+			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
+
+		-
 			message: "#^Method Mautic\\\\FormBundle\\\\Controller\\\\Api\\\\FormApiController\\:\\:createActionEntityForm\\(\\) has parameter \\$action with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
@@ -34592,6 +34672,11 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$entityName of method Doctrine\\\\ORM\\\\EntityManager\\:\\:getRepository\\(\\) expects class\\-string\\<MauticFormBundle\\:Form\\>, string given\\.$#"
+			count: 1
+			path: app/bundles/FormBundle/Model/FormModel.php
+
+		-
+			message: "#^Variable \\$pages in empty\\(\\) always exists and is not falsy\\.$#"
 			count: 1
 			path: app/bundles/FormBundle/Model/FormModel.php
 
@@ -37681,6 +37766,16 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
 
 		-
+			message: "#^Call to an undefined method Mautic\\\\LeadBundle\\\\Controller\\\\Api\\\\CompanyApiController\\:\\:generateUrl\\(\\)\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\LeadBundle\\\\Controller\\\\Api\\\\CompanyApiController\\:\\:get\\(\\)\\.$#"
+			count: 3
+			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
+
+		-
 			message: "#^Call to method getRepository\\(\\) on an unknown class Mautic\\\\LeadBundle\\\\Controller\\\\LeadModel\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
@@ -37801,6 +37896,16 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
 
 		-
+			message: "#^Call to an undefined method Mautic\\\\LeadBundle\\\\Controller\\\\Api\\\\DeviceApiController\\:\\:generateUrl\\(\\)\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/Controller/Api/DeviceApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\LeadBundle\\\\Controller\\\\Api\\\\DeviceApiController\\:\\:get\\(\\)\\.$#"
+			count: 3
+			path: app/bundles/LeadBundle/Controller/Api/DeviceApiController.php
+
+		-
 			message: "#^Call to method getRepository\\(\\) on an unknown class Mautic\\\\LeadBundle\\\\Controller\\\\LeadModel\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/DeviceApiController.php
@@ -37871,6 +37976,11 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/Api/FieldApiController.php
 
 		-
+			message: "#^Call to an undefined method Mautic\\\\LeadBundle\\\\Controller\\\\Api\\\\FieldApiController\\:\\:get\\(\\)\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/Controller/Api/FieldApiController.php
+
+		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Controller\\\\Api\\\\FieldApiController\\:\\:getWhereFromRequest\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/FieldApiController.php
@@ -37898,6 +38008,16 @@ parameters:
 		-
 			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Model\\\\AbstractCommonModel\\:\\:getFieldListWithProperties\\(\\)\\.$#"
 			count: 1
+			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\LeadBundle\\\\Controller\\\\Api\\\\LeadApiController\\:\\:get\\(\\)\\.$#"
+			count: 18
+			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\LeadBundle\\\\Controller\\\\Api\\\\LeadApiController\\:\\:getDoctrine\\(\\)\\.$#"
+			count: 3
 			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
 
 		-
@@ -38181,11 +38301,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
 
 		-
-			message: "#^Parameter \\#1 \\$className of method Doctrine\\\\Persistence\\\\ObjectManager\\:\\:getRepository\\(\\) expects class\\-string\\<MauticCampaignBundle\\:LeadEventLog\\>, string given\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
 			message: "#^Parameter \\#1 \\$data of method Mautic\\\\ApiBundle\\\\Controller\\\\CommonApiController\\:\\:view\\(\\) expects null, array given\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
@@ -38273,6 +38388,16 @@ parameters:
 		-
 			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Model\\\\AbstractCommonModel\\:\\:removeFromLists\\(\\)\\.$#"
 			count: 1
+			path: app/bundles/LeadBundle/Controller/Api/ListApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\LeadBundle\\\\Controller\\\\Api\\\\ListApiController\\:\\:generateUrl\\(\\)\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/Controller/Api/ListApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\LeadBundle\\\\Controller\\\\Api\\\\ListApiController\\:\\:get\\(\\)\\.$#"
+			count: 3
 			path: app/bundles/LeadBundle/Controller/Api/ListApiController.php
 
 		-
@@ -38414,6 +38539,11 @@ parameters:
 			message: "#^PHPDoc tag @var for variable \\$model contains unknown class Mautic\\\\LeadBundle\\\\Controller\\\\LeadModel\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/NoteApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\LeadBundle\\\\Controller\\\\Api\\\\TagApiController\\:\\:get\\(\\)\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/Controller/Api/TagApiController.php
 
 		-
 			message: "#^Cannot call method getTagByNameOrCreateNewOne\\(\\) on bool\\|Mautic\\\\CoreBundle\\\\Entity\\\\CommonRepository\\.$#"
@@ -42171,6 +42301,21 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/LeadFieldRepository.php
 
 		-
+			message: "#^Parameter \\#3 \\$conditionType of method Doctrine\\\\ORM\\\\QueryBuilder\\:\\:join\\(\\) expects 'ON'\\|'WITH'\\|null, 'u' given\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/Entity/LeadFieldRepository.php
+
+		-
+			message: "#^Parameter \\#3 \\$conditionType of method Doctrine\\\\ORM\\\\QueryBuilder\\:\\:leftJoin\\(\\) expects 'ON'\\|'WITH'\\|null, 'companies_lead' given\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/Entity/LeadFieldRepository.php
+
+		-
+			message: "#^Parameter \\#3 \\$conditionType of method Doctrine\\\\ORM\\\\QueryBuilder\\:\\:leftJoin\\(\\) expects 'ON'\\|'WITH'\\|null, 'company' given\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/Entity/LeadFieldRepository.php
+
+		-
 			message: "#^Return type \\(string\\) of method Mautic\\\\LeadBundle\\\\Entity\\\\LeadFieldRepository\\:\\:getDefaultOrder\\(\\) should be compatible with return type \\(array\\) of method Mautic\\\\CoreBundle\\\\Entity\\\\CommonRepository\\:\\:getDefaultOrder\\(\\)$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadFieldRepository.php
@@ -44581,6 +44726,11 @@ parameters:
 			path: app/bundles/LeadBundle/EventListener/LeadSubscriber.php
 
 		-
+			message: "#^Variable \\$details in empty\\(\\) always exists and is not falsy\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/EventListener/LeadSubscriber.php
+
+		-
 			message: "#^Variable \\$entries in PHPDoc tag @var does not match assigned variable \\$rows\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/EventListener/LeadSubscriber.php
@@ -46791,6 +46941,11 @@ parameters:
 			path: app/bundles/LeadBundle/Model/DeviceModel.php
 
 		-
+			message: "#^Variable \\$action in empty\\(\\) always exists and is always falsy\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/Model/DeviceModel.php
+
+		-
 			message: "#^Call to function is_array\\(\\) with string will always evaluate to false\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Model/DoNotContact.php
@@ -48257,6 +48412,11 @@ parameters:
 
 		-
 			message: "#^Property Mautic\\\\LeadBundle\\\\Model\\\\ListModel\\:\\:\\$leadChangeLists type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/Model/ListModel.php
+
+		-
+			message: "#^Variable \\$action in empty\\(\\) always exists and is always falsy\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Model/ListModel.php
 
@@ -57646,6 +57806,11 @@ parameters:
 			path: app/bundles/PluginBundle/Helper/EventHelper.php
 
 		-
+			message: "#^Argument of an invalid type string supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: app/bundles/PluginBundle/Helper/EventHelper.php
+
+		-
 			message: "#^Call to an undefined method Doctrine\\\\ORM\\\\EntityRepository\\<MauticLeadBundle\\:Lead\\>\\:\\:getEntityWithPrimaryCompany\\(\\)\\.$#"
 			count: 1
 			path: app/bundles/PluginBundle/Helper/EventHelper.php
@@ -59201,6 +59366,16 @@ parameters:
 			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
 
 		-
+			message: "#^Call to an undefined method Mautic\\\\PointBundle\\\\Controller\\\\Api\\\\PointApiController\\:\\:generateUrl\\(\\)\\.$#"
+			count: 1
+			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\PointBundle\\\\Controller\\\\Api\\\\PointApiController\\:\\:get\\(\\)\\.$#"
+			count: 5
+			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
+
+		-
 			message: "#^Call to method getRepository\\(\\) on an unknown class Mautic\\\\LeadBundle\\\\Controller\\\\LeadModel\\.$#"
 			count: 1
 			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
@@ -60591,6 +60766,11 @@ parameters:
 			path: app/bundles/ReportBundle/Controller/AjaxController.php
 
 		-
+			message: "#^Access to an undefined property Mautic\\\\ReportBundle\\\\Controller\\\\Api\\\\ReportApiController\\:\\:\\$container\\.$#"
+			count: 1
+			path: app/bundles/ReportBundle/Controller/Api/ReportApiController.php
+
+		-
 			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Model\\\\AbstractCommonModel\\:\\:getReportData\\(\\)\\.$#"
 			count: 1
 			path: app/bundles/ReportBundle/Controller/Api/ReportApiController.php
@@ -60752,6 +60932,11 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\ReportBundle\\\\Controller\\\\ScheduleController\\:\\:indexAction\\(\\) has parameter \\$scheduleUnit with no type specified\\.$#"
+			count: 1
+			path: app/bundles/ReportBundle/Controller/ScheduleController.php
+
+		-
+			message: "#^Variable \\$report in empty\\(\\) always exists and is not falsy\\.$#"
 			count: 1
 			path: app/bundles/ReportBundle/Controller/ScheduleController.php
 
@@ -62651,6 +62836,21 @@ parameters:
 			path: app/bundles/SmsBundle/Controller/AjaxController.php
 
 		-
+			message: "#^Variable \\$option in empty\\(\\) always exists and is not falsy\\.$#"
+			count: 1
+			path: app/bundles/SmsBundle/Controller/AjaxController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\SmsBundle\\\\Controller\\\\Api\\\\SmsApiController\\:\\:generateUrl\\(\\)\\.$#"
+			count: 1
+			path: app/bundles/SmsBundle/Controller/Api/SmsApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\SmsBundle\\\\Controller\\\\Api\\\\SmsApiController\\:\\:get\\(\\)\\.$#"
+			count: 8
+			path: app/bundles/SmsBundle/Controller/Api/SmsApiController.php
+
+		-
 			message: "#^Call to method getRepository\\(\\) on an unknown class Mautic\\\\LeadBundle\\\\Controller\\\\LeadModel\\.$#"
 			count: 1
 			path: app/bundles/SmsBundle/Controller/Api/SmsApiController.php
@@ -63953,6 +64153,16 @@ parameters:
 		-
 			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Model\\\\AbstractCommonModel\\:\\:removeFromStages\\(\\)\\.$#"
 			count: 1
+			path: app/bundles/StageBundle/Controller/Api/StageApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\StageBundle\\\\Controller\\\\Api\\\\StageApiController\\:\\:generateUrl\\(\\)\\.$#"
+			count: 1
+			path: app/bundles/StageBundle/Controller/Api/StageApiController.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\StageBundle\\\\Controller\\\\Api\\\\StageApiController\\:\\:get\\(\\)\\.$#"
+			count: 3
 			path: app/bundles/StageBundle/Controller/Api/StageApiController.php
 
 		-
@@ -67059,6 +67269,11 @@ parameters:
 			message: "#^Method Mautic\\\\WebhookBundle\\\\EventListener\\\\WebhookSubscriber\\:\\:onWebhookSave\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/WebhookBundle/EventListener/WebhookSubscriber.php
+
+		-
+			message: "#^Cannot assign new offset to Doctrine\\\\ORM\\\\PersistentCollection\\.$#"
+			count: 1
+			path: app/bundles/WebhookBundle/Form/DataTransformer/EventsToArrayTransformer.php
 
 		-
 			message: "#^Method Mautic\\\\WebhookBundle\\\\Form\\\\DataTransformer\\\\EventsToArrayTransformer\\:\\:reverseTransform\\(\\) return type with generic class Doctrine\\\\ORM\\\\PersistentCollection does not specify its types\\: TKey, T$#"
